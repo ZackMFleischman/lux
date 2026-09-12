@@ -162,5 +162,9 @@ app.whenReady().then(async () => {
   mainWindow.webContents.on('console-message', details => console.log('Studio:', details.message));
   await mainWindow.loadFile(page); mainWindow.show();
 }).catch(error => { console.error('Studio startup failed:', error); app.exit(1); });
-app.on('second-instance', () => mainWindow?.focus());
+app.on('second-instance', () => {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.show(); mainWindow.focus();
+});
 app.on('window-all-closed', () => app.quit());
