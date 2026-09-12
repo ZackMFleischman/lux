@@ -43,9 +43,17 @@ storage is separate from installed playback. Runtime packaging must include all
 three installed-runtime CJS modules, rebuilt render-host main/worker files, the
 descriptor-aware source DLL and native texture addon. Rebuild/export creates a
 new runtime hash; do not patch files inside an existing installed runtime.
+The source DLL statically links its C++ runtime so registration does not depend
+on Resolume's DLL search finding a matching VC redistributable. Export and
+registration can use `assertRuntimeCapabilities` to reject probe-only DLLs,
+old addons and old emitted render-host main files without loading their code.
+These protocol markers detect stale builds; complete package hashes remain the
+integrity check.
 
 CPU validation: registry isolation, rejected identity changes, bounded capacity,
 retry limits, native descriptor parsing, and the existing native ownership,
-control and lifecycle suite. No installed producer, GPU or Resolume launch was
+control and lifecycle suite. A metadata-only scan in a disposable CPU process
+also checks the real copied DLL's release ID/name and canonical 0.5 default;
+it does not call InitGL. No installed producer, GPU or Resolume launch was
 performed for this checkpoint. Cold reopen, duplicate/different source playback,
 first accepted pixels, performance and live shutdown remain root QA gates.

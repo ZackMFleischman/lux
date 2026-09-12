@@ -1,8 +1,12 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { InstanceRegistry, validateRequest } = require('../../apps/installed-runtime/src/registry.cjs');
+const { InstanceRegistry, validateRequest, sameInstalledPath } = require('../../apps/installed-runtime/src/registry.cjs');
 const runtimeId = 'a'.repeat(64), releaseId = 'b'.repeat(64);
 const request = instanceId => ({ version: 1, runtimeId, releaseId, instanceId, hostPid: 42 });
+test('installed Windows paths tolerate casing while rejecting a different directory', () => {
+  assert.equal(sameInstalledPath('C:/Users/Author/Lux/Installed', 'c:/users/author/lux/installed'), true);
+  assert.equal(sameInstalledPath('C:/Users/Author/Lux/Installed', 'C:/Users/Other/Lux/Installed'), false);
+});
 test('installed copies own independent producers and removal stops only its producer', async () => {
   const stopped = [], started = [];
   const registry = new InstanceRegistry({runtimeId, start: async value => { started.push(value); return {stop: async () => stopped.push(value.instanceId)}; }});

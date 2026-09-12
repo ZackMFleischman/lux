@@ -9,6 +9,7 @@
 #include "shared_ring.h"
 #include "installed_process.h"
 using Microsoft::WRL::ComPtr;
+extern "C" __declspec(dllexport) const char LuxInstalledProducerProtocol[]="lux-installed-producer-protocol-v1";
 namespace {
 struct Slot {
   ComPtr<ID3D11Texture2D> source, owned;

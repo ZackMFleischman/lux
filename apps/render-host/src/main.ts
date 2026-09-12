@@ -1,4 +1,5 @@
 const installed = (globalThis as any).luxInstalledContext;
+if (installed && installed.protocol !== 'lux-installed-render-host-v1') throw Error('Installed render-host protocol mismatch');
 if (!installed && (!process.env.LUX_EXPERIMENT_RUN_ID || process.env.LUX_EXPERIMENT_MODE !== 'hardware')) {
   throw Error('Reviewed experiment supervisor required');
 }
