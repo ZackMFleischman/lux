@@ -39,7 +39,9 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const subscribe = useCallback((listener: () => void) => client.subscribe(listener), [client]);
   const getSnapshot = useCallback(() => client.getSnapshot(), [client]);
   const snapshot = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-  const controller = useMemo(() => new StudioController(client), [client]);
+  const owner = controlOwner(snapshot);
+  // A rejected old-target write must not discard a new runtime's queued input.
+  const controller = useMemo(() => new StudioController(client), [client, owner]);
   const [windowState, setWindowState] = useState<WindowState>({ detached: false, fullscreen: false });
   const [maximized, setMaximized] = useState(false);
   const [pendingCommands, setPendingCommands] = useState(0);
@@ -52,7 +54,6 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const intensityIntent = useRef<{ owner: string } | null>(null);
   const runtime = snapshot.authoring;
   const available = snapshot.connection === 'connected' && runtime?.authority === 'studio';
-  const owner = controlOwner(snapshot);
   useEffect(() => {
     // Runtime status can confirm earlier points while a drag has moved ahead.
     // Keep local input until the coalesced write drain settles for this target.

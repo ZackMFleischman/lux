@@ -174,6 +174,29 @@ test('RTL: rejected slider input restores confirmed value and replacement ignore
   assert.equal(screen.queryByText('Old revision rejected'), null);
 });
 
+test('RTL: a replaced runtime has an independent input queue while old writes are pending', async () => {
+  const fixture = service();
+  const pending: Array<{ resolve(): void; reject(reason: Error): void }> = [];
+  fixture.client.invoke = operation => {
+    fixture.calls.push(operation);
+    return new Promise((resolve, reject) => pending.push({ resolve: () => {
+      if (operation.name === 'lux.parameters.set') fixture.publish(operation.input.values);
+      resolve({});
+    }, reject }));
+  };
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+  const slider = screen.getByRole('slider') as HTMLInputElement;
+  fireEvent.change(slider, { target: { value: '0.8' } });
+  await act(async () => fixture.publish({ revisionId: 'new-revision', intensity: 0.2 }));
+  fireEvent.change(slider, { target: { value: '0.4' } });
+  assert.equal(fixture.calls.length, 2, 'new runtime input cannot queue behind the obsolete target');
+  await act(async () => pending[1]!.resolve());
+  assert.equal(slider.value, '0.4');
+  await act(async () => pending[0]!.reject(Error('Obsolete revision')));
+  assert.equal(slider.value, '0.4');
+  assert.equal(screen.queryByRole('alert'), null);
+});
+
 test('RTL: Escape exits native fullscreen even before its state notification arrives', async () => {
   const values: boolean[] = [];
   const windows = { getState: async () => ({ detached: false, fullscreen: false }), subscribe: () => () => {},
