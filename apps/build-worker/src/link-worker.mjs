@@ -8,6 +8,7 @@ import { assertResultBudgets } from './result-budget.mjs';
 import { violation, limits } from './source-policy.mjs';
 import { verifyArtifact, linkedBody } from './artifact-identity.mjs';
 import { readBoundedJson } from './bounded-json.mjs';
+import { sdkSourceFile } from './sdk-selection.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -16,13 +17,15 @@ async function link() {
   const { artifact:raw, dependencyRoot } = await readBoundedJson(process.argv[2],limits.requestBytes);
   assertResultBudgets({ ok: true, artifact:raw, diagnostics: [] });
   const artifact=await verifyArtifact(raw,hash);
-  if (artifact.sdkVersion !== '0.1.0' || artifact.compilerVersion !== '7.0.2') fail('Unsupported compiler or SDK identity');
+  const selectedSdk = sdkSourceFile(artifact.sdkVersion);
+  if (artifact.compilerVersion !== '7.0.2') fail('Unsupported compiler identity');
   const moduleKeys = Object.keys(artifact.modules), folded = new Set();
   for (const key of moduleKeys) {
     if (key.length > 240 || !/^(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.js$/.test(key) || folded.has(key.toLowerCase()) || typeof artifact.modules[key] !== 'string') fail('Invalid virtual module path');
     folded.add(key.toLowerCase());
   }
   if (!Object.hasOwn(artifact.modules, artifact.entry) || !Object.hasOwn(artifact.modules, '__lux/sdk.js')) fail('Missing entry or emitted SDK module');
+  if (artifact.artifactVersion===3 && !Object.hasOwn(artifact.modules, '__lux/parameters.js')) fail('Missing SDK parameter policy module');
   const { default: getExePath } = await import(pathToFileURL(join(dependencyRoot, 'typescript/lib/getExePath.js')).href);
   const known = {
     'typescript/package.json': join(dependencyRoot, 'typescript/package.json'),
@@ -34,8 +37,12 @@ async function link() {
     'compiler/result-budget.mjs': join(root, 'apps/build-worker/src/result-budget.mjs'),
     'compiler/artifact-identity.mjs': join(root, 'apps/build-worker/src/artifact-identity.mjs'),
     'compiler/bounded-json.mjs': join(root, 'apps/build-worker/src/bounded-json.mjs'),
+    'compiler/sdk-selection.mjs': join(root, 'apps/build-worker/src/sdk-selection.mjs'),
+    'compiler/parameter-declarations.mjs': join(root, 'apps/build-worker/src/parameter-declarations.mjs'),
+    'contracts/parameters.mjs': join(root, 'packages/runtime-contracts/src/parameters.mjs'),
+    'contracts/parameters.d.mts': join(root, 'packages/runtime-contracts/src/parameters.d.mts'),
     'assets/index.mjs': join(root, 'packages/assets/src/index.mjs'),
-    'node/executable': process.execPath, 'sdk/index.ts': join(root, 'packages/visual-sdk/src/index.ts'),
+    'node/executable': process.execPath, [`sdk/${selectedSdk}`]: join(root, 'packages/visual-sdk/src', selectedSdk),
     'sdk/metadata.mjs': join(root, 'packages/visual-sdk/src/metadata.mjs'),
     'contracts/index.ts': join(root, 'packages/runtime-contracts/src/index.ts'),
     'typescript/compiler': getExePath(),
@@ -119,7 +126,8 @@ async function link() {
   const code = output.outputFiles.find(f => f.path.endsWith('linked.js')).text;
   const sourceMap = output.outputFiles.find(f => f.path.endsWith('linked.js.map')).text;
   const body = linkedBody({ code, sourceMap, bundleHash: artifact.bundleHash, linker,
-    ...(artifact.artifactVersion===2 ? {linkedVersion:2,assets:artifact.assets,assetSetHash:artifact.assetSetHash}: {}) });
+    ...(artifact.artifactVersion ? {linkedVersion:artifact.artifactVersion,assets:artifact.assets,assetSetHash:artifact.assetSetHash}: {}),
+    ...(artifact.artifactVersion===3 ? {controls:artifact.controls,controlSchemaHash:artifact.controlSchemaHash} : {}) });
   const linked = { ...body, linkedHash: hash(JSON.stringify(body)) };
   if (Buffer.byteLength(JSON.stringify(linked), 'utf8') > 16777216 - 128) throw violation('Linked ESM result exceeds 16 MiB', 'QUOTA_EXCEEDED');
   return linked;
