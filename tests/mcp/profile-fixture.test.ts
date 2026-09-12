@@ -23,3 +23,10 @@ test('isolated stdio fixture negotiates legacy profile, discovers tool, and retu
   }
   assert.equal(inflateSync(Buffer.concat(chunks)).length, 32 * (1 + 32 * 3));
 });
+
+test('unsupported negotiated profile is rejected and a fresh connection succeeds', { timeout: 15000 }, async () => {
+  await assert.rejects(runFixture({ profile: '1900-01-01' }), /Unsupported MCP profile/);
+  const result = await runFixture();
+  assert.equal(result.imageObserved, false);
+  assert.ok(result.transcript.some((item: any) => item.message.method === 'tools/call'));
+});
