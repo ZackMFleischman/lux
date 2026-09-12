@@ -8,6 +8,7 @@ Observed 12 September 2026 UTC / 11 September local. These are preflight observa
 - The startup log at `C:/Users/zFlei/AppData/Local/Resolume Avenue/Resolume Avenue log.txt`, entries at local 20:41:08, reports `NVIDIA GeForce RTX 2070/PCIe/SSE2`, OpenGL `4.1.0 NVIDIA 591.44`, and successful renderer initialization. This identifies the host renderer by its own log; exact DXGI LUID and interop extensions still require the native probe.
 - The visible Example composition is 1280×720. Default new-composition settings are 1920×1080. Neither proves the required test workload or actual 60 Hz cadence. Use a separate tracer test composition during the host gate; do not overwrite Example.
 - Existing additional FFGL search directory is `C:/Users/zFlei/AppData/Roaming/JuiceBar/resolume7_win64`; do not replace that configuration or existing plugins. Choose a separately named tracer plugin and preserve existing search paths.
+- Startup log at local 20:41:26 additionally confirms automatic scanning of `C:/Users/zFlei/Documents/Resolume Avenue/Extra Effects`, currently empty. Stage only a distinctly named tracer DLL and its private dependencies there for the authorized host experiment; no search-path changes are necessary.
 - Installed host REST server is disabled; this pass has not enabled it or changed its network binding. Native plugin instrumentation is still required for actual callback evidence.
 
 ## Dependency/API research
