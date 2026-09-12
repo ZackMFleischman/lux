@@ -75,6 +75,20 @@ test('composition suppresses save and failed admission restores the admitted edi
   assert.equal(view().state.doc.toString(), w.getSnapshot().source.files['main.ts']);
   assert.match(screen.getByRole('alert').textContent!, /valid UTF-8/);
 });
+test('repeated rejected edits never diverge from admitted source and preserve prior undo history', async () => {
+  const w = fixture(); let saved: unknown;
+  render(<SourcePanel workspace={w} readOnly={false} onSave={() => { saved = w.getSnapshot().source; }} />);
+  await act(async () => { view().dispatch({ changes: { from: 0, insert: '// admitted\n' } }); });
+  const version = w.getSnapshot().version, admitted = w.getSnapshot().source.files['main.ts'];
+  for (let i = 0; i < 2; i++) {
+    await act(async () => { view().dispatch({ changes: { from: 0, insert: '\ud800' } }); });
+    assert.equal(view().state.doc.toString(), admitted); assert.equal(w.getSnapshot().version, version);
+    fireEvent.keyDown(view().contentDOM, { key: 's', ctrlKey: true });
+    assert.equal((saved as any).files['main.ts'], admitted);
+  }
+  await act(async () => { assert.equal(undo(view()), true); });
+  assert.equal(w.getSnapshot().source.files['main.ts'], 'export const main = 1');
+});
 test('current diagnostics navigate helper coordinates and edited drafts label them stale', async () => {
   const w = fixture(), diagnostics = [{ file: 'lib/color.ts', line: 1, column: 8, message: 'A helper error', draftVersion: 0 }];
   render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} diagnostics={diagnostics} />);

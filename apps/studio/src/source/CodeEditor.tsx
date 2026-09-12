@@ -10,7 +10,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import type { EditorStateCache } from './editor-state.ts';
 export type CodeEditorProps = {
   documentKey: number; path: string; text: string; readOnly: boolean; cache: EditorStateCache;
-  onChange(text: string): void; onCompositionChange?(composing: boolean): void;
+  onChange(text: string): boolean | void; onCompositionChange?(composing: boolean): void;
   diagnosticTarget?: { path: string; offset: number; request: number } | null;
 };
 const access = new Compartment();
@@ -50,7 +50,6 @@ export function CodeEditor(props: CodeEditorProps) {
         compositionend: () => { latest.current.onCompositionChange?.(false); },
       }), EditorView.updateListener.of(update => {
         props.cache.set(props.documentKey, props.path, { state: update.state, scrollTop: update.view.scrollDOM.scrollTop, scrollLeft: update.view.scrollDOM.scrollLeft });
-        if (update.docChanged) latest.current.onChange(update.state.doc.toString());
       })];
       createState.current = text => EditorState.create({ doc: text, extensions: [
         access.of(readOnlyExtensions(props.readOnly)), EditorView.cspNonce.of(nonce), theme,
@@ -61,7 +60,13 @@ export function CodeEditor(props: CodeEditorProps) {
         behavior.of(handlers),
       ] });
       const state = retained?.state ?? createState.current(props.text);
-      editor = new EditorView({ state, parent: host.current }); view.current = editor;
+      editor = new EditorView({ state, parent: host.current, dispatchTransactions: (transactions, target) => {
+        // Admit every edit, including undo transactions that bypass state filters,
+        // before mutating the visible document or its history.
+        if (transactions.some(transaction => transaction.docChanged) &&
+            latest.current.onChange(transactions.at(-1)!.newDoc.toString()) === false) return;
+        target.update(transactions);
+      } }); view.current = editor;
       editor.dispatch({ effects: [access.reconfigure(readOnlyExtensions(latest.current.readOnly)), behavior.reconfigure(handlers)] });
       if (retained) { editor.scrollDOM.scrollTop = retained.scrollTop; editor.scrollDOM.scrollLeft = retained.scrollLeft; }
       setFailure('');
