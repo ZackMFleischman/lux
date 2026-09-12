@@ -76,11 +76,35 @@ importers:
         specifier: 7.0.2
         version: 7.0.2
 
+  apps/build-worker:
+    dependencies:
+      '@babel/parser':
+        specifier: 8.0.5
+        version: 8.0.5
+      '@types/three':
+        specifier: 0.186.0
+        version: 0.186.0
+      three:
+        specifier: 0.186.0
+        version: 0.186.0
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      zod:
+        specifier: 3.25.76
+        version: 3.25.76
+
   packages/runtime-contracts:
     dependencies:
       zod:
         specifier: 3.25.76
         version: 3.25.76
+
+  packages/visual-sdk:
+    dependencies:
+      three:
+        specifier: 0.186.0
+        version: 0.186.0
 
 packages:
 
