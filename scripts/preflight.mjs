@@ -4,8 +4,12 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
+import { parseArgs } from 'node:util';
 import { preflightSchema, integrationReady } from '../packages/runtime-contracts/src/telemetry.ts';
 const root = fileURLToPath(new URL('../', import.meta.url));
+// Optional destination for CI jobs or isolated diagnostics; relative paths use caller cwd.
+const { values } = parseArgs({ options: { 'output-root': { type: 'string' } } });
+const outputRoot = values['output-root'] ? resolve(values['output-root']) : resolve(root, 'evidence/tracer-0.1');
 process.chdir(root);
 const require = createRequire(import.meta.url);
 const checks = [];
@@ -87,7 +91,7 @@ const result = preflightSchema.parse({ schemaVersion: 1, sourceCommit: git.stdou
   build: { configuration: 'Release', architecture: 'x64', generator: 'Visual Studio 18 2026', toolset: 'v145,version=14.50.35717', windowsSdk: '10.0.26100.0' }, discovery,
 });
 const runId = new Date().toISOString().replaceAll(':', '-').replaceAll('.', '-');
-const output = resolve(root, 'evidence/tracer-0.1', runId); mkdirSync(output, { recursive: true });
+const output = resolve(outputRoot, runId); mkdirSync(output, { recursive: true });
 writeFileSync(resolve(output, 'environment.json'), JSON.stringify(result, null, 2) + '\n');
 writeFileSync(resolve(output, 'preflight.md'), `# TR-01 preflight ${runId}\n\nSource: ${result.sourceCommit}\n\nDecision: ${integrationReady(result) ? 'PASS' : 'UNAVAILABLE — dependent integration gate remains blocked'}. Inventory and fixture success are not GPU/host acceptance.\n\n${checks.map(c => `- **${c.outcome}** ${c.name}: ${c.evidence}`).join('\n')}\n\nFull commands, outputs, source pins and version tuples are retained in environment.json.\n`);
 console.log(`TR-01 evidence: ${output}`);
