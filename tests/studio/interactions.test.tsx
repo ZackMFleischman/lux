@@ -95,7 +95,7 @@ test('RTL: completing an intensity write cannot clear a pending playback command
   await act(async () => finishIntensity());
   assert.equal((screen.getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled, true);
   assert.equal((screen.getByRole('button', { name: 'Restart runtime' }) as HTMLButtonElement).disabled, true);
-  await user.click(screen.getByRole('button', { name: 'Play' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Play' }));
   assert.equal(fixture.calls.length, 2);
   await act(async () => finishPlay());
   assert.equal((screen.getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled, false);
