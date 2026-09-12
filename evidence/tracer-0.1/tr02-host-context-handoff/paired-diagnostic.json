@@ -1,0 +1,19 @@
+{
+  "ok": false,
+  "scope": "short-standalone-diagnostic-only",
+  "reasons": [
+    "No completed receiver consumption"
+  ],
+  "outcomes": [
+    {
+      "name": "receiver",
+      "pid": 18508,
+      "code": 0
+    },
+    {
+      "name": "producer",
+      "pid": 16184,
+      "code": 0
+    }
+  ]
+}
