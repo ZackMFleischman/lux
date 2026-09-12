@@ -1,7 +1,7 @@
 import test, { afterEach, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
-import type { StudioClient, StudioOperation, StudioSnapshot } from '../../apps/studio/src/service-client.ts';
+import type { StudioClient, StudioOperation, StudioSnapshot, RuntimeView } from '../../apps/studio/src/service-client.ts';
 import type { WindowState } from '../../apps/studio/src/window-client.ts';
 
 // jsdom models DOM events only. It starts no browser, Electron, canvas or GPU.
@@ -32,7 +32,10 @@ function service() {
     subscribe: listener => { listeners.add(listener); return () => { listeners.delete(listener); }; },
     invoke: async operation => { calls.push(operation); if (fail) throw Error('Runtime unavailable. Retry after reconnecting.'); return { accepted: true }; },
   };
-  return { client, calls, fail: () => { fail = true; }, update: () => {
+  return { client, calls, fail: () => { fail = true; }, publish: (values: Partial<RuntimeView>) => {
+    snapshot = { ...snapshot, authoring: { ...snapshot.authoring!, ...values } };
+    for (const listener of listeners) listener();
+  }, update: () => {
     snapshot = { ...snapshot, authoring: { ...snapshot.authoring!, generation: 3, playback: 'playing' } };
     for (const listener of listeners) listener();
   } };
@@ -121,6 +124,54 @@ test('RTL: intensity writes do not disable transport or insert a success alert',
   await act(async () => finish());
   assert.equal(screen.queryByText('Request accepted. Awaiting applied runtime status.'), null);
   assert.equal(screen.queryByRole('alert'), null);
+});
+
+test('RTL: delayed applied values never pull a slider away from the latest input', async () => {
+  const fixture = service();
+  const pending: Array<() => void> = [];
+  fixture.client.invoke = operation => {
+    fixture.calls.push(operation);
+    return new Promise(resolve => pending.push(() => {
+      if (operation.name === 'lux.parameters.set') fixture.publish(operation.input.values);
+      resolve({});
+    }));
+  };
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+  const slider = screen.getByRole('slider') as HTMLInputElement;
+  fireEvent.change(slider, { target: { value: '0.6' } });
+  fireEvent.change(slider, { target: { value: '0.8' } });
+  assert.equal(slider.value, '0.8');
+  assert.equal(fixture.calls.length, 1, 'controller coalesces pending writes');
+  await act(async () => pending.shift()!());
+  assert.ok(screen.getByText('Applied value: 0.60'));
+  assert.equal(slider.value, '0.8', 'old acknowledgement must not overwrite newer input');
+  assert.equal(fixture.calls.length, 2);
+  fireEvent.change(slider, { target: { value: '0.9' } });
+  await act(async () => pending.shift()!());
+  assert.equal(slider.value, '0.9');
+  await act(async () => pending.shift()!());
+  assert.equal(slider.value, '0.9');
+  assert.ok(screen.getByText('Applied value: 0.90'));
+  await act(async () => fixture.publish({ intensity: 0.25 }));
+  assert.equal(slider.value, '0.25', 'external changes still apply after local input settles');
+});
+
+test('RTL: rejected slider input restores confirmed value and replacement ignores old completion', async () => {
+  const fixture = service();
+  let reject!: (reason: Error) => void;
+  fixture.client.invoke = operation => { fixture.calls.push(operation); return new Promise((_resolve, fail) => { reject = fail; }); };
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+  const slider = screen.getByRole('slider') as HTMLInputElement;
+  fireEvent.change(slider, { target: { value: '0.8' } });
+  await act(async () => reject(Error('Parameter rejected')));
+  assert.equal(slider.value, '0.5');
+  assert.match(screen.getByRole('alert').textContent ?? '', /Parameter rejected/);
+  fireEvent.change(slider, { target: { value: '0.9' } });
+  await act(async () => fixture.publish({ revisionId: 'new-revision', intensity: 0.2 }));
+  assert.equal(slider.value, '0.2');
+  await act(async () => reject(Error('Old revision rejected')));
+  assert.equal(slider.value, '0.2');
+  assert.equal(screen.queryByText('Old revision rejected'), null);
 });
 
 test('RTL: Escape exits native fullscreen even before its state notification arrives', async () => {

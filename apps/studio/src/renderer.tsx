@@ -6,7 +6,7 @@ import { Preview } from './preview.tsx';
 import { StudioController } from './service-client.ts';
 import type { ReactNode } from 'react';
 import { StudioDockShell } from './layout/StudioDockShell.tsx';
-import type { StudioClient, Metric } from './service-client.ts';
+import type { StudioClient, StudioSnapshot, Metric } from './service-client.ts';
 import type { PresentationPort } from './presentation.ts';
 import type { StudioWindowClient, WindowState } from './window-client.ts';
 
@@ -28,6 +28,11 @@ export type StudioProps = {
 export function StudioApp(props: StudioProps) {
   return <ThemeProvider theme={studioTheme}><CssBaseline /><StudioLayout {...props} /></ThemeProvider>;
 }
+function controlOwner(snapshot: StudioSnapshot): string | null {
+  const runtime = snapshot.authoring;
+  return snapshot.connection === 'connected' && runtime?.authority === 'studio'
+    ? JSON.stringify([runtime.instanceId, runtime.generation, runtime.revisionId]) : null;
+}
 function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel, appCommands, fileMenu, appError }: StudioProps) {
   const [toolsHost, setToolsHost] = useState<HTMLElement | null>(null);
   const [transportMenu, setTransportMenu] = useState<HTMLElement | null>(null);
@@ -44,9 +49,18 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const [error, setError] = useState<string | null>(null);
   const [clock, setClock] = useState(() => nowMs ?? Date.now());
   const [intensity, setIntensity] = useState(snapshot.authoring?.intensity ?? INTENSITY_CONTROL.default);
+  const intensityIntent = useRef<{ owner: string } | null>(null);
   const runtime = snapshot.authoring;
   const available = snapshot.connection === 'connected' && runtime?.authority === 'studio';
-  useEffect(() => { setIntensity(runtime?.intensity ?? INTENSITY_CONTROL.default); }, [runtime?.intensity, runtime?.generation, runtime?.instanceId]);
+  const owner = controlOwner(snapshot);
+  useEffect(() => {
+    // Runtime status can confirm earlier points while a drag has moved ahead.
+    // Keep local input until the coalesced write drain settles for this target.
+    if (owner && intensityIntent.current?.owner === owner) return;
+    intensityIntent.current = null;
+    setIntensity(runtime?.intensity ?? INTENSITY_CONTROL.default);
+  }, [runtime?.intensity, owner]);
+  useEffect(() => () => { intensityIntent.current = null; }, [client]);
   useEffect(() => {
     if (nowMs !== undefined) return;
     const timer = setInterval(() => setClock(Date.now()), 1000);
@@ -83,6 +97,24 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
     finally { if (transport) { transportPending.current = false; setPendingCommands(count => count - 1); } }
   }
   function windowAction(action: () => Promise<void>): void { void action().catch(reason => setError(String(reason))); }
+  async function changeIntensity(value: number): Promise<void> {
+    if (!owner) return;
+    const intent = { owner };
+    intensityIntent.current = intent;
+    setIntensity(value); setError(null);
+    try { await controller.setIntensity(value); }
+    catch (reason) {
+      if (intensityIntent.current === intent && controlOwner(client.getSnapshot()) === owner) {
+        setError(reason instanceof Error ? reason.message : String(reason));
+      }
+    } finally {
+      if (intensityIntent.current === intent) {
+        intensityIntent.current = null;
+        const current = client.getSnapshot();
+        if (controlOwner(current) === owner) setIntensity(current.authoring!.intensity);
+      }
+    }
+  }
   const compact = previewOnly || maximized || windowState.fullscreen;
   const previewPane = <Paper component="main" square className="preview-panel">
         <div className="panel-toolbar" hidden={windowState.fullscreen}><div><Chip label="FINAL" /></div>
@@ -114,7 +146,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
           <p className="section-description">Authoring values only. Host controls stay independent.</p>
           <label className="parameter-label" id="intensity-label"><span>{INTENSITY_CONTROL.label}</span><output>{available ? intensity.toFixed(2) : '—'}</output></label>
           <Slider aria-labelledby="intensity-label" min={INTENSITY_CONTROL.min} max={INTENSITY_CONTROL.max} step={0.01} value={intensity}
-            disabled={!available} onChange={(_event, value) => { if (typeof value !== 'number') return; setIntensity(value); void command(() => controller.setIntensity(value), false); }} />
+            disabled={!available} onChange={(_event, value) => { if (typeof value === 'number') void changeIntensity(value); }} />
           <div className="parameter-scale"><span>0</span><span>1</span></div>
           <p className="hint">{available ? `Applied value: ${runtime.intensity.toFixed(2)}` : 'Connect an authoring runtime to change controls.'}</p>
         </section>
