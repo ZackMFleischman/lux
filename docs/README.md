@@ -2,6 +2,8 @@
 
 Status: documentation and planning complete; reviews closed; ready for tracer implementation. Start with [progress](planning-progress.md) and [requirements](requirements.md). Runtime feasibility remains subject to the planned experiments.
 
+Implementation has started on an isolated branch. [Implementation progress](implementation/progress.md) records completed code, reviews, evidence and active gates; the planning progress above is the historical documentation pass.
+
 The original [design and handoff](../plans/ai-visual-workshop-design.md) and [domain proposal](../plans/domain-and-workflow-proposal.md) remain preserved source records. Direct user decisions take precedence. This document set will record implementation decisions explicitly; an earlier proposal is not silently treated as user approval.
 
 ## Document ownership
