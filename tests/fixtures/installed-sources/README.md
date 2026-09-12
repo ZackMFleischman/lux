@@ -32,3 +32,17 @@ a real required image asset needs bounded asset admission, immutable content
 identity and bytes, compiler/runtime resolution, save/export closure and failure
 tests. An unused file next to the package or a TypeScript palette is not a pass.
 This remains a tracer requirement; the fixture pair does not waive it.
+
+## Required image fixture prepared
+
+`required-image/scene.lux-scene` is a version 2 fixture for the parallel asset
+pipeline. Its 3 by 2 BMP contains red/green/blue above cyan/magenta/yellow,
+including nonzero row padding. `visual.ts` requires that asset, decodes it through
+the submitted `bmp.ts` helper and assigns its pixels to the plane's DataTexture.
+There is no fallback pattern or pixel constant in the submitted TypeScript.
+
+`node --test --test-isolation=none tests/assets/required-image-fixture.test.mjs`
+checks decoder agreement, missing-asset failure, material/texture ownership and
+disposal using CPU renderer substitutes. Independent review approved this bounded
+fixture. Real compiler/link, native six-region capture, restart, export and offline
+installed playback remain separate gates; the fixture is not yet a working export.

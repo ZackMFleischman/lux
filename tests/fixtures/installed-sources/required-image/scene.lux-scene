@@ -1,0 +1,29 @@
+{
+  "format": "lux-scene",
+  "version": 2,
+  "source": {
+    "sourceVersion": 2,
+    "sdkVersion": "0.1.0",
+    "entry": "visual.ts",
+    "files": {
+      "bmp.ts": "/** Fixture-local decoder for Lux's admitted 24-bit uncompressed BMP subset. */\nexport function decodeBmp(bytes: Readonly<Uint8Array>): { width: number; height: number; data: Uint8Array } {\n  if (bytes.length < 54) throw Error('Invalid BMP header');\n  const header = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);\n  const u16 = (offset: number) => header.getUint16(offset, true);\n  const u32 = (offset: number) => header.getUint32(offset, true);\n  const width = header.getInt32(18, true), height = header.getInt32(22, true);\n  if (bytes[0] !== 66 || bytes[1] !== 77 || u32(2) !== bytes.length || u32(6) !== 0 ||\n      u32(10) !== 54 || u32(14) !== 40 || u16(26) !== 1 || u16(28) !== 24 ||\n      u32(30) !== 0 || u32(46) !== 0 || u32(50) !== 0 ||\n      width < 1 || width > 512 || height < 1 || height > 512) throw Error('Unsupported BMP');\n  const stride = Math.ceil(width * 3 / 4) * 4;\n  if (bytes.length !== 54 + stride * height || (u32(34) !== 0 && u32(34) !== stride * height)) throw Error('Invalid BMP payload');\n  const data = new Uint8Array(width * height * 4);\n  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {\n    const from = 54 + (height - 1 - y) * stride + x * 3, to = (y * width + x) * 4;\n    data[to] = bytes[from + 2]; data[to + 1] = bytes[from + 1]; data[to + 2] = bytes[from]; data[to + 3] = 255;\n  }\n  return { width, height, data };\n}\n",
+      "visual.ts": "import { defineVisual } from '@lux/visual-sdk';\nimport { Scene, Mesh, PlaneGeometry, MeshBasicNodeMaterial, OrthographicCamera, DataTexture, RGBAFormat, UnsignedByteType, NearestFilter, SRGBColorSpace } from 'three/webgpu';\nimport { decodeBmp } from './bmp.ts';\n\nexport default defineVisual({\n  async create(context) {\n    const bytes = context.assets.get('assets/checker.bmp');\n    if (!bytes) throw Error('Missing required asset: assets/checker.bmp');\n    const pixels = decodeBmp(bytes);\n    const image = new DataTexture(pixels.data, pixels.width, pixels.height, RGBAFormat, UnsignedByteType);\n    image.colorSpace = SRGBColorSpace;\n    image.minFilter = NearestFilter; image.magFilter = NearestFilter;\n    // Decoder returns top-down rows; the plane's top edge has UV v=1.\n    image.flipY = true; image.generateMipmaps = false; image.needsUpdate = true;\n    const material = new MeshBasicNodeMaterial();\n    material.map = image; material.toneMapped = false;\n    const geometry = new PlaneGeometry(3, 2);\n    const scene = new Scene(); scene.add(new Mesh(geometry, material));\n    const camera = new OrthographicCamera(-16 / 9, 16 / 9, 1, -1, 0, 1);\n    return {\n      update(_frame) {},\n      render(target) { return context.renderer.render(scene, camera, target); },\n      reset(_seed) {},\n      dispose() { image.dispose(); material.dispose(); geometry.dispose(); },\n    };\n  },\n});\n"
+    },
+    "assets": {
+      "assets/checker.bmp": {
+        "mediaType": "image/bmp",
+        "encoding": "base64",
+        "data": "Qk1OAAAAAAAAADYAAAAoAAAAAwAAAAIAAAABABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//8A/wD/AP//BwgJAAD/AP8A/wAACgsM"
+      }
+    }
+  },
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "seed": 0
+  },
+  "controls": {
+    "intensity": 0.5
+  }
+}
