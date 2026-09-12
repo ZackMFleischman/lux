@@ -14,6 +14,8 @@ await build({ ...common, entryPoints: [join(directory, 'src/preload.ts')], outfi
   platform: 'node', format: 'cjs', target: 'node24', external: ['electron'] });
 await build({ ...common, entryPoints: [join(directory, 'src/entry.tsx')], outfile: join(dist, 'renderer.js'),
   platform: 'browser', format: 'esm', target: 'chrome140', jsx: 'automatic' });
+await build({ ...common, entryPoints: [join(directory, 'src/visual-worker.mjs')], outfile: join(dist, 'visual-worker.js'),
+  platform: 'browser', format: 'esm', target: 'chrome140' });
 await copyFile(join(directory, 'src/index.html'), join(dist, 'index.html'));
 if (process.argv.includes('--tests')) await build({ ...common,
   entryPoints: [join(root, 'tests/studio/view.test.tsx')], outfile: join(dist, 'view.test.cjs'),

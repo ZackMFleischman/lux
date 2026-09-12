@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "initial": {
+    "instanceId": "cf02b97a-4c7f-4ebb-a134-9cdbc2542504",
+    "generation": 1,
+    "revisionId": "6c591e454a73c22cfddf062d1d79a9967d7ec16c812369b492839af8041653de",
+    "sceneName": "Untitled visual",
+    "authority": "studio",
+    "playback": "paused",
+    "clockEpoch": 0,
+    "frameId": "1",
+    "intensity": 0.5,
+    "output": {
+      "width": 1920,
+      "height": 1080
+    },
+    "fault": null
+  },
+  "applied": {
+    "instanceId": "cf02b97a-4c7f-4ebb-a134-9cdbc2542504",
+    "generation": 1,
+    "revisionId": "6c591e454a73c22cfddf062d1d79a9967d7ec16c812369b492839af8041653de",
+    "sceneName": "Untitled visual",
+    "authority": "studio",
+    "playback": "paused",
+    "clockEpoch": 1,
+    "frameId": "6",
+    "intensity": 0.8,
+    "output": {
+      "width": 1920,
+      "height": 1080
+    },
+    "fault": null
+  },
+  "invalidRejected": true,
+  "capture": {
+    "bytes": {},
+    "metadata": {
+      "playback": "paused",
+      "timeSeconds": 0,
+      "clockEpoch": 1,
+      "frameId": "6",
+      "controlSequence": 1,
+      "intensity": 0.8,
+      "width": 1920,
+      "height": 1080,
+      "seed": 0,
+      "colorSpace": "srgb",
+      "alphaMode": "straight",
+      "instanceId": "cf02b97a-4c7f-4ebb-a134-9cdbc2542504",
+      "generation": 1,
+      "revisionId": "6c591e454a73c22cfddf062d1d79a9967d7ec16c812369b492839af8041653de"
+    }
+  },
+  "savedAndReopened": true
+}
