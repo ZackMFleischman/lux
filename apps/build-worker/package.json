@@ -1,0 +1,1 @@
+{"name":"@lux/build-worker","version":"0.1.0","private":true,"type":"module","exports":"./src/main.ts","dependencies":{"@babel/parser":"8.0.5","typescript":"7.0.2","three":"0.186.0","@types/three":"0.186.0","zod":"3.25.76"}}
