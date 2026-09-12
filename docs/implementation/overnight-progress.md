@@ -8,13 +8,13 @@ Updated: 2026-09-12. Coordinator: Lux Studio UI task. Integration checkout: `.wo
 | --- | --- | --- | --- |
 | DONE | Reconcile revised tracer export scope with Studio docs | Coordinator / tracer | Main merged in 7ce2f56; reusable exports, independent sources and cold reopen remain tracer requirements. |
 | DONE | Integrate verified saved-visual transport | Coordinator / tracer | codex/resolume-transport merged; reuse a5eee83 evidence, no transport rewrite. |
-| IN PROGRESS | MCP generic parameters, playback and restart | mcp_controls / mcp-controls | Guarded adapter implemented; CPU tests passing in lane; awaiting committed handoff and independent review. |
+| DONE | MCP generic parameters, playback and restart | mcp_controls / mcp-controls | Integrated 0559724; 27 CPU tests, typecheck, independent review and real MCP controls/image workflow passed. |
 | IN PROGRESS | Immutable export package and installation foundation | export_foundation / export-foundation | Implementing validated release/runtime closure and safe install helper; does not yet claim automatic source registration or multiple instances. |
 | IN PROGRESS | TypeScript editor and multi-file draft state | source_editor / source-editor | Pure draft-store tests passing; CodeMirror pins installed centrally in ab3bc3e. Parallel roadmap work, not a tracer dependency. |
-| IN PROGRESS | Automated native UI QA feasibility | Coordinator | Resolume window successfully selected and observed; empty clips and Lux probe confirmed. Bounded drag/trigger attempt next. |
-| QUEUED | Review and integrate MCP lane; run real MCP controls QA | Coordinator + fresh reviewer | CPU checks before serialized Studio test. |
+| MANUAL QA NEEDED | Load/trigger source in Resolume | Coordinator | Two drag attempts selected empty slots but did not load the probe; no new host log. Stopped retries. User confirms drag did not work. No native producer started. |
+| DONE | Review and integrate MCP lane; run real MCP controls QA | Coordinator + independent reviewer | Real test starts paused, changes parameters, plays/pauses/resets/restarts, rejects stale generation and preserves output on invalid/hanging candidates. Transport worker compatibility also reviewed. |
 | QUEUED | Review and integrate export foundation | Coordinator + fresh reviewer | Verify package works without checkout references; follow with automatic startup and instance routing. |
-| QUEUED | Shared installed runtime, automatic source startup, independent instances | Export follow-on lane | Use installed package contract; one shared supervisor/runtime distribution, separate per-source state. |
+| IN PROGRESS | Shared installed runtime, automatic source startup, independent instances | review_mcp (new assignment) / installed-runtime | Coordinating package/startup contract with export_foundation; CPU implementation only. |
 | QUEUED | Export action in Studio and cold-start/reopen QA | Coordinator | Depends on installed source registration/start contract; do not label package creation alone complete export. |
 | QUEUED | Lifecycle/recovery and performance acceptance gaps | Coordinator + review lane | Original gates remain open; measure first-source cold startup and additional-source startup separately. |
 | QUEUED | Review/integrate source editor; automated Studio UI QA | Coordinator + fresh reviewer | Validate nonce/CSP, per-file drafts, editor state and preview continuity. |

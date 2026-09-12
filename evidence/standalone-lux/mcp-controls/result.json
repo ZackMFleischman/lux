@@ -1,0 +1,121 @@
+{
+  "ok": true,
+  "initial": {
+    "instanceId": "d75b4fa6-0d16-4b0a-91ed-f56e46a71546",
+    "generation": 1,
+    "revisionId": "162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898",
+    "sceneName": "Untitled visual",
+    "authority": "studio",
+    "playback": "paused",
+    "controlSequence": 0,
+    "clockEpoch": 0,
+    "frameId": "1",
+    "intensity": 0.5,
+    "output": {
+      "width": 1920,
+      "height": 1080
+    },
+    "fault": null
+  },
+  "revised": {
+    "instanceId": "d75b4fa6-0d16-4b0a-91ed-f56e46a71546",
+    "generation": 3,
+    "revisionId": "0b43b6a165d2dc06ffc29f938ed63b671674f4ac190f5adb7f1582ba8ad3e585",
+    "sceneName": "Untitled visual",
+    "authority": "studio",
+    "playback": "paused",
+    "controlSequence": 0,
+    "clockEpoch": 0,
+    "frameId": "1",
+    "intensity": 0.8,
+    "output": {
+      "width": 1920,
+      "height": 1080
+    },
+    "fault": null
+  },
+  "metadata": {
+    "playback": "paused",
+    "timeSeconds": 0,
+    "clockEpoch": 0,
+    "frameId": "1",
+    "controlSequence": 0,
+    "intensity": 0.8,
+    "width": 1920,
+    "height": 1080,
+    "seed": 0,
+    "colorSpace": "srgb",
+    "alphaMode": "straight",
+    "instanceId": "d75b4fa6-0d16-4b0a-91ed-f56e46a71546",
+    "generation": 3,
+    "revisionId": "0b43b6a165d2dc06ffc29f938ed63b671674f4ac190f5adb7f1582ba8ad3e585"
+  },
+  "controlsApplied": {
+    "applied": {
+      "type": "status",
+      "instanceId": "d75b4fa6-0d16-4b0a-91ed-f56e46a71546",
+      "generation": 1,
+      "revisionId": "162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898",
+      "requestId": "0e84b70e-153b-419c-9348-65b74d9c2450",
+      "playback": "paused",
+      "timeSeconds": 0,
+      "clockEpoch": 0,
+      "frameId": "2",
+      "controlSequence": 1,
+      "intensity": 0.8
+    },
+    "status": {
+      "connection": "connected",
+      "message": "Open an example or write a visual, then Build & preview.",
+      "receivedAtMs": 1789240108398,
+      "authoring": {
+        "instanceId": "d75b4fa6-0d16-4b0a-91ed-f56e46a71546",
+        "generation": 1,
+        "revisionId": "162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898",
+        "sceneName": "Untitled visual",
+        "authority": "studio",
+        "playback": "paused",
+        "controlSequence": 1,
+        "clockEpoch": 0,
+        "frameId": "2",
+        "intensity": 0.8,
+        "output": {
+          "width": 1920,
+          "height": 1080
+        },
+        "fault": null
+      },
+      "host": null,
+      "jobs": [
+        {
+          "jobId": "d42a8a82-14c0-4329-a410-10b63176f572",
+          "state": "succeeded",
+          "summary": "Visual is ready in Lux."
+        }
+      ],
+      "visualFps": null,
+      "uiFps": null
+    }
+  },
+  "restarted": {
+    "instanceId": "d75b4fa6-0d16-4b0a-91ed-f56e46a71546",
+    "generation": 2,
+    "revisionId": "162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898",
+    "sceneName": "Untitled visual",
+    "authority": "studio",
+    "playback": "paused",
+    "controlSequence": 0,
+    "clockEpoch": 0,
+    "frameId": "1",
+    "intensity": 0.8,
+    "output": {
+      "width": 1920,
+      "height": 1080
+    },
+    "fault": null
+  },
+  "staleGenerationRejected": true,
+  "staleEditRejected": true,
+  "hangingCandidateRejected": true,
+  "previousPreviewRetained": true
+}
