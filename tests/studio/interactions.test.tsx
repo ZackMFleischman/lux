@@ -79,7 +79,7 @@ test('RTL: failed runtime command shows actionable error without a successful-st
   assert.ok(screen.getByText('revision-2'));
 });
 
-test('RTL: completing an intensity write cannot clear a pending playback command', async () => {
+test('RTL: pending playback preserves button styling and ignores duplicate transport commands', async () => {
   const fixture = service(), user = userEvent.setup({ document });
   let finishPlay!: () => void, finishIntensity!: () => void;
   fixture.client.invoke = operation => {
@@ -95,9 +95,11 @@ test('RTL: completing an intensity write cannot clear a pending playback command
   await waitFor(() => assert.equal(fixture.calls.length, 2));
   assert.equal(document.querySelector('.playback-state')?.textContent, 'paused');
   await act(async () => finishIntensity());
-  assert.equal((screen.getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled, true);
-  assert.equal((screen.getByRole('button', { name: 'Restart runtime' }) as HTMLButtonElement).disabled, true);
+  assert.equal((screen.getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled, false);
+  assert.equal((screen.getByRole('button', { name: 'Restart runtime' }) as HTMLButtonElement).disabled, false);
   fireEvent.click(screen.getByRole('button', { name: 'Play' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Restart runtime' }));
   assert.equal(fixture.calls.length, 2);
   await act(async () => finishPlay());
   assert.equal((screen.getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled, false);

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { Alert, Button, Chip, CssBaseline, Paper, Slider, ThemeProvider } from '@mui/material';
 import { studioTheme } from './theme.ts';
 import { INTENSITY_CONTROL } from '../../../packages/runtime-contracts/src/index.ts';
@@ -34,6 +34,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const [windowState, setWindowState] = useState<WindowState>({ detached: false, fullscreen: false });
   const [maximized, setMaximized] = useState(false);
   const [pendingCommands, setPendingCommands] = useState(0);
+  const transportPending = useRef(false);
   const [fullscreenHint, setFullscreenHint] = useState(false);
   const busy = pendingCommands > 0;
   const [error, setError] = useState<string | null>(null);
@@ -70,11 +71,12 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
     return () => clearTimeout(timer);
   }, [windowState.fullscreen]);
   async function command(action: () => Promise<unknown>, transport = true): Promise<void> {
-    if (transport) setPendingCommands(count => count + 1);
+    if (transport && transportPending.current) return;
+    if (transport) { transportPending.current = true; setPendingCommands(count => count + 1); }
     setError(null);
     try { await action(); }
     catch (reason) { setError(reason instanceof Error ? reason.message : String(reason)); }
-    finally { if (transport) setPendingCommands(count => count - 1); }
+    finally { if (transport) { transportPending.current = false; setPendingCommands(count => count - 1); } }
   }
   function windowAction(action: () => Promise<void>): void { void action().catch(reason => setError(String(reason))); }
   const compact = previewOnly || maximized || windowState.fullscreen;
@@ -97,12 +99,12 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
         <Preview runtime={runtime} port={presentation} moved={!previewOnly && windowState.detached} onError={setError} onDock={() => windows && windowAction(() => windows.dock())} />
         {runtime?.fault && <Alert severity="error"><strong>{runtime.fault.code}</strong> · {runtime.fault.message}</Alert>}
         {error && <Alert severity="error" role="alert">{error}</Alert>}
-        <div className="transport" hidden={windowState.fullscreen}><div className="transport-actions">
-          <Button variant="contained" disabled={!available || busy || runtime?.playback === 'playing'} onClick={() => void command(() => controller.playback('play'))}>Play</Button>
-          <Button disabled={!available || busy || runtime?.playback === 'paused'} onClick={() => void command(() => controller.playback('pause'))}>Pause</Button>
-          <Button disabled={!available || busy} onClick={() => void command(() => controller.playback('reset'))}>Reset</Button>
+        <div className="transport" hidden={windowState.fullscreen} aria-busy={busy}><div className="transport-actions">
+          <Button variant="contained" disabled={!available || runtime?.playback === 'playing'} onClick={() => void command(() => controller.playback('play'))}>Play</Button>
+          <Button disabled={!available || runtime?.playback === 'paused'} onClick={() => void command(() => controller.playback('pause'))}>Pause</Button>
+          <Button disabled={!available} onClick={() => void command(() => controller.playback('reset'))}>Reset</Button>
           <span className="divider" />
-          <Button disabled={!available || busy} onClick={() => void command(() => controller.restart())}>Restart runtime</Button>
+          <Button disabled={!available} onClick={() => void command(() => controller.restart())}>Restart runtime</Button>
         </div><span className="playback-state">{runtime?.playback ?? 'Awaiting service'}</span></div>
       </Paper>
       {!compact && <Paper component="aside" square className="inspector" aria-label="Scene controls and status">
