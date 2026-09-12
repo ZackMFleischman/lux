@@ -3,7 +3,7 @@
 ## Current creative-session follow-ups
 
 - [ ] C22 — NEXT AUTHORING CAPABILITY, alongside assets: code-declared per-visual live parameters. No globally required Intensity; derive Inspector and generic MCP operations from the visual declaration. Cover validation, runtime changes, persistence and export compatibility. The user's noisy sphere brief is the motivating acceptance case. Prioritize ahead of broader polish.
-- [ ] C23 — IN PROGRESS: repo-shipped `lux-visual-creation` Codex skill, independent workflow review, CPU-compiled noise example, repeatable install/check command, and personal installation. Update and reinstall alongside future author-facing features. Current fixed Intensity and asset limitations must remain explicit until implementation ships.
+- [x] C23 — DONE: repo-shipped `lux-visual-creation` Codex skill (428b2de/6b7afb0), independent workflow review and corrected adapter/build guidance, CPU-compiled noise example, repeatable installer (11428ce; eight CPU tests passed), and personal installation. Installed files match the repo; Skill Creator validation passed. See [maintenance and validation](visual-creation-skill.md). Update and reinstall alongside future author-facing features. Fixed Intensity and asset limitations remain explicit; this does not close C22 or validate the template's GPU appearance.
 - User's working Studio remains available for creative use. This skill/documentation checkpoint does not launch Studio or run live MCP/graphics tests.
 
 Started 2026-09-12 after the successful guided Resolume QA. This is the active tracker; [overnight progress](overnight-progress.md) preserves the preceding work and manual observations. Integration: `.worktrees/tracer`, branch `codex/tracer-0.1`, starting commit `26fc023`.
