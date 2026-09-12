@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "profile": "MCP 2025-11-25 legacy stdio; no 2026 envelope mixing",
+  "electron": {"version":"44.3.0","license":"MIT","source":"https://releases.electronjs.org/release/v44.3.0","expectedChromium":"152.0.7977.78","expectedNode":"24.20.0","nativeAbi":"Record process.versions.modules from installed Electron; native addon not built in TR-01"},
+  "three": {"version":"0.186.0","license":"MIT","source":"https://registry.npmjs.org/three/0.186.0"},
+  "mcp": {"version":"1.30.0","license":"MIT","source":"https://github.com/modelcontextprotocol/typescript-sdk/releases"},
+  "ffgl": {"tag":"v2.2","commit":"fda8d4a5904eaf09dd97ac0f95c246bd7f9f9a46","license":"BSD-3-Clause","source":"https://github.com/resolume/ffgl","abi":"Windows x64 FFGL 2.2; verify host ABI in TR-02; not downloaded or linked in TR-01"},
+  "spout": {"tag":"2.007.017","commit":"f49e2f469f8cb25f559a6eaa61a3f5b8173fc100","license":"BSD-2-Clause","source":"https://github.com/leadedge/Spout2","abi":"Windows x64; same-adapter D3D/GL interop must be exercised in TR-02; not linked in TR-01"},
+  "adapterSelection": "Unselected until renderer, bridge and host LUIDs are measured. GPU name is inventory only."
+}
