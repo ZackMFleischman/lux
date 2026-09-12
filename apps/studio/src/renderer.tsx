@@ -4,6 +4,8 @@ import { studioTheme } from './theme.ts';
 import { INTENSITY_CONTROL } from '../../../packages/runtime-contracts/src/index.ts';
 import { Preview } from './preview.tsx';
 import { StudioController } from './service-client.ts';
+import type { ReactNode } from 'react';
+import { StudioDockShell } from './layout/StudioDockShell.tsx';
 import type { StudioClient, Metric } from './service-client.ts';
 import type { PresentationPort } from './presentation.ts';
 import type { StudioWindowClient, WindowState } from './window-client.ts';
@@ -21,12 +23,12 @@ function MetricView({ label, metric, nowMs }: { label: string; metric: Metric | 
   return <div className="metric"><span>{label}</span><strong>{text.value}</strong><small>{text.detail}</small></div>;
 }
 export type StudioProps = {
-  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number;
+  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode;
 };
 export function StudioApp(props: StudioProps) {
   return <ThemeProvider theme={studioTheme}><CssBaseline /><StudioLayout {...props} /></ThemeProvider>;
 }
-function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs }: StudioProps) {
+function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel }: StudioProps) {
   const subscribe = useCallback((listener: () => void) => client.subscribe(listener), [client]);
   const getSnapshot = useCallback(() => client.getSnapshot(), [client]);
   const snapshot = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
@@ -80,15 +82,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   }
   function windowAction(action: () => Promise<void>): void { void action().catch(reason => setError(String(reason))); }
   const compact = previewOnly || maximized || windowState.fullscreen;
-  return <div className={`studio ${compact ? 'studio-expanded' : ''} ${windowState.fullscreen ? 'studio-preview-fullscreen' : ''}`}>
-    {windowState.fullscreen && fullscreenHint && <div className="fullscreen-hint" role="status">Press Escape to exit fullscreen</div>}
-    <header className="app-bar" hidden={windowState.fullscreen}>
-      <div className="brand"><span className="brand-symbol" aria-hidden="true">L</span><strong>LUX</strong><span>STUDIO</span></div>
-      <div className="scene-heading"><span className="eyebrow">AUTHORING</span><span>{runtime?.sceneName ?? 'No scene connected'}</span></div>
-      <span className={`connection ${snapshot.connection === 'connected' ? 'connected' : ''}`}><i />{snapshot.connection === 'connected' ? 'Service connected' : snapshot.connection === 'connecting' ? 'Connecting' : 'Disconnected'}</span>
-    </header>
-    <div className="workspace">
-      <Paper component="main" square className="preview-panel">
+  const previewPane = <Paper component="main" square className="preview-panel">
         <div className="panel-toolbar" hidden={windowState.fullscreen}><div><span className="panel-label">Preview</span><Chip label="FINAL" /><span className="subtle">Authoring instance</span></div>
           <div className="preview-actions">
             {!previewOnly && <Button aria-pressed={maximized} onClick={() => setMaximized(!maximized)}>{maximized ? 'Restore workspace' : 'Maximize'}</Button>}
@@ -106,8 +100,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
           <span className="divider" />
           <Button disabled={!available} onClick={() => void command(() => controller.restart())}>Restart runtime</Button>
         </div><span className="playback-state">{runtime?.playback ?? 'Awaiting service'}</span></div>
-      </Paper>
-      {!compact && <Paper component="aside" square className="inspector" aria-label="Scene controls and status">
+      </Paper>;
+  const inspectorPane = <Paper component="aside" square className="inspector" aria-label="Scene controls and status">
         <section><div className="section-heading"><h2>Controls</h2><Chip label="LIVE" /></div>
           <p className="section-description">Authoring values only. Host controls stay independent.</p>
           <label className="parameter-label" id="intensity-label"><span>{INTENSITY_CONTROL.label}</span><output>{available ? intensity.toFixed(2) : '—'}</output></label>
@@ -120,13 +114,23 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
           <p className="hint">Delivery and interface cadence are measured separately.</p></section>
         <section><h2>Runtime</h2><dl className="identity"><dt>Authoring revision</dt><dd>{runtime?.revisionId ?? 'Unavailable'}</dd><dt>Instance</dt><dd>{runtime?.instanceId ?? 'Unavailable'}</dd><dt>Generation / clock epoch</dt><dd>{runtime ? `${runtime.generation} / ${runtime.clockEpoch}` : 'Unavailable'}</dd><dt>Completed frame</dt><dd>{runtime?.frameId ?? 'Unavailable'}</dd></dl></section>
         <section><div className="section-heading"><h2>Host output</h2><Chip label="SEPARATE" /></div><p className="host-revision">{snapshot.host?.revisionId ?? 'No host status available'}</p><p className="hint">Authoring changes do not update a pinned host revision.</p></section>
-      </Paper>}
-    </div>
-    {!compact && <section className="diagnostics" aria-label="Jobs and diagnostics"><div className="section-heading"><h2>Jobs & diagnostics</h2><span className="subtle">{snapshot.jobs.length} reported</span></div>
+      </Paper>;
+  const jobsPane = <section className="diagnostics" aria-label="Jobs and diagnostics"><div className="section-heading"><h2>Jobs & diagnostics</h2><span className="subtle">{snapshot.jobs.length} reported</span></div>
       {runtime?.fault && <p className="error" role="alert"><strong>{runtime.fault.code}</strong> · {runtime.fault.message}</p>}
       {snapshot.jobs.map(job => <p key={job.jobId} className={job.fault ? 'error' : ''}><span className="tag">{job.state}</span> {job.summary}{job.fault && ` · ${job.fault}`}</p>)}
       {!runtime?.fault && snapshot.jobs.length === 0 && <p>{snapshot.message ?? 'No jobs reported.'}</p>}
-    </section>}
+    </section>;
+  return <div className={`studio ${compact ? 'studio-expanded' : ''} ${windowState.fullscreen ? 'studio-preview-fullscreen' : ''}`}>
+    {windowState.fullscreen && fullscreenHint && <div className="fullscreen-hint" role="status">Press Escape to exit fullscreen</div>}
+    <header className="app-bar" hidden={windowState.fullscreen}>
+      <div className="brand"><span className="brand-symbol" aria-hidden="true">L</span><strong>LUX</strong><span>STUDIO</span></div>
+      <div className="scene-heading"><span className="eyebrow">AUTHORING</span><span>{runtime?.sceneName ?? 'No scene connected'}</span></div>
+      <span className={`connection ${snapshot.connection === 'connected' ? 'connected' : ''}`}><i />{snapshot.connection === 'connected' ? 'Service connected' : snapshot.connection === 'connecting' ? 'Connecting' : 'Disconnected'}</span>
+    </header>
+    <div className="workspace">
+      {sourcePanel ? <StudioDockShell compact={compact} preview={previewPane} source={sourcePanel} inspector={inspectorPane} jobs={jobsPane} /> : <>{previewPane}{!compact && inspectorPane}</>}
+    </div>
+    {!sourcePanel && !compact && jobsPane}
     <footer className="status-bar" hidden={windowState.fullscreen}><span><i className="status-dot" />{snapshot.connection === 'connected' ? 'Authoring service' : 'Awaiting authoring service'}</span><span>Presentation only · output size is independent of window size</span><span>TRACER 0.1</span></footer>
   </div>;
 }

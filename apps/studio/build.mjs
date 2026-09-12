@@ -1,4 +1,10 @@
 import { build } from 'esbuild';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+// ESM CPU tests externalize JS packages; bundle Dockview's CSS as a sidecar.
+const testCss = { name: 'test-dock-css', setup(build) {
+  build.onResolve({ filter: /^dockview-react\/dist\/styles\/dockview.css$/ }, args => ({ path: require.resolve(args.path) }));
+} };
 import { copyFile, mkdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,7 +28,7 @@ if (process.argv.includes('--tests')) await build({ ...common,
   platform: 'node', format: 'cjs', target: 'node24', jsx: 'automatic' });
 if (process.argv.includes('--tests')) await build({ ...common,
   entryPoints: [join(root, 'tests/studio/interactions.test.tsx')], outfile: join(dist, 'interactions.test.mjs'),
-  platform: 'node', format: 'esm', packages: 'external', target: 'node24', jsx: 'automatic' });
+  platform: 'node', format: 'esm', packages: 'external', plugins: [testCss], target: 'node24', jsx: 'automatic' });
 if (process.argv.includes('--tests')) await build({ ...common,
   entryPoints: [join(root, 'tests/studio/source-editor.test.tsx')], outfile: join(dist, 'source-editor.test.mjs'),
-  platform: 'node', format: 'esm', packages: 'external', target: 'node24', jsx: 'automatic' });
+  platform: 'node', format: 'esm', packages: 'external', plugins: [testCss], target: 'node24', jsx: 'automatic' });
