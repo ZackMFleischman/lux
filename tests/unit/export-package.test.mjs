@@ -6,6 +6,7 @@ import os from 'node:os';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import packageIO from '../../packages/export/src/package.cjs';
+import registration from '../../packages/export/src/register.cjs';
 const hash = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 function fixture(t) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'lux-export-test-'));
@@ -15,7 +16,7 @@ function fixture(t) {
     const target = path.join(runtime, name); fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.writeFileSync(target, name === 'electron/version' ? '44.3.0' : 'fixture:' + name);
   }
-  for (const name of ['package.cjs', 'install.cjs']) fs.copyFileSync(new URL('../../packages/export/src/' + name, import.meta.url), path.join(runtime, name));
+  for (const name of ['package.cjs', 'install.cjs', 'register.cjs']) fs.copyFileSync(new URL('../../packages/export/src/' + name, import.meta.url), path.join(runtime, name));
   fs.copyFileSync(new URL('../../tools/gpu-spike/transport-release.cjs', import.meta.url), path.join(runtime, 'transport-release.cjs'));
   const linked = { code: 'export default {};', sourceMap: '', bundleHash: 'b'.repeat(64), linker: { version: '0.28.2' } };
   linked.linkedHash = hash(JSON.stringify(linked));
@@ -86,4 +87,31 @@ test('nested destinations cannot recursively copy or mutate their own package in
   assert.throws(() => packageIO.copyTree(f.runtime, path.join(f.runtime, 'nested')), /outside/);
   assert.equal(packageIO.validatePackage(a.path).release.releaseId, a.releaseId);
   assert.equal(fs.existsSync(path.join(f.runtime, 'nested')), false);
+});
+test('source registration publishes a stable per-release DLL binding and preserves prior sources', t => {
+  const f = fixture(t), pluginDirectory = path.join(f.root, 'plugins');
+  for (const name of registration.supervisorFiles) { const filename = path.join(f.runtime, name); fs.mkdirSync(path.dirname(filename), { recursive: true }); fs.writeFileSync(filename, '// CPU fixture only'); }
+  const a = f.build(), b = f.build({ name: 'Particles' });
+  packageIO.installPackage(a.path, f.installRoot); packageIO.installPackage(b.path, f.installRoot);
+  const first = registration.registerSource({ installRoot: f.installRoot, releaseId: a.releaseId, pluginDirectory });
+  const second = registration.registerSource({ installRoot: f.installRoot, releaseId: b.releaseId, pluginDirectory });
+  assert.notEqual(first.dllPath, second.dllPath); assert.notEqual(first.pluginId, second.pluginId);
+  assert.equal(fs.readFileSync(first.sidecarPath, 'utf8'), ['lux-installed-source-v1', a.releaseId, a.runtimeId, first.pluginId, 'Tunnel', ''].join('\n'));
+  assert.equal(registration.registerSource({ installRoot: f.installRoot, releaseId: a.releaseId, pluginDirectory }).alreadyRegistered, true);
+  fs.appendFileSync(second.dllPath, 'tamper');
+  assert.throws(() => registration.registerSource({ installRoot: f.installRoot, releaseId: b.releaseId, pluginDirectory }), /refusing replacement/);
+  assert.equal(fs.readFileSync(first.sidecarPath, 'utf8'), first.sidecar);
+});
+test('registration refuses incomplete runtime and conflicting FFGL IDs', t => {
+  const f = fixture(t), a = f.build(), pluginDirectory = path.join(f.root, 'plugins');
+  packageIO.installPackage(a.path, f.installRoot);
+  assert.throws(() => registration.registerSource({ installRoot: f.installRoot, releaseId: a.releaseId, pluginDirectory }), /supervisor is not packaged/);
+  assert.equal(fs.existsSync(pluginDirectory), false);
+  for (const name of registration.supervisorFiles) { const filename = path.join(f.runtime, name); fs.mkdirSync(path.dirname(filename), { recursive: true }); fs.writeFileSync(filename, '// CPU fixture only'); }
+  const b = f.build(); packageIO.installPackage(b.path, f.installRoot);
+  const identity = registration.sourceIdentity(packageIO.validatePackage(b.path).release);
+  fs.mkdirSync(pluginDirectory);
+  fs.writeFileSync(path.join(pluginDirectory, 'Lux_' + 'f'.repeat(64) + '.dll.lux-source'), ['lux-installed-source-v1', 'f'.repeat(64), b.runtimeId, identity.pluginId, 'Existing', ''].join('\n'));
+  assert.throws(() => registration.registerSource({ installRoot: f.installRoot, releaseId: b.releaseId, pluginDirectory }), /collision/);
+  assert.equal(fs.readdirSync(pluginDirectory).length, 1);
 });

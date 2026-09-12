@@ -2,7 +2,7 @@
 
 12 September 2026. Implements storage and integrity for DEC-13/TR-06 on the
 working `a5eee83` transport. This is **not** completed Export for Resolume:
-source registration, automatic startup, concurrent runtime identities and cold
+host-verified source registration, automatic startup, concurrent runtime identities and cold
 composition reopen still need implementation and host acceptance.
 
 ## Authoring interface
@@ -41,7 +41,7 @@ scope. It does not implement a new external asset resolution pipeline.
   runtime/apps/render-host/src/{main.cjs,compiled-output.html,compiled-worker.js}
   runtime/native/build/Release/<bridge,probe DLL,app-local MSVC runtime DLLs>
   runtime/tools/gpu-spike/<transport helpers>
-  runtime/{install.cjs,package.cjs,transport-release.cjs}
+  runtime/{install.cjs,package.cjs,register.cjs,transport-release.cjs}
 ```
 
 `runtime.json`: `format: lux-runtime`, `version: 1`, `platform: win32-x64`, exact
@@ -106,6 +106,46 @@ safe storage retirement helper, **not** host-aware uninstall of running sources.
 Do not expose it as such until the supervisor can refuse retirement of live
 references. No recursive runtime garbage collection is provided.
 
+## Explicit source registration
+
+`packages/export/src/register.cjs` exports
+`registerSource({installRoot, releaseId, pluginDirectory})`. The bundled helper
+also supports `install.cmd <installRoot> --register <Resolume-Extra-Effects-directory>`.
+Ordinary package installation still does not register or modify a plugin.
+Registration requires all three pinned `apps/installed-runtime/src/` files:
+`supervisor.cjs`, `registry.cjs`, `instance.cjs`. The authoring exporter includes
+them when present and fails if that set is incomplete. Those modules are owned
+by the separate native startup lane, not this foundation.
+
+Registration copies the pinned native source DLL as `Lux_<releaseId>.dll` and
+publishes `<DLL-path>.lux-source` containing these exact LF-separated lines:
+
+```text
+lux-installed-source-v1
+<releaseId: 64 lowercase hex>
+<runtimeId: 64 lowercase hex>
+<FFGL ID: 4 uppercase base36 characters>
+<display name: 1–16 printable ASCII characters>
+```
+
+There is a final LF. The FFGL ID is deterministic:
+`parseInt(SHA256(releaseId).slice(0,8),16) % 36**4`, encoded uppercase base36,
+left-padded to four characters. An existing different release with that ID
+causes a collision error; export under a different name to choose another ID.
+The name is NFKD-normalized, stripped to printable ASCII, trimmed and truncated
+to 16 characters, with `Lux Source` as fallback.
+
+The helper scans at most 10,000 directory entries, checks existing Lux bindings,
+never replaces altered existing DLLs/descriptors and is idempotent for identical
+registration. It writes the sidecar before publishing the DLL via an exclusive
+same-directory hard link, so native discovery sees the immutable binding first.
+A failed publish can leave an orphan sidecar or temporary file; previous sources
+remain untouched. The plugin directory must support hard links (NTFS). The native
+lane must provide a descriptor-aware DLL and match its installed-root resolution
+to `installRoot`; this function does not infer binary capabilities from file
+presence. Registration CPU tests use fake DLL/module bytes and do not prove host
+loading, automatic startup, DLL signing, or GPU behavior.
+
 ## Next lifecycle lane
 
 Keep the runtime shared by `runtimeId`. Bind each FFGL source to its immutable
@@ -122,17 +162,19 @@ as required runtime files before turning `playbackReady` true.
 Next work must preserve the authoritative host snapshot before first accepted
 frame, lease each instance to host lifetime, keep independent intensity/animation
 state, allow shared service idle exit, report missing packages actionably, and
-implement per-release FFGL identity/registration without executing visual code
-during plugin scanning. Host/control restoration, two different sources, duplicate
+consume the per-release sidecar without executing visual code during plugin
+scanning. Host/control restoration, two different sources, duplicate
 copies and offline cold reopen remain unverified.
 
 ## Evidence
 
-`node --test tests/unit/export-package.test.mjs`: eight CPU tests cover repeatable
+`node --test tests/unit/export-package.test.mjs`: ten CPU tests cover repeatable
 IDs, complete-runtime changes, fixed/default versus saved control values, shared
 runtime reuse, retirement/reinstall, corrupted-package nonreplacement, unlisted
 files, manifest tampering, unsafe paths, junction escapes, nested copy rejection and helper execution
-after original input paths become unavailable.
+after original input paths become unavailable, two-source registration,
+registration idempotence/nonreplacement, incomplete supervisor refusal and FFGL
+identity collision refusal.
 
 A real checkpoint package was created from prepared transport hash
 `04784f34a76b02531b5808e8110ebb95592541ca5019a497344b68ab42d68e19` and the

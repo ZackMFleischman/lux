@@ -15,7 +15,7 @@ const electronRuntimeFiles = ['electron.exe', 'version', 'LICENSE', 'LICENSES.ch
   'd3dcompiler_47.dll', 'dxcompiler.dll', 'dxil.dll', 'ffmpeg.dll', 'icudtl.dat', 'resources.pak', 'snapshot_blob.bin', 'v8_context_snapshot.bin',
   'vk_swiftshader_icd.json', 'vk_swiftshader.dll', 'vulkan-1.dll', 'locales/en-US.pak', 'resources/default_app.asar'];
 const requiredRuntimeFiles = [
-  'electron/electron.exe', 'electron/version', 'install.cjs', 'package.cjs', 'transport-release.cjs',
+  'electron/electron.exe', 'electron/version', 'install.cjs', 'package.cjs', 'register.cjs', 'transport-release.cjs',
   'apps/render-host/src/main.cjs', 'apps/render-host/src/compiled-output.html',
   'apps/render-host/src/compiled-worker.js', 'native/build/Release/lux_texture_bridge.node',
   'native/build/Release/LuxTracerTR02.dll', 'tools/gpu-spike/producer-session.cjs',
