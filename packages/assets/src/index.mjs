@@ -86,6 +86,25 @@ export function decodeBmp(bytes) {
   return { width, height, data };
 }
 
+// Cheap untrusted envelope only. This never certifies base64 or image bytes;
+// callers crossing a trust boundary must still use validateSourceAssets.
+export function snapshotSourceAssetRecords(input) {
+  const records = dataRecord(input), keys = Object.keys(records).sort();
+  if (keys.length > assetLimits.count) fail('At most four image assets are supported',undefined,true);
+  const seen = new Set(), result = {};
+  for (const path of keys) {
+    validateAssetPath(path);
+    if (seen.has(path.toLowerCase())) fail('Case-fold asset path collision',path);
+    seen.add(path.toLowerCase());
+    const descriptor = dataRecord(records[path],sourceFields,path);
+    if (descriptor.mediaType !== 'image/bmp' || descriptor.encoding !== 'base64') fail('Asset must use image/bmp and base64',path);
+    if (typeof descriptor.data !== 'string' || !descriptor.data.length) fail('Asset base64 must be a nonempty string',path);
+    if (descriptor.data.length > Math.ceil(assetLimits.imageBytes/3)*4) fail('Encoded asset exceeds image byte limit',path,true);
+    result[path] = Object.freeze({mediaType:'image/bmp',encoding:'base64',data:descriptor.data});
+  }
+  return Object.freeze(result);
+}
+
 function admit(input, derived = false) {
   const records = dataRecord(input), keys = Object.keys(records);
   if (keys.length > assetLimits.count) fail('At most four image assets are supported', undefined, true);

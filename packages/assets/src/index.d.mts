@@ -33,6 +33,8 @@ export function decodeCanonicalBase64(data: unknown): Uint8Array;
 export function validateBmp(bytes: Uint8Array): BmpInfo;
 export function decodeBmp(bytes: Uint8Array): { width: number; height: number; data: Uint8Array };
 export function validateSourceAssets(input: unknown): SourceAssets;
+/** Cheap descriptor snapshot only; does NOT validate base64, bytes or images. */
+export function snapshotSourceAssetRecords(input: unknown): SourceAssets;
 /** Validates derived shape/size/dimensions, but does not verify the SHA-256 claims. */
 export function canonicalAssetSet(assets: unknown): string;
 export function deriveAssets(input: unknown, hashBytes: HashBytes): Promise<DerivedAssetSet>;
