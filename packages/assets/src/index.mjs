@@ -10,17 +10,22 @@ function fail(message, path, quota = false) {
   });
 }
 
-// Inspect descriptors before reading values: getters and inherited properties are
-// never accepted as wire data. Null-prototype JSON-like records are also valid.
+// Snapshot checked descriptor values, never reread the caller's properties: a
+// Proxy get trap can disagree with its own data descriptors. Null prototypes are
+// valid wire records and keep arbitrary keys safe in this intermediate snapshot.
 function dataRecord(value, fields, path) {
-  if (!value || typeof value !== 'object' || (Object.getPrototypeOf(value) !== Object.prototype && Object.getPrototypeOf(value) !== null)) fail('Expected a plain asset data record', path);
+  if (!value || typeof value !== 'object') fail('Expected a plain asset data record', path);
+  const prototype = Object.getPrototypeOf(value);
+  if (prototype !== Object.prototype && prototype !== null) fail('Expected a plain asset data record', path);
   const keys = Reflect.ownKeys(value);
-  if (fields && (keys.length !== fields.length || fields.some(key => !Object.hasOwn(value, key)))) fail('Missing or unsupported asset fields', path);
+  if (fields && (keys.length !== fields.length || fields.some(key => !keys.includes(key)))) fail('Missing or unsupported asset fields', path);
+  const snapshot = Object.create(null);
   for (const key of keys) {
     const descriptor = Object.getOwnPropertyDescriptor(value, key);
-    if (typeof key !== 'string' || !descriptor.enumerable || !Object.hasOwn(descriptor, 'value') || (fields && !fields.includes(key))) fail('Asset fields must be enumerable own data properties', path);
+    if (typeof key !== 'string' || !descriptor || !descriptor.enumerable || !Object.hasOwn(descriptor, 'value') || (fields && !fields.includes(key))) fail('Asset fields must be enumerable own data properties', path);
+    snapshot[key] = descriptor.value;
   }
-  return keys;
+  return snapshot;
 }
 
 export function validateAssetPath(path) {
@@ -82,7 +87,7 @@ export function decodeBmp(bytes) {
 }
 
 function admit(input, derived = false) {
-  const keys = dataRecord(input);
+  const records = dataRecord(input), keys = Object.keys(records);
   if (keys.length > assetLimits.count) fail('At most four image assets are supported', undefined, true);
   keys.sort(); // Code-unit ASCII order; never localeCompare.
   const seen = new Set(), result = {}, decoded = [];
@@ -91,7 +96,7 @@ function admit(input, derived = false) {
     validateAssetPath(path);
     if (seen.has(path.toLowerCase())) fail('Case-fold asset path collision', path);
     seen.add(path.toLowerCase());
-    const descriptor = input[path]; dataRecord(descriptor, derived ? derivedFields : sourceFields, path);
+    const descriptor = dataRecord(records[path], derived ? derivedFields : sourceFields, path);
     if (descriptor.mediaType !== 'image/bmp' || descriptor.encoding !== 'base64') fail('Asset must use image/bmp and base64', path);
     let bytes, info;
     try { bytes = decodeCanonicalBase64(descriptor.data); info = validateBmp(bytes); }

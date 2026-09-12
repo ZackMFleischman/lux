@@ -22,6 +22,9 @@ The module has no imports or platform image codecs and can be bundled for a brow
   descriptor record. Each descriptor is also frozen. Input records and descriptors
   must contain enumerable own data properties and have ordinary or null prototypes.
   Accessors, symbols, hidden fields, inherited fields and extra fields are rejected.
+  Both record levels are snapshotted from their checked own descriptor values;
+  later property reads or Proxy `get` substitutions cannot change admitted bytes
+  or metadata.
 
 Source descriptors are exactly `{mediaType:"image/bmp",encoding:"base64",data}`.
 An empty record is valid. Paths are logical IDs; these APIs confer no filesystem
