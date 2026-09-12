@@ -13,6 +13,8 @@ app.setPath('userData',path.join(output,'profile'));
 app.whenReady().then(async()=>{
  record({kind:'versions',versions:process.versions,pid:process.pid});
  const win = new BrowserWindow({width:1920,height:1080,frame:false,useContentSize:true,show:false,transparent:true,webPreferences:{offscreen:{useSharedTexture:true},sandbox:true,contextIsolation:true,nodeIntegration:false,backgroundThrottling:false}});
+ win.setContentSize(1920,1080);
+ record({kind:'bounds',bounds:win.getContentBounds()});
  win.webContents.on('console-message',(_e,...args)=>record({kind:'console',args}));
  win.webContents.on('paint',(event)=>{
    if(!event.texture) {record({kind:'failure',reason:'paint without shared texture'});return;}
@@ -24,6 +26,10 @@ app.whenReady().then(async()=>{
  win.webContents.setFrameRate(60);
  await win.loadFile(path.join(__dirname,'output.html'));
  record({kind:'gpu',info:await app.getGPUInfo('complete')});
+ bridge.advertise();
+ setInterval(()=>win.webContents.executeJavaScript('window.setIntensity('+bridge.control()+')').catch(()=>{}),50);
  setTimeout(()=>{clearInterval(timer);record({kind:'summary',paint:count,held:held.size,dropped});fs.writeFileSync(path.join(output,'probe.json'),JSON.stringify(records,null,2));app.exit(0);},15000);
 });
+
+
 

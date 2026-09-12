@@ -1,3 +1,4 @@
 <!doctype html><meta charset="utf-8"><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent}canvas{width:100%;height:100%;display:block}</style><canvas width="1920" height="1080"></canvas><script type="module">
-const worker=new Worker('./visual-worker.js',{type:'module'});const canvas=document.querySelector('canvas').transferControlToOffscreen();worker.onmessage=e=>console.log(JSON.stringify(e.data));worker.onerror=e=>console.error(e.message);worker.postMessage({canvas},[canvas]);
+window.setIntensity=value=>worker.postMessage({intensity:value});const worker=new Worker('./visual-worker.js',{type:'module'});const canvas=document.querySelector('canvas').transferControlToOffscreen();worker.onmessage=e=>console.log(JSON.stringify(e.data));worker.onerror=e=>console.error(e.message);worker.postMessage({canvas},[canvas]);
 </script>
+
