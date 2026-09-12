@@ -1,5 +1,5 @@
 diff --git a/lib/decoder.js b/lib/decoder.js
-index 1982481806e5fe29bd38cb008297f35731ade20b..05f52ffe659c468915231103e9e962b468531e2d 100644
+index 1982481806e5fe29bd38cb008297f35731ade20b..d3604090441d9c7300558287bf6eb2b452555fe3 100644
 --- a/lib/decoder.js
 +++ b/lib/decoder.js
 @@ -157,9 +157,11 @@ var JpegImage = (function jpegImage() {
@@ -26,7 +26,17 @@ index 1982481806e5fe29bd38cb008297f35731ade20b..05f52ffe659c468915231103e9e962b4
          var z = dctZigZag[k];
          zz[z] = receiveAndExtend(s) * (1 << successive);
          k++;
-@@ -305,6 +309,7 @@ var JpegImage = (function jpegImage() {
+@@ -247,6 +251,9 @@ var JpegImage = (function jpegImage() {
+         }
+         k++;
+       }
++      if (!opts.tolerantDecoding && successiveACState !== 0 && successiveACState !== 4) {
++        throw new Error("unfinished AC refinement run at block boundary");
++      }
+       if (successiveACState === 4) {
+         eobrun--;
+         if (eobrun === 0)
+@@ -305,6 +312,7 @@ var JpegImage = (function jpegImage() {
          for (n = 0; n < resetInterval; n++) {
            decodeBlock(component, decodeFn, mcu);
            mcu++;
@@ -34,7 +44,7 @@ index 1982481806e5fe29bd38cb008297f35731ade20b..05f52ffe659c468915231103e9e962b4
          }
        } else {
          for (n = 0; n < resetInterval; n++) {
-@@ -325,7 +330,16 @@ var JpegImage = (function jpegImage() {
+@@ -325,7 +333,17 @@ var JpegImage = (function jpegImage() {
          }
        }
  
@@ -47,6 +57,7 @@ index 1982481806e5fe29bd38cb008297f35731ade20b..05f52ffe659c468915231103e9e962b4
 +        if ((bitsData & paddingMask) !== paddingMask || data[offset] !== 0xFF || data[offset + 1] === 0x00) {
 +          throw new Error("invalid entropy padding or unused entropy bytes");
 +        }
++        while (data[offset] === 0xFF && data[offset + 1] === 0xFF) offset++;
 +      }
 +      if (mcu === mcuExpected && opts.tolerantDecoding) {
          // Skip trailing bytes at the end of the scan - until we reach the next marker

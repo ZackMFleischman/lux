@@ -13,7 +13,7 @@ patchedDependencies:
     hash: c7792735a387ac9ed4e877892e94b5cbe19e23efb66b8eae4607ab59671cf54d
     path: patches/fast-png@8.0.0.patch
   jpeg-js@0.4.4:
-    hash: 0bf17d10925e5713b0e7c930a42eb1f713603574cc9a1282c6841e7a40ee45c5
+    hash: 9f104444e6d781245877562d247768cc15dca273e2a4bb238ae46bbf73146a69
     path: patches/jpeg-js@0.4.4.patch
 
 importers:
@@ -64,7 +64,7 @@ importers:
         version: 6.0.1
       jpeg-js:
         specifier: 0.4.4
-        version: 0.4.4(patch_hash=0bf17d10925e5713b0e7c930a42eb1f713603574cc9a1282c6841e7a40ee45c5)
+        version: 0.4.4(patch_hash=9f104444e6d781245877562d247768cc15dca273e2a4bb238ae46bbf73146a69)
       pako:
         specifier: 2.1.0
         version: 2.1.0
@@ -2592,7 +2592,7 @@ snapshots:
 
   jose@6.2.12: {}
 
-  jpeg-js@0.4.4(patch_hash=0bf17d10925e5713b0e7c930a42eb1f713603574cc9a1282c6841e7a40ee45c5): {}
+  jpeg-js@0.4.4(patch_hash=9f104444e6d781245877562d247768cc15dca273e2a4bb238ae46bbf73146a69): {}
 
   js-tokens@4.0.0: {}
 

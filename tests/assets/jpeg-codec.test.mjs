@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as codec from '../../packages/assets/src/jpeg.mjs';
-import { fixture,segment,insert,exif,findSegment,restartGray,progressiveGray } from './jpeg-fixtures.mjs';
+import { fixture,segment,insert,exif,findSegment,restartGray,progressiveGray,refinementOverflow } from './jpeg-fixtures.mjs';
 
 test('baseline and progressive independent JPEG fixtures decode opaque sRGB', () => {
   assert.equal(typeof codec.decodeJpeg,'function');
@@ -50,6 +50,17 @@ test('grayscale restart decoding handles a final partial interval', () => {
   for (let i = 0; i < image.data.length; i++) assert.equal(image.data[i],i%4 === 3 ? 255 : 128);
 });
 
+test('JPEG permits FF fill bytes before restart and final markers', () => {
+  for (const fill of [[255],[255,255,255]]) {
+    const bytes = restartGray({entropy:[0x0f,...fill,255,0xd0,0x3f]});
+    const withFinalFill = Buffer.concat([bytes.subarray(0,-2),Buffer.from(fill),bytes.subarray(-2)]);
+    for (const input of [bytes,withFinalFill]) {
+      const image = codec.decodeJpeg(input);
+      for (let i = 0; i < image.data.length; i++) assert.equal(image.data[i],i%4 === 3 ? 255 : 128);
+    }
+  }
+});
+
 test('strict JPEG entropy admission rejects unused bytes and non-one padding', () => {
   for (const entropy of [[0x3f,0],[0x3f,255,0],[0x30]]) {
     assert.throws(()=>codec.decodeJpeg(restartGray({width:8,restart:0,entropy})),{code:'ASSET_BOUNDARY_VIOLATION'});
@@ -59,6 +70,12 @@ test('strict JPEG entropy admission rejects unused bytes and non-one padding', (
   assert.throws(()=>codec.decodeJpeg(restartGray({width:8,restart:0,ac:0xf1,entropy:[0x2a,255,0]})),{code:'ASSET_BOUNDARY_VIOLATION'});
   for (const [ac,acEntropy] of [[0xf0,[0x0f]],[0xf1,[0x55]],[0x10,[0x7f]]]) {
     assert.throws(()=>codec.decodeJpeg(progressiveGray(2,{ac,acEntropy})),{code:'ASSET_BOUNDARY_VIOLATION'});
+  }
+});
+
+test('progressive refinement cannot carry unfinished AC runs across block or restart boundaries', () => {
+  for (const restart of [false,true]) for (const [ac,entropy] of [[0xf0,[0x0f]],[0xf1,[0x55]]]) {
+    assert.throws(()=>codec.decodeJpeg(refinementOverflow(ac,entropy,restart)),{code:'ASSET_BOUNDARY_VIOLATION'});
   }
 });
 

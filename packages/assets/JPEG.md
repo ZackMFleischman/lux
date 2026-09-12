@@ -47,6 +47,10 @@ small boundary corrections exposed by hand-derived regression fixtures:
    instead of silently skipping arbitrary unused entropy bytes.
 3. Strict mode rejects baseline/progressive initial AC runs or coefficients beyond
    the block/band and EOB runs extending past a scan/restart boundary.
+4. Strict refinement blocks must finish in a completed state or a legitimate EOB
+   state, rejecting unfinished zero/new-coefficient runs at block boundaries.
+5. Legal FF fill bytes preceding restart/final markers are consumed without
+   changing original file bytes or relaxing entropy padding checks.
 
 These are Lux modifications, not an upstream release. The pnpm lockfile records
 the dependency integrity and patch hash. The decoder is imported directly from
