@@ -29,6 +29,10 @@ The review JSON contains `authorized: true`, a named `reviewer`, `hypothesis`,
 `args`, and nonempty `sources` and `binaries` arrays of `{path, sha256}`. Include
 the executable itself in `binaries`; include all loaded native binaries and all
 relevant source/orchestrator files. Every supplied hash is checked before launch.
+Expiry and every supplied source/binary hash are checked again immediately before
+helper dispatch, after process inspection and metadata I/O, including the actual
+executable hash. Review inputs must remain unchanged through process creation;
+this is a pre-dispatch check, not an OS-enforced immutable-file guarantee.
 The runner does not infer which dynamically loaded files are relevant; reviewers
 must make this inventory complete. Hashes identify bytes, not source cleanliness
 or reproducible build equivalence. Checkpoint source/build provenance before
@@ -37,12 +41,14 @@ not a cryptographic authorization system.
 
 A reviewed orchestrator can spawn a producer and receiver as one experiment.
 Both inherit the same Windows job. The runner sets `LUX_EXPERIMENT_RUN_ID` and
-`LUX_EXPERIMENT_MODE` (`cpu` or `hardware`) on the child environment. These are
+`LUX_EXPERIMENT_MODE` (`cpu` or `hardware`), and `LUX_EXPERIMENT_DIRECTORY` (the
+absolute run directory) on the child environment. These are
 coordination markers, not security credentials.
 
 The exclusive lock is `%USERPROFILE%\AppData\Local\Lux\experiment.lock`, shared
 by all worktrees for this Windows user, including separate sessions. It has no
-automatic expiry or override. Resolume, Electron, standalone_host and lux-prefixed
+automatic expiry or override. Avenue.exe, Arena.exe, Resolume-prefixed, Electron,
+standalone_host and lux-prefixed
 processes are inspected before launch and cause refusal. Inspection failure also
 refuses execution. Unmanaged programs launched afterward, renamed executables,
 and another Windows account are outside this cooperative exclusion mechanism.
@@ -56,6 +62,10 @@ three-second cleanup bound. Kill-on-job-close covers helper termination. There
 is no process-name kill or PID-tree traversal. Assignment errors leave the child
 suspended and terminate that exact owned process. Any unconfirmed cleanup keeps
 the lock. A successful normal parent exit still terminates remaining descendants.
+There is a narrow helper-termination window between creating the suspended child
+and assigning it to the job. Abrupt helper death there can leave that owned child
+suspended outside the job. The runner retains its stale lock; inspect for this
+case before clearing it. Kill-on-job-close applies only after assignment.
 
 Each run directory under `artifacts/experiments` contains config, source and
 executable SHA-256 hashes, supervisor/child PIDs, UTC and monotonic timestamps,
