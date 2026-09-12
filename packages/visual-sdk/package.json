@@ -1,0 +1,1 @@
+{"name":"@lux/visual-sdk","version":"0.1.0","private":true,"type":"module","exports":{".":"./src/index.ts","./discovery":"./src/discovery.mjs"},"peerDependencies":{"three":"0.186.0"}}
