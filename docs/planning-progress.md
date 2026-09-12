@@ -1,0 +1,28 @@
+# Documentation planning progress
+
+## Scope and finish line
+
+Prepare modular architecture, subsystem designs, and an executable tracer 0.1 plan. Preserve both existing `plans/` documents. Stop before application implementation. Finish with committed documents, three independent reviews, resolved tracer planning blockers, and a prompt for the next coordinator.
+
+## Work sequence
+
+- [x] Read source plans and record conversation decisions.
+- [x] Establish baseline requirements and document ownership.
+- [ ] Three specialists draft runtime/bridge, core/AI, and studio/input designs in isolated worktrees.
+- [ ] Coordinator reconciles architecture and shared contracts.
+- [ ] Write tracer tasks, milestone roadmap, and implementation handoff.
+- [ ] Freeze a committed snapshot for three independent reviewers: feasibility/reliability, product/coverage, execution/verification.
+- [ ] Resolve findings in a disposition log and obtain focused independent rechecks.
+- [ ] Validate links, diagrams, requirement coverage, source preservation, and clean Git state; commit final handoff.
+
+## Isolation and checkpoints
+
+Coordinator owns `docs/README.md`, `docs/requirements.md`, `docs/architecture.md`, `docs/planning-progress.md`, `docs/decisions.md`, and `docs/implementation/`.
+Specialists own only their assigned `docs/design/` files in `.worktrees/<role>`, on separate `codex/` branches. They commit those paths only and return commit hashes. Coordinator alone integrates commits and changes shared contracts. No pushes or application implementation in this pass.
+Reviewers examine the same frozen commit independently, each writing only its report. They do not read one another's findings before submitting. Integration and rechecks are sequentially coordinated.
+Commit checkpoints: baseline, specialist drafts, reconciled plans, initial reviews, corrections, final readiness. Keep useful work saved if a technical or environmental issue occurs.
+
+## Status log
+
+- Baseline: source commit `1c9c884`; clean checkout; no application code or tests. User authorized routine planning decisions, three independent reviewers, worktrees, frequent commits, and architecture/UI diagrams.
+- Current phase: baseline preparation. Technical proposals require evidence or a bounded tracer experiment; documentation readiness is not proof of working GPU integration.
