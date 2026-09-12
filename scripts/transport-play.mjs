@@ -12,8 +12,10 @@ const quote=value=>'"'+value.replace(/(\\*)"/g,'$1$1\\"').replace(/(\\+)$/g,'$1$
 const ps=code=>execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',code],{encoding:'utf8',windowsHide:true,timeout:15000});
 async function main(){
   const input=process.argv[2];if(!input)throw Error('Usage: pnpm transport:play <saved.lux-scene or prepared release.json>');
+  console.log(input.endsWith('.lux-scene')?'Preparing saved visual…':'Loading prepared visual…');
   const releasePath=input.endsWith('.lux-scene')?(await prepareTransportScene(input)).path:resolve(input);
   const release=releaseIO.readTransportRelease(releasePath);
+  console.log('Checking Resolume and the transport build…');
   const processes=JSON.parse(ps("@(Get-CimInstance Win32_Process | Select-Object Name,ProcessId,ExecutablePath,@{Name='CreationUtc';Expression={$_.CreationDate.ToUniversalTime().ToString('o')}}) | ConvertTo-Json -Compress"));
   const hosts=processes.filter(p=>/^(Avenue|Arena)\.exe$/i.test(p.Name));
   if(hosts.length!==1)throw Error('Open exactly one Resolume host and trigger one Lux TR02 Probe source first');
@@ -51,7 +53,7 @@ async function main(){
     await writeFile(join(directory,'config.json'),JSON.stringify({executable,commandLine:[executable,join(root,'apps/render-host/src/main.cjs')].map(quote).join(' '),
       cwd:root,directory,timeoutMs:-1,stopFile,ownerPid:process.pid,hostPid:host.pid,hostCreatedUtc:hostLifetimeUtc}));
     process.on('SIGINT',stop);process.on('SIGTERM',stop);
-    console.log(`Playing ${release.sourceHash.slice(0,12)} in Resolume. Press Ctrl+C to stop.\nSession: ${directory}`);
+    console.log(`Starting ${release.sourceHash.slice(0,12)} in Resolume. Press Ctrl+C to stop.\nSession: ${directory}`);
     const env={...process.env,LUX_EXPERIMENT_MODE:'hardware',LUX_EXPERIMENT_RUN_ID:id,LUX_EXPERIMENT_DIRECTORY:directory,
       LUX_TRANSPORT_PLAYBACK:'1',LUX_TRANSPORT_BUNDLE:releasePath,LUX_TRANSPORT_STOP:stopFile,LUX_GPU_OUTPUT:directory};
     delete env.ELECTRON_RUN_AS_NODE;started=true;

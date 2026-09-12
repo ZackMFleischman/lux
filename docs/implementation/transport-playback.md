@@ -1,8 +1,9 @@
 # Saved visual playback in Resolume
 
-Compiled visuals now pass the standalone GPU diagnostic. Actual Resolume and
-persistent playback verification are in progress. The commands below are the
-implemented entry points, not a claim that all host checks have passed.
+Saved visual playback is verified in Resolume: continuous animation, live
+Intensity, host-controlled initialization, Ctrl+C stop, last-frame retention,
+restart, clip removal, and automatic producer cleanup after normal host close.
+See [verification results](transport-resumption.md#compiled-saved-visual-completion).
 
 ## Prepare and play
 
@@ -16,6 +17,8 @@ Preparation validates the scene, runs the existing compiler and linker, and
 writes a content-addressed release under `artifacts/transport`. It never starts
 a graphics process. Resolution is 1920×1080 at 60 requested frames per second;
 the saved seed is retained.
+
+Preparation is optional: `transport:play` also compiles a saved scene directly.
 
 With the matching `native/build/Release/LuxTracerTR02.dll` installed, open one
 Resolume Avenue or Arena process and trigger one **Lux TR02 Probe** source.

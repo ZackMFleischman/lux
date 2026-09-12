@@ -1,0 +1,12 @@
+{
+  "sessionId": "25d279f3-6310-49fa-9a5f-9ac2114ce9c1",
+  "observer": "user",
+  "question": "Did this repeat freeze and resume correctly, and did clearing the clip and closing Resolume both finish normally?",
+  "answer": "Yes—all worked, and Resolume is closed",
+  "supervisorResult": "result.json",
+  "postRunInspection": {
+    "avenueArenaElectronProcesses": [],
+    "experimentLockPresent": false
+  },
+  "scope": "Manual freeze/reconnect/removal/host-close confirmation and automatic producer cleanup"
+}

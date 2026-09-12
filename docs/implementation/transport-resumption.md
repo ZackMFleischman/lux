@@ -98,3 +98,50 @@ on the authoritative host control snapshot. Further acceptance remains separate:
 numeric color/alpha and frame provenance, full 1080p60 measurement, multi-instance
 identity, resize/device-loss handling and broader lifecycle coverage. No complete
 TR-02 or production-ready integration is claimed from the short diagnostic runs.
+
+## Compiled saved visual completion
+
+The independent saved-visual transport feature is now implemented and exercised
+in actual Resolume. `pnpm transport:prepare` compiles a saved `.lux-scene` into
+an immutable release; `pnpm transport:play` runs either format persistently.
+The renderer reuses Studio's visual worker and the native bridge. Resolume's
+Intensity initializes the visual before its first render and supplies live
+updates. The saved scene's authoring Intensity never overwrites the host value.
+
+Late transfer of an already-composited canvas caused black output despite
+advancing worker frames. Replacing the placeholder with a fresh canvas directly
+before transfer fixed this in the isolated diagnostic. Temporary shader,
+scheduler, and device experiments were removed. A one-frame result no longer
+passes the animated diagnostic. Normal playback uses GPU transport; occasional
+CPU image captures are confined to the standalone diagnostic.
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Compiled standalone | 166 paints, 73 sampled receiver consumptions, correct final image, complete cleanup | `tr02-compiled-standalone` |
+| Compiled Resolume diagnostic | 665 paints, 648 consumptions; first worker frame used 0.17 | `tr02-compiled-resolume` |
+| Persistent saved-scene playback | Over one minute, 2766 paints; user confirmed continuous rotation and live color changes; Ctrl+C exited cleanly | `tr02-compiled-playback-stop` |
+| Reconnect and host close | User confirmed freeze, resume, clip removal and normal host close; 1234 paints; producer exited automatically with no forced stop | `tr02-compiled-playback-close` |
+
+Evidence folders are under `evidence/tracer-0.1/`. The initial bounded host run
+was not visually confirmed because the clip was not triggered; the subsequent
+persistent runs supplied the human visual checks. An unwatched restart was
+repeated before recording the final manual confirmation.
+
+The final shutdown had `exitCode:0`, `forcedStop:false`, and
+`cleanupComplete:true`. Read-only inspection found no remaining Avenue, Arena
+or Electron process and no experiment lock. All 34 unit tests, 9 native CPU
+tests, type checking, and the build passed. CPU fixtures additionally cover
+owner exit and a producer that ignores shutdown.
+
+Installed DLL SHA256:
+`2de5d23b889202da46ec9b2b141f9969a14e9c12ad53c29d185815b88f82f453`.
+The old installed binary and the earlier disabled incident binary are preserved.
+Source is on `codex/resolume-transport`; see [playback instructions](transport-playback.md).
+
+This completes saved-scene playback and initial host-control application for one
+source/producer. Studio must currently be closed during playback. Multi-instance
+routing, simultaneous authoring/playback, sustained 1080p60 measurement, numeric
+color/alpha acceptance and device-loss recovery remain outside this feature's
+scope. Worker acknowledgement proves initial control application; it does not
+prove which compositor texture was exported first. Full tracer acceptance is
+not inferred from these integration checks.
