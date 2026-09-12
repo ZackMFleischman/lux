@@ -62,6 +62,16 @@ test('missing pinned dependencies are a bounded service failure with no filesyst
   assert.doesNotMatch(JSON.stringify(result.diagnostics), /missing-dependencies|C:\\|C:\//);
 });
 
+test('escaping-heavy real TypeScript diagnostics stay within final serialized quota', async () => {
+  const literal = '\\\\'.repeat(700);
+  const failures = Array.from({ length: 128 }, () => `({})["${literal}"];`).join('\n');
+  const result = await compileVisual(request(`${failures}\n${await example()}`), { dependencyRoot });
+  assert.equal(result.ok, false);
+  assert.equal(result.code, 'COMPILE_FAILED', JSON.stringify(result).slice(0, 500));
+  assert.ok(Buffer.byteLength(JSON.stringify(result.diagnostics)) <= 131072);
+  assert.equal(result.diagnostics.at(-1).code, 'DIAGNOSTICS_TRUNCATED');
+});
+
 test('infinite visual initialization is emitted as untrusted data, never run by compiler', async () => {
   const source = (await example()).replace('async create(context) {', 'async create(context) { while (true) {}');
   const result = await compileVisual(request(source), { dependencyRoot });

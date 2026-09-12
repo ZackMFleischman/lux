@@ -6,6 +6,7 @@ import { spawnSync } from 'node:child_process';
 import { dirname, join, resolve, posix, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { limits, validateSource, violation } from './source-policy.mjs';
+import { boundDiagnostics, assertResultBudgets } from './result-budget.mjs';
 import { sdkMetadata } from '../../../packages/visual-sdk/src/metadata.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -100,6 +101,7 @@ async function main() {
   const dependencies = {
     'compiler/worker.mjs': fileURLToPath(import.meta.url),
     'compiler/source-policy.mjs': join(root, 'apps/build-worker/src/source-policy.mjs'),
+    'compiler/result-budget.mjs': join(root, 'apps/build-worker/src/result-budget.mjs'),
     'node/executable': process.execPath,
     'sdk/index.ts': join(root, 'packages/visual-sdk/src/index.ts'),
     'sdk/metadata.mjs': join(root, 'packages/visual-sdk/src/metadata.mjs'),
@@ -119,8 +121,9 @@ async function main() {
   }
   const artifact = { sourceHash: sha(JSON.stringify(source)), entry: source.entry.replace(/\.ts$/, '.js'), modules, sourceMaps,
     sdkVersion: source.sdkVersion, compilerVersion: pinned.typescript, dependencyHashes };
-  if (Buffer.byteLength(JSON.stringify(artifact)) > limits.outputBytes) throw violation('Emitted artifact exceeds 4 MiB', 'QUOTA_EXCEEDED');
-  return { ok: true, artifact: { ...artifact, bundleHash: sha(JSON.stringify(artifact)) }, diagnostics: [] };
+  const result = { ok: true, artifact: { ...artifact, bundleHash: sha(JSON.stringify(artifact)) }, diagnostics: [] };
+  assertResultBudgets(result);
+  return result;
 }
 let result;
 try { result = await main(); }
@@ -130,4 +133,6 @@ catch (error) {
   const safe = known ? error : Object.assign(Error('Compiler setup failed; check pinned dependencies and build-worker files'), { code: 'SERVICE_UNAVAILABLE' });
   result = { ok: false, code: safe.code, diagnostics: [diagnostic(safe)] };
 }
+result.diagnostics = boundDiagnostics(result.diagnostics);
+assertResultBudgets(result);
 await writeFile(join(workspace, 'compile-result.json'), JSON.stringify(result));
