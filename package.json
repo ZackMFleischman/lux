@@ -1,7 +1,13 @@
 {
-  "name": "lux", "version": "0.0.0", "private": true, "type": "module",
+  "name": "lux",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
   "packageManager": "pnpm@10.33.0",
-  "engines": { "node": "24.12.0", "pnpm": "10.33.0" },
+  "engines": {
+    "node": "24.12.0",
+    "pnpm": "10.33.0"
+  },
   "scripts": {
     "preflight": "node scripts/preflight.mjs",
     "typecheck": "tsc --noEmit",
@@ -14,6 +20,20 @@
     "test:host": "node scripts/unavailable.mjs TR-06 live-Resolume-and-native-plugin",
     "test:acceptance": "node scripts/unavailable.mjs TR-07 measured-host-acceptance"
   },
-  "dependencies": { "@modelcontextprotocol/sdk": "1.30.0", "zod": "3.25.76", "three": "0.186.0" },
-  "devDependencies": { "@types/node": "24.13.4", "electron": "44.3.0", "typescript": "7.0.2" }
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "three": "0.186.0",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@babel/parser": "8.0.5",
+    "@types/node": "24.13.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "electron": "44.3.0",
+    "esbuild": "0.28.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "typescript": "7.0.2"
+  }
 }
