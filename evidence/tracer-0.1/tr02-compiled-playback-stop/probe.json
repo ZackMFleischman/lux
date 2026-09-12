@@ -1,0 +1,981 @@
+[
+  {
+    "utc": "2026-09-12T18:20:01.170Z",
+    "time": "37198544323900",
+    "kind": "versions",
+    "versions": {
+      "node": "24.20.0",
+      "acorn": "8.18.0",
+      "ada": "4.0.0",
+      "amaro": "1.1.11",
+      "ares": "1.34.8",
+      "brotli": "1.2.0",
+      "cldr": "48.0",
+      "icu": "78.2",
+      "llhttp": "9.4.3",
+      "merve": "1.2.2",
+      "modules": "149",
+      "napi": "10",
+      "nbytes": "0.1.4",
+      "ncrypto": "0.0.1",
+      "nghttp2": "1.70.0",
+      "nghttp3": "",
+      "ngtcp2": "",
+      "openssl": "0.0.0",
+      "simdjson": "4.6.6",
+      "simdutf": "7.7.0",
+      "sqlite": "3.53.4",
+      "tz": "2025c",
+      "undici": "7.29.0",
+      "unicode": "17.0",
+      "uv": "1.52.1",
+      "uvwasi": "0.0.23",
+      "v8": "15.2.124.19-electron.0",
+      "zlib": "1.3.2.1-motley",
+      "zstd": "1.6.0",
+      "electron": "44.3.0",
+      "chrome": "152.0.7977.78"
+    },
+    "pid": 24188
+  },
+  {
+    "utc": "2026-09-12T18:20:01.170Z",
+    "time": "37198544345600",
+    "kind": "release",
+    "sourceHash": "162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898",
+    "linkedHash": "958b7e50987fd63497a857f6593c8473b1479df793c2c9be2f7b911c7e6368bb",
+    "settings": {
+      "width": 1920,
+      "height": 1080,
+      "fps": 60,
+      "seed": 7
+    }
+  },
+  {
+    "utc": "2026-09-12T18:20:01.197Z",
+    "time": "37198571274000",
+    "kind": "bounds",
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 1080
+    }
+  },
+  {
+    "utc": "2026-09-12T18:20:01.535Z",
+    "time": "37198909692200",
+    "kind": "gpu",
+    "info": {
+      "auxAttributes": {
+        "amdSwitchable": false,
+        "canSupportThreadedTextureMailbox": false,
+        "directMLFeatureLevel": "Not supported",
+        "displayType": "ANGLE_D3D11",
+        "dx12FeatureLevel": "Not supported",
+        "glExtensions": "GL_AMD_performance_monitor GL_ANGLE_base_vertex_base_instance_shader_builtin GL_ANGLE_blob_cache GL_ANGLE_client_arrays GL_ANGLE_clip_cull_distance GL_ANGLE_copy_texture_3d GL_ANGLE_depth_texture GL_ANGLE_framebuffer_blit GL_ANGLE_framebuffer_multisample GL_ANGLE_get_serialized_context_string GL_ANGLE_get_tex_level_parameter GL_ANGLE_instanced_arrays GL_ANGLE_memory_size GL_ANGLE_multiview_multisample GL_ANGLE_pack_reverse_row_order GL_ANGLE_polygon_mode GL_ANGLE_program_binary_readiness_query GL_ANGLE_program_cache_control GL_ANGLE_provoking_vertex GL_ANGLE_renderability_validation GL_ANGLE_request_extension GL_ANGLE_robust_client_memory GL_ANGLE_shader_pixel_local_storage GL_ANGLE_shader_pixel_local_storage_coherent GL_ANGLE_stencil_texturing GL_ANGLE_texture_compression_dxt3 GL_ANGLE_texture_compression_dxt5 GL_ANGLE_texture_multisample GL_ANGLE_texture_usage GL_ANGLE_translated_shader_source GL_APPLE_clip_distance GL_ARM_rgba8 GL_CHROMIUM_bind_generates_resource GL_CHROMIUM_bind_uniform_location GL_CHROMIUM_copy_compressed_texture GL_CHROMIUM_copy_texture GL_CHROMIUM_lose_context GL_EXT_EGL_image_external_wrap_modes GL_EXT_base_instance GL_EXT_blend_func_extended GL_EXT_blend_minmax GL_EXT_clip_control GL_EXT_clip_cull_distance GL_EXT_color_buffer_float GL_EXT_color_buffer_half_float GL_EXT_conservative_depth GL_EXT_debug_label GL_EXT_debug_marker GL_EXT_depth_clamp GL_EXT_discard_framebuffer GL_EXT_disjoint_timer_query GL_EXT_draw_buffers GL_EXT_draw_buffers_indexed GL_EXT_draw_elements_base_vertex GL_EXT_float_blend GL_EXT_frag_depth GL_EXT_instanced_arrays GL_EXT_map_buffer_range GL_EXT_occlusion_query_boolean GL_EXT_polygon_offset_clamp GL_EXT_read_format_bgra GL_EXT_render_snorm GL_EXT_robustness GL_EXT_sRGB GL_EXT_shader_texture_lod GL_EXT_texture_border_clamp GL_EXT_texture_compression_bptc GL_EXT_texture_compression_dxt1 GL_EXT_texture_compression_rgtc GL_EXT_texture_compression_s3tc_srgb GL_EXT_texture_filter_anisotropic GL_EXT_texture_format_BGRA8888 GL_EXT_texture_mirror_clamp_to_edge GL_EXT_texture_norm16 GL_EXT_texture_rg GL_EXT_texture_storage GL_EXT_texture_type_2_10_10_10_REV GL_EXT_unpack_subimage GL_KHR_debug GL_KHR_parallel_shader_compile GL_KHR_robustness GL_NV_EGL_stream_consumer_external GL_NV_fence GL_NV_framebuffer_blit GL_NV_pack_subimage GL_NV_pixel_buffer_object GL_NV_shader_noperspective_interpolation GL_OES_EGL_image GL_OES_EGL_image_external GL_OES_EGL_image_external_essl3 GL_OES_depth24 GL_OES_depth32 GL_OES_draw_buffers_indexed GL_OES_draw_elements_base_vertex GL_OES_element_index_uint GL_OES_fbo_render_mipmap GL_OES_get_program_binary GL_OES_mapbuffer GL_OES_packed_depth_stencil GL_OES_required_internalformat GL_OES_rgb8_rgba8 GL_OES_sample_variables GL_OES_shader_multisample_interpolation GL_OES_standard_derivatives GL_OES_surfaceless_context GL_OES_texture_border_clamp GL_OES_texture_float GL_OES_texture_float_linear GL_OES_texture_half_float GL_OES_texture_half_float_linear GL_OES_texture_npot GL_OES_texture_stencil8 GL_OES_texture_storage_multisample_2d_array GL_OES_vertex_array_object GL_OVR_multiview GL_OVR_multiview2 ",
+        "glImplementationParts": "(gl=egl-angle,angle=d3d11)",
+        "glRenderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 2070 (0x00001F14) Direct3D11 vs_5_0 ps_5_0, D3D11-32.0.15.9144)",
+        "glResetNotificationStrategy": 33362,
+        "glVendor": "Google Inc. (NVIDIA)",
+        "glVersion": "OpenGL ES 3.0 (ANGLE 2.1.28468 git hash: 1c43d257c56e)",
+        "glWsExtensions": "EGL_EXT_create_context_robustness EGL_ANGLE_d3d_share_handle_client_buffer EGL_ANGLE_d3d_texture_client_buffer EGL_ANGLE_surface_d3d_texture_2d_share_handle EGL_ANGLE_query_surface_pointer EGL_ANGLE_window_fixed_size EGL_ANGLE_keyed_mutex EGL_ANGLE_surface_orientation EGL_ANGLE_direct_composition EGL_NV_post_sub_buffer EGL_KHR_create_context EGL_KHR_image EGL_KHR_image_base EGL_KHR_gl_texture_2D_image EGL_KHR_gl_texture_cubemap_image EGL_KHR_gl_renderbuffer_image EGL_KHR_get_all_proc_addresses EGL_KHR_stream EGL_KHR_stream_consumer_gltexture EGL_NV_stream_consumer_gltexture_yuv EGL_ANGLE_stream_producer_d3d_texture EGL_ANGLE_create_context_webgl_compatibility EGL_CHROMIUM_create_context_bind_generates_resource EGL_CHROMIUM_sync_control EGL_EXT_pixel_format_float EGL_KHR_surfaceless_context EGL_ANGLE_display_texture_share_group EGL_ANGLE_display_semaphore_share_group EGL_ANGLE_create_context_client_arrays EGL_ANGLE_program_cache_control EGL_ANGLE_robust_resource_initialization EGL_ANGLE_create_context_extensions_enabled EGL_ANDROID_blob_cache EGL_ANDROID_recordable EGL_ANGLE_image_d3d11_texture EGL_ANGLE_create_context_backwards_compatible EGL_KHR_no_config_context EGL_KHR_create_context_no_error EGL_KHR_reusable_sync EGL_ANGLE_memory_usage_report ",
+        "glWsVendor": "Google Inc. (NVIDIA)",
+        "glWsVersion": "1.5 (ANGLE 2.1.28468 git hash: 1c43d257c56e)",
+        "inProcessGpu": false,
+        "initializationTime": 309.248,
+        "isAsan": false,
+        "isClangCoverage": false,
+        "jpegDecodeAcceleratorSupported": false,
+        "maxMsaaSamples": "8",
+        "optimus": false,
+        "overlayInfo": {
+          "bgra8OverlaySupport": "SOFTWARE",
+          "directComposition": true,
+          "nv12OverlaySupport": "SOFTWARE",
+          "p010OverlaySupport": "SOFTWARE",
+          "rgb10a2OverlaySupport": "SOFTWARE",
+          "supportsOverlays": true,
+          "yuy2OverlaySupport": "SOFTWARE"
+        },
+        "passthroughCmdDecoder": true,
+        "pixelShaderVersion": "5.0",
+        "sandboxed": true,
+        "skiaBackendType": "GaneshGL",
+        "subpixelFontRendering": true,
+        "supportsD3dSharedImages": false,
+        "supportsDirectML": false,
+        "supportsDx12": false,
+        "supportsVulkan": false,
+        "targetCpuBits": 64,
+        "vertexShaderVersion": "5.0",
+        "visibilityCallbackCallCount": 0,
+        "vulkanVersion": "Not supported"
+      },
+      "gpuDevice": [
+        {
+          "active": false,
+          "deviceId": 39876,
+          "deviceString": "Intel(R) UHD Graphics",
+          "driverVendor": "NVIDIA",
+          "driverVersion": "26.20.100.7642",
+          "gpuPreference": 2,
+          "revision": 5,
+          "subSysId": 314053730,
+          "vendorId": 32902
+        },
+        {
+          "active": true,
+          "deviceId": 7956,
+          "deviceString": "NVIDIA GeForce RTX 2070",
+          "driverVersion": "32.0.15.9144",
+          "gpuPreference": 3,
+          "revision": 161,
+          "subSysId": 314053730,
+          "vendorId": 4318
+        },
+        {
+          "active": false,
+          "deviceId": 140,
+          "deviceString": "Microsoft Basic Render Driver",
+          "driverVersion": "10.0.26100.9278",
+          "gpuPreference": 0,
+          "revision": 0,
+          "subSysId": 0,
+          "vendorId": 5140
+        }
+      ]
+    }
+  },
+  {
+    "utc": "2026-09-12T18:20:02.020Z",
+    "time": "37199394873900",
+    "kind": "host-control",
+    "value": 0.17000000178813934
+  },
+  {
+    "utc": "2026-09-12T18:20:02.149Z",
+    "time": "37199523430300",
+    "kind": "console",
+    "message": "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127"
+  },
+  {
+    "utc": "2026-09-12T18:20:02.576Z",
+    "time": "37199950080500",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"ready\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"7571a739-c927-4330-b852-e034d4fe2c14\",\"playback\":\"paused\",\"timeSeconds\":0,\"clockEpoch\":0,\"frameId\":\"1\",\"controlSequence\":0,\"intensity\":0.17000000178813934}"
+  },
+  {
+    "utc": "2026-09-12T18:20:02.576Z",
+    "time": "37199950338700",
+    "kind": "initial-frame",
+    "intensity": 0.17000000178813934,
+    "sourceHash": "162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898",
+    "frameId": "1",
+    "controlSequence": 0
+  },
+  {
+    "utc": "2026-09-12T18:20:02.585Z",
+    "time": "37199959916200",
+    "kind": "paint",
+    "id": 1,
+    "slot": 0,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 772122,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 3
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T18:20:02.600Z",
+    "time": "37199974287000",
+    "kind": "paint",
+    "id": 2,
+    "slot": 1,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 799968,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 4
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T18:20:02.626Z",
+    "time": "37200000369200",
+    "kind": "paint",
+    "id": 3,
+    "slot": 0,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 833300,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 5
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T18:20:02.660Z",
+    "time": "37200034142100",
+    "kind": "paint",
+    "id": 4,
+    "slot": 0,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 866632,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 6
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T18:20:02.676Z",
+    "time": "37200050267000",
+    "kind": "paint",
+    "id": 5,
+    "slot": 0,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 883298,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 7
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T18:20:02.692Z",
+    "time": "37200066842100",
+    "kind": "paint",
+    "id": 6,
+    "slot": 0,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 899964,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 8
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T18:20:02.726Z",
+    "time": "37200100097700",
+    "kind": "paint",
+    "id": 7,
+    "slot": 0,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 933296,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 9
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T18:20:02.742Z",
+    "time": "37200116881400",
+    "kind": "paint",
+    "id": 8,
+    "slot": 0,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 949962,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 10
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T18:20:02.760Z",
+    "time": "37200133975300",
+    "kind": "paint",
+    "id": 9,
+    "slot": 0,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 966628,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 11
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T18:20:02.776Z",
+    "time": "37200150447900",
+    "kind": "paint",
+    "id": 10,
+    "slot": 1,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 983294,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 12
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T18:20:25.981Z",
+    "time": "37223355351800",
+    "kind": "host-control",
+    "value": 0.2278480976819992
+  },
+  {
+    "utc": "2026-09-12T18:20:25.986Z",
+    "time": "37223360541100",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"c1099354-cc3c-4cd5-94c8-d469444bebe0\",\"playback\":\"playing\",\"timeSeconds\":23.407,\"clockEpoch\":0,\"frameId\":\"1111\",\"controlSequence\":1,\"intensity\":0.2278480976819992}"
+  },
+  {
+    "utc": "2026-09-12T18:20:26.043Z",
+    "time": "37223417612000",
+    "kind": "host-control",
+    "value": 0.2987338602542877
+  },
+  {
+    "utc": "2026-09-12T18:20:26.048Z",
+    "time": "37223421983300",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"ec8b0599-7aad-425d-bcc4-a25679fb5ec5\",\"playback\":\"playing\",\"timeSeconds\":23.46819999999553,\"clockEpoch\":0,\"frameId\":\"1114\",\"controlSequence\":2,\"intensity\":0.2987338602542877}"
+  },
+  {
+    "utc": "2026-09-12T18:20:26.106Z",
+    "time": "37223480274800",
+    "kind": "host-control",
+    "value": 0.3999996781349182
+  },
+  {
+    "utc": "2026-09-12T18:20:26.110Z",
+    "time": "37223484739500",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"a00fffd7-afe7-4548-98fe-ee7ce330c5da\",\"playback\":\"playing\",\"timeSeconds\":23.53089999999851,\"clockEpoch\":0,\"frameId\":\"1118\",\"controlSequence\":3,\"intensity\":0.3999996781349182}"
+  },
+  {
+    "utc": "2026-09-12T18:20:26.167Z",
+    "time": "37223541717900",
+    "kind": "host-control",
+    "value": 0.521519124507904
+  },
+  {
+    "utc": "2026-09-12T18:20:26.178Z",
+    "time": "37223552611100",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"7967c2b3-ba92-42eb-bf2d-395559a934cf\",\"playback\":\"playing\",\"timeSeconds\":23.59639999999851,\"clockEpoch\":0,\"frameId\":\"1122\",\"controlSequence\":4,\"intensity\":0.521519124507904}"
+  },
+  {
+    "utc": "2026-09-12T18:20:26.231Z",
+    "time": "37223604963400",
+    "kind": "host-control",
+    "value": 0.5316455960273743
+  },
+  {
+    "utc": "2026-09-12T18:20:26.235Z",
+    "time": "37223609635400",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"3a97375f-e293-468f-8435-988b38e6bb57\",\"playback\":\"playing\",\"timeSeconds\":23.65559999999404,\"clockEpoch\":0,\"frameId\":\"1125\",\"controlSequence\":5,\"intensity\":0.5316455960273743}"
+  },
+  {
+    "utc": "2026-09-12T18:20:26.480Z",
+    "time": "37223854719100",
+    "kind": "host-control",
+    "value": 0.521519124507904
+  },
+  {
+    "utc": "2026-09-12T18:20:26.484Z",
+    "time": "37223858764000",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"af4d5fdc-bc55-4bad-8157-499d9e5d0674\",\"playback\":\"playing\",\"timeSeconds\":23.90529999999702,\"clockEpoch\":0,\"frameId\":\"1137\",\"controlSequence\":6,\"intensity\":0.521519124507904}"
+  },
+  {
+    "utc": "2026-09-12T18:20:26.542Z",
+    "time": "37223916131700",
+    "kind": "host-control",
+    "value": 0.31898748874664307
+  },
+  {
+    "utc": "2026-09-12T18:20:26.546Z",
+    "time": "37223920587300",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"d092dac1-feb9-49a9-9c9f-57a87af42610\",\"playback\":\"playing\",\"timeSeconds\":23.96689999999851,\"clockEpoch\":0,\"frameId\":\"1140\",\"controlSequence\":7,\"intensity\":0.31898748874664307}"
+  },
+  {
+    "utc": "2026-09-12T18:20:26.605Z",
+    "time": "37223979008700",
+    "kind": "host-control",
+    "value": 0.2278480976819992
+  },
+  {
+    "utc": "2026-09-12T18:20:26.610Z",
+    "time": "37223984128200",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"c0bd14f5-70eb-4889-af28-c4b8e503e3e6\",\"playback\":\"playing\",\"timeSeconds\":24.02969999999553,\"clockEpoch\":0,\"frameId\":\"1144\",\"controlSequence\":8,\"intensity\":0.2278480976819992}"
+  },
+  {
+    "utc": "2026-09-12T18:20:26.666Z",
+    "time": "37224040794600",
+    "kind": "host-control",
+    "value": 0.1873416155576706
+  },
+  {
+    "utc": "2026-09-12T18:20:26.672Z",
+    "time": "37224046668800",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"b9b756ba-01a7-4671-a210-0535fe6534e7\",\"playback\":\"playing\",\"timeSeconds\":24.09159999999404,\"clockEpoch\":0,\"frameId\":\"1148\",\"controlSequence\":9,\"intensity\":0.1873416155576706}"
+  },
+  {
+    "utc": "2026-09-12T18:20:26.728Z",
+    "time": "37224102382200",
+    "kind": "host-control",
+    "value": 0.14683513343334198
+  },
+  {
+    "utc": "2026-09-12T18:20:26.732Z",
+    "time": "37224106666700",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"0278a736-fbd7-4aea-acc7-a79a812fc1f0\",\"playback\":\"playing\",\"timeSeconds\":24.153,\"clockEpoch\":0,\"frameId\":\"1151\",\"controlSequence\":10,\"intensity\":0.14683513343334198}"
+  },
+  {
+    "utc": "2026-09-12T18:20:26.790Z",
+    "time": "37224164681600",
+    "kind": "host-control",
+    "value": 0.04556931182742119
+  },
+  {
+    "utc": "2026-09-12T18:20:26.796Z",
+    "time": "37224170109500",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"8c547844-8a52-4fb4-bd59-a957eb2242c0\",\"playback\":\"playing\",\"timeSeconds\":24.21529999999702,\"clockEpoch\":0,\"frameId\":\"1155\",\"controlSequence\":11,\"intensity\":0.04556931182742119}"
+  },
+  {
+    "utc": "2026-09-12T18:20:27.291Z",
+    "time": "37224665493500",
+    "kind": "host-control",
+    "value": 0.0556965097784996
+  },
+  {
+    "utc": "2026-09-12T18:20:27.297Z",
+    "time": "37224671144700",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"0cc9e46c-8897-4c7c-84d4-ec08980f2e83\",\"playback\":\"playing\",\"timeSeconds\":24.71629999999702,\"clockEpoch\":0,\"frameId\":\"1179\",\"controlSequence\":12,\"intensity\":0.0556965097784996}"
+  },
+  {
+    "utc": "2026-09-12T18:20:27.416Z",
+    "time": "37224790823800",
+    "kind": "host-control",
+    "value": 0.11645585298538208
+  },
+  {
+    "utc": "2026-09-12T18:20:27.422Z",
+    "time": "37224795985500",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"7c261831-0651-4934-87d8-0febc9a08dd9\",\"playback\":\"playing\",\"timeSeconds\":24.8415,\"clockEpoch\":0,\"frameId\":\"1186\",\"controlSequence\":13,\"intensity\":0.11645585298538208}"
+  },
+  {
+    "utc": "2026-09-12T18:20:27.603Z",
+    "time": "37224977507700",
+    "kind": "host-control",
+    "value": 0.1265822798013687
+  },
+  {
+    "utc": "2026-09-12T18:20:27.607Z",
+    "time": "37224981609900",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"ee6cf38f-815f-46f7-a083-b6fccb6957d8\",\"playback\":\"playing\",\"timeSeconds\":25.02829999999702,\"clockEpoch\":0,\"frameId\":\"1195\",\"controlSequence\":14,\"intensity\":0.1265822798013687}"
+  },
+  {
+    "utc": "2026-09-12T18:20:28.103Z",
+    "time": "37225477309600",
+    "kind": "host-control",
+    "value": 0.1569623351097107
+  },
+  {
+    "utc": "2026-09-12T18:20:28.108Z",
+    "time": "37225482715800",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"71e4aea6-ae5d-4c80-bc26-4fd28c8b1ae1\",\"playback\":\"playing\",\"timeSeconds\":25.52809999999404,\"clockEpoch\":0,\"frameId\":\"1220\",\"controlSequence\":15,\"intensity\":0.1569623351097107}"
+  },
+  {
+    "utc": "2026-09-12T18:20:28.166Z",
+    "time": "37225540298000",
+    "kind": "host-control",
+    "value": 0.16708876192569733
+  },
+  {
+    "utc": "2026-09-12T18:20:28.172Z",
+    "time": "37225546051400",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"64e9d810-1aa5-45b2-8d37-737e4aa93263\",\"playback\":\"playing\",\"timeSeconds\":25.59089999999851,\"clockEpoch\":0,\"frameId\":\"1223\",\"controlSequence\":16,\"intensity\":0.16708876192569733}"
+  },
+  {
+    "utc": "2026-09-12T18:20:28.291Z",
+    "time": "37225665430000",
+    "kind": "host-control",
+    "value": 0.17721518874168396
+  },
+  {
+    "utc": "2026-09-12T18:20:28.296Z",
+    "time": "37225670868700",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"5ad92a9f-2876-4253-bda7-ff8f810fd444\",\"playback\":\"playing\",\"timeSeconds\":25.71619999999553,\"clockEpoch\":0,\"frameId\":\"1230\",\"controlSequence\":17,\"intensity\":0.17721518874168396}"
+  },
+  {
+    "utc": "2026-09-12T18:20:28.353Z",
+    "time": "37225727741800",
+    "kind": "host-control",
+    "value": 0.19746804237365723
+  },
+  {
+    "utc": "2026-09-12T18:20:28.358Z",
+    "time": "37225732417400",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"44f24199-fad0-4373-913f-70bc6d4f6874\",\"playback\":\"playing\",\"timeSeconds\":25.77839999999851,\"clockEpoch\":0,\"frameId\":\"1233\",\"controlSequence\":18,\"intensity\":0.19746804237365723}"
+  },
+  {
+    "utc": "2026-09-12T18:20:29.104Z",
+    "time": "37226478094500",
+    "kind": "host-control",
+    "value": 0.1873416155576706
+  },
+  {
+    "utc": "2026-09-12T18:20:29.112Z",
+    "time": "37226486393100",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"6f265cf2-3332-4c76-8d6a-f987cb77bf5f\",\"playback\":\"playing\",\"timeSeconds\":26.53109999999404,\"clockEpoch\":0,\"frameId\":\"1270\",\"controlSequence\":19,\"intensity\":0.1873416155576706}"
+  },
+  {
+    "utc": "2026-09-12T18:20:29.166Z",
+    "time": "37226540391100",
+    "kind": "host-control",
+    "value": 0.17721518874168396
+  },
+  {
+    "utc": "2026-09-12T18:20:29.175Z",
+    "time": "37226549131300",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"d1caebe8-f2fb-432a-92a0-7e8458e2295d\",\"playback\":\"playing\",\"timeSeconds\":26.591,\"clockEpoch\":0,\"frameId\":\"1273\",\"controlSequence\":20,\"intensity\":0.17721518874168396}"
+  },
+  {
+    "utc": "2026-09-12T18:20:29.289Z",
+    "time": "37226663863200",
+    "kind": "host-control",
+    "value": 0.16708876192569733
+  },
+  {
+    "utc": "2026-09-12T18:20:29.294Z",
+    "time": "37226668454500",
+    "kind": "console",
+    "message": "{\"kind\":\"runtime-frame\",\"type\":\"status\",\"instanceId\":\"a00cc5ce-45b0-4aa9-a0f0-e8af6547150f\",\"generation\":1,\"revisionId\":\"162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898\",\"requestId\":\"07110c0c-7d4f-4d59-9656-c71881936f1b\",\"playback\":\"playing\",\"timeSeconds\":26.71469999999553,\"clockEpoch\":0,\"frameId\":\"1280\",\"controlSequence\":21,\"intensity\":0.16708876192569733}"
+  },
+  {
+    "utc": "2026-09-12T18:21:04.681Z",
+    "time": "37262055513300",
+    "kind": "summary",
+    "paint": 2766,
+    "held": 0,
+    "uncertain": 0,
+    "dropped": 0,
+    "closed": true,
+    "failed": false,
+    "webgpuReady": true
+  }
+]

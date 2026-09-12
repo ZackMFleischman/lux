@@ -9,6 +9,8 @@
     "pnpm": "10.33.0"
   },
   "scripts": {
+    "transport:prepare": "node scripts/transport-prepare.mjs",
+    "transport:play": "node scripts/transport-play.mjs",
     "preflight": "node scripts/preflight.mjs",
     "typecheck": "tsc --noEmit",
     "test:unit": "node --test tests/unit/*.test.ts tests/unit/*.test.mjs",

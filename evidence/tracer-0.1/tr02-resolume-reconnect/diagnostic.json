@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "scope": "short-resolume-diagnostic-only",
+  "outcome": {
+    "pid": 9300,
+    "code": 0,
+    "signal": null
+  },
+  "externalHostPid": 8360,
+  "hostSupervised": false,
+  "consumed": 863,
+  "controls": [
+    {
+      "utc": "2026-09-12T17:14:56.047Z",
+      "time": "33293412837400",
+      "kind": "host-control",
+      "value": 0.6499999761581421
+    },
+    {
+      "utc": "2026-09-12T17:14:56.107Z",
+      "time": "33293472847100",
+      "kind": "host-control",
+      "value": 0.4527473747730255
+    }
+  ],
+  "manualVisualCheckRequired": true
+}

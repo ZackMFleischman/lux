@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "scope": "short-resolume-diagnostic-only",
+  "outcome": {
+    "pid": 17796,
+    "code": 0,
+    "signal": null
+  },
+  "externalHostPid": 24212,
+  "hostSupervised": false,
+  "consumed": 648,
+  "controls": [
+    {
+      "utc": "2026-09-12T18:18:52.341Z",
+      "time": "37129714802800",
+      "kind": "host-control",
+      "value": 0.17000000178813934
+    }
+  ],
+  "manualVisualCheckRequired": true
+}

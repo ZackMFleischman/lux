@@ -1,0 +1,1313 @@
+[
+  {
+    "utc": "2026-09-12T06:59:30.838Z",
+    "time": "7912783155900",
+    "kind": "versions",
+    "versions": {
+      "node": "24.20.0",
+      "acorn": "8.18.0",
+      "ada": "4.0.0",
+      "amaro": "1.1.11",
+      "ares": "1.34.8",
+      "brotli": "1.2.0",
+      "cldr": "48.0",
+      "icu": "78.2",
+      "llhttp": "9.4.3",
+      "merve": "1.2.2",
+      "modules": "149",
+      "napi": "10",
+      "nbytes": "0.1.4",
+      "ncrypto": "0.0.1",
+      "nghttp2": "1.70.0",
+      "nghttp3": "",
+      "ngtcp2": "",
+      "openssl": "0.0.0",
+      "simdjson": "4.6.6",
+      "simdutf": "7.7.0",
+      "sqlite": "3.53.4",
+      "tz": "2025c",
+      "undici": "7.29.0",
+      "unicode": "17.0",
+      "uv": "1.52.1",
+      "uvwasi": "0.0.23",
+      "v8": "15.2.124.19-electron.0",
+      "zlib": "1.3.2.1-motley",
+      "zstd": "1.6.0",
+      "electron": "44.3.0",
+      "chrome": "152.0.7977.78"
+    },
+    "pid": 13356
+  },
+  {
+    "utc": "2026-09-12T06:59:30.879Z",
+    "time": "7912820578200",
+    "kind": "bounds",
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 1080
+    }
+  },
+  {
+    "utc": "2026-09-12T06:59:30.992Z",
+    "time": "7912933716100",
+    "kind": "console",
+    "message": "%cElectron Security Warning (Insecure Content-Security-Policy) font-weight: bold; This renderer process has either no Content Security\n  Policy set or a policy with \"unsafe-eval\" enabled. This exposes users of\n  this app to unnecessary security risks.\n\nFor more information and help, consult\nhttps://electronjs.org/docs/tutorial/security.\nThis warning will not show up\nonce the app is packaged."
+  },
+  {
+    "utc": "2026-09-12T06:59:31.268Z",
+    "time": "7913209487700",
+    "kind": "gpu",
+    "info": {
+      "auxAttributes": {
+        "amdSwitchable": false,
+        "canSupportThreadedTextureMailbox": false,
+        "directMLFeatureLevel": "Not supported",
+        "displayType": "ANGLE_D3D11",
+        "dx12FeatureLevel": "Not supported",
+        "glExtensions": "GL_AMD_performance_monitor GL_ANGLE_base_vertex_base_instance_shader_builtin GL_ANGLE_blob_cache GL_ANGLE_client_arrays GL_ANGLE_clip_cull_distance GL_ANGLE_copy_texture_3d GL_ANGLE_depth_texture GL_ANGLE_framebuffer_blit GL_ANGLE_framebuffer_multisample GL_ANGLE_get_serialized_context_string GL_ANGLE_get_tex_level_parameter GL_ANGLE_instanced_arrays GL_ANGLE_memory_size GL_ANGLE_multiview_multisample GL_ANGLE_pack_reverse_row_order GL_ANGLE_polygon_mode GL_ANGLE_program_binary_readiness_query GL_ANGLE_program_cache_control GL_ANGLE_provoking_vertex GL_ANGLE_renderability_validation GL_ANGLE_request_extension GL_ANGLE_robust_client_memory GL_ANGLE_shader_pixel_local_storage GL_ANGLE_shader_pixel_local_storage_coherent GL_ANGLE_stencil_texturing GL_ANGLE_texture_compression_dxt3 GL_ANGLE_texture_compression_dxt5 GL_ANGLE_texture_multisample GL_ANGLE_texture_usage GL_ANGLE_translated_shader_source GL_APPLE_clip_distance GL_ARM_rgba8 GL_CHROMIUM_bind_generates_resource GL_CHROMIUM_bind_uniform_location GL_CHROMIUM_copy_compressed_texture GL_CHROMIUM_copy_texture GL_CHROMIUM_lose_context GL_EXT_EGL_image_external_wrap_modes GL_EXT_base_instance GL_EXT_blend_func_extended GL_EXT_blend_minmax GL_EXT_clip_control GL_EXT_clip_cull_distance GL_EXT_color_buffer_float GL_EXT_color_buffer_half_float GL_EXT_conservative_depth GL_EXT_debug_label GL_EXT_debug_marker GL_EXT_depth_clamp GL_EXT_discard_framebuffer GL_EXT_disjoint_timer_query GL_EXT_draw_buffers GL_EXT_draw_buffers_indexed GL_EXT_draw_elements_base_vertex GL_EXT_float_blend GL_EXT_frag_depth GL_EXT_instanced_arrays GL_EXT_map_buffer_range GL_EXT_occlusion_query_boolean GL_EXT_polygon_offset_clamp GL_EXT_read_format_bgra GL_EXT_render_snorm GL_EXT_robustness GL_EXT_sRGB GL_EXT_shader_texture_lod GL_EXT_texture_border_clamp GL_EXT_texture_compression_bptc GL_EXT_texture_compression_dxt1 GL_EXT_texture_compression_rgtc GL_EXT_texture_compression_s3tc_srgb GL_EXT_texture_filter_anisotropic GL_EXT_texture_format_BGRA8888 GL_EXT_texture_mirror_clamp_to_edge GL_EXT_texture_norm16 GL_EXT_texture_rg GL_EXT_texture_storage GL_EXT_texture_type_2_10_10_10_REV GL_EXT_unpack_subimage GL_KHR_debug GL_KHR_parallel_shader_compile GL_KHR_robustness GL_NV_EGL_stream_consumer_external GL_NV_fence GL_NV_framebuffer_blit GL_NV_pack_subimage GL_NV_pixel_buffer_object GL_NV_shader_noperspective_interpolation GL_OES_EGL_image GL_OES_EGL_image_external GL_OES_EGL_image_external_essl3 GL_OES_depth24 GL_OES_depth32 GL_OES_draw_buffers_indexed GL_OES_draw_elements_base_vertex GL_OES_element_index_uint GL_OES_fbo_render_mipmap GL_OES_get_program_binary GL_OES_mapbuffer GL_OES_packed_depth_stencil GL_OES_required_internalformat GL_OES_rgb8_rgba8 GL_OES_sample_variables GL_OES_shader_multisample_interpolation GL_OES_standard_derivatives GL_OES_surfaceless_context GL_OES_texture_border_clamp GL_OES_texture_float GL_OES_texture_float_linear GL_OES_texture_half_float GL_OES_texture_half_float_linear GL_OES_texture_npot GL_OES_texture_stencil8 GL_OES_texture_storage_multisample_2d_array GL_OES_vertex_array_object GL_OVR_multiview GL_OVR_multiview2 ",
+        "glImplementationParts": "(gl=egl-angle,angle=d3d11)",
+        "glRenderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 2070 (0x00001F14) Direct3D11 vs_5_0 ps_5_0, D3D11-32.0.15.9144)",
+        "glResetNotificationStrategy": 33362,
+        "glVendor": "Google Inc. (NVIDIA)",
+        "glVersion": "OpenGL ES 3.0 (ANGLE 2.1.28468 git hash: 1c43d257c56e)",
+        "glWsExtensions": "EGL_EXT_create_context_robustness EGL_ANGLE_d3d_share_handle_client_buffer EGL_ANGLE_d3d_texture_client_buffer EGL_ANGLE_surface_d3d_texture_2d_share_handle EGL_ANGLE_query_surface_pointer EGL_ANGLE_window_fixed_size EGL_ANGLE_keyed_mutex EGL_ANGLE_surface_orientation EGL_ANGLE_direct_composition EGL_NV_post_sub_buffer EGL_KHR_create_context EGL_KHR_image EGL_KHR_image_base EGL_KHR_gl_texture_2D_image EGL_KHR_gl_texture_cubemap_image EGL_KHR_gl_renderbuffer_image EGL_KHR_get_all_proc_addresses EGL_KHR_stream EGL_KHR_stream_consumer_gltexture EGL_NV_stream_consumer_gltexture_yuv EGL_ANGLE_stream_producer_d3d_texture EGL_ANGLE_create_context_webgl_compatibility EGL_CHROMIUM_create_context_bind_generates_resource EGL_CHROMIUM_sync_control EGL_EXT_pixel_format_float EGL_KHR_surfaceless_context EGL_ANGLE_display_texture_share_group EGL_ANGLE_display_semaphore_share_group EGL_ANGLE_create_context_client_arrays EGL_ANGLE_program_cache_control EGL_ANGLE_robust_resource_initialization EGL_ANGLE_create_context_extensions_enabled EGL_ANDROID_blob_cache EGL_ANDROID_recordable EGL_ANGLE_image_d3d11_texture EGL_ANGLE_create_context_backwards_compatible EGL_KHR_no_config_context EGL_KHR_create_context_no_error EGL_KHR_reusable_sync EGL_ANGLE_memory_usage_report ",
+        "glWsVendor": "Google Inc. (NVIDIA)",
+        "glWsVersion": "1.5 (ANGLE 2.1.28468 git hash: 1c43d257c56e)",
+        "inProcessGpu": false,
+        "initializationTime": 343.136,
+        "isAsan": false,
+        "isClangCoverage": false,
+        "jpegDecodeAcceleratorSupported": false,
+        "maxMsaaSamples": "8",
+        "optimus": false,
+        "overlayInfo": {
+          "bgra8OverlaySupport": "SOFTWARE",
+          "directComposition": true,
+          "nv12OverlaySupport": "SOFTWARE",
+          "p010OverlaySupport": "SOFTWARE",
+          "rgb10a2OverlaySupport": "SOFTWARE",
+          "supportsOverlays": true,
+          "yuy2OverlaySupport": "SOFTWARE"
+        },
+        "passthroughCmdDecoder": true,
+        "pixelShaderVersion": "5.0",
+        "sandboxed": true,
+        "skiaBackendType": "GaneshGL",
+        "subpixelFontRendering": true,
+        "supportsD3dSharedImages": false,
+        "supportsDirectML": false,
+        "supportsDx12": false,
+        "supportsVulkan": false,
+        "targetCpuBits": 64,
+        "vertexShaderVersion": "5.0",
+        "visibilityCallbackCallCount": 0,
+        "vulkanVersion": "Not supported"
+      },
+      "gpuDevice": [
+        {
+          "active": false,
+          "deviceId": 39876,
+          "deviceString": "Intel(R) UHD Graphics",
+          "driverVendor": "NVIDIA",
+          "driverVersion": "26.20.100.7642",
+          "gpuPreference": 2,
+          "revision": 5,
+          "subSysId": 314053730,
+          "vendorId": 32902
+        },
+        {
+          "active": true,
+          "deviceId": 7956,
+          "deviceString": "NVIDIA GeForce RTX 2070",
+          "driverVersion": "32.0.15.9144",
+          "gpuPreference": 3,
+          "revision": 161,
+          "subSysId": 314053730,
+          "vendorId": 4318
+        },
+        {
+          "active": false,
+          "deviceId": 140,
+          "deviceString": "Microsoft Basic Render Driver",
+          "driverVersion": "10.0.26100.9278",
+          "gpuPreference": 0,
+          "revision": 0,
+          "subSysId": 0,
+          "vendorId": 5140
+        }
+      ]
+    }
+  },
+  {
+    "utc": "2026-09-12T06:59:32.621Z",
+    "time": "7914562719200",
+    "kind": "console",
+    "message": "{\"kind\":\"webgpu\",\"three\":\"186\",\"backend\":\"WebGPU\",\"width\":1920,\"height\":1080}"
+  },
+  {
+    "utc": "2026-09-12T06:59:32.638Z",
+    "time": "7914579630700",
+    "kind": "console",
+    "message": "THREE.TSL: Return statement used in an inline 'Fn()'. Define a layout struct to allow return values. Stack trace not available. Enable \"THREE.Node.captureStackTrace\" to capture stack traces."
+  },
+  {
+    "utc": "2026-09-12T06:59:32.638Z",
+    "time": "7914579713800",
+    "kind": "console",
+    "message": "THREE.TSL: Return statement used in an inline 'Fn()'. Define a layout struct to allow return values. Stack trace not available. Enable \"THREE.Node.captureStackTrace\" to capture stack traces."
+  },
+  {
+    "utc": "2026-09-12T06:59:32.638Z",
+    "time": "7914579852500",
+    "kind": "console",
+    "message": "THREE.TSL: Return statement used in an inline 'Fn()'. Define a layout struct to allow return values. Stack trace not available. Enable \"THREE.Node.captureStackTrace\" to capture stack traces."
+  },
+  {
+    "utc": "2026-09-12T06:59:32.638Z",
+    "time": "7914580078900",
+    "kind": "console",
+    "message": "THREE.TSL: Return statement used in an inline 'Fn()'. Define a layout struct to allow return values. Stack trace not available. Enable \"THREE.Node.captureStackTrace\" to capture stack traces."
+  },
+  {
+    "utc": "2026-09-12T06:59:32.639Z",
+    "time": "7914580871400",
+    "kind": "console",
+    "message": "THREE.TSL: Return statement used in an inline 'Fn()'. Define a layout struct to allow return values. Stack trace not available. Enable \"THREE.Node.captureStackTrace\" to capture stack traces."
+  },
+  {
+    "utc": "2026-09-12T06:59:32.643Z",
+    "time": "7914584352800",
+    "kind": "paint",
+    "id": 1,
+    "slot": 0,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 70744,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 0,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 0
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T06:59:32.653Z",
+    "time": "7914594671600",
+    "kind": "console",
+    "message": "{\"kind\":\"submitted\",\"frame\":1}"
+  },
+  {
+    "utc": "2026-09-12T06:59:32.657Z",
+    "time": "7914598587400",
+    "kind": "copy-complete",
+    "id": 1
+  },
+  {
+    "utc": "2026-09-12T06:59:32.693Z",
+    "time": "7914635273000",
+    "kind": "console",
+    "message": "{\"kind\":\"submitted\",\"frame\":2}"
+  },
+  {
+    "utc": "2026-09-12T06:59:32.710Z",
+    "time": "7914651606200",
+    "kind": "console",
+    "message": "{\"kind\":\"submitted\",\"frame\":3}"
+  },
+  {
+    "utc": "2026-09-12T06:59:32.759Z",
+    "time": "7914700927500",
+    "kind": "paint",
+    "id": 2,
+    "slot": 1,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 70744,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 249990,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 1
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T06:59:32.762Z",
+    "time": "7914703594700",
+    "kind": "paint",
+    "id": 3,
+    "slot": 2,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 70744,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 299988,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 2
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T06:59:32.765Z",
+    "time": "7914706302200",
+    "kind": "paint",
+    "drop": "producer-inflight-limit",
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 316654,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 3
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T06:59:32.767Z",
+    "time": "7914708801300",
+    "kind": "copy-complete",
+    "id": 2
+  },
+  {
+    "utc": "2026-09-12T06:59:32.767Z",
+    "time": "7914708805600",
+    "kind": "copy-complete",
+    "id": 3
+  },
+  {
+    "utc": "2026-09-12T06:59:32.780Z",
+    "time": "7914721601900",
+    "kind": "paint",
+    "drop": "no-free-slot",
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 333320,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 4
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T06:59:32.796Z",
+    "time": "7914738173300",
+    "kind": "paint",
+    "drop": "no-free-slot",
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 349986,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 5
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T06:59:32.814Z",
+    "time": "7914755282800",
+    "kind": "paint",
+    "drop": "no-free-slot",
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 366652,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 6
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T06:59:32.831Z",
+    "time": "7914772555700",
+    "kind": "paint",
+    "drop": "no-free-slot",
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 383318,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 7
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T06:59:32.846Z",
+    "time": "7914788198400",
+    "kind": "paint",
+    "drop": "no-free-slot",
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 399984,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 8
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T06:59:32.863Z",
+    "time": "7914805263200",
+    "kind": "paint",
+    "drop": "no-free-slot",
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 416650,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 9
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T06:59:32.910Z",
+    "time": "7914851303800",
+    "kind": "copy-complete",
+    "id": 4
+  },
+  {
+    "utc": "2026-09-12T06:59:32.941Z",
+    "time": "7914882761400",
+    "kind": "copy-complete",
+    "id": 5
+  },
+  {
+    "utc": "2026-09-12T06:59:32.971Z",
+    "time": "7914912657900",
+    "kind": "copy-complete",
+    "id": 6
+  },
+  {
+    "utc": "2026-09-12T06:59:33.033Z",
+    "time": "7914974988800",
+    "kind": "copy-complete",
+    "id": 7
+  },
+  {
+    "utc": "2026-09-12T06:59:33.065Z",
+    "time": "7915006442800",
+    "kind": "copy-complete",
+    "id": 8
+  },
+  {
+    "utc": "2026-09-12T06:59:33.127Z",
+    "time": "7915069189700",
+    "kind": "copy-complete",
+    "id": 9
+  },
+  {
+    "utc": "2026-09-12T06:59:33.158Z",
+    "time": "7915099893800",
+    "kind": "copy-complete",
+    "id": 10
+  },
+  {
+    "utc": "2026-09-12T06:59:33.221Z",
+    "time": "7915163130300",
+    "kind": "copy-complete",
+    "id": 11
+  },
+  {
+    "utc": "2026-09-12T06:59:33.251Z",
+    "time": "7915193092400",
+    "kind": "copy-complete",
+    "id": 12
+  },
+  {
+    "utc": "2026-09-12T06:59:33.328Z",
+    "time": "7915269841000",
+    "kind": "copy-complete",
+    "id": 13
+  },
+  {
+    "utc": "2026-09-12T06:59:33.345Z",
+    "time": "7915286329700",
+    "kind": "copy-complete",
+    "id": 14
+  },
+  {
+    "utc": "2026-09-12T06:59:33.376Z",
+    "time": "7915317868000",
+    "kind": "copy-complete",
+    "id": 15
+  },
+  {
+    "utc": "2026-09-12T06:59:33.407Z",
+    "time": "7915348697600",
+    "kind": "copy-complete",
+    "id": 16
+  },
+  {
+    "utc": "2026-09-12T06:59:33.484Z",
+    "time": "7915426243100",
+    "kind": "copy-complete",
+    "id": 17
+  },
+  {
+    "utc": "2026-09-12T06:59:33.516Z",
+    "time": "7915457648800",
+    "kind": "copy-complete",
+    "id": 18
+  },
+  {
+    "utc": "2026-09-12T06:59:33.562Z",
+    "time": "7915503868500",
+    "kind": "copy-complete",
+    "id": 19
+  },
+  {
+    "utc": "2026-09-12T06:59:33.593Z",
+    "time": "7915535260600",
+    "kind": "copy-complete",
+    "id": 20
+  },
+  {
+    "utc": "2026-09-12T06:59:33.656Z",
+    "time": "7915597794600",
+    "kind": "copy-complete",
+    "id": 21
+  },
+  {
+    "utc": "2026-09-12T06:59:33.702Z",
+    "time": "7915643784300",
+    "kind": "copy-complete",
+    "id": 22
+  },
+  {
+    "utc": "2026-09-12T06:59:33.732Z",
+    "time": "7915674093100",
+    "kind": "copy-complete",
+    "id": 23
+  },
+  {
+    "utc": "2026-09-12T06:59:33.795Z",
+    "time": "7915736726400",
+    "kind": "copy-complete",
+    "id": 24
+  },
+  {
+    "utc": "2026-09-12T06:59:33.811Z",
+    "time": "7915752590600",
+    "kind": "copy-complete",
+    "id": 25
+  },
+  {
+    "utc": "2026-09-12T06:59:33.857Z",
+    "time": "7915799059600",
+    "kind": "copy-complete",
+    "id": 26
+  },
+  {
+    "utc": "2026-09-12T06:59:33.888Z",
+    "time": "7915829402700",
+    "kind": "copy-complete",
+    "id": 27
+  },
+  {
+    "utc": "2026-09-12T06:59:33.950Z",
+    "time": "7915892043900",
+    "kind": "copy-complete",
+    "id": 28
+  },
+  {
+    "utc": "2026-09-12T06:59:33.981Z",
+    "time": "7915922873700",
+    "kind": "copy-complete",
+    "id": 29
+  },
+  {
+    "utc": "2026-09-12T06:59:34.060Z",
+    "time": "7916001518000",
+    "kind": "copy-complete",
+    "id": 30
+  },
+  {
+    "utc": "2026-09-12T06:59:34.090Z",
+    "time": "7916031592300",
+    "kind": "copy-complete",
+    "id": 31
+  },
+  {
+    "utc": "2026-09-12T06:59:34.155Z",
+    "time": "7916096407900",
+    "kind": "copy-complete",
+    "id": 32
+  },
+  {
+    "utc": "2026-09-12T06:59:34.185Z",
+    "time": "7916126792500",
+    "kind": "copy-complete",
+    "id": 33
+  },
+  {
+    "utc": "2026-09-12T06:59:34.279Z",
+    "time": "7916220621800",
+    "kind": "copy-complete",
+    "id": 34
+  },
+  {
+    "utc": "2026-09-12T06:59:34.295Z",
+    "time": "7916236412200",
+    "kind": "copy-complete",
+    "id": 35
+  },
+  {
+    "utc": "2026-09-12T06:59:34.342Z",
+    "time": "7916283444400",
+    "kind": "copy-complete",
+    "id": 36
+  },
+  {
+    "utc": "2026-09-12T06:59:34.373Z",
+    "time": "7916314472800",
+    "kind": "copy-complete",
+    "id": 37
+  },
+  {
+    "utc": "2026-09-12T06:59:34.481Z",
+    "time": "7916422488300",
+    "kind": "copy-complete",
+    "id": 38
+  },
+  {
+    "utc": "2026-09-12T06:59:34.512Z",
+    "time": "7916453636700",
+    "kind": "copy-complete",
+    "id": 39
+  },
+  {
+    "utc": "2026-09-12T06:59:34.575Z",
+    "time": "7916516810500",
+    "kind": "copy-complete",
+    "id": 40
+  },
+  {
+    "utc": "2026-09-12T06:59:34.606Z",
+    "time": "7916547922400",
+    "kind": "copy-complete",
+    "id": 41
+  },
+  {
+    "utc": "2026-09-12T06:59:34.668Z",
+    "time": "7916609700600",
+    "kind": "copy-complete",
+    "id": 42
+  },
+  {
+    "utc": "2026-09-12T06:59:34.698Z",
+    "time": "7916640014300",
+    "kind": "copy-complete",
+    "id": 43
+  },
+  {
+    "utc": "2026-09-12T06:59:34.745Z",
+    "time": "7916686829300",
+    "kind": "copy-complete",
+    "id": 44
+  },
+  {
+    "utc": "2026-09-12T06:59:34.776Z",
+    "time": "7916717850400",
+    "kind": "copy-complete",
+    "id": 45
+  },
+  {
+    "utc": "2026-09-12T06:59:34.837Z",
+    "time": "7916778913700",
+    "kind": "copy-complete",
+    "id": 46
+  },
+  {
+    "utc": "2026-09-12T06:59:34.868Z",
+    "time": "7916809757200",
+    "kind": "copy-complete",
+    "id": 47
+  },
+  {
+    "utc": "2026-09-12T06:59:34.947Z",
+    "time": "7916888400700",
+    "kind": "copy-complete",
+    "id": 48
+  },
+  {
+    "utc": "2026-09-12T06:59:34.978Z",
+    "time": "7916919610600",
+    "kind": "copy-complete",
+    "id": 49
+  },
+  {
+    "utc": "2026-09-12T06:59:35.025Z",
+    "time": "7916966942500",
+    "kind": "copy-complete",
+    "id": 50
+  },
+  {
+    "utc": "2026-09-12T06:59:35.056Z",
+    "time": "7916997330800",
+    "kind": "copy-complete",
+    "id": 51
+  },
+  {
+    "utc": "2026-09-12T06:59:35.136Z",
+    "time": "7917077479900",
+    "kind": "copy-complete",
+    "id": 52
+  },
+  {
+    "utc": "2026-09-12T06:59:35.167Z",
+    "time": "7917108515100",
+    "kind": "copy-complete",
+    "id": 53
+  },
+  {
+    "utc": "2026-09-12T06:59:35.244Z",
+    "time": "7917185569800",
+    "kind": "copy-complete",
+    "id": 54
+  },
+  {
+    "utc": "2026-09-12T06:59:35.275Z",
+    "time": "7917216672200",
+    "kind": "copy-complete",
+    "id": 55
+  },
+  {
+    "utc": "2026-09-12T06:59:35.337Z",
+    "time": "7917278576900",
+    "kind": "copy-complete",
+    "id": 56
+  },
+  {
+    "utc": "2026-09-12T06:59:35.384Z",
+    "time": "7917325666800",
+    "kind": "copy-complete",
+    "id": 57
+  },
+  {
+    "utc": "2026-09-12T06:59:35.430Z",
+    "time": "7917372176000",
+    "kind": "copy-complete",
+    "id": 58
+  },
+  {
+    "utc": "2026-09-12T06:59:35.462Z",
+    "time": "7917403700300",
+    "kind": "copy-complete",
+    "id": 59
+  },
+  {
+    "utc": "2026-09-12T06:59:35.525Z",
+    "time": "7917466800700",
+    "kind": "copy-complete",
+    "id": 60
+  },
+  {
+    "utc": "2026-09-12T06:59:35.556Z",
+    "time": "7917498149900",
+    "kind": "copy-complete",
+    "id": 61
+  },
+  {
+    "utc": "2026-09-12T06:59:35.602Z",
+    "time": "7917544079900",
+    "kind": "copy-complete",
+    "id": 62
+  },
+  {
+    "utc": "2026-09-12T06:59:35.649Z",
+    "time": "7917590287800",
+    "kind": "copy-complete",
+    "id": 63
+  },
+  {
+    "utc": "2026-09-12T06:59:35.710Z",
+    "time": "7917652071400",
+    "kind": "copy-complete",
+    "id": 64
+  },
+  {
+    "utc": "2026-09-12T06:59:35.741Z",
+    "time": "7917682770200",
+    "kind": "copy-complete",
+    "id": 65
+  },
+  {
+    "utc": "2026-09-12T06:59:35.803Z",
+    "time": "7917744532900",
+    "kind": "copy-complete",
+    "id": 66
+  },
+  {
+    "utc": "2026-09-12T06:59:35.849Z",
+    "time": "7917790833400",
+    "kind": "copy-complete",
+    "id": 67
+  },
+  {
+    "utc": "2026-09-12T06:59:35.896Z",
+    "time": "7917837687800",
+    "kind": "copy-complete",
+    "id": 68
+  },
+  {
+    "utc": "2026-09-12T06:59:35.927Z",
+    "time": "7917868726800",
+    "kind": "copy-complete",
+    "id": 69
+  },
+  {
+    "utc": "2026-09-12T06:59:35.972Z",
+    "time": "7917914103900",
+    "kind": "copy-complete",
+    "id": 70
+  },
+  {
+    "utc": "2026-09-12T06:59:36.004Z",
+    "time": "7917945416900",
+    "kind": "copy-complete",
+    "id": 71
+  },
+  {
+    "utc": "2026-09-12T06:59:36.082Z",
+    "time": "7918023781500",
+    "kind": "copy-complete",
+    "id": 72
+  },
+  {
+    "utc": "2026-09-12T06:59:36.114Z",
+    "time": "7918055503500",
+    "kind": "copy-complete",
+    "id": 73
+  },
+  {
+    "utc": "2026-09-12T06:59:36.175Z",
+    "time": "7918116636400",
+    "kind": "copy-complete",
+    "id": 74
+  },
+  {
+    "utc": "2026-09-12T06:59:36.206Z",
+    "time": "7918147935100",
+    "kind": "copy-complete",
+    "id": 75
+  },
+  {
+    "utc": "2026-09-12T06:59:36.283Z",
+    "time": "7918224911800",
+    "kind": "copy-complete",
+    "id": 76
+  },
+  {
+    "utc": "2026-09-12T06:59:36.298Z",
+    "time": "7918240212500",
+    "kind": "copy-complete",
+    "id": 77
+  },
+  {
+    "utc": "2026-09-12T06:59:36.363Z",
+    "time": "7918304885700",
+    "kind": "copy-complete",
+    "id": 78
+  },
+  {
+    "utc": "2026-09-12T06:59:36.395Z",
+    "time": "7918336709300",
+    "kind": "copy-complete",
+    "id": 79
+  },
+  {
+    "utc": "2026-09-12T06:59:36.472Z",
+    "time": "7918413881200",
+    "kind": "copy-complete",
+    "id": 80
+  },
+  {
+    "utc": "2026-09-12T06:59:36.502Z",
+    "time": "7918444088200",
+    "kind": "copy-complete",
+    "id": 81
+  },
+  {
+    "utc": "2026-09-12T06:59:36.565Z",
+    "time": "7918506605600",
+    "kind": "copy-complete",
+    "id": 82
+  },
+  {
+    "utc": "2026-09-12T06:59:36.596Z",
+    "time": "7918537598200",
+    "kind": "copy-complete",
+    "id": 83
+  },
+  {
+    "utc": "2026-09-12T06:59:36.658Z",
+    "time": "7918599963100",
+    "kind": "copy-complete",
+    "id": 84
+  },
+  {
+    "utc": "2026-09-12T06:59:36.689Z",
+    "time": "7918630696800",
+    "kind": "copy-complete",
+    "id": 85
+  },
+  {
+    "utc": "2026-09-12T06:59:36.766Z",
+    "time": "7918708045500",
+    "kind": "copy-complete",
+    "id": 86
+  },
+  {
+    "utc": "2026-09-12T06:59:36.782Z",
+    "time": "7918723922800",
+    "kind": "copy-complete",
+    "id": 87
+  },
+  {
+    "utc": "2026-09-12T06:59:36.845Z",
+    "time": "7918786983700",
+    "kind": "copy-complete",
+    "id": 88
+  },
+  {
+    "utc": "2026-09-12T06:59:36.876Z",
+    "time": "7918817471700",
+    "kind": "copy-complete",
+    "id": 89
+  },
+  {
+    "utc": "2026-09-12T06:59:36.922Z",
+    "time": "7918863564000",
+    "kind": "copy-complete",
+    "id": 90
+  },
+  {
+    "utc": "2026-09-12T06:59:36.952Z",
+    "time": "7918894124400",
+    "kind": "copy-complete",
+    "id": 91
+  },
+  {
+    "utc": "2026-09-12T06:59:37.014Z",
+    "time": "7918955855100",
+    "kind": "copy-complete",
+    "id": 92
+  },
+  {
+    "utc": "2026-09-12T06:59:37.045Z",
+    "time": "7918986852100",
+    "kind": "copy-complete",
+    "id": 93
+  },
+  {
+    "utc": "2026-09-12T06:59:37.124Z",
+    "time": "7919065443800",
+    "kind": "copy-complete",
+    "id": 94
+  },
+  {
+    "utc": "2026-09-12T06:59:37.155Z",
+    "time": "7919096536800",
+    "kind": "copy-complete",
+    "id": 95
+  },
+  {
+    "utc": "2026-09-12T06:59:37.217Z",
+    "time": "7919158621200",
+    "kind": "copy-complete",
+    "id": 96
+  },
+  {
+    "utc": "2026-09-12T06:59:37.248Z",
+    "time": "7919189626000",
+    "kind": "copy-complete",
+    "id": 97
+  },
+  {
+    "utc": "2026-09-12T06:59:37.295Z",
+    "time": "7919236835900",
+    "kind": "copy-complete",
+    "id": 98
+  },
+  {
+    "utc": "2026-09-12T06:59:37.325Z",
+    "time": "7919266885000",
+    "kind": "copy-complete",
+    "id": 99
+  },
+  {
+    "utc": "2026-09-12T06:59:37.388Z",
+    "time": "7919330254000",
+    "kind": "copy-complete",
+    "id": 100
+  },
+  {
+    "utc": "2026-09-12T06:59:37.421Z",
+    "time": "7919362872300",
+    "kind": "copy-complete",
+    "id": 101
+  },
+  {
+    "utc": "2026-09-12T06:59:37.481Z",
+    "time": "7919422652700",
+    "kind": "summary",
+    "paint": 284,
+    "held": 0,
+    "uncertain": 0,
+    "dropped": 0,
+    "closed": true,
+    "failed": false,
+    "webgpuReady": true
+  }
+]

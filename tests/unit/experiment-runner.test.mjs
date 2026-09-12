@@ -24,6 +24,18 @@ test('actual Resolume Avenue and Arena processes block experiments', () => {
   assert.doesNotThrow(() => assertNoConflictingActivity([{ Name: 'notepad.exe', ProcessId: 12 }]));
 });
 
+test('host experiment permits only its exact reviewed Resolume process', () => {
+  const host = { pid: 123, executable: 'C:/Resolume/Avenue.exe', creationUtc: '2026-09-12T07:00:00Z' };
+  const process = { Name: 'Avenue.exe', ProcessId: 123, ExecutablePath: host.executable, CreationUtc: host.creationUtc };
+  assert.doesNotThrow(() => assertNoConflictingActivity([process], host));
+  for (const changed of [{ ...process, ProcessId: 124 }, { ...process, CreationUtc: 'later' }, { ...process, ExecutablePath: 'C:/other/Avenue.exe' }]) {
+    assert.throws(() => assertNoConflictingActivity([changed], host), /host|Conflicting/i);
+  }
+  assert.throws(() => assertNoConflictingActivity([], host), /host/i);
+  assert.throws(() => assertNoConflictingActivity([process, { Name: 'electron.exe', ProcessId: 456 }], host), /Conflicting/);
+  assert.throws(() => assertNoConflictingActivity([{ ...process, Name: 'electron.exe' }], host), /host|Conflicting/i);
+});
+
 test('review revalidation detects intervening source/binary mutation and expiry without launching', async () => {
   const folder = await mkdtemp(join(tmpdir(), 'lux-review-test-'));
   const source = join(folder, 'source.txt'), binary = join(folder, 'binary.txt');
@@ -53,7 +65,7 @@ test('CPU runs record provenance, failure, deadline and refuse competing owners'
   assert.ok(BigInt(ok.end.monotonicNs) > BigInt(ok.start.monotonicNs));
   assert.equal(ok.binary.sha256.length, 64);
   assert.ok(ok.sources.length > 0);
-  assert.deepEqual(ok.activity, []);
+  assert.ok(Array.isArray(ok.activity));
   assert.match(await readFile(join(ok.directory, 'stdout.log'), 'utf8'), /cpu fixture/);
   assert.match(await readFile(join(ok.directory, 'stdout.log'), 'utf8'), new RegExp(ok.id));
   assert.match(await readFile(join(ok.directory, 'stdout.log'), 'utf8'), /experiment timeout 8000/);

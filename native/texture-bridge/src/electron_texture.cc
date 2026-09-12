@@ -54,7 +54,7 @@ void initialize() {
   if(!mapping||GetLastError()==ERROR_ALREADY_EXISTS)throw std::runtime_error("unique ring mapping failed");
   ring=static_cast<lux::SharedRing*>(MapViewOfFile(mapping,FILE_MAP_ALL_ACCESS,0,0,sizeof(lux::SharedRing)));
   if(!ring)throw std::runtime_error("ring view failed");
-  new(ring) lux::SharedRing();ring->pid=GetCurrentProcessId();ring->generation=counter.QuadPart;ring->adapter=adapterDesc.AdapterLuid;float initial=0.65f;memcpy(const_cast<LONG*>(&ring->controlBits),&initial,sizeof(initial));
+  new(ring) lux::SharedRing();ring->pid=GetCurrentProcessId();ring->generation=counter.QuadPart;ring->adapter=adapterDesc.AdapterLuid;
 }
 void allocateSlot(unsigned index,const D3D11_TEXTURE2D_DESC& sourceDesc) {
   auto& local=slots[index];auto& shared=ring->slots[index];
@@ -79,6 +79,8 @@ napi_value submit(napi_env env,napi_callback_info info) {
   try {
     initialize();
     if(lux::isClosing(*ring))throw std::runtime_error("producer is closing; submissions rejected");
+    float hostValue;
+    if(!lux::readHostControl(*ring,hostValue))return text(env,"{\"drop\":\"waiting-for-host-control\"}");
     size_t argc=1; napi_value args[1];napi_get_cb_info(env,info,&argc,args,nullptr,nullptr);
     void* bytes=nullptr;size_t length=0;
     if(argc!=1||napi_get_buffer_info(env,args[0],&bytes,&length)!=napi_ok||length!=sizeof(HANDLE))throw std::runtime_error("NT handle must be 8-byte Buffer");
@@ -132,7 +134,7 @@ napi_value advertise(napi_env env,napi_callback_info) {
   try{initialize();if(lux::isClosing(*ring))throw std::runtime_error("producer is closing");std::wofstream file(lux::rendezvousPath(),std::ios::trunc);file<<mappingName;file.close();if(!file)throw std::runtime_error("rendezvous write failed");return text(env,"{\"advertised\":true}");}
   catch(const std::exception& error){napi_throw_error(env,nullptr,error.what());return nullptr;}
 }
-napi_value control(napi_env env,napi_callback_info){float value=0.65f;if(ring){LONG bits=InterlockedCompareExchange(&ring->controlBits,0,0);memcpy(&value,&bits,sizeof(value));}napi_value result;napi_create_double(env,value,&result);return result;}
+napi_value control(napi_env env,napi_callback_info){float value;napi_value result;if(!ring||!lux::readHostControl(*ring,value)){napi_get_null(env,&result);return result;}napi_create_double(env,value,&result);return result;}
 napi_value shutdown(napi_env env,napi_callback_info) {
   if(!ring)return text(env,"{\"closed\":true}");
   // Atomically close admission before examining borrowers. An admitted reader
@@ -150,6 +152,5 @@ napi_value module(napi_env env,napi_value exports) {
 }
 }
 NAPI_MODULE(NODE_GYP_MODULE_NAME,module)
-
 
 

@@ -1,0 +1,28 @@
+{
+  "independentReviewer": "transport_review",
+  "binaries": [
+    {
+      "Algorithm": "SHA256",
+      "Hash": "AF739BC0D4F26DB6D83416AB47FCF5D245F3241CE767DEA80D091AB782FE540A",
+      "Path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\transport\\native\\build\\Release\\LuxTracerTR02.dll"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "F26463E41EC35EB50CD06F33917FD05F5CEF92E946376E798C975509E7AE3638",
+      "Path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\transport\\native\\build\\Release\\lux_texture_bridge.node"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "E5AD9DCD6246CCEF0A209E1877E2918280C616A087C55C3D99F6DC678A94F1E7",
+      "Path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\transport\\native\\build\\Release\\lux_standalone_host.exe"
+    }
+  ],
+  "nativeCpuTests": 8,
+  "typecheck": "passed",
+  "sdk": "10.0.26100.0",
+  "compiler": "MSVC 14.50.35717 (19.50.35721)",
+  "nodeUnitTests": 21,
+  "sourceCommit": "619ab44",
+  "nativeCommand": "cmake --fresh configure; powershell -NoProfile -File scripts/native-build.ps1",
+  "generatedCommand": "node tools/gpu-spike/build.mjs"
+}

@@ -1,0 +1,5987 @@
+[
+  {
+    "utc": "2026-09-12T17:14:55.426Z",
+    "time": "33292791546200",
+    "kind": "versions",
+    "versions": {
+      "node": "24.20.0",
+      "acorn": "8.18.0",
+      "ada": "4.0.0",
+      "amaro": "1.1.11",
+      "ares": "1.34.8",
+      "brotli": "1.2.0",
+      "cldr": "48.0",
+      "icu": "78.2",
+      "llhttp": "9.4.3",
+      "merve": "1.2.2",
+      "modules": "149",
+      "napi": "10",
+      "nbytes": "0.1.4",
+      "ncrypto": "0.0.1",
+      "nghttp2": "1.70.0",
+      "nghttp3": "",
+      "ngtcp2": "",
+      "openssl": "0.0.0",
+      "simdjson": "4.6.6",
+      "simdutf": "7.7.0",
+      "sqlite": "3.53.4",
+      "tz": "2025c",
+      "undici": "7.29.0",
+      "unicode": "17.0",
+      "uv": "1.52.1",
+      "uvwasi": "0.0.23",
+      "v8": "15.2.124.19-electron.0",
+      "zlib": "1.3.2.1-motley",
+      "zstd": "1.6.0",
+      "electron": "44.3.0",
+      "chrome": "152.0.7977.78"
+    },
+    "pid": 9300
+  },
+  {
+    "utc": "2026-09-12T17:14:55.453Z",
+    "time": "33292818736900",
+    "kind": "bounds",
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 1080
+    }
+  },
+  {
+    "utc": "2026-09-12T17:14:55.558Z",
+    "time": "33292923242700",
+    "kind": "console",
+    "message": "%cElectron Security Warning (Insecure Content-Security-Policy) font-weight: bold; This renderer process has either no Content Security\n  Policy set or a policy with \"unsafe-eval\" enabled. This exposes users of\n  this app to unnecessary security risks.\n\nFor more information and help, consult\nhttps://electronjs.org/docs/tutorial/security.\nThis warning will not show up\nonce the app is packaged."
+  },
+  {
+    "utc": "2026-09-12T17:14:55.768Z",
+    "time": "33293133649900",
+    "kind": "gpu",
+    "info": {
+      "auxAttributes": {
+        "amdSwitchable": false,
+        "canSupportThreadedTextureMailbox": false,
+        "directMLFeatureLevel": "Not supported",
+        "displayType": "ANGLE_D3D11",
+        "dx12FeatureLevel": "Not supported",
+        "glExtensions": "GL_AMD_performance_monitor GL_ANGLE_base_vertex_base_instance_shader_builtin GL_ANGLE_blob_cache GL_ANGLE_client_arrays GL_ANGLE_clip_cull_distance GL_ANGLE_copy_texture_3d GL_ANGLE_depth_texture GL_ANGLE_framebuffer_blit GL_ANGLE_framebuffer_multisample GL_ANGLE_get_serialized_context_string GL_ANGLE_get_tex_level_parameter GL_ANGLE_instanced_arrays GL_ANGLE_memory_size GL_ANGLE_multiview_multisample GL_ANGLE_pack_reverse_row_order GL_ANGLE_polygon_mode GL_ANGLE_program_binary_readiness_query GL_ANGLE_program_cache_control GL_ANGLE_provoking_vertex GL_ANGLE_renderability_validation GL_ANGLE_request_extension GL_ANGLE_robust_client_memory GL_ANGLE_shader_pixel_local_storage GL_ANGLE_shader_pixel_local_storage_coherent GL_ANGLE_stencil_texturing GL_ANGLE_texture_compression_dxt3 GL_ANGLE_texture_compression_dxt5 GL_ANGLE_texture_multisample GL_ANGLE_texture_usage GL_ANGLE_translated_shader_source GL_APPLE_clip_distance GL_ARM_rgba8 GL_CHROMIUM_bind_generates_resource GL_CHROMIUM_bind_uniform_location GL_CHROMIUM_copy_compressed_texture GL_CHROMIUM_copy_texture GL_CHROMIUM_lose_context GL_EXT_EGL_image_external_wrap_modes GL_EXT_base_instance GL_EXT_blend_func_extended GL_EXT_blend_minmax GL_EXT_clip_control GL_EXT_clip_cull_distance GL_EXT_color_buffer_float GL_EXT_color_buffer_half_float GL_EXT_conservative_depth GL_EXT_debug_label GL_EXT_debug_marker GL_EXT_depth_clamp GL_EXT_discard_framebuffer GL_EXT_disjoint_timer_query GL_EXT_draw_buffers GL_EXT_draw_buffers_indexed GL_EXT_draw_elements_base_vertex GL_EXT_float_blend GL_EXT_frag_depth GL_EXT_instanced_arrays GL_EXT_map_buffer_range GL_EXT_occlusion_query_boolean GL_EXT_polygon_offset_clamp GL_EXT_read_format_bgra GL_EXT_render_snorm GL_EXT_robustness GL_EXT_sRGB GL_EXT_shader_texture_lod GL_EXT_texture_border_clamp GL_EXT_texture_compression_bptc GL_EXT_texture_compression_dxt1 GL_EXT_texture_compression_rgtc GL_EXT_texture_compression_s3tc_srgb GL_EXT_texture_filter_anisotropic GL_EXT_texture_format_BGRA8888 GL_EXT_texture_mirror_clamp_to_edge GL_EXT_texture_norm16 GL_EXT_texture_rg GL_EXT_texture_storage GL_EXT_texture_type_2_10_10_10_REV GL_EXT_unpack_subimage GL_KHR_debug GL_KHR_parallel_shader_compile GL_KHR_robustness GL_NV_EGL_stream_consumer_external GL_NV_fence GL_NV_framebuffer_blit GL_NV_pack_subimage GL_NV_pixel_buffer_object GL_NV_shader_noperspective_interpolation GL_OES_EGL_image GL_OES_EGL_image_external GL_OES_EGL_image_external_essl3 GL_OES_depth24 GL_OES_depth32 GL_OES_draw_buffers_indexed GL_OES_draw_elements_base_vertex GL_OES_element_index_uint GL_OES_fbo_render_mipmap GL_OES_get_program_binary GL_OES_mapbuffer GL_OES_packed_depth_stencil GL_OES_required_internalformat GL_OES_rgb8_rgba8 GL_OES_sample_variables GL_OES_shader_multisample_interpolation GL_OES_standard_derivatives GL_OES_surfaceless_context GL_OES_texture_border_clamp GL_OES_texture_float GL_OES_texture_float_linear GL_OES_texture_half_float GL_OES_texture_half_float_linear GL_OES_texture_npot GL_OES_texture_stencil8 GL_OES_texture_storage_multisample_2d_array GL_OES_vertex_array_object GL_OVR_multiview GL_OVR_multiview2 ",
+        "glImplementationParts": "(gl=egl-angle,angle=d3d11)",
+        "glRenderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 2070 (0x00001F14) Direct3D11 vs_5_0 ps_5_0, D3D11-32.0.15.9144)",
+        "glResetNotificationStrategy": 33362,
+        "glVendor": "Google Inc. (NVIDIA)",
+        "glVersion": "OpenGL ES 3.0 (ANGLE 2.1.28468 git hash: 1c43d257c56e)",
+        "glWsExtensions": "EGL_EXT_create_context_robustness EGL_ANGLE_d3d_share_handle_client_buffer EGL_ANGLE_d3d_texture_client_buffer EGL_ANGLE_surface_d3d_texture_2d_share_handle EGL_ANGLE_query_surface_pointer EGL_ANGLE_window_fixed_size EGL_ANGLE_keyed_mutex EGL_ANGLE_surface_orientation EGL_ANGLE_direct_composition EGL_NV_post_sub_buffer EGL_KHR_create_context EGL_KHR_image EGL_KHR_image_base EGL_KHR_gl_texture_2D_image EGL_KHR_gl_texture_cubemap_image EGL_KHR_gl_renderbuffer_image EGL_KHR_get_all_proc_addresses EGL_KHR_stream EGL_KHR_stream_consumer_gltexture EGL_NV_stream_consumer_gltexture_yuv EGL_ANGLE_stream_producer_d3d_texture EGL_ANGLE_create_context_webgl_compatibility EGL_CHROMIUM_create_context_bind_generates_resource EGL_CHROMIUM_sync_control EGL_EXT_pixel_format_float EGL_KHR_surfaceless_context EGL_ANGLE_display_texture_share_group EGL_ANGLE_display_semaphore_share_group EGL_ANGLE_create_context_client_arrays EGL_ANGLE_program_cache_control EGL_ANGLE_robust_resource_initialization EGL_ANGLE_create_context_extensions_enabled EGL_ANDROID_blob_cache EGL_ANDROID_recordable EGL_ANGLE_image_d3d11_texture EGL_ANGLE_create_context_backwards_compatible EGL_KHR_no_config_context EGL_KHR_create_context_no_error EGL_KHR_reusable_sync EGL_ANGLE_memory_usage_report ",
+        "glWsVendor": "Google Inc. (NVIDIA)",
+        "glWsVersion": "1.5 (ANGLE 2.1.28468 git hash: 1c43d257c56e)",
+        "inProcessGpu": false,
+        "initializationTime": 282.802,
+        "isAsan": false,
+        "isClangCoverage": false,
+        "jpegDecodeAcceleratorSupported": false,
+        "maxMsaaSamples": "8",
+        "optimus": false,
+        "overlayInfo": {
+          "bgra8OverlaySupport": "SOFTWARE",
+          "directComposition": true,
+          "nv12OverlaySupport": "SOFTWARE",
+          "p010OverlaySupport": "SOFTWARE",
+          "rgb10a2OverlaySupport": "SOFTWARE",
+          "supportsOverlays": true,
+          "yuy2OverlaySupport": "SOFTWARE"
+        },
+        "passthroughCmdDecoder": true,
+        "pixelShaderVersion": "5.0",
+        "sandboxed": true,
+        "skiaBackendType": "GaneshGL",
+        "subpixelFontRendering": true,
+        "supportsD3dSharedImages": false,
+        "supportsDirectML": false,
+        "supportsDx12": false,
+        "supportsVulkan": false,
+        "targetCpuBits": 64,
+        "vertexShaderVersion": "5.0",
+        "visibilityCallbackCallCount": 0,
+        "vulkanVersion": "Not supported"
+      },
+      "gpuDevice": [
+        {
+          "active": false,
+          "deviceId": 39876,
+          "deviceString": "Intel(R) UHD Graphics",
+          "driverVendor": "NVIDIA",
+          "driverVersion": "26.20.100.7642",
+          "gpuPreference": 2,
+          "revision": 5,
+          "subSysId": 314053730,
+          "vendorId": 32902
+        },
+        {
+          "active": true,
+          "deviceId": 7956,
+          "deviceString": "NVIDIA GeForce RTX 2070",
+          "driverVersion": "32.0.15.9144",
+          "gpuPreference": 3,
+          "revision": 161,
+          "subSysId": 314053730,
+          "vendorId": 4318
+        },
+        {
+          "active": false,
+          "deviceId": 140,
+          "deviceString": "Microsoft Basic Render Driver",
+          "driverVersion": "10.0.26100.9278",
+          "gpuPreference": 0,
+          "revision": 0,
+          "subSysId": 0,
+          "vendorId": 5140
+        }
+      ]
+    }
+  },
+  {
+    "utc": "2026-09-12T17:14:56.047Z",
+    "time": "33293412837400",
+    "kind": "host-control",
+    "value": 0.6499999761581421
+  },
+  {
+    "utc": "2026-09-12T17:14:56.107Z",
+    "time": "33293472847100",
+    "kind": "host-control",
+    "value": 0.4527473747730255
+  },
+  {
+    "utc": "2026-09-12T17:14:56.376Z",
+    "time": "33293741963600",
+    "kind": "console",
+    "message": "{\"kind\":\"webgpu\",\"three\":\"186\",\"backend\":\"WebGPU\",\"width\":1920,\"height\":1080}"
+  },
+  {
+    "utc": "2026-09-12T17:14:56.389Z",
+    "time": "33293754422100",
+    "kind": "paint",
+    "id": 1,
+    "slot": 0,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 0,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 0
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T17:14:56.394Z",
+    "time": "33293759481900",
+    "kind": "console",
+    "message": "THREE.TSL: Return statement used in an inline 'Fn()'. Define a layout struct to allow return values. Stack trace not available. Enable \"THREE.Node.captureStackTrace\" to capture stack traces."
+  },
+  {
+    "utc": "2026-09-12T17:14:56.394Z",
+    "time": "33293759640600",
+    "kind": "console",
+    "message": "THREE.TSL: Return statement used in an inline 'Fn()'. Define a layout struct to allow return values. Stack trace not available. Enable \"THREE.Node.captureStackTrace\" to capture stack traces."
+  },
+  {
+    "utc": "2026-09-12T17:14:56.394Z",
+    "time": "33293759737100",
+    "kind": "console",
+    "message": "THREE.TSL: Return statement used in an inline 'Fn()'. Define a layout struct to allow return values. Stack trace not available. Enable \"THREE.Node.captureStackTrace\" to capture stack traces."
+  },
+  {
+    "utc": "2026-09-12T17:14:56.394Z",
+    "time": "33293759884900",
+    "kind": "console",
+    "message": "THREE.TSL: Return statement used in an inline 'Fn()'. Define a layout struct to allow return values. Stack trace not available. Enable \"THREE.Node.captureStackTrace\" to capture stack traces."
+  },
+  {
+    "utc": "2026-09-12T17:14:56.395Z",
+    "time": "33293760696200",
+    "kind": "console",
+    "message": "THREE.TSL: Return statement used in an inline 'Fn()'. Define a layout struct to allow return values. Stack trace not available. Enable \"THREE.Node.captureStackTrace\" to capture stack traces."
+  },
+  {
+    "utc": "2026-09-12T17:14:56.403Z",
+    "time": "33293768369600",
+    "kind": "copy-complete",
+    "id": 1
+  },
+  {
+    "utc": "2026-09-12T17:14:56.410Z",
+    "time": "33293775845400",
+    "kind": "console",
+    "message": "{\"kind\":\"submitted\",\"frame\":1}"
+  },
+  {
+    "utc": "2026-09-12T17:14:56.454Z",
+    "time": "33293819271100",
+    "kind": "console",
+    "message": "{\"kind\":\"submitted\",\"frame\":2}"
+  },
+  {
+    "utc": "2026-09-12T17:14:56.455Z",
+    "time": "33293820430900",
+    "kind": "console",
+    "message": "{\"kind\":\"submitted\",\"frame\":3}"
+  },
+  {
+    "utc": "2026-09-12T17:14:56.500Z",
+    "time": "33293865913800",
+    "kind": "paint",
+    "id": 2,
+    "slot": 0,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 433316,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 1
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T17:14:56.505Z",
+    "time": "33293870675400",
+    "kind": "paint",
+    "id": 3,
+    "slot": 1,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 483314,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 2
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T17:14:56.508Z",
+    "time": "33293873795500",
+    "kind": "paint",
+    "drop": "producer-inflight-limit",
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 499980,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 3
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T17:14:56.510Z",
+    "time": "33293875558900",
+    "kind": "copy-complete",
+    "id": 2
+  },
+  {
+    "utc": "2026-09-12T17:14:56.510Z",
+    "time": "33293875596400",
+    "kind": "copy-complete",
+    "id": 3
+  },
+  {
+    "utc": "2026-09-12T17:14:56.526Z",
+    "time": "33293891802800",
+    "kind": "paint",
+    "id": 4,
+    "slot": 0,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 516646,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 4
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T17:14:56.542Z",
+    "time": "33293907263400",
+    "kind": "copy-complete",
+    "id": 4
+  },
+  {
+    "utc": "2026-09-12T17:14:56.544Z",
+    "time": "33293909658300",
+    "kind": "paint",
+    "id": 5,
+    "slot": 1,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 533312,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 5
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T17:14:56.557Z",
+    "time": "33293922317000",
+    "kind": "copy-complete",
+    "id": 5
+  },
+  {
+    "utc": "2026-09-12T17:14:56.558Z",
+    "time": "33293923601300",
+    "kind": "paint",
+    "id": 6,
+    "slot": 0,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 549978,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 6
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T17:14:56.573Z",
+    "time": "33293938341500",
+    "kind": "copy-complete",
+    "id": 6
+  },
+  {
+    "utc": "2026-09-12T17:14:56.575Z",
+    "time": "33293940159600",
+    "kind": "paint",
+    "id": 7,
+    "slot": 1,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 566644,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 7
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T17:14:56.588Z",
+    "time": "33293953893200",
+    "kind": "copy-complete",
+    "id": 7
+  },
+  {
+    "utc": "2026-09-12T17:14:56.593Z",
+    "time": "33293958667300",
+    "kind": "paint",
+    "id": 8,
+    "slot": 0,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 583310,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 8
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T17:14:56.604Z",
+    "time": "33293969072800",
+    "kind": "copy-complete",
+    "id": 8
+  },
+  {
+    "utc": "2026-09-12T17:14:56.609Z",
+    "time": "33293974582600",
+    "kind": "paint",
+    "id": 9,
+    "slot": 0,
+    "width": 1920,
+    "height": 1080,
+    "format": 87,
+    "adapterLuidLow": 71763,
+    "adapterLuidHigh": 0,
+    "info": {
+      "pixelFormat": "bgra",
+      "codedSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "visibleRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "timestamp": 599976,
+      "colorSpace": {
+        "primaries": "bt709",
+        "transfer": "srgb",
+        "matrix": "rgb",
+        "range": "full"
+      },
+      "widgetType": "frame",
+      "metadata": {
+        "captureUpdateRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "regionCaptureRect": null,
+        "sourceSize": {
+          "width": 1920,
+          "height": 1080
+        },
+        "frameCount": 9
+      },
+      "handle": "borrowed-local-NT"
+    }
+  },
+  {
+    "utc": "2026-09-12T17:14:56.620Z",
+    "time": "33293985133500",
+    "kind": "copy-complete",
+    "id": 9
+  },
+  {
+    "utc": "2026-09-12T17:14:56.635Z",
+    "time": "33294000757200",
+    "kind": "copy-complete",
+    "id": 10
+  },
+  {
+    "utc": "2026-09-12T17:14:56.651Z",
+    "time": "33294016197800",
+    "kind": "copy-complete",
+    "id": 11
+  },
+  {
+    "utc": "2026-09-12T17:14:56.666Z",
+    "time": "33294031343100",
+    "kind": "copy-complete",
+    "id": 12
+  },
+  {
+    "utc": "2026-09-12T17:14:56.682Z",
+    "time": "33294047627600",
+    "kind": "copy-complete",
+    "id": 13
+  },
+  {
+    "utc": "2026-09-12T17:14:56.697Z",
+    "time": "33294062879400",
+    "kind": "copy-complete",
+    "id": 14
+  },
+  {
+    "utc": "2026-09-12T17:14:56.713Z",
+    "time": "33294078070700",
+    "kind": "copy-complete",
+    "id": 15
+  },
+  {
+    "utc": "2026-09-12T17:14:56.729Z",
+    "time": "33294094141200",
+    "kind": "copy-complete",
+    "id": 16
+  },
+  {
+    "utc": "2026-09-12T17:14:56.744Z",
+    "time": "33294109585200",
+    "kind": "copy-complete",
+    "id": 17
+  },
+  {
+    "utc": "2026-09-12T17:14:56.776Z",
+    "time": "33294141230700",
+    "kind": "copy-complete",
+    "id": 18
+  },
+  {
+    "utc": "2026-09-12T17:14:56.791Z",
+    "time": "33294156938700",
+    "kind": "copy-complete",
+    "id": 19
+  },
+  {
+    "utc": "2026-09-12T17:14:56.807Z",
+    "time": "33294172160300",
+    "kind": "copy-complete",
+    "id": 20
+  },
+  {
+    "utc": "2026-09-12T17:14:56.823Z",
+    "time": "33294188183000",
+    "kind": "copy-complete",
+    "id": 21
+  },
+  {
+    "utc": "2026-09-12T17:14:56.838Z",
+    "time": "33294203928200",
+    "kind": "copy-complete",
+    "id": 22
+  },
+  {
+    "utc": "2026-09-12T17:14:56.855Z",
+    "time": "33294220065900",
+    "kind": "copy-complete",
+    "id": 23
+  },
+  {
+    "utc": "2026-09-12T17:14:56.870Z",
+    "time": "33294235402500",
+    "kind": "copy-complete",
+    "id": 24
+  },
+  {
+    "utc": "2026-09-12T17:14:56.886Z",
+    "time": "33294251064900",
+    "kind": "copy-complete",
+    "id": 25
+  },
+  {
+    "utc": "2026-09-12T17:14:56.901Z",
+    "time": "33294266663100",
+    "kind": "copy-complete",
+    "id": 26
+  },
+  {
+    "utc": "2026-09-12T17:14:56.917Z",
+    "time": "33294282272000",
+    "kind": "copy-complete",
+    "id": 27
+  },
+  {
+    "utc": "2026-09-12T17:14:56.933Z",
+    "time": "33294298156000",
+    "kind": "copy-complete",
+    "id": 28
+  },
+  {
+    "utc": "2026-09-12T17:14:56.948Z",
+    "time": "33294313940000",
+    "kind": "copy-complete",
+    "id": 29
+  },
+  {
+    "utc": "2026-09-12T17:14:56.964Z",
+    "time": "33294329306000",
+    "kind": "copy-complete",
+    "id": 30
+  },
+  {
+    "utc": "2026-09-12T17:14:56.979Z",
+    "time": "33294344392300",
+    "kind": "copy-complete",
+    "id": 31
+  },
+  {
+    "utc": "2026-09-12T17:14:56.994Z",
+    "time": "33294360002800",
+    "kind": "copy-complete",
+    "id": 32
+  },
+  {
+    "utc": "2026-09-12T17:14:57.026Z",
+    "time": "33294391591300",
+    "kind": "copy-complete",
+    "id": 33
+  },
+  {
+    "utc": "2026-09-12T17:14:57.042Z",
+    "time": "33294407994100",
+    "kind": "copy-complete",
+    "id": 35
+  },
+  {
+    "utc": "2026-09-12T17:14:57.042Z",
+    "time": "33294407999700",
+    "kind": "copy-complete",
+    "id": 34
+  },
+  {
+    "utc": "2026-09-12T17:14:57.074Z",
+    "time": "33294439483200",
+    "kind": "copy-complete",
+    "id": 36
+  },
+  {
+    "utc": "2026-09-12T17:14:57.090Z",
+    "time": "33294455622800",
+    "kind": "copy-complete",
+    "id": 37
+  },
+  {
+    "utc": "2026-09-12T17:14:57.092Z",
+    "time": "33294457728900",
+    "kind": "copy-complete",
+    "id": 38
+  },
+  {
+    "utc": "2026-09-12T17:14:57.121Z",
+    "time": "33294486870100",
+    "kind": "copy-complete",
+    "id": 39
+  },
+  {
+    "utc": "2026-09-12T17:14:57.136Z",
+    "time": "33294501964800",
+    "kind": "copy-complete",
+    "id": 40
+  },
+  {
+    "utc": "2026-09-12T17:14:57.153Z",
+    "time": "33294518138300",
+    "kind": "copy-complete",
+    "id": 41
+  },
+  {
+    "utc": "2026-09-12T17:14:57.169Z",
+    "time": "33294534205800",
+    "kind": "copy-complete",
+    "id": 42
+  },
+  {
+    "utc": "2026-09-12T17:14:57.185Z",
+    "time": "33294550168600",
+    "kind": "copy-complete",
+    "id": 43
+  },
+  {
+    "utc": "2026-09-12T17:14:57.201Z",
+    "time": "33294566224800",
+    "kind": "copy-complete",
+    "id": 44
+  },
+  {
+    "utc": "2026-09-12T17:14:57.216Z",
+    "time": "33294581963500",
+    "kind": "copy-complete",
+    "id": 45
+  },
+  {
+    "utc": "2026-09-12T17:14:57.232Z",
+    "time": "33294597915500",
+    "kind": "copy-complete",
+    "id": 46
+  },
+  {
+    "utc": "2026-09-12T17:14:57.248Z",
+    "time": "33294613411000",
+    "kind": "copy-complete",
+    "id": 47
+  },
+  {
+    "utc": "2026-09-12T17:14:57.264Z",
+    "time": "33294629032500",
+    "kind": "copy-complete",
+    "id": 48
+  },
+  {
+    "utc": "2026-09-12T17:14:57.279Z",
+    "time": "33294644663800",
+    "kind": "copy-complete",
+    "id": 49
+  },
+  {
+    "utc": "2026-09-12T17:14:57.295Z",
+    "time": "33294660070600",
+    "kind": "copy-complete",
+    "id": 50
+  },
+  {
+    "utc": "2026-09-12T17:14:57.310Z",
+    "time": "33294675181500",
+    "kind": "copy-complete",
+    "id": 51
+  },
+  {
+    "utc": "2026-09-12T17:14:57.325Z",
+    "time": "33294690155700",
+    "kind": "copy-complete",
+    "id": 52
+  },
+  {
+    "utc": "2026-09-12T17:14:57.355Z",
+    "time": "33294720948300",
+    "kind": "copy-complete",
+    "id": 53
+  },
+  {
+    "utc": "2026-09-12T17:14:57.371Z",
+    "time": "33294736618000",
+    "kind": "copy-complete",
+    "id": 54
+  },
+  {
+    "utc": "2026-09-12T17:14:57.387Z",
+    "time": "33294752263600",
+    "kind": "copy-complete",
+    "id": 55
+  },
+  {
+    "utc": "2026-09-12T17:14:57.403Z",
+    "time": "33294768264300",
+    "kind": "copy-complete",
+    "id": 56
+  },
+  {
+    "utc": "2026-09-12T17:14:57.418Z",
+    "time": "33294783575800",
+    "kind": "copy-complete",
+    "id": 57
+  },
+  {
+    "utc": "2026-09-12T17:14:57.433Z",
+    "time": "33294798334400",
+    "kind": "copy-complete",
+    "id": 58
+  },
+  {
+    "utc": "2026-09-12T17:14:57.448Z",
+    "time": "33294813464400",
+    "kind": "copy-complete",
+    "id": 59
+  },
+  {
+    "utc": "2026-09-12T17:14:57.464Z",
+    "time": "33294829844000",
+    "kind": "copy-complete",
+    "id": 60
+  },
+  {
+    "utc": "2026-09-12T17:14:57.481Z",
+    "time": "33294846273300",
+    "kind": "copy-complete",
+    "id": 61
+  },
+  {
+    "utc": "2026-09-12T17:14:57.496Z",
+    "time": "33294861834100",
+    "kind": "copy-complete",
+    "id": 62
+  },
+  {
+    "utc": "2026-09-12T17:14:57.512Z",
+    "time": "33294877920500",
+    "kind": "copy-complete",
+    "id": 63
+  },
+  {
+    "utc": "2026-09-12T17:14:57.529Z",
+    "time": "33294894106800",
+    "kind": "copy-complete",
+    "id": 64
+  },
+  {
+    "utc": "2026-09-12T17:14:57.544Z",
+    "time": "33294909344000",
+    "kind": "copy-complete",
+    "id": 65
+  },
+  {
+    "utc": "2026-09-12T17:14:57.560Z",
+    "time": "33294925395800",
+    "kind": "copy-complete",
+    "id": 66
+  },
+  {
+    "utc": "2026-09-12T17:14:57.591Z",
+    "time": "33294956928500",
+    "kind": "copy-complete",
+    "id": 67
+  },
+  {
+    "utc": "2026-09-12T17:14:57.607Z",
+    "time": "33294972086100",
+    "kind": "copy-complete",
+    "id": 68
+  },
+  {
+    "utc": "2026-09-12T17:14:57.622Z",
+    "time": "33294987878500",
+    "kind": "copy-complete",
+    "id": 69
+  },
+  {
+    "utc": "2026-09-12T17:14:57.639Z",
+    "time": "33295004038100",
+    "kind": "copy-complete",
+    "id": 70
+  },
+  {
+    "utc": "2026-09-12T17:14:57.654Z",
+    "time": "33295019339200",
+    "kind": "copy-complete",
+    "id": 71
+  },
+  {
+    "utc": "2026-09-12T17:14:57.670Z",
+    "time": "33295035467000",
+    "kind": "copy-complete",
+    "id": 72
+  },
+  {
+    "utc": "2026-09-12T17:14:57.686Z",
+    "time": "33295051421000",
+    "kind": "copy-complete",
+    "id": 73
+  },
+  {
+    "utc": "2026-09-12T17:14:57.703Z",
+    "time": "33295068104000",
+    "kind": "copy-complete",
+    "id": 74
+  },
+  {
+    "utc": "2026-09-12T17:14:57.719Z",
+    "time": "33295084205800",
+    "kind": "copy-complete",
+    "id": 75
+  },
+  {
+    "utc": "2026-09-12T17:14:57.734Z",
+    "time": "33295099594500",
+    "kind": "copy-complete",
+    "id": 76
+  },
+  {
+    "utc": "2026-09-12T17:14:57.750Z",
+    "time": "33295115036800",
+    "kind": "copy-complete",
+    "id": 77
+  },
+  {
+    "utc": "2026-09-12T17:14:57.765Z",
+    "time": "33295130182400",
+    "kind": "copy-complete",
+    "id": 78
+  },
+  {
+    "utc": "2026-09-12T17:14:57.780Z",
+    "time": "33295145632400",
+    "kind": "copy-complete",
+    "id": 79
+  },
+  {
+    "utc": "2026-09-12T17:14:57.796Z",
+    "time": "33295161066600",
+    "kind": "copy-complete",
+    "id": 80
+  },
+  {
+    "utc": "2026-09-12T17:14:57.811Z",
+    "time": "33295176740400",
+    "kind": "copy-complete",
+    "id": 81
+  },
+  {
+    "utc": "2026-09-12T17:14:57.827Z",
+    "time": "33295192641200",
+    "kind": "copy-complete",
+    "id": 82
+  },
+  {
+    "utc": "2026-09-12T17:14:57.843Z",
+    "time": "33295208210900",
+    "kind": "copy-complete",
+    "id": 83
+  },
+  {
+    "utc": "2026-09-12T17:14:57.874Z",
+    "time": "33295239423300",
+    "kind": "copy-complete",
+    "id": 84
+  },
+  {
+    "utc": "2026-09-12T17:14:57.889Z",
+    "time": "33295254909600",
+    "kind": "copy-complete",
+    "id": 85
+  },
+  {
+    "utc": "2026-09-12T17:14:57.905Z",
+    "time": "33295270777500",
+    "kind": "copy-complete",
+    "id": 86
+  },
+  {
+    "utc": "2026-09-12T17:14:57.921Z",
+    "time": "33295286040400",
+    "kind": "copy-complete",
+    "id": 87
+  },
+  {
+    "utc": "2026-09-12T17:14:57.936Z",
+    "time": "33295301505600",
+    "kind": "copy-complete",
+    "id": 88
+  },
+  {
+    "utc": "2026-09-12T17:14:57.952Z",
+    "time": "33295318016600",
+    "kind": "copy-complete",
+    "id": 89
+  },
+  {
+    "utc": "2026-09-12T17:14:57.969Z",
+    "time": "33295334273300",
+    "kind": "copy-complete",
+    "id": 90
+  },
+  {
+    "utc": "2026-09-12T17:14:57.985Z",
+    "time": "33295350195100",
+    "kind": "copy-complete",
+    "id": 91
+  },
+  {
+    "utc": "2026-09-12T17:14:58.000Z",
+    "time": "33295365366700",
+    "kind": "copy-complete",
+    "id": 92
+  },
+  {
+    "utc": "2026-09-12T17:14:58.016Z",
+    "time": "33295381365200",
+    "kind": "copy-complete",
+    "id": 93
+  },
+  {
+    "utc": "2026-09-12T17:14:58.031Z",
+    "time": "33295396101400",
+    "kind": "copy-complete",
+    "id": 94
+  },
+  {
+    "utc": "2026-09-12T17:14:58.045Z",
+    "time": "33295411018000",
+    "kind": "copy-complete",
+    "id": 95
+  },
+  {
+    "utc": "2026-09-12T17:14:58.061Z",
+    "time": "33295426456900",
+    "kind": "copy-complete",
+    "id": 96
+  },
+  {
+    "utc": "2026-09-12T17:14:58.076Z",
+    "time": "33295441375900",
+    "kind": "copy-complete",
+    "id": 97
+  },
+  {
+    "utc": "2026-09-12T17:14:58.107Z",
+    "time": "33295472156800",
+    "kind": "copy-complete",
+    "id": 98
+  },
+  {
+    "utc": "2026-09-12T17:14:58.122Z",
+    "time": "33295488000200",
+    "kind": "copy-complete",
+    "id": 99
+  },
+  {
+    "utc": "2026-09-12T17:14:58.138Z",
+    "time": "33295503096900",
+    "kind": "copy-complete",
+    "id": 100
+  },
+  {
+    "utc": "2026-09-12T17:14:58.154Z",
+    "time": "33295519537700",
+    "kind": "copy-complete",
+    "id": 101
+  },
+  {
+    "utc": "2026-09-12T17:14:58.170Z",
+    "time": "33295535217000",
+    "kind": "copy-complete",
+    "id": 102
+  },
+  {
+    "utc": "2026-09-12T17:14:58.185Z",
+    "time": "33295550505500",
+    "kind": "copy-complete",
+    "id": 103
+  },
+  {
+    "utc": "2026-09-12T17:14:58.201Z",
+    "time": "33295566097900",
+    "kind": "copy-complete",
+    "id": 104
+  },
+  {
+    "utc": "2026-09-12T17:14:58.216Z",
+    "time": "33295581970600",
+    "kind": "copy-complete",
+    "id": 105
+  },
+  {
+    "utc": "2026-09-12T17:14:58.232Z",
+    "time": "33295598006600",
+    "kind": "copy-complete",
+    "id": 106
+  },
+  {
+    "utc": "2026-09-12T17:14:58.248Z",
+    "time": "33295613206300",
+    "kind": "copy-complete",
+    "id": 107
+  },
+  {
+    "utc": "2026-09-12T17:14:58.263Z",
+    "time": "33295628086100",
+    "kind": "copy-complete",
+    "id": 108
+  },
+  {
+    "utc": "2026-09-12T17:14:58.278Z",
+    "time": "33295643240300",
+    "kind": "copy-complete",
+    "id": 109
+  },
+  {
+    "utc": "2026-09-12T17:14:58.294Z",
+    "time": "33295659268700",
+    "kind": "copy-complete",
+    "id": 110
+  },
+  {
+    "utc": "2026-09-12T17:14:58.310Z",
+    "time": "33295675349900",
+    "kind": "copy-complete",
+    "id": 111
+  },
+  {
+    "utc": "2026-09-12T17:14:58.325Z",
+    "time": "33295690900900",
+    "kind": "copy-complete",
+    "id": 112
+  },
+  {
+    "utc": "2026-09-12T17:14:58.357Z",
+    "time": "33295722167000",
+    "kind": "copy-complete",
+    "id": 113
+  },
+  {
+    "utc": "2026-09-12T17:14:58.373Z",
+    "time": "33295738057100",
+    "kind": "copy-complete",
+    "id": 114
+  },
+  {
+    "utc": "2026-09-12T17:14:58.388Z",
+    "time": "33295753834300",
+    "kind": "copy-complete",
+    "id": 115
+  },
+  {
+    "utc": "2026-09-12T17:14:58.404Z",
+    "time": "33295769877000",
+    "kind": "copy-complete",
+    "id": 116
+  },
+  {
+    "utc": "2026-09-12T17:14:58.420Z",
+    "time": "33295786010600",
+    "kind": "copy-complete",
+    "id": 117
+  },
+  {
+    "utc": "2026-09-12T17:14:58.436Z",
+    "time": "33295801201800",
+    "kind": "copy-complete",
+    "id": 118
+  },
+  {
+    "utc": "2026-09-12T17:14:58.452Z",
+    "time": "33295817941400",
+    "kind": "copy-complete",
+    "id": 119
+  },
+  {
+    "utc": "2026-09-12T17:14:58.468Z",
+    "time": "33295833580300",
+    "kind": "copy-complete",
+    "id": 120
+  },
+  {
+    "utc": "2026-09-12T17:14:58.483Z",
+    "time": "33295848660300",
+    "kind": "copy-complete",
+    "id": 121
+  },
+  {
+    "utc": "2026-09-12T17:14:58.499Z",
+    "time": "33295864155500",
+    "kind": "copy-complete",
+    "id": 122
+  },
+  {
+    "utc": "2026-09-12T17:14:58.514Z",
+    "time": "33295879420000",
+    "kind": "copy-complete",
+    "id": 123
+  },
+  {
+    "utc": "2026-09-12T17:14:58.530Z",
+    "time": "33295895060400",
+    "kind": "copy-complete",
+    "id": 124
+  },
+  {
+    "utc": "2026-09-12T17:14:58.545Z",
+    "time": "33295910453200",
+    "kind": "copy-complete",
+    "id": 125
+  },
+  {
+    "utc": "2026-09-12T17:14:58.561Z",
+    "time": "33295926288700",
+    "kind": "copy-complete",
+    "id": 126
+  },
+  {
+    "utc": "2026-09-12T17:14:58.576Z",
+    "time": "33295941880800",
+    "kind": "copy-complete",
+    "id": 127
+  },
+  {
+    "utc": "2026-09-12T17:14:58.591Z",
+    "time": "33295956950800",
+    "kind": "copy-complete",
+    "id": 128
+  },
+  {
+    "utc": "2026-09-12T17:14:58.623Z",
+    "time": "33295988426400",
+    "kind": "copy-complete",
+    "id": 129
+  },
+  {
+    "utc": "2026-09-12T17:14:58.638Z",
+    "time": "33296004027000",
+    "kind": "copy-complete",
+    "id": 130
+  },
+  {
+    "utc": "2026-09-12T17:14:58.655Z",
+    "time": "33296020076500",
+    "kind": "copy-complete",
+    "id": 131
+  },
+  {
+    "utc": "2026-09-12T17:14:58.670Z",
+    "time": "33296035788000",
+    "kind": "copy-complete",
+    "id": 132
+  },
+  {
+    "utc": "2026-09-12T17:14:58.686Z",
+    "time": "33296051176000",
+    "kind": "copy-complete",
+    "id": 133
+  },
+  {
+    "utc": "2026-09-12T17:14:58.701Z",
+    "time": "33296066710900",
+    "kind": "copy-complete",
+    "id": 134
+  },
+  {
+    "utc": "2026-09-12T17:14:58.717Z",
+    "time": "33296082176800",
+    "kind": "copy-complete",
+    "id": 135
+  },
+  {
+    "utc": "2026-09-12T17:14:58.732Z",
+    "time": "33296097894700",
+    "kind": "copy-complete",
+    "id": 136
+  },
+  {
+    "utc": "2026-09-12T17:14:58.748Z",
+    "time": "33296113486100",
+    "kind": "copy-complete",
+    "id": 137
+  },
+  {
+    "utc": "2026-09-12T17:14:58.764Z",
+    "time": "33296129074600",
+    "kind": "copy-complete",
+    "id": 138
+  },
+  {
+    "utc": "2026-09-12T17:14:58.780Z",
+    "time": "33296145200000",
+    "kind": "copy-complete",
+    "id": 139
+  },
+  {
+    "utc": "2026-09-12T17:14:58.795Z",
+    "time": "33296160745000",
+    "kind": "copy-complete",
+    "id": 140
+  },
+  {
+    "utc": "2026-09-12T17:14:58.811Z",
+    "time": "33296176621500",
+    "kind": "copy-complete",
+    "id": 141
+  },
+  {
+    "utc": "2026-09-12T17:14:58.842Z",
+    "time": "33296207283200",
+    "kind": "copy-complete",
+    "id": 142
+  },
+  {
+    "utc": "2026-09-12T17:14:58.857Z",
+    "time": "33296222698900",
+    "kind": "copy-complete",
+    "id": 143
+  },
+  {
+    "utc": "2026-09-12T17:14:58.873Z",
+    "time": "33296238331500",
+    "kind": "copy-complete",
+    "id": 144
+  },
+  {
+    "utc": "2026-09-12T17:14:58.888Z",
+    "time": "33296253937200",
+    "kind": "copy-complete",
+    "id": 145
+  },
+  {
+    "utc": "2026-09-12T17:14:58.904Z",
+    "time": "33296269194900",
+    "kind": "copy-complete",
+    "id": 146
+  },
+  {
+    "utc": "2026-09-12T17:14:58.920Z",
+    "time": "33296285198600",
+    "kind": "copy-complete",
+    "id": 147
+  },
+  {
+    "utc": "2026-09-12T17:14:58.935Z",
+    "time": "33296300355900",
+    "kind": "copy-complete",
+    "id": 148
+  },
+  {
+    "utc": "2026-09-12T17:14:58.950Z",
+    "time": "33296315292000",
+    "kind": "copy-complete",
+    "id": 149
+  },
+  {
+    "utc": "2026-09-12T17:14:58.966Z",
+    "time": "33296331263200",
+    "kind": "copy-complete",
+    "id": 150
+  },
+  {
+    "utc": "2026-09-12T17:14:58.981Z",
+    "time": "33296346832200",
+    "kind": "copy-complete",
+    "id": 151
+  },
+  {
+    "utc": "2026-09-12T17:14:58.997Z",
+    "time": "33296362960700",
+    "kind": "copy-complete",
+    "id": 152
+  },
+  {
+    "utc": "2026-09-12T17:14:59.013Z",
+    "time": "33296378210400",
+    "kind": "copy-complete",
+    "id": 153
+  },
+  {
+    "utc": "2026-09-12T17:14:59.028Z",
+    "time": "33296393389600",
+    "kind": "copy-complete",
+    "id": 154
+  },
+  {
+    "utc": "2026-09-12T17:14:59.059Z",
+    "time": "33296424514000",
+    "kind": "copy-complete",
+    "id": 155
+  },
+  {
+    "utc": "2026-09-12T17:14:59.059Z",
+    "time": "33296424522700",
+    "kind": "copy-complete",
+    "id": 156
+  },
+  {
+    "utc": "2026-09-12T17:14:59.090Z",
+    "time": "33296455996500",
+    "kind": "copy-complete",
+    "id": 157
+  },
+  {
+    "utc": "2026-09-12T17:14:59.106Z",
+    "time": "33296471963400",
+    "kind": "copy-complete",
+    "id": 158
+  },
+  {
+    "utc": "2026-09-12T17:14:59.122Z",
+    "time": "33296487913200",
+    "kind": "copy-complete",
+    "id": 159
+  },
+  {
+    "utc": "2026-09-12T17:14:59.138Z",
+    "time": "33296503623500",
+    "kind": "copy-complete",
+    "id": 160
+  },
+  {
+    "utc": "2026-09-12T17:14:59.153Z",
+    "time": "33296518846700",
+    "kind": "copy-complete",
+    "id": 161
+  },
+  {
+    "utc": "2026-09-12T17:14:59.169Z",
+    "time": "33296534877100",
+    "kind": "copy-complete",
+    "id": 162
+  },
+  {
+    "utc": "2026-09-12T17:14:59.185Z",
+    "time": "33296550496500",
+    "kind": "copy-complete",
+    "id": 163
+  },
+  {
+    "utc": "2026-09-12T17:14:59.201Z",
+    "time": "33296566194200",
+    "kind": "copy-complete",
+    "id": 164
+  },
+  {
+    "utc": "2026-09-12T17:14:59.217Z",
+    "time": "33296582569200",
+    "kind": "copy-complete",
+    "id": 165
+  },
+  {
+    "utc": "2026-09-12T17:14:59.232Z",
+    "time": "33296597974900",
+    "kind": "copy-complete",
+    "id": 166
+  },
+  {
+    "utc": "2026-09-12T17:14:59.248Z",
+    "time": "33296614010600",
+    "kind": "copy-complete",
+    "id": 167
+  },
+  {
+    "utc": "2026-09-12T17:14:59.264Z",
+    "time": "33296629442900",
+    "kind": "copy-complete",
+    "id": 168
+  },
+  {
+    "utc": "2026-09-12T17:14:59.280Z",
+    "time": "33296645726700",
+    "kind": "copy-complete",
+    "id": 169
+  },
+  {
+    "utc": "2026-09-12T17:14:59.294Z",
+    "time": "33296659843000",
+    "kind": "copy-complete",
+    "id": 170
+  },
+  {
+    "utc": "2026-09-12T17:14:59.311Z",
+    "time": "33296676033100",
+    "kind": "copy-complete",
+    "id": 171
+  },
+  {
+    "utc": "2026-09-12T17:14:59.326Z",
+    "time": "33296692018600",
+    "kind": "copy-complete",
+    "id": 172
+  },
+  {
+    "utc": "2026-09-12T17:14:59.343Z",
+    "time": "33296708099100",
+    "kind": "copy-complete",
+    "id": 173
+  },
+  {
+    "utc": "2026-09-12T17:14:59.375Z",
+    "time": "33296740152700",
+    "kind": "copy-complete",
+    "id": 174
+  },
+  {
+    "utc": "2026-09-12T17:14:59.391Z",
+    "time": "33296756270700",
+    "kind": "copy-complete",
+    "id": 175
+  },
+  {
+    "utc": "2026-09-12T17:14:59.407Z",
+    "time": "33296772101900",
+    "kind": "copy-complete",
+    "id": 176
+  },
+  {
+    "utc": "2026-09-12T17:14:59.423Z",
+    "time": "33296788148200",
+    "kind": "copy-complete",
+    "id": 177
+  },
+  {
+    "utc": "2026-09-12T17:14:59.438Z",
+    "time": "33296803567600",
+    "kind": "copy-complete",
+    "id": 178
+  },
+  {
+    "utc": "2026-09-12T17:14:59.454Z",
+    "time": "33296819151300",
+    "kind": "copy-complete",
+    "id": 179
+  },
+  {
+    "utc": "2026-09-12T17:14:59.469Z",
+    "time": "33296834527400",
+    "kind": "copy-complete",
+    "id": 180
+  },
+  {
+    "utc": "2026-09-12T17:14:59.485Z",
+    "time": "33296850448800",
+    "kind": "copy-complete",
+    "id": 181
+  },
+  {
+    "utc": "2026-09-12T17:14:59.501Z",
+    "time": "33296866428000",
+    "kind": "copy-complete",
+    "id": 182
+  },
+  {
+    "utc": "2026-09-12T17:14:59.517Z",
+    "time": "33296882186000",
+    "kind": "copy-complete",
+    "id": 183
+  },
+  {
+    "utc": "2026-09-12T17:14:59.533Z",
+    "time": "33296898157400",
+    "kind": "copy-complete",
+    "id": 184
+  },
+  {
+    "utc": "2026-09-12T17:14:59.548Z",
+    "time": "33296913793100",
+    "kind": "copy-complete",
+    "id": 185
+  },
+  {
+    "utc": "2026-09-12T17:14:59.564Z",
+    "time": "33296929287700",
+    "kind": "copy-complete",
+    "id": 186
+  },
+  {
+    "utc": "2026-09-12T17:14:59.580Z",
+    "time": "33296945588300",
+    "kind": "copy-complete",
+    "id": 187
+  },
+  {
+    "utc": "2026-09-12T17:14:59.596Z",
+    "time": "33296961222500",
+    "kind": "copy-complete",
+    "id": 188
+  },
+  {
+    "utc": "2026-09-12T17:14:59.611Z",
+    "time": "33296976505100",
+    "kind": "copy-complete",
+    "id": 189
+  },
+  {
+    "utc": "2026-09-12T17:14:59.626Z",
+    "time": "33296991913500",
+    "kind": "copy-complete",
+    "id": 190
+  },
+  {
+    "utc": "2026-09-12T17:14:59.657Z",
+    "time": "33297022579300",
+    "kind": "copy-complete",
+    "id": 191
+  },
+  {
+    "utc": "2026-09-12T17:14:59.673Z",
+    "time": "33297038088500",
+    "kind": "copy-complete",
+    "id": 192
+  },
+  {
+    "utc": "2026-09-12T17:14:59.688Z",
+    "time": "33297053675700",
+    "kind": "copy-complete",
+    "id": 193
+  },
+  {
+    "utc": "2026-09-12T17:14:59.704Z",
+    "time": "33297069401000",
+    "kind": "copy-complete",
+    "id": 194
+  },
+  {
+    "utc": "2026-09-12T17:14:59.720Z",
+    "time": "33297085374600",
+    "kind": "copy-complete",
+    "id": 195
+  },
+  {
+    "utc": "2026-09-12T17:14:59.735Z",
+    "time": "33297100963400",
+    "kind": "copy-complete",
+    "id": 196
+  },
+  {
+    "utc": "2026-09-12T17:14:59.751Z",
+    "time": "33297116064100",
+    "kind": "copy-complete",
+    "id": 197
+  },
+  {
+    "utc": "2026-09-12T17:14:59.766Z",
+    "time": "33297131608300",
+    "kind": "copy-complete",
+    "id": 198
+  },
+  {
+    "utc": "2026-09-12T17:14:59.783Z",
+    "time": "33297148064800",
+    "kind": "copy-complete",
+    "id": 199
+  },
+  {
+    "utc": "2026-09-12T17:14:59.799Z",
+    "time": "33297164083300",
+    "kind": "copy-complete",
+    "id": 200
+  },
+  {
+    "utc": "2026-09-12T17:14:59.814Z",
+    "time": "33297179344100",
+    "kind": "copy-complete",
+    "id": 201
+  },
+  {
+    "utc": "2026-09-12T17:14:59.830Z",
+    "time": "33297195101300",
+    "kind": "copy-complete",
+    "id": 202
+  },
+  {
+    "utc": "2026-09-12T17:14:59.846Z",
+    "time": "33297211029600",
+    "kind": "copy-complete",
+    "id": 203
+  },
+  {
+    "utc": "2026-09-12T17:14:59.861Z",
+    "time": "33297226595200",
+    "kind": "copy-complete",
+    "id": 204
+  },
+  {
+    "utc": "2026-09-12T17:14:59.893Z",
+    "time": "33297258954600",
+    "kind": "copy-complete",
+    "id": 205
+  },
+  {
+    "utc": "2026-09-12T17:14:59.893Z",
+    "time": "33297258964100",
+    "kind": "copy-complete",
+    "id": 206
+  },
+  {
+    "utc": "2026-09-12T17:14:59.923Z",
+    "time": "33297288946200",
+    "kind": "copy-complete",
+    "id": 207
+  },
+  {
+    "utc": "2026-09-12T17:14:59.939Z",
+    "time": "33297304576000",
+    "kind": "copy-complete",
+    "id": 208
+  },
+  {
+    "utc": "2026-09-12T17:14:59.954Z",
+    "time": "33297319251100",
+    "kind": "copy-complete",
+    "id": 209
+  },
+  {
+    "utc": "2026-09-12T17:14:59.970Z",
+    "time": "33297335309400",
+    "kind": "copy-complete",
+    "id": 210
+  },
+  {
+    "utc": "2026-09-12T17:14:59.985Z",
+    "time": "33297350610600",
+    "kind": "copy-complete",
+    "id": 211
+  },
+  {
+    "utc": "2026-09-12T17:15:00.000Z",
+    "time": "33297366020800",
+    "kind": "copy-complete",
+    "id": 212
+  },
+  {
+    "utc": "2026-09-12T17:15:00.016Z",
+    "time": "33297381166900",
+    "kind": "copy-complete",
+    "id": 213
+  },
+  {
+    "utc": "2026-09-12T17:15:00.031Z",
+    "time": "33297396298500",
+    "kind": "copy-complete",
+    "id": 214
+  },
+  {
+    "utc": "2026-09-12T17:15:00.047Z",
+    "time": "33297412241800",
+    "kind": "copy-complete",
+    "id": 215
+  },
+  {
+    "utc": "2026-09-12T17:15:00.061Z",
+    "time": "33297426945200",
+    "kind": "copy-complete",
+    "id": 216
+  },
+  {
+    "utc": "2026-09-12T17:15:00.077Z",
+    "time": "33297442405400",
+    "kind": "copy-complete",
+    "id": 217
+  },
+  {
+    "utc": "2026-09-12T17:15:00.092Z",
+    "time": "33297457952300",
+    "kind": "copy-complete",
+    "id": 218
+  },
+  {
+    "utc": "2026-09-12T17:15:00.123Z",
+    "time": "33297488884600",
+    "kind": "copy-complete",
+    "id": 219
+  },
+  {
+    "utc": "2026-09-12T17:15:00.138Z",
+    "time": "33297503979700",
+    "kind": "copy-complete",
+    "id": 220
+  },
+  {
+    "utc": "2026-09-12T17:15:00.154Z",
+    "time": "33297519935200",
+    "kind": "copy-complete",
+    "id": 221
+  },
+  {
+    "utc": "2026-09-12T17:15:00.170Z",
+    "time": "33297535754500",
+    "kind": "copy-complete",
+    "id": 222
+  },
+  {
+    "utc": "2026-09-12T17:15:00.185Z",
+    "time": "33297550904600",
+    "kind": "copy-complete",
+    "id": 223
+  },
+  {
+    "utc": "2026-09-12T17:15:00.200Z",
+    "time": "33297565594100",
+    "kind": "copy-complete",
+    "id": 224
+  },
+  {
+    "utc": "2026-09-12T17:15:00.216Z",
+    "time": "33297581114000",
+    "kind": "copy-complete",
+    "id": 225
+  },
+  {
+    "utc": "2026-09-12T17:15:00.231Z",
+    "time": "33297596605200",
+    "kind": "copy-complete",
+    "id": 226
+  },
+  {
+    "utc": "2026-09-12T17:15:00.247Z",
+    "time": "33297612246400",
+    "kind": "copy-complete",
+    "id": 227
+  },
+  {
+    "utc": "2026-09-12T17:15:00.263Z",
+    "time": "33297628407100",
+    "kind": "copy-complete",
+    "id": 228
+  },
+  {
+    "utc": "2026-09-12T17:15:00.279Z",
+    "time": "33297644071000",
+    "kind": "copy-complete",
+    "id": 229
+  },
+  {
+    "utc": "2026-09-12T17:15:00.294Z",
+    "time": "33297659171800",
+    "kind": "copy-complete",
+    "id": 230
+  },
+  {
+    "utc": "2026-09-12T17:15:00.309Z",
+    "time": "33297674489200",
+    "kind": "copy-complete",
+    "id": 231
+  },
+  {
+    "utc": "2026-09-12T17:15:00.341Z",
+    "time": "33297706357200",
+    "kind": "copy-complete",
+    "id": 232
+  },
+  {
+    "utc": "2026-09-12T17:15:00.356Z",
+    "time": "33297721780500",
+    "kind": "copy-complete",
+    "id": 233
+  },
+  {
+    "utc": "2026-09-12T17:15:00.372Z",
+    "time": "33297737148300",
+    "kind": "copy-complete",
+    "id": 234
+  },
+  {
+    "utc": "2026-09-12T17:15:00.387Z",
+    "time": "33297752502200",
+    "kind": "copy-complete",
+    "id": 235
+  },
+  {
+    "utc": "2026-09-12T17:15:00.403Z",
+    "time": "33297768500100",
+    "kind": "copy-complete",
+    "id": 236
+  },
+  {
+    "utc": "2026-09-12T17:15:00.419Z",
+    "time": "33297784179200",
+    "kind": "copy-complete",
+    "id": 237
+  },
+  {
+    "utc": "2026-09-12T17:15:00.435Z",
+    "time": "33297800155500",
+    "kind": "copy-complete",
+    "id": 238
+  },
+  {
+    "utc": "2026-09-12T17:15:00.451Z",
+    "time": "33297816191400",
+    "kind": "copy-complete",
+    "id": 239
+  },
+  {
+    "utc": "2026-09-12T17:15:00.467Z",
+    "time": "33297832450000",
+    "kind": "copy-complete",
+    "id": 240
+  },
+  {
+    "utc": "2026-09-12T17:15:00.483Z",
+    "time": "33297848359100",
+    "kind": "copy-complete",
+    "id": 241
+  },
+  {
+    "utc": "2026-09-12T17:15:00.499Z",
+    "time": "33297864270100",
+    "kind": "copy-complete",
+    "id": 242
+  },
+  {
+    "utc": "2026-09-12T17:15:00.514Z",
+    "time": "33297879925000",
+    "kind": "copy-complete",
+    "id": 243
+  },
+  {
+    "utc": "2026-09-12T17:15:00.530Z",
+    "time": "33297895909900",
+    "kind": "copy-complete",
+    "id": 244
+  },
+  {
+    "utc": "2026-09-12T17:15:00.546Z",
+    "time": "33297911643700",
+    "kind": "copy-complete",
+    "id": 245
+  },
+  {
+    "utc": "2026-09-12T17:15:00.562Z",
+    "time": "33297927970800",
+    "kind": "copy-complete",
+    "id": 246
+  },
+  {
+    "utc": "2026-09-12T17:15:00.579Z",
+    "time": "33297944031900",
+    "kind": "copy-complete",
+    "id": 247
+  },
+  {
+    "utc": "2026-09-12T17:15:00.594Z",
+    "time": "33297959325500",
+    "kind": "copy-complete",
+    "id": 248
+  },
+  {
+    "utc": "2026-09-12T17:15:00.610Z",
+    "time": "33297975277600",
+    "kind": "copy-complete",
+    "id": 249
+  },
+  {
+    "utc": "2026-09-12T17:15:00.640Z",
+    "time": "33298005685200",
+    "kind": "copy-complete",
+    "id": 250
+  },
+  {
+    "utc": "2026-09-12T17:15:00.656Z",
+    "time": "33298021206000",
+    "kind": "copy-complete",
+    "id": 251
+  },
+  {
+    "utc": "2026-09-12T17:15:00.672Z",
+    "time": "33298037045300",
+    "kind": "copy-complete",
+    "id": 252
+  },
+  {
+    "utc": "2026-09-12T17:15:00.687Z",
+    "time": "33298052535600",
+    "kind": "copy-complete",
+    "id": 253
+  },
+  {
+    "utc": "2026-09-12T17:15:00.702Z",
+    "time": "33298067984700",
+    "kind": "copy-complete",
+    "id": 254
+  },
+  {
+    "utc": "2026-09-12T17:15:00.718Z",
+    "time": "33298083596700",
+    "kind": "copy-complete",
+    "id": 255
+  },
+  {
+    "utc": "2026-09-12T17:15:00.734Z",
+    "time": "33298099229800",
+    "kind": "copy-complete",
+    "id": 256
+  },
+  {
+    "utc": "2026-09-12T17:15:00.749Z",
+    "time": "33298114362800",
+    "kind": "copy-complete",
+    "id": 257
+  },
+  {
+    "utc": "2026-09-12T17:15:00.764Z",
+    "time": "33298129566400",
+    "kind": "copy-complete",
+    "id": 258
+  },
+  {
+    "utc": "2026-09-12T17:15:00.780Z",
+    "time": "33298145239800",
+    "kind": "copy-complete",
+    "id": 259
+  },
+  {
+    "utc": "2026-09-12T17:15:00.795Z",
+    "time": "33298161028100",
+    "kind": "copy-complete",
+    "id": 260
+  },
+  {
+    "utc": "2026-09-12T17:15:00.811Z",
+    "time": "33298176973300",
+    "kind": "copy-complete",
+    "id": 261
+  },
+  {
+    "utc": "2026-09-12T17:15:00.827Z",
+    "time": "33298192583100",
+    "kind": "copy-complete",
+    "id": 262
+  },
+  {
+    "utc": "2026-09-12T17:15:00.843Z",
+    "time": "33298208135400",
+    "kind": "copy-complete",
+    "id": 263
+  },
+  {
+    "utc": "2026-09-12T17:15:00.873Z",
+    "time": "33298238224000",
+    "kind": "copy-complete",
+    "id": 264
+  },
+  {
+    "utc": "2026-09-12T17:15:00.888Z",
+    "time": "33298253800700",
+    "kind": "copy-complete",
+    "id": 265
+  },
+  {
+    "utc": "2026-09-12T17:15:00.904Z",
+    "time": "33298269107700",
+    "kind": "copy-complete",
+    "id": 266
+  },
+  {
+    "utc": "2026-09-12T17:15:00.920Z",
+    "time": "33298285159300",
+    "kind": "copy-complete",
+    "id": 267
+  },
+  {
+    "utc": "2026-09-12T17:15:00.935Z",
+    "time": "33298300334200",
+    "kind": "copy-complete",
+    "id": 268
+  },
+  {
+    "utc": "2026-09-12T17:15:00.950Z",
+    "time": "33298315968500",
+    "kind": "copy-complete",
+    "id": 269
+  },
+  {
+    "utc": "2026-09-12T17:15:00.966Z",
+    "time": "33298331091500",
+    "kind": "copy-complete",
+    "id": 270
+  },
+  {
+    "utc": "2026-09-12T17:15:00.982Z",
+    "time": "33298347221100",
+    "kind": "copy-complete",
+    "id": 271
+  },
+  {
+    "utc": "2026-09-12T17:15:00.998Z",
+    "time": "33298363171900",
+    "kind": "copy-complete",
+    "id": 272
+  },
+  {
+    "utc": "2026-09-12T17:15:01.014Z",
+    "time": "33298379538600",
+    "kind": "copy-complete",
+    "id": 273
+  },
+  {
+    "utc": "2026-09-12T17:15:01.030Z",
+    "time": "33298395747100",
+    "kind": "copy-complete",
+    "id": 274
+  },
+  {
+    "utc": "2026-09-12T17:15:01.046Z",
+    "time": "33298411123500",
+    "kind": "copy-complete",
+    "id": 275
+  },
+  {
+    "utc": "2026-09-12T17:15:01.061Z",
+    "time": "33298426726100",
+    "kind": "copy-complete",
+    "id": 276
+  },
+  {
+    "utc": "2026-09-12T17:15:01.076Z",
+    "time": "33298441558300",
+    "kind": "copy-complete",
+    "id": 277
+  },
+  {
+    "utc": "2026-09-12T17:15:01.092Z",
+    "time": "33298457658200",
+    "kind": "copy-complete",
+    "id": 278
+  },
+  {
+    "utc": "2026-09-12T17:15:01.125Z",
+    "time": "33298490306200",
+    "kind": "copy-complete",
+    "id": 279
+  },
+  {
+    "utc": "2026-09-12T17:15:01.140Z",
+    "time": "33298505829200",
+    "kind": "copy-complete",
+    "id": 280
+  },
+  {
+    "utc": "2026-09-12T17:15:01.155Z",
+    "time": "33298521005200",
+    "kind": "copy-complete",
+    "id": 281
+  },
+  {
+    "utc": "2026-09-12T17:15:01.171Z",
+    "time": "33298536381300",
+    "kind": "copy-complete",
+    "id": 282
+  },
+  {
+    "utc": "2026-09-12T17:15:01.186Z",
+    "time": "33298551154300",
+    "kind": "copy-complete",
+    "id": 283
+  },
+  {
+    "utc": "2026-09-12T17:15:01.201Z",
+    "time": "33298566339100",
+    "kind": "copy-complete",
+    "id": 284
+  },
+  {
+    "utc": "2026-09-12T17:15:01.216Z",
+    "time": "33298582011500",
+    "kind": "copy-complete",
+    "id": 285
+  },
+  {
+    "utc": "2026-09-12T17:15:01.232Z",
+    "time": "33298597959000",
+    "kind": "copy-complete",
+    "id": 286
+  },
+  {
+    "utc": "2026-09-12T17:15:01.248Z",
+    "time": "33298613938900",
+    "kind": "copy-complete",
+    "id": 287
+  },
+  {
+    "utc": "2026-09-12T17:15:01.264Z",
+    "time": "33298629276100",
+    "kind": "copy-complete",
+    "id": 288
+  },
+  {
+    "utc": "2026-09-12T17:15:01.280Z",
+    "time": "33298645077600",
+    "kind": "copy-complete",
+    "id": 289
+  },
+  {
+    "utc": "2026-09-12T17:15:01.296Z",
+    "time": "33298661276300",
+    "kind": "copy-complete",
+    "id": 290
+  },
+  {
+    "utc": "2026-09-12T17:15:01.312Z",
+    "time": "33298677049600",
+    "kind": "copy-complete",
+    "id": 291
+  },
+  {
+    "utc": "2026-09-12T17:15:01.327Z",
+    "time": "33298692973500",
+    "kind": "copy-complete",
+    "id": 292
+  },
+  {
+    "utc": "2026-09-12T17:15:01.343Z",
+    "time": "33298708105300",
+    "kind": "copy-complete",
+    "id": 293
+  },
+  {
+    "utc": "2026-09-12T17:15:01.374Z",
+    "time": "33298739355700",
+    "kind": "copy-complete",
+    "id": 294
+  },
+  {
+    "utc": "2026-09-12T17:15:01.389Z",
+    "time": "33298754512500",
+    "kind": "copy-complete",
+    "id": 295
+  },
+  {
+    "utc": "2026-09-12T17:15:01.405Z",
+    "time": "33298770106400",
+    "kind": "copy-complete",
+    "id": 296
+  },
+  {
+    "utc": "2026-09-12T17:15:01.420Z",
+    "time": "33298785991100",
+    "kind": "copy-complete",
+    "id": 297
+  },
+  {
+    "utc": "2026-09-12T17:15:01.435Z",
+    "time": "33298800697400",
+    "kind": "copy-complete",
+    "id": 298
+  },
+  {
+    "utc": "2026-09-12T17:15:01.451Z",
+    "time": "33298816706400",
+    "kind": "copy-complete",
+    "id": 299
+  },
+  {
+    "utc": "2026-09-12T17:15:01.468Z",
+    "time": "33298833169600",
+    "kind": "copy-complete",
+    "id": 300
+  },
+  {
+    "utc": "2026-09-12T17:15:01.483Z",
+    "time": "33298848259000",
+    "kind": "copy-complete",
+    "id": 301
+  },
+  {
+    "utc": "2026-09-12T17:15:01.499Z",
+    "time": "33298864258900",
+    "kind": "copy-complete",
+    "id": 302
+  },
+  {
+    "utc": "2026-09-12T17:15:01.514Z",
+    "time": "33298879289400",
+    "kind": "copy-complete",
+    "id": 303
+  },
+  {
+    "utc": "2026-09-12T17:15:01.529Z",
+    "time": "33298894945000",
+    "kind": "copy-complete",
+    "id": 304
+  },
+  {
+    "utc": "2026-09-12T17:15:01.545Z",
+    "time": "33298910976000",
+    "kind": "copy-complete",
+    "id": 305
+  },
+  {
+    "utc": "2026-09-12T17:15:01.561Z",
+    "time": "33298926933800",
+    "kind": "copy-complete",
+    "id": 306
+  },
+  {
+    "utc": "2026-09-12T17:15:01.578Z",
+    "time": "33298943031200",
+    "kind": "copy-complete",
+    "id": 307
+  },
+  {
+    "utc": "2026-09-12T17:15:01.593Z",
+    "time": "33298958508000",
+    "kind": "copy-complete",
+    "id": 308
+  },
+  {
+    "utc": "2026-09-12T17:15:01.623Z",
+    "time": "33298988896700",
+    "kind": "copy-complete",
+    "id": 309
+  },
+  {
+    "utc": "2026-09-12T17:15:01.639Z",
+    "time": "33299004959700",
+    "kind": "copy-complete",
+    "id": 310
+  },
+  {
+    "utc": "2026-09-12T17:15:01.655Z",
+    "time": "33299020972000",
+    "kind": "copy-complete",
+    "id": 311
+  },
+  {
+    "utc": "2026-09-12T17:15:01.671Z",
+    "time": "33299036138000",
+    "kind": "copy-complete",
+    "id": 312
+  },
+  {
+    "utc": "2026-09-12T17:15:01.687Z",
+    "time": "33299052241300",
+    "kind": "copy-complete",
+    "id": 313
+  },
+  {
+    "utc": "2026-09-12T17:15:01.702Z",
+    "time": "33299067793600",
+    "kind": "copy-complete",
+    "id": 314
+  },
+  {
+    "utc": "2026-09-12T17:15:01.718Z",
+    "time": "33299083883700",
+    "kind": "copy-complete",
+    "id": 315
+  },
+  {
+    "utc": "2026-09-12T17:15:01.734Z",
+    "time": "33299099455600",
+    "kind": "copy-complete",
+    "id": 316
+  },
+  {
+    "utc": "2026-09-12T17:15:01.750Z",
+    "time": "33299115435200",
+    "kind": "copy-complete",
+    "id": 317
+  },
+  {
+    "utc": "2026-09-12T17:15:01.766Z",
+    "time": "33299131266800",
+    "kind": "copy-complete",
+    "id": 318
+  },
+  {
+    "utc": "2026-09-12T17:15:01.782Z",
+    "time": "33299147862700",
+    "kind": "copy-complete",
+    "id": 319
+  },
+  {
+    "utc": "2026-09-12T17:15:01.798Z",
+    "time": "33299163545200",
+    "kind": "copy-complete",
+    "id": 320
+  },
+  {
+    "utc": "2026-09-12T17:15:01.813Z",
+    "time": "33299178954900",
+    "kind": "copy-complete",
+    "id": 321
+  },
+  {
+    "utc": "2026-09-12T17:15:01.829Z",
+    "time": "33299194578800",
+    "kind": "copy-complete",
+    "id": 322
+  },
+  {
+    "utc": "2026-09-12T17:15:01.845Z",
+    "time": "33299210147800",
+    "kind": "copy-complete",
+    "id": 323
+  },
+  {
+    "utc": "2026-09-12T17:15:01.860Z",
+    "time": "33299225351500",
+    "kind": "copy-complete",
+    "id": 324
+  },
+  {
+    "utc": "2026-09-12T17:15:01.891Z",
+    "time": "33299256099000",
+    "kind": "copy-complete",
+    "id": 325
+  },
+  {
+    "utc": "2026-09-12T17:15:01.906Z",
+    "time": "33299271541200",
+    "kind": "copy-complete",
+    "id": 326
+  },
+  {
+    "utc": "2026-09-12T17:15:01.921Z",
+    "time": "33299286460100",
+    "kind": "copy-complete",
+    "id": 327
+  },
+  {
+    "utc": "2026-09-12T17:15:01.936Z",
+    "time": "33299301978000",
+    "kind": "copy-complete",
+    "id": 328
+  },
+  {
+    "utc": "2026-09-12T17:15:01.952Z",
+    "time": "33299318008900",
+    "kind": "copy-complete",
+    "id": 329
+  },
+  {
+    "utc": "2026-09-12T17:15:01.969Z",
+    "time": "33299334047400",
+    "kind": "copy-complete",
+    "id": 330
+  },
+  {
+    "utc": "2026-09-12T17:15:01.984Z",
+    "time": "33299349153300",
+    "kind": "copy-complete",
+    "id": 331
+  },
+  {
+    "utc": "2026-09-12T17:15:01.999Z",
+    "time": "33299364843100",
+    "kind": "copy-complete",
+    "id": 332
+  },
+  {
+    "utc": "2026-09-12T17:15:02.015Z",
+    "time": "33299380040900",
+    "kind": "copy-complete",
+    "id": 333
+  },
+  {
+    "utc": "2026-09-12T17:15:02.030Z",
+    "time": "33299395408900",
+    "kind": "copy-complete",
+    "id": 334
+  },
+  {
+    "utc": "2026-09-12T17:15:02.045Z",
+    "time": "33299410986400",
+    "kind": "copy-complete",
+    "id": 335
+  },
+  {
+    "utc": "2026-09-12T17:15:02.061Z",
+    "time": "33299426155500",
+    "kind": "copy-complete",
+    "id": 336
+  },
+  {
+    "utc": "2026-09-12T17:15:02.076Z",
+    "time": "33299441457700",
+    "kind": "copy-complete",
+    "id": 337
+  },
+  {
+    "utc": "2026-09-12T17:15:02.106Z",
+    "time": "33299471736100",
+    "kind": "copy-complete",
+    "id": 338
+  },
+  {
+    "utc": "2026-09-12T17:15:02.122Z",
+    "time": "33299487816600",
+    "kind": "copy-complete",
+    "id": 339
+  },
+  {
+    "utc": "2026-09-12T17:15:02.138Z",
+    "time": "33299503849800",
+    "kind": "copy-complete",
+    "id": 340
+  },
+  {
+    "utc": "2026-09-12T17:15:02.154Z",
+    "time": "33299519094000",
+    "kind": "copy-complete",
+    "id": 341
+  },
+  {
+    "utc": "2026-09-12T17:15:02.169Z",
+    "time": "33299534352300",
+    "kind": "copy-complete",
+    "id": 342
+  },
+  {
+    "utc": "2026-09-12T17:15:02.185Z",
+    "time": "33299550093400",
+    "kind": "copy-complete",
+    "id": 343
+  },
+  {
+    "utc": "2026-09-12T17:15:02.201Z",
+    "time": "33299566143100",
+    "kind": "copy-complete",
+    "id": 344
+  },
+  {
+    "utc": "2026-09-12T17:15:02.216Z",
+    "time": "33299581846200",
+    "kind": "copy-complete",
+    "id": 345
+  },
+  {
+    "utc": "2026-09-12T17:15:02.233Z",
+    "time": "33299598359500",
+    "kind": "copy-complete",
+    "id": 346
+  },
+  {
+    "utc": "2026-09-12T17:15:02.249Z",
+    "time": "33299614230000",
+    "kind": "copy-complete",
+    "id": 347
+  },
+  {
+    "utc": "2026-09-12T17:15:02.264Z",
+    "time": "33299629306800",
+    "kind": "copy-complete",
+    "id": 348
+  },
+  {
+    "utc": "2026-09-12T17:15:02.280Z",
+    "time": "33299645167400",
+    "kind": "copy-complete",
+    "id": 349
+  },
+  {
+    "utc": "2026-09-12T17:15:02.295Z",
+    "time": "33299660160900",
+    "kind": "copy-complete",
+    "id": 350
+  },
+  {
+    "utc": "2026-09-12T17:15:02.311Z",
+    "time": "33299676166800",
+    "kind": "copy-complete",
+    "id": 351
+  },
+  {
+    "utc": "2026-09-12T17:15:02.326Z",
+    "time": "33299692002900",
+    "kind": "copy-complete",
+    "id": 352
+  },
+  {
+    "utc": "2026-09-12T17:15:02.343Z",
+    "time": "33299708063500",
+    "kind": "copy-complete",
+    "id": 353
+  },
+  {
+    "utc": "2026-09-12T17:15:02.374Z",
+    "time": "33299739190300",
+    "kind": "copy-complete",
+    "id": 354
+  },
+  {
+    "utc": "2026-09-12T17:15:02.389Z",
+    "time": "33299754217900",
+    "kind": "copy-complete",
+    "id": 355
+  },
+  {
+    "utc": "2026-09-12T17:15:02.404Z",
+    "time": "33299769817900",
+    "kind": "copy-complete",
+    "id": 356
+  },
+  {
+    "utc": "2026-09-12T17:15:02.420Z",
+    "time": "33299785986400",
+    "kind": "copy-complete",
+    "id": 357
+  },
+  {
+    "utc": "2026-09-12T17:15:02.436Z",
+    "time": "33299801230700",
+    "kind": "copy-complete",
+    "id": 358
+  },
+  {
+    "utc": "2026-09-12T17:15:02.452Z",
+    "time": "33299817222000",
+    "kind": "copy-complete",
+    "id": 359
+  },
+  {
+    "utc": "2026-09-12T17:15:02.467Z",
+    "time": "33299832723000",
+    "kind": "copy-complete",
+    "id": 360
+  },
+  {
+    "utc": "2026-09-12T17:15:02.483Z",
+    "time": "33299848564200",
+    "kind": "copy-complete",
+    "id": 361
+  },
+  {
+    "utc": "2026-09-12T17:15:02.498Z",
+    "time": "33299863433700",
+    "kind": "copy-complete",
+    "id": 362
+  },
+  {
+    "utc": "2026-09-12T17:15:02.514Z",
+    "time": "33299879091400",
+    "kind": "copy-complete",
+    "id": 363
+  },
+  {
+    "utc": "2026-09-12T17:15:02.529Z",
+    "time": "33299894327800",
+    "kind": "copy-complete",
+    "id": 364
+  },
+  {
+    "utc": "2026-09-12T17:15:02.544Z",
+    "time": "33299909294300",
+    "kind": "copy-complete",
+    "id": 365
+  },
+  {
+    "utc": "2026-09-12T17:15:02.560Z",
+    "time": "33299925221700",
+    "kind": "copy-complete",
+    "id": 366
+  },
+  {
+    "utc": "2026-09-12T17:15:02.591Z",
+    "time": "33299956585900",
+    "kind": "copy-complete",
+    "id": 367
+  },
+  {
+    "utc": "2026-09-12T17:15:02.607Z",
+    "time": "33299972174500",
+    "kind": "copy-complete",
+    "id": 368
+  },
+  {
+    "utc": "2026-09-12T17:15:02.623Z",
+    "time": "33299988119600",
+    "kind": "copy-complete",
+    "id": 369
+  },
+  {
+    "utc": "2026-09-12T17:15:02.639Z",
+    "time": "33300004144300",
+    "kind": "copy-complete",
+    "id": 370
+  },
+  {
+    "utc": "2026-09-12T17:15:02.654Z",
+    "time": "33300019853100",
+    "kind": "copy-complete",
+    "id": 371
+  },
+  {
+    "utc": "2026-09-12T17:15:02.670Z",
+    "time": "33300035836000",
+    "kind": "copy-complete",
+    "id": 372
+  },
+  {
+    "utc": "2026-09-12T17:15:02.685Z",
+    "time": "33300051041600",
+    "kind": "copy-complete",
+    "id": 373
+  },
+  {
+    "utc": "2026-09-12T17:15:02.701Z",
+    "time": "33300066522700",
+    "kind": "copy-complete",
+    "id": 374
+  },
+  {
+    "utc": "2026-09-12T17:15:02.717Z",
+    "time": "33300082641700",
+    "kind": "copy-complete",
+    "id": 375
+  },
+  {
+    "utc": "2026-09-12T17:15:02.732Z",
+    "time": "33300097919400",
+    "kind": "copy-complete",
+    "id": 376
+  },
+  {
+    "utc": "2026-09-12T17:15:02.749Z",
+    "time": "33300114145700",
+    "kind": "copy-complete",
+    "id": 377
+  },
+  {
+    "utc": "2026-09-12T17:15:02.765Z",
+    "time": "33300130045100",
+    "kind": "copy-complete",
+    "id": 378
+  },
+  {
+    "utc": "2026-09-12T17:15:02.780Z",
+    "time": "33300145595000",
+    "kind": "copy-complete",
+    "id": 379
+  },
+  {
+    "utc": "2026-09-12T17:15:02.795Z",
+    "time": "33300160839700",
+    "kind": "copy-complete",
+    "id": 380
+  },
+  {
+    "utc": "2026-09-12T17:15:02.811Z",
+    "time": "33300176873700",
+    "kind": "copy-complete",
+    "id": 381
+  },
+  {
+    "utc": "2026-09-12T17:15:02.827Z",
+    "time": "33300192853500",
+    "kind": "copy-complete",
+    "id": 382
+  },
+  {
+    "utc": "2026-09-12T17:15:02.842Z",
+    "time": "33300207831900",
+    "kind": "copy-complete",
+    "id": 383
+  },
+  {
+    "utc": "2026-09-12T17:15:02.874Z",
+    "time": "33300239321700",
+    "kind": "copy-complete",
+    "id": 384
+  },
+  {
+    "utc": "2026-09-12T17:15:02.889Z",
+    "time": "33300254749600",
+    "kind": "copy-complete",
+    "id": 385
+  },
+  {
+    "utc": "2026-09-12T17:15:02.904Z",
+    "time": "33300269837400",
+    "kind": "copy-complete",
+    "id": 386
+  },
+  {
+    "utc": "2026-09-12T17:15:02.920Z",
+    "time": "33300285057100",
+    "kind": "copy-complete",
+    "id": 387
+  },
+  {
+    "utc": "2026-09-12T17:15:02.936Z",
+    "time": "33300301086300",
+    "kind": "copy-complete",
+    "id": 388
+  },
+  {
+    "utc": "2026-09-12T17:15:02.950Z",
+    "time": "33300315600200",
+    "kind": "copy-complete",
+    "id": 389
+  },
+  {
+    "utc": "2026-09-12T17:15:02.966Z",
+    "time": "33300331128000",
+    "kind": "copy-complete",
+    "id": 390
+  },
+  {
+    "utc": "2026-09-12T17:15:02.982Z",
+    "time": "33300347194700",
+    "kind": "copy-complete",
+    "id": 391
+  },
+  {
+    "utc": "2026-09-12T17:15:02.997Z",
+    "time": "33300362470900",
+    "kind": "copy-complete",
+    "id": 392
+  },
+  {
+    "utc": "2026-09-12T17:15:03.013Z",
+    "time": "33300378062100",
+    "kind": "copy-complete",
+    "id": 393
+  },
+  {
+    "utc": "2026-09-12T17:15:03.028Z",
+    "time": "33300394024600",
+    "kind": "copy-complete",
+    "id": 394
+  },
+  {
+    "utc": "2026-09-12T17:15:03.044Z",
+    "time": "33300409095500",
+    "kind": "copy-complete",
+    "id": 395
+  },
+  {
+    "utc": "2026-09-12T17:15:03.060Z",
+    "time": "33300425197800",
+    "kind": "copy-complete",
+    "id": 396
+  },
+  {
+    "utc": "2026-09-12T17:15:03.090Z",
+    "time": "33300455889300",
+    "kind": "copy-complete",
+    "id": 397
+  },
+  {
+    "utc": "2026-09-12T17:15:03.106Z",
+    "time": "33300471273000",
+    "kind": "copy-complete",
+    "id": 398
+  },
+  {
+    "utc": "2026-09-12T17:15:03.121Z",
+    "time": "33300486911000",
+    "kind": "copy-complete",
+    "id": 399
+  },
+  {
+    "utc": "2026-09-12T17:15:03.137Z",
+    "time": "33300502177300",
+    "kind": "copy-complete",
+    "id": 400
+  },
+  {
+    "utc": "2026-09-12T17:15:03.152Z",
+    "time": "33300517788000",
+    "kind": "copy-complete",
+    "id": 401
+  },
+  {
+    "utc": "2026-09-12T17:15:03.168Z",
+    "time": "33300533947600",
+    "kind": "copy-complete",
+    "id": 402
+  },
+  {
+    "utc": "2026-09-12T17:15:03.184Z",
+    "time": "33300549035100",
+    "kind": "copy-complete",
+    "id": 403
+  },
+  {
+    "utc": "2026-09-12T17:15:03.199Z",
+    "time": "33300564604800",
+    "kind": "copy-complete",
+    "id": 404
+  },
+  {
+    "utc": "2026-09-12T17:15:03.215Z",
+    "time": "33300580292700",
+    "kind": "copy-complete",
+    "id": 405
+  },
+  {
+    "utc": "2026-09-12T17:15:03.231Z",
+    "time": "33300596277800",
+    "kind": "copy-complete",
+    "id": 406
+  },
+  {
+    "utc": "2026-09-12T17:15:03.246Z",
+    "time": "33300611737800",
+    "kind": "copy-complete",
+    "id": 407
+  },
+  {
+    "utc": "2026-09-12T17:15:03.261Z",
+    "time": "33300627036600",
+    "kind": "copy-complete",
+    "id": 408
+  },
+  {
+    "utc": "2026-09-12T17:15:03.277Z",
+    "time": "33300642213200",
+    "kind": "copy-complete",
+    "id": 409
+  },
+  {
+    "utc": "2026-09-12T17:15:03.292Z",
+    "time": "33300657484600",
+    "kind": "copy-complete",
+    "id": 410
+  },
+  {
+    "utc": "2026-09-12T17:15:03.323Z",
+    "time": "33300688947000",
+    "kind": "copy-complete",
+    "id": 411
+  },
+  {
+    "utc": "2026-09-12T17:15:03.339Z",
+    "time": "33300704581800",
+    "kind": "copy-complete",
+    "id": 412
+  },
+  {
+    "utc": "2026-09-12T17:15:03.355Z",
+    "time": "33300720242800",
+    "kind": "copy-complete",
+    "id": 413
+  },
+  {
+    "utc": "2026-09-12T17:15:03.371Z",
+    "time": "33300736318400",
+    "kind": "copy-complete",
+    "id": 414
+  },
+  {
+    "utc": "2026-09-12T17:15:03.386Z",
+    "time": "33300751727300",
+    "kind": "copy-complete",
+    "id": 415
+  },
+  {
+    "utc": "2026-09-12T17:15:03.402Z",
+    "time": "33300767214100",
+    "kind": "copy-complete",
+    "id": 416
+  },
+  {
+    "utc": "2026-09-12T17:15:03.417Z",
+    "time": "33300782731800",
+    "kind": "copy-complete",
+    "id": 417
+  },
+  {
+    "utc": "2026-09-12T17:15:03.433Z",
+    "time": "33300798213100",
+    "kind": "copy-complete",
+    "id": 418
+  },
+  {
+    "utc": "2026-09-12T17:15:03.448Z",
+    "time": "33300813902300",
+    "kind": "copy-complete",
+    "id": 419
+  },
+  {
+    "utc": "2026-09-12T17:15:03.464Z",
+    "time": "33300829356900",
+    "kind": "copy-complete",
+    "id": 420
+  },
+  {
+    "utc": "2026-09-12T17:15:03.479Z",
+    "time": "33300844815400",
+    "kind": "copy-complete",
+    "id": 421
+  },
+  {
+    "utc": "2026-09-12T17:15:03.495Z",
+    "time": "33300860305200",
+    "kind": "copy-complete",
+    "id": 422
+  },
+  {
+    "utc": "2026-09-12T17:15:03.510Z",
+    "time": "33300875937900",
+    "kind": "copy-complete",
+    "id": 423
+  },
+  {
+    "utc": "2026-09-12T17:15:03.526Z",
+    "time": "33300891995400",
+    "kind": "copy-complete",
+    "id": 424
+  },
+  {
+    "utc": "2026-09-12T17:15:03.542Z",
+    "time": "33300907936800",
+    "kind": "copy-complete",
+    "id": 425
+  },
+  {
+    "utc": "2026-09-12T17:15:03.558Z",
+    "time": "33300923521000",
+    "kind": "copy-complete",
+    "id": 426
+  },
+  {
+    "utc": "2026-09-12T17:15:03.589Z",
+    "time": "33300954779000",
+    "kind": "copy-complete",
+    "id": 427
+  },
+  {
+    "utc": "2026-09-12T17:15:03.605Z",
+    "time": "33300970046200",
+    "kind": "copy-complete",
+    "id": 428
+  },
+  {
+    "utc": "2026-09-12T17:15:03.620Z",
+    "time": "33300985558500",
+    "kind": "copy-complete",
+    "id": 429
+  },
+  {
+    "utc": "2026-09-12T17:15:03.635Z",
+    "time": "33301000860400",
+    "kind": "copy-complete",
+    "id": 430
+  },
+  {
+    "utc": "2026-09-12T17:15:03.651Z",
+    "time": "33301016378200",
+    "kind": "copy-complete",
+    "id": 431
+  },
+  {
+    "utc": "2026-09-12T17:15:03.666Z",
+    "time": "33301031972600",
+    "kind": "copy-complete",
+    "id": 432
+  },
+  {
+    "utc": "2026-09-12T17:15:03.683Z",
+    "time": "33301048301100",
+    "kind": "copy-complete",
+    "id": 433
+  },
+  {
+    "utc": "2026-09-12T17:15:03.698Z",
+    "time": "33301063489200",
+    "kind": "copy-complete",
+    "id": 434
+  },
+  {
+    "utc": "2026-09-12T17:15:03.714Z",
+    "time": "33301079202600",
+    "kind": "copy-complete",
+    "id": 435
+  },
+  {
+    "utc": "2026-09-12T17:15:03.729Z",
+    "time": "33301094709300",
+    "kind": "copy-complete",
+    "id": 436
+  },
+  {
+    "utc": "2026-09-12T17:15:03.745Z",
+    "time": "33301110219300",
+    "kind": "copy-complete",
+    "id": 437
+  },
+  {
+    "utc": "2026-09-12T17:15:03.760Z",
+    "time": "33301125778400",
+    "kind": "copy-complete",
+    "id": 438
+  },
+  {
+    "utc": "2026-09-12T17:15:03.776Z",
+    "time": "33301141321800",
+    "kind": "copy-complete",
+    "id": 439
+  },
+  {
+    "utc": "2026-09-12T17:15:03.791Z",
+    "time": "33301156603500",
+    "kind": "copy-complete",
+    "id": 440
+  },
+  {
+    "utc": "2026-09-12T17:15:03.822Z",
+    "time": "33301187811100",
+    "kind": "copy-complete",
+    "id": 441
+  },
+  {
+    "utc": "2026-09-12T17:15:03.838Z",
+    "time": "33301203981500",
+    "kind": "copy-complete",
+    "id": 442
+  },
+  {
+    "utc": "2026-09-12T17:15:03.854Z",
+    "time": "33301219322900",
+    "kind": "copy-complete",
+    "id": 443
+  },
+  {
+    "utc": "2026-09-12T17:15:03.869Z",
+    "time": "33301235019500",
+    "kind": "copy-complete",
+    "id": 444
+  },
+  {
+    "utc": "2026-09-12T17:15:03.885Z",
+    "time": "33301250035800",
+    "kind": "copy-complete",
+    "id": 445
+  },
+  {
+    "utc": "2026-09-12T17:15:03.900Z",
+    "time": "33301265250700",
+    "kind": "copy-complete",
+    "id": 446
+  },
+  {
+    "utc": "2026-09-12T17:15:03.916Z",
+    "time": "33301281202500",
+    "kind": "copy-complete",
+    "id": 447
+  },
+  {
+    "utc": "2026-09-12T17:15:03.931Z",
+    "time": "33301296724700",
+    "kind": "copy-complete",
+    "id": 448
+  },
+  {
+    "utc": "2026-09-12T17:15:03.946Z",
+    "time": "33301312000200",
+    "kind": "copy-complete",
+    "id": 449
+  },
+  {
+    "utc": "2026-09-12T17:15:03.962Z",
+    "time": "33301327870300",
+    "kind": "copy-complete",
+    "id": 450
+  },
+  {
+    "utc": "2026-09-12T17:15:03.978Z",
+    "time": "33301343437100",
+    "kind": "copy-complete",
+    "id": 451
+  },
+  {
+    "utc": "2026-09-12T17:15:03.994Z",
+    "time": "33301359590800",
+    "kind": "copy-complete",
+    "id": 452
+  },
+  {
+    "utc": "2026-09-12T17:15:04.025Z",
+    "time": "33301390289300",
+    "kind": "copy-complete",
+    "id": 453
+  },
+  {
+    "utc": "2026-09-12T17:15:04.025Z",
+    "time": "33301390297800",
+    "kind": "copy-complete",
+    "id": 454
+  },
+  {
+    "utc": "2026-09-12T17:15:04.056Z",
+    "time": "33301421887000",
+    "kind": "copy-complete",
+    "id": 455
+  },
+  {
+    "utc": "2026-09-12T17:15:04.072Z",
+    "time": "33301437972400",
+    "kind": "copy-complete",
+    "id": 456
+  },
+  {
+    "utc": "2026-09-12T17:15:04.087Z",
+    "time": "33301453011900",
+    "kind": "copy-complete",
+    "id": 457
+  },
+  {
+    "utc": "2026-09-12T17:15:04.104Z",
+    "time": "33301469153900",
+    "kind": "copy-complete",
+    "id": 458
+  },
+  {
+    "utc": "2026-09-12T17:15:04.120Z",
+    "time": "33301485277600",
+    "kind": "copy-complete",
+    "id": 459
+  },
+  {
+    "utc": "2026-09-12T17:15:04.136Z",
+    "time": "33301501229300",
+    "kind": "copy-complete",
+    "id": 460
+  },
+  {
+    "utc": "2026-09-12T17:15:04.152Z",
+    "time": "33301517248600",
+    "kind": "copy-complete",
+    "id": 461
+  },
+  {
+    "utc": "2026-09-12T17:15:04.167Z",
+    "time": "33301532399000",
+    "kind": "copy-complete",
+    "id": 462
+  },
+  {
+    "utc": "2026-09-12T17:15:04.183Z",
+    "time": "33301548161200",
+    "kind": "copy-complete",
+    "id": 463
+  },
+  {
+    "utc": "2026-09-12T17:15:04.198Z",
+    "time": "33301563612300",
+    "kind": "copy-complete",
+    "id": 464
+  },
+  {
+    "utc": "2026-09-12T17:15:04.213Z",
+    "time": "33301579013800",
+    "kind": "copy-complete",
+    "id": 465
+  },
+  {
+    "utc": "2026-09-12T17:15:04.229Z",
+    "time": "33301594672200",
+    "kind": "copy-complete",
+    "id": 466
+  },
+  {
+    "utc": "2026-09-12T17:15:04.245Z",
+    "time": "33301610497300",
+    "kind": "copy-complete",
+    "id": 467
+  },
+  {
+    "utc": "2026-09-12T17:15:04.261Z",
+    "time": "33301626159500",
+    "kind": "copy-complete",
+    "id": 468
+  },
+  {
+    "utc": "2026-09-12T17:15:04.276Z",
+    "time": "33301641794900",
+    "kind": "copy-complete",
+    "id": 469
+  },
+  {
+    "utc": "2026-09-12T17:15:04.308Z",
+    "time": "33301673128300",
+    "kind": "copy-complete",
+    "id": 470
+  },
+  {
+    "utc": "2026-09-12T17:15:04.323Z",
+    "time": "33301688272500",
+    "kind": "copy-complete",
+    "id": 471
+  },
+  {
+    "utc": "2026-09-12T17:15:04.338Z",
+    "time": "33301703398200",
+    "kind": "copy-complete",
+    "id": 472
+  },
+  {
+    "utc": "2026-09-12T17:15:04.354Z",
+    "time": "33301719064100",
+    "kind": "copy-complete",
+    "id": 473
+  },
+  {
+    "utc": "2026-09-12T17:15:04.370Z",
+    "time": "33301735119400",
+    "kind": "copy-complete",
+    "id": 474
+  },
+  {
+    "utc": "2026-09-12T17:15:04.385Z",
+    "time": "33301750388300",
+    "kind": "copy-complete",
+    "id": 475
+  },
+  {
+    "utc": "2026-09-12T17:15:04.401Z",
+    "time": "33301766137400",
+    "kind": "copy-complete",
+    "id": 476
+  },
+  {
+    "utc": "2026-09-12T17:15:04.415Z",
+    "time": "33301781046600",
+    "kind": "copy-complete",
+    "id": 477
+  },
+  {
+    "utc": "2026-09-12T17:15:04.431Z",
+    "time": "33301796679500",
+    "kind": "copy-complete",
+    "id": 478
+  },
+  {
+    "utc": "2026-09-12T17:15:04.447Z",
+    "time": "33301812211400",
+    "kind": "copy-complete",
+    "id": 479
+  },
+  {
+    "utc": "2026-09-12T17:15:04.463Z",
+    "time": "33301828162100",
+    "kind": "copy-complete",
+    "id": 480
+  },
+  {
+    "utc": "2026-09-12T17:15:04.478Z",
+    "time": "33301843140300",
+    "kind": "copy-complete",
+    "id": 481
+  },
+  {
+    "utc": "2026-09-12T17:15:04.493Z",
+    "time": "33301858280300",
+    "kind": "copy-complete",
+    "id": 482
+  },
+  {
+    "utc": "2026-09-12T17:15:04.509Z",
+    "time": "33301874377200",
+    "kind": "copy-complete",
+    "id": 483
+  },
+  {
+    "utc": "2026-09-12T17:15:04.541Z",
+    "time": "33301906458000",
+    "kind": "copy-complete",
+    "id": 484
+  },
+  {
+    "utc": "2026-09-12T17:15:04.556Z",
+    "time": "33301921994000",
+    "kind": "copy-complete",
+    "id": 485
+  },
+  {
+    "utc": "2026-09-12T17:15:04.573Z",
+    "time": "33301938055300",
+    "kind": "copy-complete",
+    "id": 486
+  },
+  {
+    "utc": "2026-09-12T17:15:04.588Z",
+    "time": "33301953706800",
+    "kind": "copy-complete",
+    "id": 487
+  },
+  {
+    "utc": "2026-09-12T17:15:04.604Z",
+    "time": "33301969193800",
+    "kind": "copy-complete",
+    "id": 488
+  },
+  {
+    "utc": "2026-09-12T17:15:04.620Z",
+    "time": "33301985394100",
+    "kind": "copy-complete",
+    "id": 489
+  },
+  {
+    "utc": "2026-09-12T17:15:04.635Z",
+    "time": "33302000979000",
+    "kind": "copy-complete",
+    "id": 490
+  },
+  {
+    "utc": "2026-09-12T17:15:04.651Z",
+    "time": "33302016229700",
+    "kind": "copy-complete",
+    "id": 491
+  },
+  {
+    "utc": "2026-09-12T17:15:04.666Z",
+    "time": "33302031504300",
+    "kind": "copy-complete",
+    "id": 492
+  },
+  {
+    "utc": "2026-09-12T17:15:04.682Z",
+    "time": "33302047108400",
+    "kind": "copy-complete",
+    "id": 493
+  },
+  {
+    "utc": "2026-09-12T17:15:04.697Z",
+    "time": "33302062507100",
+    "kind": "copy-complete",
+    "id": 494
+  },
+  {
+    "utc": "2026-09-12T17:15:04.713Z",
+    "time": "33302078139800",
+    "kind": "copy-complete",
+    "id": 495
+  },
+  {
+    "utc": "2026-09-12T17:15:04.729Z",
+    "time": "33302094202600",
+    "kind": "copy-complete",
+    "id": 496
+  },
+  {
+    "utc": "2026-09-12T17:15:04.744Z",
+    "time": "33302109334300",
+    "kind": "copy-complete",
+    "id": 497
+  },
+  {
+    "utc": "2026-09-12T17:15:04.760Z",
+    "time": "33302125450400",
+    "kind": "copy-complete",
+    "id": 498
+  },
+  {
+    "utc": "2026-09-12T17:15:04.775Z",
+    "time": "33302140442600",
+    "kind": "copy-complete",
+    "id": 499
+  },
+  {
+    "utc": "2026-09-12T17:15:04.806Z",
+    "time": "33302171654600",
+    "kind": "copy-complete",
+    "id": 500
+  },
+  {
+    "utc": "2026-09-12T17:15:04.823Z",
+    "time": "33302188056800",
+    "kind": "copy-complete",
+    "id": 501
+  },
+  {
+    "utc": "2026-09-12T17:15:04.838Z",
+    "time": "33302203566300",
+    "kind": "copy-complete",
+    "id": 502
+  },
+  {
+    "utc": "2026-09-12T17:15:04.853Z",
+    "time": "33302218822800",
+    "kind": "copy-complete",
+    "id": 503
+  },
+  {
+    "utc": "2026-09-12T17:15:04.868Z",
+    "time": "33302233888500",
+    "kind": "copy-complete",
+    "id": 504
+  },
+  {
+    "utc": "2026-09-12T17:15:04.884Z",
+    "time": "33302249382000",
+    "kind": "copy-complete",
+    "id": 505
+  },
+  {
+    "utc": "2026-09-12T17:15:04.900Z",
+    "time": "33302265483500",
+    "kind": "copy-complete",
+    "id": 506
+  },
+  {
+    "utc": "2026-09-12T17:15:04.916Z",
+    "time": "33302281142500",
+    "kind": "copy-complete",
+    "id": 507
+  },
+  {
+    "utc": "2026-09-12T17:15:04.931Z",
+    "time": "33302296563900",
+    "kind": "copy-complete",
+    "id": 508
+  },
+  {
+    "utc": "2026-09-12T17:15:04.947Z",
+    "time": "33302312281000",
+    "kind": "copy-complete",
+    "id": 509
+  },
+  {
+    "utc": "2026-09-12T17:15:04.962Z",
+    "time": "33302327862000",
+    "kind": "copy-complete",
+    "id": 510
+  },
+  {
+    "utc": "2026-09-12T17:15:04.977Z",
+    "time": "33302342807800",
+    "kind": "copy-complete",
+    "id": 511
+  },
+  {
+    "utc": "2026-09-12T17:15:04.992Z",
+    "time": "33302357932100",
+    "kind": "copy-complete",
+    "id": 512
+  },
+  {
+    "utc": "2026-09-12T17:15:05.024Z",
+    "time": "33302389308900",
+    "kind": "copy-complete",
+    "id": 513
+  },
+  {
+    "utc": "2026-09-12T17:15:05.040Z",
+    "time": "33302405494600",
+    "kind": "copy-complete",
+    "id": 514
+  },
+  {
+    "utc": "2026-09-12T17:15:05.055Z",
+    "time": "33302420800400",
+    "kind": "copy-complete",
+    "id": 515
+  },
+  {
+    "utc": "2026-09-12T17:15:05.071Z",
+    "time": "33302436174400",
+    "kind": "copy-complete",
+    "id": 516
+  },
+  {
+    "utc": "2026-09-12T17:15:05.086Z",
+    "time": "33302451783400",
+    "kind": "copy-complete",
+    "id": 517
+  },
+  {
+    "utc": "2026-09-12T17:15:05.102Z",
+    "time": "33302467051000",
+    "kind": "copy-complete",
+    "id": 518
+  },
+  {
+    "utc": "2026-09-12T17:15:05.117Z",
+    "time": "33302482099800",
+    "kind": "copy-complete",
+    "id": 519
+  },
+  {
+    "utc": "2026-09-12T17:15:05.133Z",
+    "time": "33302498119000",
+    "kind": "copy-complete",
+    "id": 520
+  },
+  {
+    "utc": "2026-09-12T17:15:05.148Z",
+    "time": "33302513473300",
+    "kind": "copy-complete",
+    "id": 521
+  },
+  {
+    "utc": "2026-09-12T17:15:05.164Z",
+    "time": "33302529140700",
+    "kind": "copy-complete",
+    "id": 522
+  },
+  {
+    "utc": "2026-09-12T17:15:05.179Z",
+    "time": "33302545001500",
+    "kind": "copy-complete",
+    "id": 523
+  },
+  {
+    "utc": "2026-09-12T17:15:05.195Z",
+    "time": "33302560829900",
+    "kind": "copy-complete",
+    "id": 524
+  },
+  {
+    "utc": "2026-09-12T17:15:05.211Z",
+    "time": "33302576843700",
+    "kind": "copy-complete",
+    "id": 525
+  },
+  {
+    "utc": "2026-09-12T17:15:05.227Z",
+    "time": "33302592485700",
+    "kind": "copy-complete",
+    "id": 526
+  },
+  {
+    "utc": "2026-09-12T17:15:05.243Z",
+    "time": "33302608154100",
+    "kind": "copy-complete",
+    "id": 527
+  },
+  {
+    "utc": "2026-09-12T17:15:05.258Z",
+    "time": "33302623716800",
+    "kind": "copy-complete",
+    "id": 528
+  },
+  {
+    "utc": "2026-09-12T17:15:05.291Z",
+    "time": "33302656416200",
+    "kind": "copy-complete",
+    "id": 529
+  },
+  {
+    "utc": "2026-09-12T17:15:05.307Z",
+    "time": "33302672463400",
+    "kind": "copy-complete",
+    "id": 530
+  },
+  {
+    "utc": "2026-09-12T17:15:05.322Z",
+    "time": "33302687938700",
+    "kind": "copy-complete",
+    "id": 531
+  },
+  {
+    "utc": "2026-09-12T17:15:05.338Z",
+    "time": "33302703473200",
+    "kind": "copy-complete",
+    "id": 532
+  },
+  {
+    "utc": "2026-09-12T17:15:05.354Z",
+    "time": "33302719079200",
+    "kind": "copy-complete",
+    "id": 533
+  },
+  {
+    "utc": "2026-09-12T17:15:05.369Z",
+    "time": "33302734967000",
+    "kind": "copy-complete",
+    "id": 534
+  },
+  {
+    "utc": "2026-09-12T17:15:05.385Z",
+    "time": "33302750050800",
+    "kind": "copy-complete",
+    "id": 535
+  },
+  {
+    "utc": "2026-09-12T17:15:05.400Z",
+    "time": "33302765329900",
+    "kind": "copy-complete",
+    "id": 536
+  },
+  {
+    "utc": "2026-09-12T17:15:05.415Z",
+    "time": "33302780812100",
+    "kind": "copy-complete",
+    "id": 537
+  },
+  {
+    "utc": "2026-09-12T17:15:05.430Z",
+    "time": "33302795944200",
+    "kind": "copy-complete",
+    "id": 538
+  },
+  {
+    "utc": "2026-09-12T17:15:05.446Z",
+    "time": "33302811125700",
+    "kind": "copy-complete",
+    "id": 539
+  },
+  {
+    "utc": "2026-09-12T17:15:05.462Z",
+    "time": "33302827030600",
+    "kind": "copy-complete",
+    "id": 540
+  },
+  {
+    "utc": "2026-09-12T17:15:05.477Z",
+    "time": "33302842932000",
+    "kind": "copy-complete",
+    "id": 541
+  },
+  {
+    "utc": "2026-09-12T17:15:05.493Z",
+    "time": "33302858086400",
+    "kind": "copy-complete",
+    "id": 542
+  },
+  {
+    "utc": "2026-09-12T17:15:05.508Z",
+    "time": "33302873573300",
+    "kind": "copy-complete",
+    "id": 543
+  },
+  {
+    "utc": "2026-09-12T17:15:05.540Z",
+    "time": "33302905449500",
+    "kind": "copy-complete",
+    "id": 544
+  },
+  {
+    "utc": "2026-09-12T17:15:05.556Z",
+    "time": "33302921622000",
+    "kind": "copy-complete",
+    "id": 545
+  },
+  {
+    "utc": "2026-09-12T17:15:05.572Z",
+    "time": "33302937096000",
+    "kind": "copy-complete",
+    "id": 546
+  },
+  {
+    "utc": "2026-09-12T17:15:05.587Z",
+    "time": "33302952296500",
+    "kind": "copy-complete",
+    "id": 547
+  },
+  {
+    "utc": "2026-09-12T17:15:05.602Z",
+    "time": "33302967863100",
+    "kind": "copy-complete",
+    "id": 548
+  },
+  {
+    "utc": "2026-09-12T17:15:05.618Z",
+    "time": "33302983549300",
+    "kind": "copy-complete",
+    "id": 549
+  },
+  {
+    "utc": "2026-09-12T17:15:05.634Z",
+    "time": "33302999585400",
+    "kind": "copy-complete",
+    "id": 550
+  },
+  {
+    "utc": "2026-09-12T17:15:05.650Z",
+    "time": "33303015163300",
+    "kind": "copy-complete",
+    "id": 551
+  },
+  {
+    "utc": "2026-09-12T17:15:05.664Z",
+    "time": "33303029838600",
+    "kind": "copy-complete",
+    "id": 552
+  },
+  {
+    "utc": "2026-09-12T17:15:05.680Z",
+    "time": "33303045869100",
+    "kind": "copy-complete",
+    "id": 553
+  },
+  {
+    "utc": "2026-09-12T17:15:05.696Z",
+    "time": "33303061112600",
+    "kind": "copy-complete",
+    "id": 554
+  },
+  {
+    "utc": "2026-09-12T17:15:05.711Z",
+    "time": "33303076383600",
+    "kind": "copy-complete",
+    "id": 555
+  },
+  {
+    "utc": "2026-09-12T17:15:05.726Z",
+    "time": "33303091965600",
+    "kind": "copy-complete",
+    "id": 556
+  },
+  {
+    "utc": "2026-09-12T17:15:05.742Z",
+    "time": "33303108015800",
+    "kind": "copy-complete",
+    "id": 557
+  },
+  {
+    "utc": "2026-09-12T17:15:05.759Z",
+    "time": "33303124154800",
+    "kind": "copy-complete",
+    "id": 558
+  },
+  {
+    "utc": "2026-09-12T17:15:05.789Z",
+    "time": "33303154456800",
+    "kind": "copy-complete",
+    "id": 559
+  },
+  {
+    "utc": "2026-09-12T17:15:05.804Z",
+    "time": "33303169649200",
+    "kind": "copy-complete",
+    "id": 560
+  },
+  {
+    "utc": "2026-09-12T17:15:05.820Z",
+    "time": "33303185116300",
+    "kind": "copy-complete",
+    "id": 561
+  },
+  {
+    "utc": "2026-09-12T17:15:05.835Z",
+    "time": "33303200336500",
+    "kind": "copy-complete",
+    "id": 562
+  },
+  {
+    "utc": "2026-09-12T17:15:05.851Z",
+    "time": "33303216139600",
+    "kind": "copy-complete",
+    "id": 563
+  },
+  {
+    "utc": "2026-09-12T17:15:05.866Z",
+    "time": "33303231135500",
+    "kind": "copy-complete",
+    "id": 564
+  },
+  {
+    "utc": "2026-09-12T17:15:05.881Z",
+    "time": "33303246911800",
+    "kind": "copy-complete",
+    "id": 565
+  },
+  {
+    "utc": "2026-09-12T17:15:05.896Z",
+    "time": "33303261735100",
+    "kind": "copy-complete",
+    "id": 566
+  },
+  {
+    "utc": "2026-09-12T17:15:05.911Z",
+    "time": "33303276750700",
+    "kind": "copy-complete",
+    "id": 567
+  },
+  {
+    "utc": "2026-09-12T17:15:05.927Z",
+    "time": "33303292127700",
+    "kind": "copy-complete",
+    "id": 568
+  },
+  {
+    "utc": "2026-09-12T17:15:05.942Z",
+    "time": "33303308002400",
+    "kind": "copy-complete",
+    "id": 569
+  },
+  {
+    "utc": "2026-09-12T17:15:05.974Z",
+    "time": "33303339821900",
+    "kind": "copy-complete",
+    "id": 570
+  },
+  {
+    "utc": "2026-09-12T17:15:05.989Z",
+    "time": "33303354726200",
+    "kind": "copy-complete",
+    "id": 571
+  },
+  {
+    "utc": "2026-09-12T17:15:06.004Z",
+    "time": "33303369978000",
+    "kind": "copy-complete",
+    "id": 572
+  },
+  {
+    "utc": "2026-09-12T17:15:06.020Z",
+    "time": "33303385961200",
+    "kind": "copy-complete",
+    "id": 573
+  },
+  {
+    "utc": "2026-09-12T17:15:06.036Z",
+    "time": "33303401096800",
+    "kind": "copy-complete",
+    "id": 574
+  },
+  {
+    "utc": "2026-09-12T17:15:06.051Z",
+    "time": "33303416842600",
+    "kind": "copy-complete",
+    "id": 575
+  },
+  {
+    "utc": "2026-09-12T17:15:06.067Z",
+    "time": "33303432234200",
+    "kind": "copy-complete",
+    "id": 576
+  },
+  {
+    "utc": "2026-09-12T17:15:06.082Z",
+    "time": "33303447978600",
+    "kind": "copy-complete",
+    "id": 577
+  },
+  {
+    "utc": "2026-09-12T17:15:06.098Z",
+    "time": "33303463207900",
+    "kind": "copy-complete",
+    "id": 578
+  },
+  {
+    "utc": "2026-09-12T17:15:06.114Z",
+    "time": "33303479384300",
+    "kind": "copy-complete",
+    "id": 579
+  },
+  {
+    "utc": "2026-09-12T17:15:06.130Z",
+    "time": "33303495391200",
+    "kind": "copy-complete",
+    "id": 580
+  },
+  {
+    "utc": "2026-09-12T17:15:06.145Z",
+    "time": "33303510869700",
+    "kind": "copy-complete",
+    "id": 581
+  },
+  {
+    "utc": "2026-09-12T17:15:06.161Z",
+    "time": "33303526966500",
+    "kind": "copy-complete",
+    "id": 582
+  },
+  {
+    "utc": "2026-09-12T17:15:06.177Z",
+    "time": "33303542388000",
+    "kind": "copy-complete",
+    "id": 583
+  },
+  {
+    "utc": "2026-09-12T17:15:06.192Z",
+    "time": "33303557892100",
+    "kind": "copy-complete",
+    "id": 584
+  },
+  {
+    "utc": "2026-09-12T17:15:06.225Z",
+    "time": "33303590114100",
+    "kind": "copy-complete",
+    "id": 585
+  },
+  {
+    "utc": "2026-09-12T17:15:06.240Z",
+    "time": "33303605499800",
+    "kind": "copy-complete",
+    "id": 586
+  },
+  {
+    "utc": "2026-09-12T17:15:06.256Z",
+    "time": "33303621406700",
+    "kind": "copy-complete",
+    "id": 587
+  },
+  {
+    "utc": "2026-09-12T17:15:06.273Z",
+    "time": "33303638079100",
+    "kind": "copy-complete",
+    "id": 588
+  },
+  {
+    "utc": "2026-09-12T17:15:06.288Z",
+    "time": "33303653215300",
+    "kind": "copy-complete",
+    "id": 589
+  },
+  {
+    "utc": "2026-09-12T17:15:06.303Z",
+    "time": "33303668622400",
+    "kind": "copy-complete",
+    "id": 590
+  },
+  {
+    "utc": "2026-09-12T17:15:06.319Z",
+    "time": "33303684794500",
+    "kind": "copy-complete",
+    "id": 591
+  },
+  {
+    "utc": "2026-09-12T17:15:06.335Z",
+    "time": "33303700237200",
+    "kind": "copy-complete",
+    "id": 592
+  },
+  {
+    "utc": "2026-09-12T17:15:06.350Z",
+    "time": "33303715059400",
+    "kind": "copy-complete",
+    "id": 593
+  },
+  {
+    "utc": "2026-09-12T17:15:06.365Z",
+    "time": "33303730224700",
+    "kind": "copy-complete",
+    "id": 594
+  },
+  {
+    "utc": "2026-09-12T17:15:06.380Z",
+    "time": "33303745354400",
+    "kind": "copy-complete",
+    "id": 595
+  },
+  {
+    "utc": "2026-09-12T17:15:06.396Z",
+    "time": "33303761311400",
+    "kind": "copy-complete",
+    "id": 596
+  },
+  {
+    "utc": "2026-09-12T17:15:06.411Z",
+    "time": "33303776178900",
+    "kind": "copy-complete",
+    "id": 597
+  },
+  {
+    "utc": "2026-09-12T17:15:06.427Z",
+    "time": "33303792046800",
+    "kind": "copy-complete",
+    "id": 598
+  },
+  {
+    "utc": "2026-09-12T17:15:06.458Z",
+    "time": "33303823891500",
+    "kind": "copy-complete",
+    "id": 599
+  },
+  {
+    "utc": "2026-09-12T17:15:06.474Z",
+    "time": "33303839098600",
+    "kind": "copy-complete",
+    "id": 600
+  },
+  {
+    "utc": "2026-09-12T17:15:06.489Z",
+    "time": "33303855006800",
+    "kind": "copy-complete",
+    "id": 601
+  },
+  {
+    "utc": "2026-09-12T17:15:06.505Z",
+    "time": "33303870152600",
+    "kind": "copy-complete",
+    "id": 602
+  },
+  {
+    "utc": "2026-09-12T17:15:06.520Z",
+    "time": "33303885874100",
+    "kind": "copy-complete",
+    "id": 603
+  },
+  {
+    "utc": "2026-09-12T17:15:06.535Z",
+    "time": "33303900750500",
+    "kind": "copy-complete",
+    "id": 604
+  },
+  {
+    "utc": "2026-09-12T17:15:06.551Z",
+    "time": "33303916196600",
+    "kind": "copy-complete",
+    "id": 605
+  },
+  {
+    "utc": "2026-09-12T17:15:06.566Z",
+    "time": "33303931694700",
+    "kind": "copy-complete",
+    "id": 606
+  },
+  {
+    "utc": "2026-09-12T17:15:06.582Z",
+    "time": "33303947754200",
+    "kind": "copy-complete",
+    "id": 607
+  },
+  {
+    "utc": "2026-09-12T17:15:06.597Z",
+    "time": "33303962635000",
+    "kind": "copy-complete",
+    "id": 608
+  },
+  {
+    "utc": "2026-09-12T17:15:06.613Z",
+    "time": "33303978324000",
+    "kind": "copy-complete",
+    "id": 609
+  },
+  {
+    "utc": "2026-09-12T17:15:06.629Z",
+    "time": "33303994343700",
+    "kind": "copy-complete",
+    "id": 610
+  },
+  {
+    "utc": "2026-09-12T17:15:06.645Z",
+    "time": "33304010737400",
+    "kind": "copy-complete",
+    "id": 611
+  },
+  {
+    "utc": "2026-09-12T17:15:06.661Z",
+    "time": "33304026121300",
+    "kind": "copy-complete",
+    "id": 612
+  },
+  {
+    "utc": "2026-09-12T17:15:06.676Z",
+    "time": "33304041737200",
+    "kind": "copy-complete",
+    "id": 613
+  },
+  {
+    "utc": "2026-09-12T17:15:06.692Z",
+    "time": "33304057864500",
+    "kind": "copy-complete",
+    "id": 614
+  },
+  {
+    "utc": "2026-09-12T17:15:06.708Z",
+    "time": "33304073892200",
+    "kind": "copy-complete",
+    "id": 615
+  },
+  {
+    "utc": "2026-09-12T17:15:06.740Z",
+    "time": "33304105139400",
+    "kind": "copy-complete",
+    "id": 616
+  },
+  {
+    "utc": "2026-09-12T17:15:06.755Z",
+    "time": "33304120161900",
+    "kind": "copy-complete",
+    "id": 617
+  },
+  {
+    "utc": "2026-09-12T17:15:06.771Z",
+    "time": "33304136135000",
+    "kind": "copy-complete",
+    "id": 618
+  },
+  {
+    "utc": "2026-09-12T17:15:06.786Z",
+    "time": "33304151714100",
+    "kind": "copy-complete",
+    "id": 619
+  },
+  {
+    "utc": "2026-09-12T17:15:06.802Z",
+    "time": "33304167179700",
+    "kind": "copy-complete",
+    "id": 620
+  },
+  {
+    "utc": "2026-09-12T17:15:06.817Z",
+    "time": "33304182528900",
+    "kind": "copy-complete",
+    "id": 621
+  },
+  {
+    "utc": "2026-09-12T17:15:06.832Z",
+    "time": "33304198012700",
+    "kind": "copy-complete",
+    "id": 622
+  },
+  {
+    "utc": "2026-09-12T17:15:06.849Z",
+    "time": "33304214114700",
+    "kind": "copy-complete",
+    "id": 623
+  },
+  {
+    "utc": "2026-09-12T17:15:06.864Z",
+    "time": "33304229481000",
+    "kind": "copy-complete",
+    "id": 624
+  },
+  {
+    "utc": "2026-09-12T17:15:06.880Z",
+    "time": "33304245566200",
+    "kind": "copy-complete",
+    "id": 625
+  },
+  {
+    "utc": "2026-09-12T17:15:06.896Z",
+    "time": "33304261357600",
+    "kind": "copy-complete",
+    "id": 626
+  },
+  {
+    "utc": "2026-09-12T17:15:06.911Z",
+    "time": "33304276813800",
+    "kind": "copy-complete",
+    "id": 627
+  },
+  {
+    "utc": "2026-09-12T17:15:06.943Z",
+    "time": "33304308205800",
+    "kind": "copy-complete",
+    "id": 628
+  },
+  {
+    "utc": "2026-09-12T17:15:06.943Z",
+    "time": "33304308211200",
+    "kind": "copy-complete",
+    "id": 629
+  },
+  {
+    "utc": "2026-09-12T17:15:06.973Z",
+    "time": "33304339020000",
+    "kind": "copy-complete",
+    "id": 630
+  },
+  {
+    "utc": "2026-09-12T17:15:06.989Z",
+    "time": "33304354791100",
+    "kind": "copy-complete",
+    "id": 631
+  },
+  {
+    "utc": "2026-09-12T17:15:07.005Z",
+    "time": "33304370388600",
+    "kind": "copy-complete",
+    "id": 632
+  },
+  {
+    "utc": "2026-09-12T17:15:07.020Z",
+    "time": "33304385858800",
+    "kind": "copy-complete",
+    "id": 633
+  },
+  {
+    "utc": "2026-09-12T17:15:07.036Z",
+    "time": "33304401437200",
+    "kind": "copy-complete",
+    "id": 634
+  },
+  {
+    "utc": "2026-09-12T17:15:07.052Z",
+    "time": "33304417147200",
+    "kind": "copy-complete",
+    "id": 635
+  },
+  {
+    "utc": "2026-09-12T17:15:07.068Z",
+    "time": "33304433182600",
+    "kind": "copy-complete",
+    "id": 636
+  },
+  {
+    "utc": "2026-09-12T17:15:07.083Z",
+    "time": "33304448833500",
+    "kind": "copy-complete",
+    "id": 637
+  },
+  {
+    "utc": "2026-09-12T17:15:07.099Z",
+    "time": "33304464593800",
+    "kind": "copy-complete",
+    "id": 638
+  },
+  {
+    "utc": "2026-09-12T17:15:07.115Z",
+    "time": "33304480442000",
+    "kind": "copy-complete",
+    "id": 639
+  },
+  {
+    "utc": "2026-09-12T17:15:07.131Z",
+    "time": "33304496113300",
+    "kind": "copy-complete",
+    "id": 640
+  },
+  {
+    "utc": "2026-09-12T17:15:07.146Z",
+    "time": "33304511173200",
+    "kind": "copy-complete",
+    "id": 641
+  },
+  {
+    "utc": "2026-09-12T17:15:07.162Z",
+    "time": "33304527207900",
+    "kind": "copy-complete",
+    "id": 642
+  },
+  {
+    "utc": "2026-09-12T17:15:07.177Z",
+    "time": "33304542790400",
+    "kind": "copy-complete",
+    "id": 643
+  },
+  {
+    "utc": "2026-09-12T17:15:07.193Z",
+    "time": "33304558858700",
+    "kind": "copy-complete",
+    "id": 644
+  },
+  {
+    "utc": "2026-09-12T17:15:07.224Z",
+    "time": "33304589356600",
+    "kind": "copy-complete",
+    "id": 645
+  },
+  {
+    "utc": "2026-09-12T17:15:07.240Z",
+    "time": "33304605409400",
+    "kind": "copy-complete",
+    "id": 646
+  },
+  {
+    "utc": "2026-09-12T17:15:07.255Z",
+    "time": "33304620975900",
+    "kind": "copy-complete",
+    "id": 647
+  },
+  {
+    "utc": "2026-09-12T17:15:07.271Z",
+    "time": "33304636657300",
+    "kind": "copy-complete",
+    "id": 648
+  },
+  {
+    "utc": "2026-09-12T17:15:07.288Z",
+    "time": "33304653126700",
+    "kind": "copy-complete",
+    "id": 649
+  },
+  {
+    "utc": "2026-09-12T17:15:07.303Z",
+    "time": "33304668436100",
+    "kind": "copy-complete",
+    "id": 650
+  },
+  {
+    "utc": "2026-09-12T17:15:07.319Z",
+    "time": "33304684410900",
+    "kind": "copy-complete",
+    "id": 651
+  },
+  {
+    "utc": "2026-09-12T17:15:07.335Z",
+    "time": "33304700083900",
+    "kind": "copy-complete",
+    "id": 652
+  },
+  {
+    "utc": "2026-09-12T17:15:07.350Z",
+    "time": "33304715697500",
+    "kind": "copy-complete",
+    "id": 653
+  },
+  {
+    "utc": "2026-09-12T17:15:07.366Z",
+    "time": "33304731818400",
+    "kind": "copy-complete",
+    "id": 654
+  },
+  {
+    "utc": "2026-09-12T17:15:07.382Z",
+    "time": "33304747921700",
+    "kind": "copy-complete",
+    "id": 655
+  },
+  {
+    "utc": "2026-09-12T17:15:07.398Z",
+    "time": "33304763965900",
+    "kind": "copy-complete",
+    "id": 656
+  },
+  {
+    "utc": "2026-09-12T17:15:07.414Z",
+    "time": "33304779866300",
+    "kind": "copy-complete",
+    "id": 657
+  },
+  {
+    "utc": "2026-09-12T17:15:07.430Z",
+    "time": "33304795669800",
+    "kind": "copy-complete",
+    "id": 658
+  },
+  {
+    "utc": "2026-09-12T17:15:07.445Z",
+    "time": "33304810800100",
+    "kind": "copy-complete",
+    "id": 659
+  },
+  {
+    "utc": "2026-09-12T17:15:07.461Z",
+    "time": "33304826741900",
+    "kind": "copy-complete",
+    "id": 660
+  },
+  {
+    "utc": "2026-09-12T17:15:07.477Z",
+    "time": "33304842311400",
+    "kind": "copy-complete",
+    "id": 661
+  },
+  {
+    "utc": "2026-09-12T17:15:07.509Z",
+    "time": "33304874452400",
+    "kind": "copy-complete",
+    "id": 662
+  },
+  {
+    "utc": "2026-09-12T17:15:07.524Z",
+    "time": "33304889969400",
+    "kind": "copy-complete",
+    "id": 663
+  },
+  {
+    "utc": "2026-09-12T17:15:07.540Z",
+    "time": "33304905880300",
+    "kind": "copy-complete",
+    "id": 664
+  },
+  {
+    "utc": "2026-09-12T17:15:07.555Z",
+    "time": "33304920979800",
+    "kind": "copy-complete",
+    "id": 665
+  },
+  {
+    "utc": "2026-09-12T17:15:07.571Z",
+    "time": "33304936228500",
+    "kind": "copy-complete",
+    "id": 666
+  },
+  {
+    "utc": "2026-09-12T17:15:07.587Z",
+    "time": "33304952440000",
+    "kind": "copy-complete",
+    "id": 667
+  },
+  {
+    "utc": "2026-09-12T17:15:07.602Z",
+    "time": "33304967903600",
+    "kind": "copy-complete",
+    "id": 668
+  },
+  {
+    "utc": "2026-09-12T17:15:07.618Z",
+    "time": "33304983094000",
+    "kind": "copy-complete",
+    "id": 669
+  },
+  {
+    "utc": "2026-09-12T17:15:07.633Z",
+    "time": "33304998713500",
+    "kind": "copy-complete",
+    "id": 670
+  },
+  {
+    "utc": "2026-09-12T17:15:07.649Z",
+    "time": "33305014803100",
+    "kind": "copy-complete",
+    "id": 671
+  },
+  {
+    "utc": "2026-09-12T17:15:07.665Z",
+    "time": "33305030286400",
+    "kind": "copy-complete",
+    "id": 672
+  },
+  {
+    "utc": "2026-09-12T17:15:07.680Z",
+    "time": "33305045878800",
+    "kind": "copy-complete",
+    "id": 673
+  },
+  {
+    "utc": "2026-09-12T17:15:07.695Z",
+    "time": "33305060998600",
+    "kind": "copy-complete",
+    "id": 674
+  },
+  {
+    "utc": "2026-09-12T17:15:07.711Z",
+    "time": "33305076228800",
+    "kind": "copy-complete",
+    "id": 675
+  },
+  {
+    "utc": "2026-09-12T17:15:07.743Z",
+    "time": "33305108628500",
+    "kind": "copy-complete",
+    "id": 676
+  },
+  {
+    "utc": "2026-09-12T17:15:07.758Z",
+    "time": "33305123897700",
+    "kind": "copy-complete",
+    "id": 677
+  },
+  {
+    "utc": "2026-09-12T17:15:07.773Z",
+    "time": "33305138696000",
+    "kind": "copy-complete",
+    "id": 678
+  },
+  {
+    "utc": "2026-09-12T17:15:07.789Z",
+    "time": "33305154900000",
+    "kind": "copy-complete",
+    "id": 679
+  },
+  {
+    "utc": "2026-09-12T17:15:07.806Z",
+    "time": "33305171560600",
+    "kind": "copy-complete",
+    "id": 680
+  },
+  {
+    "utc": "2026-09-12T17:15:07.822Z",
+    "time": "33305187312600",
+    "kind": "copy-complete",
+    "id": 681
+  },
+  {
+    "utc": "2026-09-12T17:15:07.837Z",
+    "time": "33305202677900",
+    "kind": "copy-complete",
+    "id": 682
+  },
+  {
+    "utc": "2026-09-12T17:15:07.853Z",
+    "time": "33305218303900",
+    "kind": "copy-complete",
+    "id": 683
+  },
+  {
+    "utc": "2026-09-12T17:15:07.868Z",
+    "time": "33305233819200",
+    "kind": "copy-complete",
+    "id": 684
+  },
+  {
+    "utc": "2026-09-12T17:15:07.884Z",
+    "time": "33305249443700",
+    "kind": "copy-complete",
+    "id": 685
+  },
+  {
+    "utc": "2026-09-12T17:15:07.899Z",
+    "time": "33305264833700",
+    "kind": "copy-complete",
+    "id": 686
+  },
+  {
+    "utc": "2026-09-12T17:15:07.915Z",
+    "time": "33305280273800",
+    "kind": "copy-complete",
+    "id": 687
+  },
+  {
+    "utc": "2026-09-12T17:15:07.930Z",
+    "time": "33305295265400",
+    "kind": "copy-complete",
+    "id": 688
+  },
+  {
+    "utc": "2026-09-12T17:15:07.946Z",
+    "time": "33305311322900",
+    "kind": "copy-complete",
+    "id": 689
+  },
+  {
+    "utc": "2026-09-12T17:15:07.961Z",
+    "time": "33305326364200",
+    "kind": "copy-complete",
+    "id": 690
+  },
+  {
+    "utc": "2026-09-12T17:15:07.977Z",
+    "time": "33305342039500",
+    "kind": "copy-complete",
+    "id": 691
+  },
+  {
+    "utc": "2026-09-12T17:15:08.007Z",
+    "time": "33305372969400",
+    "kind": "copy-complete",
+    "id": 692
+  },
+  {
+    "utc": "2026-09-12T17:15:08.023Z",
+    "time": "33305388410100",
+    "kind": "copy-complete",
+    "id": 693
+  },
+  {
+    "utc": "2026-09-12T17:15:08.038Z",
+    "time": "33305403478400",
+    "kind": "copy-complete",
+    "id": 694
+  },
+  {
+    "utc": "2026-09-12T17:15:08.054Z",
+    "time": "33305419143100",
+    "kind": "copy-complete",
+    "id": 695
+  },
+  {
+    "utc": "2026-09-12T17:15:08.070Z",
+    "time": "33305435293200",
+    "kind": "copy-complete",
+    "id": 696
+  },
+  {
+    "utc": "2026-09-12T17:15:08.085Z",
+    "time": "33305450879500",
+    "kind": "copy-complete",
+    "id": 697
+  },
+  {
+    "utc": "2026-09-12T17:15:08.101Z",
+    "time": "33305466258600",
+    "kind": "copy-complete",
+    "id": 698
+  },
+  {
+    "utc": "2026-09-12T17:15:08.116Z",
+    "time": "33305481724800",
+    "kind": "copy-complete",
+    "id": 699
+  },
+  {
+    "utc": "2026-09-12T17:15:08.132Z",
+    "time": "33305497262500",
+    "kind": "copy-complete",
+    "id": 700
+  },
+  {
+    "utc": "2026-09-12T17:15:08.147Z",
+    "time": "33305512906400",
+    "kind": "copy-complete",
+    "id": 701
+  },
+  {
+    "utc": "2026-09-12T17:15:08.163Z",
+    "time": "33305528256200",
+    "kind": "copy-complete",
+    "id": 702
+  },
+  {
+    "utc": "2026-09-12T17:15:08.178Z",
+    "time": "33305544022300",
+    "kind": "copy-complete",
+    "id": 703
+  },
+  {
+    "utc": "2026-09-12T17:15:08.194Z",
+    "time": "33305559219100",
+    "kind": "copy-complete",
+    "id": 704
+  },
+  {
+    "utc": "2026-09-12T17:15:08.210Z",
+    "time": "33305575149100",
+    "kind": "copy-complete",
+    "id": 705
+  },
+  {
+    "utc": "2026-09-12T17:15:08.240Z",
+    "time": "33305605937700",
+    "kind": "copy-complete",
+    "id": 706
+  },
+  {
+    "utc": "2026-09-12T17:15:08.256Z",
+    "time": "33305621058400",
+    "kind": "copy-complete",
+    "id": 707
+  },
+  {
+    "utc": "2026-09-12T17:15:08.271Z",
+    "time": "33305636807100",
+    "kind": "copy-complete",
+    "id": 708
+  },
+  {
+    "utc": "2026-09-12T17:15:08.287Z",
+    "time": "33305652059300",
+    "kind": "copy-complete",
+    "id": 709
+  },
+  {
+    "utc": "2026-09-12T17:15:08.303Z",
+    "time": "33305668232200",
+    "kind": "copy-complete",
+    "id": 710
+  },
+  {
+    "utc": "2026-09-12T17:15:08.319Z",
+    "time": "33305684213600",
+    "kind": "copy-complete",
+    "id": 711
+  },
+  {
+    "utc": "2026-09-12T17:15:08.335Z",
+    "time": "33305700121200",
+    "kind": "copy-complete",
+    "id": 712
+  },
+  {
+    "utc": "2026-09-12T17:15:08.349Z",
+    "time": "33305714914200",
+    "kind": "copy-complete",
+    "id": 713
+  },
+  {
+    "utc": "2026-09-12T17:15:08.365Z",
+    "time": "33305730380800",
+    "kind": "copy-complete",
+    "id": 714
+  },
+  {
+    "utc": "2026-09-12T17:15:08.381Z",
+    "time": "33305746413900",
+    "kind": "copy-complete",
+    "id": 715
+  },
+  {
+    "utc": "2026-09-12T17:15:08.397Z",
+    "time": "33305762697500",
+    "kind": "copy-complete",
+    "id": 716
+  },
+  {
+    "utc": "2026-09-12T17:15:08.413Z",
+    "time": "33305778601700",
+    "kind": "copy-complete",
+    "id": 717
+  },
+  {
+    "utc": "2026-09-12T17:15:08.428Z",
+    "time": "33305793793900",
+    "kind": "copy-complete",
+    "id": 718
+  },
+  {
+    "utc": "2026-09-12T17:15:08.444Z",
+    "time": "33305809334500",
+    "kind": "copy-complete",
+    "id": 719
+  },
+  {
+    "utc": "2026-09-12T17:15:08.460Z",
+    "time": "33305825335200",
+    "kind": "copy-complete",
+    "id": 720
+  },
+  {
+    "utc": "2026-09-12T17:15:08.491Z",
+    "time": "33305856635100",
+    "kind": "copy-complete",
+    "id": 721
+  },
+  {
+    "utc": "2026-09-12T17:15:08.507Z",
+    "time": "33305872220600",
+    "kind": "copy-complete",
+    "id": 722
+  },
+  {
+    "utc": "2026-09-12T17:15:08.522Z",
+    "time": "33305887871900",
+    "kind": "copy-complete",
+    "id": 723
+  },
+  {
+    "utc": "2026-09-12T17:15:08.538Z",
+    "time": "33305903132200",
+    "kind": "copy-complete",
+    "id": 724
+  },
+  {
+    "utc": "2026-09-12T17:15:08.553Z",
+    "time": "33305918996000",
+    "kind": "copy-complete",
+    "id": 725
+  },
+  {
+    "utc": "2026-09-12T17:15:08.569Z",
+    "time": "33305935003200",
+    "kind": "copy-complete",
+    "id": 726
+  },
+  {
+    "utc": "2026-09-12T17:15:08.585Z",
+    "time": "33305950129100",
+    "kind": "copy-complete",
+    "id": 727
+  },
+  {
+    "utc": "2026-09-12T17:15:08.600Z",
+    "time": "33305965253100",
+    "kind": "copy-complete",
+    "id": 728
+  },
+  {
+    "utc": "2026-09-12T17:15:08.616Z",
+    "time": "33305981136900",
+    "kind": "copy-complete",
+    "id": 729
+  },
+  {
+    "utc": "2026-09-12T17:15:08.631Z",
+    "time": "33305997023500",
+    "kind": "copy-complete",
+    "id": 730
+  },
+  {
+    "utc": "2026-09-12T17:15:08.646Z",
+    "time": "33306011918600",
+    "kind": "copy-complete",
+    "id": 731
+  },
+  {
+    "utc": "2026-09-12T17:15:08.663Z",
+    "time": "33306028126500",
+    "kind": "copy-complete",
+    "id": 732
+  },
+  {
+    "utc": "2026-09-12T17:15:08.678Z",
+    "time": "33306043430200",
+    "kind": "copy-complete",
+    "id": 733
+  },
+  {
+    "utc": "2026-09-12T17:15:08.694Z",
+    "time": "33306059173500",
+    "kind": "copy-complete",
+    "id": 734
+  },
+  {
+    "utc": "2026-09-12T17:15:08.724Z",
+    "time": "33306089914200",
+    "kind": "copy-complete",
+    "id": 735
+  },
+  {
+    "utc": "2026-09-12T17:15:08.740Z",
+    "time": "33306105452400",
+    "kind": "copy-complete",
+    "id": 736
+  },
+  {
+    "utc": "2026-09-12T17:15:08.755Z",
+    "time": "33306120782600",
+    "kind": "copy-complete",
+    "id": 737
+  },
+  {
+    "utc": "2026-09-12T17:15:08.771Z",
+    "time": "33306136297000",
+    "kind": "copy-complete",
+    "id": 738
+  },
+  {
+    "utc": "2026-09-12T17:15:08.776Z",
+    "time": "33306141266800",
+    "kind": "copy-complete",
+    "id": 739
+  },
+  {
+    "utc": "2026-09-12T17:15:08.803Z",
+    "time": "33306168035200",
+    "kind": "copy-complete",
+    "id": 740
+  },
+  {
+    "utc": "2026-09-12T17:15:08.819Z",
+    "time": "33306184336800",
+    "kind": "copy-complete",
+    "id": 741
+  },
+  {
+    "utc": "2026-09-12T17:15:08.833Z",
+    "time": "33306199003400",
+    "kind": "copy-complete",
+    "id": 742
+  },
+  {
+    "utc": "2026-09-12T17:15:08.849Z",
+    "time": "33306214372000",
+    "kind": "copy-complete",
+    "id": 743
+  },
+  {
+    "utc": "2026-09-12T17:15:08.864Z",
+    "time": "33306230034400",
+    "kind": "copy-complete",
+    "id": 744
+  },
+  {
+    "utc": "2026-09-12T17:15:08.880Z",
+    "time": "33306245190000",
+    "kind": "copy-complete",
+    "id": 745
+  },
+  {
+    "utc": "2026-09-12T17:15:08.895Z",
+    "time": "33306260175500",
+    "kind": "copy-complete",
+    "id": 746
+  },
+  {
+    "utc": "2026-09-12T17:15:08.911Z",
+    "time": "33306276242200",
+    "kind": "copy-complete",
+    "id": 747
+  },
+  {
+    "utc": "2026-09-12T17:15:08.941Z",
+    "time": "33306306824500",
+    "kind": "copy-complete",
+    "id": 748
+  },
+  {
+    "utc": "2026-09-12T17:15:08.956Z",
+    "time": "33306321949700",
+    "kind": "copy-complete",
+    "id": 749
+  },
+  {
+    "utc": "2026-09-12T17:15:08.973Z",
+    "time": "33306338177400",
+    "kind": "copy-complete",
+    "id": 750
+  },
+  {
+    "utc": "2026-09-12T17:15:08.988Z",
+    "time": "33306353871300",
+    "kind": "copy-complete",
+    "id": 751
+  },
+  {
+    "utc": "2026-09-12T17:15:09.004Z",
+    "time": "33306369121400",
+    "kind": "copy-complete",
+    "id": 752
+  },
+  {
+    "utc": "2026-09-12T17:15:09.020Z",
+    "time": "33306385055100",
+    "kind": "copy-complete",
+    "id": 753
+  },
+  {
+    "utc": "2026-09-12T17:15:09.035Z",
+    "time": "33306400578100",
+    "kind": "copy-complete",
+    "id": 754
+  },
+  {
+    "utc": "2026-09-12T17:15:09.050Z",
+    "time": "33306415785400",
+    "kind": "copy-complete",
+    "id": 755
+  },
+  {
+    "utc": "2026-09-12T17:15:09.065Z",
+    "time": "33306431013700",
+    "kind": "copy-complete",
+    "id": 756
+  },
+  {
+    "utc": "2026-09-12T17:15:09.082Z",
+    "time": "33306447530500",
+    "kind": "copy-complete",
+    "id": 757
+  },
+  {
+    "utc": "2026-09-12T17:15:09.098Z",
+    "time": "33306463106800",
+    "kind": "copy-complete",
+    "id": 758
+  },
+  {
+    "utc": "2026-09-12T17:15:09.114Z",
+    "time": "33306479426700",
+    "kind": "copy-complete",
+    "id": 759
+  },
+  {
+    "utc": "2026-09-12T17:15:09.130Z",
+    "time": "33306495416700",
+    "kind": "copy-complete",
+    "id": 760
+  },
+  {
+    "utc": "2026-09-12T17:15:09.146Z",
+    "time": "33306511259400",
+    "kind": "copy-complete",
+    "id": 761
+  },
+  {
+    "utc": "2026-09-12T17:15:09.161Z",
+    "time": "33306527001000",
+    "kind": "copy-complete",
+    "id": 762
+  },
+  {
+    "utc": "2026-09-12T17:15:09.178Z",
+    "time": "33306543052400",
+    "kind": "copy-complete",
+    "id": 763
+  },
+  {
+    "utc": "2026-09-12T17:15:09.193Z",
+    "time": "33306558284300",
+    "kind": "copy-complete",
+    "id": 764
+  },
+  {
+    "utc": "2026-09-12T17:15:09.208Z",
+    "time": "33306573856700",
+    "kind": "copy-complete",
+    "id": 765
+  },
+  {
+    "utc": "2026-09-12T17:15:09.240Z",
+    "time": "33306605415600",
+    "kind": "copy-complete",
+    "id": 766
+  },
+  {
+    "utc": "2026-09-12T17:15:09.256Z",
+    "time": "33306621444400",
+    "kind": "copy-complete",
+    "id": 767
+  },
+  {
+    "utc": "2026-09-12T17:15:09.271Z",
+    "time": "33306636912000",
+    "kind": "copy-complete",
+    "id": 768
+  },
+  {
+    "utc": "2026-09-12T17:15:09.287Z",
+    "time": "33306652320400",
+    "kind": "copy-complete",
+    "id": 769
+  },
+  {
+    "utc": "2026-09-12T17:15:09.303Z",
+    "time": "33306668135200",
+    "kind": "copy-complete",
+    "id": 770
+  },
+  {
+    "utc": "2026-09-12T17:15:09.318Z",
+    "time": "33306683080800",
+    "kind": "copy-complete",
+    "id": 771
+  },
+  {
+    "utc": "2026-09-12T17:15:09.333Z",
+    "time": "33306698185100",
+    "kind": "copy-complete",
+    "id": 772
+  },
+  {
+    "utc": "2026-09-12T17:15:09.348Z",
+    "time": "33306713868100",
+    "kind": "copy-complete",
+    "id": 773
+  },
+  {
+    "utc": "2026-09-12T17:15:09.363Z",
+    "time": "33306729019300",
+    "kind": "copy-complete",
+    "id": 774
+  },
+  {
+    "utc": "2026-09-12T17:15:09.379Z",
+    "time": "33306744490800",
+    "kind": "copy-complete",
+    "id": 775
+  },
+  {
+    "utc": "2026-09-12T17:15:09.395Z",
+    "time": "33306760449300",
+    "kind": "copy-complete",
+    "id": 776
+  },
+  {
+    "utc": "2026-09-12T17:15:09.410Z",
+    "time": "33306775971300",
+    "kind": "copy-complete",
+    "id": 777
+  },
+  {
+    "utc": "2026-09-12T17:15:09.427Z",
+    "time": "33306792068000",
+    "kind": "copy-complete",
+    "id": 778
+  },
+  {
+    "utc": "2026-09-12T17:15:09.442Z",
+    "time": "33306807204700",
+    "kind": "copy-complete",
+    "id": 779
+  },
+  {
+    "utc": "2026-09-12T17:15:09.473Z",
+    "time": "33306838405200",
+    "kind": "copy-complete",
+    "id": 780
+  },
+  {
+    "utc": "2026-09-12T17:15:09.489Z",
+    "time": "33306854176600",
+    "kind": "copy-complete",
+    "id": 781
+  },
+  {
+    "utc": "2026-09-12T17:15:09.504Z",
+    "time": "33306869881800",
+    "kind": "copy-complete",
+    "id": 782
+  },
+  {
+    "utc": "2026-09-12T17:15:09.520Z",
+    "time": "33306885918600",
+    "kind": "copy-complete",
+    "id": 783
+  },
+  {
+    "utc": "2026-09-12T17:15:09.537Z",
+    "time": "33306902064500",
+    "kind": "copy-complete",
+    "id": 784
+  },
+  {
+    "utc": "2026-09-12T17:15:09.552Z",
+    "time": "33306917189400",
+    "kind": "copy-complete",
+    "id": 785
+  },
+  {
+    "utc": "2026-09-12T17:15:09.568Z",
+    "time": "33306933406300",
+    "kind": "copy-complete",
+    "id": 786
+  },
+  {
+    "utc": "2026-09-12T17:15:09.584Z",
+    "time": "33306949390700",
+    "kind": "copy-complete",
+    "id": 787
+  },
+  {
+    "utc": "2026-09-12T17:15:09.599Z",
+    "time": "33306964954000",
+    "kind": "copy-complete",
+    "id": 788
+  },
+  {
+    "utc": "2026-09-12T17:15:09.615Z",
+    "time": "33306980954300",
+    "kind": "copy-complete",
+    "id": 789
+  },
+  {
+    "utc": "2026-09-12T17:15:09.630Z",
+    "time": "33306996020500",
+    "kind": "copy-complete",
+    "id": 790
+  },
+  {
+    "utc": "2026-09-12T17:15:09.646Z",
+    "time": "33307011197900",
+    "kind": "copy-complete",
+    "id": 791
+  },
+  {
+    "utc": "2026-09-12T17:15:09.662Z",
+    "time": "33307027294700",
+    "kind": "copy-complete",
+    "id": 792
+  },
+  {
+    "utc": "2026-09-12T17:15:09.692Z",
+    "time": "33307057941200",
+    "kind": "copy-complete",
+    "id": 793
+  },
+  {
+    "utc": "2026-09-12T17:15:09.693Z",
+    "time": "33307058034400",
+    "kind": "copy-complete",
+    "id": 794
+  },
+  {
+    "utc": "2026-09-12T17:15:09.724Z",
+    "time": "33307089091700",
+    "kind": "copy-complete",
+    "id": 795
+  },
+  {
+    "utc": "2026-09-12T17:15:09.739Z",
+    "time": "33307104650800",
+    "kind": "copy-complete",
+    "id": 796
+  },
+  {
+    "utc": "2026-09-12T17:15:09.755Z",
+    "time": "33307120355000",
+    "kind": "copy-complete",
+    "id": 797
+  },
+  {
+    "utc": "2026-09-12T17:15:09.771Z",
+    "time": "33307136365700",
+    "kind": "copy-complete",
+    "id": 798
+  },
+  {
+    "utc": "2026-09-12T17:15:09.786Z",
+    "time": "33307151927700",
+    "kind": "copy-complete",
+    "id": 799
+  },
+  {
+    "utc": "2026-09-12T17:15:09.803Z",
+    "time": "33307168147700",
+    "kind": "copy-complete",
+    "id": 800
+  },
+  {
+    "utc": "2026-09-12T17:15:09.818Z",
+    "time": "33307183773100",
+    "kind": "copy-complete",
+    "id": 801
+  },
+  {
+    "utc": "2026-09-12T17:15:09.834Z",
+    "time": "33307199828300",
+    "kind": "copy-complete",
+    "id": 802
+  },
+  {
+    "utc": "2026-09-12T17:15:09.850Z",
+    "time": "33307215273600",
+    "kind": "copy-complete",
+    "id": 803
+  },
+  {
+    "utc": "2026-09-12T17:15:09.865Z",
+    "time": "33307230758800",
+    "kind": "copy-complete",
+    "id": 804
+  },
+  {
+    "utc": "2026-09-12T17:15:09.881Z",
+    "time": "33307246275900",
+    "kind": "copy-complete",
+    "id": 805
+  },
+  {
+    "utc": "2026-09-12T17:15:09.897Z",
+    "time": "33307262084800",
+    "kind": "copy-complete",
+    "id": 806
+  },
+  {
+    "utc": "2026-09-12T17:15:09.913Z",
+    "time": "33307278059700",
+    "kind": "copy-complete",
+    "id": 807
+  },
+  {
+    "utc": "2026-09-12T17:15:09.928Z",
+    "time": "33307293283100",
+    "kind": "copy-complete",
+    "id": 808
+  },
+  {
+    "utc": "2026-09-12T17:15:09.943Z",
+    "time": "33307308914500",
+    "kind": "copy-complete",
+    "id": 809
+  },
+  {
+    "utc": "2026-09-12T17:15:09.959Z",
+    "time": "33307324396400",
+    "kind": "copy-complete",
+    "id": 810
+  },
+  {
+    "utc": "2026-09-12T17:15:09.990Z",
+    "time": "33307355287500",
+    "kind": "copy-complete",
+    "id": 811
+  },
+  {
+    "utc": "2026-09-12T17:15:10.006Z",
+    "time": "33307371102200",
+    "kind": "copy-complete",
+    "id": 812
+  },
+  {
+    "utc": "2026-09-12T17:15:10.022Z",
+    "time": "33307387065200",
+    "kind": "copy-complete",
+    "id": 813
+  },
+  {
+    "utc": "2026-09-12T17:15:10.037Z",
+    "time": "33307402216600",
+    "kind": "copy-complete",
+    "id": 814
+  },
+  {
+    "utc": "2026-09-12T17:15:10.052Z",
+    "time": "33307417186200",
+    "kind": "copy-complete",
+    "id": 815
+  },
+  {
+    "utc": "2026-09-12T17:15:10.067Z",
+    "time": "33307432631200",
+    "kind": "copy-complete",
+    "id": 816
+  },
+  {
+    "utc": "2026-09-12T17:15:10.083Z",
+    "time": "33307448264100",
+    "kind": "copy-complete",
+    "id": 817
+  },
+  {
+    "utc": "2026-09-12T17:15:10.098Z",
+    "time": "33307463359800",
+    "kind": "copy-complete",
+    "id": 818
+  },
+  {
+    "utc": "2026-09-12T17:15:10.114Z",
+    "time": "33307479481200",
+    "kind": "copy-complete",
+    "id": 819
+  },
+  {
+    "utc": "2026-09-12T17:15:10.129Z",
+    "time": "33307494925600",
+    "kind": "copy-complete",
+    "id": 820
+  },
+  {
+    "utc": "2026-09-12T17:15:10.145Z",
+    "time": "33307510290200",
+    "kind": "copy-complete",
+    "id": 821
+  },
+  {
+    "utc": "2026-09-12T17:15:10.161Z",
+    "time": "33307526357500",
+    "kind": "copy-complete",
+    "id": 822
+  },
+  {
+    "utc": "2026-09-12T17:15:10.192Z",
+    "time": "33307557870900",
+    "kind": "copy-complete",
+    "id": 823
+  },
+  {
+    "utc": "2026-09-12T17:15:10.192Z",
+    "time": "33307557878700",
+    "kind": "copy-complete",
+    "id": 824
+  },
+  {
+    "utc": "2026-09-12T17:15:10.223Z",
+    "time": "33307588952500",
+    "kind": "copy-complete",
+    "id": 825
+  },
+  {
+    "utc": "2026-09-12T17:15:10.240Z",
+    "time": "33307605552500",
+    "kind": "copy-complete",
+    "id": 826
+  },
+  {
+    "utc": "2026-09-12T17:15:10.255Z",
+    "time": "33307620186100",
+    "kind": "copy-complete",
+    "id": 827
+  },
+  {
+    "utc": "2026-09-12T17:15:10.270Z",
+    "time": "33307635313500",
+    "kind": "copy-complete",
+    "id": 828
+  },
+  {
+    "utc": "2026-09-12T17:15:10.285Z",
+    "time": "33307650370400",
+    "kind": "copy-complete",
+    "id": 829
+  },
+  {
+    "utc": "2026-09-12T17:15:10.300Z",
+    "time": "33307665970700",
+    "kind": "copy-complete",
+    "id": 830
+  },
+  {
+    "utc": "2026-09-12T17:15:10.316Z",
+    "time": "33307681870500",
+    "kind": "copy-complete",
+    "id": 831
+  },
+  {
+    "utc": "2026-09-12T17:15:10.332Z",
+    "time": "33307698005100",
+    "kind": "copy-complete",
+    "id": 832
+  },
+  {
+    "utc": "2026-09-12T17:15:10.348Z",
+    "time": "33307713132900",
+    "kind": "copy-complete",
+    "id": 833
+  },
+  {
+    "utc": "2026-09-12T17:15:10.363Z",
+    "time": "33307728962900",
+    "kind": "copy-complete",
+    "id": 834
+  },
+  {
+    "utc": "2026-09-12T17:15:10.379Z",
+    "time": "33307744781900",
+    "kind": "copy-complete",
+    "id": 835
+  },
+  {
+    "utc": "2026-09-12T17:15:10.394Z",
+    "time": "33307760009500",
+    "kind": "copy-complete",
+    "id": 836
+  },
+  {
+    "utc": "2026-09-12T17:15:10.410Z",
+    "time": "33307775709900",
+    "kind": "copy-complete",
+    "id": 837
+  },
+  {
+    "utc": "2026-09-12T17:15:10.441Z",
+    "time": "33307806129700",
+    "kind": "copy-complete",
+    "id": 838
+  },
+  {
+    "utc": "2026-09-12T17:15:10.457Z",
+    "time": "33307822262600",
+    "kind": "copy-complete",
+    "id": 839
+  },
+  {
+    "utc": "2026-09-12T17:15:10.473Z",
+    "time": "33307838199100",
+    "kind": "copy-complete",
+    "id": 840
+  },
+  {
+    "utc": "2026-09-12T17:15:10.488Z",
+    "time": "33307853381500",
+    "kind": "copy-complete",
+    "id": 841
+  },
+  {
+    "utc": "2026-09-12T17:15:10.504Z",
+    "time": "33307869060900",
+    "kind": "copy-complete",
+    "id": 842
+  },
+  {
+    "utc": "2026-09-12T17:15:10.519Z",
+    "time": "33307884926500",
+    "kind": "copy-complete",
+    "id": 843
+  },
+  {
+    "utc": "2026-09-12T17:15:10.535Z",
+    "time": "33307900432700",
+    "kind": "copy-complete",
+    "id": 844
+  },
+  {
+    "utc": "2026-09-12T17:15:10.551Z",
+    "time": "33307916075900",
+    "kind": "copy-complete",
+    "id": 845
+  },
+  {
+    "utc": "2026-09-12T17:15:10.567Z",
+    "time": "33307932128900",
+    "kind": "copy-complete",
+    "id": 846
+  },
+  {
+    "utc": "2026-09-12T17:15:10.582Z",
+    "time": "33307947888200",
+    "kind": "copy-complete",
+    "id": 847
+  },
+  {
+    "utc": "2026-09-12T17:15:10.598Z",
+    "time": "33307963211000",
+    "kind": "copy-complete",
+    "id": 848
+  },
+  {
+    "utc": "2026-09-12T17:15:10.613Z",
+    "time": "33307978521100",
+    "kind": "copy-complete",
+    "id": 849
+  },
+  {
+    "utc": "2026-09-12T17:15:10.629Z",
+    "time": "33307994537200",
+    "kind": "copy-complete",
+    "id": 850
+  },
+  {
+    "utc": "2026-09-12T17:15:10.645Z",
+    "time": "33308010155900",
+    "kind": "copy-complete",
+    "id": 851
+  },
+  {
+    "utc": "2026-09-12T17:15:10.660Z",
+    "time": "33308025793900",
+    "kind": "copy-complete",
+    "id": 852
+  },
+  {
+    "utc": "2026-09-12T17:15:10.676Z",
+    "time": "33308041172200",
+    "kind": "copy-complete",
+    "id": 853
+  },
+  {
+    "utc": "2026-09-12T17:15:10.691Z",
+    "time": "33308056435600",
+    "kind": "copy-complete",
+    "id": 854
+  },
+  {
+    "utc": "2026-09-12T17:15:10.722Z",
+    "time": "33308087221300",
+    "kind": "copy-complete",
+    "id": 855
+  },
+  {
+    "utc": "2026-09-12T17:15:10.737Z",
+    "time": "33308102687200",
+    "kind": "copy-complete",
+    "id": 856
+  },
+  {
+    "utc": "2026-09-12T17:15:10.753Z",
+    "time": "33308118948300",
+    "kind": "copy-complete",
+    "id": 857
+  },
+  {
+    "utc": "2026-09-12T17:15:10.769Z",
+    "time": "33308134791500",
+    "kind": "copy-complete",
+    "id": 858
+  },
+  {
+    "utc": "2026-09-12T17:15:10.785Z",
+    "time": "33308150331300",
+    "kind": "copy-complete",
+    "id": 859
+  },
+  {
+    "utc": "2026-09-12T17:15:10.800Z",
+    "time": "33308165565200",
+    "kind": "copy-complete",
+    "id": 860
+  },
+  {
+    "utc": "2026-09-12T17:15:10.816Z",
+    "time": "33308181310400",
+    "kind": "copy-complete",
+    "id": 861
+  },
+  {
+    "utc": "2026-09-12T17:15:10.832Z",
+    "time": "33308197296300",
+    "kind": "copy-complete",
+    "id": 862
+  },
+  {
+    "utc": "2026-09-12T17:15:10.847Z",
+    "time": "33308212756200",
+    "kind": "copy-complete",
+    "id": 863
+  },
+  {
+    "utc": "2026-09-12T17:15:10.862Z",
+    "time": "33308227289600",
+    "kind": "copy-complete",
+    "id": 864
+  },
+  {
+    "utc": "2026-09-12T17:15:10.877Z",
+    "time": "33308242450100",
+    "kind": "copy-complete",
+    "id": 865
+  },
+  {
+    "utc": "2026-09-12T17:15:10.893Z",
+    "time": "33308258104600",
+    "kind": "copy-complete",
+    "id": 866
+  },
+  {
+    "utc": "2026-09-12T17:15:10.923Z",
+    "time": "33308288992600",
+    "kind": "copy-complete",
+    "id": 867
+  },
+  {
+    "utc": "2026-09-12T17:15:10.940Z",
+    "time": "33308305151500",
+    "kind": "copy-complete",
+    "id": 868
+  },
+  {
+    "utc": "2026-09-12T17:15:10.955Z",
+    "time": "33308320532700",
+    "kind": "copy-complete",
+    "id": 869
+  },
+  {
+    "utc": "2026-09-12T17:15:10.971Z",
+    "time": "33308336565200",
+    "kind": "copy-complete",
+    "id": 870
+  },
+  {
+    "utc": "2026-09-12T17:15:10.987Z",
+    "time": "33308352177800",
+    "kind": "copy-complete",
+    "id": 871
+  },
+  {
+    "utc": "2026-09-12T17:15:11.003Z",
+    "time": "33308368253100",
+    "kind": "copy-complete",
+    "id": 872
+  },
+  {
+    "utc": "2026-09-12T17:15:11.030Z",
+    "time": "33308395717800",
+    "kind": "summary",
+    "paint": 873,
+    "held": 0,
+    "uncertain": 0,
+    "dropped": 0,
+    "closed": true,
+    "failed": false,
+    "webgpuReady": true
+  }
+]

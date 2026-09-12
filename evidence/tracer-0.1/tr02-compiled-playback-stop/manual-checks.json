@@ -1,0 +1,9 @@
+{
+  "sessionId": "3291f432-3663-4ca9-be7c-16a5bf777046",
+  "observer": "user",
+  "question": "In the current continuous run, does the shape keep rotating, and does its color change as you sweep Intensity?",
+  "answer": "Yes, continuous rotation and color response",
+  "stopAction": "Ctrl+C sent to the playback terminal",
+  "supervisorResult": "result.json",
+  "scope": "Manual motion/control confirmation plus supervised producer cleanup; not a performance measurement"
+}
