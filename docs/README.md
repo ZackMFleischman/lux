@@ -1,6 +1,6 @@
 # Lux engineering documentation
 
-Status: planning and independent review in progress. Start with [progress](planning-progress.md) and [requirements](requirements.md).
+Status: documentation and planning complete; reviews closed; ready for tracer implementation. Start with [progress](planning-progress.md) and [requirements](requirements.md). Runtime feasibility remains subject to the planned experiments.
 
 The original [design and handoff](../plans/ai-visual-workshop-design.md) and [domain proposal](../plans/domain-and-workflow-proposal.md) remain preserved source records. Direct user decisions take precedence. This document set will record implementation decisions explicitly; an earlier proposal is not silently treated as user approval.
 
@@ -26,5 +26,6 @@ Specialist drafting assignments:
 - **Execution:** [tracer task plan](implementation/tracer-0.1.md), [acceptance/evidence](implementation/tracer-acceptance.md), [later milestone coverage](implementation/roadmap.md).
 - **Review:** [disposition and readiness](reviews/disposition.md), [technical](reviews/technical.md), [product](reviews/product.md), [execution](reviews/execution.md).
 - **Handoff:** [copyable coordinator prompt](implementation/implementation-handoff.md).
+- **Checks:** [documentation validation](validation.md).
 
 The task plan defines work order; subsystem contracts define behavior. The tracer contract map resolves cross-document naming/ownership. Actual implementation results belong in evidence manifests, not in source design prose. Planning readiness is permission to execute the bounded experiments, not a claim the proposed GPU path works.

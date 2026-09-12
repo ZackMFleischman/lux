@@ -1,6 +1,6 @@
 # Lux architecture
 
-Status: reconciled planning target for independent review. Read [decisions](decisions.md) for authority and [requirements](requirements.md) for outcomes. No runtime implementation or GPU capability has been proved by this document.
+Status: reviewed planning target, ready for implementation. Read [decisions](decisions.md) for authority and [requirements](requirements.md) for outcomes. No runtime implementation or GPU capability has been proved by this document.
 
 ## System boundaries
 
