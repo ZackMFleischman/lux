@@ -3,3 +3,8 @@ packages:
   - apps/*
 onlyBuiltDependencies:
   - electron
+patchedDependencies:
+  fast-png@8.0.0: patches/fast-png@8.0.0.patch
+overrides:
+  fast-png>fflate: 0.8.2
+  fast-png>iobuffer: 6.0.1

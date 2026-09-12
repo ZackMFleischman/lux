@@ -1,0 +1,43 @@
+diff --git a/lib/png_decoder.js b/lib/png_decoder.js
+index 58578698eb498022dbfc9d8dcbeaaaeb21f78995..f09a4e2c1adfc4346330676433146aec22f5bf92 100644
+--- a/lib/png_decoder.js
++++ b/lib/png_decoder.js
+@@ -281,11 +281,9 @@ export default class PngDecoder extends IOBuffer {
+         switch (this._colorType) {
+             case ColorType.GREYSCALE:
+             case ColorType.TRUECOLOUR: {
+-                if (length % 2 !== 0) {
+-                    throw new RangeError(`tRNS chunk length must be a multiple of 2. Got ${length}`);
+-                }
+-                if (length / 2 > this._png.width * this._png.height) {
+-                    throw new Error(`tRNS chunk contains more alpha values than there are pixels (${length / 2} vs ${this._png.width * this._png.height})`);
++                const expectedLength = this._colorType === ColorType.GREYSCALE ? 2 : 6;
++                if (length !== expectedLength) {
++                    throw new RangeError(`tRNS chunk length must be ${expectedLength}. Got ${length}`);
+                 }
+                 this._hasTransparency = true;
+                 this._transparency = new Uint16Array(length / 2);
+diff --git a/src/png_decoder.ts b/src/png_decoder.ts
+index 7f27123caac37442fcd0348f77a651cfaab3b73b..135e529390c812df8114fd8ad386af9ef4b62fb2 100644
+--- a/src/png_decoder.ts
++++ b/src/png_decoder.ts
+@@ -324,16 +324,10 @@ export default class PngDecoder extends IOBuffer {
+     switch (this._colorType) {
+       case ColorType.GREYSCALE:
+       case ColorType.TRUECOLOUR: {
+-        if (length % 2 !== 0) {
++        const expectedLength = this._colorType === ColorType.GREYSCALE ? 2 : 6;
++        if (length !== expectedLength) {
+           throw new RangeError(
+-            `tRNS chunk length must be a multiple of 2. Got ${length}`,
+-          );
+-        }
+-        if (length / 2 > this._png.width * this._png.height) {
+-          throw new Error(
+-            `tRNS chunk contains more alpha values than there are pixels (${
+-              length / 2
+-            } vs ${this._png.width * this._png.height})`,
++            `tRNS chunk length must be ${expectedLength}. Got ${length}`,
+           );
+         }
+         this._hasTransparency = true;
