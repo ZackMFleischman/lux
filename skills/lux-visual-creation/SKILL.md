@@ -11,7 +11,7 @@ Turn the user's visual brief into working Lux source, inspect the actual preview
 
 Prefer available `lux.studio.*` MCP tools. Otherwise read [connection and tools](references/studio-tools.md) for the local stdio adapter. Use the existing Studio session; ordinary visual creation does not call for launching extra Studio instances, running integration tests, modifying infrastructure, or installing/exporting to Resolume.
 
-Call `discover`, then `read`. Discovery supplies the exact SDK contract, example, allowed imports, versions, and capabilities. Read returns the **complete source bundle**, draft version, and current preview status. Use these instead of assuming this skill's snapshot describes a newer installation. Do not print connection credentials.
+Call `discover`, then `read`. Discovery supplies the adapter checkout's SDK contract, example, allowed imports, versions, and declared capabilities; it is not a handshake proving the running Studio supports them. Use the adapter from the checkout/build that launched the current Studio when known, and verify actual `read`, `status`, and operation results. Read returns the **complete source bundle**, draft version, and current preview status. A newer adapter can describe features absent from an already-open build; investigate that mismatch rather than trusting either this skill's snapshot or discovery alone. Do not print connection credentials.
 
 ## Create and revise
 

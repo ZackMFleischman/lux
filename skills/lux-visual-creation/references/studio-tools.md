@@ -4,7 +4,7 @@
 
 Use configured `lux.studio.*` tools when available. Tool search can discover a configured server; absence of those tools does not prove Lux lacks an adapter.
 
-For a local coding agent with terminal access, locate the user's actual Lux checkout. Check the current workspace and supplied project paths for `scripts/studio-mcp.mjs`; do not assume a particular username, drive, or `.worktrees/tracer` directory exists. Launch that **adapter only**, with the project's installed Node version and dependencies:
+For a local coding agent with terminal access, locate the Lux checkout/build used to launch the current Studio. Use known launch context or inspect its process command line when needed; do not ask the user to reconfirm a path already established. Check that checkout for `scripts/studio-mcp.mjs`; do not assume a particular username, drive, or `.worktrees/tracer` directory exists. Launch that **adapter only**, with the project's installed Node version and dependencies:
 
 ```text
 command: <absolute path to Node executable>
@@ -14,6 +14,8 @@ transport: stdio
 ```
 
 The checked project pins Node 24.12.0. The Windows adapter finds the already-running Studio through `%APPDATA%/Lux/Studio/agent-endpoint.json`. Keep its token private. Do not hand-edit the endpoint or copy it to another host. A remote/cloud agent cannot reach this local session merely by knowing the checkout path. If the checkout or running Studio is unavailable, explain the concrete missing connection; don't install packages or start test apps to work around it without that task being requested.
+
+`discover` reads local adapter-checkout files and can succeed with Studio closed. It does not attest to the open app's build. Even the launching checkout can have changed since its last build. Pair the adapter with known launch/build evidence and actual `read`/`status`/operation results; when they disagree, preserve the source and report or investigate the version mismatch. A newer worktree's discovery does not upgrade the running app.
 
 When no configured MCP client tool is available, a temporary `.mjs` script in the checkout can use the already-installed SDK. This skeleton establishes the connection and reads context; extend it to perform the authorized visual work. It is not necessary to persistently change Codex configuration.
 
@@ -53,7 +55,7 @@ Read live tool schemas if available; these are the checked adapter's contracts. 
 
 | Tool | Arguments and result |
 | --- | --- |
-| `discover` | `{}` → SDK source, example, shared types, imports, capabilities. This can succeed even if Studio is not running. |
+| `discover` | `{}` → adapter-checkout SDK source, example, shared types, imports, declared capabilities. No running-app handshake; can succeed with Studio closed. |
 | `read` | `{}` → `{ source, draftVersion, ..., status }`. Complete source; don't truncate assets/files when storing it for an edit. |
 | `build` | `{ expectedDraftVersion, source }` → `{ draftVersion, status }` after compile/candidate promotion. This is a complete replacement. |
 | `status` | `{}` → snapshot containing `authoring`, which is null before a working runtime exists. |
