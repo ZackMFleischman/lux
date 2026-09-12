@@ -8,7 +8,7 @@ export type Metric = Readonly<{ value: number; sampledAtMs: number; coverage: nu
 export type RuntimeView = RuntimeKey & Readonly<{
   revisionId: string; sceneName: string; authority: 'studio' | 'host';
   playback: 'playing' | 'paused' | 'starting' | 'failed';
-  clockEpoch: number; frameId: string | null; intensity: number;
+  controlSequence?: number; clockEpoch: number; frameId: string | null; intensity: number;
   output: Readonly<Pick<OutputSettings, 'width' | 'height'>>;
   fault: Readonly<{ code: string; message: string }> | null;
 }>;

@@ -1,6 +1,7 @@
 import type { StudioClient, StudioSnapshot, StudioOperation } from './service-client.ts';
 import type { PresentationPort } from './presentation.ts';
 import type { SourceBundle } from '../../../packages/runtime-contracts/src/index.ts';
+import { studioOperationSchema } from './runtime-operations.ts';
 import { DEFAULT_OUTPUT } from '../../../packages/runtime-contracts/src/index.ts';
 export interface AuthoringApi {
   example(): Promise<SourceBundle>;
@@ -25,7 +26,8 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private source: SourceBundle | null = null;
   private busy = false;
   private pending = new Map<string, { resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
-  constructor(private api: AuthoringApi) {}
+  private api: AuthoringApi;
+  constructor(api: AuthoringApi) { this.api = api; }
   getSnapshot = () => this.snapshot;
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
   private publish(patch: Partial<StudioSnapshot>) { this.snapshot = { ...this.snapshot, ...patch, receivedAtMs: Date.now() }; for (const listener of this.listeners) listener(); }
@@ -40,7 +42,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       this.publish({ jobs: [{ jobId, state: 'initializing', summary: 'Preparing preview…' }] });
       await this.start(result.linked.code, result.sourceHash);
       this.source = structuredClone(source);
-      this.publish({ jobs: [{ jobId, state: 'succeeded', summary: 'Visual is running in Lux.' }] });
+      this.publish({ jobs: [{ jobId, state: 'succeeded', summary: 'Visual is ready in Lux.' }] });
     } catch (error) { this.publish({ jobs: [{ jobId, state: 'failed', summary: 'Build failed; previous preview retained.', fault: String(error) }] }); throw error; }
     finally { this.busy = false; }
   }
@@ -52,7 +54,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), watchdog: undefined as any, controls: 0 };
     const previous = this.running;
     const intensity = this.snapshot.authoring?.intensity ?? 0.5;
-    const playing = this.snapshot.authoring?.playback !== 'paused';
+    const playing = this.snapshot.authoring?.playback === 'playing';
     let ready = false;
     try {
       await new Promise<void>((resolve, reject) => {
@@ -79,18 +81,19 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           }
           if (!['ready', 'frame', 'status'].includes(message.type) || !/^\d+$/.test(message.frameId) ||
               !Number.isFinite(message.timeSeconds) || !Number.isSafeInteger(message.clockEpoch) ||
+              !['playing', 'paused'].includes(message.playback) || !Number.isSafeInteger(message.controlSequence) || message.controlSequence < 0 ||
               !Number.isFinite(message.intensity) || message.intensity < 0 || message.intensity > 1) return;
           candidate.lastFrame = performance.now();
           if (message.type === 'ready' && !ready) {
             ready = true; clearTimeout(timer); this.running = candidate;
-            if (previous) { clearInterval(previous.watchdog); previous.worker.terminate(); previous.canvas.remove(); }
+            if (previous) { for (const wait of this.pending.values()) { clearTimeout(wait.timer); wait.reject(Error('Runtime changed before command completed')); } this.pending.clear(); clearInterval(previous.watchdog); previous.worker.terminate(); previous.canvas.remove(); }
             this.target?.appendChild(canvas);
             resolve();
           }
           if (this.running !== candidate) return;
           this.publish({ authoring: { instanceId: candidate.instanceId, generation: candidate.generation, revisionId,
             sceneName: 'Untitled visual', authority: 'studio', playback: message.playback,
-            clockEpoch: message.clockEpoch, frameId: message.frameId, intensity: message.intensity,
+            controlSequence: message.controlSequence, clockEpoch: message.clockEpoch, frameId: message.frameId, intensity: message.intensity,
             output: { width: 1920, height: 1080 }, fault: null } });
           const wait = this.pending.get(message.requestId);
           if (wait) { clearTimeout(wait.timer); this.pending.delete(message.requestId); wait.resolve(message); }
@@ -112,15 +115,19 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     if (this.snapshot.authoring) this.publish({ authoring: { ...this.snapshot.authoring, playback: 'failed', fault: { code: 'RUNTIME_FAILED', message } } });
   }
   async invoke(operation: StudioOperation): Promise<unknown> {
+    operation = studioOperationSchema.parse(operation);
     const runtime = this.running, input = operation.input;
+    if (this.snapshot.authoring?.authority !== 'studio') throw Error('Authority conflict: Studio cannot control this instance');
+    if (this.busy) throw Error('A visual build is already running');
     if (!runtime || input.instanceId !== runtime.instanceId || input.expectedGeneration !== runtime.generation) throw Error('Runtime changed; retry using its current state');
-    if (operation.name === 'lux.runtime.restart') { if (!this.source) throw Error('No visual to restart'); return this.submit(this.source); }
+    if (operation.name === 'lux.runtime.restart') { if (!this.source) throw Error('No visual to restart'); await this.submit(this.source); return this.snapshot.authoring; }
     if (this.snapshot.authoring?.playback === 'failed') throw Error('Restart the failed runtime first');
     let message;
     if (operation.name === 'lux.parameters.set') {
-      if (operation.input.expectedRevisionId !== runtime.revisionId || !Number.isFinite(operation.input.values.intensity) || operation.input.values.intensity < 0 || operation.input.values.intensity > 1) throw Error('Invalid control write');
+      if (operation.input.expectedRevisionId !== runtime.revisionId) throw Error('Revision changed; read current runtime state');
       message = { type: 'controls', values: operation.input.values, controlSequence: ++runtime.controls };
     } else message = { type: 'playback', action: operation.input.action };
+    if (this.pending.has(input.requestId)) throw Error('Request ID already pending');
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => { this.pending.delete(input.requestId); reject(Error('Runtime command timed out')); }, 5000);
       this.pending.set(input.requestId, { resolve, reject, timer });
