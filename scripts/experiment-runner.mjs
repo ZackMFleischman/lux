@@ -84,7 +84,7 @@ export async function runExperiment(options = {}) {
     started = true;
     await powershell(['-ExecutionPolicy', 'Bypass', '-File', join(here, 'experiment-job.ps1'), '-Config', join(directory, 'config.json')], {
       timeout: timeoutMs + 15000,
-      env: { ...process.env, LUX_EXPERIMENT_RUN_ID: id, LUX_EXPERIMENT_MODE: mode, LUX_EXPERIMENT_DIRECTORY: directory },
+      env: { ...process.env, LUX_EXPERIMENT_RUN_ID: id, LUX_EXPERIMENT_MODE: mode, LUX_EXPERIMENT_DIRECTORY: directory, LUX_EXPERIMENT_TIMEOUT_MS: String(timeoutMs) },
     });
     const child = JSON.parse(await readFile(join(directory, 'child.json'), 'utf8'));
     const result = JSON.parse(await readFile(join(directory, 'result.json'), 'utf8'));
