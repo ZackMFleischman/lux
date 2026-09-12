@@ -50,18 +50,18 @@ export function StudioDockShell({ compact, ...content }: { compact: boolean } & 
   }
   const nonce = document.querySelector<HTMLMetaElement>('meta[name="style-nonce"]')?.content ?? '';
   return <div className={`studio-dock-shell ${compact ? 'dock-compact' : ''}`}>
-    <details className="layout-tools" hidden={compact}><summary>View & layouts</summary>
+    <details className="layout-tools" hidden={compact}><summary>View & layouts</summary><div className="layout-tools-content">
       <div className="layout-actions" aria-label="Add panel">{kinds.map(kind => <Button key={kind} onClick={() => action(value => value.open(kind))}>Open {registry.get(kind).title}</Button>)}</div>
       <div className="layout-actions"><TextField size="small" label="Layout name" value={name} onChange={event => setName(event.target.value)} />
         <Button onClick={() => action(value => { value.save(name); setMessage(`Saved layout: ${name}`); })}>Save layout</Button>
         <Button onClick={() => action(value => { const result = value.restore(name); setMessage(result.restored ? `Restored layout: ${name}` : result.reason ?? 'Default layout restored'); })}>Restore layout</Button>
         <Button onClick={() => reset('desktop')}>Reset desktop layout</Button><Button onClick={() => reset('laptop')}>Reset laptop layout</Button></div>
-      <div className="layout-actions"><label>Move panel <select value={panel} onChange={event => setPanel(event.target.value as Kind)}>{kinds.map(kind => <option key={kind}>{kind}</option>)}</select></label>
-        <label>Relative to <select value={reference} onChange={event => setReference(event.target.value as Kind)}>{kinds.map(kind => <option key={kind}>{kind}</option>)}</select></label>
+      <div className="layout-actions"><label>Move panel <select aria-label="Move panel" value={panel} onChange={event => setPanel(event.target.value as Kind)}>{kinds.map(kind => <option key={kind}>{kind}</option>)}</select></label>
+        <label>Relative to <select aria-label="Relative to" value={reference} onChange={event => setReference(event.target.value as Kind)}>{kinds.map(kind => <option key={kind}>{kind}</option>)}</select></label>
         {(['left', 'right', 'top', 'bottom', 'center'] as const).map(position => <Button key={position} onClick={() => action(value => value.move(panel, reference, position))}>Move {position === 'center' ? 'to tab group' : position}</Button>)}
         <Button onClick={() => action(value => value.close(panel))}>Close selected panel</Button></div>
       {message && <Alert severity="info" role="status">{message}</Alert>}
-    </details>
+    </div></details>
     <div className="studio-dock-grid" hidden={compact}><LuxDockLayout registry={registry} panels={panels} storage={storage} nonce={nonce} mode={mode}
       onReady={(value, result) => { adapter.current = value; if (result.reason && result.reason !== 'No saved personal layout') setMessage(result.reason); }} /></div>
     <div className="studio-expanded-pane" hidden={!compact} ref={expanded} />

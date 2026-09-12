@@ -1,0 +1,26 @@
+{
+  "ok": true,
+  "checks": [
+    "Saved desktop arrangement restores actual pane bounds and original canvas/editor",
+    "Actual pointer drag docks Source as a Preview tab and restores without replacing owners",
+    "Actual pointer split resizing changes pane width and retains output/editor",
+    "Closing and reopening Preview retains the original live canvas",
+    "Laptop tabs switch between real Source and Preview with owners intact",
+    "Actual GPU preview keeps animating after close/reopen and layout changes"
+  ],
+  "errors": [],
+  "restoredBounds": {
+    "before": {
+      "x": 0,
+      "y": 164.27500915527344,
+      "width": 396,
+      "height": 461.00001525878906
+    },
+    "after": {
+      "x": 0,
+      "y": 164.27500915527344,
+      "width": 396,
+      "height": 461.00001525878906
+    }
+  }
+}
