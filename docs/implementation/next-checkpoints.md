@@ -108,3 +108,14 @@ User feedback: properties should dominate the Inspector. Performance, Runtime an
 C11 closeout: native tests ran serially and closed owned Electron windows; process inspection showed no Electron/Avenue/Arena. Coordinator inspected desktop/laptop screenshots and independently reviewed the separate editor implementation against admission, composition and undo tests. The12-line handler fixes Chromium selected-text formatting without changing CSP. MCP restart request-to-ready sample241ms is not physical-stop/host-consumed recovery evidence. New test export remains uninstalled.
 
 C15 isolated checkpoint-asset-authoring commit8e99781 passes73Studio+8editor CPU tests and root/Studio typechecks. Independent review found no blockers; discovery now distinguishes per-file and total asset byte limits from shared constants. Playback remains explicitly gated until C16; save/read support does not imply images render.
+
+## C20: live AI source proposals — DESIGN FOLLOW-UP
+
+User likes seeing generated code appear in real time. Schedule after the first
+usable asset workflow: a labeled proposal tab streams genuine updates while
+authoritative files remain independently editable and the last-good visual runs.
+No focus stealing, implicit overwrite or per-chunk builds. Final candidate
+validation plus baseline draft version gates promotion; conflicts remain visible.
+Current complete-source MCP calls need an incremental protocol or streaming
+integration for this behavior. Roadmap records cancellation, ordering, quotas,
+multi-file/assets and undo requirements. No implementation claimed.
