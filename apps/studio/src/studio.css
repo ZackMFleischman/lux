@@ -64,3 +64,8 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 /* Both file and asset groups stay reachable when the Source pane is short. */
 .source-files{overflow:auto}
 .asset-thumbnail,.asset-image-area{background-color:#20232c;background-image:conic-gradient(#343845 25%,transparent 0 50%,#343845 0 75%,transparent 0);background-size:12px 12px}
+/* Fit the actual output inside the entire remaining pane. object-fit on the
+   consumer handles its aspect ratio; no second fixed-ratio box or caption row. */
+.studio .preview-area{position:relative;padding:0;align-items:stretch;justify-content:flex-start}
+.studio .preview-surface{flex:1;width:100%;height:100%;aspect-ratio:auto;max-height:none;min-height:0;border:0;border-radius:0;box-shadow:none}
+.studio .preview-caption{position:absolute;width:1px;height:1px;min-height:0;max-width:none;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}

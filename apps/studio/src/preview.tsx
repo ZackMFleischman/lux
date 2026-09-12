@@ -34,7 +34,7 @@ export function Preview({ runtime, port, moved, onDock, onError }: {
   }, [runtime?.instanceId, runtime?.generation, port, moved, onError]);
   const output = runtime?.output ?? DEFAULT_OUTPUT;
   return <div className="preview-area">
-    <div className="preview-surface" ref={target} aria-label="Final authoring output" data-output-width={output.width} data-output-height={output.height}>
+    <div className="preview-surface" ref={target} aria-label="Final authoring output" title={`Output ${output.width} × ${output.height} · Fit to view`} data-output-width={output.width} data-output-height={output.height}>
       {state !== 'attached' && <div className="preview-empty">
         <div className="preview-mark" aria-hidden="true">L</div>
         <h1>{moved ? 'Preview in separate window' : state === 'attaching' ? 'Attaching preview' : state === 'failed' ? 'Preview unavailable' : 'Awaiting runtime'}</h1>
