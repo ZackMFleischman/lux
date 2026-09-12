@@ -48,12 +48,17 @@ for (const [name, value] of Object.entries({ visualStudio: toolchain.visualStudi
   check(name, value ? 'pass' : 'unavailable', value || 'TR-01 prerequisite missing: Visual Studio C++ workload/CMake and SDK 10.0.26100.0');
 }
 // Never require('electron') during inventory: newer packages download implicitly.
-const electronDirectory = dirname(require.resolve('electron'));
-const electronPathFile = resolve(electronDirectory, 'path.txt');
-const electronPath = existsSync(electronPathFile) ? resolve(electronDirectory, 'dist', readFileSync(electronPathFile, 'utf8').trim()) : null;
-const electron = electronPath && existsSync(electronPath)
-  ? run(electronPath, ['-p', 'JSON.stringify(process.versions)'], { env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' } })
-  : { command: [], status: null, stdout: '', stderr: 'Run node node_modules/electron/install.js to install the exact pinned binary explicitly' };
+let electron = { command: [], status: null, stdout: '', stderr: 'Run node node_modules/electron/install.js to install the exact pinned binary explicitly' };
+try {
+  const electronDirectory = dirname(require.resolve('electron'));
+  const electronPathFile = resolve(electronDirectory, 'path.txt');
+  const electronPath = existsSync(electronPathFile) ? resolve(electronDirectory, 'dist', readFileSync(electronPathFile, 'utf8').trim()) : null;
+  if (electronPath && existsSync(electronPath)) {
+    electron = run(electronPath, ['-p', 'JSON.stringify(process.versions)'], { env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' } });
+  }
+} catch (error) {
+  electron.stderr = `TR-01 prerequisite: pnpm install --frozen-lockfile, then install the pinned Electron binary; ${error.message}`;
+}
 discovery.push(electron);
 let electronRuntime = null;
 try { if (electron.status === 0) electronRuntime = JSON.parse(electron.stdout); } catch { /* explicit check below */ }

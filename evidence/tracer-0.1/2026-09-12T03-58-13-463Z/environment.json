@@ -1,0 +1,310 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "ab6e699582fb89a6b810da7b3161a24fb4e75066",
+  "host": {
+    "executable": "C:/Program Files/Resolume Avenue/Avenue.exe",
+    "version": "7.27.1.15990",
+    "refreshHz": null,
+    "pluginDirectory": null
+  },
+  "adapters": {
+    "rendererLuid": null,
+    "bridgeLuid": null,
+    "hostLuid": null
+  },
+  "versions": {
+    "node": "24.12.0",
+    "pnpm": "10.33.0",
+    "three": "0.186.0",
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "typescript": "7.0.2",
+    "zod": "3.25.76",
+    "visualStudio": "18.1.11312.151",
+    "compiler": "19.50.35721.0",
+    "cmake": "cmake version 4.1.1-msvc1",
+    "windowsSdk": "10.0.26100.0"
+  },
+  "mcp": {
+    "profile": "2025-11-25",
+    "client": null,
+    "imageObserved": false
+  },
+  "checks": [
+    {
+      "name": "Windows inventory",
+      "outcome": "pass",
+      "evidence": "{\"caption\":\"Microsoft Windows 11 Pro\",\"architecture\":\"64-bit\",\"build\":\"26200\",\"version\":\"10.0.26200\"}"
+    },
+    {
+      "name": "native x64 process",
+      "outcome": "pass",
+      "evidence": "win32/x64"
+    },
+    {
+      "name": "dependency electron",
+      "outcome": "fail",
+      "evidence": "TR-01 prerequisite: pnpm install --frozen-lockfile; Cannot find module 'electron' (missing dependency regression)"
+    },
+    {
+      "name": "dependency three",
+      "outcome": "pass",
+      "evidence": "0.186.0"
+    },
+    {
+      "name": "dependency @modelcontextprotocol/sdk",
+      "outcome": "pass",
+      "evidence": "1.30.0"
+    },
+    {
+      "name": "dependency typescript",
+      "outcome": "pass",
+      "evidence": "7.0.2"
+    },
+    {
+      "name": "dependency zod",
+      "outcome": "pass",
+      "evidence": "3.25.76"
+    },
+    {
+      "name": "pinned development tools",
+      "outcome": "pass",
+      "evidence": "Node 24.12.0; pnpm 10.33.0"
+    },
+    {
+      "name": "visualStudio",
+      "outcome": "pass",
+      "evidence": "18.1.11312.151"
+    },
+    {
+      "name": "compiler",
+      "outcome": "pass",
+      "evidence": "19.50.35721.0"
+    },
+    {
+      "name": "cmake",
+      "outcome": "pass",
+      "evidence": "cmake version 4.1.1-msvc1"
+    },
+    {
+      "name": "windowsSdk",
+      "outcome": "pass",
+      "evidence": "10.0.26100.0"
+    },
+    {
+      "name": "Electron executable version tuple",
+      "outcome": "unavailable",
+      "evidence": "TR-01 prerequisite: pnpm install --frozen-lockfile, then install the pinned Electron binary; Cannot find module 'electron' (missing dependency regression)"
+    },
+    {
+      "name": "native QPC smoke",
+      "outcome": "pass",
+      "evidence": "{\"target\":\"lux_native_smoke\",\"architecture\":\"x64\",\"qpcFrequency\":10000000,\"compiler\":195035721,\"gpuTested\":false,\"hostTested\":false}"
+    },
+    {
+      "name": "host executable inventory",
+      "outcome": "pass",
+      "evidence": "C:/Program Files/Resolume Avenue/Avenue.exe: 7.27.1.15990"
+    },
+    {
+      "name": "host plugin directory",
+      "outcome": "unavailable",
+      "evidence": "Requires actual host preference observation; no host settings changed"
+    },
+    {
+      "name": "host refresh",
+      "outcome": "unavailable",
+      "evidence": "Requires actual host/display measurement; inventory cannot prove 60 Hz"
+    },
+    {
+      "name": "adapter selection",
+      "outcome": "unavailable",
+      "evidence": "TR-02 must record renderer/bridge/host DXGI LUIDs and reject mismatch"
+    },
+    {
+      "name": "GPU timestamp queries",
+      "outcome": "unavailable",
+      "evidence": "TR-02 must probe selected device feature, enable it, and establish full timing coverage"
+    },
+    {
+      "name": "trace capability",
+      "outcome": "unavailable",
+      "evidence": "TR-02 must discover runtime trace categories and record selected process coverage"
+    },
+    {
+      "name": "external client image observation",
+      "outcome": "unavailable",
+      "evidence": "Run pnpm test:mcp -- --profile-fixture, then record separate actual client image observation; automated image decoding is insufficient"
+    }
+  ],
+  "capturedAt": "2026-09-12T03:58:13.453Z",
+  "sourceTreeDirty": true,
+  "sourceFileHashes": {
+    "package.json": "25a485c99a0cadeb7d2bdf598de402905997e33dbc4df171d829a7f494ea0b6e",
+    "pnpm-lock.yaml": "43d7985b9cee08ce0e3970cf5a99e8fe53528f1b59cf66e3b336703af9aa17b3",
+    "scripts/preflight.mjs": "291f3fab35813ca3b61ac7d3871a177742d518515ae420703606755ed9d7fbdd",
+    "scripts/collect-windows.ps1": "0ac73cfe061d31099e8d222459ecdd71f3ac03049126bc47f232a1fe92b1fc3c",
+    "scripts/native-build.ps1": "fd42509ff7a368f3df22a7f9bf91d41ca216c7eab871fb111e1bc1ef93de71eb",
+    "native/CMakeLists.txt": "f69afa49dd83d58f30689bb14a1ca4034c5b28b72cbdf4758b724da9b40537c4",
+    "native/smoke.cc": "80e7535fd1c4a276ac5069eef49f5fd2f5e4934e6da980518fe9297f00520d07",
+    "packages/runtime-contracts/src/telemetry.ts": "6c71c168f20762439aec9bd32e1d0c6dc0a051f16b7ee1544ec9027734f26902"
+  },
+  "inventory": {
+    "toolchain": {
+      "installation": "C:\\Program Files (x86)\\Microsoft Visual Studio\\18\\BuildTools",
+      "cmake": "cmake version 4.1.1-msvc1",
+      "windowsSdk": "10.0.26100.0",
+      "visualStudio": "18.1.11312.151",
+      "compiler": {
+        "version": "19.50.35721.0",
+        "path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\18\\BuildTools\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe"
+      }
+    },
+    "host": {
+      "executable": "C:/Program Files/Resolume Avenue/Avenue.exe",
+      "version": "7.27.1.15990"
+    },
+    "cpu": [
+      {
+        "Name": "Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz",
+        "Architecture": 9,
+        "NumberOfCores": 6,
+        "NumberOfLogicalProcessors": 12
+      }
+    ],
+    "gpus": [
+      {
+        "Name": "NVIDIA GeForce RTX 2070",
+        "DriverVersion": "32.0.15.9144",
+        "PNPDeviceID": "PCI\\VEN_10DE&DEV_1F14&SUBSYS_12B81462&REV_A1\\4&231A6B39&0&0008"
+      },
+      {
+        "Name": "Intel(R) UHD Graphics",
+        "DriverVersion": "26.20.100.7642",
+        "PNPDeviceID": "PCI\\VEN_8086&DEV_9BC4&SUBSYS_12B81462&REV_05\\3&11583659&0&10"
+      }
+    ],
+    "os": {
+      "caption": "Microsoft Windows 11 Pro",
+      "architecture": "64-bit",
+      "build": "26200",
+      "version": "10.0.26200"
+    }
+  },
+  "electronRuntime": null,
+  "nativeSmoke": {
+    "target": "lux_native_smoke",
+    "architecture": "x64",
+    "qpcFrequency": 10000000,
+    "compiler": 195035721,
+    "gpuTested": false,
+    "hostTested": false
+  },
+  "dependencyPins": {
+    "schemaVersion": 1,
+    "profile": "MCP 2025-11-25 legacy stdio; no 2026 envelope mixing",
+    "electron": {
+      "version": "44.3.0",
+      "license": "MIT",
+      "source": "https://releases.electronjs.org/release/v44.3.0",
+      "expectedChromium": "152.0.7977.78",
+      "expectedNode": "24.20.0",
+      "nativeAbi": "Record process.versions.modules from installed Electron; native addon not built in TR-01"
+    },
+    "three": {
+      "version": "0.186.0",
+      "license": "MIT",
+      "source": "https://registry.npmjs.org/three/0.186.0"
+    },
+    "mcp": {
+      "version": "1.30.0",
+      "license": "MIT",
+      "source": "https://github.com/modelcontextprotocol/typescript-sdk/releases"
+    },
+    "ffgl": {
+      "tag": "v2.2",
+      "commit": "fda8d4a5904eaf09dd97ac0f95c246bd7f9f9a46",
+      "license": "BSD-3-Clause",
+      "source": "https://github.com/resolume/ffgl",
+      "abi": "Windows x64 FFGL 2.2; verify host ABI in TR-02; not downloaded or linked in TR-01"
+    },
+    "spout": {
+      "tag": "2.007.017",
+      "commit": "f49e2f469f8cb25f559a6eaa61a3f5b8173fc100",
+      "license": "BSD-2-Clause",
+      "source": "https://github.com/leadedge/Spout2",
+      "abi": "Windows x64; same-adapter D3D/GL interop must be exercised in TR-02; not linked in TR-01"
+    },
+    "adapterSelection": "Unselected until renderer, bridge and host LUIDs are measured. GPU name is inventory only."
+  },
+  "build": {
+    "configuration": "Release",
+    "architecture": "x64",
+    "generator": "Visual Studio 18 2026",
+    "toolset": "v145,version=14.50.35717",
+    "windowsSdk": "10.0.26100.0"
+  },
+  "discovery": [
+    {
+      "command": [
+        "git",
+        "-c",
+        "safe.directory=C:/Users/zFlei/repos/lux/.worktrees/tr01-harness",
+        "rev-parse",
+        "HEAD"
+      ],
+      "status": 0,
+      "stdout": "ab6e699582fb89a6b810da7b3161a24fb4e75066",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "safe.directory=C:/Users/zFlei/repos/lux/.worktrees/tr01-harness",
+        "status",
+        "--porcelain"
+      ],
+      "status": 0,
+      "stdout": "M scripts/preflight.mjs\n M tests/mcp/profile-fixture.test.ts\n?? evidence/tracer-0.1/2026-09-12T03-57-11-097Z/\n?? tests/unit/fixtures/\n?? tests/unit/preflight-missing-electron.test.ts",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "powershell",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr01-harness\\scripts\\collect-windows.ps1"
+      ],
+      "status": 0,
+      "stdout": "{\r\n    \"toolchain\":  {\r\n                      \"installation\":  \"C:\\\\Program Files (x86)\\\\Microsoft Visual Studio\\\\18\\\\BuildTools\",\r\n                      \"cmake\":  \"cmake version 4.1.1-msvc1\",\r\n                      \"windowsSdk\":  \"10.0.26100.0\",\r\n                      \"visualStudio\":  \"18.1.11312.151\",\r\n                      \"compiler\":  {\r\n                                       \"version\":  \"19.50.35721.0\",\r\n                                       \"path\":  \"C:\\\\Program Files (x86)\\\\Microsoft Visual Studio\\\\18\\\\BuildTools\\\\VC\\\\Tools\\\\MSVC\\\\14.50.35717\\\\bin\\\\Hostx64\\\\x64\\\\cl.exe\"\r\n                                   }\r\n                  },\r\n    \"host\":  {\r\n                 \"executable\":  \"C:/Program Files/Resolume Avenue/Avenue.exe\",\r\n                 \"version\":  \"7.27.1.15990\"\r\n             },\r\n    \"cpu\":  [\r\n                {\r\n                    \"Name\":  \"Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz\",\r\n                    \"Architecture\":  9,\r\n                    \"NumberOfCores\":  6,\r\n                    \"NumberOfLogicalProcessors\":  12\r\n                }\r\n            ],\r\n    \"gpus\":  [\r\n                 {\r\n                     \"Name\":  \"NVIDIA GeForce RTX 2070\",\r\n                     \"DriverVersion\":  \"32.0.15.9144\",\r\n                     \"PNPDeviceID\":  \"PCI\\\\VEN_10DE\\u0026DEV_1F14\\u0026SUBSYS_12B81462\\u0026REV_A1\\\\4\\u0026231A6B39\\u00260\\u00260008\"\r\n                 },\r\n                 {\r\n                     \"Name\":  \"Intel(R) UHD Graphics\",\r\n                     \"DriverVersion\":  \"26.20.100.7642\",\r\n                     \"PNPDeviceID\":  \"PCI\\\\VEN_8086\\u0026DEV_9BC4\\u0026SUBSYS_12B81462\\u0026REV_05\\\\3\\u002611583659\\u00260\\u002610\"\r\n                 }\r\n             ],\r\n    \"os\":  {\r\n               \"caption\":  \"Microsoft Windows 11 Pro\",\r\n               \"architecture\":  \"64-bit\",\r\n               \"build\":  \"26200\",\r\n               \"version\":  \"10.0.26200\"\r\n           }\r\n}",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "powershell",
+        "-NoProfile",
+        "-Command",
+        "pnpm --version"
+      ],
+      "status": 0,
+      "stdout": "10.33.0",
+      "stderr": ""
+    },
+    {
+      "command": [],
+      "status": null,
+      "stdout": "",
+      "stderr": "TR-01 prerequisite: pnpm install --frozen-lockfile, then install the pinned Electron binary; Cannot find module 'electron' (missing dependency regression)"
+    },
+    {
+      "command": [
+        "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr01-harness\\native\\build\\Release\\lux_native_smoke.exe"
+      ],
+      "status": 0,
+      "stdout": "{\"target\":\"lux_native_smoke\",\"architecture\":\"x64\",\"qpcFrequency\":10000000,\"compiler\":195035721,\"gpuTested\":false,\"hostTested\":false}",
+      "stderr": ""
+    }
+  ]
+}
