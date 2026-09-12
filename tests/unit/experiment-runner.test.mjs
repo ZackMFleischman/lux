@@ -1,9 +1,37 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, open, unlink } from 'node:fs/promises';
+import { mkdtemp, readFile, open, unlink, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { runExperiment, lockPath } from '../../scripts/experiment-runner.mjs';
+import { runExperiment, lockPath, assertNoConflictingActivity, validateReviewedInputs } from '../../scripts/experiment-runner.mjs';
+
+test('actual Resolume Avenue and Arena processes block experiments', () => {
+  for (const Name of ['Avenue.exe', 'Arena.exe', 'AVENUE.EXE', 'ResolumeArena.exe', 'electron.exe', 'standalone_host.exe']) {
+    assert.throws(() => assertNoConflictingActivity([{ Name, ProcessId: 123 }]), /Conflicting/);
+  }
+  assert.doesNotThrow(() => assertNoConflictingActivity([{ Name: 'notepad.exe', ProcessId: 12 }]));
+});
+
+test('review revalidation detects intervening source/binary mutation and expiry without launching', async () => {
+  const folder = await mkdtemp(join(tmpdir(), 'lux-review-test-'));
+  const source = join(folder, 'source.txt'), binary = join(folder, 'binary.txt');
+  await writeFile(source, 'source'); await writeFile(binary, 'binary');
+  const digest = text => createHash('sha256').update(text).digest('hex');
+  const review = { authorized: true, reviewer: 'test', hypothesis: 'CPU data validation', hostClosedConfirmed: true,
+    expiresUtc: new Date(Date.now() + 60000).toISOString(), executable: binary, args: [],
+    sources: [{ path: source, sha256: digest('source') }], binaries: [{ path: binary, sha256: digest('binary') }] };
+  await validateReviewedInputs(review);
+  await writeFile(source, 'modified');
+  await assert.rejects(validateReviewedInputs(review), /hash mismatch/);
+  await writeFile(source, 'source'); await writeFile(binary, 'modified');
+  await assert.rejects(validateReviewedInputs(review), /hash mismatch/);
+  await writeFile(binary, 'binary');
+  review.expiresUtc = new Date(Date.now() + 100).toISOString();
+  await validateReviewedInputs(review);
+  await new Promise(resolve => setTimeout(resolve, 120));
+  await assert.rejects(validateReviewedInputs(review), /expired/);
+});
 
 test('CPU runs record provenance, failure, deadline and refuse competing owners', async () => {
   const output = await mkdtemp(join(tmpdir(), 'lux-run-test-'));
@@ -15,6 +43,7 @@ test('CPU runs record provenance, failure, deadline and refuse competing owners'
   assert.equal(ok.binary.sha256.length, 64);
   assert.ok(ok.sources.length > 0);
   assert.match(await readFile(join(ok.directory, 'stdout.log'), 'utf8'), /cpu fixture/);
+  assert.match(await readFile(join(ok.directory, 'stdout.log'), 'utf8'), new RegExp(ok.id));
   const fail = await runExperiment({ mode: 'cpu', fixture: 'failure', output });
   assert.equal(fail.exitCode, 7);
   assert.equal(fail.outcome, 'failure');

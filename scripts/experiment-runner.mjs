@@ -11,6 +11,24 @@ const root = resolve(here, '..');
 export const lockPath = join(homedir(), 'AppData', 'Local', 'Lux', 'experiment.lock');
 const stamp = () => ({ utc: new Date().toISOString(), monotonicNs: process.hrtime.bigint().toString() });
 const hash = async path => ({ path: resolve(path), sha256: createHash('sha256').update(await readFile(path)).digest('hex') });
+export function assertNoConflictingActivity(processes) {
+  const activity = processes.filter(p => /^(Avenue|Arena|Resolume.*|electron|standalone_host|lux[-_].*)\.exe$/i.test(p.Name));
+  if (activity.length) throw new Error(`Conflicting host/standalone activity: ${activity.map(p => `${p.Name} PID ${p.ProcessId}`).join(', ')}`);
+}
+export async function validateReviewedInputs(review) {
+  if (review.authorized !== true || !review.reviewer || !review.hypothesis || review.hostClosedConfirmed !== true || !Array.isArray(review.sources) || !review.sources.length || !Array.isArray(review.binaries) || !review.binaries.length || !Array.isArray(review.args)) throw new Error('Incomplete hardware review');
+  const checkExpiry = () => { if (!Number.isFinite(Date.parse(review.expiresUtc)) || Date.parse(review.expiresUtc) <= Date.now()) throw new Error('Hardware review expired'); };
+  checkExpiry();
+  const executable = resolve(review.executable);
+  if (!review.args.every(a => typeof a === 'string')) throw new Error('Review arguments must be strings');
+  for (const entry of [...review.sources, ...review.binaries]) if ((await hash(entry.path)).sha256 !== entry.sha256) throw new Error(`Reviewed hash mismatch: ${entry.path}`);
+  const reviewedExecutable = review.binaries.find(b => resolve(b.path) === executable);
+  if (!reviewedExecutable) throw new Error('Executable missing from reviewed binaries');
+  const binary = await hash(executable);
+  if (binary.sha256 !== reviewedExecutable.sha256) throw new Error('Executable hash mismatch');
+  checkExpiry();
+  return binary;
+}
 function quote(value) { return '"' + value.replace(/(\\*)"/g, '$1$1\\"').replace(/(\\+)$/g, '$1$1') + '"'; }
 function powershell(args, { timeout = 15000, env = process.env } = {}) {
   return new Promise((res, rej) => {
@@ -33,12 +51,8 @@ export async function runExperiment(options = {}) {
     if (!['success', 'failure', 'timeout'].includes(fixture)) throw new Error('Unknown CPU fixture');
   } else {
     review = JSON.parse(await readFile(options.reviewFile, 'utf8'));
-    if (review.authorized !== true || !review.reviewer || !review.hypothesis || !review.hostClosedConfirmed || !Array.isArray(review.sources) || !review.sources.length || !Array.isArray(review.binaries) || !review.binaries.length || !Array.isArray(review.args)) throw new Error('Incomplete hardware review');
-    if (!Number.isFinite(Date.parse(review.expiresUtc)) || Date.parse(review.expiresUtc) <= Date.now()) throw new Error('Hardware review expired');
+    await validateReviewedInputs(review);
     executable = resolve(review.executable); args = review.args;
-    if (!args.every(a => typeof a === 'string')) throw new Error('Review arguments must be strings');
-    for (const entry of [...review.sources, ...review.binaries]) if ((await hash(entry.path)).sha256 !== entry.sha256) throw new Error(`Reviewed hash mismatch: ${entry.path}`);
-    if (!review.binaries.some(b => resolve(b.path) === executable)) throw new Error('Executable missing from reviewed binaries');
   }
   await mkdir(dirname(lockPath), { recursive: true });
   let lock;
@@ -50,11 +64,11 @@ export async function runExperiment(options = {}) {
     await lock.writeFile(JSON.stringify({ id, pid: process.pid, start: manifest.start, directory }));
     await mkdir(directory, { recursive: true });
     // Read-only inspection, including outside this runner. Failure to inspect refuses execution.
-    const activityRaw = await powershell(['-Command', "@(Get-CimInstance Win32_Process -ErrorAction Stop | Where-Object { $_.Name -match '^(Resolume.*|electron|standalone_host|lux[-_].*)\\.exe$' } | Select-Object ProcessId,Name,ExecutablePath) | ConvertTo-Json -Compress"]);
+    const activityRaw = await powershell(['-Command', "@(Get-CimInstance Win32_Process -ErrorAction Stop | Select-Object ProcessId,Name,ExecutablePath) | ConvertTo-Json -Compress"]);
     const parsedActivity = activityRaw.trim() ? JSON.parse(activityRaw) : [];
     const activity = Array.isArray(parsedActivity) ? parsedActivity : [parsedActivity];
     manifest.activity = activity;
-    if (activity.length) throw new Error(`Conflicting host/standalone activity: ${activity.map(p => `${p.Name} PID ${p.ProcessId}`).join(', ')}`);
+    assertNoConflictingActivity(activity);
     manifest.binary = await hash(executable);
     const sourcePaths = [fileURLToPath(import.meta.url), join(here, 'experiment-job.cs'), join(here, 'experiment-job.ps1'), join(here, 'experiment-cpu-fixture.mjs')];
     manifest.sources = await Promise.all(sourcePaths.map(hash));
@@ -64,10 +78,13 @@ export async function runExperiment(options = {}) {
     await writeFile(join(directory, 'config.json'), JSON.stringify(config, null, 2));
     manifest.outcome = 'running';
     await writeFile(join(directory, 'manifest.json'), JSON.stringify(manifest, null, 2));
+    // Inspection and metadata I/O can take seconds. Check the same review again
+    // at dispatch, including expiry after all file reads and executable bytes.
+    if (review) manifest.binary = await validateReviewedInputs(review);
     started = true;
     await powershell(['-ExecutionPolicy', 'Bypass', '-File', join(here, 'experiment-job.ps1'), '-Config', join(directory, 'config.json')], {
       timeout: timeoutMs + 15000,
-      env: { ...process.env, LUX_EXPERIMENT_RUN_ID: id, LUX_EXPERIMENT_MODE: mode },
+      env: { ...process.env, LUX_EXPERIMENT_RUN_ID: id, LUX_EXPERIMENT_MODE: mode, LUX_EXPERIMENT_DIRECTORY: directory },
     });
     const child = JSON.parse(await readFile(join(directory, 'child.json'), 'utf8'));
     const result = JSON.parse(await readFile(join(directory, 'result.json'), 'utf8'));
