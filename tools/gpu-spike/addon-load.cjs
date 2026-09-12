@@ -1,0 +1,1 @@
+const fs=require('fs');fs.writeFileSync('addon-entered.txt',JSON.stringify(process.versions));require('../../native/build/Release/lux_texture_bridge.node');fs.appendFileSync('addon-entered.txt','loaded');require('electron').app.exit(0);

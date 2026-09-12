@@ -11,10 +11,10 @@
   "scripts": {
     "preflight": "node scripts/preflight.mjs",
     "typecheck": "tsc --noEmit",
-    "test:unit": "node --test tests/unit/*.test.ts",
-    "build": "tsc -p tsconfig.build.json",
+    "test:unit": "node --test tests/unit/*.test.ts tests/unit/*.test.mjs",
+    "build": "tsc -p tsconfig.build.json && node tools/gpu-spike/build.mjs",
     "native:build": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/native-build.ps1",
-    "test:gpu": "node scripts/unavailable.mjs TR-02 actual-GPU-and-FFGL-transfer",
+    "test:gpu": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-gpu.ps1",
     "test:mcp": "node scripts/test-mcp.mjs",
     "test:studio": "node scripts/unavailable.mjs TR-05 Electron-studio-and-core",
     "test:host": "node scripts/unavailable.mjs TR-06 live-Resolume-and-native-plugin",

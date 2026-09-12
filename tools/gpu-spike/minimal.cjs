@@ -1,0 +1,1 @@
+const {app,BrowserWindow}=require('electron');const fs=require('fs');fs.writeFileSync('minimal-entered.txt','entered');app.whenReady().then(()=>{const w=new BrowserWindow({show:false,webPreferences:{sandbox:true}});w.loadURL('data:text/html,test');setTimeout(()=>app.exit(0),3000)});

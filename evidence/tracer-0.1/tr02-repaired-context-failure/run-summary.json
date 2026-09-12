@@ -1,0 +1,59 @@
+{
+  "id": "f7193eb4-6085-4c20-8caa-47cb3c9b73c1",
+  "start": {
+    "utc": "2026-09-12T05:21:43.93Z",
+    "monotonicNs": "2045872208800"
+  },
+  "end": {
+    "utc": "2026-09-12T05:21:49.754Z",
+    "monotonicNs": "2051695927700"
+  },
+  "outcome": "failure",
+  "cleanupComplete": true,
+  "exitCode": 2,
+  "timeoutMs": 20000,
+  "commit": "0163a09e8d22633fb6da3c99526c3956498304c6",
+  "pid": 22288,
+  "binaries": [
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\native\\build\\Release\\LuxTracerTR02.dll",
+      "sha256": "13440a481726246cb7336fd5ede1552d1e45d3241ba7a34f3ed26881c345a30b",
+      "bytes": 463872,
+      "modifiedUtc": "2026-09-12T05:16:09.835Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\native\\build\\Release\\lux_texture_bridge.node",
+      "sha256": "0b1a130954aeb89b2a677a41011af11f6a479838b715cffece41cb761c1dec59",
+      "bytes": 59392,
+      "modifiedUtc": "2026-09-12T05:16:19.261Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\native\\build\\Release\\lux_standalone_host.exe",
+      "sha256": "3e2abffbc3009601a17398a96308924db1cea7f4ba0fcc1fd81c914191379dd4",
+      "bytes": 373760,
+      "modifiedUtc": "2026-09-12T05:13:53.181Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\node_modules\\electron\\dist\\electron.exe",
+      "sha256": "e048632e03fabc96de5e10afbebc0aa31f4e1674155ea3d270597fe7523f9d80",
+      "bytes": 246070272,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\native\\vendor\\node\\node.lib",
+      "sha256": "fc08ff294c2db5f0c9184a60ba52aa756fdada5b458108b6eda2308a3da5e48f",
+      "bytes": 1334576,
+      "modifiedUtc": "2026-09-12T04:10:31.246Z"
+    },
+    {
+      "path": "C:\\Program Files\\nodejs\\node.exe",
+      "sha256": "2ffe3acc0458fdde999f50d11809bbe7c9b7ef204dcf17094e325d26ace101d8",
+      "bytes": 89935872,
+      "modifiedUtc": "2025-12-10T16:59:28Z"
+    }
+  ],
+  "review": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\artifacts\\experiments\\repaired-short-authorized.json",
+    "sha256": "0e8184dde219c26c808b4a9458d27297f1c9e27a2f3c283f0c1d673685f20b64"
+  }
+}

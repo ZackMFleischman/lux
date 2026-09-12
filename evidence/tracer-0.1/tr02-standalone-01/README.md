@@ -1,0 +1,2 @@
+# Standalone experiment 01: failed
+Actual FFGL plugMain loaded in the standalone GL test host (not Resolume). Shared GL context succeeded; NVIDIA adapter LUID matched 0:71045. Three.js186 WebGPU output1920x1080 succeeded. NV registration of an imported named NT texture failed; Win32 error had not yet been logged in this version. No completed consumer frames; transparent black retained. Producer wrote15s summary but did not exit; only experiment PIDs9868,13960,24140 were stopped. Investigating explicit addon resource teardown. No hardware gate passes from this run.
