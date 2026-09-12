@@ -5,6 +5,7 @@
     "Actual pointer drag docks Source as a Preview tab and restores without replacing owners",
     "Actual pointer split resizing changes pane width and retains output/editor",
     "Closing and reopening Preview retains the original live canvas",
+    "Local + picker reopens in the chosen group and moves an existing pane without replacing owners",
     "Laptop tabs switch between real Source and Preview with owners intact",
     "Actual GPU preview keeps animating after close/reopen and layout changes",
     "Both distinct saved fixtures open/build/render in Studio; triangle center and ring hole differ"
@@ -13,15 +14,15 @@
   "restoredBounds": {
     "before": {
       "x": 0,
-      "y": 164.27500915527344,
+      "y": 75,
       "width": 396,
-      "height": 461.00001525878906
+      "height": 580
     },
     "after": {
       "x": 0,
-      "y": 164.27500915527344,
+      "y": 75,
       "width": 396,
-      "height": 461.00001525878906
+      "height": 580
     }
   },
   "fixtureImages": [

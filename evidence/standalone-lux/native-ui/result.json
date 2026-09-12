@@ -2,17 +2,33 @@
   "ok": true,
   "checks": [
     "Real example builds and starts paused",
-    "Three real play/pause cycles: no reset/restart disabled transitions or preview relayout",
+    "Compact application and transport bars; unsupported popout action hidden",
+    "Three real play/pause cycles: no transport disabled transitions or preview relayout",
     "Paused intensity changes preserve layout and transport state",
     "Preview-only fullscreen, fading notice, first Escape exit and original canvas retention",
     "Real CodeMirror syntax colors under CSP; helper draft and undo survive tabs and close/reopen without replacing preview",
+    "File Save and Open round trip the actual edited helper and controls after an intervening draft edit",
     "Studio exports the validated draft and applied intensity through real IPC/compiler/package writer; native folder-picker response supplied by test"
   ],
   "errors": [],
+  "compactGeometry": {
+    "appBar": {
+      "x": 0,
+      "y": 0,
+      "width": 1426.4000244140625,
+      "height": 40
+    },
+    "transport": {
+      "x": 396,
+      "y": 619,
+      "width": 792,
+      "height": 36
+    }
+  },
   "export": {
-    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tracer\\artifacts\\studio-ui\\exports\\2d2549826ffcb8a3f0265e060e89c0b86b4b09ab0a7c6a758c96a08634e2a468",
-    "releaseId": "2d2549826ffcb8a3f0265e060e89c0b86b4b09ab0a7c6a758c96a08634e2a468",
-    "runtimeId": "20c587d4e58f118945180ca4a6c3ae8f669121c947f4e22aec00b0359a1be0c3",
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tracer\\artifacts\\studio-ui\\exports\\7c690a16def0168ac2d79b94fb80748efd5ad9ae2230bb69e6108169dec2d165",
+    "releaseId": "7c690a16def0168ac2d79b94fb80748efd5ad9ae2230bb69e6108169dec2d165",
+    "runtimeId": "82d548bb3d0737c927e3ae48ec3889981576f7e8c15acd6b9ec363d29e076f9f",
     "files": 99
   }
 }
