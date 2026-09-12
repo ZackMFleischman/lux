@@ -13,7 +13,7 @@ export const inventoryPaths = {
     'scripts/gpu-experiment.mjs', 'scripts/gpu-evidence.mjs', 'scripts/resolume-experiment.mjs',
     'tools/gpu-spike/build.mjs', 'tools/gpu-spike/standalone_host.cc',
     'tools/gpu-spike/producer-session.cjs', 'tools/gpu-spike/recorder.cjs',
-    'tools/gpu-spike/transport-release.cjs', 'tools/gpu-spike/host-startup.cjs', 'apps/studio/src/visual-worker.mjs',
+    'tools/gpu-spike/transport-release.cjs', 'tools/gpu-spike/host-startup.cjs', 'tools/gpu-spike/frame-progress.cjs', 'apps/studio/src/visual-worker.mjs',
     'apps/render-host/src/compiled-output.html', 'apps/render-host/src/compiled-worker.js',
     'apps/render-host/src/main.ts', 'apps/render-host/src/main.cjs',
     'apps/render-host/src/visual-worker.js', 'apps/render-host/src/output.html',

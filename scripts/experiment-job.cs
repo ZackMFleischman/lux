@@ -36,12 +36,18 @@ public static class ExperimentJob {
   [DllImport("kernel32.dll")] static extern bool TerminateProcess(IntPtr p,uint code);
   [DllImport("kernel32.dll")] static extern bool CloseHandle(IntPtr h);
   static void Check(bool ok) { if(!ok) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error()); }
-  public static void Run(string exe,string command,string cwd,string dir,int timeout,ulong memoryLimitBytes=0,string stopFile=null,int ownerPid=0,int hostPid=0) {
+  public static void Run(string exe,string command,string cwd,string dir,int timeout,ulong memoryLimitBytes=0,string stopFile=null,int ownerPid=0,int hostPid=0,string hostCreatedUtc=null) {
     bool playback=timeout==-1;
-    if(playback && (String.IsNullOrEmpty(stopFile)||ownerPid<=0||hostPid<=0))throw new ArgumentException("Playback requires stop file, owner and host");
+    if(playback && (String.IsNullOrEmpty(stopFile)||ownerPid<=0||hostPid<=0||String.IsNullOrEmpty(hostCreatedUtc)))throw new ArgumentException("Playback requires stop file, owner and host identity");
     if(!playback && timeout<1)throw new ArgumentOutOfRangeException("timeout");
     using(var owner=playback?Process.GetProcessById(ownerPid):null)
     using(var host=playback?Process.GetProcessById(hostPid):null) {
+    if(playback) {
+      // Force stable handles before launch; HasExited must not later resolve a
+      // recycled PID. Verify the host lifetime against the dispatch inventory.
+      IntPtr ownerHandle=owner.Handle,hostHandle=host.Handle;
+      if(owner.HasExited||host.HasExited||host.StartTime.ToUniversalTime()!=DateTime.Parse(hostCreatedUtc,null,System.Globalization.DateTimeStyles.RoundtripKind).ToUniversalTime())throw new Exception("Playback host identity changed");
+    }
     if(memoryLimitBytes!=0 && (memoryLimitBytes<67108864 || memoryLimitBytes>4294967296)) throw new ArgumentOutOfRangeException("memoryLimitBytes", "Use zero or 64 MiB through 4 GiB");
     IntPtr job=CreateJobObject(IntPtr.Zero,null); Check(job!=IntPtr.Zero);
     PI pi=new PI(); bool assigned=false;

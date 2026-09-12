@@ -39,11 +39,13 @@ async function main(){
   const stop=()=>{void writeFile(stopFile,'stop').catch(console.error);};
   try{
     await lock.writeFile(JSON.stringify({id,pid:process.pid,directory,kind:'transport-playback'}));
+    await validateReviewedInputs(review);
     const current=JSON.parse(ps("@(Get-CimInstance Win32_Process | Select-Object Name,ProcessId,ExecutablePath,@{Name='CreationUtc';Expression={$_.CreationDate.ToUniversalTime().ToString('o')}}) | ConvertTo-Json -Compress"));
-    assertNoConflictingActivity(current,host);await validateReviewedInputs(review);
+    assertNoConflictingActivity(current,host);
+    if(Date.parse(review.expiresUtc)<=Date.now())throw Error('Playback review expired');
     const executable=join(root,'node_modules/electron/dist/electron.exe');
     await writeFile(join(directory,'config.json'),JSON.stringify({executable,commandLine:[executable,join(root,'apps/render-host/src/main.cjs')].map(quote).join(' '),
-      cwd:root,directory,timeoutMs:-1,stopFile,ownerPid:process.pid,hostPid:host.pid}));
+      cwd:root,directory,timeoutMs:-1,stopFile,ownerPid:process.pid,hostPid:host.pid,hostCreatedUtc:host.creationUtc}));
     process.on('SIGINT',stop);process.on('SIGTERM',stop);
     console.log(`Playing ${release.sourceHash.slice(0,12)} in Resolume. Press Ctrl+C to stop.\nSession: ${directory}`);
     const env={...process.env,LUX_EXPERIMENT_MODE:'hardware',LUX_EXPERIMENT_RUN_ID:id,LUX_EXPERIMENT_DIRECTORY:directory,

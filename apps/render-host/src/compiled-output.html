@@ -19,7 +19,7 @@ window.startVisual = async (release, intensity) => {
   worker = new Worker('./compiled-worker.js', {type:'module'});
   identity = {instanceId:crypto.randomUUID(),generation:1,revisionId:release.sourceHash};
   worker.onmessage = ({data}) => {
-    if (data.type === 'heartbeat') console.log(JSON.stringify({kind:'runtime-heartbeat'}));
+    if (data.type === 'heartbeat') console.log(JSON.stringify({kind:'runtime-heartbeat',frameId:data.frameId}));
     if (data.type === 'failure') console.error(JSON.stringify({kind:'failure',reason:data.message}));
     if (data.type === 'ready' || data.type === 'status') console.log(JSON.stringify({kind:'runtime-frame',...data}));
     const wait = pending.get(data.requestId);

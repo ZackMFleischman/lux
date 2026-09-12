@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {spawn} from 'node:child_process';
+import {spawn,execFileSync} from 'node:child_process';
 import {mkdtemp,writeFile,readFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
@@ -9,9 +9,10 @@ async function run(action,ignore=false){
  const directory=await mkdtemp(join(tmpdir(),'lux-playback-cpu-')),stopFile=join(directory,'stop');
  const host=spawn(process.execPath,['-e','setInterval(()=>{},1000)'],{stdio:'ignore',windowsHide:true});
  const owner=spawn(process.execPath,['-e','setInterval(()=>{},1000)'],{stdio:'ignore',windowsHide:true});
+ const hostCreatedUtc=execFileSync('powershell.exe',['-NoProfile','-Command',`(Get-Process -Id ${host.pid}).StartTime.ToUniversalTime().ToString('o')`],{encoding:'utf8',windowsHide:true}).trim();
  const commandLine=[process.execPath,resolve('tests/unit/fixtures/playback.cjs'),stopFile,ignore?'ignore':'graceful'].map(quote).join(' ');
  await writeFile(join(directory,'config.json'),JSON.stringify({executable:process.execPath,commandLine,cwd:directory,directory,timeoutMs:-1,
-   stopFile,ownerPid:owner.pid,hostPid:host.pid}));
+   stopFile,ownerPid:owner.pid,hostPid:host.pid,hostCreatedUtc}));
  const helper=spawn('powershell.exe',['-NoProfile','-NonInteractive','-File',resolve('scripts/experiment-job.ps1'),'-Config',join(directory,'config.json')],
    {stdio:['ignore','ignore','pipe'],windowsHide:true});
  let stderr='';helper.stderr.on('data',d=>{stderr+=d;});

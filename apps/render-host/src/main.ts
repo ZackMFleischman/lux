@@ -7,6 +7,8 @@ const path = require('node:path');
 const { ProducerSession } = require('../../../tools/gpu-spike/producer-session.cjs');
 const { readTransportRelease } = require('../../../tools/gpu-spike/transport-release.cjs');
 const { HostStartup } = require('../../../tools/gpu-spike/host-startup.cjs');
+const { FrameProgress } = require('../../../tools/gpu-spike/frame-progress.cjs');
+const progress = new FrameProgress();
 const release = process.env.LUX_TRANSPORT_BUNDLE ? readTransportRelease(process.env.LUX_TRANSPORT_BUNDLE) : null;
 const playback = process.env.LUX_TRANSPORT_PLAYBACK === '1';
 if(playback&&(!release||!process.env.LUX_TRANSPORT_STOP))throw Error('Playback requires a compiled release and supervised stop signal');
@@ -18,7 +20,7 @@ fs.mkdirSync(output, { recursive: true });
 const records = [], session = new ProducerSession(bridge);
 let count = 0, dropped = 0, failed = false, finishing = false, webgpuReady = false, visualReady = false;
 let pollTimer, controlTimer, endTimer;
-let stopProducer=()=>{}, lastHeartbeat=0;
+let stopProducer=()=>{};
 function record(value) {
   if(playback&&value.kind==='copy-complete')return;
   if(playback&&records.length>=1000)records.shift();
@@ -50,7 +52,7 @@ app.whenReady().then(async () => {
   win.webContents.on('console-message', (details, _level, legacyMessage) => {
     const message = details.message ?? legacyMessage;
     if(typeof message==='string'&&message.includes('runtime-heartbeat')){
-      try{if(JSON.parse(message).kind==='runtime-heartbeat'){lastHeartbeat=performance.now();return;}}catch{}
+      try{const data=JSON.parse(message);if(data.kind==='runtime-heartbeat'){progress.observe(data.frameId,performance.now());return;}}catch{}
     }
     record({ kind: 'console', message });
     try {
@@ -86,7 +88,7 @@ app.whenReady().then(async () => {
     observe:value=>record({kind:'host-control',value}), stopped:()=>session.stopping||finishing,
     promote:(initial,value)=>{
       record({kind:'initial-frame',intensity:value,sourceHash:release.sourceHash,frameId:initial.frameId,controlSequence:initial.controlSequence});
-      visualReady=true;webgpuReady=true;lastHeartbeat=performance.now();win.webContents.startPainting();
+      visualReady=true;webgpuReady=true;progress.observe(initial.frameId,performance.now());win.webContents.startPainting();
     }}) : null;
   let applyingControl = false;
   controlTimer = setInterval(async () => {
@@ -117,7 +119,7 @@ app.whenReady().then(async () => {
   };
   if(playback)endTimer=setInterval(()=>{
     if(fs.existsSync(process.env.LUX_TRANSPORT_STOP))stopProducer();
-    else if(visualReady&&performance.now()-lastHeartbeat>2000)failure('Visual worker stopped reporting progress');
+    else if(visualReady&&progress.expired(performance.now()))failure('Visual worker stopped producing frames');
   },100);
   else endTimer=setTimeout(stopProducer,duration);
 }).catch(error => { failure(error); finish(false); });
