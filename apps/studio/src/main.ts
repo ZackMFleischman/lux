@@ -10,6 +10,7 @@ import { resolve } from 'node:path';
 import { SceneFileStore } from '../../../packages/core/src/scene-file.ts';
 import { createAgentBridge } from './agent-bridge.ts';
 import { observeFullscreen } from './fullscreen.ts';
+import { createExportService, runExportChild } from './export-process.ts';
 
 // This process owns presentation windows only. It never creates a render service,
 // starts an authoring instance, or terminates a host-owned process.
@@ -27,6 +28,20 @@ const files = new SceneFileStore();
 let dirty = false, closeConfirmed = false;
 const agentRequests = new Map<string, { resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
 const workspace = resolve(__dirname, '../../..');
+const exportShutdown = new AbortController();
+const exportService = createExportService({
+  chooseDirectory: async () => {
+    if (!mainWindow || mainWindow.isDestroyed() || closing) throw Error('Studio is closing');
+    const selection = await dialog.showOpenDialog(mainWindow, { title: 'Choose export output folder', properties: ['openDirectory', 'createDirectory'] });
+    return selection.canceled ? null : selection.filePaths[0] ?? null;
+  },
+  run: request => {
+    const executable = process.env.LUX_NODE_EXECUTABLE;
+    if (!executable) throw Error('Start Studio with pnpm studio');
+    return runExportChild(request, { workspace, executable, signal: exportShutdown.signal });
+  },
+});
+app.once('will-quit', () => exportShutdown.abort());
 function trusted(event: Electron.IpcMainInvokeEvent): boolean {
   const window = BrowserWindow.fromWebContents(event.sender);
   return !!window && owned.has(window) && event.senderFrame === event.sender.mainFrame && isTrustedStudioUrl(event.senderFrame.url, pageUrl);
@@ -87,6 +102,10 @@ app.whenReady().then(async () => {
   await mkdir(app.getPath('userData'), { recursive: true });
   const template = await readFile(join(__dirname, 'index.html'), 'utf8');
   await writeFile(page, createStudioPage(template, pathToFileURL(__dirname + sep).href, randomBytes(24).toString('base64')));
+  ipcMain.handle('studio:export', (event, request: unknown) => {
+    if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted export sender');
+    return exportService.create(request);
+  });
   ipcMain.handle('studio:authoring', async (event, action: unknown, value: unknown) => {
     if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted authoring sender');
     if (action === 'example') return { sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': await readFile(join(workspace, 'packages/visual-sdk/examples/intensity.ts'), 'utf8') } };
