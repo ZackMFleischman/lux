@@ -1,0 +1,54 @@
+{
+  "ok": true,
+  "initial": {
+    "instanceId": "c0eba803-33d5-4e99-9363-711fd324542d",
+    "generation": 1,
+    "revisionId": "162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898",
+    "sceneName": "Untitled visual",
+    "authority": "studio",
+    "playback": "paused",
+    "clockEpoch": 0,
+    "frameId": "1",
+    "intensity": 0.5,
+    "output": {
+      "width": 1920,
+      "height": 1080
+    },
+    "fault": null
+  },
+  "revised": {
+    "instanceId": "c0eba803-33d5-4e99-9363-711fd324542d",
+    "generation": 2,
+    "revisionId": "0b43b6a165d2dc06ffc29f938ed63b671674f4ac190f5adb7f1582ba8ad3e585",
+    "sceneName": "Untitled visual",
+    "authority": "studio",
+    "playback": "paused",
+    "clockEpoch": 0,
+    "frameId": "1",
+    "intensity": 0.5,
+    "output": {
+      "width": 1920,
+      "height": 1080
+    },
+    "fault": null
+  },
+  "metadata": {
+    "playback": "playing",
+    "timeSeconds": 0.016600000001490117,
+    "clockEpoch": 0,
+    "frameId": "2",
+    "controlSequence": 0,
+    "intensity": 0.5,
+    "width": 1920,
+    "height": 1080,
+    "seed": 0,
+    "colorSpace": "srgb",
+    "alphaMode": "straight",
+    "instanceId": "c0eba803-33d5-4e99-9363-711fd324542d",
+    "generation": 2,
+    "revisionId": "0b43b6a165d2dc06ffc29f938ed63b671674f4ac190f5adb7f1582ba8ad3e585"
+  },
+  "staleEditRejected": true,
+  "hangingCandidateRejected": true,
+  "previousPreviewRetained": true
+}

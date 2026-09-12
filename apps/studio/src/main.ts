@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import { join, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { randomBytes } from 'node:crypto';
@@ -7,6 +7,8 @@ import { StudioWindows, isTrustedStudioUrl } from './windows.ts';
 import { createStudioPage } from './page.ts';
 import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
+import { SceneFileStore } from '../../../packages/core/src/scene-file.ts';
+import { createAgentBridge } from './agent-bridge.ts';
 
 // This process owns presentation windows only. It never creates a render service,
 // starts an authoring instance, or terminates a host-owned process.
@@ -19,6 +21,9 @@ const owned = new Set<BrowserWindow>();
 let mainWindow: BrowserWindow | null = null;
 let closing = false;
 let compiling = false;
+const files = new SceneFileStore();
+let dirty = false, closeConfirmed = false;
+const agentRequests = new Map<string, { resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
 const workspace = resolve(__dirname, '../../..');
 function trusted(event: Electron.IpcMainInvokeEvent): boolean {
   const window = BrowserWindow.fromWebContents(event.sender);
@@ -85,6 +90,23 @@ app.whenReady().then(async () => {
     if (action === 'example') return { sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': await readFile(join(workspace, 'packages/visual-sdk/examples/intensity.ts'), 'utf8') } };
     if (action === 'compile') return compile(value);
     if (action === 'smoke-enabled') return process.env.LUX_STUDIO_SMOKE === '1';
+    if (action === 'dirty') { if (typeof value !== 'boolean') throw Error('Invalid dirty state'); dirty = value; return; }
+    if (action === 'open') {
+      const result = await dialog.showOpenDialog(mainWindow!, { properties: ['openFile'], filters: [{ name: 'Lux visual', extensions: ['lux-scene'] }] });
+      if (result.canceled || !result.filePaths[0]) return null;
+      return files.open(result.filePaths[0]);
+    }
+    if (action === 'save') {
+      const request = value as { token?: string; document?: unknown; saveAs?: boolean };
+      if (request?.token && !request.saveAs) return files.save(request.token, request.document);
+      const result = await dialog.showSaveDialog(mainWindow!, { defaultPath: 'Untitled.lux-scene', filters: [{ name: 'Lux visual', extensions: ['lux-scene'] }] });
+      if (result.canceled || !result.filePath) return null;
+      return files.saveAs(result.filePath, request?.document);
+    }
+    if (action === 'smoke-save' && process.env.LUX_STUDIO_SMOKE === '1') {
+      const folder = join(workspace, 'artifacts/studio-smoke'); await mkdir(folder, { recursive: true });
+      const path = join(folder, 'roundtrip.lux-scene'); await files.saveAs(path, value); return files.open(path);
+    }
     if (action === 'smoke-result' && process.env.LUX_STUDIO_SMOKE === '1') {
       const directory = join(workspace, 'artifacts/studio-smoke'); await mkdir(directory, { recursive: true });
       const capture = (value as { capture?: { bytes: ArrayBuffer } })?.capture;
@@ -110,8 +132,33 @@ app.whenReady().then(async () => {
     }
   });
   mainWindow = createWindow(false);
+  ipcMain.handle('studio:agent-result', (event, id: string, result: { ok: boolean; result?: unknown; error?: string }) => {
+    if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted authoring reply');
+    const pending = agentRequests.get(id); if (!pending) return;
+    clearTimeout(pending.timer); agentRequests.delete(id);
+    result.ok ? pending.resolve(result.result) : pending.reject(Error(result.error || 'Authoring operation failed'));
+  });
+  const bridge = await createAgentBridge((method, params) => new Promise((resolve, reject) => {
+    if (process.env.LUX_STUDIO_MCP_TEST === '1' && method === 'status' && (params as { shutdown?: boolean })?.shutdown) {
+      resolve({ closing: true }); setTimeout(() => app.exit(0), 100); return;
+    }
+    if (!mainWindow || mainWindow.isDestroyed()) { reject(Error('Studio is closed')); return; }
+    const id = randomBytes(16).toString('hex');
+    const timer = setTimeout(() => { agentRequests.delete(id); reject(Error('Studio did not finish the operation in time')); }, 70000);
+    agentRequests.set(id, { resolve, reject, timer }); mainWindow.webContents.send('studio:agent-command', { id, method, params });
+  }));
+  await writeFile(join(app.getPath('userData'), 'agent-endpoint.json'), JSON.stringify({ url: bridge.url, token: bridge.token, pid: process.pid }));
+  app.once('will-quit', () => { bridge.close(); for (const pending of agentRequests.values()) { clearTimeout(pending.timer); pending.reject(Error('Studio closed')); } agentRequests.clear(); });
+  mainWindow.on('close', event => {
+    if (!dirty || closeConfirmed || process.env.LUX_STUDIO_SMOKE === '1') return;
+    event.preventDefault();
+    void dialog.showMessageBox(mainWindow!, { type: 'question', message: 'Close without saving your changes?', buttons: ['Keep editing', 'Discard changes'], defaultId: 0, cancelId: 0 }).then(result => {
+      if (result.response === 1) { closeConfirmed = true; mainWindow?.close(); }
+    });
+  });
   mainWindow.on('close', () => { closing = true; coordinator.dock(); });
   if (process.env.LUX_STUDIO_SMOKE === '1') setTimeout(() => { console.error('Studio smoke timeout'); app.exit(3); }, 90000);
+  if (process.env.LUX_STUDIO_MCP_TEST === '1') setTimeout(() => { console.error('Studio MCP test timeout'); app.exit(3); }, 120000);
   mainWindow.webContents.on('console-message', details => console.log('Studio:', details.message));
   await mainWindow.loadFile(page); mainWindow.show();
 }).catch(error => { console.error('Studio startup failed:', error); app.exit(1); });

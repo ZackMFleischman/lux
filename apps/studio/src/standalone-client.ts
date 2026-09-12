@@ -7,6 +7,11 @@ export interface AuthoringApi {
   compile(source: SourceBundle): Promise<any>;
   smokeResult?(result: unknown): Promise<void>;
   smokeEnabled?(): Promise<boolean>;
+  open(): Promise<any>;
+  save(request: unknown): Promise<any>;
+  dirty(value: boolean): Promise<void>;
+  smokeSave(document: unknown): Promise<any>;
+  onAgentCommand(listener: (command: any) => Promise<unknown>): () => void;
 }
 declare global { interface Window { luxAuthoring: AuthoringApi } }
 type Running = { worker: Worker; canvas: HTMLCanvasElement; instanceId: string; generation: number; revisionId: string;

@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true, "allowImportingTsExtensions": true,
+    "noEmit": true, "allowImportingTsExtensions": true, "allowJs": true,
     "jsx": "react-jsx", "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "types": ["node", "react", "react-dom"]
   },

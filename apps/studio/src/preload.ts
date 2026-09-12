@@ -18,4 +18,16 @@ contextBridge.exposeInMainWorld('luxAuthoring', Object.freeze({
   compile: (source: unknown) => ipcRenderer.invoke('studio:authoring', 'compile', source),
   smokeResult: (result: unknown) => ipcRenderer.invoke('studio:authoring', 'smoke-result', result),
   smokeEnabled: () => ipcRenderer.invoke('studio:authoring', 'smoke-enabled'),
+  open: () => ipcRenderer.invoke('studio:authoring', 'open'),
+  save: (request: unknown) => ipcRenderer.invoke('studio:authoring', 'save', request),
+  dirty: (value: boolean) => ipcRenderer.invoke('studio:authoring', 'dirty', value),
+  smokeSave: (document: unknown) => ipcRenderer.invoke('studio:authoring', 'smoke-save', document),
+  onAgentCommand: (listener: (command: unknown) => Promise<unknown>) => {
+    const callback = (_event: Electron.IpcRendererEvent, command: { id: string }) => {
+      void Promise.resolve().then(() => listener(command)).then(result => ipcRenderer.invoke('studio:agent-result', command.id, { ok: true, result }),
+        error => ipcRenderer.invoke('studio:agent-result', command.id, { ok: false, error: String(error?.message || error) }));
+    };
+    ipcRenderer.on('studio:agent-command', callback);
+    return () => ipcRenderer.removeListener('studio:agent-command', callback);
+  },
 }));
