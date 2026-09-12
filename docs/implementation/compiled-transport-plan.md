@@ -34,12 +34,27 @@ scene rejection test). `pnpm typecheck` and
 `pnpm build` passed. Persistent Job cleanup is covered by CPU fixtures for
 explicit stop, host exit, owner exit, and an unresponsive producer.
 
-Compiled GPU output is **not accepted yet**. Run
+The initial compiled GPU diagnostic failed. Run
 `252c3c38-7a88-4138-a9a9-2bfe95cfc9f7` captured the correct colored visual inside
 the worker, with frame IDs continuing to advance, but the receiver got only one
 black compositor frame. Removing the pre-initialization `stopPainting()` did
 not resolve it. The evaluator now rejects that result. Next: compare a canvas
 capture with the render-target capture, then isolate worker rAF presentation.
-GPU diagnostics are paused while the user tests Studio with another agent.
+GPU diagnostics were paused while the user tested Studio with another agent.
 The failed run, exact inventory and worker capture are preserved under
 `evidence/tracer-0.1/tr02-compiled-presentation-debug/`.
+
+After resuming, fresh-canvas initialization fixed the compositor failure:
+replace the already-composited placeholder immediately before transferring it
+to the worker. rAF scheduling, direct rendering, and additional device features
+did not fix it and were reverted. Run
+`64557b28-7737-4cf7-8ee6-0860b016c373` delivered the actual compiled visual with
+166 paints, an appropriately rotated final image, and complete cleanup. Source
+and final images plus exact inventory are in `tr02-compiled-standalone`.
+An optional canvas readback remains unsupported and has been removed; the
+worker render-target capture and actual receiver image verify visual output.
+
+The tested protocol-3 DLL is installed, SHA256
+`2de5d23b889202da46ec9b2b141f9969a14e9c12ad53c29d185815b88f82f453`.
+The prior installed DLL is preserved as `.AF739BC0D4F2.backup`. Awaiting the
+user's actual-host setup with Intensity 0.17 for live and persistent checks.

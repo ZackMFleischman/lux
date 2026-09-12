@@ -92,10 +92,7 @@ app.whenReady().then(async () => {
       visualReady=true;webgpuReady=true;progress.observe(initial.frameId,performance.now());win.webContents.startPainting();
       if(!playback&&!process.env.LUX_RESOLUME_PID)win.webContents.executeJavaScript('window.captureVisual()').then(capture=>{
         fs.writeFileSync(path.join(output,'worker.png'),Buffer.from(capture.bytes));record({kind:'capture',...capture.metadata});
-        return win.webContents.executeJavaScript("window.captureVisual('canvas')");
-      }).then(capture=>{
-        fs.writeFileSync(path.join(output,'canvas.png'),Buffer.from(capture.bytes));record({kind:'canvas-capture',...capture.metadata});
-      }).catch(failure);
+      }).catch(error=>record({kind:'diagnostic-capture-error',reason:String(error)}));
     }}) : null;
   let applyingControl = false;
   controlTimer = setInterval(async () => {

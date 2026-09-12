@@ -1,8 +1,8 @@
 # Saved visual playback in Resolume
 
-Verification is in progress: compiled visuals currently render inside the
-worker but fail to reach the compositor correctly. The commands below are the
-implemented entry points, not a claim that host playback has passed.
+Compiled visuals now pass the standalone GPU diagnostic. Actual Resolume and
+persistent playback verification are in progress. The commands below are the
+implemented entry points, not a claim that all host checks have passed.
 
 ## Prepare and play
 
