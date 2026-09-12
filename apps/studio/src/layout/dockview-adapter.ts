@@ -1,4 +1,4 @@
-import type { DockviewApi, SerializedDockview } from 'dockview-react';
+import type { DockviewApi, SerializedDockview, DockviewGroupPanel } from 'dockview-react';
 import type { PanelRegistry } from './registry.ts';
 import { isReservedPanelKey } from './registry.ts';
 import { DOCKVIEW_VERSION, defaultPersonalLayout, parsePersonalLayout, validatePersonalLayout } from './personal-layout.ts';
@@ -46,7 +46,23 @@ export class LuxDockviewAdapter {
     }
   }
   reset(name: string, mode = this.mode): void { this.live(); this.mode = mode; this.apply(defaultPersonalLayout(this.registry, this.mode)); this.storage.removeItem(this.key(name)); }
-  open(kind: string, id = kind): void {
+  groupTarget(id: string): DockviewGroupPanel {
+    this.live(); const group = this.api.getGroup(id);
+    if (!group) throw Error('Target group no longer exists'); return group as DockviewGroupPanel;
+  }
+  groupAction(kind: string, group: DockviewGroupPanel): 'Open' | 'Move' | 'Focus' {
+    const panel = this.api.getPanel(kind); return !panel ? 'Open' : panel.group === group ? 'Focus' : 'Move';
+  }
+  openInGroup(kind: string, group: DockviewGroupPanel): void {
+    this.live();
+    // Compare the object, too: restored layouts may reuse a removed group's ID.
+    if (this.api.getGroup(group.id) !== group) throw Error('Target group no longer exists');
+    const existing = this.api.getPanel(kind);
+    if (existing) { if (existing.group !== group) existing.api.moveTo({ group, position: 'center' }); existing.api.setActive(); }
+    else this.open(kind, kind, group);
+    group.focus();
+  }
+  open(kind: string, id = kind, group?: DockviewGroupPanel): void {
     this.live(); const definition = this.registry.get(kind);
     if (!/^[A-Za-z0-9_-]{1,64}$/.test(id) || isReservedPanelKey(id)) throw Error('Invalid panel identity');
     const existing = this.api.getPanel(id);
@@ -56,7 +72,7 @@ export class LuxDockviewAdapter {
     const previous = this.closed[id];
     if (previous && previous.contentComponent !== kind) throw Error('Closed panel identity belongs to another kind');
     if (this.api.panels.length + Object.keys(this.closed).filter(key => !this.api.getPanel(key)).length >= 32 && !previous) throw Error('Too many panels');
-    this.api.addPanel({ id, component: kind, title: definition.title, renderer: 'always', params: { viewState: definition.parseViewState(previous?.params?.viewState) } });
+    this.api.addPanel({ ...(group ? { position: { referenceGroup: group, direction: 'within' as const } } : {}), id, component: kind, title: definition.title, renderer: 'always', params: { viewState: definition.parseViewState(previous?.params?.viewState) } });
     delete this.closed[id];
   }
   close(id: string): void { this.live(); const panel = this.api.getPanel(id); if (panel) this.api.removePanel(panel); }

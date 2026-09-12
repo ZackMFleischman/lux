@@ -75,8 +75,8 @@ export function defaultPersonalLayout(registry: PanelRegistry, mode: 'desktop' |
   const root: GridNode = mode === 'laptop' ? { type: 'branch', data: [leaf('workspace', Object.keys(panels), 900)] } : {
     type: 'branch', data: [
       { type: 'branch', size: 1200, data: [
-        { type: 'branch', size: 720, data: [leaf('source-group', ['source'], 400), leaf('preview-group', ['preview'], 800)] },
-        leaf('jobs-group', ['jobs'], 180),
+        { type: 'branch', size: 800, data: [leaf('source-group', ['source'], 400), leaf('preview-group', ['preview'], 800)] },
+        leaf('jobs-group', ['jobs'], 100),
       ] }, leaf('inspector-group', ['inspector'], 240),
     ],
   };

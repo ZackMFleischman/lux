@@ -57,7 +57,7 @@ test('RTL: playback and intensity invoke guarded shared operations and wait for 
   await waitFor(() => assert.equal(fixture.calls.length, 1));
   assert.equal(fixture.calls[0]?.name, 'lux.playback');
   assert.equal(fixture.calls[0]?.input.expectedGeneration, 2);
-  assert.equal((screen.getByRole('button', { name: 'Pause' }) as HTMLButtonElement).disabled, true);
+  assert.equal(screen.queryByRole('button', { name: 'Pause' }), null);
   fireEvent.change(screen.getByRole('slider'), { target: { value: '0.8' } });
   await waitFor(() => assert.equal(fixture.calls.length, 2));
   const write = fixture.calls[1];
@@ -73,7 +73,8 @@ test('RTL: playback and intensity invoke guarded shared operations and wait for 
 test('RTL: failed runtime command shows actionable error without a successful-state claim', async () => {
   const fixture = service(), user = userEvent.setup({ document }); fixture.fail();
   render(<StudioApp client={fixture.client} nowMs={1000} />);
-  await user.click(screen.getByRole('button', { name: 'Restart runtime' }));
+  await user.click(screen.getByRole('button', { name: 'More playback actions' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Restart runtime' }));
   await waitFor(() => assert.match(screen.getByRole('alert').textContent ?? '', /Runtime unavailable/));
   assert.equal(screen.queryByText('Request accepted. Awaiting applied runtime status.'), null);
   assert.ok(screen.getByText('revision-2'));
@@ -96,10 +97,11 @@ test('RTL: pending playback preserves button styling and ignores duplicate trans
   assert.equal(document.querySelector('.playback-state')?.textContent, 'paused');
   await act(async () => finishIntensity());
   assert.equal((screen.getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled, false);
-  assert.equal((screen.getByRole('button', { name: 'Restart runtime' }) as HTMLButtonElement).disabled, false);
+  await user.click(screen.getByRole('button', { name: 'More playback actions' }));
+  assert.notEqual(screen.getByRole('menuitem', { name: 'Restart runtime' }).getAttribute('aria-disabled'), 'true');
+  fireEvent.click(screen.getByRole('menuitem', { name: 'Restart runtime' }));
   fireEvent.click(screen.getByRole('button', { name: 'Play' }));
   fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
-  fireEvent.click(screen.getByRole('button', { name: 'Restart runtime' }));
   assert.equal(fixture.calls.length, 2);
   await act(async () => finishPlay());
   assert.equal((screen.getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled, false);
@@ -114,7 +116,7 @@ test('RTL: intensity writes do not disable transport or insert a success alert',
   render(<StudioApp client={fixture.client} nowMs={1000} />);
   fireEvent.change(screen.getByRole('slider'), { target: { value: '0.8' } });
   await waitFor(() => assert.equal(fixture.calls.length, 1));
-  for (const name of ['Play', 'Reset', 'Restart runtime']) assert.equal((screen.getByRole('button', { name }) as HTMLButtonElement).disabled, false);
+  for (const name of ['Play', 'Reset', 'More playback actions']) assert.equal((screen.getByRole('button', { name }) as HTMLButtonElement).disabled, false);
   assert.equal(screen.queryByText('Sending request…'), null);
   await act(async () => finish());
   assert.equal(screen.queryByText('Request accepted. Awaiting applied runtime status.'), null);
@@ -153,4 +155,13 @@ test('RTL: fullscreen shows only preview, ignores stale initial state, and exits
   assert.equal(container.querySelector('.studio-preview-fullscreen'), null);
   assert.ok(screen.getByRole('button', { name: 'Fullscreen' }));
   assert.equal(container.querySelector('.preview-surface'), surface);
+});
+
+
+test('RTL: unavailable popout is absent while fullscreen remains available', async () => {
+  const windows = { getState: async () => ({ detached: false, fullscreen: false }), subscribe: () => () => {},
+    dock: async () => {}, fullscreen: async () => {} };
+  render(<StudioApp client={service().client} windows={windows} nowMs={1000} />);
+  assert.equal(screen.queryByRole('button', { name: 'Pop out' }), null);
+  assert.equal((screen.getByRole('button', { name: 'Fullscreen' }) as HTMLButtonElement).disabled, false);
 });

@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useRef, useSyncExternalStore } from 'react';
-import { Alert, Button, ThemeProvider } from '@mui/material';
+import { Button, ThemeProvider } from '@mui/material';
 import { StudioApp } from './renderer.tsx';
 import { studioTheme } from './theme.ts';
 import { StandaloneClient } from './standalone-client.ts';
@@ -16,7 +16,7 @@ import './export-client.ts';
 const client = new StandaloneClient(window.luxAuthoring);
 export function AuthoringApp() {
   const windows = useMemo(() => window.luxStudioWindows ? { ...window.luxStudioWindows,
-    popout: async () => { throw Error('Separate preview windows are not connected in this standalone checkpoint. Fullscreen is available.'); } } : undefined, []);
+    popout: undefined } : undefined, []);
   const [error, setError] = useState('');
   const [diagnostics, setDiagnostics] = useState<SourceDiagnostic[]>([]);
   const composing = useRef(false);
@@ -96,12 +96,17 @@ export function AuthoringApp() {
     setError('');
     try { await session.open(); setDiagnostics([]); } catch (reason) { const current = workspace.getSnapshot(); reportError(reason, current.version, current.source); }
   }
-  return <ThemeProvider theme={studioTheme}><div className="authoring-shell" style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-    <div className="authoring-tools" style={{ padding: '4px 16px', background: '#191b23' }}><Button variant="contained" disabled={busy} onClick={() => void build()}>Build & preview</Button>
-      <Button disabled={busy} onClick={() => void open()}>Open</Button><Button disabled={busy} onClick={() => void save()}>Save</Button><Button disabled={busy} onClick={() => void save(true)}>Save as</Button><span>{io.name}{dirty ? ' *' : ''}</span>
+  const fileMenu = <details className="file-tools" onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }}><summary>File</summary><div className="file-tools-content" onClick={event => { if ((event.target as Element).closest('button')) event.currentTarget.closest('details')!.open = false; }}>
+      <Button disabled={busy} onClick={() => void open()}>Open</Button><Button disabled={busy} onClick={() => void save()}>Save</Button><Button disabled={busy} onClick={() => void save(true)}>Save as</Button>
       <ExportDialog disabled={busy || composing.current} defaultName={io.name} create={name => session.exportSource(name)} />
-      <span role="status">{draft.runningMatchesDraft ? 'Preview matches source' : draft.hasRunningSource ? 'Preview shows previous source' : 'Source has not been built'}</span>
-      {error && <Alert severity="error">{error}</Alert>}</div>
-    <div style={{ flex: 1, minHeight: 0 }}><StudioApp client={client} presentation={client} windows={windows} sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnostics={diagnostics} />} /></div>
+    </div></details>;
+  const commands = <>
+    <span className="document-name" title={io.name}>{io.name}{dirty ? ' *' : ''}</span>
+    <Button variant="contained" disabled={busy} onClick={() => void build()}>Build</Button>
+    <span className="build-status" role="status">{draft.runningMatchesDraft ? 'Preview current' : draft.hasRunningSource ? 'Preview shows previous source' : 'Not built'}</span>
+  </>;
+  return <ThemeProvider theme={studioTheme}><div className="authoring-shell">
+    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} appCommands={commands} appError={error}
+      sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnostics={diagnostics} />} />
   </div></ThemeProvider>;
 }

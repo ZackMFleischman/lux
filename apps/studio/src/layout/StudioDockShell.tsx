@@ -16,7 +16,7 @@ const storage: LayoutStorage = {
 };
 /** The portals own real panes above Dockview mounts. Reparenting their host preserves
  * the same canvas, editor/undo, subscriptions and React state even through closure. */
-export function StudioDockShell({ compact, ...content }: { compact: boolean } & Record<Kind, ReactNode>) {
+export function StudioDockShell({ compact, toolsHost, ...content }: { compact: boolean; toolsHost?: HTMLElement | null } & Record<Kind, ReactNode>) {
   const [mode] = useState<'desktop' | 'laptop'>(() => window.innerWidth < 1100 ? 'laptop' : 'desktop');
   const [name, setName] = useState('Default'), [message, setMessage] = useState('');
   const [panel, setPanel] = useState<Kind>('source'), [reference, setReference] = useState<Kind>('preview');
@@ -49,8 +49,8 @@ export function StudioDockShell({ compact, ...content }: { compact: boolean } & 
     action(value => { value.reset(name, next); setMessage(`Reset to ${next} layout`); });
   }
   const nonce = document.querySelector<HTMLMetaElement>('meta[name="style-nonce"]')?.content ?? '';
-  return <div className={`studio-dock-shell ${compact ? 'dock-compact' : ''}`}>
-    <details className="layout-tools" hidden={compact}><summary>View & layouts</summary><div className="layout-tools-content">
+  const tools = <details className="layout-tools" hidden={compact} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }}><summary>View</summary><div className="layout-tools-content">
+
       <div className="layout-actions" aria-label="Add panel">{kinds.map(kind => <Button key={kind} onClick={() => action(value => value.open(kind))}>Open {registry.get(kind).title}</Button>)}</div>
       <div className="layout-actions"><TextField size="small" label="Layout name" value={name} onChange={event => setName(event.target.value)} />
         <Button onClick={() => action(value => { value.save(name); setMessage(`Saved layout: ${name}`); })}>Save layout</Button>
@@ -61,7 +61,10 @@ export function StudioDockShell({ compact, ...content }: { compact: boolean } & 
         {(['left', 'right', 'top', 'bottom', 'center'] as const).map(position => <Button key={position} onClick={() => action(value => value.move(panel, reference, position))}>Move {position === 'center' ? 'to tab group' : position}</Button>)}
         <Button onClick={() => action(value => value.close(panel))}>Close selected panel</Button></div>
       {message && <Alert severity="info" role="status">{message}</Alert>}
-    </div></details>
+    </div></details>;
+  return <div className={`studio-dock-shell ${compact ? 'dock-compact' : ''}`}>
+    {toolsHost ? createPortal(tools, toolsHost) : tools}
+
     <div className="studio-dock-grid" hidden={compact}><LuxDockLayout registry={registry} panels={panels} storage={storage} nonce={nonce} mode={mode}
       onReady={(value, result) => { adapter.current = value; if (result.reason && result.reason !== 'No saved personal layout') setMessage(result.reason); }} /></div>
     <div className="studio-expanded-pane" hidden={!compact} ref={expanded} />

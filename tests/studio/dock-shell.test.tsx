@@ -36,7 +36,7 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   const editorNode = document.querySelector('.cm-editor') as HTMLElement;
   const editor = EditorView.findFromDOM(editorNode)!;
   await act(async () => { editor.dispatch({ changes: { from: 0, insert: '// draft\n' } }); });
-  await act(async () => { fireEvent.click(screen.getByText('View & layouts')); });
+  await act(async () => { fireEvent.click(screen.getByText('View')); });
   await click('Close selected panel');
   assert.equal(document.contains(editorNode), false);
   await click('Open Source');
@@ -98,6 +98,49 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   await click('Open Preview');
   assert.equal(document.querySelector('.cm-editor'), editorNode);
   assert.equal(attaches, 1); assert.equal(detaches, 0); assert.equal(subscriptions, 1);
+  for (const kind of ['preview', 'source', 'inspector', 'jobs']) {
+    fireEvent.change(screen.getByLabelText('Move panel'), { target: { value: kind } });
+    await click('Close selected panel');
+  }
+  assert.equal(document.querySelectorAll('.studio-dock-grid .dv-groupview').length, 0);
+  await click('Open Source'); await click('Open Preview');
+  assert.equal(document.querySelector('.cm-editor'), editorNode);
+  assert.ok(document.contains(canvas));
+  assert.equal(attaches, 1); assert.equal(subscriptions, 1);
   ui.unmount(); await act(async () => {});
   assert.equal(detaches, 1); assert.equal(subscriptions, 0);
+});
+
+
+test('group menu targets its owning group, cancels with focus and rejects a vanished target', async () => {
+  const { LuxDockLayout } = await import('../../apps/studio/src/layout/LuxDockLayout.tsx');
+  const { createStudioPanelRegistry } = await import('../../apps/studio/src/layout/registry.ts');
+  let adapter: any;
+  const registry = createStudioPanelRegistry();
+  const ui = render(<LuxDockLayout registry={registry} panels={Object.fromEntries(registry.list().map(def => [def.kind, () => <div>{def.kind} content</div>]))}
+    storage={window.localStorage} name="group-test" nonce="abcdefghijklmnopqrstuvwx" onReady={value => { adapter = value; }} />);
+  const trigger = screen.getByRole('button', { name: 'Add pane to Preview group' });
+  await act(async () => { trigger.focus(); fireEvent.click(trigger); });
+  const focus = screen.getByRole('menuitem', { name: 'Focus Preview' });
+  assert.equal(document.activeElement, focus);
+  fireEvent.keyDown(focus, { key: 'ArrowDown' });
+  assert.equal(document.activeElement, screen.getByRole('menuitem', { name: 'Move Source here' }));
+  fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
+  await waitFor(() => assert.equal(document.activeElement, trigger));
+  await act(async () => { fireEvent.click(trigger); });
+  await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: 'Move Source here' })); });
+  await waitFor(() => assert.ok(document.activeElement?.closest('.dv-groupview')));
+  let layout = adapter.capture('check');
+  const groups = (node: any): any[] => node.type === 'leaf' ? [node.data] : node.data.flatMap(groups);
+  assert.deepEqual(groups(layout.dock.grid.root).find((g: any) => g.id === 'preview-group').views, ['preview', 'source']);
+  await act(async () => { adapter.close('source'); });
+  await act(async () => { fireEvent.click(screen.getByRole('button', { name: 'Add pane to Preview group' })); });
+  await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: 'Open Source' })); });
+  assert.ok(groups(adapter.capture('check').dock.grid.root).find((g: any) => g.id === 'preview-group').views.includes('source'));
+  const target = adapter.groupTarget('jobs-group');
+  await act(async () => { adapter.close('jobs'); });
+  const before = adapter.capture('check');
+  assert.throws(() => adapter.openInGroup('source', target), /no longer exists/);
+  assert.deepEqual(adapter.capture('check'), before);
+  ui.unmount();
 });
