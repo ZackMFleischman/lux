@@ -9,5 +9,6 @@ artifacts/experiments/
 artifacts/studio-smoke/
 artifacts/studio-mcp/
 artifacts/studio-ui/
+artifacts/installed-package/
 artifacts/transport/
 apps/render-host/src/compiled-worker.js
