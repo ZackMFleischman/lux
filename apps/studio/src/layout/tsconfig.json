@@ -1,0 +1,1 @@
+{"extends":"../../../../tsconfig.base.json","compilerOptions":{"noEmit":true,"allowImportingTsExtensions":true,"jsx":"react-jsx"},"include":["*.ts","*.tsx","../../../../tests/studio/layout.test.ts"]}
