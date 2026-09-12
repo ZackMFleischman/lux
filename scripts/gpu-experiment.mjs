@@ -7,6 +7,9 @@ import { validateProbeEvidence } from './gpu-evidence.mjs';
 if (process.env.LUX_EXPERIMENT_MODE !== 'hardware' || !process.env.LUX_EXPERIMENT_RUN_ID || !process.env.LUX_EXPERIMENT_DIRECTORY) {
   throw Error('Reviewed experiment supervisor required');
 }
+if (Number(process.env.LUX_EXPERIMENT_TIMEOUT_MS) < 15000 || !Number.isFinite(Number(process.env.LUX_EXPERIMENT_TIMEOUT_MS))) {
+  throw Error('Short GPU pair requires at least a 15000 ms supervisor budget; use 20000 ms');
+}
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const output = join(process.env.LUX_EXPERIMENT_DIRECTORY, 'gpu');
 await mkdir(output, { recursive: true });

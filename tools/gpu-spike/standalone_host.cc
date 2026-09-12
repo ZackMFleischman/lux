@@ -36,5 +36,9 @@ int main(int argc,char** argv) {
   // One diagnostic capture only. Not transport or performance evidence.
   std::vector<unsigned char> pixels(1920*1080*4);glReadPixels(0,0,1920,1080,GL_RGBA,GL_UNSIGNED_BYTE,pixels.data());std::ofstream file(argc>2?argv[2]:"standalone.rgba",std::ios::binary);file.write(reinterpret_cast<char*>(pixels.data()),pixels.size());file.close();
   std::cout<<"callbacks "<<count<<" centerRGBA ";for(int i=0;i<4;++i)std::cout<<int(pixels[(540*1920+960)*4+i])<<" ";std::cout<<"\n";
-  main(FF_DEINSTANTIATE_GL,{},instance);main(FF_DEINITIALISE,{},nullptr);FreeLibrary(dll);glDeleteFramebuffers(1,&fbo);glDeleteTextures(1,&texture);wglMakeCurrent(nullptr,nullptr);wglDeleteContext(context);ReleaseDC(window,dc);DestroyWindow(window);return 0;
+  // Do not explicitly unload code/destroy its context after a failed teardown.
+  // A blocked call remains subject to the outer process-job deadline.
+  if(main(FF_DEINSTANTIATE_GL,{},instance).UIntValue!=FF_SUCCESS){std::cerr<<"FFGL deinstantiate failed\n";return 7;}
+  if(main(FF_DEINITIALISE,{},nullptr).UIntValue!=FF_SUCCESS){std::cerr<<"FFGL deinitialise failed\n";return 8;}
+  FreeLibrary(dll);glDeleteFramebuffers(1,&fbo);glDeleteTextures(1,&texture);wglMakeCurrent(nullptr,nullptr);wglDeleteContext(context);ReleaseDC(window,dc);DestroyWindow(window);return 0;
 }
