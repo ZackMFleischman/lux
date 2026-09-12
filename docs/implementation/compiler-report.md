@@ -67,7 +67,10 @@ Three **0.186.0**, not handwritten substitute typings. `skipLibCheck` avoids
 rechecking dependency declaration bodies; submitted source and SDK are strict
 typechecked. Browser DOM types describe renderer APIs but do not grant actual
 runtime capabilities. Diagnostics are bounded to 128 KiB; emitted result data is
-bounded to 4 MiB. Diagnostics redact the job/dependency root paths.
+bounded to 4 MiB. Both quotas count final serialized UTF-8 JSON bytes, including
+escaping and the artifact's hash field. Excess diagnostics carry an explicit
+truncation marker; the parent independently rejects oversized decoded results.
+Diagnostics redact the job/dependency root paths.
 
 Artifacts contain source hash, bundle hash, emitted modules/source maps, SDK and
 compiler versions, and dependency hashes including the actual compiler executable,
@@ -108,8 +111,8 @@ compiler processes and harmless CPU allocation/spin fixtures. They cover source
 boundary/budgets, real syntax/type diagnostics, pinned import failures, sibling
 modules, deterministic identity, unexecuted infinite visual initialization,
 compile timeout/recovery, literal SDK schema, memory limit and confirmed loop stop.
-The full suite passed 11/11 in 37.7 seconds on this Windows machine; the final
-path-length admission regression also passed independently. These timings describe
+The full suite passed 15/15 in 39.9 seconds on this Windows machine, including
+escaping-heavy diagnostics and parent result-reader regressions. These timings describe
 the CPU tests, not compile performance or runtime/GPU acceptance.
 
 Still required: real render-process sandbox and escape tests; resource factory and

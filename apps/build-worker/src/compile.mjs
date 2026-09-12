@@ -4,11 +4,20 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { limits, validateSource } from './source-policy.mjs';
+import { assertResultBudgets } from './result-budget.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '../../..');
 const failure = (code, message) => ({ ok: false, code, diagnostics: [{ code, message }] });
 const quote = value => '"' + value.replace(/(\\*)"/g, '$1$1\\"').replace(/(\\+)$/g, '$1$1') + '"';
+
+export async function readCompileResult(resultPath) {
+  if ((await stat(resultPath)).size > limits.outputBytes + limits.diagnosticBytes) return failure('QUOTA_EXCEEDED', 'Compiler result exceeds bounded output limit');
+  const result = JSON.parse(await readFile(resultPath, 'utf8'));
+  try { assertResultBudgets(result); }
+  catch (error) { return failure(error.code || 'SERVICE_UNAVAILABLE', error.message); }
+  return result;
+}
 
 /** @param {import('../../../packages/runtime-contracts/src/index.ts').CompileRequest} request
  * @param {{dependencyRoot?: string, timeoutMs?: number}} options
@@ -45,9 +54,7 @@ export async function compileVisual(request, options = {}) {
     cleanupConfirmed = job.cleanupComplete === true;
     if (!cleanupConfirmed) return failure('SERVICE_UNAVAILABLE', 'Compiler cleanup could not be confirmed');
     if (job.timeout) return failure('TIMEOUT', 'Compiler initialization or compilation exceeded its process deadline');
-    const resultPath = join(directory, 'compile-result.json');
-    if ((await stat(resultPath)).size > limits.outputBytes + limits.diagnosticBytes) return failure('QUOTA_EXCEEDED', 'Compiler result exceeds bounded output limit');
-    return JSON.parse(await readFile(resultPath, 'utf8'));
+    return await readCompileResult(join(directory, 'compile-result.json'));
   } catch (error) { keepEvidence = true; return failure('SERVICE_UNAVAILABLE', `${error.message}; retained evidence: ${directory}`); }
   finally {
     // The randomly allocated exact directory is owned by this invocation. Keep
