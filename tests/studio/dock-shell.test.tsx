@@ -51,9 +51,38 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   assert.ok(document.contains(canvas));
   assert.equal(attaches, 1);
   fireEvent.change(screen.getByLabelText('Move panel'), { target: { value: 'source' } });
-  await click('Save layout');
+  // Preserve a named non-default arrangement while resetting a different entry.
+  // Resetting the saved name would delete it and exercise only missing fallback.
   await click('Reset desktop layout');
+  await click('Move to tab group');
+  const groupFor = (title: string) => {
+    const tab = [...document.querySelectorAll('.dv-tab')].find(node => node.textContent?.trim() === title);
+    assert.ok(tab, `Expected dock tab ${title}`);
+    const group = tab.closest('.dv-groupview'); assert.ok(group); return group;
+  };
+  assert.equal(document.querySelectorAll('.studio-dock-grid .dv-groupview').length, 3);
+  assert.equal(groupFor('Source'), groupFor('Preview'));
+  await act(async () => { editor.dispatch({ changes: { from: 0, insert: '// saved layout draft\n' } }); });
+  fireEvent.change(screen.getByLabelText('Layout name'), { target: { value: 'Authoring tabs' } });
+  await click('Save layout');
+  const saved = window.localStorage.getItem('lux.personal-layout.v1.Authoring%20tabs');
+  assert.ok(saved);
+  fireEvent.change(screen.getByLabelText('Layout name'), { target: { value: 'Temporary reset' } });
+  await click('Reset desktop layout');
+  assert.equal(document.querySelectorAll('.studio-dock-grid .dv-groupview').length, 4);
+  assert.notEqual(groupFor('Source'), groupFor('Preview'));
+  assert.equal(window.localStorage.getItem('lux.personal-layout.v1.Authoring%20tabs'), saved);
+  fireEvent.change(screen.getByLabelText('Layout name'), { target: { value: 'Authoring tabs' } });
   await click('Restore layout');
+  assert.ok(screen.getByText('Restored layout: Authoring tabs'));
+  assert.equal(document.querySelectorAll('.studio-dock-grid .dv-groupview').length, 3);
+  assert.equal(groupFor('Source'), groupFor('Preview'));
+  assert.equal(document.querySelector('.preview-surface canvas'), canvas);
+  assert.equal(document.querySelector('.cm-editor'), editorNode);
+  assert.equal(EditorView.findFromDOM(editorNode), editor);
+  assert.equal(editor.state.doc.toString(), '// saved layout draft\nexport const value = 1');
+  await act(async () => { assert.equal(undo(editor), true); });
+  assert.equal(workspace.getSnapshot().source.files['main.ts'], 'export const value = 1');
   await click('Reset laptop layout');
   await click('Open Preview');
   assert.equal(canvas.closest('.preview-surface'), document.querySelector('.preview-surface'));
