@@ -99,3 +99,7 @@ Acceptance: an external agent read → build → capture → failed build produc
 ## Current sequencing addendum
 
 See [current implementation order](current-priorities.md) for the standalone-first pivot and QA follow-ups reconciled against TR-01–07. Shared MCP controls, lifecycle/recovery gaps and measured acceptance precede the planned editor expansion. Host integration remains a separate coordinated lane and a requirement for original full tracer completion; the AI activity log stays low priority.
+
+## Feedback placement policy
+
+User direction: integrate roadmap requests and product feedback into the appropriate existing milestone or active implementation task. Small bugs and low-cost fixes may be immediate; larger features follow their dependencies; optional polish belongs in a later polish step. Use scope, impact and dependencies to choose placement rather than treating every suggestion as the next task. Update the relevant existing entry and its acceptance checks instead of accumulating separate competing priority documents. Briefly tell the user where the feedback landed. The current-priorities addendum above records the earlier scope reconciliation; it is not a template for creating a new priority list with each request.
