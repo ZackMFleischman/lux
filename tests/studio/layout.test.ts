@@ -16,6 +16,9 @@ test('versioned desktop split and laptop tab layouts contain only registered rea
   const expanded = createStudioPanelRegistry([{ kind: 'graph', title: 'Graph', multiple: false, parseViewState: () => ({}) }]);
   assert.equal(expanded.get('graph').title, 'Graph');
   assert.throws(() => new PanelRegistry([registry.get('preview'), registry.get('preview')]), /duplicate/);
+  for (const kind of ['__proto__', 'constructor', 'prototype']) {
+    assert.throws(() => new PanelRegistry([{ ...registry.get('preview'), kind }]), /Invalid/);
+  }
 });
 test('layout parser rejects unsupported schema, unknown panels, state authority and unsafe references', () => {
   const registry = createStudioPanelRegistry(), base = defaultPersonalLayout(registry, 'desktop');
@@ -63,6 +66,11 @@ test('real Dockview CPU adapter moves, saves, restores, reopens and resets witho
   const adapter = new LuxDockviewAdapter(api, registry, storage, 'desktop');
   t.after(() => { adapter.dispose(); api.dispose(); dom.window.close(); for (const [key, value] of originals) if (value) Object.defineProperty(globalThis, key, value); else Reflect.deleteProperty(globalThis, key); });
   assert.equal(adapter.restore('Personal').restored, false); assert.equal(api.totalPanels, 4);
+  const beforeInvalidOpen = JSON.stringify(adapter.capture('Personal'));
+  for (const id of ['__proto__', 'constructor', 'prototype']) {
+    assert.throws(() => adapter.open('inspector', id), /Invalid panel identity/);
+    assert.equal(JSON.stringify(adapter.capture('Personal')), beforeInvalidOpen);
+  }
   adapter.setViewState('inspector', { lockedTargetId: 'node-a' });
   adapter.open('inspector', 'inspector-2'); adapter.setViewState('inspector-2', { lockedTargetId: 'node-b' });
   adapter.move('source', 'preview', 'center');

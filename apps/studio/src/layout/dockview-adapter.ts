@@ -1,5 +1,6 @@
 import type { DockviewApi, SerializedDockview } from 'dockview-react';
 import type { PanelRegistry } from './registry.ts';
+import { isReservedPanelKey } from './registry.ts';
 import { DOCKVIEW_VERSION, defaultPersonalLayout, parsePersonalLayout, validatePersonalLayout } from './personal-layout.ts';
 import type { PersonalLayout } from './personal-layout.ts';
 
@@ -47,7 +48,7 @@ export class LuxDockviewAdapter {
   reset(name: string): void { this.live(); this.apply(defaultPersonalLayout(this.registry, this.mode)); this.storage.removeItem(this.key(name)); }
   open(kind: string, id = kind): void {
     this.live(); const definition = this.registry.get(kind);
-    if (!/^[A-Za-z0-9_-]{1,64}$/.test(id)) throw Error('Invalid panel identity');
+    if (!/^[A-Za-z0-9_-]{1,64}$/.test(id) || isReservedPanelKey(id)) throw Error('Invalid panel identity');
     const existing = this.api.getPanel(id);
     if (existing) { if (existing.view.contentComponent !== kind) throw Error('Panel identity already belongs to another kind'); existing.api.setActive(); return; }
     if (!definition.multiple && this.api.panels.some(panel => panel.view.contentComponent === kind)) throw Error('Panel is already open');

@@ -1,11 +1,13 @@
 import { z } from 'zod';
 
+export const isReservedPanelKey = (key: string): boolean => ['__proto__', 'constructor', 'prototype'].includes(key);
+
 export type PanelDefinition = Readonly<{ kind: string; title: string; multiple: boolean; parseViewState(value: unknown): Record<string, unknown> }>;
 export class PanelRegistry {
   private definitions = new Map<string, PanelDefinition>();
   constructor(definitions: readonly PanelDefinition[]) {
     for (const definition of definitions) {
-      if (!/^[a-z][a-z0-9-]{0,31}$/.test(definition.kind) || this.definitions.has(definition.kind)) throw Error('Invalid or duplicate panel kind');
+      if (!/^[a-z][a-z0-9-]{0,31}$/.test(definition.kind) || isReservedPanelKey(definition.kind) || this.definitions.has(definition.kind)) throw Error('Invalid or duplicate panel kind');
       this.definitions.set(definition.kind, Object.freeze({ ...definition }));
     }
   }
