@@ -7,7 +7,7 @@ const tick = (ms: number) => (origin + BigInt(Math.round(ms * 1000))).toString()
 function fixture(hz = 60): Evidence {
   const opportunities = Array.from({ length: hz * 300 }, (_, i) => ({
     sequence: i + 1, at: tick(i * 1000 / hz), generation: 1, frameId: String(i + 1),
-    controlVersion: Math.floor(i / hz * 2) + 1,
+    controlVersion: Math.floor(i / hz * 2) + 1, renderedAt: tick(i * 1000 / hz),
   }));
   return {
     schemaVersion: 1, provenance: 'synthetic', instanceId: 'instance', revisionId: 'revision',
@@ -28,6 +28,7 @@ test('complete synthetic reference evaluates covered gates without claiming hard
   assert.equal(result.validity, 'complete');
   assert.equal(result.host.cadence, 'pass');
   assert.equal(result.host.freshness, 'pass');
+  assert.equal(result.host.freshRateHz, 60);
   assert.equal(result.controls.gate, 'pass');
   assert.equal(result.controls.matched, 600);
   assert.equal(result.hardwareAcceptance, 'unavailable');
@@ -36,6 +37,7 @@ test('complete synthetic reference evaluates covered gates without claiming hard
 test('fresh every time at 30 Hz fails independent cadence', () => {
   const result = evaluatePerformance(fixture(30));
   assert.equal(result.host.rateHz, 30);
+  assert.equal(result.host.freshRateHz, 30);
   assert.equal(result.host.cadence, 'fail');
   assert.equal(result.host.freshRatio, 1);
 });
@@ -56,7 +58,7 @@ test('missing beginning/end coverage and loss never pass', () => {
 });
 test('repeats and delivery gaps count; edges cannot vanish', () => {
   const e = fixture();
-  for (let i = 1; i <= 200; i++) { e.opportunities[i]!.frameId = '1'; e.opportunities[i]!.controlVersion = 1; }
+  for (let i = 1; i <= 200; i++) { e.opportunities[i]!.frameId = '1'; e.opportunities[i]!.controlVersion = 1; e.opportunities[i]!.renderedAt = tick(0); }
   const r = evaluatePerformance(e);
   assert.equal(r.host.repeats, 200);
   assert.equal(r.host.freshness, 'fail');
@@ -82,7 +84,7 @@ test('missing, superseded, substituted or unreceived versions cannot disappear',
     (e: Evidence) => { for (const o of e.opportunities) if (o.controlVersion === 11) o.controlVersion = 12; },
   ]) {
     const e = fixture(); mutate(e);
-    assert.equal(evaluatePerformance(e).controls.gate, 'fail');
+    assert.notEqual(evaluatePerformance(e).controls.gate, 'pass');
   }
 });
 test('fewer than 500 exact samples cannot produce p99', () => {
@@ -141,7 +143,7 @@ test('slow exact control tails fail rather than getting filtered away', () => {
 });
 test('null opportunities, stale generations and changed frame markers never look fresh', () => {
   const empty = fixture();
-  for (const o of empty.opportunities) { o.frameId = null; o.controlVersion = null; }
+  for (const o of empty.opportunities) { o.frameId = null; o.controlVersion = null; o.renderedAt = null; }
   const r = evaluatePerformance(empty);
   assert.equal(r.host.fresh, 0);
   assert.equal(r.host.maxGapMs, 300000);
@@ -157,4 +159,67 @@ test('null opportunities, stale generations and changed frame markers never look
     const e = fixture(); mutate(e);
     assert.equal(evaluatePerformance(e).validity, 'invalid');
   }
+});
+
+test('empty restart opportunities advance the generation fence', () => {
+  const e = fixture();
+  Object.assign(e.opportunities[100]!, { generation: 2, frameId: null, controlVersion: null, renderedAt: null });
+  assert.equal(evaluatePerformance(e).validity, 'invalid');
+});
+
+test('all consumed version markers obey receipt and first-render causality', () => {
+  for (const version of [2, 601]) {
+    const e = fixture(); e.opportunities[29]!.controlVersion = version;
+    assert.equal(evaluatePerformance(e).validity, 'invalid');
+  }
+});
+test('a later rendered frame can provide the first exact consumed control version', () => {
+  const e = fixture();
+  Object.assign(e.opportunities[30]!, { frameId: '30', controlVersion: 1, renderedAt: tick(29 * 1000 / 60) });
+  const r = evaluatePerformance(e);
+  assert.equal(r.host.cadence, 'pass');
+  assert.equal(r.host.freshness, 'pass');
+  assert.equal(r.controls.matched, 600);
+  assert.equal(r.controls.maxMs, 16.667);
+  assert.equal(r.controls.gate, 'pass');
+});
+
+test('control drain ends 250 ms after the final actual stimulus, including late tails', () => {
+  const late = fixture();
+  for (let i = 17970; i < 18000; i++) late.opportunities[i]!.controlVersion = 599;
+  late.opportunities.push({ sequence: 18001, at: tick(300200), generation: 1,
+    frameId: '18001', controlVersion: 600, renderedAt: tick(299500) });
+  late.controls[599]!.rendered!.frameId = '18001';
+  const r = evaluatePerformance(late);
+  assert.equal(r.controls.gate, 'fail');
+  assert.equal(r.controls.matched, 599);
+  assert.equal(r.controls.unmatched, 1);
+});
+test('full window coverage suffices when final-stimulus drain ends inside it', () => {
+  const e = fixture(); e.window.coverageEnd = tick(300000);
+  const r = evaluatePerformance(e);
+  assert.equal(r.validity, 'complete');
+  assert.equal(r.controls.gate, 'pass');
+});
+
+test('consumed frames must agree with first-render identity and retain render timestamps', () => {
+  for (const mutate of [
+    (e: Evidence) => { e.opportunities[30]!.controlVersion = 1; },
+    (e: Evidence) => { e.opportunities[31]!.renderedAt = tick(499); },
+    (e: Evidence) => { e.opportunities[31]!.renderedAt = tick(600); },
+    (e: Evidence) => { Object.assign(e.opportunities[31]!, { frameId: '31', renderedAt: tick(501) }); },
+  ]) {
+    const e = fixture(); mutate(e);
+    assert.equal(evaluatePerformance(e).validity, 'invalid');
+  }
+});
+test('final control consumed exactly at the final-stimulus deadline still matches', () => {
+  const e = fixture();
+  for (let i = 17970; i < 17985; i++) e.opportunities[i]!.controlVersion = 599;
+  e.opportunities[17985]!.renderedAt = tick(299500);
+  e.controls[599]!.rendered!.frameId = '17986';
+  const r = evaluatePerformance(e);
+  assert.equal(r.controls.matched, 600);
+  assert.equal(r.controls.maxMs, 250);
+  assert.equal(r.controls.gate, 'pass');
 });

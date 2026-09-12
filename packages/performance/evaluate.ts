@@ -9,7 +9,7 @@ export interface Evidence {
   lostRecords: number;
   incomplete: boolean;
   smoothing: boolean;
-  opportunities: { sequence: number; at: string; generation: number; frameId: string | null; controlVersion: number | null }[];
+  opportunities: { sequence: number; at: string; generation: number; frameId: string | null; controlVersion: number | null; renderedAt: string | null }[];
   controls: { version: number; value: number; sent: string; received: string | null; superseded: boolean;
     rendered: { at: string; generation: number; frameId: string } | null }[];
 }
@@ -20,7 +20,7 @@ export interface Evaluation {
   hardwareAcceptance: 'unavailable';
   unsupported: Record<string, 'unavailable'>;
   host: { cadence: Gate; freshness: Gate; opportunities?: number; expectedOpportunities?: number;
-    rateHz?: number; fresh?: number; repeats?: number; skipped?: string; freshRatio?: number; maxGapMs?: number };
+    rateHz?: number; freshRateHz?: number; fresh?: number; repeats?: number; skipped?: string; freshRatio?: number; maxGapMs?: number };
   controls: { gate: Gate; sent?: number; received?: number; superseded?: number; rendered?: number;
     matched?: number; unmatched?: number; p50Ms?: number; p95Ms?: number; p99Ms?: number; maxMs?: number };
 }
@@ -53,11 +53,14 @@ function admit(input: unknown): asserts input is Evidence {
   for (const v of Object.values(input.window)) ticks(v);
   integer(input.lostRecords); boolean(input.incomplete); boolean(input.smoothing);
   for (const o of input.opportunities) {
-    object(o, 'sequence at generation frameId controlVersion');
+    object(o, 'sequence at generation frameId controlVersion renderedAt');
     integer(o.sequence); ticks(o.at); integer(o.generation);
     if (o.frameId !== null) ticks(o.frameId);
     if (o.controlVersion !== null) integer(o.controlVersion);
     if (o.frameId === null && o.controlVersion !== null) throw new Error('Control without frame');
+    if (o.frameId === null) {
+      if (o.renderedAt !== null) throw new Error('Render timestamp without frame');
+    } else ticks(o.renderedAt);
   }
   for (const c of input.controls) {
     object(c, 'version value sent received superseded rendered');
@@ -89,21 +92,40 @@ export function evaluatePerformance(input: unknown): Evaluation {
     if (e.lostRecords !== 0 || e.incomplete) throw new Error('Lost or incomplete evidence');
     let fresh = 0, repeats = 0, skipped = 0n, count = 0;
     let lastAt = coverageStart, lastFreshAt = start, maxGap = 0n;
+    let currentGeneration: number | undefined;
     let previous: { generation: number; frame: bigint } | undefined;
-    const firstConsumes = new Map<string, bigint>();
-    const frameControls = new Map<string, number | null>();
+    const firstConsumes = new Map<number, bigint>();
+    const frameControls = new Map<string, { version: number | null; renderedAt: bigint }>();
+    const controlByVersion = new Map(e.controls.map(c => [c.version, c]));
     for (const [i, o] of e.opportunities.entries()) {
       const at = ticks(o.at);
       if (o.sequence !== i + 1 || at < coverageStart || at > coverageEnd || (i > 0 && at <= lastAt)) throw new Error('Opportunity sequence/time invalid');
       lastAt = at;
+      if (currentGeneration !== undefined && o.generation < currentGeneration) throw new Error('Stale opportunity generation');
+      if (o.generation !== currentGeneration) previous = undefined;
+      currentGeneration = o.generation;
       const inWindow = at >= start && at < end;
       if (inWindow) count++;
       if (o.frameId === null) continue;
       const frame = ticks(o.frameId), identity = `${o.generation}:${o.frameId}`;
-      if (frameControls.has(identity) && frameControls.get(identity) !== o.controlVersion) throw new Error('Frame control identity changed');
-      frameControls.set(identity, o.controlVersion);
-      const key = `${identity}:${o.controlVersion}`;
-      if (!firstConsumes.has(key)) firstConsumes.set(key, at);
+      const renderedAt = ticks(o.renderedAt);
+      if (renderedAt > at) throw new Error('Frame consumed before rendering');
+      const knownFrame = frameControls.get(identity);
+      if (knownFrame && (knownFrame.version !== o.controlVersion || knownFrame.renderedAt !== renderedAt)) throw new Error('Frame metadata changed');
+      frameControls.set(identity, { version: o.controlVersion, renderedAt });
+      if (o.controlVersion !== null) {
+        if (o.controlVersion < 1 || o.controlVersion > 600) throw new Error('Unknown consumed control version');
+        const c = controlByVersion.get(o.controlVersion);
+        // Missing evidence remains a failing control gate; contradictory evidence is invalid.
+        if (c?.received !== null && c?.received !== undefined && renderedAt < ticks(c.received)) throw new Error('Consumed frame rendered before control receipt');
+        if (c?.rendered) {
+          const firstRenderAt = ticks(c.rendered.at), firstFrame = ticks(c.rendered.frameId);
+          if (renderedAt < firstRenderAt || o.generation < c.rendered.generation ||
+            (o.generation === c.rendered.generation && frame < firstFrame) ||
+            (o.generation === c.rendered.generation && frame === firstFrame && renderedAt !== firstRenderAt)) throw new Error('Consumed frame contradicts first rendered marker');
+        }
+        if (!firstConsumes.has(o.controlVersion)) firstConsumes.set(o.controlVersion, at);
+      }
       if (previous && (o.generation < previous.generation || (o.generation === previous.generation && frame < previous.frame))) throw new Error('Stale generation/frame');
       const isFresh = !previous || o.generation > previous.generation || frame > previous.frame;
       if (inWindow) {
@@ -120,9 +142,11 @@ export function evaluatePerformance(input: unknown): Evaluation {
     const rateHz = count / (duration / 1000), freshRatio = count ? fresh / count : 0;
     result.host = { cadence: rateHz >= 59.4 && rateHz <= 60.6 ? 'pass' : 'fail',
       freshness: freshRatio >= .99 && ms(maxGap) <= 100 ? 'pass' : 'fail',
-      opportunities: count, expectedOpportunities: duration / 1000 * 60, rateHz, fresh, repeats,
+      opportunities: count, expectedOpportunities: duration / 1000 * 60, rateHz, freshRateHz: fresh / (duration / 1000), fresh, repeats,
       skipped: skipped.toString(), freshRatio, maxGapMs: ms(maxGap) };
     const versions = new Set<number>(), samples: number[] = [];
+    const finalSent = e.controls.reduce((latest, c) => ticks(c.sent) > latest ? ticks(c.sent) : latest, start);
+    const drainDeadline = finalSent + frequency / 4n;
     let received = 0, rendered = 0, superseded = 0;
     let controlValid = !e.smoothing;
     for (const c of e.controls) {
@@ -140,10 +164,12 @@ export function evaluatePerformance(input: unknown): Evaluation {
       rendered++;
       const renderAt = ticks(c.rendered.at);
       if (renderAt < receipt || renderAt > coverageEnd) throw new Error('Invalid rendered time');
-      const consumed = firstConsumes.get(`${c.rendered.generation}:${c.rendered.frameId}:${c.version}`);
-      if (consumed !== undefined && consumed >= renderAt && consumed <= end + frequency / 4n) samples.push(ms(consumed - receipt));
+      const observedFirstFrame = frameControls.get(`${c.rendered.generation}:${c.rendered.frameId}`);
+      if (observedFirstFrame && (observedFirstFrame.version !== c.version || observedFirstFrame.renderedAt !== renderAt)) throw new Error('First rendered frame identity contradicts consumption');
+      const consumed = firstConsumes.get(c.version);
+      if (consumed !== undefined && consumed >= renderAt && consumed <= drainDeadline) samples.push(ms(consumed - receipt));
     }
-    if (coverageEnd < end + frequency / 4n) throw new Error('Missing control drain coverage');
+    if (e.controls.length > 0 && coverageEnd < drainDeadline) throw new Error('Missing control drain coverage');
     samples.sort((a, b) => a - b);
     const quantile = (q: number) => samples.length ? samples[Math.ceil(samples.length * q) - 1] : undefined;
     const p95Ms = quantile(.95), p99Ms = samples.length >= 500 ? quantile(.99) : undefined;
