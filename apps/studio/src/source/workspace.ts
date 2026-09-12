@@ -1,10 +1,11 @@
 import type { SourceBundle } from '../../../../packages/runtime-contracts/src/index.ts';
 import { validateSource } from '../../../build-worker/src/source-policy.mjs';
+import { equalSource as equal, changedAssets } from './source-equality.ts';
 
 export type SourceSnapshot = Readonly<{
   source: SourceBundle; version: number; documentKey: number; dirty: boolean;
   selectedFile: string; openFiles: readonly string[]; busy: boolean;
-  dirtyFiles: readonly string[]; runningMatchesDraft: boolean; hasRunningSource: boolean;
+  dirtyFiles: readonly string[]; dirtyAssets: readonly string[]; runningMatchesDraft: boolean; hasRunningSource: boolean;
   canUndoReplacement: boolean;
 }>;
 export interface SourceWorkspace {
@@ -23,11 +24,6 @@ function admit(source: SourceBundle): SourceBundle {
   const admitted = validateSource(source) as SourceBundle;
   Object.freeze(admitted.files); return Object.freeze(admitted);
 }
-function equal(a: SourceBundle | null, b: SourceBundle): boolean {
-  return a !== null && a.sdkVersion === b.sdkVersion && a.entry === b.entry &&
-    Object.keys(a.files).length === Object.keys(b.files).length &&
-    Object.entries(a.files).every(([path, text]) => b.files[path] === text);
-}
 export function createSourceWorkspace(initial: SourceBundle): SourceWorkspace {
   let source = admit(initial), saved = source, running: SourceBundle | null = null, undo: SourceBundle | null = null;
   let version = 0, documentKey = 0, busy = false, selectedFile = source.entry, openFiles = [source.entry];
@@ -35,6 +31,7 @@ export function createSourceWorkspace(initial: SourceBundle): SourceWorkspace {
   function snapshot(): SourceSnapshot { return Object.freeze({ source, version, documentKey, busy, selectedFile,
     openFiles: Object.freeze([...openFiles]), dirty: !equal(saved, source),
     dirtyFiles: Object.freeze(Object.keys(source.files).filter(path => source.files[path] !== saved.files[path])),
+    dirtyAssets: Object.freeze(changedAssets(saved, source)),
     runningMatchesDraft: equal(running, source), hasRunningSource: running !== null, canUndoReplacement: undo !== null }); }
   let current = snapshot();
   function publish() { current = snapshot(); for (const listener of listeners) listener(); }

@@ -9,6 +9,7 @@ import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
 import { SceneFileStore } from '../../../packages/core/src/scene-file.ts';
 import { createAgentBridge } from './agent-bridge.ts';
+import { assertLegacyPlaybackSource } from './source/asset-playback.ts';
 import { observeFullscreen } from './fullscreen.ts';
 import { createExportService, runExportChild } from './export-process.ts';
 
@@ -47,6 +48,7 @@ function trusted(event: Electron.IpcMainInvokeEvent): boolean {
   return !!window && owned.has(window) && event.senderFrame === event.sender.mainFrame && isTrustedStudioUrl(event.senderFrame.url, pageUrl);
 }
 async function compile(source: unknown): Promise<unknown> {
+  assertLegacyPlaybackSource(source);
   if (compiling) throw Error('Another compile is in progress');
   const encoded = JSON.stringify(source);
   if (!encoded || Buffer.byteLength(encoded) > 8388608) throw Error('Source request exceeds its limit');

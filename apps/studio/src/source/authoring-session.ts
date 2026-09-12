@@ -1,6 +1,7 @@
 import { DEFAULT_OUTPUT } from '../../../../packages/runtime-contracts/src/index.ts';
 import type { SourceBundle } from '../../../../packages/runtime-contracts/src/index.ts';
 import type { SceneDocument } from '../../../../packages/core/src/scene-file.ts';
+import { createSceneDocument } from '../../../../packages/core/src/scene-document.ts';
 import type { SourceWorkspace } from './workspace.ts';
 
 type SavedFile = { token: string; name: string };
@@ -48,15 +49,13 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         if (!ports.export) throw Error('Export is unavailable');
         const snapshot = workspace.getSnapshot(), source = structuredClone(snapshot.source);
         await activate(source, snapshot.version);
-        return ports.export({ name, document: { format: 'lux-scene', version: 1, source,
-          settings: { ...DEFAULT_OUTPUT }, controls: documentControls() } });
+        return ports.export({ name, document: createSceneDocument(source, { ...DEFAULT_OUTPUT }, documentControls()) });
       });
     },
     save(saveAs = false) {
       return exclusive(async () => {
         const snapshot = workspace.getSnapshot(), controlVersion = controlsVersion;
-        const document: SceneDocument = { format: 'lux-scene', version: 1, source: structuredClone(snapshot.source),
-          settings: { ...DEFAULT_OUTPUT }, controls: documentControls() };
+        const document = createSceneDocument(structuredClone(snapshot.source), { ...DEFAULT_OUTPUT }, documentControls());
         const result = await ports.save({ token, saveAs, document });
         if (result) { token = result.token; workspace.markSaved(snapshot.version);
           update({ name: result.name, controlsDirty: controlsVersion !== controlVersion }); }

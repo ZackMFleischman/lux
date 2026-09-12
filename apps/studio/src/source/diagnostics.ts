@@ -1,12 +1,11 @@
 import type { SourceSnapshot } from './workspace.ts';
 import type { SourceBundle } from '../../../../packages/runtime-contracts/src/index.ts';
+import { equalSource } from './source-equality.ts';
 export type CompilerDiagnostic = { file?: string; line?: number; column?: number; message: string };
 export type SourceDiagnostic = CompilerDiagnostic & { draftVersion: number; candidateOnly?: boolean };
 export function diagnosticsForSource(diagnostics: readonly CompilerDiagnostic[], submitted: SourceBundle, draftVersion: number, snapshot: SourceSnapshot): SourceDiagnostic[] {
   const current = snapshot.source;
-  const candidateOnly = submitted.sdkVersion !== current.sdkVersion || submitted.entry !== current.entry ||
-    Object.keys(submitted.files).length !== Object.keys(current.files).length ||
-    Object.entries(submitted.files).some(([path, text]) => !Object.hasOwn(current.files, path) || current.files[path] !== text);
+  const candidateOnly = !equalSource(submitted, current);
   return diagnostics.map(diagnostic => ({ ...diagnostic, draftVersion, candidateOnly }));
 }
 export class SourceCompileError extends Error {

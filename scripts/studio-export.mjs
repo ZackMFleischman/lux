@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url';
 import { SceneFileStore } from '../packages/core/src/scene-file.ts';
 import { prepareTransportScene } from './transport-prepare.mjs';
 import { exportResolume } from './export-resolume.mjs';
+import { assertLegacyPlaybackSource } from '../apps/studio/src/source/asset-playback.ts';
 
 /** Child-process entry point. No generated source is evaluated in this process. */
 export async function exportSceneDocument(request, { prepare = prepareTransportScene, exporter = exportResolume } = {}) {
@@ -12,6 +13,7 @@ export async function exportSceneDocument(request, { prepare = prepareTransportS
       Object.keys(request).some(key => !['name', 'document', 'outputDirectory'].includes(key))) throw Error('Invalid export request');
   if (typeof request.name !== 'string' || !request.name.trim() || request.name.length > 80 || /[\x00-\x1f]/.test(request.name)) throw Error('Invalid source name');
   if (typeof request.outputDirectory !== 'string' || !isAbsolute(request.outputDirectory)) throw Error('Export requires an absolute output directory');
+  assertLegacyPlaybackSource(request.document?.source);
   const temporaryRoot = resolve(tmpdir()), temporary = await mkdtemp(join(temporaryRoot, 'lux-studio-export-'));
   try {
     const scenePath = join(temporary, 'draft.lux-scene');
