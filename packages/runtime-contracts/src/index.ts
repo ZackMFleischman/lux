@@ -25,7 +25,12 @@ export type ControlValues = z.infer<typeof controlValuesSchema>;
 // Canonical paths, UTF-8 validity and aggregate byte quotas are checked by the
 // compiler admission policy, before files are materialized. These DTOs never
 // authorize filesystem operations or execution of submitted code.
-export const sourceBundleSchema = z.object({ entry: z.string().min(1), files: z.record(z.string()), sdkVersion: z.literal(SDK_VERSION) }).strict();
+export const legacySourceBundleSchema = z.object({ entry: z.string().min(1), files: z.record(z.string()), sdkVersion: z.literal(SDK_VERSION) }).strict();
+export const sourceAssetSchema = z.object({mediaType:z.literal('image/bmp'),encoding:z.literal('base64'),data:z.string().min(1)}).strict();
+export const assetSourceBundleSchema = legacySourceBundleSchema.extend({sourceVersion:z.literal(2),assets:z.record(sourceAssetSchema)}).strict();
+export const sourceBundleSchema = z.union([legacySourceBundleSchema,assetSourceBundleSchema]);
+export type LegacySourceBundle = z.infer<typeof legacySourceBundleSchema>;
+export type AssetSourceBundle = z.infer<typeof assetSourceBundleSchema>;
 export type SourceBundle = z.infer<typeof sourceBundleSchema>;
 export const compileRequestSchema = z.object({ source: sourceBundleSchema }).strict();
 export type CompileRequest = z.infer<typeof compileRequestSchema>;
@@ -34,11 +39,14 @@ export const compileDiagnosticSchema = z.object({
   line: z.number().int().positive().optional(), column: z.number().int().positive().optional(),
 }).strict();
 export type CompileDiagnostic = z.infer<typeof compileDiagnosticSchema>;
-export const compiledArtifactSchema = z.object({
+export const legacyCompiledArtifactSchema = z.object({
   sourceHash: hashSchema, bundleHash: hashSchema, entry: z.string().min(1),
   modules: z.record(z.string()), sourceMaps: z.record(z.string()),
   dependencyHashes: z.record(hashSchema), sdkVersion: z.literal(SDK_VERSION), compilerVersion: z.string().min(1),
 }).strict();
+export const derivedAssetSchema = sourceAssetSchema.extend({byteLength:z.number().int().positive(),sha256:hashSchema,width:z.number().int().min(1).max(512),height:z.number().int().min(1).max(512)}).strict();
+export const assetCompiledArtifactSchema = legacyCompiledArtifactSchema.extend({artifactVersion:z.literal(2),assets:z.record(derivedAssetSchema),assetSetHash:hashSchema}).strict();
+export const compiledArtifactSchema = z.union([legacyCompiledArtifactSchema,assetCompiledArtifactSchema]);
 export type CompiledArtifact = z.infer<typeof compiledArtifactSchema>;
 // A compiled artifact has not run a candidate smoke test and is not a ValidatedBundle.
 export const compileFailureCodeSchema = z.enum(['SOURCE_BOUNDARY_VIOLATION', 'COMPILE_FAILED', 'QUOTA_EXCEEDED', 'TIMEOUT', 'SERVICE_UNAVAILABLE']);
