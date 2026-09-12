@@ -1,5 +1,9 @@
 # Tracer 0.1 acceptance and evidence
 
+## Required authoring-property addendum — 12 September 2026
+
+The user explicitly requires **properties declared in visual code before the tracer is complete**. The fixed Intensity-only tracer implementation does not satisfy this gate. Demonstrate a visual with multiple independent declared parameters (for example spike height, noise scale, sharpness and animation speed), generated Inspector controls, generic guarded MCP updates, preserved values through save/reopen and restart, and those declared controls in an independently installed Resolume export. A visual need not declare Intensity at all. Preserve legacy scenes and immutable installed releases; an intermediate implementation that blocks new-schema export cannot pass this gate. Test stale/invalid changes and smooth dragging without older acknowledgements overwriting current user input.
+
 This procedure operationalizes [requirements T01–T09](../requirements.md) and original design Appendix B. It is a plan, not a test report. Do not check any acceptance box using source review, a mocked host, or generated fixtures alone.
 
 DEC-13 adds T10 and the minimum installed release outcomes described in

@@ -2,9 +2,12 @@
 
 ## Current creative-session follow-ups
 
-- [ ] C22 — NEXT AUTHORING CAPABILITY, alongside assets: code-declared per-visual live parameters. No globally required Intensity; derive Inspector and generic MCP operations from the visual declaration. Cover validation, runtime changes, persistence and export compatibility. The user's noisy sphere brief is the motivating acceptance case. Prioritize ahead of broader polish.
+- [ ] C22 — IN PROGRESS: visual_parameters_design is mapping the actual SDK/compiler/runtime/scene/host interfaces into an implementation contract in an isolated worktree. Code declares each visual's parameters; no globally required Intensity. Inspector and generic MCP operations consume that declaration. Cover validation, runtime changes, persistence and export compatibility. The user's noisy sphere brief is the motivating acceptance case.
 - [x] C23 — DONE: repo-shipped `lux-visual-creation` Codex skill (428b2de/6b7afb0), independent workflow review and corrected adapter/build guidance, CPU-compiled noise example, repeatable installer (11428ce; eight CPU tests passed), and personal installation. Installed files match the repo; Skill Creator validation passed. See [maintenance and validation](visual-creation-skill.md). Update and reinstall alongside future author-facing features. Fixed Intensity and asset limitations remain explicit; this does not close C22 or validate the template's GPU appearance.
 - User's working Studio remains available for creative use. This skill/documentation checkpoint does not launch Studio or run live MCP/graphics tests.
+
+- [ ] C24 — IN PROGRESS (BOUNDED USABILITY): editor_apply_polish implements Ctrl+S to apply the source bundle to preview, keeps explicit scene save, distinguishes the passive scene title from File/View menus, and keeps file navigation compact even in a wide editor. Isolated CPU/RTL validation first; no reload of the user's open Studio.
+- Asset delivery update: C16 preview/restart and browser implementations have completed independent review in separate worktrees (2df7baf and96cec76). Coordinator is combining them for CPU validation. C21 PNG/JPEG/alpha design is complete (a6ed354); image_codec_delivery now implements the bounded codec slice in isolation. This supersedes the older in-progress ownership entries below; no PNG/JPEG playback or GPU alpha validation is claimed yet.
 
 Started 2026-09-12 after the successful guided Resolume QA. This is the active tracker; [overnight progress](overnight-progress.md) preserves the preceding work and manual observations. Integration: `.worktrees/tracer`, branch `codex/tracer-0.1`, starting commit `26fc023`.
 
