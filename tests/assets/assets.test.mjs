@@ -129,6 +129,43 @@ test('asynchronous hashing snapshots input and sorts derived paths in ASCII orde
   assert.deepEqual(Object.keys(verified.sourceAssets),['assets/Z.bmp','assets/a.bmp']);
 });
 
+test('admission snapshots checked descriptors and readmits under changing Proxy get traps', () => {
+  const original = source(); let reads = 0;
+  const swappingDescriptor = new Proxy({...original['assets/checker.bmp']}, {
+    get(target,key) { return key === 'data' && ++reads > 1 ? '' : Reflect.get(target,key); },
+  });
+  const admitted = api.validateSourceAssets({'assets/checker.bmp':swappingDescriptor});
+  assert.deepEqual(api.validateSourceAssets(admitted),original);
+  assert.equal(reads,0);
+
+  const changed = bmp(); changed[54] ^= 123;
+  const swappingRecord = new Proxy(original, {get() { return descriptor(changed); }});
+  assert.deepEqual(api.validateSourceAssets(swappingRecord),original);
+});
+
+test('verification binds projected facade bytes to checked data and metadata under Proxy substitution', async () => {
+  const original = await api.deriveAssets(source(),hash);
+  const changed = bmp(); changed[54] ^= 123;
+  let reads = 0;
+  const swappingData = new Proxy({...original.assets['assets/checker.bmp']}, {
+    get(target,key) { return key === 'data' && ++reads > 1 ? changed.toString('base64') : Reflect.get(target,key); },
+  });
+  const verified = await api.verifyDerivedAssets({'assets/checker.bmp':swappingData},original.assetSetHash,hash);
+  const bytes = api.createReadonlyAssetMap(verified.sourceAssets).get('assets/checker.bmp');
+  assert.equal(hash(bytes),verified.assets['assets/checker.bmp'].sha256);
+  assert.deepEqual(await api.deriveAssets(verified.sourceAssets,hash),original);
+  assert.equal(reads,0);
+
+  for (const [field,replacement] of [['byteLength',1],['width',512],['height',512],['sha256','f'.repeat(64)],['mediaType','image/png'],['encoding','url']]) {
+    const swappingMetadata = new Proxy({...original.assets['assets/checker.bmp']}, {
+      get(target,key) { return key === field ? replacement : Reflect.get(target,key); },
+    });
+    const result = await api.verifyDerivedAssets({'assets/checker.bmp':swappingMetadata},original.assetSetHash,hash);
+    assert.deepEqual(result.assets,original.assets,field);
+    assert.deepEqual(api.validateSourceAssets(result.sourceAssets),source(),field);
+  }
+});
+
 test('readonly facade isolates get, iteration, forEach, input mutation and independent candidates', () => {
   const input = source(); const map = api.createReadonlyAssetMap(input); const other = api.createReadonlyAssetMap(input);
   assert(Object.isFrozen(map)); assert.equal(map.size,1); assert.equal(map.set,undefined); assert.equal(map.delete,undefined);
