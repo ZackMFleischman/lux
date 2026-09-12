@@ -14,10 +14,11 @@ Updated: 2026-09-12. Coordinator: Lux Studio UI task. Integration checkout: `.wo
 | MANUAL QA NEEDED | Load/trigger source in Resolume | Coordinator | Two drag attempts selected empty slots but did not load the probe; no new host log. Stopped retries. User confirms drag did not work. No native producer started. |
 | DONE | Review and integrate MCP lane; run real MCP controls QA | Coordinator + independent reviewer | Real test starts paused, changes parameters, plays/pauses/resets/restarts, rejects stale generation and preserves output on invalid/hanging candidates. Transport worker compatibility also reviewed. |
 | DONE | Automated real Studio polish QA | Coordinator / Playwright | Three play/pause cycles had no Reset/Restart disabled transitions or preview relayout; paused intensity stable; native preview-only fullscreen fills window, hint fades, one Escape restores original canvas. |
-| IN PROGRESS | Review and integrate export foundation | Coordinator + review lane | Storage/registration integrated; native location, stale-binary capability, static CRT and cached default issues corrected. 18 combined package/install/process tests pass. |
-| IN PROGRESS | Shared installed runtime, automatic source startup, independent instances | Coordinator + native review | Watchdog155cb3b and nonblocking cleanup6705365 integrated; 14 CPU supervision tests and 11 native CTests pass. Real packaged supervisor installation/startup/singleton/idle exit passes. Actual visual/source concurrency acceptance pending. |
-| IN PROGRESS | Export action in Studio and cold-start/reopen QA | Coordinator | Real Studio export and bundled Electron install/supervisor checks pass for release2d254982… / runtime20c587d4…. 99 runtime files. Install17.0s, supervisor ready1.66s, idle exit31.7s; OS file cache warm, no producer/first-pixel measurement. Actual Resolume registration/playback/reopen remains manual QA. |
-| IN PROGRESS | Lifecycle/recovery and performance acceptance gaps | Coordinator + review lane | Watchdog/cached restart integrated 78c8cb8. Real MCP workflow passes; restart request-to-ready measured 172 ms. Native stop/first-source cold/warm timings remain unmeasured. |
+| DONE | Review and integrate export foundation | Coordinator + review lane | Storage/registration integrated; native location, stale-binary capability, static CRT and cached default issues corrected. 18 combined package/install/process tests pass. |
+| IMPLEMENTED; HOST QA PENDING | Shared installed runtime, automatic source startup, independent instances | Coordinator + native review | Watchdog155cb3b and nonblocking cleanup6705365 integrated; 14 CPU supervision tests and 11 native CTests pass. Real packaged supervisor installation/startup/singleton/idle exit passes. Actual visual/source concurrency acceptance pending. |
+| DONE | Export action in Studio | Coordinator | Real Studio export and bundled Electron install/supervisor checks pass for release2d254982… / runtime20c587d4…. 99 runtime files. Install17.0s, supervisor ready1.66s, idle exit31.7s; OS file cache warm, no producer/first-pixel measurement. |
+| MANUAL QA NEEDED | Installed export registration, playback and composition cold reopen | Coordinator + user for host interaction | Actual Resolume registration/playback/reopen is unverified. Use the prepared export and installed-runtime-validation.md; this gate is separate from the completed Studio export action. |
+| UNFINISHED | Lifecycle/recovery and performance acceptance gaps | Coordinator | Watchdog/cached restart integrated 78c8cb8; external supervision improved in 155cb3b/6705365. Real MCP workflow passes; latest Studio restart request-to-ready is 181 ms. Confirmed stop/GPU teardown, recovered consumed frame, cold/warm source timing and remaining performance gates are unmeasured. Automatic recovery/retry policy still needs reconciliation with the acceptance design; CPU tests and further implementation can proceed without Resolume UI. |
 | DONE | Review/integrate source editor; automated Studio UI QA | Coordinator + independent reviewer | Three review findings fixed; native editor/preview continuity and readable dark syntax contrast pass. Native IME/maximum-size performance remain broader acceptance tasks. |
 | DONE | Flexible layout adapter spike (later roadmap) | export_foundation / layout-spike | Integrated fa88bfa/af52dd2; real Dockview CPU move/save/restore/reopen/reset tests, scoped typecheck and React/CSS bundle pass. Current UI remains unchanged. |
 | QUEUED | Connect ordinary dockable Source/Preview/Inspector/Jobs panels | Coordinator | Use tested adapter with application-owned state above mounts; native drag/focus/CSP and preview/editor continuity QA required before replacing current shell. Future Library/Graph use same registry. |
@@ -36,7 +37,17 @@ Updated: 2026-09-12. Coordinator: Lux Studio UI task. Integration checkout: `.wo
 
 - Started three independent implementation agents; transport task was idle before this execution began.
 - Read computer-use guidance, selected the actual Resolume window, and confirmed the user-described empty workspace/source filter without changing clips yet.
-- Integration has preserved current Studio work and merged current main scope plus completed transport implementation. Native tests/install have not been rerun yet.
+- Integration has preserved current Studio work and merged current main scope plus completed transport implementation. Native CPU tests and isolated packaged installation have subsequently passed; the real Resolume plugin installation remains unchanged.
+
+## Work remaining after the agent checkpoint
+
+All three dispatched agents have finished; no implementation lane is currently running in the background. Completion of their bounded assignments does not mean tracer acceptance is complete.
+
+1. Reconcile lifecycle recovery/retry behavior with the acceptance design, implement outstanding behavior, and add meaningful automated failure/timing checks. Separate confirmed stop and consumed-frame recovery from request-to-ready observations.
+2. Independently connect the tested Dockview adapter to the actual Studio panes and validate drag/resize/tab persistence and preview/editor continuity. The visible Studio is not dockable yet; preview popout is also not delivered by the adapter spike.
+3. When host interaction is available, validate installed Resolume sources, duplicate/different-source independence, removal and saved-composition cold reopen, and collect first-correct-frame and performance measurements. This host gate does not block items 1 and 2.
+
+Status labels distinguish completed implementation, outstanding acceptance, and unfinished work. Update a row to IN PROGRESS only while an owner is actively executing it.
 
 Each completed lane updates this table with commit IDs and test results. Failed or blocked checks remain visible until resolved; CPU success does not stand in for native visual acceptance.
 
