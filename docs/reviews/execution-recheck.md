@@ -32,3 +32,9 @@ Resolve this by naming a service-level retention-root fixture in TR-04 and movin
 The original six findings are corrected in their contracts/procedures. The plan is ready to start the bounded environment and GPU experiments. Full sequential task-plan execution is ready **subject to the small EXEC-R1 ownership clarification before TR-04**, plus the existing mandatory experiment gates. No other cross-document contradiction was found within this focused recheck.
 
 Actual dependency/profile compatibility, GPU texture readiness and retirement, compositor/frame correspondence, host control delivery, and performance remain implementation evidence obligations. The negative acceptance fixtures and new identity/retention tests are specified work, not passing tests. The documentation corrections must not be represented as proof that the proposed runtime works.
+
+## Closure addendum — 12 September 2026 UTC
+
+Rechecked root correction `a1db9932775de1da096d749d601b31853ea6e855`, cherry-picked here as `8761632e475806e3cbde531b68824ecbcc8f01df`. **EXEC-R1 is closed.** TR-04 line 168 now uses a service-level retention-root fixture and explicitly defers actual CLI/native attachment to TR-06. TR-06 line 204 owns the full activate-A/accept-B-C/collect/Attach/restart scenario, including current host values and failed replacement retention. The fixture no longer depends on a later production operation or counts as host evidence.
+
+All findings from this execution review are now closed at the planning level. The complete sequential task plan is ready for implementation subject to its existing prerequisite and hardware gates. No implementation success is claimed. The authorship/independence limitation above remains unchanged; this narrow closure read no other review or disposition.
