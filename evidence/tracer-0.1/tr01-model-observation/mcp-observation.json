@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-12",
+  "topology": "Codex orchestrator -> functions exec_command -> MCP SDK StdioClientTransport -> fixture server; exact returned ImageContent forwarded by functions image()",
+  "protocolVersion": "2025-11-25",
+  "imageObserved": true,
+  "observation": "A square split into four colored quadrants: red upper-left, green upper-right, blue lower-left, yellow lower-right.",
+  "limitations": [
+    "This is the fixture, not a Lux rendered visual.",
+    "The local MCP SDK client is bridged through the shell/tool result; native Codex MCP server registration was not tested.",
+    "Protocol timeouts/reconnect checks are separately owned by the harness."
+  ],
+  "response": {
+    "content": [
+      {
+        "type": "image",
+        "data": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAMUlEQVR4nO3NwQkAMAACMfdf2s5gP6UQuKeSNJna1hcBAAAA4AmwPtpMAQAAAOAL4ABxefs9G/cRNAAAAABJRU5ErkJggg==",
+        "mimeType": "image/png"
+      }
+    ]
+  },
+  "transcript": [
+    {
+      "direction": "client->server",
+      "message": {
+        "method": "initialize",
+        "params": {
+          "protocolVersion": "2025-11-25",
+          "capabilities": {},
+          "clientInfo": {
+            "name": "lux-tr01-sdk-client",
+            "version": "0.0.0"
+          }
+        },
+        "jsonrpc": "2.0",
+        "id": 0
+      }
+    },
+    {
+      "direction": "server->client",
+      "message": {
+        "jsonrpc": "2.0",
+        "id": 0,
+        "result": {
+          "protocolVersion": "2025-11-25",
+          "capabilities": {
+            "tools": {
+              "listChanged": true
+            }
+          },
+          "serverInfo": {
+            "name": "lux-tr01-profile-fixture",
+            "version": "0.0.0"
+          }
+        }
+      }
+    },
+    {
+      "direction": "client->server",
+      "message": {
+        "method": "notifications/initialized",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "direction": "client->server",
+      "message": {
+        "method": "tools/list",
+        "jsonrpc": "2.0",
+        "id": 1
+      }
+    },
+    {
+      "direction": "server->client",
+      "message": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "tools": [
+            {
+              "name": "lux_fixture_image",
+              "description": "TR-01 test-only known image fixture; no renderer or application state.",
+              "inputSchema": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "properties": {}
+              },
+              "execution": {
+                "taskSupport": "forbidden"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "direction": "client->server",
+      "message": {
+        "method": "tools/call",
+        "params": {
+          "name": "lux_fixture_image",
+          "arguments": {}
+        },
+        "jsonrpc": "2.0",
+        "id": 2
+      }
+    },
+    {
+      "direction": "server->client",
+      "message": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": {
+          "content": [
+            {
+              "type": "image",
+              "data": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAMUlEQVR4nO3NwQkAMAACMfdf2s5gP6UQuKeSNJna1hcBAAAA4AmwPtpMAQAAAOAL4ABxefs9G/cRNAAAAABJRU5ErkJggg==",
+              "mimeType": "image/png"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "client": "lux-tr01-sdk-client via stdio; automated protocol test only"
+}
