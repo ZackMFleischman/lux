@@ -10,6 +10,8 @@
 
 **Spec:** [Source workspace](../design/source-workspace.md). Read [CPU audit](../reviews/source-workspace-cpu-audit.md) for current evidence.
 
+**Scheduling:** [Current implementation order](current-priorities.md) governs priority. This prepared plan does not put editor expansion ahead of tracer control, recovery and measurement gaps. Its task numbering is local to the editor workstream.
+
 ## Global constraints
 
 - Work from `codex/tracer-0.1` or its integrated successor; use a dedicated `codex/` worktree for implementation. Do not share a writable checkout with transport agents.

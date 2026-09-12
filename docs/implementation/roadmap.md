@@ -95,3 +95,7 @@ Record a bounded session history of admitted MCP requests with timestamp, reques
 Show only activity observable by Lux: a request in progress is not evidence of an agent's internal reasoning or work between calls. Keep authentication tokens and secrets out of entries. Routine activity must not insert/remove banners or resize the preview. Durable history, rich diffs and filtering are optional later extensions, not requirements for the first bounded session log.
 
 Acceptance: an external agent read → build → capture → failed build produces understandable entries, pending work updates in place, failure retains the working preview, and opening/closing the activity view does not alter runtime behavior. Validate request correlation, bounded retention and redaction with CPU tests before interactive QA.
+
+## Current sequencing addendum
+
+See [current implementation order](current-priorities.md) for the standalone-first pivot and QA follow-ups reconciled against TR-01–07. Shared MCP controls, lifecycle/recovery gaps and measured acceptance precede the planned editor expansion. Host integration remains a separate coordinated lane and a requirement for original full tracer completion; the AI activity log stays low priority.
