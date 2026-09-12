@@ -24,6 +24,7 @@ test('source panel preserves helper edits and undo across close/reopen and docum
   await act(async () => { view().dispatch({ changes: { from: 0, to: view().state.doc.length, insert: 'helper draft' } }); });
   assert.equal(w.getSnapshot().source.files['lib/color.ts'], 'helper draft');
   await click(screen.getByRole('button', { name: 'Close lib/color.ts' }));
+  assert.equal(document.activeElement?.getAttribute('aria-selected'), 'true');
   await click(screen.getByRole('button', { name: 'Open lib/color.ts' }));
   assert.equal(view().state.doc.toString(), 'helper draft');
   await act(async () => { assert.equal(undo(view()), true); });
@@ -35,9 +36,12 @@ test('source panel preserves helper edits and undo across close/reopen and docum
 test('file creation validates paths, saving sees all files, and busy view is readonly', async () => {
   const w = fixture(); let saved: unknown;
   const ui = render(<SourcePanel workspace={w} readOnly={false} onSave={() => { saved = w.getSnapshot().source; }} />);
+  assert.equal(screen.queryByRole('textbox', { name: 'New TypeScript file' }), null);
+  await click(screen.getByRole('button', { name: 'New file' }));
   fireEvent.change(screen.getByRole('textbox', { name: 'New TypeScript file' }), { target: { value: '../bad.ts' } });
   await click(screen.getByRole('button', { name: 'Add file' }));
   assert.match(screen.getByRole('alert').textContent!, /Invalid relative/);
+  assert.equal((screen.getByRole('textbox', { name: 'New TypeScript file' }) as HTMLInputElement).value, '../bad.ts');
   fireEvent.change(screen.getByRole('textbox', { name: 'New TypeScript file' }), { target: { value: 'lib/new.ts' } });
   await click(screen.getByRole('button', { name: 'Add file' }));
   assert.equal(w.getSnapshot().selectedFile, 'lib/new.ts');
@@ -45,7 +49,7 @@ test('file creation validates paths, saving sees all files, and busy view is rea
   assert.equal(Object.keys((saved as any).files).length, 4);
   ui.rerender(<SourcePanel workspace={w} readOnly={true} onSave={() => {}} />);
   assert.equal(view().contentDOM.getAttribute('contenteditable'), 'false');
-  assert.equal((screen.getByRole('button', { name: 'Add file' }) as HTMLButtonElement).disabled, true);
+  assert.equal((screen.getByRole('button', { name: 'New file' }) as HTMLButtonElement).disabled, true);
   assert.ok(document.querySelector('style[nonce="abcdefghijklmnopqrstuvwx"]'));
 });
 test('external replacement resets changed file history and panel remount retains unaffected file history', async () => {
@@ -106,4 +110,19 @@ test('rejected candidate diagnostics explain their origin and cannot navigate th
   assert.equal((screen.getByRole('button', { name: /Candidate helper error/ }) as HTMLButtonElement).disabled, true);
   assert.match(screen.getByText(/Diagnostic belongs to a rejected candidate/).textContent!, /displayed source is unchanged/);
   assert.equal(w.getSnapshot().selectedFile, 'main.ts');
+});
+
+
+test('new-file Escape cancels locally, restores focus and leaves source unchanged', async () => {
+  const w = fixture(); render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} />);
+  const before = w.getSnapshot(); let globalEscapes = 0;
+  const listener = () => { globalEscapes++; }; window.addEventListener('keydown', listener);
+  await click(screen.getByRole('button', { name: 'New file' }));
+  const input = screen.getByRole('textbox', { name: 'New TypeScript file' });
+  fireEvent.change(input, { target: { value: 'unsaved.ts' } });
+  await act(async () => { fireEvent.keyDown(input, { key: 'Escape' }); });
+  assert.equal(screen.queryByRole('textbox', { name: 'New TypeScript file' }), null);
+  assert.equal(document.activeElement, screen.getByRole('button', { name: 'New file' }));
+  assert.equal(w.getSnapshot(), before); assert.equal(globalEscapes, 0);
+  window.removeEventListener('keydown', listener);
 });

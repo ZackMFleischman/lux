@@ -10,7 +10,7 @@ export const studioTheme = createTheme({
   typography: { fontFamily: 'Inter, "Segoe UI", sans-serif', fontSize: 13, button: { textTransform: 'none', fontWeight: 500 } },
   shape: { borderRadius: 5 },
   components: {
-    MuiButton: { defaultProps: { size: 'small', variant: 'outlined', disableElevation: true }, styleOverrides: { root: { whiteSpace: 'nowrap', minWidth: 0 } } },
+    MuiButton: { defaultProps: { size: 'small', variant: 'text', disableElevation: true }, styleOverrides: { root: { whiteSpace: 'nowrap', minWidth: 0 } } },
     MuiPaper: { defaultProps: { elevation: 0 }, styleOverrides: { root: { backgroundImage: 'none' } } },
     MuiChip: { defaultProps: { size: 'small', variant: 'outlined' }, styleOverrides: { root: { fontSize: 9, letterSpacing: 1, borderRadius: 3, height: 23 } } },
     MuiSlider: { defaultProps: { size: 'small' } },

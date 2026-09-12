@@ -10,7 +10,7 @@ test('default view shows unavailable output and disabled runtime controls rather
   assert.match(html, /Awaiting runtime/);
   assert.match(html, /Reference output/);
   assert.match(html, /1920 × 1080/);
-  assert.match(html, /disabled=""[^>]*>Play/);
+  assert.match(html, /disabled=""[^>]*aria-label="Play"/);
   assert.match(html, /Visual delivery[\s\S]*Unavailable/);
   assert.match(html, /UI cadence[\s\S]*Unavailable/);
   assert.doesNotMatch(html, /<canvas|<img|60 fps|demo scene/i);

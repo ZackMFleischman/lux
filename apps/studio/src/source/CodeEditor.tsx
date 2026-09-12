@@ -26,7 +26,7 @@ const sourceColors = HighlightStyle.define([
   { tag: tags.invalid, color: '#ff8a98', textDecoration: 'underline' },
 ]);
 const theme = EditorView.theme({
-  '&': { height: '280px', backgroundColor: '#111217', color: '#e1e2ec', fontSize: '13px' },
+  '&': { height: '100%', backgroundColor: '#111217', color: '#e1e2ec', fontSize: '13px' },
   '.cm-scroller': { overflow: 'auto', fontFamily: 'Consolas, monospace' },
   '.cm-content': { caretColor: '#b4a4e9' }, '.cm-cursor': { borderLeftColor: '#b4a4e9' },
   '.cm-gutters': { backgroundColor: '#191b23', color: '#959bb0', borderRight: '1px solid #30323d' },

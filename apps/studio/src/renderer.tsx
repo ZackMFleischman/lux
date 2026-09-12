@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
-import { Alert, Button, Chip, CssBaseline, Paper, Slider, ThemeProvider } from '@mui/material';
+import { Alert, Button, Chip, CssBaseline, Paper, Slider, ThemeProvider, IconButton, Tooltip, Menu, MenuItem } from '@mui/material';
 import { studioTheme } from './theme.ts';
 import { INTENSITY_CONTROL } from '../../../packages/runtime-contracts/src/index.ts';
 import { Preview } from './preview.tsx';
@@ -23,12 +23,14 @@ function MetricView({ label, metric, nowMs }: { label: string; metric: Metric | 
   return <div className="metric"><span>{label}</span><strong>{text.value}</strong><small>{text.detail}</small></div>;
 }
 export type StudioProps = {
-  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode;
+  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; appError?: string;
 };
 export function StudioApp(props: StudioProps) {
   return <ThemeProvider theme={studioTheme}><CssBaseline /><StudioLayout {...props} /></ThemeProvider>;
 }
-function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel }: StudioProps) {
+function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel, appCommands, fileMenu, appError }: StudioProps) {
+  const [toolsHost, setToolsHost] = useState<HTMLElement | null>(null);
+  const [transportMenu, setTransportMenu] = useState<HTMLElement | null>(null);
   const subscribe = useCallback((listener: () => void) => client.subscribe(listener), [client]);
   const getSnapshot = useCallback(() => client.getSnapshot(), [client]);
   const snapshot = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
@@ -59,7 +61,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   }, [windows]);
   useEffect(() => {
     const escape = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
+      if (event.key !== 'Escape' || event.defaultPrevented) return;
       if (windows) void windows.fullscreen(false).catch(reason => setError(String(reason)));
       if (!windowState.fullscreen) setMaximized(false);
     };
@@ -83,10 +85,10 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   function windowAction(action: () => Promise<void>): void { void action().catch(reason => setError(String(reason))); }
   const compact = previewOnly || maximized || windowState.fullscreen;
   const previewPane = <Paper component="main" square className="preview-panel">
-        <div className="panel-toolbar" hidden={windowState.fullscreen}><div><span className="panel-label">Preview</span><Chip label="FINAL" /><span className="subtle">Authoring instance</span></div>
+        <div className="panel-toolbar" hidden={windowState.fullscreen}><div><Chip label="FINAL" /></div>
           <div className="preview-actions">
             {!previewOnly && <Button aria-pressed={maximized} onClick={() => setMaximized(!maximized)}>{maximized ? 'Restore workspace' : 'Maximize'}</Button>}
-            <Button disabled={!windows} onClick={() => windows && windowAction(() => previewOnly || windowState.detached ? windows.dock() : windows.popout())}>{previewOnly || windowState.detached ? 'Dock preview' : 'Pop out'}</Button>
+            {(previewOnly || windowState.detached || windows?.popout) && <Button disabled={!windows} onClick={() => windows && windowAction(() => previewOnly || windowState.detached ? windows.dock() : windows.popout!())}>{previewOnly || windowState.detached ? 'Dock preview' : 'Pop out'}</Button>}
             <Button disabled={!windows} onClick={() => windows && windowAction(() => windows.fullscreen(!windowState.fullscreen))}>{windowState.fullscreen ? 'Exit fullscreen' : 'Fullscreen'}</Button>
           </div>
         </div>
@@ -94,11 +96,17 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
         {runtime?.fault && <Alert severity="error"><strong>{runtime.fault.code}</strong> · {runtime.fault.message}</Alert>}
         {error && <Alert severity="error" role="alert">{error}</Alert>}
         <div className="transport" hidden={windowState.fullscreen} aria-busy={busy}><div className="transport-actions">
-          <Button variant="contained" disabled={!available || runtime?.playback === 'playing'} onClick={() => void command(() => controller.playback('play'))}>Play</Button>
-          <Button disabled={!available || runtime?.playback === 'paused'} onClick={() => void command(() => controller.playback('pause'))}>Pause</Button>
-          <Button disabled={!available} onClick={() => void command(() => controller.playback('reset'))}>Reset</Button>
-          <span className="divider" />
-          <Button disabled={!available} onClick={() => void command(() => controller.restart())}>Restart runtime</Button>
+          <Tooltip title={runtime?.playback === 'playing' ? 'Pause' : 'Play'}><span><IconButton className="playback-toggle" aria-label={runtime?.playback === 'playing' ? 'Pause' : 'Play'} disabled={!available}
+            onClick={() => void command(() => controller.playback(runtime?.playback === 'playing' ? 'pause' : 'play'))}>
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d={runtime?.playback === 'playing' ? 'M6 4h4v16H6zm8 0h4v16h-4z' : 'M6 3l15 9-15 9z'} /></svg>
+          </IconButton></span></Tooltip>
+          <Tooltip title="Reset"><span><IconButton aria-label="Reset" disabled={!available} onClick={() => void command(() => controller.playback('reset'))}>
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" strokeWidth="2" d="M4 10a8 8 0 1 1 0 5M4 4v6h6" /></svg>
+          </IconButton></span></Tooltip>
+          <Tooltip title="More playback actions"><IconButton aria-label="More playback actions" aria-haspopup="menu" aria-expanded={!!transportMenu} onClick={event => setTransportMenu(event.currentTarget)}>...</IconButton></Tooltip>
+          <Menu anchorEl={transportMenu} open={!!transportMenu} onClose={() => setTransportMenu(null)} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); setTransportMenu(null); } }}>
+            <MenuItem disabled={!available} onClick={() => { setTransportMenu(null); void command(() => controller.restart()); }}>Restart runtime</MenuItem>
+          </Menu>
         </div><span className="playback-state">{runtime?.playback ?? 'Awaiting service'}</span></div>
       </Paper>;
   const inspectorPane = <Paper component="aside" square className="inspector" aria-label="Scene controls and status">
@@ -123,12 +131,15 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   return <div className={`studio ${compact ? 'studio-expanded' : ''} ${windowState.fullscreen ? 'studio-preview-fullscreen' : ''}`}>
     {windowState.fullscreen && fullscreenHint && <div className="fullscreen-hint" role="status">Press Escape to exit fullscreen</div>}
     <header className="app-bar" hidden={windowState.fullscreen}>
-      <div className="brand"><span className="brand-symbol" aria-hidden="true">L</span><strong>LUX</strong><span>STUDIO</span></div>
-      <div className="scene-heading"><span className="eyebrow">AUTHORING</span><span>{runtime?.sceneName ?? 'No scene connected'}</span></div>
+      <div className="brand"><strong>LUX</strong></div>
+      {fileMenu}
+      <span className="view-tools-host" ref={setToolsHost} />
+      {appCommands ?? <div className="scene-heading"><span className="eyebrow">AUTHORING</span><span>{runtime?.sceneName ?? 'No scene connected'}</span></div>}
       <span className={`connection ${snapshot.connection === 'connected' ? 'connected' : ''}`}><i />{snapshot.connection === 'connected' ? 'Service connected' : snapshot.connection === 'connecting' ? 'Connecting' : 'Disconnected'}</span>
     </header>
+    {appError && <Alert severity="error">{appError}</Alert>}
     <div className="workspace">
-      {sourcePanel ? <StudioDockShell compact={compact} preview={previewPane} source={sourcePanel} inspector={inspectorPane} jobs={jobsPane} /> : <>{previewPane}{!compact && inspectorPane}</>}
+      {sourcePanel ? <StudioDockShell toolsHost={toolsHost} compact={compact} preview={previewPane} source={sourcePanel} inspector={inspectorPane} jobs={jobsPane} /> : <>{previewPane}{!compact && inspectorPane}</>}
     </div>
     {!sourcePanel && !compact && jobsPane}
     <footer className="status-bar" hidden={windowState.fullscreen}><span><i className="status-dot" />{snapshot.connection === 'connected' ? 'Authoring service' : 'Awaiting authoring service'}</span><span>Presentation only · output size is independent of window size</span><span>TRACER 0.1</span></footer>
