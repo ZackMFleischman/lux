@@ -6,6 +6,10 @@ This is the full-product coverage map. Only [tracer 0.1](tracer-0.1.md) is decom
 
 The user specifically requested **asset implementation continue in parallel as important authoring capability**. Keep the approved required-assets pipeline active alongside the creative-use/UI work, while preserving the existing code-only path. The earlier general infrastructure deferral does not defer this explicitly prioritized track.
 
+**Near-term creative-workflow polish: inspector density (user feedback, 12 September).** Visual properties take precedence in the Inspector. Performance, Runtime and Host output are independently collapsible and collapsed by default; expansion uses compact aligned rows, restrained spacing and concise labels instead of tall diagnostic blocks. Keep full identifiers available through accessible disclosure/copy actions without dominating the default layout. Background status updates must not reopen sections, steal focus or resize expanded content unnecessarily. This is a bounded follow-up to the compact shell pass, in parallel with assets, rather than deferred to the broad milestone 4 redesign. Validate narrow panes, keyboard expansion, readable values and preservation of property editing; errors remain discoverable without automatically expanding routine telemetry.
+
+**First usable asset workflow:** assets appear alongside source files in compact pane content with thumbnail, filename, dimensions and size. Selection shows an image preview; import, replace and remove update the complete scene. Deliver this browser with initial Studio asset rendering, ahead of full offline-export acceptance. The first supported codec remains the bounded BMP subset; PNG/JPEG require their own codec step.
+
 **Scope revised 12 September 2026:** tracer means **create in Lux → export/install
 a reusable source → use it in Resolume without Lux Studio running**, including
 cold start, independent sources and composition reopen. The authoritative

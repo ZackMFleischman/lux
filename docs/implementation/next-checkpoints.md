@@ -31,10 +31,10 @@ See [required-assets.md](required-assets.md) for the approved contract. Asset wo
 
 - [x] Foundation: bounded image admission, identity and isolated byte ownership (C12).
 - [ ] C14 — IN PROGRESS: versioned source/scene and compiler/linker envelopes; preserve legacy hashes and pin helper dependencies. Agent owns contracts/build worker/scene file in an isolated worktree.
-- [ ] C15 — NEXT: Studio workspace, save/open and MCP retain the complete asset-bearing source; asset changes affect document dirty state and replacement undo. Coordinate with C14 schema; do not silently strip assets.
-- [ ] C16 — NEXT: preview worker verification before submitted code, restart retention and a fixture that visibly samples the image.
+- [ ] C15 — IN PROGRESS: Studio workspace, save/open and MCP retain the complete asset-bearing source; asset changes affect document dirty state and replacement undo. Coordinate with C14 schema; do not silently strip assets.
+- [ ] C16 — NEXT: preview worker verification before submitted code, restart retention and a fixture that visibly samples the image. Basic asset list, selection preview and metadata belong in this first usable Studio asset checkpoint.
 - [ ] C17 — NEXT: versioned immutable transport/release, installed runtime capability and exact byte closure; tamper rejection and offline asset playback evidence.
-- [ ] C18 — FOLLOW THROUGH: bounded import/replace/remove controls for supported BMP files, then common image codecs as a separate scoped step.
+- [ ] C18 — FIRST-USE COMPANION: bounded import/replace/remove controls alongside the C16 asset browser, before treating the creative asset workflow as usable. Common image codecs remain a separate scoped step.
 
 Each slice receives focused tests and independent review. Production asset admission is enabled only after the relevant downstream path retains and validates bytes. Foundation completion is not asset workflow completion.
 
@@ -98,3 +98,9 @@ Prepare docs/implementation/required-assets.md as an implementation-ready bounde
 ## Task 12: image admission foundation
 
 Implement a browser-compatible pure module under packages/assets for the approved bounded BMP subset and canonical base64 byte admission. No source-v2 wiring or runtime claim in this slice. Validate encoded length/padding and decoded quotas before allocation; validate BMP headers, dimensions, exact padded payload, encoding and trailing bytes before pixel allocation. Decode bottom-up BGR to top-down opaque RGBA only on explicit request. Add reusable CPU fixture generation and tests for asymmetric padded rows, maximum dimensions, invalid headers/dimensions/compression/palette/truncation/trailing data, canonical base64 and boundary limits. No dependency or native changes. Export typed interfaces for later compiler/runtime use, run focused tests/typecheck, then obtain independent review before marking done. Full descriptor/path/aggregate admission, hashing, workspace/MCP and installed closure remain later slices of required-assets.md.
+
+User clarification: assets should be visible in Studio alongside source files. The first asset workflow includes a compact asset list with thumbnail, filename, dimensions and size; selection opens an image preview, and import/replace/remove manage the underlying document. Assets are ordinary pane content and do not become TypeScript editor tabs. This precedes full offline export acceptance rather than waiting behind it.
+
+## C19: inspector density polish — QUEUED NEAR-TERM
+
+User feedback: properties should dominate the Inspector. Performance, Runtime and Host output become independently collapsible, collapsed by default, and compact when expanded. Implement as a small follow-up alongside assets, with keyboard/narrow-pane and stable-update checks. See compact-studio-audit.md and roadmap.md; no implementation claimed.

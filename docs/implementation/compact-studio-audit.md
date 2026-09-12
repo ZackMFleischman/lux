@@ -141,3 +141,15 @@ bounds unchanged. Check one advancing producer through moves, closure, tabs and
 multiple views, and measure consumer/resource counts and hidden-pane cost against
 the existing baseline. Any second Preview requires real presentation evidence;
 cross-document popouts and monitor-removal recovery remain their separate gates.
+
+## Inspector follow-up from actual use
+
+User feedback, 12 September 2026: Performance, Runtime and Host output consume
+space needed by visual properties. Add a bounded polish pass after the compact
+shell integration and alongside asset implementation. Keep properties first;
+make each diagnostic section independently collapsible and initially collapsed.
+Expanded content uses compact label/value rows and minimal vertical padding.
+Long revisions/instance identifiers need accessible full-value disclosure/copy
+without wrapping into tall blocks. Routine telemetry must not reset disclosure
+state. Verify keyboard operation, narrow pane readability and stable property
+editing. This is scheduled near-term in roadmap.md; implementation is pending.
