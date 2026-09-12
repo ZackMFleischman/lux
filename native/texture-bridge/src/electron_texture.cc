@@ -5,7 +5,9 @@
 #include <sstream>
 #include <fstream>
 #include <array>
+#include <vector>
 #include "shared_ring.h"
+#include "installed_process.h"
 using Microsoft::WRL::ComPtr;
 namespace {
 struct Slot {
@@ -21,6 +23,7 @@ uint64_t sequence=0;
 HANDLE mapping=nullptr;
 lux::SharedRing* ring=nullptr;
 std::wstring mappingName;
+HANDLE supervisorMutex=nullptr;
 DXGI_ADAPTER_DESC adapterDesc{};
 void check(HRESULT hr) {
   if(FAILED(hr)) { std::ostringstream s;s<<"HRESULT 0x"<<std::hex<<uint32_t(hr);throw std::runtime_error(s.str()); }
@@ -130,9 +133,29 @@ napi_value poll(napi_env env,napi_callback_info) {
   return response;
   }catch(const std::exception& error){napi_throw_error(env,nullptr,error.what());return nullptr;}
 }
-napi_value advertise(napi_env env,napi_callback_info) {
-  try{initialize();if(lux::isClosing(*ring))throw std::runtime_error("producer is closing");std::wofstream file(lux::rendezvousPath(),std::ios::trunc);file<<mappingName;file.close();if(!file)throw std::runtime_error("rendezvous write failed");return text(env,"{\"advertised\":true}");}
+napi_value advertise(napi_env env,napi_callback_info info) {
+  try{
+    size_t argc=1;napi_value args[1];napi_get_cb_info(env,info,&argc,args,nullptr,nullptr);
+    auto destination=lux::rendezvousPath();
+    if(argc){size_t length=0;if(napi_get_value_string_utf16(env,args[0],nullptr,0,&length)!=napi_ok||!length||length>32760)throw std::runtime_error("Invalid installed rendezvous path");std::vector<char16_t> value(length+1);napi_get_value_string_utf16(env,args[0],value.data(),value.size(),&length);destination.assign(reinterpret_cast<wchar_t*>(value.data()),length);}
+    initialize();if(lux::isClosing(*ring))throw std::runtime_error("producer is closing");
+    auto temporary=destination+L".tmp-"+std::to_wstring(GetCurrentProcessId());std::wofstream file(temporary,std::ios::trunc);file<<mappingName;file.close();
+    if(!file||!MoveFileExW(temporary.c_str(),destination.c_str(),MOVEFILE_REPLACE_EXISTING|MOVEFILE_WRITE_THROUGH))throw std::runtime_error("rendezvous write failed");return text(env,"{\"advertised\":true}");
+  }
   catch(const std::exception& error){napi_throw_error(env,nullptr,error.what());return nullptr;}
+}
+napi_value lockSupervisor(napi_env env,napi_callback_info info){
+ try{
+  size_t argc=1,length=0;napi_value args[1],result;napi_get_cb_info(env,info,&argc,args,nullptr,nullptr);char runtime[65]{};
+  if(argc!=1||napi_get_value_string_utf8(env,args[0],runtime,sizeof(runtime),&length)!=napi_ok||length!=64||std::string(runtime).find_first_not_of("0123456789abcdef")!=std::string::npos)throw std::runtime_error("Invalid supervisor runtime identity");
+  if(supervisorMutex)throw std::runtime_error("Supervisor already locked");
+  lux::UserSecurity security;auto name=L"Local\\LuxInstalledSupervisor-"+lux::userSid()+L"-"+std::wstring(runtime,runtime+64);
+  supervisorMutex=CreateMutexW(&security.attributes,TRUE,name.c_str());if(!supervisorMutex)throw std::runtime_error("Supervisor mutex failed");
+  bool acquired=GetLastError()!=ERROR_ALREADY_EXISTS;
+  if(!acquired){const auto wait=WaitForSingleObject(supervisorMutex,0);acquired=wait==WAIT_OBJECT_0||wait==WAIT_ABANDONED;}
+  if(!acquired){CloseHandle(supervisorMutex);supervisorMutex=nullptr;}
+  napi_get_boolean(env,acquired,&result);return result;
+ }catch(const std::exception& error){napi_throw_error(env,nullptr,error.what());return nullptr;}
 }
 napi_value control(napi_env env,napi_callback_info){float value;napi_value result;if(!ring||!lux::readHostControl(*ring,value)){napi_get_null(env,&result);return result;}napi_create_double(env,value,&result);return result;}
 napi_value shutdown(napi_env env,napi_callback_info) {
@@ -148,9 +171,13 @@ napi_value shutdown(napi_env env,napi_callback_info) {
 }
 napi_value module(napi_env env,napi_value exports) {
   napi_property_descriptor properties[]={{"shutdown",nullptr,shutdown,nullptr,nullptr,nullptr,napi_default,nullptr},{"submit",nullptr,submit,nullptr,nullptr,nullptr,napi_default,nullptr},{"poll",nullptr,poll,nullptr,nullptr,nullptr,napi_default,nullptr},{"advertise",nullptr,advertise,nullptr,nullptr,nullptr,napi_default,nullptr},{"control",nullptr,control,nullptr,nullptr,nullptr,napi_default,nullptr}};
-  napi_define_properties(env,exports,5,properties);return exports;
+  napi_define_properties(env,exports,5,properties);
+  napi_property_descriptor supervisor[]={
+    {"lockSupervisor",nullptr,lockSupervisor,nullptr,nullptr,nullptr,napi_default,nullptr},
+    {"installedStart",nullptr,lux::installedStart,nullptr,nullptr,nullptr,napi_default,nullptr},
+    {"installedRunning",nullptr,lux::installedRunning,nullptr,nullptr,nullptr,napi_default,nullptr},
+    {"installedStop",nullptr,lux::installedStop,nullptr,nullptr,nullptr,napi_default,nullptr}};
+  napi_define_properties(env,exports,4,supervisor);return exports;
 }
 }
 NAPI_MODULE(NODE_GYP_MODULE_NAME,module)
-
-

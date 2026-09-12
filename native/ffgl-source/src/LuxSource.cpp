@@ -4,6 +4,14 @@
 #include <algorithm>
 #include <cmath>
 using namespace ffglex;
+namespace {
+struct Descriptor {
+ std::optional<lux::InstalledSource> source;std::string error;
+ Descriptor(){try{source=lux::readInstalledSource(reinterpret_cast<const void*>(&descriptorAnchor));}catch(const std::exception& value){error=value.what();}}
+ static void descriptorAnchor(){}
+};
+const Descriptor descriptor;
+}
 class LuxSource : public CFFGLPlugin {
   FFGLShader shader;
   FFGLScreenQuad quad;
@@ -12,8 +20,9 @@ class LuxSource : public CFFGLPlugin {
   GLint imageLocation=-1,availableLocation=-1;
   bool initialized=false;
  public:
-  LuxSource(){SetMinInputs(0);SetMaxInputs(0);SetParamInfof(0,"Intensity",FF_TYPE_STANDARD);}
+  LuxSource(){SetMinInputs(0);SetMaxInputs(0);SetParamInfof(0,"Intensity",FF_TYPE_STANDARD);receiver.configureInstalled(descriptor.source);if(descriptor.source){intensity=0.5f;receiver.setIntensity(0.5f);}}
   FFResult InitGL(const FFGLViewportStruct* viewport) override {
+    if(!descriptor.error.empty()){OutputDebugStringA(descriptor.error.c_str());return FF_FAIL;}
     if(initialized)return FF_SUCCESS;
     const char* vertex=R"(#version 410 core
 layout(location=0) in vec4 position;
@@ -54,4 +63,4 @@ void main(){color=available!=0?texture(image,vec2(uv.x,1.0-uv.y)):vec4(0);}
   }
   float GetFloatParameter(unsigned int) override{return intensity;}
 };
-static CFFGLPluginInfo info(PluginFactory<LuxSource>,"LX02","Lux TR02 Probe",2,1,0,2,FF_SOURCE,"Lux bounded GPU feasibility probe","Lux TR02");
+static CFFGLPluginInfo info(PluginFactory<LuxSource>,descriptor.source?descriptor.source->pluginId.c_str():"LX02",descriptor.source?descriptor.source->name.c_str():"Lux TR02 Probe",2,1,0,2,FF_SOURCE,"Lux source runtime","Lux");

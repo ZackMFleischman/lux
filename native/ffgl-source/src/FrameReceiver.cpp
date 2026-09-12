@@ -173,6 +173,7 @@ void FrameReceiver::run(HGLRC shared) {
   require(SUCCEEDED(base.As(&device)),"D3D11.1");interop=open(device.Get());require(interop!=nullptr,"wglDXOpenDeviceNV failed: adapter/context compatibility unproved");
   log<<"{\"kind\":\"adapter\",\"luidLow\":"<<description.AdapterLuid.LowPart<<",\"luidHigh\":"<<description.AdapterLuid.HighPart<<"}"<<std::endl;
   glGenFramebuffers(1,&readFbo);glGenFramebuffers(1,&drawFbo);require(readFbo&&drawFbo,"worker framebuffer allocation failed");
+  activation.begin();
   std::wstring connected;ReceiverPoll discovery,counters;int pending=-1,sourceSlot=-1;
   lifecycle.started();
   while(!lifecycle.stopRequested()) {
@@ -182,7 +183,8 @@ void FrameReceiver::run(HGLRC shared) {
    }
    const auto now=ReceiverPoll::Clock::now();
    if(discovery.due(now,pending<0)){
-    std::wifstream file(rendezvousPath());std::wstring name;std::getline(file,name);
+    activation.heartbeat();
+    std::wifstream file(activation.rendezvous());std::wstring name;std::getline(file,name);
     log<<"{\"kind\":\"discovery\",\"elapsedMs\":"<<std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count()<<",\"namePresent\":"<<(!name.empty()?"true":"false")<<",\"alreadyConnected\":"<<(name==connected?"true":"false")<<"}"<<std::endl;
     if(!name.empty()&&name!=connected&&name.rfind(L"Local\\LuxTracerTR02-",0)==0){
      detach();connected.clear();mapping=OpenFileMappingW(FILE_MAP_ALL_ACCESS,FALSE,name.c_str());
@@ -234,6 +236,7 @@ void FrameReceiver::run(HGLRC shared) {
   }
  }catch(const std::exception& error){log<<"{\"kind\":\"failure\",\"reason\":\""<<error.what()<<"\"}"<<std::endl;}
  catch(...){log<<"{\"kind\":\"failure\",\"reason\":\"unknown worker exception\"}"<<std::endl;}
+ activation.end();
  detach(); // always before closing interop or releasing its D3D device
  if(interop&&!close(interop)){unsupportedUnload();for(;;)std::this_thread::sleep_for(std::chrono::seconds(1));}
  if(readFbo)glDeleteFramebuffers(1,&readFbo);if(drawFbo)glDeleteFramebuffers(1,&drawFbo);
