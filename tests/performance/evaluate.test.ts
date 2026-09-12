@@ -223,3 +223,16 @@ test('final control consumed exactly at the final-stimulus deadline still matche
   assert.equal(r.controls.maxMs, 250);
   assert.equal(r.controls.gate, 'pass');
 });
+
+test('unconsumed first-render markers share immutable frame identity accounting', () => {
+  for (const missingReceipt of [false, true]) {
+    const e = fixture();
+    e.controls[0]!.rendered!.frameId = '0';
+    e.controls[1]!.rendered!.frameId = '0';
+    if (missingReceipt) e.controls[0]!.received = null;
+    const r = evaluatePerformance(e);
+    assert.equal(r.validity, 'invalid');
+    assert.notEqual(r.controls.gate, 'pass');
+    assert.notEqual(r.host.cadence, 'pass');
+  }
+});
