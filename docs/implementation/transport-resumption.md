@@ -71,3 +71,30 @@ current producer PID and counters must increase beyond the starting sample.
 Producer records host Intensity changes. User observation is required for image
 movement/control effect; neither control logging nor this short test proves
 end-to-end latency, 60 fps, host teardown or long-run stability.
+
+Actual-host run `33558649-2ffd-44c8-b0c5-194c75a15c62` passed: 866 completed
+consumptions within sampled counters, 877 paints, clean producer shutdown, and
+103 received control changes spanning 0–1. The user confirmed motion, color
+response and last-frame retention. Evidence: `tr02-resolume-transfer`.
+
+Reconnect run `9562564a-b8e4-410c-b202-f848cf33a542` passed automated checks with
+863 additional consumptions and clean shutdown. It also exposed an initial
+control synchronization gap: default 0.65 precedes host value 0.452747 by about
+60 ms. Exact first-frame restoration is not proved and needs a snapshot/frame
+handshake before production acceptance. The user did not watch this reconnect
+run and requested a repeat for visual confirmation and source-removal testing.
+
+The repeat `cf98718d-b6ea-4dcf-b035-75580f8f0edd` passed with 853 additional
+completed frames. User confirmed resumed motion, freeze after producer exit,
+clip removal and normal Resolume close. Read-only process inspection confirms
+the host exited; its current-session log contains no failure/unsupported-unload
+records. Evidence: `tr02-resolume-repeat`.
+
+The core GPU transport is now demonstrated in actual Resolume. The standalone
+Lux branch has meanwhile added its compiled-visual runtime (`81dccce`), which is
+not yet connected to this diagnostic producer. Next implementation work is
+binding a validated compiled visual to the transport and gating initial output
+on the authoritative host control snapshot. Further acceptance remains separate:
+numeric color/alpha and frame provenance, full 1080p60 measurement, multi-instance
+identity, resize/device-loss handling and broader lifecycle coverage. No complete
+TR-02 or production-ready integration is claimed from the short diagnostic runs.

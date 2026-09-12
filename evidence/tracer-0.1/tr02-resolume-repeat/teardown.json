@@ -1,0 +1,7 @@
+{
+  "hostStillPresent": false,
+  "hostPid": 8360,
+  "userObservation": "It moved and then froze as expected; user cleared the clip and closed Resolume.",
+  "observedUtc": "2026-09-12T17:18:53.7138113Z",
+  "recordedFailures": []
+}
