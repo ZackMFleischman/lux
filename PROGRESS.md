@@ -17,3 +17,5 @@ Updated: 12 September 2026. **Tracer is not complete.** Studio testing is now au
 | Performance and final sign-off | Measure real playback smoothness and control response, then record every required check as passed, failed or unavailable. | **Foundation complete:** measurement design and offline evaluator tested. Runtime measurement collection and final hardware acceptance remain. |
 
 After relevant features land, update and reinstall the repo-shipped visual-creation skill. The latest BMP-preview and shortcut instructions are validated, reinstalled and verified identical. Studio testing is authorized; graphics tests run one at a time. Compact status-bar consolidation is queued with the Inspector density polish, after required property and asset work.
+
+Next after tracer: filesystem-first projects with real TypeScript files, SDK/editor support, ordinary Git history, and explicit apply/preview through Lux. Planned; current scenes still embed files.

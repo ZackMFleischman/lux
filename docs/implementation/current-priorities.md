@@ -27,6 +27,10 @@ Keep compact UI defaults as a product requirement. True multiple views and broad
 
 Coordinator initially stopped the BMP validator slice and removed its uncommitted stub/draft tests, then resumed asset support in an isolated worktree after the user's explicit clarification. The existing CPU evaluator is reviewed and integrated as bounded housekeeping; no new measurement collector is scheduled ahead of creative use.
 
+## First project checkpoint after tracer: filesystem-first authoring
+
+User approved normal coding environments on 12 September. Immediately after required tracer delivery, prioritize real TypeScript project files, pinned SDK/editor type resolution, normal Git diffs/history and explicit conflict-aware apply into Studio. MCP supplies discovery, application operations and preview feedback; it is not the required code-edit transport. Import existing .lux-scene documents. Follow the [project-model clarification](../design/project-model.md#filesystem-first-authoring-clarification--12-september-2026); write a focused implementation plan before changing persistence. This bounded milestone-1a workflow precedes optional shell polish and larger project-history/graph work. Current property/assets/export/acceptance work remains the tracer priority.
+
 ## Historical sequencing before editor and installed-source checkpoints
 
 2026-09-12. This sequencing addendum reconciles [tracer 0.1](tracer-0.1.md), the user-approved [standalone pivot](standalone-lux.md), and subsequent UI requests. It supersedes conversational suggestions to start the source editor immediately after adding MCP controls. It does not rewrite the original tracer's acceptance criteria or declare unavailable gates passed.
