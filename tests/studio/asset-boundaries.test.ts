@@ -21,12 +21,17 @@ test('MCP full-source schema preserves v2 and rejects omitted assets or unknown 
   assert.deepEqual(JSON.parse(sourceReadResult({ source, draftVersion: 3 }).content[0]!.text), { source, draftVersion: 3 });
   assert.throws(() => sourceReadResult({ text: '\\'.repeat(8 * 1024 * 1024) }), /16 MiB/);
 });
-test('asset playback gate rejects before compiling or replacing the current preview', async () => {
+test('v2 source reaches preview compilation and compiler failure keeps the current preview', async () => {
   let compiled = false;
-  const client = new StandaloneClient({ compile: async () => { compiled = true; assert.fail('asset activation is not wired'); } } as any);
-  const before = client.getSnapshot();
-  await assert.rejects(client.submit(source), /Asset playback is not available/);
-  assert.equal(compiled, false); assert.equal(client.getSnapshot(), before);
+  const client = new StandaloneClient({ compile: async (input:any) => { compiled = true; assert.deepEqual(input,source);return {ok:false,diagnostics:[{code:'COMPILE_FAILED',message:'invalid source'}]}; } } as any);
+  const before = client.getSnapshot().authoring;
+  await assert.rejects(client.submit(source), /invalid source/);
+  assert.equal(compiled, true); assert.equal(client.getSnapshot().authoring, before);
+});
+test('source and linked versions must match before creating a preview worker',async()=>{
+  const client=new StandaloneClient({compile:async()=>({ok:true,linked:{code:'legacy'},sourceHash:'revision'})} as any);
+  await assert.rejects(client.submit(source),/versions do not match/);
+  assert.equal(client.getSnapshot().authoring,null);
 });
 test('agent bridge round-trips complete Unicode source and rejects oversized read responses', async () => {
   const bridge = await createAgentBridge(async method => method === 'read' ? { value: 'x'.repeat(16 * 1024 * 1024) } : source);
@@ -41,20 +46,20 @@ test('agent bridge round-trips complete Unicode source and rejects oversized rea
     assert.equal((await fetch(bridge.url, { method: 'POST', headers, body: malformed })).status, 400);
   } finally { bridge.close(); }
 });
-test('compile and export entry points reject v2 explicitly before producing a legacy payload', async () => {
+test('compile accepts v2 admission while export entry points still reject before producing legacy payloads', async () => {
   const compiled = spawnSync(process.execPath, ['scripts/studio-compile.mjs'], { input: JSON.stringify(source), encoding: 'utf8', windowsHide: true, timeout: 10000 });
   assert.equal(compiled.status, 0, compiled.stderr);
   const result = JSON.parse(compiled.stdout); assert.equal(result.ok, false);
-  assert.match(result.diagnostics[0].message, /Asset playback is not available/);
+  assert.match(result.diagnostics[0].message, /Entry must export default/);
   const directory = await mkdtemp(join(tmpdir(), 'lux-asset-gate-'));
   try {
     const document = createSceneDocument(source, { width: 1920, height: 1080, fps: 60, seed: 0 }, { intensity: 0.5 });
     const path = join(directory, 'scene.lux-scene'), output = join(directory, 'output');
     await new SceneFileStore().saveAs(path, document);
-    await assert.rejects(prepareTransportScene(path, output), /Asset playback is not available/);
+    await assert.rejects(prepareTransportScene(path, output), /Asset export is not available/);
     await assert.rejects(access(output));
     await assert.rejects(exportSceneDocument({ name: 'Image', document, outputDirectory: directory }, {
       prepare: async () => assert.fail('unsupported assets must not reach preparation'), exporter: async () => assert.fail('must not publish'),
-    }), /Asset playback is not available/);
+    }), /Asset export is not available/);
   } finally { await rm(directory, { recursive: true, force: true }); }
 });

@@ -4,7 +4,7 @@ import type { SourceBundle } from '../../../packages/runtime-contracts/src/index
 import { studioOperationSchema } from './runtime-operations.ts';
 import { DEFAULT_OUTPUT } from '../../../packages/runtime-contracts/src/index.ts';
 import { SourceCompileError } from './source/diagnostics.ts';
-import { assertLegacyPlaybackSource } from './source/asset-playback.ts';
+import type { LinkedEnvelope } from '../../build-worker/src/artifact-identity.mjs';
 export interface AuthoringApi {
   example(): Promise<SourceBundle>;
   compile(source: SourceBundle): Promise<any>;
@@ -26,7 +26,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private target: HTMLElement | null = null;
   private generation = 0;
   private source: SourceBundle | null = null;
-  private accepted: { moduleSource: string; revisionId: string } | null = null;
+  private accepted: { linked: LinkedEnvelope; revisionId: string } | null = null;
   private busy = false;
   private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
   private api: AuthoringApi;
@@ -35,23 +35,25 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
   private publish(patch: Partial<StudioSnapshot>) { this.snapshot = { ...this.snapshot, ...patch, receivedAtMs: Date.now() }; for (const listener of this.listeners) listener(); }
   async submit(source: SourceBundle): Promise<void> {
-    assertLegacyPlaybackSource(source);
     if (this.busy) throw Error('A visual build is already running');
     this.busy = true;
     const jobId = crypto.randomUUID();
     this.publish({ jobs: [{ jobId, state: 'compiling', summary: 'Compiling visual…' }] });
     try {
-      const result = await this.api.compile(source);
+      const submittedSource = structuredClone(source);
+      const result = await this.api.compile(submittedSource);
       if (!result.ok) throw new SourceCompileError(result.diagnostics ?? []);
+      const linked = structuredClone(result.linked) as LinkedEnvelope;
+      if (('sourceVersion' in submittedSource) !== ('linkedVersion' in linked)) throw Error('Compiled source and linked payload versions do not match');
       this.publish({ jobs: [{ jobId, state: 'initializing', summary: 'Preparing preview…' }] });
-      await this.start(result.linked.code, result.sourceHash);
-      this.source = structuredClone(source);
-      this.accepted = { moduleSource: result.linked.code, revisionId: result.sourceHash };
+      await this.start(linked, result.sourceHash);
+      this.source = submittedSource;
+      this.accepted = { linked, revisionId: result.sourceHash };
       this.publish({ jobs: [{ jobId, state: 'succeeded', summary: 'Visual is ready in Lux.' }] });
     } catch (error) { this.publish({ jobs: [{ jobId, state: 'failed', summary: 'Build failed; previous preview retained.', fault: String(error) }] }); throw error; }
     finally { this.busy = false; }
   }
-  private async start(moduleSource: string, revisionId: string, restartIntensity?: number): Promise<void> {
+  private async start(linked: LinkedEnvelope, revisionId: string, restartIntensity?: number): Promise<void> {
     const canvas = document.createElement('canvas'); canvas.width = 1920; canvas.height = 1080;
     canvas.style.cssText = 'width:100%;height:100%;position:absolute;inset:0;object-fit:contain';
     const worker = new Worker(new URL('./visual-worker.js', import.meta.url), { type: 'module' });
@@ -116,7 +118,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
         };
         const offscreen = canvas.transferControlToOffscreen();
         worker.postMessage({ type: 'init', requestId: crypto.randomUUID(), instanceId: candidate.instanceId, generation: candidate.generation,
-          revisionId, moduleSource, canvas: offscreen, controls: { intensity }, settings: DEFAULT_OUTPUT, playing }, [offscreen]);
+          revisionId, linked: structuredClone(linked), canvas: offscreen, controls: { intensity }, settings: DEFAULT_OUTPUT, playing }, [offscreen]);
       });
     } catch (error) { this.stop(candidate, String(error)); canvas.remove(); throw error; }
   }
@@ -141,7 +143,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     if (operation.name === 'lux.runtime.restart') {
       if (!this.accepted) throw Error('No visual to restart');
       this.busy = true;
-      try { await this.start(this.accepted.moduleSource, this.accepted.revisionId, runtime.desiredIntensity); return this.snapshot.authoring; }
+      try { await this.start(this.accepted.linked, this.accepted.revisionId, runtime.desiredIntensity); return this.snapshot.authoring; }
       finally { this.busy = false; }
     }
     if (this.snapshot.authoring?.playback === 'failed') throw Error('Restart the failed runtime first');

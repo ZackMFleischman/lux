@@ -1,5 +1,5 @@
-/** Temporary capability gate until preview and export retain the entire v2 envelope. */
+/** Export-only capability gate until transport and installed runtime retain v2. */
 export function assertLegacyPlaybackSource(source: unknown): void {
   if (source && typeof source === 'object' && ('sourceVersion' in source || 'assets' in source))
-    throw Error('Asset playback is not available in this build yet. The scene can be saved without losing its assets.');
+    throw Error('Asset export is not available in this build yet. Preview and saving preserve the scene assets.');
 }

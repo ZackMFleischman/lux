@@ -12,7 +12,7 @@ class WorkerFixture {
   terminate() { this.terminated = true; }
 }
 const source = { sdkVersion: '0.1.0' as const, entry: 'visual.ts', files: { 'visual.ts': '' } };
-function fixture(t: any) {
+function fixture(t: any, linked: any = {code:'accepted'}) {
   let now = 0, next = 0, compiles = 0;
   const scheduled = new Map<number, { at: number; callback: () => void; interval: number }>();
   const originals = new Map<string, PropertyDescriptor | undefined>();
@@ -24,10 +24,10 @@ function fixture(t: any) {
   replace('setTimeout', (callback: () => void, ms: number) => schedule(callback, ms, 0));
   replace('setInterval', (callback: () => void, ms: number) => schedule(callback, ms, ms));
   replace('clearTimeout', (id: number) => scheduled.delete(id)); replace('clearInterval', (id: number) => scheduled.delete(id));
-  const client = new StandaloneClient({ compile: async () => { compiles++; return { ok: true, linked: { code: 'accepted' }, sourceHash: 'revision' }; } } as any);
+  const client = new StandaloneClient({ compile: async () => { compiles++; return { ok: true, linked, sourceHash: 'revision' }; } } as any);
   const flush = async () => { for (let i = 0; i < 8; i++) await Promise.resolve(); };
   const advance = async (ms: number) => { const end = now + ms; while (true) { const due = [...scheduled].filter(([, timer]) => timer.at <= end).sort((a, b) => a[1].at - b[1].at)[0]; if (!due) break; const [id, timer] = due; now = timer.at; if (timer.interval) timer.at += timer.interval; else scheduled.delete(id); timer.callback(); await flush(); } now = end; await flush(); };
-  const start = async () => { const pending = client.submit(source); await flush(); const worker = WorkerFixture.all.at(-1)!; worker.reply({ type: 'ready' }); await pending; return worker; };
+  const start = async (input: any = source) => { const pending = client.submit(input); await flush(); const worker = WorkerFixture.all.at(-1)!; worker.reply({ type: 'ready' }); await pending; return worker; };
   t.after(() => { for (const [name, descriptor] of originals) if (descriptor) Object.defineProperty(globalThis, name, descriptor); else Reflect.deleteProperty(globalThis, name); });
   const operation = (requestId: string) => { const state = client.getSnapshot().authoring!; return { name: 'lux.playback' as const, input: { requestId, instanceId: state.instanceId, expectedGeneration: state.generation, action: 'play' as const } }; };
   return { client, start, flush, advance, scheduled, operation, compiles: () => compiles };
@@ -69,8 +69,25 @@ test('restart uses cached accepted linked bytes without compiling and retains co
   const state = f.client.getSnapshot().authoring!;
   const pending = f.client.invoke({ name: 'lux.runtime.restart', input: { requestId: 'restart', instanceId: state.instanceId, expectedGeneration: state.generation } });
   await f.flush(); const restarted = WorkerFixture.all.at(-1)!;
-  assert.equal(f.compiles(), 1); assert.equal(restarted.init.moduleSource, 'accepted'); assert.equal(restarted.init.controls.intensity, 0.8);
+  assert.equal(f.compiles(), 1); assert.equal(restarted.init.linked.code, 'accepted'); assert.equal(restarted.init.controls.intensity, 0.8);
   restarted.reply({ type: 'ready' }); await pending; assert.equal(worker.terminated, true);
+});
+
+test('v2 restart retains the whole accepted envelope after compile-result mutation and failed replacement',async t=>{
+  const data='Qk06AAAAAAAAADYAAAAoAAAAAQAAAAEAAAABABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AA==';
+  const linked={linkedVersion:2,code:'accepted',sourceMap:'{}',bundleHash:'bundle',linkedHash:'linked',assetSetHash:'assets',linker:{version:'0.28.2'},assets:{'assets/red.bmp':{data,mediaType:'image/bmp',encoding:'base64',byteLength:58,width:1,height:1,sha256:'image'}}};
+  const expected=structuredClone(linked), input={...source,sourceVersion:2,assets:{'assets/red.bmp':{data,mediaType:'image/bmp',encoding:'base64'}}};
+  const f=fixture(t,linked), old=await f.start(input);old.reply({intensity:0.7});
+  assert.deepEqual(old.init.linked,expected);assert.equal(old.init.moduleSource,undefined);
+  linked.assets['assets/red.bmp'].data='changed result';
+  const failed=assert.rejects(f.client.submit(input),/Missing required asset/);await f.flush();
+  WorkerFixture.all.at(-1)!.reply({type:'failure',message:'Missing required asset: assets/red.bmp'});await failed;
+  assert.equal(old.terminated,false);
+  const state=f.client.getSnapshot().authoring!;
+  const restart=f.client.invoke({name:'lux.runtime.restart',input:{requestId:'restart',instanceId:state.instanceId,expectedGeneration:state.generation}});
+  await f.flush();const replacement=WorkerFixture.all.at(-1)!;
+  assert.deepEqual(replacement.init.linked,expected);assert.equal(replacement.init.controls.intensity,0.7);assert.equal(f.compiles(),2);
+  replacement.reply({type:'ready'});await restart;assert.equal(old.terminated,true);
 });
 test('postMessage failure faults and clears every pending operation', async t => {
   const f = fixture(t), worker = await f.start(); const capture = assert.rejects(f.client.capture(), /post failed/);
