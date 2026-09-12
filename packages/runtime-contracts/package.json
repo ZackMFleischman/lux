@@ -1,1 +1,1 @@
-{"name":"@lux/runtime-contracts","version":"0.0.0","private":true,"type":"module","exports":{"./telemetry":"./src/telemetry.ts"},"dependencies":{"zod":"3.25.76"}}
+{"name":"@lux/runtime-contracts","version":"0.0.0","private":true,"type":"module","exports":{".":"./src/index.ts","./telemetry":"./src/telemetry.ts"},"dependencies":{"zod":"3.25.76"}}
