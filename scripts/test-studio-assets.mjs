@@ -63,7 +63,21 @@ try {
     await new Promise(resolve => setTimeout(resolve, 250));
   }
   assert.ok(initial.source.files[initial.source.entry]?.length, 'Wait for initial example loading before guarded replacement');
+  await page.locator('.layout-tools summary').click();
+  await page.getByRole('button', { name: 'Reset desktop layout', exact: true }).click();
+  if (await page.locator('.layout-tools').evaluate(element => element.open)) await page.locator('.layout-tools summary').click();
   const built = parse(await call('build', { expectedDraftVersion: initial.draftVersion, source: document.source }));
+  await page.evaluate(() => { window.__assetEditor = document.querySelector('.cm-editor'); window.__assetRuntimeCanvas = document.querySelector('.preview-surface canvas'); });
+  await page.getByRole('button', { name: 'View assets/checker.bmp', exact: true }).click();
+  const browserImage = page.getByRole('img', { name: 'Image preview: assets/checker.bmp', exact: true });
+  await browserImage.waitFor({ state: 'visible' });
+  assert.deepEqual(await browserImage.evaluate(canvas => Array.from(canvas.getContext('2d').getImageData(0, 0, 1, 1).data)), [255, 0, 0, 255]);
+  assert.equal(await page.locator('.cm-editor').isVisible(), false);
+  await page.screenshot({ path: join(output, 'asset-browser.png') });
+  await page.getByRole('button', { name: 'Open visual.ts', exact: true }).click();
+  assert.equal(await page.evaluate(() => window.__assetEditor === document.querySelector('.cm-editor') && window.__assetRuntimeCanvas === document.querySelector('.preview-surface canvas')), true);
+  assert.equal(await page.locator('.cm-editor').isVisible(), true);
+  report.checks.push('Asset browser paints actual decoded pixels; switching back retains editor and runtime canvas');
   await capture('original', colors);
   report.checks.push('Six actual GPU image regions match top/bottom orientation and RGB/CMY colors');
   const revised = structuredClone(document.source), bytes = Buffer.from(revised.assets['assets/checker.bmp'].data, 'base64');

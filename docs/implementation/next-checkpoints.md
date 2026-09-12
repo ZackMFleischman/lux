@@ -111,3 +111,9 @@ C11 closeout: native tests ran serially and closed owned Electron windows; proce
 C15 isolated checkpoint-asset-authoring commit8e99781 passes73Studio+8editor CPU tests and root/Studio typechecks. Independent review found no blockers; discovery now distinguishes per-file and total asset byte limits from shared constants. Playback remains explicitly gated until C16; save/read support does not imply images render.
 
 Integration checkpoint: C14/C15 and fixture compilation are committed; integrated16 asset/fixture checks,73Studio+9editor checks, root and Studio typechecks pass. Native asset script is being prepared but has not run; no actual asset render or export is claimed. Preview worker and asset browser implementations proceed independently.
+
+## User creative session now open
+
+At the user's request, launched the working tracer Studio (window PID2276, launcher27288) and verified its window responding. Freeze tracer implementation/build outputs and compile/MCP scripts while this session is in use. Automated Studio/native tests are paused until the user closes Studio and clears testing. Isolated-worktree CPU/design work may continue.
+
+C16 preview2df7baf and browser96cec76 are independently reviewed, but remain unintegrated pending native validation. PNG/JPEG and alpha remain required before the complete asset workflow is ready. The open build supports the existing procedural creation/preview/MCP/save/export path. User can begin with Build and Play; no full tracer completion is claimed.
