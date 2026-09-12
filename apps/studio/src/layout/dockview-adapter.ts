@@ -45,7 +45,7 @@ export class LuxDockviewAdapter {
       return { restored: false, reason: 'Saved layout unavailable or incompatible: ' + String(error) };
     }
   }
-  reset(name: string): void { this.live(); this.apply(defaultPersonalLayout(this.registry, this.mode)); this.storage.removeItem(this.key(name)); }
+  reset(name: string, mode = this.mode): void { this.live(); this.mode = mode; this.apply(defaultPersonalLayout(this.registry, this.mode)); this.storage.removeItem(this.key(name)); }
   open(kind: string, id = kind): void {
     this.live(); const definition = this.registry.get(kind);
     if (!/^[A-Za-z0-9_-]{1,64}$/.test(id) || isReservedPanelKey(id)) throw Error('Invalid panel identity');
