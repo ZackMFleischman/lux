@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "checks": [
+    "Real example builds and starts paused",
+    "Three real play/pause cycles: no reset/restart disabled transitions or preview relayout",
+    "Paused intensity changes preserve layout and transport state",
+    "Preview-only fullscreen, fading notice, first Escape exit and original canvas retention"
+  ],
+  "errors": []
+}
