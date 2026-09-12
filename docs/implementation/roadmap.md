@@ -83,3 +83,15 @@ Use the original domain proposal's Loom examples as inspiration and source inspe
 - 5 approves final numerical release budgets against measured evidence and completes installer signing/distribution decisions.
 
 Later work does not promise cloud rendering, marketplace, accounts, collaboration, seamless loops for arbitrary simulations, identical pixels across GPUs, or an incoming-image FFGL effect.
+
+## Low-priority follow-up: AI activity visibility
+
+User request (2026-09-12): show what external AI agents did or are currently doing through the Studio MCP adapter. Schedule with milestone 4 Studio workflow polish; this does not block standalone authoring, playback controls, or export work.
+
+Start with an activity view in Jobs & diagnostics, or a separate **AI Activity** dockable panel if the volume warrants it. Placement remains a UX decision; a separate panel must support ordinary dragging, resizing, tabs, close/reopen and saved layouts.
+
+Record a bounded session history of admitted MCP requests with timestamp, request ID, operation, target when known, actual pending/running/succeeded/failed state, and a concise result or error. Distinguish source reads and captures from code or control changes. Link builds to their revision and available diagnostics; summarize affected files without dumping complete source or image payloads. Correlate updates by request ID so retries do not create misleading duplicate completed actions. Identify the calling client only when known, otherwise label it as an external agent.
+
+Show only activity observable by Lux: a request in progress is not evidence of an agent's internal reasoning or work between calls. Keep authentication tokens and secrets out of entries. Routine activity must not insert/remove banners or resize the preview. Durable history, rich diffs and filtering are optional later extensions, not requirements for the first bounded session log.
+
+Acceptance: an external agent read → build → capture → failed build produces understandable entries, pending work updates in place, failure retains the working preview, and opening/closing the activity view does not alter runtime behavior. Validate request correlation, bounded retention and redaction with CPU tests before interactive QA.
