@@ -101,3 +101,26 @@ test('submitted sibling modules resolve while unavailable Three exports fail typ
   assert.ok(bad.diagnostics.some(d => /no exported member/.test(d.message)), JSON.stringify(bad));
   assert.ok(bad.diagnostics.some(d => d.file === 'main.ts' && d.line === 1 && d.column > 0), JSON.stringify(bad));
 });
+
+test('helper-only edits affect both identities and helper errors retain their path and line', async () => {
+  const source = await example();
+  const input = request(`import { start } from './lib/color.ts';\n${source.replace('uniform(0.5)', 'uniform(start)')}`);
+  input.source.files['lib/color.ts'] = '// helper\nexport const start: number = 0.25;';
+  const first = await compileVisual(input, { dependencyRoot });
+  assert.equal(first.ok, true, JSON.stringify(first));
+  input.source.files['lib/color.ts'] = '// helper\nexport const start: number = 0.75;';
+  const changed = await compileVisual(input, { dependencyRoot });
+  assert.equal(changed.ok, true, JSON.stringify(changed));
+  assert.notEqual(changed.artifact.sourceHash, first.artifact.sourceHash);
+  assert.notEqual(changed.artifact.bundleHash, first.artifact.bundleHash);
+  assert.equal(changed.artifact.modules['main.js'], first.artifact.modules['main.js']);
+  assert.notEqual(changed.artifact.modules['lib/color.js'], first.artifact.modules['lib/color.js']);
+  input.source.files['lib/color.ts'] = '// helper\nexport const start: number = "wrong";';
+  const invalid = await compileVisual(input, { dependencyRoot });
+  assert.equal(invalid.ok, false);
+  assert.ok(invalid.diagnostics.some(diagnostic => diagnostic.file === 'lib/color.ts' && diagnostic.line === 2 && diagnostic.column > 0), JSON.stringify(invalid));
+  delete input.source.files['lib/color.ts'];
+  const missing = await compileVisual(input, { dependencyRoot });
+  assert.equal(missing.ok, false);
+  assert.ok(missing.diagnostics.some(diagnostic => /lib\/color/.test(diagnostic.message)), JSON.stringify(missing));
+});

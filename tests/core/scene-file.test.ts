@@ -40,3 +40,24 @@ test('failed replacement keeps old file and permits a later successful save', as
     assert.equal(final.document.controls.intensity, 0.2);
   } finally { await rm(folder, { recursive: true, force: true }); }
 });
+
+test('three-file Unicode drafts with a nested alternate entry roundtrip without losing helper bytes on failure', async () => {
+  const folder = await mkdtemp(join(tmpdir(), 'lux-multifile-'));
+  try {
+    const path = join(folder, 'multi.lux-scene');
+    const multi = { ...document, source: { sdkVersion: '0.1.0', entry: 'scene/start.ts', files: {
+      'scene/start.ts': "import { color } from '../lib/color.ts';\r\n// 🌈 unfinished\r\n",
+      'lib/color.ts': "export const color = '彩色';\n",
+      'lib/noise.ts': '// λ 😀\nexport const noise = 0.125;\n',
+    } } };
+    await new SceneFileStore().saveAs(path, multi);
+    const failing = new SceneFileStore({ replace: async () => { throw Error('injected replacement failure'); } });
+    const reopened = await failing.open(path); assert.deepEqual(reopened.document, multi);
+    const changed = structuredClone(multi); changed.source.files['lib/noise.ts'] = '// changed helper';
+    await assert.rejects(failing.save(reopened.token, changed), /replacement failure/);
+    assert.deepEqual((await new SceneFileStore().open(path)).document, multi);
+    const successful = await new SceneFileStore().saveAs(path, changed);
+    assert.deepEqual(successful.document, changed);
+    assert.deepEqual((await new SceneFileStore().open(path)).document, changed);
+  } finally { await rm(folder, { recursive: true, force: true }); }
+});
