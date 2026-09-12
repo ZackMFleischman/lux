@@ -21,9 +21,22 @@ User clarification: asset support is important and continues as a high-priority 
 | C8: required asset implementation contract | DONE (DESIGN) | Coordinator + independent review | Design f362f87 with intrinsic-isolation/dependency-closure correction 3f84c04 approved on independent recheck. See required-assets.md; actual asset playback remains to implement. |
 | C9: installed diagnostic cleanup race | DONE | Coordinator + independent review | 41b4668 suppresses normal ENOENT lease removal and retains other scan errors; 15 installed CPU tests pass. Independent review reproduced red/green. Supporting manual records saved in 1bca5b7. No installed binary changes. |
 | C10: compact Studio UX audit | DONE (AUDIT) | compact_ui_audit + coordinator | compact-studio-audit.md records screenshot/code evidence, compact arrangement and bounded slices. Includes per-group picker, application/file controls, icon transport and explicit multiple-view follow-on. No new native run or production changes. |
-| C11: local pane picker and compact shell polish | IN REVIEW | compact_ui_review | a468253 implements group-local picker, compact application/file controls and accessible icon transport. Agent reports 65 Studio + 8 editor + 2 dock + 4 layout CPU tests and typechecks passing. Root native harness migration ready, including actual Save/Open round trip; graphics follow review. True multiple views remain separate. |
-| C12: bounded image validation foundation | IN PROGRESS | asset_foundation | User explicitly resumed parallel asset work. Isolated codex/checkpoint-asset-foundation from a4fa3af implements strict image/record admission and protected byte ownership with CPU tests; scene/export wiring follows. No actual asset playback claimed yet. |
+| C11: local pane picker and compact shell polish | INTEGRATED; NATIVE QA IN PROGRESS | Coordinator + source_editor | Independent review approved a468253; integrated ddabbda. Integrated 65 Studio + 8 editor CPU tests pass. Native functionality and Save/Open round trip pass, but highlighted-text replacement triggers a Chromium inline-style CSP warning; isolated editor investigation underway before final native verdict. True multiple views remain separate. |
+| C12: bounded image validation foundation | DONE (FOUNDATION) | asset_foundation + independent review | 8311363 and reviewed descriptor-snapshot correction609744d integrated as2e66bb6/37f1188. Integrated13 asset tests and root typecheck pass. Strict BMP/base64/path/aggregate validation, verified identities and protected byte map; no scene or playback wiring claimed. |
 | C13: creative-use checkpoint | TOP PRIORITY; GUIDE READY | Coordinator + user creative feedback | creative-workflow-checkpoint.md provides verified host paths, agent prompt and real creation/revision/save loop. Existing working build is usable; C11 can land when verified but broader polish/assets/measurement do not block the session. Actual user creation and feedback remain next. |
+
+## Parallel asset delivery order
+
+See [required-assets.md](required-assets.md) for the approved contract. Asset work proceeds alongside creative workflow readiness; a visual brief is not required.
+
+- [x] Foundation: bounded image admission, identity and isolated byte ownership (C12).
+- [ ] C14 — IN PROGRESS: versioned source/scene and compiler/linker envelopes; preserve legacy hashes and pin helper dependencies. Agent owns contracts/build worker/scene file in an isolated worktree.
+- [ ] C15 — NEXT: Studio workspace, save/open and MCP retain the complete asset-bearing source; asset changes affect document dirty state and replacement undo. Coordinate with C14 schema; do not silently strip assets.
+- [ ] C16 — NEXT: preview worker verification before submitted code, restart retention and a fixture that visibly samples the image.
+- [ ] C17 — NEXT: versioned immutable transport/release, installed runtime capability and exact byte closure; tamper rejection and offline asset playback evidence.
+- [ ] C18 — FOLLOW THROUGH: bounded import/replace/remove controls for supported BMP files, then common image codecs as a separate scoped step.
+
+Each slice receives focused tests and independent review. Production asset admission is enabled only after the relevant downstream path retains and validates bytes. Foundation completion is not asset workflow completion.
 
 ## Established baseline
 
