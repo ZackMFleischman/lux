@@ -5,6 +5,7 @@ import { studioTheme } from './theme.ts';
 import { StandaloneClient } from './standalone-client.ts';
 import { DEFAULT_OUTPUT } from '../../../packages/runtime-contracts/src/index.ts';
 import type { SourceBundle } from '../../../packages/runtime-contracts/src/index.ts';
+import { dispatchRuntimeCommand } from './runtime-operations.ts';
 const client = new StandaloneClient(window.luxAuthoring);
 export function AuthoringApp() {
   const [code, setCode] = useState(''), [busy, setBusy] = useState(false), [error, setError] = useState('');
@@ -12,6 +13,7 @@ export function AuthoringApp() {
   const draft = useRef<{ source: SourceBundle | null; version: number; busy: boolean }>({ source: null, version: 0, busy: false });
   draft.current.busy = busy;
   useEffect(() => window.luxAuthoring.onAgentCommand(async command => {
+    if (['parameters', 'playback', 'restart'].includes(command.method)) return dispatchRuntimeCommand(client, command.method, command.params);
     if (command.method === 'status') return client.getSnapshot();
     if (command.method === 'read') return { source: draft.current.source, draftVersion: draft.current.version, status: client.getSnapshot() };
     if (command.method === 'capture') {

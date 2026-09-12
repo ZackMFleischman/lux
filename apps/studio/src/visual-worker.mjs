@@ -59,8 +59,9 @@ async function initialize(message) {
       renderer.setRenderTarget(null); presentation.render(renderer);
     } }) }));
   for (const name of ['update', 'render', 'reset', 'dispose']) if (typeof visual?.[name] !== 'function') throw Error(`Visual missing ${name}`);
+  if (message.playing) clock.play();
   await draw(message.requestId, 'ready');
-  if (message.playing) { clock.play(); schedule(); }
+  schedule();
 }
 onmessage = event => {
   const message = event.data;
