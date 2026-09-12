@@ -2,12 +2,12 @@
 // Run using the pinned Electron executable in Node mode. This process creates
 // no Electron windows or GPU devices. Each producer owns a separate Windows Job.
 const fs = require('node:fs'), path = require('node:path');
-const {InstanceRegistry, validateRequest} = require('./registry.cjs');
+const {InstanceRegistry, validateRequest, sameInstalledPath} = require('./registry.cjs');
 const runtimeDirectory = path.resolve(__dirname, '../../..');
 const runtimeId = process.argv[process.argv.indexOf('--lux-runtime-id') + 1];
 if (!/^[a-f0-9]{64}$/.test(runtimeId) || path.basename(runtimeDirectory) !== runtimeId) throw Error('Installed runtime identity/path mismatch');
 const root = path.resolve(runtimeDirectory, '../..');
-if (root !== path.resolve(process.env.LOCALAPPDATA, 'Lux/Installed')) throw Error('Installed playback requires the default install location');
+if (!sameInstalledPath(root, path.resolve(process.env.LOCALAPPDATA, 'Lux/Installed'))) throw Error('Installed playback requires the default install location');
 const directory = path.join(root, 'instances', runtimeId);
 fs.mkdirSync(directory, {recursive:true});
 const bridge = require(path.join(runtimeDirectory, 'native/build/Release/lux_texture_bridge.node'));

@@ -1,5 +1,6 @@
 'use strict';
 const id = /^[a-f0-9]{64}$/, instance = /^[a-f0-9]{32}$/;
+const sameInstalledPath = (a, b) => require('node:path').win32.resolve(a).toLowerCase() === require('node:path').win32.resolve(b).toLowerCase();
 function validateRequest(value, runtimeId) {
   if (!value || value.version !== 1 || !id.test(value.runtimeId) || value.runtimeId !== runtimeId || !id.test(value.releaseId) ||
       !instance.test(value.instanceId) || !Number.isSafeInteger(value.hostPid) || value.hostPid < 1 ||
@@ -36,4 +37,4 @@ class InstanceRegistry {
   }
   async close() { await Promise.all([...this.entries.values()].map(entry => entry.producer?.stop())); this.entries.clear(); }
 }
-module.exports = {InstanceRegistry, validateRequest};
+module.exports = {InstanceRegistry, validateRequest, sameInstalledPath};

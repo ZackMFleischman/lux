@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 using namespace ffglex;
+extern "C" __declspec(dllexport) const char LuxInstalledSourceProtocol[]="lux-installed-source-protocol-v1";
 namespace {
 struct Descriptor {
  std::optional<lux::InstalledSource> source;std::string error;
@@ -20,7 +21,7 @@ class LuxSource : public CFFGLPlugin {
   GLint imageLocation=-1,availableLocation=-1;
   bool initialized=false;
  public:
-  LuxSource(){SetMinInputs(0);SetMaxInputs(0);SetParamInfof(0,"Intensity",FF_TYPE_STANDARD);receiver.configureInstalled(descriptor.source);if(descriptor.source){intensity=0.5f;receiver.setIntensity(0.5f);}}
+  LuxSource(){SetMinInputs(0);SetMaxInputs(0);receiver.configureInstalled(descriptor.source);if(descriptor.source){intensity=0.5f;receiver.setIntensity(0.5f);}SetParamInfof(0,"Intensity",FF_TYPE_STANDARD);}
   FFResult InitGL(const FFGLViewportStruct* viewport) override {
     if(!descriptor.error.empty()){OutputDebugStringA(descriptor.error.c_str());return FF_FAIL;}
     if(initialized)return FF_SUCCESS;
