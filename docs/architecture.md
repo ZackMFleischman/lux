@@ -79,6 +79,7 @@ The detached supervisor remains alive while host consumers exist after the studi
 - [Project model](design/project-model.md): identity, source authority, storage and releases.
 - [AI authoring](design/ai-authoring.md): application operation schemas, jobs, errors and captures.
 - [Runtime](design/runtime.md): visual execution, frame provenance and render-host lifecycle.
+- [Performance monitoring](design/performance-monitoring.md): instrumentation ownership, bounded collection, CPU/GPU/UI/host metrics, profiler modes and measurement validation.
 - [Resolume bridge](design/resolume-bridge.md): GPU ownership/synchronization, FFGL and measurements.
 - [Studio](design/studio.md): dock layouts and UI diagrams, preview/settings/input behavior.
 - [Environment](implementation/environment.md): observed machine and required version pinning.

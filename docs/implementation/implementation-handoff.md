@@ -7,6 +7,7 @@ Coordinate implementation of Lux tracer 0.1 in this repository.
 
 Read docs/README.md, docs/decisions.md, docs/architecture.md,
 docs/design/tracer-contracts.md, docs/implementation/tracer-0.1.md,
+docs/design/performance-monitoring.md,
 docs/implementation/tracer-acceptance.md, docs/implementation/environment.md,
 and docs/reviews/disposition.md. Load the subsystem design documents needed
 for each task. The original plans/ files are preserved source records;
@@ -41,6 +42,9 @@ At acceptance, use three independent reviewers biased toward technical
 reliability, product/requirement fidelity, and executable verification.
 Resolve findings, retain raw evidence for every applicable acceptance gate,
 and never mark unavailable metrics or mock-host tests as hardware success.
+Implement the dedicated performance design early: bounded nonblocking
+collection, separate CPU/GPU/UI/host metrics, calibrated clocks, telemetry
+coverage, profiler overhead checks and negative accounting fixtures.
 Stop after tracer 0.1 is implemented, reviewed, committed and honestly
 validated, or after documenting a genuine external blocker requiring my
 decision. Report commits, checks, evidence, limitations and the next

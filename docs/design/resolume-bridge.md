@@ -153,6 +153,8 @@ See [runtime lifetime/watchdog](runtime.md) for lease periods, generation invali
 
 ## Measurements and pass/fail
 
+Implement native frame/control/span probes and nonblocking telemetry buffers according to [performance monitoring](performance-monitoring.md). Record unsupported GPU stages and collector loss explicitly; the profiler cannot introduce waits into the FFGL callback or extend texture leases for convenience.
+
 The [acceptance procedure](../implementation/tracer-acceptance.md) owns calculator semantics: independently bracket the full 300-second run, require actual 59.4–60.6 Hz host opportunity rate, and reconcile all 600 normal-rate host control stimuli with exact consumed versions. A 30 Hz fresh-every-time run or a latency report omitting unmatched values fails. High-rate coalescing is a separate diagnostic test, not an excuse to drop acceptance samples.
 
 Use one monotonic native clock domain (Windows performance counter) for plugin receipt, native completion and host consumption. Calibrate worker timestamps through ping-pong samples and record offset/error, or keep worker timings in their own domain. Do not subtract unrelated clocks. The endpoint is host source consumption, not monitor/projector presentation. Measure host reference budgets with the authoring preview inactive/closed, then measure the separate concurrent studio/UI workload and declare both configurations in the manifest.

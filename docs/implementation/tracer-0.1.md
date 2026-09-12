@@ -8,7 +8,9 @@
 
 **Tech stack:** Windows x64, pnpm/TypeScript, Electron/React, Three.js TSL/WebGPU, C++ FFGL and proposed Spout/D3D transport. Exact package/SDK versions are selected and pinned in TR-01; actual transfer is proved in TR-02 before broader work.
 
-**Spec:** [Architecture](../architecture.md), [requirements](../requirements.md), [decisions](../decisions.md), and the five [subsystem designs](../README.md).
+**Spec:** [Architecture](../architecture.md), [requirements](../requirements.md), [decisions](../decisions.md), and the [subsystem designs](../README.md).
+
+**Performance implementation:** [Profiling and monitoring design](../design/performance-monitoring.md) is required reading for TR-01/02/03 and TR-07, and for the status integration in TR-04/05. It defines exact metric endpoints, buffer/query/recording limits, availability/coverage, clocks, overhead methodology and validation fixtures. Numerical targets remain in [acceptance](tracer-acceptance.md).
 
 ## Global constraints
 
@@ -131,6 +133,7 @@ and releasing one lease permits only that slot's next generation.
 - [ ] Implement runtime create/update/render/reset/dispose, play/pause clock behavior, compatible live controls and immutable candidate activation. Preserve the active bundle on failed compile/smoke and retain prior validated artifact for recovery. Initial API budgets are owned by AI authoring; watchdog uses runtime's stricter two-second stop gate.
 - [ ] Implement detached service rendezvous/start lock, host/preview leases, independent authoring/host instances, startup/shutdown and restart generations. Verify actual PIDs and that studio shutdown does not kill host-owned processes.
 - [ ] Implement bounded full-output readback with immutable frame metadata; pair image resource and provenance before asynchronous encoding. No inspection readback on the continuous host transport path.
+- [ ] Implement performance-design probes and collector (`apps/render-service/src/telemetry-collector.ts`), shared telemetry DTOs, asynchronous timing-query pools and owned-resource gauges. Test missing queries, stale generation/calibration, collector overload and paused/hidden UI without blocking rendering. TR-04 provides the shared profiling/status service; TR-05 consumes snapshots with age/coverage.
 - [ ] Run `pnpm test:unit -- --area runtime`, `pnpm typecheck`, `pnpm build`, then `pnpm test:gpu` against the SDK-produced reference. Add real-process hang tests verifying confirmed stop within two seconds.
 - [ ] Commit contracts, implementation and tests. Freeze them before TR-04, then deliver its real core service before TR-05. Include old-ring retirement after slot reuse, duplicate/lost-reply Attach, and literal `intensity` schema tests from the contract map.
 
@@ -218,6 +221,7 @@ The harness helper names above are test-local, not competing production APIs. It
 
 - [ ] Run full build/type/unit/contract suites on the integrated commit; preserve output and test count. Missing hardware suites must be visibly unavailable rather than green.
 - [ ] Execute the acceptance workload, failure matrix and actual AI/host checks under the pinned environment. Measure warmup/five-minute run, delivery/control/CPU/GPU/UI/overhead independently with calibrated clocks and declared workload conditions.
+- [ ] Run `tests/performance/{accounting,clocks,quantiles,overhead}.test.ts` and the performance design's capability/overflow/lifecycle fixtures before trusting hardware reports. Measure paired baseline/routine work-duration overhead and preserve raw coverage/calibration/resource/instrumentation records. Unavailable timing or incomplete collection cannot yield a passing metric.
 - [ ] Generate `acceptance.md` linking every gate to source/settings/environment and raw evidence. Compute fresh/repeated/skipped counts from actual frame IDs, not target FPS or producer submissions. Negative calculator fixtures: a perfect 30 Hz trace declared 60 Hz fails workload validity; missing/unmatched control versions fail reconciliation rather than improve latency quantiles.
 - [ ] Review failures or unavailable metrics; fix bottlenecks and rerun affected gates. Record any explicit budget/design revision with its reason before claiming completion. Never silently lower quality.
 - [ ] Request independent implementation review for runtime/native ownership, product loop and evidence validity. Use separate worktrees for fixes and serialize actual-host runs.

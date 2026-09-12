@@ -2,6 +2,8 @@
 
 This procedure operationalizes [requirements T01–T09](../requirements.md) and original design Appendix B. It is a plan, not a test report. Do not check any acceptance box using source review, a mocked host, or generated fixtures alone.
 
+Read [profiling and performance monitoring](../design/performance-monitoring.md) for how to implement probes, GPU timing, calibration, bounded collection, summaries and negative measurement tests. This acceptance document owns numerical targets; that design owns measurement implementation. Both are required: correct workload counters cannot compensate for invalid or dropped telemetry, and an accurate profiler cannot compensate for failed hardware budgets.
+
 ## Evidence layout
 
 ```text
@@ -84,5 +86,7 @@ If GPU queries are unavailable, record which stage cannot be timed and preserve 
 Two independent host instances and composition reopen are 0.2. Stateful simulation and 20 events/sec over ten seconds are 0.3. Recorded-input deterministic capture is 3. The 60-minute resource/queue soak and five workload categories are 5. Keep these visible in the roadmap; do not demand them to complete 0.1 or describe them as already established.
 
 ## Sign-off
+
+First pass the performance design's quantile/clock/accounting/overflow/query-validity negative fixtures and cross-tool checks. Include `telemetry.jsonl`, `calibration.json`, `resources.jsonl`, `instrumentation.json` and selected bounded traces alongside the evidence layout above. `performance.json` records sampling/coverage, clock uncertainty, lost records and incomplete-output status. Routine overhead uses the design's paired work-duration procedure; vsync-capped intervals alone cannot prove the 2% gate.
 
 The implementing coordinator fills `acceptance.md` with source commit, environment, each gate's result and raw artifact links. A reviewer checks the actual AI image loop and host evidence plus raw counters. Run unit/build/contract checks after integration, then actual-host acceptance. A passing unit suite or a WebGPU demo without the FFGL path does not complete the tracer.

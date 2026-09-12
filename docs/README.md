@@ -22,6 +22,7 @@ Specialist drafting assignments:
 - **Product:** [requirements](requirements.md), [decisions](decisions.md), [studio and UI diagrams](design/studio.md).
 - **Architecture:** [system diagrams and ownership](architecture.md), [cross-subsystem tracer contracts](design/tracer-contracts.md).
 - **Runtime/native implementation:** [runtime](design/runtime.md), [Resolume bridge](design/resolume-bridge.md), [environment](implementation/environment.md).
+- **Profiling and performance:** [instrumentation, monitoring, diagnostics and validation](design/performance-monitoring.md); numerical tracer gates remain in the acceptance document.
 - **Application/AI implementation:** [project model](design/project-model.md), [AI operations and capture](design/ai-authoring.md).
 - **Execution:** [tracer task plan](implementation/tracer-0.1.md), [acceptance/evidence](implementation/tracer-acceptance.md), [later milestone coverage](implementation/roadmap.md).
 - **Review:** [disposition and readiness](reviews/disposition.md), [technical](reviews/technical.md), [product](reviews/product.md), [execution](reviews/execution.md).

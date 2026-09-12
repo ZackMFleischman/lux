@@ -127,6 +127,8 @@ Failure changes the layout/presentation adapter or library choice, not U04 or T0
 
 ## Inputs: source, analysis, mapping
 
+Performance monitoring has its own independent dockable panel, separate from Inputs and Inspector. The [performance design](performance-monitoring.md) defines its Overview, CPU/GPU, frame/control timeline, resource/queue and profile views. Tracer uses only the small shared status snapshot; milestone 4 adds the complete panel. Opening it never implicitly starts expensive profiling, and closing/moving it cannot reset a renderer.
+
 ```mermaid
 flowchart LR
   Device[Machine audio or MIDI device] --> Source[Named logical source]

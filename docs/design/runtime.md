@@ -152,6 +152,8 @@ Captured PNGs use a documented display conversion from linear premultiplied runt
 
 ## Measurement and acceptance evidence
 
+The dedicated [profiling and performance-monitoring design](performance-monitoring.md) owns collection modes, per-writer buffers, GPU query pools, clock calibration, metric semantics, resource attribution and validation tests. Runtime implements those probes without allowing telemetry to schedule or block frames. The table below summarizes the existing tracer budgets; [acceptance](../implementation/tracer-acceptance.md) remains authoritative for complete numerical gates and evidence validity.
+
 Store the test manifest, raw bounded timing samples/counters, summary and source hashes under `evidence/tracer-0.1/<run-id>/`. Measure host reference budgets with the studio preview inactive/closed; measure UI responsiveness in a separately declared concurrent studio workload. Record both workloads and never merge their samples. Hardware/runtime selection is recorded in [environment](../implementation/environment.md). No result may be inferred from static documents or successful compilation.
 
 | Measurement | 0.1 procedure and gate |

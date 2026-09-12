@@ -16,6 +16,8 @@ Bounded profile test: with the actual selected client, allow 10 seconds for conn
 
 `lux.discover` returns application API version, scratch/durable capabilities, SDK source contract and minimal working example, allowed imports, size/time limits, available scenes/instances, authority, and tool feature flags. `lux.scene.read` returns source plus accepted revision, declared controls, settings, and diagnostics; milestone 2 adds graph/definitions. An AI must read current source before replacement. Discovery does not require the model to browse local files. Never send secrets in examples or diagnostics.
 
+`lux.status` performance results use the same versioned snapshots as Studio, with mode/window, sample coverage, age and explicit unavailable/invalid values. [Performance monitoring](performance-monitoring.md) owns their collection/result semantics and later bounded profiling-job extensions; the MCP adapter must not calculate a second verdict or stream raw per-frame telemetry by default.
+
 ## Tracer operation surface
 
 All IDs below are branded strings from `packages/runtime-contracts/src/index.ts`, imported/reexported by `packages/core/src/contracts.ts`. Core alone owns Scene snapshots/head transactions. `Mutation` means `{requestId: string; sceneId: SceneId; baseRevisionId: RevisionId | null}`. A unique request ID deduplicates retries by payload hash; reusing it with different input is an error. Stage 0.1 supports one scratch Scene; general saved-project selection begins at milestone 1.

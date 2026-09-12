@@ -19,6 +19,8 @@ flowchart LR
 
 Features accumulate without removing prior tests. Small docking/presentation experiments belong early to validate lifetime boundaries, but a full graph, library or embedded assistant is not needed to pass 0.1.
 
+[Performance monitoring](../design/performance-monitoring.md) owns instrumentation and measurement validation across stages: native baseline in TR-02, bounded runtime/collector in TR-03, shared status in TR-04/05, acceptance evaluator in TR-07, shared-pass attribution in 2, bounded AI diagnostics in 3, full dockable Performance panel in 4, and resource soak in 5. T03/T06/T07/T09 and R03 require those checks as well as the milestone outcome tests.
+
 ## Deliverables and verification by milestone
 
 | Stage | Deliverables and contract extensions | Acceptance evidence |
