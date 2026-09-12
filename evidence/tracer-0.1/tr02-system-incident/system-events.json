@@ -1,0 +1,14 @@
+[
+  {
+    "TimeCreated": "2026-09-11T21:42:51.1014622-07:00",
+    "Id": 41,
+    "ProviderName": "Microsoft-Windows-Kernel-Power",
+    "Message": "The system has rebooted without cleanly shutting down first. This error could be caused if the system stopped responding, crashed, or lost power unexpectedly."
+  },
+  {
+    "TimeCreated": "2026-09-11T21:44:52.6370333-07:00",
+    "Id": 6008,
+    "ProviderName": "EventLog",
+    "Message": "The previous system shutdown at 9:12:44 PM on ‎9/‎11/‎2026 was unexpected."
+  }
+]
