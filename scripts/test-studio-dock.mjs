@@ -31,7 +31,7 @@ try {
   }
   await menu(); await page.getByRole('textbox', { name: 'Layout name', exact: true }).fill('Automated Dock QA');
   await page.getByRole('button', { name: 'Reset desktop layout', exact: true }).click(); await done();
-  await page.getByRole('button', { name: 'Build & preview', exact: true }).click();
+  await page.getByRole('button', { name: 'Build', exact: true }).click();
   await page.waitForFunction(() => document.querySelector('.playback-state')?.textContent === 'paused');
   await page.locator('.cm-editor').waitFor();
   await page.evaluate(() => { window.__dockCanvas = document.querySelector('.preview-surface canvas'); window.__dockEditor = document.querySelector('.cm-editor'); });
@@ -80,6 +80,27 @@ try {
   assert.equal(await page.locator('.preview-surface canvas').count(), 0);
   await action('Open Preview'); await sameOwners();
   report.checks.push('Closing and reopening Preview retains the original live canvas');
+  // Open the group's real picker and restore the closed Preview in that group.
+  await action('Restore layout');
+  await menu(); await page.getByLabel('Move panel', { exact: true }).selectOption('preview');
+  await page.getByRole('button', { name: 'Close selected panel', exact: true }).click(); await done();
+  await page.getByRole('button', { name: 'Add pane to Source group', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Open Preview', exact: true }).click();
+  await page.waitForFunction(() => {
+    const tabs = [...document.querySelectorAll('.dv-tab')];
+    const group = title => tabs.find(tab => tab.textContent.trim() === title)?.closest('.dv-groupview');
+    return group('Source') && group('Source') === group('Preview');
+  });
+  await sameOwners();
+  await page.getByRole('button', { name: 'Add pane to Inspector group', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Move Source here', exact: true }).click();
+  await page.waitForFunction(() => {
+    const tabs = [...document.querySelectorAll('.dv-tab')];
+    const group = title => tabs.find(tab => tab.textContent.trim() === title)?.closest('.dv-groupview');
+    return group('Source') && group('Source') === group('Inspector');
+  });
+  await sameOwners(); await action('Restore layout');
+  report.checks.push('Local + picker reopens in the chosen group and moves an existing pane without replacing owners');
   await action('Reset laptop layout');
   await action('Open Source');
   await page.getByRole('textbox', { name: 'TypeScript source visual.ts', exact: true }).focus();
@@ -106,10 +127,11 @@ try {
   for (const [fixture, constructor] of [['triangle', 'new CircleGeometry('], ['ring', 'new RingGeometry(']]) {
     const filename = join(root, 'tests/fixtures/installed-sources', fixture, 'scene.lux-scene');
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, filename);
+    await page.locator('.file-tools summary').click();
     await page.getByRole('button', { name: 'Open', exact: true }).click();
     await page.waitForFunction(expected => document.querySelector('.cm-content')?.textContent.includes(expected)
-      && [...document.querySelectorAll('button')].some(button => button.textContent === 'Open' && !button.disabled)
-      && document.querySelector('.authoring-tools')?.textContent.includes('Preview matches source')
+      && [...document.querySelectorAll('button')].some(button => button.textContent === 'Build' && !button.disabled)
+      && document.querySelector('.build-status')?.textContent === 'Preview current'
       && [...document.querySelectorAll('.hint')].some(node => node.textContent === 'Applied value: 0.80'), constructor);
     const png = await page.locator('.preview-surface canvas').screenshot({ path: join(output, `${fixture}.png`) });
     const samples = await app.evaluate(({ nativeImage }, bytes) => {

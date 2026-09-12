@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { _electron } from 'playwright';
 import { createRequire } from 'node:module';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import packageIO from '../packages/export/src/package.cjs';
@@ -20,27 +20,39 @@ try {
   page = await app.firstWindow();
   page.setDefaultTimeout(15000);
   page.on('pageerror', error => report.errors.push(error.message));
-  page.on('console', message => { if (message.type() === 'error' && /Content Security Policy|Refused to (apply|execute|load)/i.test(message.text())) report.errors.push(message.text()); });
+  page.on('console', message => {
+    if (message.type() === 'error' && /Content Security Policy|Refused to (apply|execute|load)/i.test(message.text())) {
+      report.errors.push(message.text());
+      (report.cspDetails ??= []).push({ after: report.checks.at(-1), location: message.location() });
+      console.error(JSON.stringify(report.cspDetails.at(-1)));
+    }
+  });
   async function layoutAction(name) {
-    await page.getByText('View & layouts', { exact: true }).click();
+    await page.getByText('View', { exact: true }).click();
     await page.getByRole('button', { name, exact: true }).click();
-    await page.getByText('View & layouts', { exact: true }).click();
+    await page.getByText('View', { exact: true }).click();
   }
-  await page.getByText('View & layouts', { exact: true }).click();
+  await page.getByText('View', { exact: true }).click();
   await page.getByRole('textbox', { name: 'Layout name', exact: true }).fill('Automated UI QA');
   await page.getByRole('button', { name: 'Reset desktop layout', exact: true }).click();
-  await page.getByText('View & layouts', { exact: true }).click();
-  await page.getByRole('button', { name: 'Build & preview', exact: true }).click();
+  await page.getByText('View', { exact: true }).click();
+  await page.getByRole('button', { name: 'Build', exact: true }).click();
   await page.locator('.preview-surface canvas').waitFor();
   await page.waitForFunction(() => !document.querySelector('.preview-empty') && document.querySelector('.playback-state')?.textContent === 'paused');
   report.checks.push('Real example builds and starts paused');
+  const appBar = await page.locator('.app-bar').boundingBox(), transport = await page.locator('.transport').boundingBox();
+  assert.ok(appBar && appBar.height <= 44, 'compact application bar');
+  assert.ok(transport && transport.height <= 40, 'compact transport');
+  assert.equal(await page.getByRole('button', { name: 'Pop out', exact: true }).count(), 0, 'unsupported popout is not an actionable control');
+  report.compactGeometry = { appBar, transport };
+  report.checks.push('Compact application and transport bars; unsupported popout action hidden');
   await page.evaluate(() => {
     window.__qaCanvas = document.querySelector('.preview-surface canvas');
     window.__qaDisabled = [];
     window.__qaObserver = new MutationObserver(records => {
       for (const record of records) {
-        const name = record.target.textContent;
-        if (['Reset', 'Restart runtime'].includes(name) && record.attributeName === 'disabled') window.__qaDisabled.push(name);
+        const name = record.target.getAttribute('aria-label') ?? record.target.textContent;
+        if (['Play', 'Pause', 'Reset', 'More playback actions'].includes(name) && record.attributeName === 'disabled') window.__qaDisabled.push(name);
       }
     });
     window.__qaObserver.observe(document.querySelector('.transport'), { subtree: true, attributes: true, attributeFilter: ['disabled'] });
@@ -55,7 +67,7 @@ try {
   assert.deepEqual(await page.evaluate(() => window.__qaDisabled), []);
   assert.deepEqual(await page.locator('.preview-surface').boundingBox(), before);
   assert.equal(await page.getByText('Sending request…', { exact: true }).count(), 0);
-  report.checks.push('Three real play/pause cycles: no reset/restart disabled transitions or preview relayout');
+  report.checks.push('Three real play/pause cycles: no transport disabled transitions or preview relayout');
   const slider = page.getByRole('slider');
   await slider.focus();
   await page.keyboard.press('Home');
@@ -68,7 +80,7 @@ try {
   for (let i = 0; i < 2; i++) {
     await page.getByRole('button', { name: 'Fullscreen', exact: true }).click();
     await page.locator('.studio-preview-fullscreen').waitFor();
-    assert.equal(await page.getByRole('button', { name: 'Build & preview', exact: true }).isVisible(), false);
+    assert.equal(await page.getByRole('button', { name: 'Build', exact: true }).isVisible(), false);
     assert.equal(await page.getByRole('button', { name: 'Play', exact: true }).isVisible(), false);
     const bounds = await page.locator('.studio-preview-fullscreen').boundingBox();
     const viewport = await page.evaluate(() => ({ width: innerWidth, height: innerHeight }));
@@ -86,6 +98,7 @@ try {
   await layoutAction('Open Source');
   await page.locator('.cm-editor').waitFor();
   assert.equal(await page.getByText(/Editor unavailable:/).count(), 0);
+  await page.getByRole('button', { name: 'New file', exact: true }).click();
   await page.getByRole('textbox', { name: 'New TypeScript file', exact: true }).fill('lib/qa-helper.ts');
   await page.getByRole('button', { name: 'Add file', exact: true }).click();
   const helper = page.getByRole('textbox', { name: 'TypeScript source lib/qa-helper.ts', exact: true });
@@ -112,11 +125,33 @@ try {
   assert.equal(await page.evaluate(() => window.__qaCanvas === document.querySelector('.preview-surface canvas')), true);
   await page.screenshot({ path: join(output, 'source-editor.png') });
   report.checks.push('Real CodeMirror syntax colors under CSP; helper draft and undo survive tabs and close/reopen without replacing preview');
+  // Save and reopen the actual edited scene through the File commands. Only
+  // native picker responses are supplied; source/control serialization is real.
+  const savedScenePath = join(output, 'creative-workflow.lux-scene');
+  await app.evaluate(({ dialog }, path) => { dialog.showSaveDialog = async () => ({ canceled: false, filePath: path }); }, savedScenePath);
+  await page.locator('.file-tools summary').click();
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await page.waitForFunction(() => document.querySelector('.document-name')?.textContent === 'creative-workflow.lux-scene');
+  const savedScene = JSON.parse(await readFile(savedScenePath, 'utf8'));
+  assert.equal(savedScene.source.files['lib/qa-helper.ts'], 'export const amount: number = 0.42;');
+  assert.equal(savedScene.controls.intensity, 0.08);
+  await helper.fill('export const amount: number = 0.99;');
+  page.on('dialog', dialog => dialog.type() === 'confirm' ? dialog.accept() : dialog.dismiss());
+  await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, savedScenePath);
+  await page.locator('.file-tools summary').click();
+  await page.getByRole('button', { name: 'Open', exact: true }).click();
+  await page.waitForFunction(() => document.querySelector('.build-status')?.textContent === 'Preview current'
+    && [...document.querySelectorAll('button')].some(button => button.textContent === 'Build' && !button.disabled));
+  await page.getByRole('button', { name: 'Open lib/qa-helper.ts', exact: true }).click();
+  assert.equal(await helper.innerText(), 'export const amount: number = 0.42;');
+  await page.getByText('Applied value: 0.08', { exact: true }).waitFor();
+  report.checks.push('File Save and Open round trip the actual edited helper and controls after an intervening draft edit');
   // Supply only the native folder-picker response. The renderer, trusted IPC,
   // child compiler and real package writer all run normally.
   const exportDirectory = join(output, 'exports');
   await mkdir(exportDirectory, { recursive: true });
   await app.evaluate(({ dialog }, directory) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [directory] }); }, exportDirectory);
+  await page.locator('.file-tools summary').click();
   await page.getByRole('button', { name: 'Export for Resolume', exact: true }).click();
   await page.getByRole('textbox', { name: 'Source name', exact: true }).fill('Lux UI acceptance');
   await page.getByRole('button', { name: 'Choose folder and export', exact: true }).click();
