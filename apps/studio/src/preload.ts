@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import type { StudioWindowClient, WindowState } from './window-client.ts';
+import type { StudioExportClient } from './export-client.ts';
 
 const api: StudioWindowClient = {
   getState: () => ipcRenderer.invoke('studio:window', 'state'),
@@ -13,6 +14,8 @@ const api: StudioWindowClient = {
   },
 };
 contextBridge.exposeInMainWorld('luxStudioWindows', Object.freeze(api));
+const exportApi: StudioExportClient = { create: request => ipcRenderer.invoke('studio:export', request) };
+contextBridge.exposeInMainWorld('luxExport', Object.freeze(exportApi));
 contextBridge.exposeInMainWorld('luxAuthoring', Object.freeze({
   example: () => ipcRenderer.invoke('studio:authoring', 'example'),
   compile: (source: unknown) => ipcRenderer.invoke('studio:authoring', 'compile', source),
