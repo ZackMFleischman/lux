@@ -31,7 +31,7 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
     fullscreen: async (fullscreen: boolean) => notify({ detached: false, fullscreen }), dock: async () => {}, popout: async () => {} };
   const workspace = createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'main.ts', files: { 'main.ts': 'export const value = 1' } });
   const ui = render(<StudioApp client={client} presentation={presentation} windows={windows} nowMs={1000}
-    sourcePanel={<SourcePanel workspace={workspace} readOnly={false} onSave={() => {}} />} />);
+    sourcePanel={<SourcePanel workspace={workspace} readOnly={false} onApply={() => {}} onSave={() => {}} />} />);
   await waitFor(() => assert.equal(attaches, 1));
   const editorNode = document.querySelector('.cm-editor') as HTMLElement;
   const editor = EditorView.findFromDOM(editorNode)!;

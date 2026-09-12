@@ -7,8 +7,8 @@ import { ProblemsPanel } from './ProblemsPanel.tsx';
 import type { SourceDiagnostic } from './diagnostics.ts';
 import { AssetItem, AssetPreview } from './AssetPreview.tsx';
 import { sourceAssets } from './source-equality.ts';
-export function SourcePanel({ workspace, readOnly, onSave, onCompositionChange, diagnosticTarget, diagnostics = [] }: {
-  workspace: SourceWorkspace; readOnly: boolean; onSave(): void; onCompositionChange?(value: boolean): void;
+export function SourcePanel({ workspace, readOnly, onApply, onSave, onCompositionChange, diagnosticTarget, diagnostics = [] }: {
+  workspace: SourceWorkspace; readOnly: boolean; onApply(): void; onSave(): void; onCompositionChange?(value: boolean): void;
   diagnosticTarget?: { path: string; offset: number; request: number } | null;
   diagnostics?: readonly SourceDiagnostic[];
 }) {
@@ -34,8 +34,10 @@ export function SourcePanel({ workspace, readOnly, onSave, onCompositionChange, 
   const locked = readOnly || snapshot.busy;
   function attempt(action: () => void) { try { action(); setError(''); return true; } catch (reason) { setError(String(reason)); return false; } }
   return <section className="source-workspace" aria-label="Source workspace" onKeyDownCapture={event => {
-    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
-      event.preventDefault(); if (!locked && !composing.current && !event.nativeEvent.isComposing) onSave();
+    if ((event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === 's') {
+      event.preventDefault(); event.stopPropagation();
+      if (locked || workspace.getSnapshot().busy || event.repeat || composing.current || event.nativeEvent.isComposing) return;
+      if (event.shiftKey) onSave(); else onApply();
     }
   }}>
     <div className="source-columns"><div className="source-files">
@@ -59,7 +61,7 @@ export function SourcePanel({ workspace, readOnly, onSave, onCompositionChange, 
       </div>
       <div className="source-editing"><Tabs ref={tabs} value={assetPath ? false : snapshot.selectedFile || false} onChange={(_, path: string) => openCode(path)} variant="scrollable" scrollButtons="auto" aria-label="Open source files">
         {snapshot.openFiles.map(path => <Tab key={path} value={path} title={path} label={<span className="file-tab-label"><span className="file-path">{path}{snapshot.dirtyFiles.includes(path) ? ' *' : ''}</span><span role="button" tabIndex={0} aria-label={`Close ${path}`} className="file-tab-close"
-          onClick={event => { event.stopPropagation(); closeFile(path); }} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); closeFile(path); } }}>×</span></span>} />)}
+          onClick={event => { event.stopPropagation(); closeFile(path); }} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); closeFile(path); } }}>Ã—</span></span>} />)}
       </Tabs>
       <div className="source-code-content" hidden={!!assetPath}>
       {snapshot.selectedFile && <>
@@ -67,7 +69,7 @@ export function SourcePanel({ workspace, readOnly, onSave, onCompositionChange, 
           onChange={text => attempt(() => workspace.edit(snapshot.selectedFile, text))} diagnosticTarget={diagnosticTarget ?? (navigation?.version === snapshot.version ? navigation : null)}
           onCompositionChange={value => { composing.current = value; onCompositionChange?.(value); }} /></>}
       {!snapshot.selectedFile && <p>Choose a file to edit. Closed tabs retain their drafts.</p>}
-      <p id="source-keyboard-help" className="source-keyboard-help">Tab moves focus out of the editor. Ctrl+F searches; Ctrl+S saves all files.</p>
+      <p id="source-keyboard-help" className="source-keyboard-help">Tab moves focus out. Ctrl/Cmd+F searches; Ctrl/Cmd+S builds the preview; Ctrl/Cmd+Shift+S saves the scene.</p>
       </div>
       {assetPath && <AssetPreview path={assetPath} asset={assets[assetPath]!} />}
       </div></div>{error && <Alert severity="error">{error}</Alert>}

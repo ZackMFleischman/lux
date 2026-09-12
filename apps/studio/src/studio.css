@@ -24,8 +24,8 @@
 
 .source-workspace { color: #e1e2ec; }
 .source-header { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
-.source-columns { display: flex; gap: 12px; }
-.source-files { width: 230px; min-width: 150px; flex-shrink: 0; }
+.source-columns { display: flex; flex-direction: column; gap: 12px; }
+.source-files { width: auto; min-width: 0; flex-shrink: 0; }
 .source-files nav { display: flex; flex-direction: column; align-items: stretch; max-height: 230px; overflow: auto; gap: 3px; margin: 8px 0; }
 .source-files nav button { justify-content: flex-start; text-align: left; overflow-wrap: anywhere; white-space: normal; }
 .source-files form { display: flex; flex-direction: column; gap: 6px; }
@@ -39,6 +39,7 @@
 .app-bar{height:40px;min-height:40px;padding:0 10px;gap:12px;position:relative;z-index:30}
 .brand{gap:0;letter-spacing:1px;order:0}.brand strong{font-size:14px}
 .file-tools{order:1}.view-tools-host{order:2}.document-name,.scene-heading{order:3;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.document-name{display:flex;align-items:baseline;gap:6px;border-left:1px solid #3b3d49;padding-left:12px;color:#a9adbd;font-size:12px;cursor:default}.document-label{flex-shrink:0;font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:#858b9f}.document-title{min-width:0;overflow:hidden;text-overflow:ellipsis}.document-name>[aria-label]{flex-shrink:0}
 .app-bar>.MuiButton-root{order:4}.build-status{order:5;font-size:11px;white-space:nowrap}.connection{order:6;white-space:nowrap;margin-left:0}
 .file-tools,.layout-tools{position:static;padding:0;background:transparent}
 .file-tools summary,.layout-tools summary{min-height:28px;display:flex;align-items:center;cursor:pointer;padding:0 6px;list-style:none}
@@ -55,7 +56,6 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 .source-editing .MuiTabs-root,.source-editing .MuiTab-root{min-height:30px}.source-editing .MuiTab-root{padding:0 6px;text-transform:none;min-width:0;max-width:260px}.file-tab-label{display:flex;align-items:center;gap:4px;max-width:100%;font-size:12px}.file-tab-close{display:grid;place-items:center;min-width:24px;height:28px;font-size:16px}.source-keyboard-help{font-size:10px;margin:3px 0}
 .source-workspace>section{max-height:25%;overflow:auto;flex-shrink:0}.source-workspace>.MuiAlert-root{max-height:25%;overflow:auto;flex-shrink:0}
 .inspector section{padding:10px 0}.section-description{margin:6px 0 10px}.parameter-label{margin-bottom:4px}.metric{padding:8px 0}.diagnostics{min-height:0;padding:6px 10px}.diagnostics p{margin:4px 0}.status-bar{height:24px;min-height:24px}
-@container (min-width:520px){.studio-pane-source .source-columns{flex-direction:row}.studio-pane-source .source-files{width:170px}.studio-pane-source .source-files nav{max-height:calc(100% - 32px)}.source-files form{flex-wrap:wrap}}
 @media(max-width:1000px){.app-bar{gap:6px;padding:0 6px}.build-status{max-width:150px;overflow:hidden;text-overflow:ellipsis}.connection{font-size:10px}.transport{padding:2px 8px}}
 @media(max-width:740px){.app-bar .connection{display:none}.app-bar .build-status{max-width:100px}.source-keyboard-help{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
 .source-code-content{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}.source-code-content[hidden]{display:none}

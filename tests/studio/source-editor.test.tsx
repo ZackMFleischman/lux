@@ -21,7 +21,7 @@ function view() { return EditorView.findFromDOM(document.querySelector('.cm-edit
 
 test('native selected-text insertion preserves admission, undo, readonly and composition paths', async () => {
   const w = fixture();
-  const ui = render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} />);
+  const ui = render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => {}} />);
   const initial = view().state.doc.toString();
   const select = async () => act(async () => { view().dispatch({ selection: { anchor: view().state.doc.length, head: 0 } }); });
   const input = async (data: string, options: InputEventInit = {}) => {
@@ -30,8 +30,8 @@ test('native selected-text insertion preserves admission, undo, readonly and com
     return event.defaultPrevented;
   };
   await select();
-  assert.equal(await input('export const unicode = "日本";'), true);
-  assert.equal(w.getSnapshot().source.files['main.ts'], 'export const unicode = "日本";');
+  assert.equal(await input('export const unicode = "æ—¥æœ¬";'), true);
+  assert.equal(w.getSnapshot().source.files['main.ts'], 'export const unicode = "æ—¥æœ¬";');
   await act(async () => { assert.equal(undo(view()), true); });
   assert.equal(view().state.doc.toString(), initial);
   await select();
@@ -45,12 +45,12 @@ test('native selected-text insertion preserves admission, undo, readonly and com
   assert.equal(await input('composition without flag'), false);
   fireEvent.compositionEnd(view().contentDOM);
   assert.equal(view().state.doc.toString(), initial);
-  ui.rerender(<SourcePanel workspace={w} readOnly={true} onSave={() => {}} />);
+  ui.rerender(<SourcePanel workspace={w} readOnly={true} onApply={() => {}} onSave={() => {}} />);
   await input('blocked');
   assert.equal(view().state.doc.toString(), initial);
 });
 test('source panel preserves helper edits and undo across close/reopen and document replacement resets history', async () => {
-  const w = fixture(); render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} />);
+  const w = fixture(); render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => {}} />);
   await click(screen.getByRole('button', { name: 'Open lib/color.ts' }));
   await act(async () => { view().dispatch({ changes: { from: 0, to: view().state.doc.length, insert: 'helper draft' } }); });
   assert.equal(w.getSnapshot().source.files['lib/color.ts'], 'helper draft');
@@ -66,7 +66,7 @@ test('source panel preserves helper edits and undo across close/reopen and docum
 });
 test('file creation validates paths, saving sees all files, and busy view is readonly', async () => {
   const w = fixture(); let saved: unknown;
-  const ui = render(<SourcePanel workspace={w} readOnly={false} onSave={() => { saved = w.getSnapshot().source; }} />);
+  const ui = render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => { saved = w.getSnapshot().source; }} />);
   assert.equal(screen.queryByRole('textbox', { name: 'New TypeScript file' }), null);
   await click(screen.getByRole('button', { name: 'New file' }));
   fireEvent.change(screen.getByRole('textbox', { name: 'New TypeScript file' }), { target: { value: '../bad.ts' } });
@@ -76,15 +76,15 @@ test('file creation validates paths, saving sees all files, and busy view is rea
   fireEvent.change(screen.getByRole('textbox', { name: 'New TypeScript file' }), { target: { value: 'lib/new.ts' } });
   await click(screen.getByRole('button', { name: 'Add file' }));
   assert.equal(w.getSnapshot().selectedFile, 'lib/new.ts');
-  fireEvent.keyDown(view().contentDOM, { key: 's', ctrlKey: true });
+  fireEvent.keyDown(view().contentDOM, { key: 's', ctrlKey: true, shiftKey: true });
   assert.equal(Object.keys((saved as any).files).length, 4);
-  ui.rerender(<SourcePanel workspace={w} readOnly={true} onSave={() => {}} />);
+  ui.rerender(<SourcePanel workspace={w} readOnly={true} onApply={() => {}} onSave={() => {}} />);
   assert.equal(view().contentDOM.getAttribute('contenteditable'), 'false');
   assert.equal((screen.getByRole('button', { name: 'New file' }) as HTMLButtonElement).disabled, true);
   assert.ok(document.querySelector('style[nonce="abcdefghijklmnopqrstuvwx"]'));
 });
 test('external replacement resets changed file history and panel remount retains unaffected file history', async () => {
-  const w = fixture(); let ui = render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} />);
+  const w = fixture(); let ui = render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => {}} />);
   await act(async () => { view().dispatch({ changes: { from: 0, insert: '// mine\n' } }); });
   await click(screen.getByRole('button', { name: 'Open lib/color.ts' }));
   await act(async () => { view().dispatch({ changes: { from: 0, insert: '// helper\n' } }); });
@@ -92,7 +92,7 @@ test('external replacement resets changed file history and panel remount retains
     await w.submit(next, w.getSnapshot().version, async () => {}); });
   assert.equal(view().state.doc.toString(), 'external helper');
   await act(async () => { assert.equal(undo(view()), false); });
-  ui.unmount(); ui = render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} />);
+  ui.unmount(); ui = render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => {}} />);
   await click(screen.getByRole('button', { name: 'Open main.ts' }));
   await act(async () => { assert.equal(undo(view()), true); });
   assert.equal(w.getSnapshot().source.files['main.ts'], 'export const main = 1');
@@ -101,24 +101,24 @@ test('external replacement resets changed file history and panel remount retains
 });
 test('composition suppresses save and failed admission restores the admitted editor text', async () => {
   const w = fixture(); let saves = 0;
-  render(<SourcePanel workspace={w} readOnly={false} onSave={() => { saves++; }} />);
+  render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => { saves++; }} />);
   fireEvent.compositionStart(view().contentDOM);
-  fireEvent.keyDown(view().contentDOM, { key: 's', ctrlKey: true }); assert.equal(saves, 0);
+  fireEvent.keyDown(view().contentDOM, { key: 's', ctrlKey: true, shiftKey: true }); assert.equal(saves, 0);
   fireEvent.compositionEnd(view().contentDOM);
-  fireEvent.keyDown(view().contentDOM, { key: 's', ctrlKey: true }); assert.equal(saves, 1);
+  fireEvent.keyDown(view().contentDOM, { key: 's', ctrlKey: true, shiftKey: true }); assert.equal(saves, 1);
   await act(async () => { view().dispatch({ changes: { from: 0, insert: '\ud800' } }); });
   assert.equal(view().state.doc.toString(), w.getSnapshot().source.files['main.ts']);
   assert.match(screen.getByRole('alert').textContent!, /valid UTF-8/);
 });
 test('repeated rejected edits never diverge from admitted source and preserve prior undo history', async () => {
   const w = fixture(); let saved: unknown;
-  render(<SourcePanel workspace={w} readOnly={false} onSave={() => { saved = w.getSnapshot().source; }} />);
+  render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => { saved = w.getSnapshot().source; }} />);
   await act(async () => { view().dispatch({ changes: { from: 0, insert: '// admitted\n' } }); });
   const version = w.getSnapshot().version, admitted = w.getSnapshot().source.files['main.ts'];
   for (let i = 0; i < 2; i++) {
     await act(async () => { view().dispatch({ changes: { from: 0, insert: '\ud800' } }); });
     assert.equal(view().state.doc.toString(), admitted); assert.equal(w.getSnapshot().version, version);
-    fireEvent.keyDown(view().contentDOM, { key: 's', ctrlKey: true });
+    fireEvent.keyDown(view().contentDOM, { key: 's', ctrlKey: true, shiftKey: true });
     assert.equal((saved as any).files['main.ts'], admitted);
   }
   await act(async () => { assert.equal(undo(view()), true); });
@@ -126,7 +126,7 @@ test('repeated rejected edits never diverge from admitted source and preserve pr
 });
 test('current diagnostics navigate helper coordinates and edited drafts label them stale', async () => {
   const w = fixture(), diagnostics = [{ file: 'lib/color.ts', line: 1, column: 8, message: 'A helper error', draftVersion: 0 }];
-  render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} diagnostics={diagnostics} />);
+  render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => {}} diagnostics={diagnostics} />);
   await click(screen.getByRole('button', { name: /A helper error/ }));
   assert.equal(w.getSnapshot().selectedFile, 'lib/color.ts'); assert.equal(view().state.selection.main.head, 7);
   await act(async () => { w.edit('main.ts', 'new draft'); });
@@ -135,7 +135,7 @@ test('current diagnostics navigate helper coordinates and edited drafts label th
 });
 test('rejected candidate diagnostics explain their origin and cannot navigate the retained source', async () => {
   const w = fixture();
-  render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} diagnostics={[
+  render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => {}} diagnostics={[
     { file: 'lib/color.ts', line: 1, column: 8, message: 'Candidate helper error', draftVersion: 0, candidateOnly: true },
   ]} />);
   assert.equal((screen.getByRole('button', { name: /Candidate helper error/ }) as HTMLButtonElement).disabled, true);
@@ -145,7 +145,7 @@ test('rejected candidate diagnostics explain their origin and cannot navigate th
 
 
 test('new-file Escape cancels locally, restores focus and leaves source unchanged', async () => {
-  const w = fixture(); render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} />);
+  const w = fixture(); render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => {}} />);
   const before = w.getSnapshot(); let globalEscapes = 0;
   const listener = () => { globalEscapes++; }; window.addEventListener('keydown', listener);
   await click(screen.getByRole('button', { name: 'New file' }));
@@ -175,12 +175,12 @@ function imageSource() {
 }
 const preview = () => screen.getByRole('img', { name: /Image preview:/ }) as HTMLCanvasElement;
 test('asset selection displays decoded pixels and preserves code drafts and undo', async () => {
-  const w = createSourceWorkspace(imageSource()); render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} />);
+  const w = createSourceWorkspace(imageSource()); render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => {}} />);
   await act(async () => { view().dispatch({ changes: { from: 0, insert: '// draft\n' } }); });
   const editor = view();
   await click(screen.getByRole('button', { name: 'View assets/red.bmp' }));
   assert.deepEqual(painted.get(preview()), [255, 0, 0, 255]);
-  assert.match(screen.getByRole('region', { name: 'Asset preview' }).textContent!, /1 × 1.*58 bytes/);
+  assert.match(screen.getByRole('region', { name: 'Asset preview' }).textContent!, /1 Ã— 1.*58 bytes/);
   assert.equal(screen.queryByRole('textbox', { name: /TypeScript source/ }), null);
   await click(screen.getByRole('button', { name: 'View assets/green.bmp' }));
   assert.deepEqual(painted.get(preview()), [0, 255, 0, 255]);
@@ -190,7 +190,7 @@ test('asset selection displays decoded pixels and preserves code drafts and undo
   assert.equal(w.getSnapshot().source.files['main.ts'], 'export const main = 1');
 });
 test('selected asset refreshes on replacement, reports dirty bytes and cannot survive removal or a new document', async () => {
-  const w = createSourceWorkspace(imageSource()); render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} />);
+  const w = createSourceWorkspace(imageSource()); render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => {}} />);
   await click(screen.getByRole('button', { name: 'View assets/red.bmp' }));
   const next = imageSource(); next.assets['assets/red.bmp'].data = next.assets['assets/green.bmp'].data;
   await act(async () => { await w.submit(next, w.getSnapshot().version, async () => {}); });
@@ -206,14 +206,14 @@ test('selected asset refreshes on replacement, reports dirty bytes and cannot su
   assert.equal(screen.queryByRole('img', { name: /Image preview:/ }), null);
 });
 test('legacy files remain editable with an empty asset list', () => {
-  render(<SourcePanel workspace={fixture()} readOnly={false} onSave={() => {}} />);
+  render(<SourcePanel workspace={fixture()} readOnly={false} onApply={() => {}} onSave={() => {}} />);
   assert.ok(screen.getByText('No image assets.')); assert.equal(view().state.doc.toString(), 'export const main = 1');
 });
 test('malformed image presentation stays local and code remains accessible', async () => {
   const w = createSourceWorkspace(imageSource()), snapshot = w.getSnapshot();
   const broken = { ...snapshot, source: { ...imageSource(), assets: { 'assets/red.bmp': { mediaType: 'image/bmp' as const, encoding: 'base64' as const, data: 'bad' } } } };
   const presentation = { ...w, getSnapshot: () => broken };
-  render(<SourcePanel workspace={presentation} readOnly={false} onSave={() => {}} />);
+  render(<SourcePanel workspace={presentation} readOnly={false} onApply={() => {}} onSave={() => {}} />);
   await click(screen.getByRole('button', { name: 'View assets/red.bmp' }));
   assert.match(screen.getByRole('region', { name: 'Asset preview' }).textContent!, /Image unavailable/);
   assert.equal(screen.queryByRole('img', { name: /Image preview:/ }), null);
@@ -223,7 +223,7 @@ test('malformed image presentation stays local and code remains accessible', asy
 test('keyboard asset activation and source tabs keep navigation accessible', async () => {
   const { userEvent } = await import('@testing-library/user-event');
   const user = userEvent.setup({ document });
-  const w = createSourceWorkspace(imageSource()); render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} />);
+  const w = createSourceWorkspace(imageSource()); render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => {}} />);
   const asset = screen.getByRole('button', { name: 'View assets/red.bmp' });
   await act(async () => { asset.focus(); });
   await user.keyboard('{Enter}');
@@ -232,4 +232,99 @@ test('keyboard asset activation and source tabs keep navigation accessible', asy
   await click(screen.getByRole('tab', { name: /main.ts/ }));
   assert.ok(screen.getByRole('textbox', { name: /TypeScript source/ }));
   assert.equal(screen.queryByRole('img', { name: /Image preview:/ }), null);
+});
+
+test('source shortcuts apply all drafts with Ctrl/Cmd+S and save the scene only with Shift', async () => {
+  const w = fixture(); const commands: string[] = [];
+  const ui = render(<SourcePanel workspace={w} readOnly={false} onApply={() => { commands.push('apply'); }} onSave={() => { commands.push('save'); }} />);
+  const key = (options: KeyboardEventInit) => fireEvent.keyDown(view().contentDOM, { key: 's', ...options });
+  assert.equal(key({}), true);
+  for (const modifier of [{ ctrlKey: true }, { metaKey: true }]) {
+    assert.equal(key(modifier), false);
+    assert.equal(key({ ...modifier, key: 'S', shiftKey: true }), false);
+    for (const shiftKey of [false, true]) {
+      assert.equal(key({ ...modifier, shiftKey, repeat: true }), false);
+      key({ ...modifier, shiftKey, isComposing: true });
+      assert.equal(key({ ...modifier, shiftKey, altKey: true }), true);
+      fireEvent.compositionStart(view().contentDOM);
+      key({ ...modifier, shiftKey });
+      fireEvent.compositionEnd(view().contentDOM);
+    }
+  }
+  assert.deepEqual(commands, ['apply', 'save', 'apply', 'save']);
+  ui.rerender(<SourcePanel workspace={w} readOnly={true} onApply={() => { commands.push('apply'); }} onSave={() => { commands.push('save'); }} />);
+  key({ ctrlKey: true }); key({ metaKey: true, shiftKey: true });
+  assert.deepEqual(commands, ['apply', 'save', 'apply', 'save']);
+  ui.rerender(<SourcePanel workspace={w} readOnly={false} onApply={() => { commands.push('apply'); }} onSave={() => { commands.push('save'); }} />);
+  let finish!: () => void;
+  let pending!: Promise<void>;
+  await act(async () => { pending = w.submit(w.getSnapshot().source, w.getSnapshot().version, () => new Promise(resolve => { finish = resolve; })); });
+  key({ ctrlKey: true }); key({ metaKey: true, shiftKey: true });
+  assert.deepEqual(commands, ['apply', 'save', 'apply', 'save']);
+  await act(async () => { finish(); await pending; });
+});
+
+test('authoring source shortcut compiles the complete edited bundle, exposes errors, and keeps explicit scene save', async () => {
+  // Only the compiler/file IPC boundary is replaced; authoring/session/workspace/editor stay real.
+  Object.assign(globalThis, {
+    requestAnimationFrame: dom.window.requestAnimationFrame.bind(dom.window),
+    cancelAnimationFrame: dom.window.cancelAnimationFrame.bind(dom.window),
+    ResizeObserver: class { observe() {} unobserve() {} disconnect() {} },
+  });
+  const source = fixture().getSnapshot().source;
+  const builds: unknown[] = [], saves: any[] = [];
+  let finish!: () => void, finishSave!: () => void;
+  let holdSave = true;
+  const sceneName = 'A deliberately long scene title.lux-scene';
+  window.luxAuthoring = {
+    example: async () => source,
+    compile: async bundle => { builds.push(structuredClone(bundle)); await new Promise<void>(resolve => { finish = resolve; });
+      return { ok: false, diagnostics: [{ file: 'lib/color.ts', line: 1, column: 8, message: 'Shortcut compile error' }] }; },
+    save: async request => { saves.push(request);
+      if (holdSave) await new Promise<void>(resolve => { finishSave = resolve; });
+      return { token: 'scene-token', name: sceneName }; },
+    open: async () => null, dirty: async () => {}, smokeSave: async () => null, onAgentCommand: () => () => {},
+  };
+  const { AuthoringApp } = await import('../../apps/studio/src/authoring.tsx');
+  await act(async () => { render(<AuthoringApp />); });
+  await click(screen.getByRole('button', { name: 'Open Source' }));
+  await click(screen.getByRole('button', { name: 'Open lib/color.ts' }));
+  await act(async () => { view().dispatch({ changes: { from: 0, to: view().state.doc.length, insert: 'export const color = 42' } }); });
+  const editor = view();
+  await act(async () => {
+    fireEvent.keyDown(editor.contentDOM, { key: 's', ctrlKey: true });
+    fireEvent.keyDown(editor.contentDOM, { key: 's', ctrlKey: true });
+    fireEvent.keyDown(editor.contentDOM, { key: 's', metaKey: true, shiftKey: true });
+  });
+  assert.deepEqual(builds, [{ sdkVersion: '0.1.0', entry: 'main.ts', files: {
+    'main.ts': 'export const main = 1', 'lib/color.ts': 'export const color = 42', 'other/color.ts': 'export const color = 2',
+  } }]);
+  assert.equal(saves.length, 0);
+  assert.equal(screen.queryByText(/Studio is busy/), null);
+  await act(async () => { finish(); });
+  assert.ok(screen.getByRole('button', { name: /Shortcut compile error/ }));
+  assert.equal(view(), editor);
+  await act(async () => {
+    fireEvent.keyDown(editor.contentDOM, { key: 's', metaKey: true, shiftKey: true });
+    fireEvent.keyDown(editor.contentDOM, { key: 's', metaKey: true, shiftKey: true });
+    fireEvent.keyDown(editor.contentDOM, { key: 's', ctrlKey: true });
+  });
+  assert.equal(builds.length, 1); assert.equal(saves.length, 1);
+  assert.equal(screen.queryByText(/Studio is busy/), null);
+  await act(async () => { holdSave = false; finishSave(); });
+  assert.equal(saves[0].saveAs, false); assert.deepEqual(saves[0].document.source, builds[0]);
+  const title = document.querySelector('.document-name')!;
+  assert.equal(title.getAttribute('title'), sceneName);
+  assert.ok(title.textContent?.includes(sceneName));
+  assert.equal(title.querySelector('button, summary, [role="button"]'), null);
+  await act(async () => { editor.dispatch({ changes: { from: 0, insert: '// unsaved\n' } }); });
+  assert.ok(title.textContent?.endsWith(' *'));
+  fireEvent.click(screen.getByText('File'));
+  await click(screen.getByRole('button', { name: 'Save' }));
+  assert.equal(saves.length, 2); assert.equal(saves[1].saveAs, false);
+  assert.equal(title.textContent?.endsWith(' *'), false);
+  fireEvent.click(screen.getByText('File'));
+  await click(screen.getByRole('button', { name: 'Save as' }));
+  assert.equal(saves.length, 3); assert.equal(saves[2].saveAs, true);
+  assert.equal(builds.length, 1);
 });
