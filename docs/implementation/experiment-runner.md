@@ -17,6 +17,33 @@ Hardware execution is a separate, explicit action after incident-review gates:
 node scripts/experiment-runner.mjs hardware C:\absolute\review.json 20000
 ```
 
+The package GPU-test entry point is now provided by `scripts/test-gpu.ps1`:
+
+```
+powershell -NoProfile -File scripts/test-gpu.ps1 -ReviewFile C:\absolute\review.json
+```
+
+It requires a review path and supplies an explicit 20-second process budget.
+Missing reviews fail before launching anything. To prepare an **unauthorized**
+request offline, from the integrated worktree with all builds present:
+
+```
+node scripts/prepare-gpu-review.mjs C:\absolute\request.json C:\absolute\build-attribution.json
+```
+
+The second argument is optional. Without it, build attribution is marked
+unverified. With it, its bytes and JSON are recorded as supplied-unverified.
+Preparation never sets authorization, reviewer, host confirmation or expiry;
+reviewers fill these only after establishing the incident-review prerequisites.
+It refuses missing source/build/dependency inputs and refuses to overwrite an
+existing request. Each request records the source commit, dirty status, source
+and generated entry hashes, DLL/addon/standalone/Electron/Node hashes, native
+source/header trees, Node import library, lockfile and relevant dependency entry
+bytes/versions. It does not recursively inventory all node_modules or establish
+source-to-binary equivalence. The request includes these inventory limits and
+the required build-attribution evidence explicitly. Build first, checkpoint the
+source, then prepare the request against the exact final integrated tree.
+
 No hardware runs were used to verify this supervisor. The diagnostic deadline
 defaults to 8000 ms and accepts explicit integer overrides from 100 to 30000 ms.
 This is the child lifetime including shutdown, not just measurement time. A
@@ -42,7 +69,10 @@ not a cryptographic authorization system.
 A reviewed orchestrator can spawn a producer and receiver as one experiment.
 Both inherit the same Windows job. The runner sets `LUX_EXPERIMENT_RUN_ID` and
 `LUX_EXPERIMENT_MODE` (`cpu` or `hardware`), and `LUX_EXPERIMENT_DIRECTORY` (the
-absolute run directory) on the child environment. These are
+absolute run directory), plus `LUX_EXPERIMENT_TIMEOUT_MS` (the explicit integer
+process budget as a string) on the child environment. Orchestrators should refuse
+insufficient budgets before creating children rather than extending the deadline.
+These are
 coordination markers, not security credentials.
 
 The exclusive lock is `%USERPROFILE%\AppData\Local\Lux\experiment.lock`, shared

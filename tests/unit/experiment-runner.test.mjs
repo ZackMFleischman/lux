@@ -44,6 +44,7 @@ test('CPU runs record provenance, failure, deadline and refuse competing owners'
   assert.ok(ok.sources.length > 0);
   assert.match(await readFile(join(ok.directory, 'stdout.log'), 'utf8'), /cpu fixture/);
   assert.match(await readFile(join(ok.directory, 'stdout.log'), 'utf8'), new RegExp(ok.id));
+  assert.match(await readFile(join(ok.directory, 'stdout.log'), 'utf8'), /experiment timeout 8000/);
   const fail = await runExperiment({ mode: 'cpu', fixture: 'failure', output });
   assert.equal(fail.exitCode, 7);
   assert.equal(fail.outcome, 'failure');
