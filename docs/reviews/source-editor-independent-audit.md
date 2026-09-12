@@ -78,3 +78,24 @@ The editor uses the launch nonce, bundled TypeScript mode and view teardown with
 retained editor state. No weakening of script/network CSP was found. Actual native
 IME, accessibility, layout/rendering and CSP enforcement are outside this CPU
 audit; the coordinator owns those checks. The known palette issue was excluded.
+
+## Follow-up fixes and verification
+
+Finding 1 is fixed in `ac0e5e0`: CodeMirror dispatch admits proposed text before
+updating its visible document/history. It also covers undo transactions, which
+bypass CodeMirror state filters. The regression failed before the patch and now
+passes two identical invalid edits while preserving earlier valid undo history
+and whole-document save agreement. No palette changes are included.
+
+Finding 3 is fixed in the follow-up source-aware diagnostic patch: the authoring
+handler compares the submitted complete source with the retained draft when
+attaching diagnostics. A differing rejected candidate is labeled candidate-only
+and cannot navigate into the retained source, even with the same concurrency
+version/path. Current-source diagnostics retain existing navigation behavior.
+The direct navigation regression failed before the fix; multi-file failed-build
+and Problems-panel tests now cover the complete behavior.
+
+Validation after both fixes: Studio CPU/build suite 45/45 general tests plus
+7/7 CodeMirror editor tests; TypeScript checking passed. No graphics launches.
+Finding 2 is owned by the coordinator's separate document-control preservation
+patch and was not edited in this lane.
