@@ -120,3 +120,24 @@ renderer adapter; candidate initialization/first-frame smoke; generation-aware
 supervisor lifecycle; queueing/cancellation; accepted revision retention and failed
 replacement behavior; SDK-produced completed GPU output/captures and actual host
 acceptance. This slice does not claim those gates or full TR-03 completion.
+
+## CPU runtime linker checkpoint
+
+`linkRuntime(artifact, { dependencyRoot? })` returns
+`{ code, sourceMap, bundleHash, linker, linkedHash }`. The ESM exports the default
+visual and named `WebGPURenderer` from the same pinned Three copy. It is suitable
+for a later worker blob import; linking never imports or evaluates generated code.
+The original artifact and its bundleHash remain unchanged. linkedHash hashes the
+JSON object `{ code, sourceMap, bundleHash, linker }`; linker records esbuild
+0.28.2 and hashes of its API, native executable and trusted linker implementation.
+
+The bounded Windows CPU job verifies the artifact hash, every inventoried compiler,
+SDK, contract, declaration and runtime dependency byte, then snapshots allowed
+modules into an esbuild virtual namespace. There is no resolver filesystem/network
+fallback. Generated dynamic imports, privileged imports and relative escapes fail.
+Input source-map comments are removed using AST ranges; the returned external map
+does not cause a runtime fetch. Output JSON is capped at 16 MiB and the parent
+checks its identity and hash. Job limits match compilation: 30 seconds, 1 GiB job
+memory and 256 MiB Node heap. This is CPU linking evidence, not runtime sandbox,
+initialization, frame or GPU acceptance. Dependency installations are trusted,
+immutable service inputs; hashes provide byte attribution, not package signatures.
