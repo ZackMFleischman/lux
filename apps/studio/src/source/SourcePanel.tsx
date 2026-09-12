@@ -16,7 +16,7 @@ export function SourcePanel({ workspace, readOnly, onSave, onCompositionChange, 
   const composing = useRef(false), cache = editorCache(workspace);
   cache.reconcile(snapshot.documentKey, snapshot.source);
   const locked = readOnly || snapshot.busy;
-  function attempt(action: () => void) { try { action(); setError(''); } catch (reason) { setError(String(reason)); } }
+  function attempt(action: () => void) { try { action(); setError(''); return true; } catch (reason) { setError(String(reason)); return false; } }
   return <section className="source-workspace" aria-label="Source workspace" onKeyDownCapture={event => {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
       event.preventDefault(); if (!locked && !composing.current && !event.nativeEvent.isComposing) onSave();
