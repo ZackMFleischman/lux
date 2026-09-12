@@ -1,6 +1,7 @@
 #include <d3d11_1.h>
 #include "FrameReceiver.h"
 #include "ContextDiagnostic.h"
+#include "ContextHandoff.h"
 #include <dxgi1_2.h>
 #include <wrl/client.h>
 #include <fstream>
@@ -65,18 +66,31 @@ bool FrameReceiver::start(HDC target,HGLRC host) {
  if(!createContext||!pixelFormat||!DescribePixelFormat(target,pixelFormat,sizeof(pixelDescriptor),&pixelDescriptor))return false;
  hostContext=host;
  {std::ostringstream snapshot;snapshot<<"{\"kind\":\"context-host-snapshot\",\"createContextProc\":"<<reinterpret_cast<uintptr_t>(createContext)<<",\"current\":";currentContextDiagnostic(snapshot);snapshot<<",\"drawable\":";drawableDiagnostic(snapshot,target);snapshot<<"}";hostDiagnostic=snapshot.str();}
- if(!lifecycle.beginStart())return false;
- try{worker=std::thread(&FrameReceiver::run,this);}catch(...){lifecycle.finished();lifecycle.reaped();return false;}
+ wchar_t temp[MAX_PATH]{},configured[32768]{};GetTempPathW(MAX_PATH,temp);const auto length=GetEnvironmentVariableW(L"LUX_HOST_LOG",configured,32768);
+ std::ofstream log(length>0&&length<32768?std::wstring(configured):std::wstring(temp)+L"LuxTracer-tr02-host.jsonl",std::ios::app);
+ log<<hostDiagnostic<<std::endl;
+ HGLRC prepared=nullptr;
+ const bool launched=launchPreparedContext(lifecycle,[&]{
+  // Hypothesis: establish sharing through the active host ICD/DC on its owner
+  // thread, then bind this never-current context only on the worker's own DC.
+  const int attributes[]={0x2091,4,0x2092,1,0};
+  SetLastError(ERROR_SUCCESS);prepared=createContext(target,hostContext,attributes);const auto createError=GetLastError();
+  log<<"{\"kind\":\"wgl-create-context\",\"creationSite\":\"host-thread-host-dc\",\"ok\":"<<(prepared?"true":"false")<<",\"win32\":"<<createError<<",\"context\":"<<reinterpret_cast<uintptr_t>(prepared)<<",\"creationDc\":"<<reinterpret_cast<uintptr_t>(target)<<",\"shareContext\":"<<reinterpret_cast<uintptr_t>(hostContext)<<",\"attributes\":[8337,4,8338,1,0],\"current\":";currentContextDiagnostic(log);log<<"}"<<std::endl;
+  return prepared!=nullptr;
+ },[&]{worker=std::thread(&FrameReceiver::run,this,prepared);},[&]{
+  if(prepared&&!wglDeleteContext(prepared)){unsupportedUnload();for(;;)std::this_thread::sleep_for(std::chrono::seconds(1));}
+  prepared=nullptr;
+ });
+ if(!launched)return false;
  if(lifecycle.waitStarted(std::chrono::seconds(2)))return true;
  stop();return false;
 }
-void FrameReceiver::run() {
+void FrameReceiver::run(HGLRC shared) {
  struct Finished {WorkerLifecycle& lifecycle;~Finished(){lifecycle.finished();}} finished{lifecycle};
  wchar_t temp[MAX_PATH]{};GetTempPathW(MAX_PATH,temp);
  wchar_t configured[32768]{};DWORD length=GetEnvironmentVariableW(L"LUX_HOST_LOG",configured,32768);
  std::ofstream log(length>0&&length<32768?std::wstring(configured):std::wstring(temp)+L"LuxTracer-tr02-host.jsonl",std::ios::app);
- log<<hostDiagnostic<<std::endl;
- HWND window=nullptr;HDC dc=nullptr;HGLRC shared=nullptr;bool currentContext=false;
+ HWND window=nullptr;HDC dc=nullptr;bool currentContext=false;
  std::wstring windowClass;ATOM classAtom=0;
  HANDLE mapping=nullptr;SharedRing* ring=nullptr;
  ComPtr<ID3D11Device1> device;ComPtr<ID3D11DeviceContext> context;
@@ -115,7 +129,7 @@ void FrameReceiver::run() {
  auto detach=[&]{drainImports();if(ring){UnmapViewOfFile(ring);ring=nullptr;}if(mapping){CloseHandle(mapping);mapping=nullptr;}};
  try {
   // The worker creates, uses and destroys its own drawable/DC. The host's DC is
-  // consulted only in start for its pixel format; it is never made current here.
+  // consulted only in start for format/context creation; never made current here.
   windowClass=L"LuxTR02Drawable-"+std::to_wstring(GetCurrentThreadId())+L"-"+std::to_wstring(reinterpret_cast<uintptr_t>(this));
   WNDCLASSW wc{};wc.style=CS_OWNDC;wc.lpfnWndProc=DefWindowProcW;wc.hInstance=GetModuleHandleW(nullptr);wc.lpszClassName=windowClass.c_str();
   classAtom=RegisterClassW(&wc);require(classAtom!=0,"worker drawable class failed");
@@ -124,10 +138,6 @@ void FrameReceiver::run() {
   SetLastError(ERROR_SUCCESS);const auto pixelSet=SetPixelFormat(dc,pixelFormat,&pixelDescriptor);const auto pixelError=GetLastError();
   log<<"{\"kind\":\"context-worker-drawable\",\"setPixelFormatOk\":"<<(pixelSet?"true":"false")<<",\"win32\":"<<pixelError<<",\"requestedPixelFormat\":"<<pixelFormat<<",\"current\":";currentContextDiagnostic(log);log<<",\"drawable\":";drawableDiagnostic(log,dc);log<<"}"<<std::endl;
   require(pixelSet!=FALSE,"worker matching pixel format failed");
-  const int attributes[]={0x2091,4,0x2092,1,0};
-  SetLastError(ERROR_SUCCESS);shared=createContext(dc,hostContext,attributes);const auto createError=GetLastError();
-  log<<"{\"kind\":\"wgl-create-context\",\"ok\":"<<(shared?"true":"false")<<",\"win32\":"<<createError<<",\"context\":"<<reinterpret_cast<uintptr_t>(shared)<<",\"shareContext\":"<<reinterpret_cast<uintptr_t>(hostContext)<<",\"attributes\":[8337,4,8338,1,0],\"current\":";currentContextDiagnostic(log);log<<"}"<<std::endl;
-  require(shared!=nullptr,"worker wglCreateContextAttribsARB failed");
   SetLastError(ERROR_SUCCESS);const auto madeCurrent=wglMakeCurrent(dc,shared);const auto makeCurrentError=GetLastError();
   currentContext=madeCurrent!=FALSE;
   log<<"{\"kind\":\"wgl-make-current\",\"ok\":"<<(madeCurrent?"true":"false")<<",\"win32\":"<<makeCurrentError<<",\"requestedContext\":"<<reinterpret_cast<uintptr_t>(shared)<<",\"requestedDc\":"<<reinterpret_cast<uintptr_t>(dc)<<",\"current\":";currentContextDiagnostic(log);log<<"}"<<std::endl;
