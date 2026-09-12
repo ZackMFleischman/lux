@@ -2,6 +2,7 @@
 #include "FFGLSDK.h"
 #include "shared_ring.h"
 #include "ReceiverLifecycle.h"
+#include "InstalledActivation.h"
 #include <atomic>
 #include <thread>
 #include <array>
@@ -11,6 +12,7 @@ class FrameReceiver {
   ~FrameReceiver();
   // Host lifecycle calls are serialized with ProcessOpenGL by the FFGL host.
   bool start(HDC dc,HGLRC host);
+  void configureInstalled(std::optional<InstalledSource> source){activation.configure(std::move(source));}
   // May retain/wait indefinitely if a driver never completes. No safe bounded
   // in-process unload exists; FFGL SDK deletes this object after DeInitGL.
   void stop();
@@ -24,6 +26,7 @@ class FrameReceiver {
   std::array<Output,3> outputs;
   std::atomic<float> intensity{0.65f};
   WorkerLifecycle lifecycle;
+  InstalledActivation activation;
   using CreateContext=HGLRC(WINAPI*)(HDC,HGLRC,const int*);
   CreateContext createContext=nullptr;HGLRC hostContext=nullptr;
   PIXELFORMATDESCRIPTOR pixelDescriptor{};int pixelFormat=0;

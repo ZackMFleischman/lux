@@ -1,4 +1,5 @@
-if (!process.env.LUX_EXPERIMENT_RUN_ID || process.env.LUX_EXPERIMENT_MODE !== 'hardware') {
+const installed = (globalThis as any).luxInstalledContext;
+if (!installed && (!process.env.LUX_EXPERIMENT_RUN_ID || process.env.LUX_EXPERIMENT_MODE !== 'hardware')) {
   throw Error('Reviewed experiment supervisor required');
 }
 const { app, BrowserWindow } = require('electron');
@@ -81,7 +82,7 @@ app.whenReady().then(async () => {
   win.webContents.setFrameRate(60);
   await win.loadFile(path.join(__dirname, release ? 'compiled-output.html' : 'output.html'));
   record({ kind: 'gpu', info: await app.getGPUInfo('complete') });
-  bridge.advertise();
+  if (installed) bridge.advertise(installed.rendezvous); else bridge.advertise();
   let lastHostControl: number | undefined;
   const startup = release ? new HostStartup({revisionId:release.sourceHash,
     init:value=>win.webContents.executeJavaScript('window.startVisual(' + JSON.stringify(release) + ',' + value + ')'),
@@ -122,6 +123,12 @@ app.whenReady().then(async () => {
     }, 10);
   };
   if(playback)endTimer=setInterval(()=>{
+    if(installed){
+      try {
+        if(Date.now()-fs.statSync(installed.requestPath).mtimeMs>10000||Date.now()-fs.statSync(installed.supervisorReady).mtimeMs>10000){stopProducer();return;}
+        process.kill(installed.hostPid,0);
+      } catch {stopProducer();return;}
+    }
     if(fs.existsSync(process.env.LUX_TRANSPORT_STOP))stopProducer();
     else if(visualReady&&progress.expired(performance.now()))failure('Visual worker stopped producing frames');
   },100);
