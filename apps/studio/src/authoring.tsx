@@ -9,11 +9,14 @@ import { dispatchRuntimeCommand } from './runtime-operations.ts';
 import { createSourceWorkspace } from './source/workspace.ts';
 import { createAuthoringSession } from './source/authoring-session.ts';
 import { SourcePanel } from './source/SourcePanel.tsx';
+import { SourceCompileError } from './source/diagnostics.ts';
+import type { SourceDiagnostic } from './source/diagnostics.ts';
 const client = new StandaloneClient(window.luxAuthoring);
 export function AuthoringApp() {
   const windows = useMemo(() => window.luxStudioWindows ? { ...window.luxStudioWindows,
     popout: async () => { throw Error('Separate preview windows are not connected in this standalone checkpoint. Fullscreen is available.'); } } : undefined, []);
   const [error, setError] = useState('');
+  const [diagnostics, setDiagnostics] = useState<SourceDiagnostic[]>([]);
   const composing = useRef(false);
   const workspace = useMemo(() => createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': '' } }), []);
   const session = useMemo(() => createAuthoringSession(workspace, {
@@ -26,6 +29,10 @@ export function AuthoringApp() {
   const draft = useSyncExternalStore(workspace.subscribe, workspace.getSnapshot);
   const io = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const busy = io.busy || draft.busy, dirty = draft.dirty || io.controlsDirty;
+  function reportError(reason: unknown, draftVersion: number) {
+    setError(String(reason));
+    if (reason instanceof SourceCompileError) setDiagnostics(reason.diagnostics.map(diagnostic => ({ ...diagnostic, draftVersion })));
+  }
   useEffect(() => window.luxAuthoring.onAgentCommand(async command => {
     if (['parameters', 'playback', 'restart'].includes(command.method)) return dispatchRuntimeCommand(client, command.method, command.params);
     if (command.method === 'status') return client.getSnapshot();
@@ -41,7 +48,7 @@ export function AuthoringApp() {
     try {
       await session.build(source, command.params?.expectedDraftVersion);
       return { draftVersion: workspace.getSnapshot().version, status: client.getSnapshot() };
-    } catch (reason) { setError(String(reason)); throw reason; }
+    } catch (reason) { reportError(reason, command.params?.expectedDraftVersion); throw reason; }
   }), [session, workspace]);
   useEffect(() => { void window.luxAuthoring.dirty(dirty); }, [dirty]);
   useEffect(() => {
@@ -75,7 +82,7 @@ export function AuthoringApp() {
     }
   }).catch(reason => setError(String(reason))); }, [session, workspace]);
   async function build() { if (composing.current) return; setError(''); const current = session.read();
-    try { await session.build(current.source, current.draftVersion); } catch (reason) { setError(String(reason)); } }
+    try { await session.build(current.source, current.draftVersion); setDiagnostics([]); } catch (reason) { reportError(reason, current.draftVersion); } }
   async function save(saveAs = false) {
     if (composing.current) return;
     setError('');
@@ -84,11 +91,11 @@ export function AuthoringApp() {
   async function open() {
     if (dirty && !window.confirm('Discard unsaved changes and open another visual?')) return;
     setError('');
-    try { await session.open(); } catch (reason) { setError(String(reason)); }
+    try { await session.open(); setDiagnostics([]); } catch (reason) { reportError(reason, workspace.getSnapshot().version); }
   }
   return <ThemeProvider theme={studioTheme}><div className="authoring-shell" style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
     <details className="authoring-tools" style={{ padding: '8px 16px', background: '#191b23', flexShrink: 0 }}><summary>Visual source</summary>
-      <SourcePanel workspace={workspace} readOnly={busy} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} />
+      <SourcePanel workspace={workspace} readOnly={busy} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnostics={diagnostics} />
     </details><div className="authoring-tools" style={{ padding: '4px 16px', background: '#191b23' }}><Button variant="contained" disabled={busy} onClick={() => void build()}>Build & preview</Button>
       <Button disabled={busy} onClick={() => void open()}>Open</Button><Button disabled={busy} onClick={() => void save()}>Save</Button><Button disabled={busy} onClick={() => void save(true)}>Save as</Button><span>{io.name}{dirty ? ' *' : ''}</span>
       <span role="status">{draft.runningMatchesDraft ? 'Preview matches source' : draft.hasRunningSource ? 'Preview shows previous source' : 'Source has not been built'}</span>
