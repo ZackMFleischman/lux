@@ -16,6 +16,9 @@ function sourceIdentity(release) {
 function registerSource({ installRoot, releaseId, pluginDirectory }) {
   if (!/^[a-f0-9]{64}$/.test(releaseId)) throw Error('Invalid release identity');
   installRoot = noLinks(installRoot); pluginDirectory = noLinks(pluginDirectory);
+  const expectedRoot = process.env.LOCALAPPDATA && path.resolve(process.env.LOCALAPPDATA, 'Lux', 'Installed');
+  const comparable = value => process.platform === 'win32' ? value.toLowerCase() : value;
+  if (!expectedRoot || comparable(installRoot) !== comparable(expectedRoot)) throw Error('Source registration requires the standard installed runtime location: %LOCALAPPDATA%/Lux/Installed');
   const release = validateRelease(path.join(installRoot, 'releases', releaseId), releaseId);
   const runtimePath = path.join(installRoot, 'runtimes', release.runtimeId);
   const runtime = validateRuntime(runtimePath, release.runtimeId);

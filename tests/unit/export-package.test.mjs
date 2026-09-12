@@ -10,6 +10,9 @@ import registration from '../../packages/export/src/register.cjs';
 const hash = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 function fixture(t) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'lux-export-test-'));
+  const previousLocalAppData = process.env.LOCALAPPDATA;
+  process.env.LOCALAPPDATA = path.join(root, 'appdata');
+  t.after(() => { if (previousLocalAppData === undefined) delete process.env.LOCALAPPDATA; else process.env.LOCALAPPDATA = previousLocalAppData; });
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const runtime = path.join(root, 'input'); fs.mkdirSync(runtime);
   for (const name of packageIO.requiredRuntimeFiles) {
@@ -23,7 +26,7 @@ function fixture(t) {
   const visual = { format: 'lux-transport', version: 1, sourceHash: 'a'.repeat(64), settings: { width: 1920, height: 1080, fps: 60, seed: 1 }, linked };
   const bytes = JSON.stringify(visual), transportPath = path.join(root, hash(bytes) + '.json'); fs.writeFileSync(transportPath, bytes);
   const options = { name: 'Tunnel', transportPath, runtimeDirectory: runtime, electronVersion: '44.3.0', outputDirectory: path.join(root, 'exports'), intensity: 0.17 };
-  return { root, runtime, options, build: overrides => packageIO.createPackage({ ...options, ...overrides }), installRoot: path.join(root, 'installed') };
+  return { root, runtime, options, build: overrides => packageIO.createPackage({ ...options, ...overrides }), installRoot: path.join(process.env.LOCALAPPDATA, 'Lux', 'Installed') };
 }
 test('release identity is repeatable and pins name, control default, visual and complete runtime bytes', t => {
   const f = fixture(t), first = f.build(), repeated = f.build();
@@ -114,4 +117,14 @@ test('registration refuses incomplete runtime and conflicting FFGL IDs', t => {
   fs.writeFileSync(path.join(pluginDirectory, 'Lux_' + 'f'.repeat(64) + '.dll.lux-source'), ['lux-installed-source-v1', 'f'.repeat(64), b.runtimeId, identity.pluginId, 'Existing', ''].join('\n'));
   assert.throws(() => registration.registerSource({ installRoot: f.installRoot, releaseId: b.releaseId, pluginDirectory }), /collision/);
   assert.equal(fs.readdirSync(pluginDirectory).length, 1);
+});
+
+test('registration rejects storage locations that the native source cannot resolve', t => {
+  const f = fixture(t), pluginDirectory = path.join(f.root, 'plugins');
+  for (const name of registration.supervisorFiles) { const filename = path.join(f.runtime, name); fs.mkdirSync(path.dirname(filename), { recursive: true }); fs.writeFileSync(filename, '// CPU fixture only'); }
+  const a = f.build(), customRoot = path.join(f.root, 'custom-installed');
+  packageIO.installPackage(a.path, customRoot);
+  assert.throws(() => registration.registerSource({ installRoot: customRoot, releaseId: a.releaseId, pluginDirectory }), /standard installed runtime location/);
+  assert.equal(fs.existsSync(pluginDirectory), false);
+  assert.equal(packageIO.validateRelease(path.join(customRoot, 'releases', a.releaseId)).releaseId, a.releaseId);
 });
