@@ -6,6 +6,8 @@ User direction, 12 September 2026, after the docking checkpoint: getting to actu
 
 The current build already supports executable multi-file TypeScript authoring with syntax coloring, Studio preview, MCP create/read/build/capture/revise and playback controls, save/reopen, and immutable source export. Native Studio workflow tests and guided installed-source functional QA have passed within their recorded scope. Start from these capabilities rather than building another foundation before trying real work. The user subsequently clarified that **asset support is important and must continue in parallel**; it does not require a chosen visual brief or completion before code-only experimentation.
 
+Asset first-use requirements now explicitly include **PNG with transparency and JPG/JPEG**, plus visible asset browsing and import/replace/remove. The opaque BMP foundation is an intermediate checkpoint only. Codec admission and actual alpha/compositing validation are prioritized ahead of claiming that asset workflow ready; code-only creative use remains available meanwhile.
+
 | Priority | Work | Exit condition |
 | --- | --- | --- |
 | Now: creative-use checkpoint | Prepare a short, portable Studio/MCP start guide and use actual user-chosen visual briefs. Create a visual, inspect its live/captured output, request meaningful revisions, make a small manual edit, save and reopen it. Use the current procedural-code path; no asset or graph prerequisite. | User can complete a real creation/revision session and identify the next workflow friction. Preserve the actual scene and concise feedback; do not require a fixed number of visuals or full tracer acceptance before proceeding. |

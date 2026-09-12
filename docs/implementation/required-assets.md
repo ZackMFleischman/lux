@@ -105,3 +105,27 @@ Use the existing compiler, scene-file, source-workspace/authoring-session, MCP, 
 First implement/test versioned contracts, bounded parser and identity functions; then workspace/MCP round-trip; then compile/link and runtime byte-map plumbing; then transport/release compatibility and stale-runtime checks. Add the consuming fixture and CPU gates alongside those changes. Runtime evidence follows the separate host/GPU safety process.
 
 For the initial checkpoint, opening the supplied self-contained scene and whole-source MCP replacement provide a usable byte entry path. A minimal subsequent **Import BMP** action selects a local file through Studio's trusted dialog, bounded-reads one regular file (no directory traversal, reparse links, remote URL or automatic watcher), validates it, and atomically adds/replaces its source asset descriptor. Default logical name derives from a sanitized basename with explicit collision handling; cancel or failure leaves draft unchanged. Replacement increments draft version and needs Build to affect preview. Show path, dimensions, byte count, dirty state and removal in a small asset list; no binary editor or base64 text area. Preflight the entire resulting source/scene serialized budget before committing the change. Import UI must not be marketed as general image import until another codec is approved and tested. No product question blocks the bounded recommendation; the recorded format and size costs are the deliberate first-step tradeoff.
+
+## User requirement update: PNG, JPEG and transparency
+
+User direction, 12 September 2026, supersedes the earlier decision to defer common
+codecs and transparent images from first use. The first usable asset workflow
+must support PNG, including alpha, and JPG/JPEG at minimum. The bounded opaque
+BMP implementation remains useful foundation/fixture coverage but is not product
+completion. Extend validation, logical extensions/media types, browser preview,
+MCP discovery, runtime decoding and immutable export consistently; do not merely
+accept a filename whose bytes cannot be consumed.
+
+Codec implementation must document and enforce decoded dimensions, aggregate
+pixel/output memory, decompression bounds and unsupported variants before unsafe
+allocation. Prefer established open-source codecs with verified bounds. Preserve
+existing admitted bytes and identities; do not silently reinterpret old BMPs.
+
+Alpha validation must cover fully transparent and partially transparent pixels,
+straight versus premultiplied representations, color space and filtering at image
+edges. Use actual GPU captures and known black/white-background composites to catch
+halos or double multiplication. Current capture feeds render-target bytes directly
+to ImageData while labeling them straight, and presentation uses a premultiplied
+WebGPU canvas; these are unverified representation boundaries, not passing alpha
+evidence. Exported/installed alpha is a separate required validation after Studio.
+Codec and alpha implementation details are being developed in asset-alpha.md.

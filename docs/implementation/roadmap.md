@@ -10,6 +10,8 @@ The user specifically requested **asset implementation continue in parallel as i
 
 **First usable asset workflow:** assets appear alongside source files in compact pane content with thumbnail, filename, dimensions and size. Selection shows an image preview; import, replace and remove update the complete scene. Deliver this browser with initial Studio asset rendering, ahead of full offline-export acceptance. The first supported codec remains the bounded BMP subset; PNG/JPEG require their own codec step.
 
+**User codec requirement update:** PNG with transparency and JPG/JPEG are minimum first-use requirements. Their codec step and verified alpha compositing now precede calling the asset workflow usable; the opaque BMP slice alone does not satisfy this checkpoint. Validate transparent/partial-alpha pixels, filtered edges over light/dark backgrounds, capture representation and later exported playback. See the appended requirement update in required-assets.md; this supersedes deferring these formats beyond first use.
+
 **Scope revised 12 September 2026:** tracer means **create in Lux → export/install
 a reusable source → use it in Resolume without Lux Studio running**, including
 cold start, independent sources and composition reopen. The authoritative

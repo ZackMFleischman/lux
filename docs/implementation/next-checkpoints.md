@@ -33,8 +33,9 @@ See [required-assets.md](required-assets.md) for the approved contract. Asset wo
 - [x] C14 — DONE (CPU PIPELINE): versioned source/scene and compiler/linker envelopes reviewed and integrated as8b1b6fd/fbea47c/84f5a25. Legacy identity behavior and helper closure covered;45 implementer CPU tests and14 independent focused review checks passed.
 - [x] C15 — DONE (AUTHORING PRESERVATION): reviewed55372e1 retains complete assets in workspace/session/save/read/MCP, dirty metadata and replacement undo. Combined73Studio+9editor tests and root/Studio types pass. Explicit preview/export gates remain until the next slices.
 - [ ] C16 — IN PROGRESS IN TWO WORKTREES: asset_foundation connects verified images to preview/restart; checkpoint_fixture_review implements compact asset list/thumbnails/selection preview. Coordinator prepares native six-region image/revision/restart/save/reopen checks. Required image fixture now passes real compiler/linker969c2c7.
-- [ ] C17 — NEXT: versioned immutable transport/release, installed runtime capability and exact byte closure; tamper rejection and offline asset playback evidence.
+- [ ] C21 — REQUIRED BEFORE FIRST USE; DESIGN IN PROGRESS: PNG with alpha and JPG/JPEG codecs, bounded decoded memory/decompression, verified straight/premultiplied capture and light/dark-background compositing. Opaque BMP alone is not asset completion. source_editor owns the independent design/research.
 - [ ] C18 — FIRST-USE COMPANION: bounded import/replace/remove controls alongside the C16 asset browser, before treating the creative asset workflow as usable. Common image codecs remain a separate scoped step.
+- [ ] C17 — NEXT: versioned immutable transport/release, installed runtime capability and exact byte closure; tamper rejection and offline asset playback evidence.
 
 Each slice receives focused tests and independent review. Production asset admission is enabled only after the relevant downstream path retains and validates bytes. Foundation completion is not asset workflow completion.
 
