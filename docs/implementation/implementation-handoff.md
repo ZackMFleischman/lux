@@ -1,5 +1,15 @@
 # Prompt for the implementation coordinator
 
+**Current handoff authority (12 September 2026):** start with
+[active creative-workflow priorities](current-priorities.md#active-order-creative-workflow-feedback-first)
+and [live checkpoints](next-checkpoints.md). The user now prioritizes creating
+real visuals and feeding back on the workflow ahead of additional infrastructure.
+The existing Studio/MCP authoring, editor, docking and installed functional work
+must be reused. [Creative-use guide](creative-workflow-checkpoint.md) is the next
+user-facing checkpoint. The prompt below preserves the original implementation
+handoff; its historical order and statements about missing integrations are not
+the current work queue. Original release acceptance obligations remain in force.
+
 Copy the prompt below into a new agent working in this Lux repository. The
 original planning pass is complete; subsequent implementation includes the
 [verified transport checkpoint](transport-status.md).

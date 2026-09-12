@@ -34,3 +34,9 @@ Then integrate bounded native opportunity/receipt/consumption recording and comp
 - Required asset admission is a separate tracer gap, described by the installed-source fixture README; it must not be hidden behind telemetry work.
 - Docking is an independent presentation change. Its tests should show that moving panels does not create duplicate runtimes or lose state, without claiming frame-budget acceptance.
 - Remaining automatic-retry policy reconciliation is tracked in `recovery-checkpoint.md`; this audit does not authorize changing its limits.
+
+## Delivered evaluator and revised priority
+
+The bounded CPU evaluator is now in `packages/performance/evaluate.ts`, with its normalized record contract in the adjacent README. Independent review corrections are integrated through 3956931; 19 synthetic tests validate window/freshness, exact control-version causality, skipped first-rendered frames, immutable frame metadata and final-stimulus drain accounting. Overall hardware acceptance and unimplemented metric gates remain unavailable. This is evaluator validation, not a measured host result.
+
+User direction now prioritizes real creative workflow feedback; see current-priorities.md. Do not begin the native instrumentation/collector work described above as a prerequisite for creating visuals in Studio. Preserve this design and resume the remaining measurement work for release readiness or a concrete performance problem encountered during creation.
