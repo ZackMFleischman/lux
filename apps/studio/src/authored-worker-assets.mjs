@@ -18,7 +18,7 @@ export async function loadAuthoredModule(message,importModule) {
     if(new TextEncoder().encode(JSON.stringify(message.linked)).byteLength>limit) throw Error('Linked payload exceeds 16 MiB');
     const linked=await verifyLinked(message.linked,sha256);
     if(new TextEncoder().encode(JSON.stringify(linked)).byteLength>limit) throw Error('Linked payload exceeds 16 MiB');
-    const sourceAssets=linked.linkedVersion===2 ? (await verifyDerivedAssets(linked.assets,linked.assetSetHash,sha256)).sourceAssets : {};
+    const sourceAssets=linked.linkedVersion===2 || linked.linkedVersion===3 ? (await verifyDerivedAssets(linked.assets,linked.assetSetHash,sha256)).sourceAssets : {};
     assets=createReadonlyAssetMap(sourceAssets);
     moduleSource=linked.code;
   } else {
