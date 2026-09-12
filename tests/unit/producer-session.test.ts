@@ -43,3 +43,15 @@ test('query failure preserves leases for supervised process failure', () => {
   assert.equal(session.held.size, 1);
   assert.equal(releases, 0);
 });
+
+test('ambiguous native acceptance never releases the submitted texture', () => {
+  for (const submit of [() => { throw Error('accepted then failed'); }, () => 'malformed', () => '{"id":0}', () => '{}']) {
+    let releases = 0;
+    const session = new ProducerSession({ submit, poll: () => '[]', shutdown: () => '{"closed":true}' });
+    assert.throws(() => session.submit({ textureInfo: { handle: { ntHandle: 1 } }, release() { releases++; } }));
+    session.stop();
+    assert.equal(releases, 0);
+    assert.equal(session.uncertain.size, 1);
+    assert.equal(session.drain(), false);
+  }
+});

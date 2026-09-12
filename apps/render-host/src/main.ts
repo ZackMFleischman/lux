@@ -19,7 +19,7 @@ function finish(closed) {
   if (finishing) return;
   finishing = true;
   clearInterval(pollTimer); clearInterval(controlTimer); clearTimeout(endTimer);
-  record({ kind: 'summary', paint: count, held: session.held.size, dropped, closed, failed });
+  record({ kind: 'summary', paint: count, held: session.held.size, uncertain: session.uncertain.size, dropped, closed, failed });
   fs.writeFileSync(path.join(output, 'probe.json'), JSON.stringify(records, null, 2));
   // The external supervisor owns the final wall-clock deadline if driver teardown stalls.
   app.exit(closed && !failed && !dropped && count > 0 ? 0 : 2);

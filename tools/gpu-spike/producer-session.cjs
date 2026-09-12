@@ -3,20 +3,28 @@ class ProducerSession {
   constructor(bridge) {
     this.bridge = bridge;
     this.held = new Map();
+    this.uncertain = new Set();
     this.stopping = false;
     this.closed = false;
   }
   submit(texture) {
     if (this.stopping) { texture.release(); return { drop: 'stopping' }; }
     let result;
-    try { result = JSON.parse(this.bridge.submit(texture.textureInfo.handle.ntHandle)); }
+    try {
+      result = JSON.parse(this.bridge.submit(texture.textureInfo.handle.ntHandle));
+      const accepted = result && Number.isSafeInteger(result.id) && result.id > 0 && result.drop === undefined;
+      const rejected = result && result.id === undefined && typeof result.drop === 'string';
+      if (!accepted && !rejected) throw Error('invalid native submission response');
+      if (accepted && this.held.has(result.id)) throw Error('duplicate borrowed lease id');
+    }
     catch (error) {
-      // Native submit must throw only before it accepts a borrowed lease.
-      texture.release();
+      // Neither a thrown exception nor malformed response proves rejection.
+      // Preserve the texture until supervised process failure; never guess ownership.
+      this.uncertain.add(texture);
+      this.stopping = true;
       throw error;
     }
     if (result.id) {
-      if (this.held.has(result.id)) throw Error('duplicate borrowed lease id');
       this.held.set(result.id, texture);
     } else texture.release();
     return result;
@@ -41,7 +49,7 @@ class ProducerSession {
     if (this.closed) return true;
     if (!this.stopping) throw Error('stop must precede drain');
     this.poll();
-    if (this.held.size) return false;
+    if (this.held.size || this.uncertain.size) return false;
     this.closed = JSON.parse(this.bridge.shutdown()).closed === true;
     return this.closed;
   }
