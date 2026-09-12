@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo, useSyncExternalStore } from 'react';
-import { Alert, Button, TextField, ThemeProvider } from '@mui/material';
+import { useEffect, useState, useMemo, useRef, useSyncExternalStore } from 'react';
+import { Alert, Button, ThemeProvider } from '@mui/material';
 import { StudioApp } from './renderer.tsx';
 import { studioTheme } from './theme.ts';
 import { StandaloneClient } from './standalone-client.ts';
@@ -8,11 +8,13 @@ import type { SourceBundle } from '../../../packages/runtime-contracts/src/index
 import { dispatchRuntimeCommand } from './runtime-operations.ts';
 import { createSourceWorkspace } from './source/workspace.ts';
 import { createAuthoringSession } from './source/authoring-session.ts';
+import { SourcePanel } from './source/SourcePanel.tsx';
 const client = new StandaloneClient(window.luxAuthoring);
 export function AuthoringApp() {
   const windows = useMemo(() => window.luxStudioWindows ? { ...window.luxStudioWindows,
     popout: async () => { throw Error('Separate preview windows are not connected in this standalone checkpoint. Fullscreen is available.'); } } : undefined, []);
   const [error, setError] = useState('');
+  const composing = useRef(false);
   const workspace = useMemo(() => createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': '' } }), []);
   const session = useMemo(() => createAuthoringSession(workspace, {
     submit: source => client.submit(source), save: request => window.luxAuthoring.save(request), open: () => window.luxAuthoring.open(),
@@ -33,7 +35,7 @@ export function AuthoringApp() {
       let binary = ''; for (let i = 0; i < bytes.length; i += 8192) binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
       return { base64: btoa(binary), metadata: capture.metadata };
     }
-    if (command.method !== 'build' || session.getSnapshot().busy) throw Error('Studio is busy or command is unsupported');
+    if (command.method !== 'build' || session.getSnapshot().busy || composing.current) throw Error('Studio is busy or command is unsupported');
     const source = command.params.source as SourceBundle;
     setError('');
     try {
@@ -72,9 +74,10 @@ export function AuthoringApp() {
       } catch (error) { setError(String(error)); await window.luxAuthoring.smokeResult?.({ ok: false, error: String(error), snapshot: client.getSnapshot() }); }
     }
   }).catch(reason => setError(String(reason))); }, [session, workspace]);
-  async function build() { setError(''); const current = session.read();
+  async function build() { if (composing.current) return; setError(''); const current = session.read();
     try { await session.build(current.source, current.draftVersion); } catch (reason) { setError(String(reason)); } }
   async function save(saveAs = false) {
+    if (composing.current) return;
     setError('');
     try { await session.save(saveAs); } catch (reason) { setError(String(reason)); }
   }
@@ -85,9 +88,7 @@ export function AuthoringApp() {
   }
   return <ThemeProvider theme={studioTheme}><div className="authoring-shell" style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
     <details className="authoring-tools" style={{ padding: '8px 16px', background: '#191b23', flexShrink: 0 }}><summary>Visual source</summary>
-      <TextField disabled={busy} fullWidth multiline minRows={8} maxRows={16} label="TypeScript visual" value={draft.source.files[draft.source.entry]} onChange={event => {
-        try { workspace.edit(draft.source.entry, event.target.value); } catch (reason) { setError(String(reason)); } }}
-        slotProps={{ input: { style: { fontFamily: 'Consolas, monospace', fontSize: 12 } } }} />
+      <SourcePanel workspace={workspace} readOnly={busy} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} />
     </details><div className="authoring-tools" style={{ padding: '4px 16px', background: '#191b23' }}><Button variant="contained" disabled={busy} onClick={() => void build()}>Build & preview</Button>
       <Button disabled={busy} onClick={() => void open()}>Open</Button><Button disabled={busy} onClick={() => void save()}>Save</Button><Button disabled={busy} onClick={() => void save(true)}>Save as</Button><span>{io.name}{dirty ? ' *' : ''}</span>
       <span role="status">{draft.runningMatchesDraft ? 'Preview matches source' : draft.hasRunningSource ? 'Preview shows previous source' : 'Source has not been built'}</span>
