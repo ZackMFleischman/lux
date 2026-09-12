@@ -50,3 +50,7 @@ add_executable(lux_receiver_lifecycle_test ../tests/native/receiver_lifecycle_te
 target_include_directories(lux_receiver_lifecycle_test PRIVATE ffgl-source/src)
 target_compile_features(lux_receiver_lifecycle_test PRIVATE cxx_std_20)
 add_test(NAME receiver_lifecycle_cpu COMMAND lux_receiver_lifecycle_test)
+add_executable(lux_context_diagnostic_test context_diagnostic_test.cc)
+target_include_directories(lux_context_diagnostic_test PRIVATE ffgl-source/src)
+target_compile_features(lux_context_diagnostic_test PRIVATE cxx_std_20)
+add_test(NAME context_diagnostic_cpu COMMAND lux_context_diagnostic_test)

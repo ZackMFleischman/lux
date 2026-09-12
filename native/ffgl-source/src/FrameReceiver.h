@@ -27,6 +27,7 @@ class FrameReceiver {
   using CreateContext=HGLRC(WINAPI*)(HDC,HGLRC,const int*);
   CreateContext createContext=nullptr;HGLRC hostContext=nullptr;
   PIXELFORMATDESCRIPTOR pixelDescriptor{};int pixelFormat=0;
+  std::string hostDiagnostic;
   std::thread worker;int current=-1;uint64_t lastFrame=0,lastGeneration=0;
   void run();
 };

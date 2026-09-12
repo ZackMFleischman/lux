@@ -1,5 +1,6 @@
 #include <d3d11_1.h>
 #include "FrameReceiver.h"
+#include "ContextDiagnostic.h"
 #include <dxgi1_2.h>
 #include <wrl/client.h>
 #include <fstream>
@@ -26,6 +27,33 @@ void unsupportedUnload() noexcept {
 // Do not accept the sentinel values returned by some WGL implementations.
 template<class T>T extension(const char* name){auto p=wglGetProcAddress(name);return p==nullptr||p==reinterpret_cast<PROC>(1)||p==reinterpret_cast<PROC>(2)||p==reinterpret_cast<PROC>(3)||p==reinterpret_cast<PROC>(-1)?nullptr:reinterpret_cast<T>(p);}
 Completion glCompletion(GLsync fence){if(!fence)return Completion::Failed;const auto status=glClientWaitSync(fence,0,0);if(status==GL_WAIT_FAILED)return Completion::Failed;return status==GL_ALREADY_SIGNALED||status==GL_CONDITION_SATISFIED?Completion::Complete:Completion::Pending;}
+void drawableDiagnostic(std::ostream& out,HDC dc){
+ PIXELFORMATDESCRIPTOR pfd{};const int format=GetPixelFormat(dc);const auto described=DescribePixelFormat(dc,format,sizeof(pfd),&pfd);
+ const auto window=WindowFromDC(dc);DWORD pid=0;const auto thread=window?GetWindowThreadProcessId(window,&pid):0;
+ RECT rect{};if(window)GetWindowRect(window,&rect);
+ MONITORINFOEXA monitor{};monitor.cbSize=sizeof(monitor);const auto hmonitor=window?MonitorFromWindow(window,MONITOR_DEFAULTTONEAREST):nullptr;
+ const bool monitorKnown=hmonitor&&GetMonitorInfoA(hmonitor,&monitor);
+ DISPLAY_DEVICEA display{};display.cb=sizeof(display);bool displayKnown=false;
+ if(monitorKnown)for(DWORD index=0;EnumDisplayDevicesA(nullptr,index,&display,0);++index){if(std::string_view(display.DeviceName)==monitor.szDevice){displayKnown=true;break;}}
+ out<<"{\"dc\":"<<reinterpret_cast<uintptr_t>(dc)<<",\"window\":"<<reinterpret_cast<uintptr_t>(window)<<",\"windowThread\":"<<thread<<",\"windowPid\":"<<pid
+ <<",\"style\":"<<(window?GetWindowLongPtrW(window,GWL_STYLE):0)<<",\"classStyle\":"<<(window?GetClassLongPtrW(window,GCL_STYLE):0)
+ <<",\"rect\":["<<rect.left<<","<<rect.top<<","<<rect.right<<","<<rect.bottom<<"],\"pixelFormat\":"<<format<<",\"described\":"<<(described?"true":"false")
+ <<",\"pfdFlags\":"<<pfd.dwFlags<<",\"pixelType\":"<<unsigned(pfd.iPixelType)<<",\"colorBits\":"<<unsigned(pfd.cColorBits)<<",\"alphaBits\":"<<unsigned(pfd.cAlphaBits)
+ <<",\"depthBits\":"<<unsigned(pfd.cDepthBits)<<",\"stencilBits\":"<<unsigned(pfd.cStencilBits)<<",\"layerType\":"<<unsigned(pfd.iLayerType)
+ <<",\"technology\":"<<GetDeviceCaps(dc,TECHNOLOGY)<<",\"monitorKnown\":"<<(monitorKnown?"true":"false")<<",\"monitorDevice\":";
+ diagnosticString(out,monitorKnown?monitor.szDevice:"");out<<",\"displayDeviceKnown\":"<<(displayKnown?"true":"false")<<",\"displayDevice\":";
+ diagnosticString(out,displayKnown?display.DeviceString:"");out<<",\"displayDeviceId\":";diagnosticString(out,displayKnown?display.DeviceID:"");
+ // Monitor/display identity is not an OpenGL adapter LUID. Do not label it so.
+ out<<",\"glAdapterLuidAvailable\":false}";
+}
+void currentContextDiagnostic(std::ostream& out){
+ out<<"{\"thread\":"<<GetCurrentThreadId()<<",\"context\":"<<reinterpret_cast<uintptr_t>(wglGetCurrentContext())<<",\"dc\":"<<reinterpret_cast<uintptr_t>(wglGetCurrentDC());
+ if(wglGetCurrentContext()){
+  GLint major=0,minor=0,flags=0,profile=0;glGetIntegerv(GL_MAJOR_VERSION,&major);glGetIntegerv(GL_MINOR_VERSION,&minor);glGetIntegerv(GL_CONTEXT_FLAGS,&flags);glGetIntegerv(GL_CONTEXT_PROFILE_MASK,&profile);
+  out<<",\"major\":"<<major<<",\"minor\":"<<minor<<",\"flags\":"<<flags<<",\"profileMask\":"<<profile;
+  for(auto pair:{std::pair<const char*,GLenum>{"vendor",GL_VENDOR},{"renderer",GL_RENDERER},{"version",GL_VERSION}}){out<<",\""<<pair.first<<"\":";auto value=glGetString(pair.second);diagnosticString(out,value?reinterpret_cast<const char*>(value):"");}
+ }out<<"}";
+}
 }
 FrameReceiver::~FrameReceiver(){stop();}
 bool FrameReceiver::start(HDC target,HGLRC host) {
@@ -36,6 +64,7 @@ bool FrameReceiver::start(HDC target,HGLRC host) {
  pixelFormat=GetPixelFormat(target);
  if(!createContext||!pixelFormat||!DescribePixelFormat(target,pixelFormat,sizeof(pixelDescriptor),&pixelDescriptor))return false;
  hostContext=host;
+ {std::ostringstream snapshot;snapshot<<"{\"kind\":\"context-host-snapshot\",\"createContextProc\":"<<reinterpret_cast<uintptr_t>(createContext)<<",\"current\":";currentContextDiagnostic(snapshot);snapshot<<",\"drawable\":";drawableDiagnostic(snapshot,target);snapshot<<"}";hostDiagnostic=snapshot.str();}
  if(!lifecycle.beginStart())return false;
  try{worker=std::thread(&FrameReceiver::run,this);}catch(...){lifecycle.finished();lifecycle.reaped();return false;}
  if(lifecycle.waitStarted(std::chrono::seconds(2)))return true;
@@ -46,6 +75,7 @@ void FrameReceiver::run() {
  wchar_t temp[MAX_PATH]{};GetTempPathW(MAX_PATH,temp);
  wchar_t configured[32768]{};DWORD length=GetEnvironmentVariableW(L"LUX_HOST_LOG",configured,32768);
  std::ofstream log(length>0&&length<32768?std::wstring(configured):std::wstring(temp)+L"LuxTracer-tr02-host.jsonl",std::ios::app);
+ log<<hostDiagnostic<<std::endl;
  HWND window=nullptr;HDC dc=nullptr;HGLRC shared=nullptr;bool currentContext=false;
  std::wstring windowClass;ATOM classAtom=0;
  HANDLE mapping=nullptr;SharedRing* ring=nullptr;
@@ -91,9 +121,17 @@ void FrameReceiver::run() {
   classAtom=RegisterClassW(&wc);require(classAtom!=0,"worker drawable class failed");
   window=CreateWindowExW(0,windowClass.c_str(),L"Lux TR02 receiver drawable",WS_POPUP,0,0,1,1,nullptr,nullptr,wc.hInstance,nullptr);
   require(window!=nullptr,"worker drawable creation failed");dc=GetDC(window);require(dc!=nullptr,"worker DC failed");
-  require(SetPixelFormat(dc,pixelFormat,&pixelDescriptor)!=FALSE,"worker matching pixel format failed");
-  const int attributes[]={0x2091,4,0x2092,1,0};shared=createContext(dc,hostContext,attributes);
-  require(shared&&wglMakeCurrent(dc,shared),"worker shared GL context failed");currentContext=true;
+  SetLastError(ERROR_SUCCESS);const auto pixelSet=SetPixelFormat(dc,pixelFormat,&pixelDescriptor);const auto pixelError=GetLastError();
+  log<<"{\"kind\":\"context-worker-drawable\",\"setPixelFormatOk\":"<<(pixelSet?"true":"false")<<",\"win32\":"<<pixelError<<",\"requestedPixelFormat\":"<<pixelFormat<<",\"current\":";currentContextDiagnostic(log);log<<",\"drawable\":";drawableDiagnostic(log,dc);log<<"}"<<std::endl;
+  require(pixelSet!=FALSE,"worker matching pixel format failed");
+  const int attributes[]={0x2091,4,0x2092,1,0};
+  SetLastError(ERROR_SUCCESS);shared=createContext(dc,hostContext,attributes);const auto createError=GetLastError();
+  log<<"{\"kind\":\"wgl-create-context\",\"ok\":"<<(shared?"true":"false")<<",\"win32\":"<<createError<<",\"context\":"<<reinterpret_cast<uintptr_t>(shared)<<",\"shareContext\":"<<reinterpret_cast<uintptr_t>(hostContext)<<",\"attributes\":[8337,4,8338,1,0],\"current\":";currentContextDiagnostic(log);log<<"}"<<std::endl;
+  require(shared!=nullptr,"worker wglCreateContextAttribsARB failed");
+  SetLastError(ERROR_SUCCESS);const auto madeCurrent=wglMakeCurrent(dc,shared);const auto makeCurrentError=GetLastError();
+  currentContext=madeCurrent!=FALSE;
+  log<<"{\"kind\":\"wgl-make-current\",\"ok\":"<<(madeCurrent?"true":"false")<<",\"win32\":"<<makeCurrentError<<",\"requestedContext\":"<<reinterpret_cast<uintptr_t>(shared)<<",\"requestedDc\":"<<reinterpret_cast<uintptr_t>(dc)<<",\"current\":";currentContextDiagnostic(log);log<<"}"<<std::endl;
+  require(madeCurrent!=FALSE,"worker wglMakeCurrent failed");
   open=extension<OpenDevice>("wglDXOpenDeviceNV");close=extension<CloseDevice>("wglDXCloseDeviceNV");
   reg=extension<RegisterObject>("wglDXRegisterObjectNV");unreg=extension<UnregisterObject>("wglDXUnregisterObjectNV");
   lock=extension<LockObjects>("wglDXLockObjectsNV");unlock=extension<LockObjects>("wglDXUnlockObjectsNV");
@@ -204,4 +242,3 @@ void FrameReceiver::stop(){
  hostContext=nullptr;current=-1;lastFrame=lastGeneration=0;callbacks=0;consumed=0;
 }
 }
-
