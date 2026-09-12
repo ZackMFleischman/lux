@@ -7,12 +7,12 @@ Started 2026-09-12 after the successful guided Resolume QA. This is the active t
 | Checkpoint | Status | Owner | Completion evidence / next action |
 | --- | --- | --- | --- |
 | C0: record the new work and isolate lanes | DONE | Coordinator | Tracker committed 4193818; recovery/layout worktrees dispatched from that base. |
-| C1: recovery contract and automated failure validation | DONE (BOUNDED FIX) | checkpoint_recovery + independent review | Fix 5af0eb9 reviewed and integrated as 700ec5f; 13 lifecycle / 71 Studio CPU tests reported, integration rerun underway. Remaining retry/physical timing gaps in recovery-checkpoint.md. |
-| C2: dockable Studio panes | IMPLEMENTED; REVIEW NEXT | checkpoint_layout | Commit 8b80c00 connects real panes via stable portal hosts. Dedicated DOM integration test plus prior CPU/type/build checks pass in lane. Root review/native Electron checks next. |
+| C1: recovery contract and automated failure validation | DONE (BOUNDED FIX) | checkpoint_recovery + independent review | Fix 5af0eb9 reviewed and integrated as 700ec5f; integrated 71 Studio CPU tests and real MCP workflow pass. Remaining retry/physical timing gaps in recovery-checkpoint.md. |
+| C2: dockable Studio panes | DONE; FINAL BATCH REVIEW PENDING | checkpoint_layout + coordinator | Reviewed integration ced1a3b/88ced7e plus native-QA correction7f5bbed. Actual pointer drag/resize, exact saved bounds, original canvas/editor, desktop/laptop tabs and continuing GPU animation pass. Fullscreen/editor/export regression also passes. |
 | C3: two distinct exported visuals and asset fixture | PACKAGES PREPARED; ASSET GAP OPEN | Coordinator + independent review | 37d3102: real positive/negative compiler test passes; two99-file packages validate with distinct source/release hashes and shared runtime20c587d4. Reviewed with no blockers in bounded scope. Scene asset admission/resolution remains missing; no unused file is counted as an asset. |
 | C4: acceptance measurement audit | DONE | Coordinator + independent review | 37d3102 adds performance-checkpoint.md; source-backed per-gate matrix reviewed. Next measurement implementation is offline validity/accounting core, then bounded native correlation/collection. |
-| C5: independent review and integration | IN PROGRESS | Coordinator + reviewers | Recovery and fixture/audit reviews pass; recovery integrated. Layout review and combined tests next. |
-| C6: graphics and host checkpoint | AUTHORIZED; WAITING FOR INTEGRATION | Coordinator | User confirmed Resolume closed and authorized Studio tests; process check found no Avenue/Arena/Electron. No plugin installation/replacement planned in this batch. |
+| C5: independent review and integration | FINAL BATCH REVIEW NEXT | Coordinator + reviewers | All three task reviews pass; saved-layout test correction reviewed. Combined 71 Studio CPU + one real Dockview DOM test, Studio typecheck and native UI/MCP checks pass. |
+| C6: graphics and host checkpoint | STUDIO PASS; DISTINCT-SOURCE HOST QA PENDING | Coordinator | Real Studio docking, fullscreen/editor/export and MCP checks pass; owned test windows closed. Prepared triangle/ring packages remain uninstalled and untested in Resolume. |
 
 ## Established baseline
 
@@ -57,3 +57,7 @@ Recovery and layout agents dispatched; coordinator prepares fixtures locally. No
 - 37d3102: distinct source fixtures, preparation command, package manifest evidence and performance audit committed. Triangle release5569712e… and ring releasec1b26300… are under artifacts/installed-package/qa-fixtures; host/GPU flags remain false pending actual playback.
 - 700ec5f: independently reviewed recovery correction integrated. Generic desired control intent is preserved within its admitted accepted runtime; rejected/stale commands and source replacement do not inherit it.
 - User cleared graphics lane by closing Resolume. Root verified no host/Electron processes before proceeding. Native Studio QA will run only after layout review and integration.
+
+- Native docking regression caught the menu resizing the persisted grid; overlay fix restores exact geometry. Actual pointer drag and splitter movement now pass along with retained owners and continuing GPU output. Evidence is in evidence/standalone-lux/native-ui/docking.json.
+- Full native UI regression passes including preview-only fullscreen, CodeMirror and real export. MCP create/revise/capture/controls, invalid/hanging candidate retention and restart pass; latest local restart request-to-ready sample is about223ms, not host recovery timing.
+- Required assets, two different installed-source host evidence, offline/checkout isolation, automatic retry policy and the performance collection/evaluator work remain open. C1/C2 DONE describe their bounded delivered work, not full tracer completion.

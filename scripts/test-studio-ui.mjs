@@ -21,6 +21,15 @@ try {
   page.setDefaultTimeout(15000);
   page.on('pageerror', error => report.errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error' && /Content Security Policy|Refused to (apply|execute|load)/i.test(message.text())) report.errors.push(message.text()); });
+  async function layoutAction(name) {
+    await page.getByText('View & layouts', { exact: true }).click();
+    await page.getByRole('button', { name, exact: true }).click();
+    await page.getByText('View & layouts', { exact: true }).click();
+  }
+  await page.getByText('View & layouts', { exact: true }).click();
+  await page.getByRole('textbox', { name: 'Layout name', exact: true }).fill('Automated UI QA');
+  await page.getByRole('button', { name: 'Reset desktop layout', exact: true }).click();
+  await page.getByText('View & layouts', { exact: true }).click();
   await page.getByRole('button', { name: 'Build & preview', exact: true }).click();
   await page.locator('.preview-surface canvas').waitFor();
   await page.waitForFunction(() => !document.querySelector('.preview-empty') && document.querySelector('.playback-state')?.textContent === 'paused');
@@ -74,7 +83,7 @@ try {
     assert.equal(await page.evaluate(() => window.__qaCanvas === document.querySelector('.preview-surface canvas')), true);
   }
   report.checks.push('Preview-only fullscreen, fading notice, first Escape exit and original canvas retention');
-  await page.getByText('Visual source', { exact: true }).click();
+  await layoutAction('Open Source');
   await page.locator('.cm-editor').waitFor();
   assert.equal(await page.getByText(/Editor unavailable:/).count(), 0);
   await page.getByRole('textbox', { name: 'New TypeScript file', exact: true }).fill('lib/qa-helper.ts');

@@ -48,3 +48,27 @@ native return, DPI/monitor changes, and performance with active source editing.
 Cross-document popouts, monitor-removal recovery, and GPU/context portability
 remain the separate U04/U05 gates, not claims of this checkpoint. No Electron,
 Studio, graphics or native producer was launched for this implementation.
+
+## Coordinator integration validation
+
+Real Electron/WebGPU checks subsequently passed: actual pointer drag of Source
+into Preview's tab group; pointer split resize; exact saved pane bounds restored;
+same canvas/editor retained through close/reopen and desktop/laptop layout changes;
+and visibly advancing preview output afterward. Packaged CSP produced no observed
+errors. The existing UI regression also passes preview-only fullscreen, fading
+notice/first Escape, transport styling, CodeMirror edits/undo and real export.
+The real MCP source/image/revision/control/restart workflow passes after integration.
+
+Native QA exposed two corrections: explicit accessible labels for the move
+selectors, and an overlay layout menu so opening it or showing its save result
+does not resize the grid being persisted. The geometry regression failed with a
+13 CSS-pixel restored-height discrepancy before the overlay fix and now restores
+the exact tested bounds. A final Studio typecheck also removed unsupported `exact`
+options from the RTL test queries; the focused dock test and typecheck pass.
+
+Evidence: `evidence/standalone-lux/native-ui/docking.json`, the existing native UI
+result and MCP result; screenshots live under ignored `artifacts/studio-ui/docking`.
+The DOM test's named restore case now preserves the saved entry while resetting
+a different layout name and verifies actual group membership plus editor undo.
+These checks do not cover cross-document popout, monitor removal, or throughput
+budgets. Each owned test Studio was closed after its run.

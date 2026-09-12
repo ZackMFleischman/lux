@@ -16,7 +16,7 @@ const { createSourceWorkspace } = await import('../../apps/studio/src/source/wor
 const { EditorView } = await import('@codemirror/view');
 const { undo } = await import('@codemirror/commands');
 after(() => { cleanup(); dom.window.close(); });
-async function click(name: string) { await act(async () => { fireEvent.click(screen.getByRole('button', { name, exact: true })); }); }
+async function click(name: string) { await act(async () => { fireEvent.click(screen.getByRole('button', { name })); }); }
 test('real dock panes preserve canvas, editor undo and runtime subscriptions through close, tab, reset, restore and fullscreen', async () => {
   const runtime = { instanceId: '44ff55f0-8ea6-4fbf-89d5-665923f65cad', generation: 2, revisionId: 'revision-2', sceneName: 'Fixture',
     authority: 'studio' as const, playback: 'paused' as const, clockEpoch: 1, frameId: '10', intensity: 0.5, output: { width: 1920, height: 1080 }, fault: null };
@@ -88,7 +88,7 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   assert.equal(canvas.closest('.preview-surface'), document.querySelector('.preview-surface'));
   await click('Fullscreen');
   assert.equal(canvas.closest('.studio-expanded-pane')?.hasAttribute('hidden'), false);
-  assert.equal(screen.queryByRole('button', { name: 'Play', exact: true }), null);
+  assert.equal(screen.queryByRole('button', { name: 'Play' }), null);
   await act(async () => { fireEvent.keyDown(window, { key: 'Escape' }); });
   assert.ok(canvas.closest('.studio-dock-grid'));
   await click('Maximize'); await click('Restore workspace');
