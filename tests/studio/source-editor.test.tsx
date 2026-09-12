@@ -98,3 +98,12 @@ test('current diagnostics navigate helper coordinates and edited drafts label th
   assert.match(screen.getByText(/Stale diagnostic/).textContent!, /source has changed/);
   assert.equal((screen.getByRole('button', { name: /A helper error/ }) as HTMLButtonElement).disabled, true);
 });
+test('rejected candidate diagnostics explain their origin and cannot navigate the retained source', async () => {
+  const w = fixture();
+  render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} diagnostics={[
+    { file: 'lib/color.ts', line: 1, column: 8, message: 'Candidate helper error', draftVersion: 0, candidateOnly: true },
+  ]} />);
+  assert.equal((screen.getByRole('button', { name: /Candidate helper error/ }) as HTMLButtonElement).disabled, true);
+  assert.match(screen.getByText(/Diagnostic belongs to a rejected candidate/).textContent!, /displayed source is unchanged/);
+  assert.equal(w.getSnapshot().selectedFile, 'main.ts');
+});

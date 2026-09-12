@@ -10,6 +10,6 @@ export function ProblemsPanel({ diagnostics, snapshot, onNavigate }: {
     const target = diagnosticTarget(diagnostic, snapshot), stale = diagnostic.draftVersion !== snapshot.version;
     return <li key={index}><Button disabled={!target} onClick={() => target && onNavigate(target)}>
       {diagnostic.file ? `${diagnostic.file}:${diagnostic.line ?? ''}:${diagnostic.column ?? ''} ` : ''}{diagnostic.message}
-    </Button>{stale ? <span>Stale diagnostic: source has changed. Build again to refresh.</span> : !target && <span>Location unavailable in this source bundle.</span>}</li>;
+    </Button>{diagnostic.candidateOnly ? <span>Diagnostic belongs to a rejected candidate; the displayed source is unchanged.</span> : stale ? <span>Stale diagnostic: source has changed. Build again to refresh.</span> : !target && <span>Location unavailable in this source bundle.</span>}</li>;
   })}</ul></section>;
 }
