@@ -9,14 +9,16 @@ Scope: planning artifacts only, 12 September 2026 UTC. No application implementa
 | Original source preservation | Both files under `plans/` compared byte-for-byte with Git source commit `1c9c884`; unchanged. |
 | Requirement routing | All 44 baseline IDs appear in the milestone coverage map. Independent product review additionally compared the source text, catching and restoring frame-step and bounded particle diagnostics. |
 | Tracer coverage | T01–T09 mapped to TR tasks and evidence in the tracer plan; hardware/client preconditions and stop gates remain explicit. |
-| Relative links and Markdown fences | Final recursive scan after review-report integration: 24 Markdown documents, 162 relative links, 27 fenced blocks; no missing targets or unbalanced fences. |
-| Diagram syntax and rendering | All nine Mermaid blocks parsed and rendered with Mermaid 11.12.0 in headless Chromium. Two sequence-label semicolons were corrected after initial parser failures; final render succeeded for all blocks. |
+| Relative links and Markdown fences | Final recursive scan including the profiling addendum and review: 26 Markdown documents, 178 relative links, 29 fenced blocks; no missing targets or unbalanced fences. |
+| Diagram syntax and rendering | All ten Mermaid blocks parsed and rendered with Mermaid 11.12.0 in headless Chromium, including the new telemetry collection diagram. Two sequence-label semicolons were corrected in the original pass; final render succeeded for all blocks. |
 | Diagram visual inspection | Rendered system, sequence, state, input, roadmap and task diagrams inspected. Ultrawide/laptop UI wireframes are included as text diagrams in the Studio design. |
 | Independent review | Three initial reports, coordinator disposition, focused rechecks and execution follow-up closure retained under `docs/reviews/`. Authorship limitation is recorded, not hidden. |
 | Whitespace | `git diff --check` before checkpoints and final handoff. |
 | Repository state | All documentation changes committed; final `git status --short` must be empty. Specialist/reviewer worktrees have disjoint ownership and committed work. |
 
 Diagram QA used temporary tooling and render artifacts in the local visualization workspace, outside the project; no application dependencies were introduced. The Markdown Mermaid sources are the portable authoritative diagrams. Rendering does not establish any runtime or native integration claim.
+
+Profiling follow-up: the dedicated design and implementation links received focused technical review, with PERF-01 recorder staging corrected and independently rechecked closed. The new collection diagram was visually inspected after rendering. All 44 requirements remain routed and both original plans remain byte-identical. Instrumentation, clock, overload, overhead and soak tests are specified for implementation; none was executed as part of this documentation task.
 
 ## Recheck procedure
 
