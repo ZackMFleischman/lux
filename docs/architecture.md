@@ -57,7 +57,7 @@ sequenceDiagram
     B-->>C: Artifact or structured diagnostics
     C->>R: Prepare isolated candidate
     R-->>C: First completed frame with candidate identity
-    C->>C: Recheck base revision; accept candidate
+    C->>C: Recheck base revision, accept candidate
     C-->>V: Present accepted revision
     C-->>AI: Job result and change summary
     AI->>C: Capture accepted revision

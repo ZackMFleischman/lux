@@ -50,10 +50,11 @@ Each ID has a design owner, a completion milestone, and an acceptance home. Requ
 | B04 | [Architecture](../architecture.md), [bridge](../design/resolume-bridge.md) | 0.1 feasibility gate; decision record before fallback |
 | A01, A02 | [Project model](../design/project-model.md), [AI authoring](../design/ai-authoring.md) | 1 transaction/conflict/undo/reopen tests |
 | G01, G02, G03 | [Project model](../design/project-model.md), [runtime](../design/runtime.md), [studio](../design/studio.md) | 2 graph/compositing test; DEC-09 resolves source example |
-| C01, C02, C03 | [AI authoring](../design/ai-authoring.md), [runtime](../design/runtime.md) | 3 capture/diagnostic/scope/replay tests |
+| C01, C02, C03 | [AI authoring](../design/ai-authoring.md), [runtime](../design/runtime.md) | 3 capture/diagnostic/scope/replay tests, including AI use of bounded particle position samples paired to image tick and before/after comparison under the same seed/input sequence |
 | S01 | [AI authoring](../design/ai-authoring.md), [studio](../design/studio.md) | 4 external/embedded parity test |
 | S02, S03 | [Studio](../design/studio.md), [bridge](../design/resolume-bridge.md) | 0.3 native host subset; 4 studio analysis/mapping; 5 export mapping test |
 | S04 | [Project model](../design/project-model.md), [studio](../design/studio.md) | 4 look save/compare |
+| S05 | [Runtime](../design/runtime.md), [studio](../design/studio.md), [AI authoring](../design/ai-authoring.md) | 4 repeated paused frame-step through UI and AI advances exact declared time/ticks with recorded input policy, retains pause/revision/instance and leaves host unchanged |
 | M01, M02 | [Project model](../design/project-model.md), [AI authoring](../design/ai-authoring.md) | 4 asset workflow and failed replacement; 5 offline generated sprite |
 | P01, P02 | [Project model](../design/project-model.md) | 1 storage; 2 graph/library pins; 5 archive/release closure |
 | R01, R02, R03 | [Project model](../design/project-model.md), [bridge](../design/resolume-bridge.md), [runtime](../design/runtime.md) | 5 installed lifecycle and benchmark suite |

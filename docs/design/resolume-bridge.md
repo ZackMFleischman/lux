@@ -62,11 +62,11 @@ sequenceDiagram
   participant P as FFGL consumer
   W->>E: Present output canvas
   E->>N: Borrowed texture + metadata
-  N->>N: Validate readiness; enqueue GPU copy to free slot
+  N->>N: Validate readiness, enqueue GPU copy to free slot
   N->>N: Observe copy completion outside host callback
   N->>E: Release borrowed texture
   N->>P: Publish completed slot descriptor
-  P->>P: Try newest ready slot; otherwise reuse last image
+  P->>P: Try newest ready slot, otherwise reuse last image
   P->>P: Copy/draw with host GL context
   P->>N: Retire slot only after GPU read completes
 ```
@@ -75,7 +75,7 @@ The native producer's D3D device belongs to the render-host process; native rece
 
 The original Electron handle remains borrowed. Native code closes only handles it created/duplicated and releases its own COM references. Sending the numeric value over IPC does not transfer an NT handle: duplicate into the specific destination process when necessary [S3/S4]. Validate PID/session identity before duplication; close duplicates on detach/failure. Never expose handles to generated code.
 
-Proposed ring state is `Free → Writing → Ready → Reading → Free`, with three slots and at most two producer submissions in flight. Each slot includes a generation and monotonically increasing frame ID. Publish `Ready` only after the producer GPU copy has completed, with CPU descriptor publication ordered after that completion. Release borrowed compositor resources even when dropping an unwanted frame.
+Proposed ring state is `Free → Writing → Ready → Reading → Free`, with three slots and at most two producer submissions in flight. Each slot is keyed by instance ID, runtime `generation`, native `outputGeneration` and slot index, with monotonically increasing frame ID. Ring registration and every acquire/retire acknowledgment carry that full key. Publish `Ready` only after the producer GPU copy has completed, with CPU descriptor publication ordered after that completion. Release borrowed compositor resources even when dropping an unwanted frame.
 
 The receiver selects the newest compatible ready slot. It uses only a nonblocking acquire/test; busy means repeat last frame. An atomic descriptor is not a GPU fence. If the chosen native transport uses a keyed mutex on **owned** resources, use its exact key protocol and zero timeout and treat timeout/abandonment as separate failures [S8]. If it uses interop locks/fences, verify their actual blocking behavior before adoption. Do not pretend the borrowed Electron texture supplies those primitives.
 
@@ -83,7 +83,7 @@ Producer may replace unacquired `Ready` frames only through an atomic claim that
 
 Allocation/import/handle opening belongs outside the steady-state callback where possible. GL allocations requiring the host context occur during supported lifecycle or a bounded setup phase; measure them separately from steady state. Preserve host GL bindings, viewport, blend and framebuffer state. The plugin must not assume it owns the GL context or call host rendering from its IPC thread.
 
-On resize/device recreation, increment output generation and prepare a new ring before switching. Keep the old last-frame texture until the new generation produces a valid frame; retire the old ring after completion or process/device teardown. Ignore stale descriptors and acknowledgements. Neither resize nor sender death permits freeing a texture still referenced by a live consumer.
+On resize/ring recreation within a live renderer, the native producer increments `outputGeneration` and prepares a new ring before switching. Runtime `generation` and current control commands remain valid; frame IDs continue monotonically. If device recovery restarts the renderer, the supervisor increments runtime generation and a new ring namespace starts. Keep the old last-frame texture until the new ring produces a valid frame; retire the old ring after completion or process/device teardown. An old-ring lease finishing after slot-number reuse must retire only its original full key. Ignore stale descriptors and acknowledgements. Neither resize nor sender death permits freeing a texture still referenced by a live consumer.
 
 ## Frame provenance and image contract
 
@@ -93,6 +93,7 @@ interface FrameDescriptor {
   protocolVersion: number;
   instanceId: string;
   generation: number;
+  outputGeneration: number; // ring incarnation within the runtime generation
   clockEpoch: number;        // logical reset epoch, not a measurement clock
   frameId: string;            // decimal uint64, not lossy JS number
   revisionId: string;
@@ -125,11 +126,11 @@ For 0.1 choose a fixed tracer source plugin with a compile-time schema and one c
 
 For 0.2/5 recommend thin generated per-release source wrappers sharing one maintained bridge library. Each wrapper freezes release identity and published schema into its binary/manifest; distinct releases get distinct plugin identities. This avoids promising dynamic arbitrary-schema discovery in a generic plugin. Validate host plugin-ID length/registration constraints and composition persistence before adopting this packaging decision. No registry/editor implementation is needed in 0.1.
 
-Each native plugin object has a new runtime-instance UUID, independent values and output resources. A wrapper identifies immutable scene/release/schema hashes; saved host control indices are append-only within a compatible schema, never reassigned. Changed meaning/type/range or removed required controls requires a new incompatible release identity. A reconnect instance UUID is not the same thing as durable release identity. The studio authoring instance is separate even in 0.1; the two-host-instance test remains 0.2.
+Each native plugin object creates a `pluginClientId` UUID; the service allocates and returns its canonical runtime-instance UUID on first Attach. Duplicate/reconnected Attach resolves that mapping, never blindly allocates again. Follow the [attachment and reconnect contract](tracer-contracts.md) for service epoch, connection epoch and stale-pipe rejection. A wrapper identifies immutable scene/release/schema hashes; saved host control indices are append-only within a compatible schema, never reassigned. Changed meaning/type/range or removed required controls requires a new incompatible release identity. Attachment/runtime UUIDs are not durable release identity. The studio authoring instance is separate even in 0.1; the two-host-instance test remains 0.2.
 
 `SetFloatParameter` (SDK naming to confirm at the pinned commit) validates finite input and updates an atomic current-value snapshot plus sequence. A non-render control worker sends `Hello`, `Attach`, `ControlSnapshot`, `Heartbeat`, `Detach`; runtime replies with `Attached`, `Status`, `FrameReady` metadata and `Error`. Use bounded length-prefixed messages over a per-user Windows named pipe with local user ACLs and protocol handshake; never block the GL callback on I/O, service launch or parsing.
 
-`Hello` negotiates protocol/runtime/schema versions and process identity. `Attach` identifies instance, release or explicitly pinned tracer bundle, output size and full host snapshot. Host values are authoritative for published performance controls. Continuous pending updates coalesce; after reconnect send the latest full snapshot, including changes made during downtime, before accepting the first restored frame. No studio or stale renderer snapshot may overwrite it.
+`Hello` negotiates protocol/runtime/schema versions and process identity. `Attach` identifies pluginClientId/connection epoch, known service/runtime identity when reconnecting, binding version or release, output size and full host snapshot. `Attached` returns the service-owned runtime identity and generation. Host values are authoritative for published performance controls. Continuous pending updates coalesce; after reconnect send the latest full snapshot, including changes made during downtime, before accepting the first restored frame. No studio or stale renderer snapshot may overwrite it.
 
 0.3 adds a separate `TriggerBatch` carrying ordered event IDs, arrival timestamps and connection epoch. Proposed limit is 256 pending events; overflow reports failure rather than silently coalescing. Discard disconnected-epoch events on recovery. Verify 20 events/s for 10 seconds and the selected host's repeated-note behavior. Native host modulation is the initial audio/MIDI path; neither raw audio buffers nor raw MIDI events are assumed to come through FFGL.
 
@@ -138,7 +139,7 @@ Each native plugin object has a new runtime-instance UUID, independent values an
 | Event | Required behavior |
 | --- | --- |
 | Plugin discovery | Metadata/schema available without starting a visual during directory scan. |
-| Instance initialization | Allocate native instance identity; asynchronously attach/start service; clear transparent black until first completed frame. |
+| Instance initialization | Allocate pluginClientId; asynchronously attach/start service and obtain canonical runtime ID; clear transparent black until first completed frame. |
 | Process callback | Read atomic status and newest ready frame; reuse last completed image when late. No intentional renderer wait. |
 | Studio closes | Host lease keeps service and render-host alive; control updates and image delivery continue. |
 | Renderer crashes/hangs | Keep last host-owned frame; control worker reports failure and sends latest values on recovery; host stays responsive. |
@@ -151,6 +152,8 @@ Each native plugin object has a new runtime-instance UUID, independent values an
 See [runtime lifetime/watchdog](runtime.md) for lease periods, generation invalidation and restart policy. 0.2 must exercise two copies, composition save/reopen, deactivate/reactivate and resize. Verify the exact host persistence mechanism rather than assuming plugin-private arbitrary state is serialized. Wrapper identity plus host-native parameter persistence is the preferred minimal model.
 
 ## Measurements and pass/fail
+
+The [acceptance procedure](../implementation/tracer-acceptance.md) owns calculator semantics: independently bracket the full 300-second run, require actual 59.4–60.6 Hz host opportunity rate, and reconcile all 600 normal-rate host control stimuli with exact consumed versions. A 30 Hz fresh-every-time run or a latency report omitting unmatched values fails. High-rate coalescing is a separate diagnostic test, not an excuse to drop acceptance samples.
 
 Use one monotonic native clock domain (Windows performance counter) for plugin receipt, native completion and host consumption. Calibrate worker timestamps through ping-pong samples and record offset/error, or keep worker timings in their own domain. Do not subtract unrelated clocks. The endpoint is host source consumption, not monitor/projector presentation. Measure host reference budgets with the authoring preview inactive/closed, then measure the separate concurrent studio/UI workload and declare both configurations in the manifest.
 

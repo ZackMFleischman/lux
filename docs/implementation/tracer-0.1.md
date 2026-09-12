@@ -50,13 +50,13 @@ flowchart LR
     T1[TR-01 Environment and harness] --> T2[TR-02 Actual GPU / FFGL gate]
     T2 --> T3[TR-03 Runtime and supervisor]
     T3 --> T4[TR-04 Core and MCP loop]
-    T3 --> T5[TR-05 Studio and presentation]
+    T4 --> T5[TR-05 Studio and presentation]
     T4 --> T6[TR-06 Integrated host control / recovery]
     T5 --> T6
     T6 --> T7[TR-07 Acceptance and handoff]
 ```
 
-One implementing coordinator owns integration and shared contracts. TR-01–03 are sequential because each establishes the next boundary. After TR-03, TR-04 and TR-05 may use separate worktrees with frozen DTOs; only the coordinator changes shared contracts. Real-host/GPU acceptance runs serially on this machine. Keep each reviewed task committed before dependent work starts.
+One implementing coordinator owns integration and shared contracts. TR-01–06 run sequentially: TR-05 consumes the core operations committed in TR-04. Use parallel agents only for bounded independent subtasks or review with exclusive ownership; a mocked service cannot satisfy Studio integration. Only the coordinator changes shared contracts. Real-host/GPU acceptance runs serially on this machine. Keep each reviewed task committed before dependent work starts.
 
 ## TR-01 — Pin environment and establish executable harness
 
@@ -132,7 +132,7 @@ and releasing one lease permits only that slot's next generation.
 - [ ] Implement detached service rendezvous/start lock, host/preview leases, independent authoring/host instances, startup/shutdown and restart generations. Verify actual PIDs and that studio shutdown does not kill host-owned processes.
 - [ ] Implement bounded full-output readback with immutable frame metadata; pair image resource and provenance before asynchronous encoding. No inspection readback on the continuous host transport path.
 - [ ] Run `pnpm test:unit -- --area runtime`, `pnpm typecheck`, `pnpm build`, then `pnpm test:gpu` against the SDK-produced reference. Add real-process hang tests verifying confirmed stop within two seconds.
-- [ ] Commit contracts, implementation and tests. Freeze contracts before concurrent TR-04/TR-05 work.
+- [ ] Commit contracts, implementation and tests. Freeze them before TR-04, then deliver its real core service before TR-05. Include old-ring retirement after slot reuse, duplicate/lost-reply Attach, and literal `intensity` schema tests from the contract map.
 
 Example contract tests to translate into runnable tests using the implemented service harness:
 
@@ -165,7 +165,7 @@ The harness helper names above are test-local, not competing production APIs. It
 **Interfaces:** Core consumes runtime DTOs/sessions; MCP exposes the exact `lux.*` operation table in AI design. Canonical public types are `Submit`, `ParameterWrite`, `Playback`, `CaptureRequest`, `Job`, `Fault` and `CaptureMetadata`. Adapter results use the negotiated MCP profile, never mix profile-specific envelopes.
 
 - [ ] Write operation/schema tests for new scratch scene, stale base, payload mismatch for repeated request ID, invalid scope/import, full queues and host authority rejection. Implement discovery and source read with actual SDK contract/examples returned to the client.
-- [ ] Implement serial submit/compile/smoke/activate with default automatic apply and a concise summary. Explicit staging tools remain diagnostic options; do not add a required Keep button. Tracer uses scratch source/bundle retention; durable history is milestone 1.
+- [ ] Implement serial submit/compile/smoke/activate with default automatic apply and a concise summary. Explicit staging tools remain diagnostic options; do not add a required Keep button. Tracer uses scratch retention with host-binding/live-runtime roots; durable history is milestone 1. Test bind A, accept B/C, collect unrooted data, then attach/restart and still render A.
 - [ ] Implement status/cancel/retry/idempotency behavior and bounded retention. Test cancellation before commit and late cancellation after commit; the latter must report the actual committed result.
 - [ ] Implement `lux.capture` and `lux.jobs.get({includeResult:true})` returning real PNG ImageContent and metadata. Test revision change before/after frame lease, restart before lease, control sequence barrier, paused repeated frame and queue/timeout cleanup.
 - [ ] Run `pnpm test:unit -- --area core`, `pnpm test:mcp`, `pnpm typecheck` and `pnpm build`. Include real source-to-render capture integration in addition to mocked protocol cases.
@@ -217,7 +217,7 @@ The harness helper names above are test-local, not competing production APIs. It
 
 - [ ] Run full build/type/unit/contract suites on the integrated commit; preserve output and test count. Missing hardware suites must be visibly unavailable rather than green.
 - [ ] Execute the acceptance workload, failure matrix and actual AI/host checks under the pinned environment. Measure warmup/five-minute run, delivery/control/CPU/GPU/UI/overhead independently with calibrated clocks and declared workload conditions.
-- [ ] Generate `acceptance.md` linking every gate to source/settings/environment and raw evidence. Compute fresh/repeated/skipped counts from actual frame IDs, not target FPS or producer submissions.
+- [ ] Generate `acceptance.md` linking every gate to source/settings/environment and raw evidence. Compute fresh/repeated/skipped counts from actual frame IDs, not target FPS or producer submissions. Negative calculator fixtures: a perfect 30 Hz trace declared 60 Hz fails workload validity; missing/unmatched control versions fail reconciliation rather than improve latency quantiles.
 - [ ] Review failures or unavailable metrics; fix bottlenecks and rerun affected gates. Record any explicit budget/design revision with its reason before claiming completion. Never silently lower quality.
 - [ ] Request independent implementation review for runtime/native ownership, product loop and evidence validity. Use separate worktrees for fixes and serialize actual-host runs.
 - [ ] Commit implementation and final evidence manifest; verify clean working tree and no missing referenced artifacts. Report tracer success only if all applicable gates are resolved. Hand off remaining 0.2/0.3 work through the roadmap.

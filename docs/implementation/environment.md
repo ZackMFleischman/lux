@@ -20,8 +20,8 @@ WMI AdapterRAM is not reliable evidence of physical VRAM capacity and is intenti
 
 ## Preflight output
 
-Task TR-01 must create `evidence/tracer-0.1/environment.json` containing OS, CPU, physical GPU/driver and chosen adapter IDs, display/host refresh, host path/version, Electron/Chromium/Node versions, Three.js and MCP SDK versions, FFGL and Spout source commit hashes, native compiler/SDK/CMake versions, build configuration and source commit. Resolve package versions once, pin exact versions/commits and retain the lockfile. Do not use moving branch heads in benchmark manifests.
+Task TR-01 must create `evidence/tracer-0.1/<run-id>/environment.json` containing OS, CPU, physical GPU/driver and chosen adapter IDs, display/host refresh, host path/version, Electron/Chromium/Node versions, Three.js and MCP SDK versions, FFGL and Spout source commit hashes, native compiler/SDK/CMake versions, build configuration and source commit. Resolve package versions once, pin exact versions/commits and retain the lockfile. Do not use moving branch heads in benchmark manifests.
 
-Create `evidence/tracer-0.1/preflight.md` with actual discovery commands, successes/failures, device selection evidence and client MCP protocol compatibility. Confirm external AI tool discovery and PNG image display using a known fixture before relying on generated output. Fixture success is only preflight evidence, not T01/T02 completion.
+Create `evidence/tracer-0.1/<run-id>/preflight.md` with actual discovery commands, successes/failures, device selection evidence and client MCP protocol compatibility. Confirm external AI tool discovery and PNG image display using a known fixture before relying on generated output. Fixture success is only preflight evidence, not T01/T02 completion.
 
 Missing tools can be installed in the implementation phase within authorized scope. An unavailable host/GPU or license is a hardware acceptance blocker; headless CI cannot replace the actual-host run. Preserve useful unit-test work, but do not mark tracer complete until host gates run.

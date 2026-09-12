@@ -24,6 +24,7 @@ Specialist drafting assignments:
 - **Runtime/native implementation:** [runtime](design/runtime.md), [Resolume bridge](design/resolume-bridge.md), [environment](implementation/environment.md).
 - **Application/AI implementation:** [project model](design/project-model.md), [AI operations and capture](design/ai-authoring.md).
 - **Execution:** [tracer task plan](implementation/tracer-0.1.md), [acceptance/evidence](implementation/tracer-acceptance.md), [later milestone coverage](implementation/roadmap.md).
-- **Handoff:** [copyable coordinator prompt](implementation/implementation-handoff.md). Review reports and disposition will be linked when the frozen review finishes.
+- **Review:** [disposition and readiness](reviews/disposition.md), [technical](reviews/technical.md), [product](reviews/product.md), [execution](reviews/execution.md).
+- **Handoff:** [copyable coordinator prompt](implementation/implementation-handoff.md).
 
 The task plan defines work order; subsystem contracts define behavior. The tracer contract map resolves cross-document naming/ownership. Actual implementation results belong in evidence manifests, not in source design prose. Planning readiness is permission to execute the bounded experiments, not a claim the proposed GPU path works.

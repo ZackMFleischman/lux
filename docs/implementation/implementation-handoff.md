@@ -20,8 +20,9 @@ Electron shared-texture interoperability or synchronization is proved.
 
 Own integration, shared contracts, a small progress log and frequent Git
 commits. Delegate only independent bounded tasks, using separate worktrees
-and exclusive file ownership. Freeze contracts before parallel core/UI
-work. Run GPU/host acceptance serially. Review changes before integration.
+and exclusive file ownership. Freeze contracts before dependent work;
+TR-05 needs the real core service from TR-04, so these tasks run sequentially.
+Run GPU/host acceptance serially. Review changes before integration.
 Make routine decisions autonomously and record evidence. Escalate material
 product changes, paid/license decisions, or a backend fallback that changes
 the promised authoring/runtime capabilities. A failed feasibility gate

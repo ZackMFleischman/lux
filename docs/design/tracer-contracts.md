@@ -25,6 +25,10 @@ Native code lives in `native/texture-bridge/` and `native/ffgl-source/`; `frame-
 
 Every completed runtime frame also includes `clockEpoch`, effective control values, seed, render settings, runtime build hash and input snapshot ID (`none` for 0.1 no-input fixture). A native descriptor must carry clock epoch or resolve it through an immutable generation/frame manifest; do not read reset epoch from current runtime state after capture. The implementation should carry it directly to reduce ambiguity.
 
+`generation` is allocated by the supervisor for a renderer incarnation. `outputGeneration` is a separate counter allocated by the native producer for a ring replacement within that incarnation; it increments on resize/ring recreation without invalidating control commands. Ring registration, descriptors, acquire/retire acknowledgements and resource caches use `(instanceId, generation, outputGeneration, slot)`. Frame IDs remain monotonic across ring swaps within one runtime generation. An old-ring read lease may finish after a new ring reuses its slot number; its retirement cannot free the new slot. A renderer restart changes runtime generation and starts a new output generation namespace. Clock reset changes `clockEpoch`, neither generation counter.
+
+Entity IDs (Scene, Revision, Candidate, Job and canonical Runtime Instance) are UUIDs allocated by the application service, including its supervisor. Declared control IDs are stable schema keys such as `intensity`, validated against `^[a-z][a-z0-9_]{0,63}$`; they are not entity UUIDs. The plugin allocates only a `pluginClientId` UUID for each native object lifetime. This is an attachment identity, not the canonical runtime-instance ID.
+
 ## Minimal SDK and runtime completion rules
 
 The SDK example is executable code returned by discovery, not a hidden fixed-scene registry. Runtime imports are limited to the pinned visual SDK and allowed Three.js subset. `create` receives controlled renderer/resource access, immutable asset bytes and deterministic random generator. `update` receives runtime time and effective controls. `render` targets an explicitly sized runtime-owned output; it cannot own pane geometry or FFGL state. Define the concrete allowed TypeScript surface with the SDK in TR-03 and expose that same generated declaration text through `lux.discover`.
@@ -50,9 +54,29 @@ type TracerHostBinding = {
 };
 ```
 
-Resolve only an accepted retained revision to its immutable artifact. Validate fixed schema and runtime hash. Atomically advance binding version if expected version matches; otherwise `HOST_BINDING_CONFLICT`. No host instance is required to activate the binding. On a plugin's `Attach`, allocate an independent instance UUID from this artifact and the plugin's current control snapshot. Re-activation while the single tracer host instance exists prepares a candidate using its latest host values, then switches generation only after a completed compatible frame; a failed candidate keeps the prior binding/output. Studio head and authoring state are unaffected. A service restart requires reactivation of this scratch binding in 0.1; ordinary renderer restart does not. Installed persistence is 0.2/5.
+Resolve only an accepted retained revision to its immutable artifact. Validate fixed schema and runtime hash. Atomically advance binding version if expected version matches; otherwise `HOST_BINDING_CONFLICT`. No host instance is required to activate the binding. On first plugin attachment, resolve this artifact and allocate the service-owned runtime identity under the idempotent attachment contract below. Re-activation while the single tracer host instance exists prepares a candidate using its latest host values, then switches generation only after a completed compatible frame; a failed candidate keeps the prior binding/output. Studio head and authoring state are unaffected. A service restart requires reactivation of this scratch binding in 0.1; ordinary renderer restart does not. Installed persistence is 0.2/5.
 
 The CLI must read current binding version before activation; it cannot overwrite an intervening activation silently. Return binding/instance/revision identifiers to evidence. Later persistent release installation replaces this developer operation rather than turning it into implicit live-export updating.
+
+An active host binding pins the full immutable source/compiled artifact/runtime-manifest/asset closure, even before any plugin attaches. Live instances separately pin everything needed for restart. Current/previous-working scene revisions and job leases are additional retention roots, not the only roots. During replacement retain both bindings until the new host frame succeeds, then release the old binding's pin only when no instance/job/frame lease still references it. Failed replacement keeps the old binding and recovery bytes. Scratch service shutdown may release this registry; renderer shutdown must not. Test: bind A, accept B then C, collect unrooted revisions, attach/restart the host and still render A.
+
+### Attachment and reconnect identity
+
+```ts
+type HostAttach = {
+  pluginClientId: string; connectionEpoch: number;
+  knownServiceEpoch?: string; knownInstanceId?: RuntimeInstanceId;
+  bindingVersion: number; controls: ControlSnapshot;
+};
+type HostAttached = {
+  serviceEpoch: string; pluginClientId: string; connectionEpoch: number;
+  instanceId: RuntimeInstanceId; generation: number; bindingVersion: number;
+};
+```
+
+The service creates a fresh `serviceEpoch` UUID at startup and owns a mapping from `pluginClientId` to one canonical runtime UUID while that native object's lease remains live. Only first attachment allocates the runtime; retry after a lost `Attached` response resolves the same mapping. Reconnect increments the native object's `connectionEpoch`, sends its latest full control snapshot, resolves the same runtime and returns its authoritative generation. A newer connection epoch supersedes the old pipe; old-epoch updates/heartbeats cannot renew leases or change controls. Repeated messages in the same epoch are idempotent by request ID and payload. A second native object has a distinct pluginClientId; 0.1 may explicitly reject a second active object with `TRACER_CAPACITY`, never alias it to the first.
+
+If clean detach or lease expiry destroyed an instance, a later reconnect allocates a new canonical instance and explicitly reports that reset. A mismatched known instance under a live mapping fails `INSTANCE_CONFLICT`. A changed service epoch means scratch identity was lost: reject the stale known binding with `BINDING_UNAVAILABLE` until explicit developer reactivation, then attach afresh. No transparent claim of persisted composition state is made before 0.2. Required tests include duplicate Attach, lost reply, reconnect during renderer restart, delayed old-connection writes and current-control replay; each live client mapping must own at most one runtime.
 
 ## Unified limits and scope
 

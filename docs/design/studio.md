@@ -89,12 +89,15 @@ Chat attaches explicit node selection and captures, including revision/time. Job
 | Render scale | Explicit authoring render-quality override relative to scene output dimensions. | Show effective render dimensions and cost; never silently lower for speed. |
 | Output dimensions/aspect | Scene output settings, validated and saved with the Scene. | Allocates output targets through runtime resize; independent of dock size. |
 | Target FPS | Scene/runtime pacing target, separate from measured delivery. | Report actual performance; missed target is not hidden. |
+| Frame-step (milestone 4) | Advance one declared runtime step while paused through the shared playback operation. | Preserve pause state/revision/instance, render the next frame, show advanced tick/time; never advance the host instance. |
 | Seed | Saved Scene/Look creative state. | Reset/reinitialize when required by component contract. |
 | Simulation resolution | Advanced component control for field/grid/particle workload. | Independent from image dimensions; show reset and memory implications. |
 | Capture dimensions | Requested inspection output size/aspect policy. | Downsampling is not a render override; provenance records both. |
 | Preferences | Machine display, UI scale, devices, monitor output, layout. | Excluded from project content and release. |
 
 Render scale defaults to 1.0 in the tracer with a fixed recorded output size. Changing pane size, DPI, maximize, or fullscreen changes presentation only. Host output resize is a separate host/runtime operation. A capture records the effective output/render settings and any explicitly requested override (T07, U07, C03).
+
+Milestone 4 frame-step uses the runtime's declared timestep (default 1/60 second), including all necessary internal fixed simulation steps. It is enabled only when paused. UI and AI call the same generation-aware step operation. For live inputs, freeze continuous values at command admission and consume only explicitly queued current-epoch events once; for replay inputs, sample the recorded interval being advanced. Record input mode/snapshot. Repeated steps advance exactly the declared intervals and remain paused, without touching host time or source revision (S05).
 
 Workspace maximize temporarily hides other panels and returns to their prior arrangement. Popout moves the presentation to another window; closing that window docks it back. Monitor fullscreen uses the native window operation, with Escape and a visible return action. Save pre-fullscreen bounds separately. These actions preserve instance ID, simulation tick, revision, controls, and input subscriptions; a transient presentation interruption must not reset the scene (U04).
 
