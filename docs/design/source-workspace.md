@@ -124,3 +124,5 @@ Full multi-Scene navigation, graph/component scope actions and Dockview integrat
 ## Normal coding environments — approved direction, 12 September
 
 Source files in directory projects must be directly editable by agents and external editors, with pinned SDK type resolution and normal Git diffs. MCP provides discovery of the selected project/scene and file locations, explicit apply/build, diagnostics, control and captures; code editing need not be tunneled through full-bundle MCP replacements. Studio buffers, disk changes and accepted runtime revisions share conflict-aware batch admission. See the filesystem-first clarification in [project model](project-model.md#filesystem-first-authoring-clarification--12-september-2026). Current tracer files remain embedded in .lux-scene; this is the next project-workflow capability, not a shipped feature.
+
+Detailed filesystem/buffer/Git behavior is specified in [Filesystem projects and accepted revisions](filesystem-projects.md); implementation slices and validation are in [the project plan](../implementation/filesystem-projects-plan.md).

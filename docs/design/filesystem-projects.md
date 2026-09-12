@@ -40,16 +40,16 @@ Raw file hashes preserve UTF-8 bytes, line endings and asset bytes. JSON semanti
 
 ## Files and schema
 
-The folder suffix is optional; `project.json` identifies the format. Friendly folder names can change without changing entity identity. Initial generated folders use IDs for stable paths. Every authoritative content file is declared by project, component, asset or dependency manifests; unrelated README files and editor configuration can coexist without entering runtime content.
+The folder suffix is optional; `project.json` identifies the format. Explicit ID-to-directory registries use readable names such as `scenes/night-sky` and `components/particles`. Renaming a folder updates its registry path and any relative imports in one candidate while preserving IDs. Paths must be unique, nonoverlapping and confined to their scene/component namespace. Every authoritative content file is declared by project, component, asset or dependency manifests; unrelated README files and editor configuration can coexist without entering runtime content.
 
 ```text
 MySet/
   project.json
   tsconfig.json                         # usable ordinary-editor configuration
-  scenes/<sceneId>/scene.json
-  components/<componentId>/component.json
-  components/<componentId>/src/main.ts
-  components/<componentId>/src/noise.ts
+  scenes/night-sky/scene.json
+  components/particles/component.json
+  components/particles/src/main.ts
+  components/particles/src/noise.ts
   assets/manifest.json
   assets/files/<assetId>/spark.bmp       # original bytes, ordinary Git content
   dependencies.lock.json
@@ -73,7 +73,8 @@ type ComponentRef =
   | { kind: 'package'; packageId: string; exportId: string };
 type ProjectManifest = {
   format: 'lux-project'; schemaVersion: 1; projectId: ProjectId; name: string;
-  sceneIds: SceneId[]; componentIds: ComponentId[];
+  scenes: Record<SceneId, string>;         // ID -> scenes/<friendly-directory>
+  components: Record<ComponentId, string>; // ID -> components/<friendly-directory>
 };
 type SceneFile = {
   schemaVersion: 1; sceneId: SceneId; name: string;
@@ -134,8 +135,8 @@ Project creation copies a complete, versioned declaration pack from the installe
 ```json
 {
   "compilerOptions": {
-    "strict": true, "noEmit": true, "target": "ES2022", "module": "ESNext",
-    "moduleResolution": "Bundler", "allowImportingTsExtensions": true, "types": [],
+    "strict": true, "noEmit": true, "target": "ES2023", "module": "ESNext",
+    "moduleResolution": "Bundler", "allowImportingTsExtensions": true, "types": [], "lib": ["ES2023", "DOM"],
     "paths": {
       "@lux/visual-sdk": ["./vendor/toolchain/<hash>/sdk/index.d.ts"],
       "three/webgpu": ["./vendor/toolchain/<hash>/three/build/three.webgpu.d.ts"],
@@ -192,7 +193,7 @@ type ApplyResult = {
 };
 ```
 
-Stage and apply use different request IDs; retrying an ID with different payload returns `REQUEST_ID_REUSED`. Candidate metadata retains scope, buffer expectations, original session and head, exact inventory, toolchain hashes and expiry. Apply cannot expand that scope or substitute a candidate from another session. Full inventory is rechecked at admission and immediately before commit; buffers, saved-control intent sequence and selected-instance binding are also checked. Rechecking the complete project deliberately serializes unrelated saved-content edits in the initial small-project implementation.
+Stage and apply use different request IDs; retrying an ID with different payload returns `REQUEST_ID_REUSED`. Candidate metadata retains scope, buffer expectations, original session and head, exact inventory, toolchain hashes and expiry. Apply cannot expand that scope or substitute a candidate from another session. Full inventory is rechecked at admission and immediately before commit; protected buffers, saved-control intent sequence and selected-instance binding are also checked. Protected buffers are the changed files plus all files/metadata in affected scene closures, including old and new reference users. Dirty unrelated buffers remain open and are not consumed; their disk versions in the unchanged part of the candidate cannot replace their in-memory text. Rechecking the complete disk inventory deliberately serializes unrelated saved-content edits in the initial small-project implementation.
 
 The core reports structured paths/entity IDs for `WORKSPACE_CHANGED`, `BUFFER_CONFLICT`, `REVISION_CONFLICT`, `SCOPE_VIOLATION`, `PROJECT_ID_CHANGED`, `PACKAGE_MODIFIED`, `DEPENDENCY_UNAVAILABLE`, `PROJECT_BUSY`, `QUOTA_EXCEEDED` and compile/runtime errors. Conflict keeps candidate evidence and working files; the caller rereads and deliberately stages again. CLI text diagnostics and MCP structured diagnostics carry candidate ID, original path, line/column and content hash so stale errors never underline unrelated new text.
 
@@ -268,11 +269,19 @@ stateDiagram-v2
     Conflict --> DiskAhead: Explicit save copy, reload or merge
 ```
 
-Every buffer keeps base disk hash, current text, version and owning entity. External changes to a clean buffer reload safely and invalidate stale diagnostics; a changed disk hash under a dirty buffer preserves both versions and shows conflict. No automatic last-writer-wins or invisible text merge. Initial apply rejects any dirty buffer in the candidate read set, including metadata/control drafts. Save writes only after verifying its expected disk base; save failure keeps the dirty buffer. Revert is an explicit discard action; closing a tab does not discard.
+Every buffer keeps base disk hash, current text, version and owning entity. External changes to a clean buffer reload safely and invalidate stale diagnostics; a changed disk hash under a dirty buffer preserves both versions and shows conflict. No automatic last-writer-wins or invisible text merge. Initial apply rejects any dirty protected buffer, including metadata/control drafts, even when its supplied version matches. Save writes only after verifying its expected disk base; save failure keeps the dirty buffer. Revert is an explicit discard action; closing a tab does not discard.
+
+In directory projects, Ctrl+S saves the active file and then stages/applies its affected scene set when the required inputs are saved and conflict-free. Other dirty protected files offer **Save all and apply**; they are never mixed with older disk versions. A separate Save draft action persists text without apply. Invalid source remains saved and editable after build failure while the previous working visual remains visible. Shared-definition scope is shown persistently and previously selected shared-edit scope remains valid until its impact changes; no generic confirmation is added to every build. Standalone tracer whole-bundle shortcuts remain unchanged until its explicit project migration.
 
 Use a recoverable working-write protocol for Studio save: record expected old bytes/hash and proposed new bytes, then replace each file through the safe filesystem adapter. If external edits intervene, stop and report the actually written subset; acceptance has not changed. On restart, finish only entries whose current bytes still match the journal's old or already-written hashes. A third value is a conflict retained as recovery material, never overwritten. Prefer single-file saves for ordinary typing; metadata-plus-file operations remain explicit batches.
 
+A pre-save hash check followed by ordinary replacing rename has a lost-update race. The native working-save protocol must avoid it: acquire the expected target by an exclusive handle, verify identity/hash, move that handle-owned original to a unique journal backup, and exclusively create the replacement target without overwriting an intervening external creation. The transient missing/partly written working file is allowed; it cannot activate. If another writer creates the target first, preserve its bytes, the original backup and proposed replacement and return conflict. Recovery uses the same no-clobber rule. The accepted head uses its separate core-owned atomic replacement protocol.
+
 Track source, metadata, original assets, dependency lock, vendored packages, declaration pack and editor configuration in Git. Ignore `.lux/`, captures, generated artifacts, local logs and machine settings. Git commits/checkpoints are deliberate user/agent actions and are independent of accepted revisions and buffer undo. Do not initialize Git, stage unrelated files or create commits merely because apply succeeded.
+
+Git awareness ships with the first directory-project release: discover/status reports repository/worktree identity, current branch or detached HEAD, modified/untracked paths, unmerged paths and merge/rebase state. A project outside a repository reports that plainly. Unmerged managed content blocks apply even if its text happens to parse; a branch/HEAD change marks status stale and triggers reconciliation, not activation. Commits may contain invalid Lux drafts. Lux does not automatically commit, change branches, fetch or reset, and a full Git history/staging UI is outside this delivery.
+
+A bounded read-only `project/git.ts` adapter invokes the installed Git directly with fixed argument arrays, sanitized environment, time/output limits and optional locks disabled. It first reads configuration as data, disables fsmonitor, hooks/pagers and external diff behavior, and refuses content-status inspection when configured clean/process filters or other executable extension settings cannot be safely excluded; basic identity can remain available with an explicit status-unavailable reason. It never runs diff textconv, submodule recursion, hooks, credential helpers or repository scripts. Tests use sentinel executable configs to prove nonexecution; `--no-optional-locks` alone is not a security boundary. Git metadata may legitimately live outside the working directory for a worktree, but it is never admitted as Lux source or write authority.
 
 Watchers invalidate inventories and report likely external changes, but perform full safe scans on stage/apply, reopen and explicit refresh. Node documents watcher platform limitations and lack of protection against filesystem substitution; it is a hint source, not the transaction boundary. [Node filesystem documentation](https://nodejs.org/api/fs.html#caveats).
 
@@ -340,6 +349,6 @@ GC roots include accepted and previous-working revisions, recovery journals, act
 
 First delivery includes directory create/open, stable manifests, ordinary file editing and pinned offline types, a bounded local package import/pin path, shared code definitions across single-entry scenes, safe explicit stage/apply, dirty-buffer and Git reconciliation, durable acceptance/recovery, migration/interchange and MCP/CLI discovery/check/apply. It deliberately does not require a graph editor, general library registry, network publication, automatic apply, broad npm support, remote collaborative editing, full history UI, new image formats or IDE replacement. Later milestones can add these without changing the working-file/accepted-snapshot boundary.
 
-Proposed implementation ownership is `packages/core/src/project-{schema,session,inventory,store,service}.ts` for data/admission; a native-backed `project-filesystem` adapter for Windows handles, safe writes and leases; `project-resolver.ts` and `library-service.ts` for closure/pins; and `apps/studio/src/source/` for buffer reconciliation. Reuse current compiler/linker, asset admission, saved-control compatibility, runtime preparation/promotion and capture contracts. CLI and MCP are thin authenticated adapters to the same core methods. The final tracer service ownership must be reconciled before implementation rather than creating a second competing runtime authority.
+Proposed implementation ownership is `packages/core/src/project/contracts.ts`, `service.ts` and `store.ts` for data/admission; `paths.ts` and native-backed `filesystem.ts` for Windows handles, safe writes and leases; `resolver.ts`, `library.ts`, `tooling.ts`, `interchange.ts`, `buffers.ts` and `git.ts` for their corresponding boundaries. `apps/studio/src/project/` adapts the existing source editor and its buffer histories. Reuse current compiler/linker, asset admission, saved-control compatibility, runtime preparation/promotion and capture contracts. CLI and MCP are thin authenticated adapters to the same core methods. The final tracer service ownership must be reconciled before implementation rather than creating a second competing runtime authority.
 
 Acceptance requires a fresh offline clone resolving SDK/Three types, an entry-plus-helper edit with meaningful Git diff, explicit shared-scene apply and correctly tagged capture, invalid/incomplete batch retention, dirty-buffer/Git races, package override behavior, original-byte scene migration, and process-crash/disk-full/path-substitution fault injection. CPU tests establish data and transaction invariants; actual Windows filesystem, packaged editor/CLI and renderer promotion checks establish integration. Independent architecture and implementation-plan reviews must inspect every ownership and failure boundary before runtime work begins.

@@ -87,3 +87,7 @@ The detached supervisor remains alive while host consumers exist after the studi
 - [Tracer contract map](design/tracer-contracts.md): shared type ownership, adapter mappings, fixed host schema and explicit activation.
 
 The tracer plan is the execution order. If subsystem details disagree, the coordinator must reconcile the contract before delegating dependent tasks; implementers must not invent local variants of shared IDs, frame descriptors or operation names.
+
+## Filesystem-first project extension
+
+The [filesystem project architecture](design/filesystem-projects.md) specifies real editable working files, explicit immutable stage/apply, shared definitions and pinned libraries, and first-release Git awareness. See its [implementation plan](implementation/filesystem-projects-plan.md) and [independent review record](reviews/filesystem-projects-review.md). This is the first project checkpoint after tracer acceptance; the existing runtime sandbox and installed-release ownership remain unchanged.

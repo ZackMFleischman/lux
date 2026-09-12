@@ -10,13 +10,13 @@ Reviewers receive the documents and repository locations, not other reviewers' c
 
 | Review | Emphasis | Status |
 | --- | --- | --- |
-| Data integrity | Saved vs accepted vs running state, external-write races, crash ordering, Git checkout, identity and recovery | Pending draft completion |
-| Coding workflow and ownership | Normal editor/agent experience, manual Studio edits, project/scene/component/library references, shared edits and migration | Pending draft completion |
-| Implementation feasibility | Concrete APIs/file boundaries, Windows I/O, type/compiler parity, dependency closure, quotas, testability and staged delivery | Pending draft completion |
+| Data integrity | Saved vs accepted vs running state, external-write races, crash ordering, Git checkout, identity and recovery | Independent review running |
+| Coding workflow and ownership | Normal editor/agent experience, manual Studio edits, project/scene/component/library references, shared edits and migration | Independent review running |
+| Implementation feasibility | Concrete APIs/file boundaries, Windows I/O, type/compiler parity, dependency closure, quotas, testability and staged delivery | Independent review running |
 
 ## Finding dispositions
 
-No findings recorded yet. Record each issue with severity, source, affected contract, resolution or explicitly deferred scope, and reviewer verification. Resolve conflicting recommendations explicitly; do not count mere receipt of feedback as closure.
+Coordinator pre-review correction: aligned the sample editor target/lib with the current compiler (ES2023 and DOM). Native safe-save tests now explicitly cover an external file creation between backup and replacement. Independent findings pending. Record each issue with severity, source, affected contract, resolution or explicitly deferred scope, and reviewer verification. Resolve conflicting recommendations explicitly; do not count mere receipt of feedback as closure.
 
 ## Completion gate
 

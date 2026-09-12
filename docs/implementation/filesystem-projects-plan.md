@@ -105,7 +105,7 @@ Use separate worktrees for independent slices. Freeze contracts after slice 1. F
 **Deliverable:** open a selected directory as a session capability, enumerate exactly managed files with byte hashes, and save only against a checked base without following outside links or overwriting an external writer.
 
 - [ ] Write real temporary-directory tests for spaces/Unicode project roots, nested relative paths, empty/deleted files, case collisions, reserved/device/alternate-stream paths and all quota boundaries.
-- [ ] Exercise junction/reparse/symlink/hardlink/ancestor substitution and file replacement between inspection and I/O. Test handle lifetime and replacement behavior, not only lexical path validators.
+- [ ] Exercise junction/reparse/symlink/hardlink/ancestor substitution and file replacement between inspection and I/O. Test the native handle-owned original-to-backup and exclusive no-clobber new-target save protocol: an intervening external creation must survive and leave both original/proposed recovery bytes. Test handle lifetime and replacement behavior, not only lexical path validators.
 - [ ] Implement bounded reads and complete membership fingerprints through the architecture's supported local-filesystem contract. If native guarantees cannot be provided, report unsupported mode rather than silently weaken the promise.
 - [ ] Implement watcher hints plus explicit full refresh; inject dropped, duplicate and reordered events. Assert refresh catches changes with identical mtime/size.
 - [ ] Test sharing violations, unreadable files, disk full and external writes during save. Preserve both conflicting versions; failed saves cannot mark a dirty buffer saved.
