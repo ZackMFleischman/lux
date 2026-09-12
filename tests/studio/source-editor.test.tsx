@@ -75,3 +75,12 @@ test('composition suppresses save and failed admission restores the admitted edi
   assert.equal(view().state.doc.toString(), w.getSnapshot().source.files['main.ts']);
   assert.match(screen.getByRole('alert').textContent!, /valid UTF-8/);
 });
+test('current diagnostics navigate helper coordinates and edited drafts label them stale', async () => {
+  const w = fixture(), diagnostics = [{ file: 'lib/color.ts', line: 1, column: 8, message: 'A helper error', draftVersion: 0 }];
+  render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} diagnostics={diagnostics} />);
+  await click(screen.getByRole('button', { name: /A helper error/ }));
+  assert.equal(w.getSnapshot().selectedFile, 'lib/color.ts'); assert.equal(view().state.selection.main.head, 7);
+  await act(async () => { w.edit('main.ts', 'new draft'); });
+  assert.match(screen.getByText(/Stale diagnostic/).textContent!, /source has changed/);
+  assert.equal((screen.getByRole('button', { name: /A helper error/ }) as HTMLButtonElement).disabled, true);
+});

@@ -3,6 +3,7 @@ import type { PresentationPort } from './presentation.ts';
 import type { SourceBundle } from '../../../packages/runtime-contracts/src/index.ts';
 import { studioOperationSchema } from './runtime-operations.ts';
 import { DEFAULT_OUTPUT } from '../../../packages/runtime-contracts/src/index.ts';
+import { SourceCompileError } from './source/diagnostics.ts';
 export interface AuthoringApi {
   example(): Promise<SourceBundle>;
   compile(source: SourceBundle): Promise<any>;
@@ -38,7 +39,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     this.publish({ jobs: [{ jobId, state: 'compiling', summary: 'Compiling visual…' }] });
     try {
       const result = await this.api.compile(source);
-      if (!result.ok) throw Error(result.diagnostics?.map((d: any) => `${d.file ? d.file + ':' + (d.line ?? '') + ' ' : ''}${d.message}`).join('\n') || 'Compilation failed');
+      if (!result.ok) throw new SourceCompileError(result.diagnostics ?? []);
       this.publish({ jobs: [{ jobId, state: 'initializing', summary: 'Preparing preview…' }] });
       await this.start(result.linked.code, result.sourceHash);
       this.source = structuredClone(source);

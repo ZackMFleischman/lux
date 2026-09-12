@@ -3,12 +3,16 @@ import { Alert, Button, Tab, Tabs, TextField } from '@mui/material';
 import type { SourceWorkspace } from './workspace.ts';
 import { CodeEditor } from './CodeEditor.tsx';
 import { editorCache } from './editor-state.ts';
-export function SourcePanel({ workspace, readOnly, onSave, onCompositionChange, diagnosticTarget }: {
+import { ProblemsPanel } from './ProblemsPanel.tsx';
+import type { SourceDiagnostic } from './diagnostics.ts';
+export function SourcePanel({ workspace, readOnly, onSave, onCompositionChange, diagnosticTarget, diagnostics = [] }: {
   workspace: SourceWorkspace; readOnly: boolean; onSave(): void; onCompositionChange?(value: boolean): void;
   diagnosticTarget?: { path: string; offset: number; request: number } | null;
+  diagnostics?: readonly SourceDiagnostic[];
 }) {
   const snapshot = useSyncExternalStore(workspace.subscribe, workspace.getSnapshot);
   const [newPath, setNewPath] = useState(''), [error, setError] = useState('');
+  const [navigation, setNavigation] = useState<{ path: string; offset: number; request: number; version: number } | null>(null);
   const composing = useRef(false), cache = editorCache(workspace);
   cache.reconcile(snapshot.documentKey, snapshot.source);
   const locked = readOnly || snapshot.busy;
@@ -32,10 +36,13 @@ export function SourcePanel({ workspace, readOnly, onSave, onCompositionChange, 
       </Tabs>
       {snapshot.selectedFile && <><Button aria-label={`Close ${snapshot.selectedFile}`} onClick={() => workspace.closeFile(snapshot.selectedFile)}>Close tab</Button>
         <CodeEditor documentKey={snapshot.documentKey} path={snapshot.selectedFile} text={snapshot.source.files[snapshot.selectedFile]!} readOnly={locked} cache={cache}
-          onChange={text => attempt(() => workspace.edit(snapshot.selectedFile, text))} diagnosticTarget={diagnosticTarget}
+          onChange={text => attempt(() => workspace.edit(snapshot.selectedFile, text))} diagnosticTarget={diagnosticTarget ?? (navigation?.version === snapshot.version ? navigation : null)}
           onCompositionChange={value => { composing.current = value; onCompositionChange?.(value); }} /></>}
       {!snapshot.selectedFile && <p>Choose a file to edit. Closed tabs retain their drafts.</p>}
       <p id="source-keyboard-help" className="source-keyboard-help">Tab moves focus out of the editor. Ctrl+F searches; Ctrl+S saves all files.</p>
       </div></div>{error && <Alert severity="error">{error}</Alert>}
-  </section>;
+      <ProblemsPanel diagnostics={diagnostics} snapshot={snapshot} onNavigate={target => {
+        workspace.openFile(target.path); setNavigation(previous => ({ ...target, version: snapshot.version, request: (previous?.request ?? 0) + 1 }));
+      }} />
+    </section>;
 }
