@@ -4,6 +4,8 @@ This is the full-product coverage map. Only [tracer 0.1](tracer-0.1.md) is decom
 
 **Active priority: creative workflow feedback (12 September 2026).** The user wants to create and iterate on actual visuals now. [Current implementation order](current-priorities.md#active-order-creative-workflow-feedback-first) therefore puts an internal creative-use checkpoint ahead of remaining infrastructure and release acceptance. Use the working Studio/MCP authoring path, finish only bounded usability work already underway, then prioritize capabilities from real creative friction. Image assets, graph/multiple-view expansion, telemetry and broader export hardening are not blanket prerequisites for that checkpoint. The milestone map below still defines eventual product coverage and release obligations; it is not a gate preventing early user iteration.
 
+The user specifically requested **asset implementation continue in parallel as important authoring capability**. Keep the approved required-assets pipeline active alongside the creative-use/UI work, while preserving the existing code-only path. The earlier general infrastructure deferral does not defer this explicitly prioritized track.
+
 **Scope revised 12 September 2026:** tracer means **create in Lux → export/install
 a reusable source → use it in Resolume without Lux Studio running**, including
 cold start, independent sources and composition reopen. The authoritative

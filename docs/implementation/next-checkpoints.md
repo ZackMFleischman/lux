@@ -4,6 +4,8 @@ Started 2026-09-12 after the successful guided Resolume QA. This is the active t
 
 **Current objective: real visual creation and workflow feedback.** User reprioritized this ahead of additional infrastructure. [Active order](current-priorities.md#active-order-creative-workflow-feedback-first) governs sequencing: creative-use checkpoint first, bounded UI work already underway, then fixes/features driven by observed use. Tracer release acceptance remains open and does not block an internal creative session.
 
+User clarification: asset support is important and continues as a high-priority parallel track. No chosen visual brief is required to keep it moving.
+
 ## Live checklist
 
 | Checkpoint | Status | Owner | Completion evidence / next action |
@@ -20,7 +22,7 @@ Started 2026-09-12 after the successful guided Resolume QA. This is the active t
 | C9: installed diagnostic cleanup race | DONE | Coordinator + independent review | 41b4668 suppresses normal ENOENT lease removal and retains other scan errors; 15 installed CPU tests pass. Independent review reproduced red/green. Supporting manual records saved in 1bca5b7. No installed binary changes. |
 | C10: compact Studio UX audit | DONE (AUDIT) | compact_ui_audit + coordinator | compact-studio-audit.md records screenshot/code evidence, compact arrangement and bounded slices. Includes per-group picker, application/file controls, icon transport and explicit multiple-view follow-on. No new native run or production changes. |
 | C11: local pane picker and compact shell polish | IN PROGRESS | compact_ui_implementation | Isolated codex/checkpoint-compact-ui from 29c4b45. Implements group-local picker, compact application/file controls and accessible icon transport with retained ownership. CPU review precedes coordinator-only native QA; true multiple views remain separate. |
-| C12: bounded image validation foundation | DEFERRED | Unassigned | Paused for user-directed creative workflow priority. Uncommitted stub/draft tests removed; no asset implementation is claimed. Resume when a concrete visual needs image input, or for required release closure. |
+| C12: bounded image validation foundation | IN PROGRESS | asset_foundation | User explicitly resumed parallel asset work. Isolated codex/checkpoint-asset-foundation from a4fa3af implements strict image/record admission and protected byte ownership with CPU tests; scene/export wiring follows. No actual asset playback claimed yet. |
 | C13: creative-use checkpoint | TOP PRIORITY; GUIDE READY | Coordinator + user creative feedback | creative-workflow-checkpoint.md provides verified host paths, agent prompt and real creation/revision/save loop. Existing working build is usable; C11 can land when verified but broader polish/assets/measurement do not block the session. Actual user creation and feedback remain next. |
 
 ## Established baseline
