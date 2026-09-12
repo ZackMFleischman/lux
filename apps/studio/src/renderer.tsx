@@ -103,7 +103,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
           <Button disabled={!available || busy} onClick={() => void command(() => controller.playback('reset'))}>Reset</Button>
           <span className="divider" />
           <Button disabled={!available || busy} onClick={() => void command(() => controller.restart())}>Restart runtime</Button>
-        </div><span className="playback-state">{busy ? 'Sending request…' : runtime?.playback ?? 'Awaiting service'}</span></div>
+        </div><span className="playback-state">{runtime?.playback ?? 'Awaiting service'}</span></div>
       </Paper>
       {!compact && <Paper component="aside" square className="inspector" aria-label="Scene controls and status">
         <section><div className="section-heading"><h2>Controls</h2><Chip label="LIVE" /></div>

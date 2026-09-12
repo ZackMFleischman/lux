@@ -93,6 +93,7 @@ test('RTL: completing an intensity write cannot clear a pending playback command
   await user.click(screen.getByRole('button', { name: 'Play' }));
   fireEvent.change(screen.getByRole('slider'), { target: { value: '0.8' } });
   await waitFor(() => assert.equal(fixture.calls.length, 2));
+  assert.equal(document.querySelector('.playback-state')?.textContent, 'paused');
   await act(async () => finishIntensity());
   assert.equal((screen.getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled, true);
   assert.equal((screen.getByRole('button', { name: 'Restart runtime' }) as HTMLButtonElement).disabled, true);
@@ -100,6 +101,9 @@ test('RTL: completing an intensity write cannot clear a pending playback command
   assert.equal(fixture.calls.length, 2);
   await act(async () => finishPlay());
   assert.equal((screen.getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled, false);
+  assert.equal(document.querySelector('.playback-state')?.textContent, 'paused');
+  await act(async () => fixture.update());
+  assert.equal(document.querySelector('.playback-state')?.textContent, 'playing');
 });
 
 test('RTL: intensity writes do not disable transport or insert a success alert', async () => {
