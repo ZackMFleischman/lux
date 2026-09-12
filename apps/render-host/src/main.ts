@@ -1,5 +1,5 @@
 const installed = (globalThis as any).luxInstalledContext;
-if (installed && installed.protocol !== 'lux-installed-render-host-v1') throw Error('Installed render-host protocol mismatch');
+if (installed && installed.protocol !== 'lux-installed-render-host-v2') throw Error('Installed render-host protocol mismatch');
 if (!installed && (!process.env.LUX_EXPERIMENT_RUN_ID || process.env.LUX_EXPERIMENT_MODE !== 'hardware')) {
   throw Error('Reviewed experiment supervisor required');
 }
@@ -22,7 +22,21 @@ fs.mkdirSync(output, { recursive: true });
 const records = [], session = new ProducerSession(bridge);
 let count = 0, dropped = 0, failed = false, finishing = false, webgpuReady = false, visualReady = false;
 let pollTimer, controlTimer, endTimer;
+let healthTimer, healthSequence = 0, completedFrames = 0, backpressureFrames = 0;
 let stopProducer=()=>{};
+function publishHealth() {
+  if (!installed || finishing) return;
+  const state = {version:1, attemptId:installed.attemptId, sequence:++healthSequence,
+    ready:visualReady && completedFrames > 0, frameId:progress.frame.toString(), completedFrames, backpressureFrames};
+  const temporary = installed.healthPath + '.tmp';
+  fs.writeFileSync(temporary, JSON.stringify(state)); fs.renameSync(temporary, installed.healthPath);
+}
+// Start reporting before Electron startup awaits. The supervisor owns the
+// deadline if this main event loop or a native driver call stops responding.
+if (installed) {
+  publishHealth();
+  healthTimer = setInterval(() => { try { publishHealth(); } catch (error) { failure(error); } }, 250);
+}
 function record(value) {
   if(playback&&value.kind==='copy-complete')return;
   if(playback&&records.length>=1000)records.shift();
@@ -33,7 +47,7 @@ function failure(error) { failed = true; record({ kind: 'failure', reason: Strin
 function finish(closed) {
   if (finishing) return;
   finishing = true;
-  clearInterval(pollTimer); clearInterval(controlTimer); clearTimeout(endTimer);
+  clearInterval(pollTimer); clearInterval(controlTimer); clearInterval(healthTimer); clearTimeout(endTimer);
   record({ kind: 'summary', paint: count, held: session.held.size, uncertain: session.uncertain.size, dropped, closed, failed, webgpuReady });
   fs.writeFileSync(path.join(output, 'probe.json'), JSON.stringify(records, null, 2));
   // The external supervisor owns the final wall-clock deadline if driver teardown stalls.
@@ -71,13 +85,16 @@ app.whenReady().then(async () => {
     if (release && !visualReady) { event.texture.release(); return; }
     try {
       const result = session.submit(event.texture);
+      // A host that has stopped drawing can fill the receiver ring without a
+      // failed visual. Only confirmed backpressure with no pending copy counts.
+      if (result.drop === 'no-free-slot' && session.held.size === 0 && session.uncertain.size === 0) backpressureFrames++;
       count++;
       if (result.id && (result.width !== 1920 || result.height !== 1080)) failure('Unexpected output dimensions');
       if (count <= 10) record({ kind: 'paint', ...result, info: { ...event.texture.textureInfo, handle: 'borrowed-local-NT' } });
     } catch (error) { failure(error); }
   });
   pollTimer = setInterval(() => {
-    try { for (const id of session.poll()) record({ kind: 'copy-complete', id }); }
+    try { for (const id of session.poll()) { completedFrames++; record({ kind: 'copy-complete', id }); } }
     catch (error) { failure(error); finish(false); }
   }, 1);
   win.webContents.setFrameRate(60);

@@ -34,6 +34,33 @@ producer for up to three seconds before closing its Job. Crashed host leases
 expire after ten seconds. The supervisor stays warm for 30 seconds after its
 last attachment, then exits. A crashed supervisor closes every Job it owns;
 remaining host instances automatically request a replacement supervisor.
+Each producer attempt receives a fresh 32-hex nonce, an immutable request under
+`<instanceId>.attempts/<attemptId>.json`, and a private status file beside it.
+Retries also use separate Electron profile/output directories. Old-attempt
+status cannot renew a replacement. The original top-level host lease remains
+the source-removal authority.
+
+The supervisor now owns a monotonic 15-second first-ready deadline. Readiness
+requires the first host-control-acknowledged visual and a completed published
+texture copy. After readiness, producer-main status must advance within 2.5
+seconds, worker frame IDs within 4 seconds, and output admission within 4 seconds.
+Main writes one bounded, atomically replaced status file every 250 ms, starting
+before `loadFile`/`getGPUInfo` awaits; missing, malformed, replayed or foreign-nonce
+samples cannot renew health. No child-supplied timestamp controls a deadline.
+Known expiry immediately closes only that producer's Job, then uses the existing
+backoff and maximum three starts. The final failed attempt is also disposed.
+
+Installed visuals remain playing while attached; a host pause is not a request
+to pause their simulation clock. A non-consuming host may legitimately fill the
+receiver ring. Confirmed `no-free-slot` callbacks with no borrowed copy outstanding
+renew output-admission freshness while worker-frame and main-heartbeat progress
+remain required. An in-flight-copy stall receives no backpressure exemption.
+This avoids restarting healthy sources merely because their host stopped drawing.
+The 15/2.5/4-second watchdog values are conservative recovery failsafes, not proof
+of the original <=2-second stop gate or three-second cold responsiveness target.
+Normal removal still has its existing up-to-three-second drain path; watchdog
+expiry does not add that drain delay.
+
 Startup errors are recorded beside the instance lease (`*.error` and
 `supervisor.error`); missing native descriptors also report through the Windows
 debug output. A polished host-visible error panel is not implemented.
@@ -57,3 +84,12 @@ also checks the real copied DLL's release ID/name and canonical 0.5 default;
 it does not call InitGL. No installed producer, GPU or Resolume launch was
 performed for this checkpoint. Cold reopen, duplicate/different source playback,
 first accepted pixels, performance and live shutdown remain root QA gates.
+
+Watchdog CPU evidence additionally covers fake-time startup stalls, independently
+stale main/worker/output progress, receiver backpressure, foreign/replayed status,
+per-attempt path isolation, forced expiry of only the affected Job and disposal
+after the third failed attempt. A fake Electron test executes the real render-host
+main with `loadFile` permanently pending and observes bounded non-ready heartbeat
+publication. These tests do not initialize graphics. Re-emit the render-host main
+before export: the capability marker is now `lux-installed-render-host-v2`, so an
+old pre-watchdog emitted main is rejected rather than silently missing health.

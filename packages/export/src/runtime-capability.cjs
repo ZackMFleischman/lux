@@ -6,13 +6,13 @@ const fs = require('node:fs'), path = require('node:path');
 const capabilities = Object.freeze({
   'native/build/Release/LuxTracerTR02.dll': 'lux-installed-source-protocol-v1',
   'native/build/Release/lux_texture_bridge.node': 'lux-installed-producer-protocol-v1',
-  'apps/render-host/src/main.cjs': 'lux-installed-render-host-v1',
+  'apps/render-host/src/main.cjs': 'lux-installed-render-host-v2',
 });
 function assertRuntimeCapabilities(root) {
   for (const [relative, marker] of Object.entries(capabilities)) {
     const filename = path.join(root, relative);
     if (!fs.existsSync(filename) || !fs.statSync(filename).isFile() || fs.statSync(filename).size > 32 * 1024 * 1024 || !fs.readFileSync(filename).includes(Buffer.from(marker)))
-      throw Error('Rebuild the installed runtime before export/registration: ' + relative + ' lacks protocol v1');
+      throw Error('Rebuild the installed runtime before export/registration: ' + relative + ' lacks ' + marker);
   }
   for (const name of ['supervisor', 'registry', 'instance']) {
     const filename = path.join(root, 'apps/installed-runtime/src', name + '.cjs');
