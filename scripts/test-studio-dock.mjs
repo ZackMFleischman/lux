@@ -99,6 +99,34 @@ try {
   await sameOwners();
   report.checks.push('Actual GPU preview keeps animating after close/reopen and layout changes');
   await page.screenshot({ path: join(output, 'final.png') });
+  // Validate the two prepared source implementations through real Studio open/build.
+  // Supply only file-picker responses; compiler, runtime and rendering remain real.
+  page.on('dialog', dialog => dialog.type() === 'confirm' ? dialog.accept() : dialog.dismiss());
+  const fixtureImages = [];
+  for (const [fixture, constructor] of [['triangle', 'new CircleGeometry('], ['ring', 'new RingGeometry(']]) {
+    const filename = join(root, 'tests/fixtures/installed-sources', fixture, 'scene.lux-scene');
+    await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, filename);
+    await page.getByRole('button', { name: 'Open', exact: true }).click();
+    await page.waitForFunction(expected => document.querySelector('.cm-content')?.textContent.includes(expected)
+      && [...document.querySelectorAll('button')].some(button => button.textContent === 'Open' && !button.disabled)
+      && document.querySelector('.authoring-tools')?.textContent.includes('Preview matches source')
+      && [...document.querySelectorAll('.hint')].some(node => node.textContent === 'Applied value: 0.80'), constructor);
+    const png = await page.locator('.preview-surface canvas').screenshot({ path: join(output, `${fixture}.png`) });
+    const samples = await app.evaluate(({ nativeImage }, bytes) => {
+      const image = nativeImage.createFromBuffer(Buffer.from(bytes)), size = image.getSize(), bitmap = image.toBitmap();
+      const sample = x => {
+        const offset = (Math.floor(size.height / 2) * size.width + Math.floor(size.width * x)) * 4;
+        return [...bitmap.subarray(offset, offset + 4)];
+      };
+      return { centerBGRA: sample(0.5), rightBGRA: sample(0.64) };
+    }, [...png]);
+    fixtureImages.push({ fixture, ...samples });
+  }
+  assert.ok(fixtureImages[0].centerBGRA[0] > fixtureImages[1].centerBGRA[0] + 50, 'cyan triangle center differs from the dark ring hole');
+  assert.ok(fixtureImages[1].rightBGRA[2] > fixtureImages[1].centerBGRA[2] + 50
+    && fixtureImages[1].rightBGRA[2] > fixtureImages[1].rightBGRA[0] + 50, 'ring has a visible gold rim, not merely a blank dark canvas');
+  report.fixtureImages = fixtureImages;
+  report.checks.push('Both distinct saved fixtures open/build/render in Studio; triangle center and ring hole differ');
   assert.deepEqual(report.errors, []);
   report.ok = true;
 } catch (error) {
@@ -107,7 +135,7 @@ try {
   throw error;
 } finally {
   if (page && !page.isClosed()) await page.evaluate(() => localStorage.removeItem('lux.personal-layout.v1.Automated%20Dock%20QA')).catch(() => {});
-  await writeFile(join(output, 'result.json'), JSON.stringify(report, null, 2));
   if (app) { await app.evaluate(({ app }) => app.exit(0)).catch(() => {}); await app.close().catch(() => {}); }
+  await writeFile(join(output, 'result.json'), JSON.stringify(report, null, 2));
 }
 console.log(JSON.stringify(report, null, 2));

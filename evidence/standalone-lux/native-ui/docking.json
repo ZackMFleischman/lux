@@ -6,7 +6,8 @@
     "Actual pointer split resizing changes pane width and retains output/editor",
     "Closing and reopening Preview retains the original live canvas",
     "Laptop tabs switch between real Source and Preview with owners intact",
-    "Actual GPU preview keeps animating after close/reopen and layout changes"
+    "Actual GPU preview keeps animating after close/reopen and layout changes",
+    "Both distinct saved fixtures open/build/render in Studio; triangle center and ring hole differ"
   ],
   "errors": [],
   "restoredBounds": {
@@ -22,5 +23,37 @@
       "width": 396,
       "height": 461.00001525878906
     }
-  }
+  },
+  "fixtureImages": [
+    {
+      "fixture": "triangle",
+      "centerBGRA": [
+        231,
+        215,
+        72,
+        255
+      ],
+      "rightBGRA": [
+        231,
+        215,
+        72,
+        255
+      ]
+    },
+    {
+      "fixture": "ring",
+      "centerBGRA": [
+        53,
+        36,
+        29,
+        255
+      ],
+      "rightBGRA": [
+        72,
+        191,
+        231,
+        255
+      ]
+    }
+  ]
 }
