@@ -34,3 +34,10 @@ test('incomplete ownership, worker failure and telemetry loss cannot pass', () =
     assert.equal(validateProbeEvidence([{...producer[0],...invalid}],receiver).ok,false);
   }
 });
+
+test('a single delivered frame is not continuing transport', () => {
+  assert.equal(validateProbeEvidence([{...producer[0],paint:1}],receiver).ok,false);
+  assert.equal(validateProbeEvidence(producer,[receiver[0],{kind:'counters',consumed:1}]).ok,false);
+  assert.equal(validateResolumeEvidence(producer,[{kind:'attached',producerPid:42},
+    {kind:'counters',callbacks:20,consumed:3}],{pid:42,code:0},{callbacks:10,consumed:2}).ok,false);
+});

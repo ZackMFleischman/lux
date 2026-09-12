@@ -94,7 +94,9 @@ export async function runExperiment(options = {}) {
     // Read-only inspection, including outside this runner. Failure to inspect refuses execution.
     const activity = await inspectActivity();
     manifest.activity = conflictingActivity(activity);
-    assertNoConflictingActivity(activity, review?.host);
+    // CPU mode can launch only the three fixed CPU fixtures above. Graphics
+    // isolation applies to hardware; authoring must not block CPU regressions.
+    if (mode === 'hardware') assertNoConflictingActivity(activity, review?.host);
     if (review?.host) manifest.externalHost = { ...review.host, supervised: false, terminatedByJob: false };
     manifest.binary = await hash(executable);
     const sourcePaths = [fileURLToPath(import.meta.url), join(here, 'experiment-job.cs'), join(here, 'experiment-job.ps1'), join(here, 'experiment-cpu-fixture.mjs')];

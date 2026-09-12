@@ -34,4 +34,9 @@ window.startVisual = async (release, intensity) => {
     canvas,controls:{intensity},playing:true},[canvas]);
 };
 window.setIntensity = value => request({type:'controls',...identity,controlSequence:++sequence,values:{intensity:value}});
+window.captureVisual = async surface => {
+  const result = await request({type:'capture',surface,...identity});
+  if(result.type !== 'capture') throw Error(result.message || 'Capture failed');
+  return {metadata:result.metadata,bytes:Array.from(new Uint8Array(result.bytes))};
+};
 </script>

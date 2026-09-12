@@ -19,7 +19,11 @@ async function main(){
   if(hosts.length!==1)throw Error('Open exactly one Resolume host and trigger one Lux TR02 Probe source first');
   const p=hosts[0],host={pid:p.ProcessId,executable:p.ExecutablePath,creationUtc:p.CreationUtc};
   assertNoConflictingActivity(processes,host);
-  const loaded=JSON.parse(ps(`@((Get-Process -Id ${host.pid}).Modules | Where-Object ModuleName -eq 'LuxTracerTR02.dll' | Select-Object FileName) | ConvertTo-Json -Compress`));
+  // CIM rounds creation times to microseconds. The Job helper compares the
+  // full .NET process lifetime, so capture that value rather than rounding its
+  // check. The fresh CIM identity check before dispatch still pins this host.
+  const hostLifetimeUtc=ps(`(Get-Process -Id ${host.pid}).StartTime.ToUniversalTime().ToString('o')`).trim();
+  const loaded=JSON.parse(ps(`ConvertTo-Json -Compress -InputObject @((Get-Process -Id ${host.pid}).Modules | Where-Object ModuleName -eq 'LuxTracerTR02.dll' | Select-Object FileName)`));
   const modules=Array.isArray(loaded)?loaded:[loaded];
   if(modules.length!==1||!modules[0]?.FileName)throw Error('Trigger the Lux TR02 Probe source in Resolume before playback');
   const staged=modules[0].FileName;
@@ -45,7 +49,7 @@ async function main(){
     if(Date.parse(review.expiresUtc)<=Date.now())throw Error('Playback review expired');
     const executable=join(root,'node_modules/electron/dist/electron.exe');
     await writeFile(join(directory,'config.json'),JSON.stringify({executable,commandLine:[executable,join(root,'apps/render-host/src/main.cjs')].map(quote).join(' '),
-      cwd:root,directory,timeoutMs:-1,stopFile,ownerPid:process.pid,hostPid:host.pid,hostCreatedUtc:host.creationUtc}));
+      cwd:root,directory,timeoutMs:-1,stopFile,ownerPid:process.pid,hostPid:host.pid,hostCreatedUtc:hostLifetimeUtc}));
     process.on('SIGINT',stop);process.on('SIGTERM',stop);
     console.log(`Playing ${release.sourceHash.slice(0,12)} in Resolume. Press Ctrl+C to stop.\nSession: ${directory}`);
     const env={...process.env,LUX_EXPERIMENT_MODE:'hardware',LUX_EXPERIMENT_RUN_ID:id,LUX_EXPERIMENT_DIRECTORY:directory,

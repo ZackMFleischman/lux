@@ -1,0 +1,20 @@
+{
+  "ok": false,
+  "scope": "short-standalone-diagnostic-only",
+  "reasons": [
+    "Producer did not prove successful WebGPU production and complete ownership drain",
+    "Insufficient continuing receiver consumption"
+  ],
+  "outcomes": [
+    {
+      "name": "receiver",
+      "pid": 16464,
+      "code": 0
+    },
+    {
+      "name": "producer",
+      "pid": 22896,
+      "code": 0
+    }
+  ]
+}

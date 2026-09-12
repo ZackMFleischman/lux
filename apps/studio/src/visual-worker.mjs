@@ -2,7 +2,7 @@
 // desktop bridge is exposed here. The parent owns termination and promotion.
 import { RuntimeClock } from '../../../packages/runtime/src/clock.ts';
 import { SeededRandom } from '../../../packages/runtime/src/seed.ts';
-let identity, renderer, device, visual, clock, random, settings, outputTarget, presentation;
+let identity, renderer, device, visual, clock, random, settings, outputTarget, presentation, outputCanvas;
 let controls = { intensity: 0.5 }, sequence = 0, frame = 0, tick = 0, lastTime = 0;
 let stopped = false, timer, heartbeat, chain = Promise.resolve();
 const send = (type, extra = {}) => postMessage({ type, ...identity, ...extra });
@@ -33,6 +33,7 @@ async function initialize(message) {
   if (typeof message.moduleSource !== 'string' || message.moduleSource.length > 16777216) throw Error('Invalid linked module');
   if (!Number.isFinite(message.controls?.intensity) || message.controls.intensity < 0 || message.controls.intensity > 1) throw Error('Invalid intensity');
   controls = { intensity: message.controls.intensity };
+  outputCanvas = message.canvas;
   clock = new RuntimeClock(() => performance.now(), 'paused'); random = new SeededRandom(settings.seed);
   heartbeat = setInterval(() => send('heartbeat', { frameId: String(frame) }), 250);
   const url = URL.createObjectURL(new Blob([message.moduleSource], { type: 'text/javascript' }));
@@ -82,9 +83,12 @@ onmessage = event => {
       try {
         // Same completed output as presentation; no user-code rerender during
         // capture. The serialized execution queue pins it until encoding ends.
-        const pixels = await renderer.readRenderTargetPixelsAsync(outputTarget, 0, 0, settings.width, settings.height);
-        const image = new OffscreenCanvas(settings.width, settings.height);
-        image.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(pixels.buffer, pixels.byteOffset, pixels.byteLength), settings.width, settings.height), 0, 0);
+        let image = outputCanvas;
+        if (message.surface !== 'canvas') {
+          const pixels = await renderer.readRenderTargetPixelsAsync(outputTarget, 0, 0, settings.width, settings.height);
+          image = new OffscreenCanvas(settings.width, settings.height);
+          image.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(pixels.buffer, pixels.byteOffset, pixels.byteLength), settings.width, settings.height), 0, 0);
+        }
         const blob = await image.convertToBlob({ type: 'image/png' });
         if (blob.size > 8388608) throw Error('Capture exceeds 8 MiB');
         const bytes = await blob.arrayBuffer();

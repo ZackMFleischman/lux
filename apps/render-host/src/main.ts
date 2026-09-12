@@ -47,12 +47,13 @@ app.whenReady().then(async () => {
   const win = new BrowserWindow({ width: 1920, height: 1080, frame: false, useContentSize: true, show: false, transparent: true,
     webPreferences: { offscreen: { useSharedTexture: true }, sandbox: true, contextIsolation: true, nodeIntegration: false, backgroundThrottling: false } });
   win.setContentSize(1920, 1080);
-  if (release) win.webContents.stopPainting();
+  // Keep compositor begin-frames running while the worker initializes. Paints
+  // are released below until the initial host control has been rendered.
   record({ kind: 'bounds', bounds: win.getContentBounds() });
   win.webContents.on('console-message', (details, _level, legacyMessage) => {
     const message = details.message ?? legacyMessage;
     if(typeof message==='string'&&message.includes('runtime-heartbeat')){
-      try{const data=JSON.parse(message);if(data.kind==='runtime-heartbeat'){progress.observe(data.frameId,performance.now());return;}}catch{}
+      try{const data=JSON.parse(message);if(data.kind==='runtime-heartbeat'){progress.observe(data.frameId,performance.now());if(!playback)record(data);return;}}catch{}
     }
     record({ kind: 'console', message });
     try {
@@ -89,6 +90,12 @@ app.whenReady().then(async () => {
     promote:(initial,value)=>{
       record({kind:'initial-frame',intensity:value,sourceHash:release.sourceHash,frameId:initial.frameId,controlSequence:initial.controlSequence});
       visualReady=true;webgpuReady=true;progress.observe(initial.frameId,performance.now());win.webContents.startPainting();
+      if(!playback&&!process.env.LUX_RESOLUME_PID)win.webContents.executeJavaScript('window.captureVisual()').then(capture=>{
+        fs.writeFileSync(path.join(output,'worker.png'),Buffer.from(capture.bytes));record({kind:'capture',...capture.metadata});
+        return win.webContents.executeJavaScript("window.captureVisual('canvas')");
+      }).then(capture=>{
+        fs.writeFileSync(path.join(output,'canvas.png'),Buffer.from(capture.bytes));record({kind:'canvas-capture',...capture.metadata});
+      }).catch(failure);
     }}) : null;
   let applyingControl = false;
   controlTimer = setInterval(async () => {

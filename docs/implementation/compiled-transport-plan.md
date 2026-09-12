@@ -9,10 +9,10 @@ default-value output. Resolume retains its last completed image while waiting.
 **Spec:** `docs/design/resolume-bridge.md`, narrowed by the user's request to
 finish compiled-visual integration and initial control synchronization.
 
-- [ ] Native control handshake: add versioned initialized snapshot state, bounded
+- [x] Native control handshake: add versioned initialized snapshot state, bounded
   atomic reads, and CPU tests proving no default snapshot or submission before
   host publication. Publish host controls before admitting frames.
-- [ ] Saved visual preparation: read the existing `.lux-scene` format through
+- [x] Saved visual preparation: read the existing `.lux-scene` format through
   SceneFileStore, compile/link with existing bounded workers, write immutable
   content-identified release bytes. Test source rejection and tamper rejection.
 - [ ] Shared runtime: bundle the existing Studio worker for the offscreen page;
@@ -26,3 +26,20 @@ finish compiled-visual integration and initial control synchronization.
 No CPU pixel streaming, generated code in Electron main, or silently shared
 authoring/host controls. This work does not add multi-instance routing or the
 separate full performance acceptance suite.
+
+## Current verification checkpoint
+
+Native CPU tests: 9 passed. Unit tests: 34 passed (33-test suite plus the saved
+scene rejection test). `pnpm typecheck` and
+`pnpm build` passed. Persistent Job cleanup is covered by CPU fixtures for
+explicit stop, host exit, owner exit, and an unresponsive producer.
+
+Compiled GPU output is **not accepted yet**. Run
+`252c3c38-7a88-4138-a9a9-2bfe95cfc9f7` captured the correct colored visual inside
+the worker, with frame IDs continuing to advance, but the receiver got only one
+black compositor frame. Removing the pre-initialization `stopPainting()` did
+not resolve it. The evaluator now rejects that result. Next: compare a canvas
+capture with the render-target capture, then isolate worker rAF presentation.
+GPU diagnostics are paused while the user tests Studio with another agent.
+The failed run, exact inventory and worker capture are preserved under
+`evidence/tracer-0.1/tr02-compiled-presentation-debug/`.

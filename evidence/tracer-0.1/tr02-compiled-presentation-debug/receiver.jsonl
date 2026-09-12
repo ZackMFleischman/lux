@@ -1,0 +1,48 @@
+{"kind":"context-host-snapshot","createContextProc":140712691721040,"current":{"thread":256,"context":65537,"dc":18446744072635879218,"major":4,"minor":1,"flags":0,"profileMask":1,"vendor":"NVIDIA Corporation","renderer":"NVIDIA GeForce RTX 2070/PCIe/SSE2","version":"4.1.0 NVIDIA 591.44"},"drawable":{"dc":18446744072635879218,"window":3080948,"windowThread":256,"windowPid":16464,"style":80674816,"classStyle":32,"rect":[0,0,1556,884],"pixelFormat":9,"described":true,"pfdFlags":33317,"pixelType":0,"colorBits":32,"alphaBits":0,"depthBits":24,"stencilBits":0,"layerType":0,"technology":1,"monitorKnown":true,"monitorDevice":"\\\\.\\DISPLAY1","displayDeviceKnown":true,"displayDevice":"Intel(R) UHD Graphics","displayDeviceId":"PCI\\VEN_8086&DEV_9BC4&SUBSYS_12B81462&REV_05","glAdapterLuidAvailable":false}}
+{"kind":"wgl-create-context","creationSite":"host-thread-host-dc","ok":true,"win32":0,"context":131072,"creationDc":18446744072635879218,"shareContext":65537,"attributes":[8337,4,8338,1,0],"current":{"thread":256,"context":65537,"dc":18446744072635879218,"major":4,"minor":1,"flags":0,"profileMask":1,"vendor":"NVIDIA Corporation","renderer":"NVIDIA GeForce RTX 2070/PCIe/SSE2","version":"4.1.0 NVIDIA 591.44"}}
+{"kind":"context-worker-drawable","setPixelFormatOk":true,"win32":0,"requestedPixelFormat":9,"current":{"thread":13480,"context":0,"dc":0},"drawable":{"dc":18446744071914457366,"window":722890,"windowThread":13480,"windowPid":16464,"style":2214592512,"classStyle":32,"rect":[0,0,1,1],"pixelFormat":9,"described":true,"pfdFlags":33317,"pixelType":0,"colorBits":32,"alphaBits":0,"depthBits":24,"stencilBits":0,"layerType":0,"technology":1,"monitorKnown":true,"monitorDevice":"\\\\.\\DISPLAY1","displayDeviceKnown":true,"displayDevice":"Intel(R) UHD Graphics","displayDeviceId":"PCI\\VEN_8086&DEV_9BC4&SUBSYS_12B81462&REV_05","glAdapterLuidAvailable":false}}
+{"kind":"wgl-make-current","ok":true,"win32":0,"requestedContext":131072,"requestedDc":18446744071914457366,"current":{"thread":13480,"context":131072,"dc":18446744071914457366,"major":4,"minor":1,"flags":0,"profileMask":1,"vendor":"NVIDIA Corporation","renderer":"NVIDIA GeForce RTX 2070/PCIe/SSE2","version":"4.1.0 NVIDIA 591.44"}}
+{"kind":"context","ownedDrawable":true,"sharedContext":true,"nvInterop":true,"pid":16464,"renderer":"NVIDIA GeForce RTX 2070/PCIe/SSE2"}
+{"kind":"adapter","luidLow":71763,"luidHigh":0}
+{"kind":"discovery","elapsedMs":35690679,"namePresent":true,"alreadyConnected":false}
+{"kind":"mapping-unavailable","win32":2}
+{"kind":"counters","callbacks":0,"consumed":0}
+{"kind":"discovery","elapsedMs":35691189,"namePresent":true,"alreadyConnected":false}
+{"kind":"attached","producerPid":22896,"generation":356909496093}
+{"kind":"counters","callbacks":17,"consumed":0}
+{"kind":"discovery","elapsedMs":35691703,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":34,"consumed":0}
+{"kind":"discovery","elapsedMs":35692217,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":53,"consumed":1}
+{"kind":"discovery","elapsedMs":35692732,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":71,"consumed":1}
+{"kind":"discovery","elapsedMs":35693247,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":88,"consumed":1}
+{"kind":"discovery","elapsedMs":35693761,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":105,"consumed":1}
+{"kind":"discovery","elapsedMs":35694275,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":122,"consumed":1}
+{"kind":"discovery","elapsedMs":35694787,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":139,"consumed":1}
+{"kind":"discovery","elapsedMs":35695287,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":156,"consumed":1}
+{"kind":"discovery","elapsedMs":35695798,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":173,"consumed":1}
+{"kind":"discovery","elapsedMs":35696299,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":189,"consumed":1}
+{"kind":"discovery","elapsedMs":35696800,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":206,"consumed":1}
+{"kind":"discovery","elapsedMs":35697314,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":223,"consumed":1}
+{"kind":"discovery","elapsedMs":35697828,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":239,"consumed":1}
+{"kind":"discovery","elapsedMs":35698339,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":257,"consumed":1}
+{"kind":"discovery","elapsedMs":35698851,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":273,"consumed":1}
+{"kind":"discovery","elapsedMs":35699366,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":290,"consumed":1}
+{"kind":"discovery","elapsedMs":35699882,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":307,"consumed":1}
+{"kind":"discovery","elapsedMs":35700396,"namePresent":true,"alreadyConnected":true}
+{"kind":"counters","callbacks":325,"consumed":1}
