@@ -64,7 +64,7 @@ app.whenReady().then(async () => {
   win.webContents.setFrameRate(60);
   await win.loadFile(path.join(__dirname, 'output.html'));
   record({ kind: 'gpu', info: await app.getGPUInfo('complete') });
-  bridge.advertise();
+  record({ kind: 'advertise', ...JSON.parse(bridge.advertise()) });
   controlTimer = setInterval(() => {
     try { win.webContents.executeJavaScript('window.setIntensity(' + bridge.control() + ')').catch(failure); }
     catch (error) { failure(error); }
