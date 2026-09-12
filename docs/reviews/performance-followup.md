@@ -1,0 +1,30 @@
+# Focused performance-monitoring review
+
+Reviewed snapshot: `0160de10882035c3062067a78f06f201a9cfabcc`. Date: 2026-09-12 UTC. Scope: `docs/design/performance-monitoring.md` against the existing runtime, bridge, tracer contracts, task sequence and acceptance procedure. This is an independent documentation review; no implementation or hardware validation was performed. Coordinator-owned link integration was excluded from findings.
+
+**Verdict: the measurement design is technically sound and ready for implementation after one small task-order correction.** PERF-01 does not block starting preflight, but should be reconciled before TR-02 runner integration. No other actionable technical defect was found in this focused pass. Buffer sizes, sampling rates and timing pools are explicitly initial engineering choices to test, not asserted capabilities.
+
+## PERF-01 — Give the GPU spike a recording path before the core service exists
+
+**Classification: required before affected task — TR-02 recording integration.**
+
+References: `docs/design/performance-monitoring.md:109` (Studio and AI access), `:135`–`:137` (Implementation ownership and evidence); `docs/implementation/tracer-0.1.md:59` (sequential dependency order).
+
+The document says TR-02–07 benchmark runners start recording through a trusted core profiling service. Its ownership table delivers the collector in TR-03 and `packages/core/src/profiling-service.ts` with trusted recording control in TR-04/05. TR-02 must finish the actual GPU experiment before those tasks. Taken literally, the spike therefore needs an unavailable later service, or must prematurely implement application-core infrastructure.
+
+Concrete correction: explicitly let TR-02 use a small trusted spike-local recorder/controller that drains bounded native buffers, writes the common evidence format and marks loss/truncation. Assign its file/owner in TR-02. TR-03 can adopt its collector contract and TR-04 expose the shared core operation. Alternatively move only the minimal trusted recording primitive to TR-02, leaving UI/application integration later. State which path starts/stops a TR-02 run; do not require the later core or Studio to pass the spike. Keep the same nonblocking and evidence-validity rules in both stages.
+
+## Technical assessment
+
+- **Collection and ownership:** fixed-size single-writer records, interned IDs, off-callback formatting/I/O, aggregate caps and independently retained loss counters give implementers a credible bounded design. Collector/disk/client stalls drop evidence rather than delaying FFGL or extending visual leases. The overload and lifecycle tests explicitly verify that design; a buffer declaration alone is not treated as proof.
+- **GPU accuracy:** feature enablement, asynchronous query resolution, separate reusable timing slots, uint64 subtraction before conversion, validity checks and full pass-coverage accounting avoid the major false GPU measurements. Missing/timed-out query samples invalidate benchmark coverage instead of removing slow tails. The document does not promise that Three.js hooks cover every pass; selected-version adapter/source and cross-tool checks remain required. Copies/compositor work remain separately attributed.
+- **Clock bounds:** native QPC and worker/UI origins are separated, recurring calibration records uncertainty and restart IDs, and cross-domain latency gates cannot pass on an optimistic point estimate. GPU timestamps remain duration-only in their own domain. Offset/drift/asymmetric-delay fixtures test the bounding method rather than assuming ping-pong yields an exact offset.
+- **Loss and statistics:** writer sequence, expected/missing counts, incomplete flags and complete-population acceptance prevent a dropped-record stream from presenting an apparently healthy p99. Cadence and exact control-version reconciliation remain consistent with tracer acceptance. Quantiles aggregate per-frame work before percentile calculation.
+- **UI endpoint:** routine rAF measurements are explicitly proxies. Acceptance requires trace/presentation correlation with the acknowledgement; React commit alone is insufficient. Trace coverage and hidden-window tests make this an implementation gate, not an assertion that a convenient browser callback proves paint.
+- **Modes, overhead and soak:** health/correctness remain active in baseline mode, full acceptance coverage is distinct from routine sampling, and diagnostics have duration/storage caps. Paired work-duration comparisons avoid hiding overhead behind vsync. The acceptance procedure already permits an external or identical fixed baseline probe; implementation must preserve that comparison in both modes. Confidence/noise can make the result inconclusive. Later soak checks compare live resources at equivalent lifecycle phases after retirement, distinguish bounded caches from leaks and reject incomplete evidence.
+
+## Primary-source checks and limits
+
+The cited [GPUWeb pass timestamp interface](https://gpuweb.github.io/types/interfaces/GPURenderPassTimestampWrites.html) supports the described beginning/end query fields; it does not establish selected-device support, timer precision or complete Three.js coverage. [Microsoft's QPC guidance](https://learn.microsoft.com/en-us/windows/win32/sysinfo/acquiring-high-resolution-time-stamps) supports same-system interval timing independently of UTC. [Electron contentTracing](https://www.electronjs.org/docs/latest/api/content-tracing) provides main-process category/start/stop controls; the design correctly requires separate coverage for native host tracing rather than assuming an unrelated Resolume process is included. These source facts do not prove Lux instrumentation accuracy or overhead.
+
+After PERF-01 is clarified, the addendum provides an adequate how-to and validation contract for the planned tracer sequence. Actual nonblocking behavior, query coverage, frame/presentation correlation, calibrated bounds, resource reclamation and the numerical acceptance gates remain implementation evidence requirements. No new hardware tests are requested during this documentation pass.
