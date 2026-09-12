@@ -19,6 +19,7 @@ self.onmessage=async({data})=>{
       If(p.x.lessThan(.2).and(p.y.lessThan(.2)),()=>color.assign(vec3(0,0,1)));
       If(p.x.greaterThan(.8).and(p.y.lessThan(.2)),()=>color.assign(vec3(1,1,0)));
       If(p.y.greaterThan(.4).and(p.y.lessThan(.6)),()=>{alpha.assign(floor(p.x.mul(4)).div(3));color.assign(vec3(intensity,.3,.6));});
+      If(p.x.sub(frame.mod(180).div(180)).abs().lessThan(.006).and(p.y.greaterThan(.2)).and(p.y.lessThan(.8)),()=>color.assign(vec3(1)));
       If(screenCoordinate.y.lessThan(16),()=>{color.assign(vec3(floor(frame.div(pow(2,floor(screenCoordinate.x.div(64))))).mod(2)));alpha.assign(1);});
       return vec4(color,alpha);
     })();
@@ -28,4 +29,5 @@ self.onmessage=async({data})=>{
     renderer.setAnimationLoop(()=>{frame.value++;renderer.render(scene,camera);if(frame.value<=3)self.postMessage({kind:'submitted',frame:frame.value});});
   }catch(error){self.postMessage({kind:'failure',reason:String(error)});}
 };
+
 

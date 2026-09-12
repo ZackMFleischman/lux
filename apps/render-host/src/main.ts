@@ -28,8 +28,10 @@ app.whenReady().then(async()=>{
  record({kind:'gpu',info:await app.getGPUInfo('complete')});
  bridge.advertise();
  setInterval(()=>win.webContents.executeJavaScript('window.setIntensity('+bridge.control()+')').catch(()=>{}),50);
- setTimeout(()=>{clearInterval(timer);record({kind:'summary',paint:count,held:held.size,dropped});fs.writeFileSync(path.join(output,'probe.json'),JSON.stringify(records,null,2));app.exit(0);},15000);
+ setTimeout(()=>{win.webContents.stopPainting();const deadline=Date.now()+2000;const closing=setInterval(()=>{const closed=held.size===0&&JSON.parse(bridge.shutdown()).closed;if(closed||Date.now()>deadline){clearInterval(closing);clearInterval(timer);record({kind:'summary',paint:count,held:held.size,dropped,closed});fs.writeFileSync(path.join(output,'probe.json'),JSON.stringify(records,null,2));app.exit(closed?0:2);}},10);},Number(process.env.LUX_GPU_DURATION_MS||15000));
 });
+
+
 
 
 

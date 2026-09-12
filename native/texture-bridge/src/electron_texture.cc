@@ -50,7 +50,7 @@ void initialize() {
   if(!mapping||GetLastError()==ERROR_ALREADY_EXISTS)throw std::runtime_error("unique ring mapping failed");
   ring=static_cast<lux::SharedRing*>(MapViewOfFile(mapping,FILE_MAP_ALL_ACCESS,0,0,sizeof(lux::SharedRing)));
   if(!ring)throw std::runtime_error("ring view failed");
-  new(ring) lux::SharedRing();ring->pid=GetCurrentProcessId();ring->generation=counter.QuadPart;ring->adapter=adapterDesc.AdapterLuid;
+  new(ring) lux::SharedRing();ring->pid=GetCurrentProcessId();ring->generation=counter.QuadPart;ring->adapter=adapterDesc.AdapterLuid;float initial=0.65f;memcpy(const_cast<LONG*>(&ring->controlBits),&initial,sizeof(initial));
 }
 void allocateSlot(unsigned index,const D3D11_TEXTURE2D_DESC& sourceDesc) {
   auto& local=slots[index];auto& shared=ring->slots[index];
@@ -115,11 +115,22 @@ napi_value advertise(napi_env env,napi_callback_info) {
   try{initialize();std::wofstream file(lux::rendezvousPath(),std::ios::trunc);file<<mappingName;file.close();if(!file)throw std::runtime_error("rendezvous write failed");return text(env,"{\"advertised\":true}");}
   catch(const std::exception& error){napi_throw_error(env,nullptr,error.what());return nullptr;}
 }
-napi_value control(napi_env env,napi_callback_info){float value=0.65f;if(ring){LONG bits=InterlockedCompareExchange(&ring->controlBits,0,0);if(bits)memcpy(&value,&bits,sizeof(value));}napi_value result;napi_create_double(env,value,&result);return result;}
+napi_value control(napi_env env,napi_callback_info){float value=0.65f;if(ring){LONG bits=InterlockedCompareExchange(&ring->controlBits,0,0);memcpy(&value,&bits,sizeof(value));}napi_value result;napi_create_double(env,value,&result);return result;}
+napi_value shutdown(napi_env env,napi_callback_info) {
+  if(!ring)return text(env,"{\"closed\":true}");
+  InterlockedExchange(&ring->alive,0);
+  for(unsigned i=0;i<3;++i)if(slots[i].borrowedId||InterlockedCompareExchange(&ring->slots[i].state,lux::Reading,lux::Reading)==lux::Reading)return text(env,"{\"closed\":false}");
+  for(auto& slot:slots){slot.source.Reset();slot.done.Reset();slot.owned.Reset();if(slot.exportHandle)CloseHandle(slot.exportHandle);slot.exportHandle=nullptr;}
+  context->ClearState();context->Flush();context.Reset();device.Reset();
+  UnmapViewOfFile(ring);ring=nullptr;CloseHandle(mapping);mapping=nullptr;
+  return text(env,"{\"closed\":true}");
+}
 napi_value module(napi_env env,napi_value exports) {
-  napi_property_descriptor properties[]={{"submit",nullptr,submit,nullptr,nullptr,nullptr,napi_default,nullptr},{"poll",nullptr,poll,nullptr,nullptr,nullptr,napi_default,nullptr},{"advertise",nullptr,advertise,nullptr,nullptr,nullptr,napi_default,nullptr},{"control",nullptr,control,nullptr,nullptr,nullptr,napi_default,nullptr}};
-  napi_define_properties(env,exports,4,properties);return exports;
+  napi_property_descriptor properties[]={{"shutdown",nullptr,shutdown,nullptr,nullptr,nullptr,napi_default,nullptr},{"submit",nullptr,submit,nullptr,nullptr,nullptr,napi_default,nullptr},{"poll",nullptr,poll,nullptr,nullptr,nullptr,napi_default,nullptr},{"advertise",nullptr,advertise,nullptr,nullptr,nullptr,napi_default,nullptr},{"control",nullptr,control,nullptr,nullptr,nullptr,napi_default,nullptr}};
+  napi_define_properties(env,exports,5,properties);return exports;
 }
 }
 NAPI_MODULE(NODE_GYP_MODULE_NAME,module)
+
+
 

@@ -26,10 +26,11 @@ bool FrameReceiver::start(HDC target,HGLRC host) {
 }
 void FrameReceiver::run() {
   wchar_t temp[MAX_PATH];GetTempPathW(MAX_PATH,temp);
-  std::ofstream log(std::wstring(temp)+L"LuxTracer-tr02-host.jsonl",std::ios::app);
+  wchar_t configured[32768];DWORD length=GetEnvironmentVariableW(L"LUX_HOST_LOG",configured,32768);
+  std::ofstream log(length?std::wstring(configured):std::wstring(temp)+L"LuxTracer-tr02-host.jsonl",std::ios::app);
   HANDLE mapping=nullptr;SharedRing* ring=nullptr;
   ComPtr<ID3D11Device1> device;ComPtr<ID3D11DeviceContext> context;
-  struct Import {ComPtr<ID3D11Texture2D> texture;GLuint gl=0;HANDLE object=nullptr;};
+  struct Import {ComPtr<ID3D11Texture2D> texture,local;ComPtr<ID3D11Query> query;GLuint gl=0;HANDLE object=nullptr;};
   std::array<Import,3> imports;
   HANDLE interop=nullptr;GLuint readFbo=0,drawFbo=0;
   auto open=reinterpret_cast<OpenDevice>(wglGetProcAddress("wglDXOpenDeviceNV"));
@@ -69,8 +70,7 @@ void FrameReceiver::run() {
         if(status==GL_ALREADY_SIGNALED||status==GL_CONDITION_SATISFIED) {
           glDeleteSync(output.fence);output.fence=nullptr;
           auto& imported=imports[sourceSlot];require(unlock(interop,1,&imported.object),"NV unlock failed");
-          FrameKey key{ring->generation,ring->outputGeneration,ring->slots[sourceSlot].frame,uint32_t(sourceSlot)};
-          require(retire(*ring,key),"source retirement key mismatch");
+          
           output.state.store(Ready);pending=-1;sourceSlot=-1;
         }
       }
@@ -88,7 +88,7 @@ void FrameReceiver::run() {
         log<<"{\"kind\":\"counters\",\"callbacks\":"<<callbacks.load()<<",\"consumed\":"<<consumed.load()<<"}"<<std::endl;
       }
       if(ring) {float value=intensity.load();LONG bits;memcpy(&bits,&value,sizeof(bits));InterlockedExchange(&ring->controlBits,bits);}
-      if(ring&&pending<0) {
+      if(ring&&pending<0&&InterlockedCompareExchange(&ring->alive,1,1)==1) {
         int outputIndex=-1;
         for(int i=0;i<3;++i){int expected=Free;if(outputs[i].state.compare_exchange_strong(expected,Writing)){outputIndex=i;break;}}
         if(outputIndex>=0) {
@@ -100,23 +100,30 @@ void FrameReceiver::run() {
               require(SUCCEEDED(device->OpenSharedResourceByName(source.textureName,DXGI_SHARED_RESOURCE_READ|DXGI_SHARED_RESOURCE_WRITE,IID_PPV_ARGS(&imported.texture))),"open owned named NT texture");
               D3D11_TEXTURE2D_DESC desc;imported.texture->GetDesc(&desc);
               require(desc.Width==source.width&&desc.Height==source.height&&desc.Format==source.format,"descriptor mismatch");
-              glGenTextures(1,&imported.gl);glBindTexture(GL_TEXTURE_2D,imported.gl);SetLastError(0);imported.object=reg(interop,imported.texture.Get(),imported.gl,GL_TEXTURE_2D,0x0000);if(!imported.object){log<<"{\"kind\":\"nv-register-error\",\"win32\":"<<GetLastError()<<",\"glError\":"<<glGetError()<<",\"misc\":"<<desc.MiscFlags<<",\"format\":"<<desc.Format<<"}"<<std::endl;}require(imported.object!=nullptr,"NV registration failed");
+              desc.MiscFlags=0;desc.BindFlags=D3D11_BIND_SHADER_RESOURCE|D3D11_BIND_RENDER_TARGET;
+              require(SUCCEEDED(device->CreateTexture2D(&desc,nullptr,&imported.local)),"local interop texture creation");
+              D3D11_QUERY_DESC queryDesc{D3D11_QUERY_EVENT,0};require(SUCCEEDED(device->CreateQuery(&queryDesc,&imported.query)),"local copy query");
+              glGenTextures(1,&imported.gl);glBindTexture(GL_TEXTURE_2D,imported.gl);SetLastError(0);imported.object=reg(interop,imported.local.Get(),imported.gl,GL_TEXTURE_2D,0x0000);if(!imported.object){log<<"{\"kind\":\"nv-register-error\",\"win32\":"<<GetLastError()<<",\"glError\":"<<glGetError()<<",\"misc\":"<<desc.MiscFlags<<",\"format\":"<<desc.Format<<"}"<<std::endl;}require(imported.object!=nullptr,"NV registration failed");
             }
             if(!output.texture) {glGenTextures(1,&output.texture);glBindTexture(GL_TEXTURE_2D,output.texture);glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,source.width,source.height,0,GL_RGBA,GL_UNSIGNED_BYTE,nullptr);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);}
+            context->CopyResource(imported.local.Get(),imported.texture.Get());context->End(imported.query.Get());context->Flush();
+            const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(2);
+            for(;;){BOOL complete=FALSE;HRESULT result=context->GetData(imported.query.Get(),&complete,sizeof(complete),D3D11_ASYNC_GETDATA_DONOTFLUSH);require(SUCCEEDED(result),"local D3D copy query failure");if(result==S_OK&&complete)break;require(!stopping&&std::chrono::steady_clock::now()<deadline,"local D3D copy deadline");std::this_thread::sleep_for(std::chrono::milliseconds(1));}
+            const uint64_t copiedFrame=source.frame;FrameKey copiedKey{ring->generation,ring->outputGeneration,source.frame,uint32_t(newest)};require(retire(*ring,copiedKey),"source retirement key mismatch");
             // This driver synchronization can wait. It is deliberately confined to this worker.
             require(lock(interop,1,&imported.object),"NV lock failed");
             glBindFramebuffer(GL_READ_FRAMEBUFFER,readFbo);glFramebufferTexture2D(GL_READ_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,imported.gl,0);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER,drawFbo);glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,output.texture,0);
             require(glCheckFramebufferStatus(GL_READ_FRAMEBUFFER)==GL_FRAMEBUFFER_COMPLETE&&glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)==GL_FRAMEBUFFER_COMPLETE,"copy FBO incomplete");
             glBlitFramebuffer(0,0,source.width,source.height,0,0,source.width,source.height,GL_COLOR_BUFFER_BIT,GL_NEAREST);
-            output.frame=source.frame;output.fence=glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE,0);glFlush();pending=outputIndex;sourceSlot=newest;
+            output.frame=copiedFrame;output.generation=ring->generation;output.fence=glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE,0);glFlush();pending=outputIndex;sourceSlot=newest;
           } else outputs[outputIndex].state.store(Free);
         }
       }
       ++ticks;std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     // Lifecycle teardown may drain the worker GPU; never reached from ProcessOpenGL.
-    glFinish();if(pending>=0){unlock(interop,1,&imports[sourceSlot].object);InterlockedExchange(&ring->slots[sourceSlot].state,Free);}
+    glFinish();if(pending>=0){unlock(interop,1,&imports[sourceSlot].object);}
     detach();
   }catch(const std::exception& error){log<<"{\"kind\":\"failure\",\"reason\":\""<<error.what()<<"\"}"<<std::endl;}
   if(interop&&close)close(interop);
@@ -126,15 +133,19 @@ void FrameReceiver::run() {
 GLuint FrameReceiver::acquireLatest() {
   ++callbacks;
   for(int i=0;i<3;++i)if(i!=current&&outputs[i].state.load()==Reading&&outputs[i].fence){const GLenum status=glClientWaitSync(outputs[i].fence,0,0);if(status==GL_ALREADY_SIGNALED||status==GL_CONDITION_SATISFIED){glDeleteSync(outputs[i].fence);outputs[i].fence=nullptr;outputs[i].state.store(Free);}}
-  int newest=-1;uint64_t frame=lastFrame;
-  for(int i=0;i<3;++i)if(outputs[i].state.load()==Ready&&outputs[i].frame>frame){newest=i;frame=outputs[i].frame;}
-  if(newest>=0){int expected=Ready;if(outputs[newest].state.compare_exchange_strong(expected,Reading)){current=newest;lastFrame=frame;++consumed;}}
+  int newest=-1;uint64_t frame=lastFrame,generation=lastGeneration;
+  for(int i=0;i<3;++i)if(outputs[i].state.load()==Ready&&(outputs[i].generation>generation||(outputs[i].generation==generation&&outputs[i].frame>frame))){newest=i;frame=outputs[i].frame;generation=outputs[i].generation;}
+  if(newest>=0){int expected=Ready;if(outputs[newest].state.compare_exchange_strong(expected,Reading)){current=newest;lastFrame=frame;lastGeneration=generation;++consumed;}}
   // Drop completed older outputs atomically; never touch held output storage.
-  for(int i=0;i<3;++i)if(i!=current&&outputs[i].state.load()==Ready&&outputs[i].frame<lastFrame){int expected=Ready;outputs[i].state.compare_exchange_strong(expected,Free);}
+  for(int i=0;i<3;++i)if(i!=current&&outputs[i].state.load()==Ready&&(outputs[i].generation<lastGeneration||(outputs[i].generation==lastGeneration&&outputs[i].frame<lastFrame))){int expected=Ready;outputs[i].state.compare_exchange_strong(expected,Free);}
   return current>=0?outputs[current].texture:0;
 }
 void FrameReceiver::afterDraw(){if(current>=0){auto& output=outputs[current];if(output.fence)glDeleteSync(output.fence);output.fence=glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE,0);glFlush();}}
 void FrameReceiver::stop(){stopping=true;if(worker.joinable())worker.join();if(shared){wglDeleteContext(shared);shared=nullptr;}for(auto& output:outputs){if(output.fence)glDeleteSync(output.fence);if(output.texture)glDeleteTextures(1,&output.texture);}}
 }
+
+
+
+
 
 
