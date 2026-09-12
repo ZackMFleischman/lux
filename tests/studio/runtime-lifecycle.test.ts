@@ -107,3 +107,32 @@ test('completed captures release admission while capture deadline tears down an 
   await f.advance(250); await Promise.all([second, third]);
   assert.equal(worker.terminated, true); assert.equal(f.scheduled.size, 0); assert.equal((f.client as any).pending.size, 0);
 });
+
+test('restart retains admitted controls across failure and failed recovery; rejected commands cannot replace intent', async t => {
+  const f = fixture(t), worker = await f.start();
+  const state = f.client.getSnapshot().authoring!;
+  const controls = (requestId: string, intensity: number) => ({ name: 'lux.parameters.set' as const,
+    input: { requestId, instanceId: state.instanceId, expectedGeneration: state.generation, expectedRevisionId: state.revisionId, mode: 'live' as const, values: { intensity } } });
+  const pending = assert.rejects(f.client.invoke(controls('pending', 0.8)), /failed/);
+  await assert.rejects(f.client.invoke(controls('pending', 0.1)), /already pending/);
+  await assert.rejects(f.client.invoke({ ...controls('stale', 0.2), input: { ...controls('stale', 0.2).input, expectedGeneration: state.generation + 1 } }), /Runtime changed/);
+  await assert.rejects(f.client.invoke({ ...controls('revision', 0.3), input: { ...controls('revision', 0.3).input, expectedRevisionId: 'other' } }), /Revision changed/);
+  worker.reply({ type: 'failure', message: 'failed' }); await pending;
+  const restart = () => f.client.invoke({ name: 'lux.runtime.restart', input: { requestId: 'restart', instanceId: state.instanceId, expectedGeneration: state.generation } });
+  const failed = assert.rejects(restart(), /candidate failed/); await f.flush();
+  WorkerFixture.all.at(-1)!.reply({ type: 'failure', message: 'candidate failed' }); await failed;
+  const recovered = restart(); await f.flush(); const replacement = WorkerFixture.all.at(-1)!;
+  replacement.reply({ type: 'ready' }); await recovered;
+  assert.equal(f.client.getSnapshot().authoring!.intensity, 0.8);
+  assert.equal(f.compiles(), 1);
+  assert.equal(f.client.getSnapshot().authoring!.revisionId, state.revisionId);
+  assert.ok(f.client.getSnapshot().authoring!.generation > state.generation);
+});
+
+test('source replacement does not inherit unacknowledged control intent from the previous runtime', async t => {
+  const f = fixture(t); await f.start(); const state = f.client.getSnapshot().authoring!;
+  const pending = assert.rejects(f.client.invoke({ name: 'lux.parameters.set', input: { requestId: 'pending',
+    instanceId: state.instanceId, expectedGeneration: state.generation, expectedRevisionId: state.revisionId, mode: 'live', values: { intensity: 0.8 } } }), /Runtime changed/);
+  await f.start(); await pending;
+  assert.equal(f.client.getSnapshot().authoring!.intensity, 0.5);
+});
