@@ -12,8 +12,14 @@ export const lockPath = join(homedir(), 'AppData', 'Local', 'Lux', 'experiment.l
 const stamp = () => ({ utc: new Date().toISOString(), monotonicNs: process.hrtime.bigint().toString() });
 const hash = async path => ({ path: resolve(path), sha256: createHash('sha256').update(await readFile(path)).digest('hex') });
 const conflictingActivity = processes => processes.filter(p => /^(Avenue|Arena|Resolume.*|electron|standalone_host|lux[-_].*)\.exe$/i.test(p.Name));
-export function assertNoConflictingActivity(processes) {
-  const activity = conflictingActivity(processes);
+export function assertNoConflictingActivity(processes, host) {
+  let activity = conflictingActivity(processes);
+  if (host) {
+    const matching = activity.filter(p => /^(Avenue|Arena)\.exe$/i.test(p.Name) && p.ProcessId === host.pid &&
+      typeof p.ExecutablePath === 'string' && resolve(p.ExecutablePath).toLowerCase() === resolve(host.executable).toLowerCase() && p.CreationUtc === host.creationUtc);
+    if (matching.length !== 1) throw Error('Reviewed Resolume host identity unavailable or changed');
+    activity = activity.filter(p => p !== matching[0]);
+  }
   if (activity.length) throw new Error(`Conflicting host/standalone activity: ${activity.map(p => `${p.Name} PID ${p.ProcessId}`).join(', ')}`);
 }
 export function experimentSummary(manifest) {
@@ -23,7 +29,14 @@ export function experimentSummary(manifest) {
     elapsedMs: Number(BigInt(manifest.end.monotonicNs) - BigInt(manifest.start.monotonicNs)) / 1e6 };
 }
 export async function validateReviewedInputs(review) {
-  if (review.authorized !== true || !review.reviewer || !review.hypothesis || review.hostClosedConfirmed !== true || !Array.isArray(review.sources) || !review.sources.length || !Array.isArray(review.binaries) || !review.binaries.length || !Array.isArray(review.args)) throw new Error('Incomplete hardware review');
+  if (review.authorized !== true || !review.reviewer || !review.hypothesis || !Array.isArray(review.sources) || !review.sources.length || !Array.isArray(review.binaries) || !review.binaries.length || !Array.isArray(review.args)) throw new Error('Incomplete hardware review');
+  if (review.host) {
+    if (review.testKind !== 'resolume-producer' || review.hostClosedConfirmed !== false || !Number.isInteger(review.host.pid) || review.host.pid <= 0 ||
+        typeof review.host.executable !== 'string' || !review.host.creationUtc || review.args.length !== 1 ||
+        resolve(review.args[0]) !== join(root, 'scripts/resolume-experiment.mjs') ||
+        !review.binaries.some(b => resolve(b.path).toLowerCase() === resolve(review.host.executable).toLowerCase()) ||
+        !review.sources.some(s => resolve(s.path) === join(root, 'scripts/resolume-experiment.mjs'))) throw Error('Incomplete Resolume host review');
+  } else if (review.hostClosedConfirmed !== true) throw Error('Incomplete hardware review: host must be closed');
   const checkExpiry = () => { if (!Number.isFinite(Date.parse(review.expiresUtc)) || Date.parse(review.expiresUtc) <= Date.now()) throw new Error('Hardware review expired'); };
   checkExpiry();
   const executable = resolve(review.executable);
@@ -45,6 +58,11 @@ function powershell(args, { timeout = 15000, env = process.env } = {}) {
     child.stdout.on('data', d => { out += d; }); child.stderr.on('data', d => { err += d; });
     child.on('error', error => { clearTimeout(timer); rej(error); }); child.on('close', code => { clearTimeout(timer); code === 0 ? res(out) : rej(new Error(`Supervisor failed (${code}): ${err}`)); });
   });
+}
+async function inspectActivity() {
+  const raw = await powershell(['-Command', "@(Get-CimInstance Win32_Process -ErrorAction Stop | Select-Object ProcessId,Name,ExecutablePath,@{Name='CreationUtc';Expression={$_.CreationDate.ToUniversalTime().ToString('o')}}) | ConvertTo-Json -Compress"]);
+  const parsed = raw.trim() ? JSON.parse(raw) : [];
+  return Array.isArray(parsed) ? parsed : [parsed];
 }
 export async function runExperiment(options = {}) {
   const { mode = 'cpu', fixture = 'success', timeoutMs = 8000, output = join(root, 'artifacts', 'experiments') } = options;
@@ -71,11 +89,10 @@ export async function runExperiment(options = {}) {
     await lock.writeFile(JSON.stringify({ id, pid: process.pid, start: manifest.start, directory }));
     await mkdir(directory, { recursive: true });
     // Read-only inspection, including outside this runner. Failure to inspect refuses execution.
-    const activityRaw = await powershell(['-Command', "@(Get-CimInstance Win32_Process -ErrorAction Stop | Select-Object ProcessId,Name,ExecutablePath) | ConvertTo-Json -Compress"]);
-    const parsedActivity = activityRaw.trim() ? JSON.parse(activityRaw) : [];
-    const activity = Array.isArray(parsedActivity) ? parsedActivity : [parsedActivity];
+    const activity = await inspectActivity();
     manifest.activity = conflictingActivity(activity);
-    assertNoConflictingActivity(activity);
+    assertNoConflictingActivity(activity, review?.host);
+    if (review?.host) manifest.externalHost = { ...review.host, supervised: false, terminatedByJob: false };
     manifest.binary = await hash(executable);
     const sourcePaths = [fileURLToPath(import.meta.url), join(here, 'experiment-job.cs'), join(here, 'experiment-job.ps1'), join(here, 'experiment-cpu-fixture.mjs')];
     manifest.sources = await Promise.all(sourcePaths.map(hash));
@@ -88,10 +105,15 @@ export async function runExperiment(options = {}) {
     // Inspection and metadata I/O can take seconds. Check the same review again
     // at dispatch, including expiry after all file reads and executable bytes.
     if (review) manifest.binary = await validateReviewedInputs(review);
+    if (review?.host) {
+      assertNoConflictingActivity(await inspectActivity(), review.host);
+      if (Date.parse(review.expiresUtc) <= Date.now()) throw Error('Hardware review expired');
+    }
     started = true;
     await powershell(['-ExecutionPolicy', 'Bypass', '-File', join(here, 'experiment-job.ps1'), '-Config', join(directory, 'config.json')], {
       timeout: timeoutMs + 15000,
-      env: { ...process.env, LUX_EXPERIMENT_RUN_ID: id, LUX_EXPERIMENT_MODE: mode, LUX_EXPERIMENT_DIRECTORY: directory, LUX_EXPERIMENT_TIMEOUT_MS: String(timeoutMs) },
+      env: { ...process.env, LUX_EXPERIMENT_RUN_ID: id, LUX_EXPERIMENT_MODE: mode, LUX_EXPERIMENT_DIRECTORY: directory, LUX_EXPERIMENT_TIMEOUT_MS: String(timeoutMs),
+        LUX_RESOLUME_PID: review?.host ? String(review.host.pid) : '' },
     });
     const child = JSON.parse(await readFile(join(directory, 'child.json'), 'utf8'));
     const result = JSON.parse(await readFile(join(directory, 'result.json'), 'utf8'));

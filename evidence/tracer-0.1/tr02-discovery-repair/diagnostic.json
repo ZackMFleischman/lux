@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "scope": "short-standalone-diagnostic-only",
+  "reasons": [],
+  "outcomes": [
+    {
+      "name": "receiver",
+      "pid": 16672,
+      "code": 0
+    },
+    {
+      "name": "producer",
+      "pid": 13356,
+      "code": 0
+    }
+  ]
+}

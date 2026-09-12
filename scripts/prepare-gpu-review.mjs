@@ -10,7 +10,7 @@ export const inventoryPaths = {
     'package.json', 'pnpm-lock.yaml', 'native/CMakeLists.txt',
     'scripts/native-build.ps1', 'scripts/test-gpu.ps1', 'scripts/prepare-gpu-review.mjs',
     'scripts/experiment-runner.mjs', 'scripts/experiment-job.ps1', 'scripts/experiment-job.cs',
-    'scripts/gpu-experiment.mjs', 'scripts/gpu-evidence.mjs',
+    'scripts/gpu-experiment.mjs', 'scripts/gpu-evidence.mjs', 'scripts/resolume-experiment.mjs',
     'tools/gpu-spike/build.mjs', 'tools/gpu-spike/standalone_host.cc',
     'tools/gpu-spike/producer-session.cjs', 'tools/gpu-spike/recorder.cjs',
     'apps/render-host/src/main.ts', 'apps/render-host/src/main.cjs',

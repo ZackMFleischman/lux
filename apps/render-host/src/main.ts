@@ -65,8 +65,13 @@ app.whenReady().then(async () => {
   await win.loadFile(path.join(__dirname, 'output.html'));
   record({ kind: 'gpu', info: await app.getGPUInfo('complete') });
   bridge.advertise();
+  let lastHostControl: number | undefined;
   controlTimer = setInterval(() => {
-    try { win.webContents.executeJavaScript('window.setIntensity(' + bridge.control() + ')').catch(failure); }
+    try {
+      const value = bridge.control();
+      if (value !== lastHostControl) { record({ kind: 'host-control', value }); lastHostControl = value; }
+      win.webContents.executeJavaScript('window.setIntensity(' + value + ')').catch(failure);
+    }
     catch (error) { failure(error); }
   }, 50);
   endTimer = setTimeout(() => {

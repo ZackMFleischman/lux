@@ -11,3 +11,23 @@ export function validateProbeEvidence(producer, receiver) {
   if ([...producer, ...receiver].some(row => row.kind === 'failure' || row.kind === 'bounded-unload-unsupported')) reasons.push('Failure recorded');
   return { ok: reasons.length === 0, scope: 'short-standalone-diagnostic-only', reasons };
 }
+
+export function validateResolumeEvidence(producer, receiver, outcome, initialCounters) {
+  let last = initialCounters, stable = !!last;
+  for (const row of receiver) {
+    if (row.kind === 'context' || row.kind === 'context-host-snapshot') stable = false;
+    if (row.kind === 'counters') {
+      if (!Number.isSafeInteger(row.callbacks) || !Number.isSafeInteger(row.consumed) ||
+          row.callbacks < (last?.callbacks ?? 0) || row.consumed < (last?.consumed ?? 0)) stable = false;
+      last = row;
+    }
+  }
+  const summary = producer.findLast(row => row.kind === 'summary');
+  const finalCounters = receiver.findLast(row => row.kind === 'counters');
+  const consumed = (finalCounters?.consumed || 0) - (initialCounters?.consumed || 0);
+  const ok = stable && outcome.code === 0 && summary?.paint > 0 && summary?.closed === true && summary.failed === false && summary.webgpuReady === true &&
+    summary.held === 0 && summary.uncertain === 0 && summary.dropped === 0 && consumed > 0 &&
+    receiver.some(row => row.kind === 'attached' && row.producerPid === outcome.pid) &&
+    !receiver.some(row => row.kind === 'failure' || row.kind === 'bounded-unload-unsupported');
+  return { ok, consumed };
+}

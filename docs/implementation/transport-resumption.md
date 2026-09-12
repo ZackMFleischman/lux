@@ -36,3 +36,38 @@ transport acceptance. The earlier system incident's cause remains unconfirmed.
 Independent review noted an existing reconnect defect: after detaching A to try
 unavailable B, the cached name A can suppress a later return to A. It does not
 affect this single-producer diagnostic and remains follow-up work.
+
+## Standalone result
+
+Run `c2171c69-a48d-4914-b84e-ad813a968251` passed the short standalone evaluator:
+284 compositor paint callbacks, 92 completed receiver consumptions, 333 host
+callbacks; producer closed with zero held/uncertain leases, both children exited
+zero, and the supervisor confirmed cleanup. The final image contains the
+expected orientation, corner colors, moving-line sample and alpha bands. This
+is visual inspection, not a numeric color/alpha acceptance test. The receiver
+kept its final image after the producer stopped. See
+`evidence/tracer-0.1/tr02-discovery-repair/` for image, logs and manifest.
+
+## Manual Resolume diagnostic
+
+The same tested DLL (SHA256
+`af739bc0d4f26db6d83416ab47fcf5d245f3241ce767dea80d091ab782fe540a`)
+was copied to the configured Extra Effects directory. The older disabled DLL is
+preserved. `scripts/resolume-experiment.mjs` runs a 15-second producer inside the
+existing 25-second Job budget; it does not launch or terminate Resolume.
+
+The review must name `testKind: resolume-producer`, set `hostClosedConfirmed:
+false`, and include `host: {pid, executable, creationUtc}`. The runner admits only
+that exact Avenue/Arena identity, rejects other graphics processes, rechecks host
+identity after hashing immediately before dispatch, and records the external
+host as unsupervised. Inventory both the host executable and the actual staged
+DLL, and verify the host's loaded module path against it before launch.
+
+Manual precondition: an empty composition with exactly one active Lux TR02 Probe;
+keep that instance loaded throughout the run. Existing receiver counters have no
+instance tags, so this diagnostic depends on that precondition. New context
+records or decreasing counters invalidate the run. Attachment must name the
+current producer PID and counters must increase beyond the starting sample.
+Producer records host Intensity changes. User observation is required for image
+movement/control effect; neither control logging nor this short test proves
+end-to-end latency, 60 fps, host teardown or long-run stability.
