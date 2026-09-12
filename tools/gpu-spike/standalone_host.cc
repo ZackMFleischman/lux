@@ -6,8 +6,19 @@
 #include <vector>
 #include <chrono>
 #include <thread>
+#include <cstdlib>
+#include <cstring>
 extern "C" __declspec(dllexport) DWORD NvOptimusEnablement=1;
 int main(int argc,char** argv) {
+  // Refuse unsupervised launches before creating a window or touching the driver.
+  const char* runId=std::getenv("LUX_EXPERIMENT_RUN_ID");
+  const char* mode=std::getenv("LUX_EXPERIMENT_MODE");
+  if(!runId||!*runId||!mode||std::strcmp(mode,"hardware")!=0){std::cerr<<"Reviewed experiment supervisor required\n";return 2;}
+  const char* durationText=std::getenv("LUX_STANDALONE_DURATION_MS");
+  char* end=nullptr;
+  const long duration=durationText?std::strtol(durationText,&end,10):10000;
+  if(duration<1000||duration>30000||(durationText&&(!end||*end))){std::cerr<<"Invalid standalone duration\n";return 2;}
+  if(argc==2&&std::strcmp(argv[1],"--validate-options")==0){std::cout<<"options valid, no graphics initialized\n";return 0;}
   if(argc<2){std::cerr<<"DLL path required\n";return 2;}
   WNDCLASSW wc{};wc.style=CS_OWNDC;wc.lpfnWndProc=DefWindowProcW;wc.hInstance=GetModuleHandle(nullptr);wc.lpszClassName=L"LuxStandaloneGL";RegisterClassW(&wc);
   HWND window=CreateWindowW(wc.lpszClassName,L"Lux standalone diagnostic",WS_OVERLAPPEDWINDOW,0,0,1920,1080,nullptr,nullptr,wc.hInstance,nullptr);
@@ -21,7 +32,7 @@ int main(int argc,char** argv) {
   FFGLViewportStruct viewport{0,0,1920,1080};value.PointerValue=&viewport;void* instance=main(FF_INSTANTIATE_GL,value,nullptr).PointerValue;if(!instance||instance==reinterpret_cast<void*>(FF_FAIL))return 5;
   GLuint texture,fbo;glGenTextures(1,&texture);glBindTexture(GL_TEXTURE_2D,texture);glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,1920,1080,0,GL_RGBA,GL_UNSIGNED_BYTE,nullptr);glGenFramebuffers(1,&fbo);glBindFramebuffer(GL_FRAMEBUFFER,fbo);glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,texture,0);glViewport(0,0,1920,1080);
   ProcessOpenGLStruct process{0,nullptr,fbo};value.PointerValue=&process;uint64_t count=0;auto start=std::chrono::steady_clock::now();
-  while(std::chrono::steady_clock::now()-start<std::chrono::seconds(25)) {if(main(FF_PROCESS_OPENGL,value,instance).UIntValue!=FF_SUCCESS)return 6;++count;std::this_thread::sleep_for(std::chrono::milliseconds(16));}
+  while(std::chrono::steady_clock::now()-start<std::chrono::milliseconds(duration)) {if(main(FF_PROCESS_OPENGL,value,instance).UIntValue!=FF_SUCCESS)return 6;++count;std::this_thread::sleep_for(std::chrono::milliseconds(16));}
   // One diagnostic capture only. Not transport or performance evidence.
   std::vector<unsigned char> pixels(1920*1080*4);glReadPixels(0,0,1920,1080,GL_RGBA,GL_UNSIGNED_BYTE,pixels.data());std::ofstream file(argc>2?argv[2]:"standalone.rgba",std::ios::binary);file.write(reinterpret_cast<char*>(pixels.data()),pixels.size());file.close();
   std::cout<<"callbacks "<<count<<" centerRGBA ";for(int i=0;i<4;++i)std::cout<<int(pixels[(540*1920+960)*4+i])<<" ";std::cout<<"\n";

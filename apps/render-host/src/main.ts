@@ -1,3 +1,6 @@
+if (!process.env.LUX_EXPERIMENT_RUN_ID || process.env.LUX_EXPERIMENT_MODE !== 'hardware') {
+  throw Error('Reviewed experiment supervisor required');
+}
 const { app, BrowserWindow } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -8,7 +11,7 @@ const duration = Number(process.env.LUX_GPU_DURATION_MS || 8000);
 if (!Number.isInteger(duration) || duration < 1000 || duration > 330000) throw Error('Invalid diagnostic duration');
 fs.mkdirSync(output, { recursive: true });
 const records = [], session = new ProducerSession(bridge);
-let count = 0, dropped = 0, failed = false, finishing = false;
+let count = 0, dropped = 0, failed = false, finishing = false, webgpuReady = false;
 let pollTimer, controlTimer, endTimer;
 function record(value) {
   if (records.length < 10000) records.push({ utc: new Date().toISOString(), time: process.hrtime.bigint().toString(), ...value });
@@ -19,10 +22,10 @@ function finish(closed) {
   if (finishing) return;
   finishing = true;
   clearInterval(pollTimer); clearInterval(controlTimer); clearTimeout(endTimer);
-  record({ kind: 'summary', paint: count, held: session.held.size, uncertain: session.uncertain.size, dropped, closed, failed });
+  record({ kind: 'summary', paint: count, held: session.held.size, uncertain: session.uncertain.size, dropped, closed, failed, webgpuReady });
   fs.writeFileSync(path.join(output, 'probe.json'), JSON.stringify(records, null, 2));
   // The external supervisor owns the final wall-clock deadline if driver teardown stalls.
-  app.exit(closed && !failed && !dropped && count > 0 ? 0 : 2);
+  app.exit(closed && !failed && !dropped && count > 0 && webgpuReady ? 0 : 2);
 }
 app.commandLine.appendSwitch('enable-unsafe-webgpu');
 app.commandLine.appendSwitch('force-device-scale-factor', '1');
@@ -34,7 +37,16 @@ app.whenReady().then(async () => {
     webPreferences: { offscreen: { useSharedTexture: true }, sandbox: true, contextIsolation: true, nodeIntegration: false, backgroundThrottling: false } });
   win.setContentSize(1920, 1080);
   record({ kind: 'bounds', bounds: win.getContentBounds() });
-  win.webContents.on('console-message', (_event, ...args) => record({ kind: 'console', args }));
+  win.webContents.on('console-message', (details, _level, legacyMessage) => {
+    const message = details.message ?? legacyMessage;
+    record({ kind: 'console', message });
+    try {
+      const value = JSON.parse(message);
+      if (value.kind === 'failure') failure(value.reason);
+      if (value.kind === 'webgpu' && value.backend === 'WebGPU' && value.width === 1920 && value.height === 1080) webgpuReady = true;
+    } catch { /* Ordinary browser log messages are not worker protocol records. */ }
+    if (details.level === 'error' || _level === 3) failure(message);
+  });
   win.webContents.on('render-process-gone', (_event, details) => { failure(JSON.stringify(details)); finish(false); });
   win.webContents.on('paint', event => {
     if (!event.texture) { failure('paint without shared texture'); return; }
