@@ -26,6 +26,12 @@
     "test:studio:mcp": "node apps/studio/build.mjs && node scripts/test-studio-mcp.mjs"
   },
   "dependencies": {
+    "@codemirror/commands": "6.11.0",
+    "@codemirror/lang-javascript": "6.2.5",
+    "@codemirror/language": "6.12.4",
+    "@codemirror/search": "6.7.2",
+    "@codemirror/state": "6.7.4",
+    "@codemirror/view": "6.43.11",
     "@modelcontextprotocol/sdk": "1.30.0",
     "three": "0.186.0",
     "zod": "3.25.76"
