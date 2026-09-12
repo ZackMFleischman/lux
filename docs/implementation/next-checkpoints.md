@@ -13,9 +13,9 @@ Started 2026-09-12 after the successful guided Resolume QA. This is the active t
 | C4: acceptance measurement audit | DONE | Coordinator + independent review | 37d3102 adds performance-checkpoint.md; source-backed per-gate matrix reviewed. Next measurement implementation is offline validity/accounting core, then bounded native correlation/collection. |
 | C5: independent review and integration | DONE (FIRST BATCH) | Coordinator + reviewers | Task and final batch reviews pass; two final harness suggestions applied and rerun successfully. Combined 71 Studio CPU + one real Dockview DOM test, Studio typecheck and native UI/MCP checks pass. |
 | C6: graphics and host checkpoint | STUDIO PASS; DISTINCT-SOURCE HOST QA PENDING | Coordinator | Real Studio docking, fullscreen/editor/export and MCP checks pass; owned test windows closed. Prepared triangle/ring packages remain uninstalled and untested in Resolume. |
-| C7: offline performance validity/evaluation core | IN PROGRESS | checkpoint_evaluator | Implementing the first CPU-only evaluator from performance-checkpoint.md with negative fixtures in its isolated worktree. This cannot certify real hardware without actual records. |
-| C8: required asset implementation contract | IN PROGRESS | checkpoint_assets | Resolving bounded source/asset schema, immutable byte closure, runtime asset access and backward compatibility into an implementation-ready design. |
-| C9: installed diagnostic cleanup race | IN PROGRESS | Coordinator | Real QA logs include a missing-lease error after normal host removal. CPU regression reproduces it; suppress only ENOENT while preserving other scan errors. No installed binary changes. |
+| C7: offline performance validity/evaluation core | IN REVIEW | evaluator_review | Implementation 15ee09e has 11 synthetic evaluator tests and 37 focused CPU checks passing. Independent review checks window, exact control accounting and false-pass risks before integration. Real hardware acceptance remains unavailable. |
+| C8: required asset implementation contract | IN REVIEW | assets_design_review | Design bf9da68 specifies bounded image bytes, immutable closure and compatibility. Independent review checks actual interfaces and implementation practicality; asset playback is not implemented yet. |
+| C9: installed diagnostic cleanup race | IMPLEMENTED; REVIEW QUEUED | Coordinator | 41b4668 suppresses normal ENOENT lease removal and retains other scan errors; 15 installed CPU tests pass. Supporting manual records saved in 1bca5b7. No installed binary changes. |
 
 ## Established baseline
 
@@ -29,7 +29,7 @@ Started 2026-09-12 after the successful guided Resolume QA. This is the active t
 
 - User explicitly authorizes parallel agents and worktree isolation. Independent implementations use separate worktrees; coordinator alone edits this tracker, dependency manifests and integration checkout.
 - Ruling: run independent implementers in parallel despite the generic skill's serial default, following the user's explicit parallel-work instruction. Review and integration remain sequential.
-- No agent launches Studio, Electron graphics, a native producer, or changes the real Resolume installation. Coordinator serializes graphics later. Resolume may still be running after manual QA.
+- No agent launches Studio, Electron graphics, a native producer, or changes the real Resolume installation. User confirmed Resolume closed and authorized Studio tests; coordinator ran them serially and closed all owned windows afterward.
 - Preserve runtime ownership above pane mounts, preview-only fullscreen, source draft/undo, saved control intent, MCP guards, immutable releases and independent instance cleanup.
 - Performance design and tracer acceptance remain authoritative. Request-to-ready is not confirmed termination or consumed-frame recovery; never weaken gates to make tests green.
 - Library/Graph use the ordinary panel registry when implemented; do not add pretend graph/library contents to this shell change. Popout remains a separate presentation-lifetime feature.
