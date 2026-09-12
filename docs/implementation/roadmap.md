@@ -159,3 +159,7 @@ inside a Lux source and applying existing Resolume effects to it remain useful
 before effect export exists. DEC-14 records this addition, not implementation.
 
 Later work does not promise cloud rendering, marketplace, accounts, collaboration, seamless loops for arbitrary simulations or identical pixels across GPUs.
+
+### Compact status-bar follow-up (C19)
+
+Consolidate the compact footer and routine Jobs/Diagnostics summaries into one status bar: current build activity, problem counts and useful runtime/connection health, with click/keyboard access to detail panes. Keep Jobs and Diagnostics available as normal dockable panes without consuming default workspace space for idle or duplicated information. Preserve a stable, concise height and make failures discoverable without preview reflow. This belongs with the Inspector density pass, after the required code-defined properties and image workflow; persistent editor shortcut hints are removed immediately.

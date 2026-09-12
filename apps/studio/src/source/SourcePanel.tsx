@@ -69,7 +69,6 @@ export function SourcePanel({ workspace, readOnly, onApply, onSave, onCompositio
           onChange={text => attempt(() => workspace.edit(snapshot.selectedFile, text))} diagnosticTarget={diagnosticTarget ?? (navigation?.version === snapshot.version ? navigation : null)}
           onCompositionChange={value => { composing.current = value; onCompositionChange?.(value); }} /></>}
       {!snapshot.selectedFile && <p>Choose a file to edit. Closed tabs retain their drafts.</p>}
-      <p id="source-keyboard-help" className="source-keyboard-help">Tab moves focus out. Ctrl/Cmd+F searches; Ctrl/Cmd+S builds the preview; Ctrl/Cmd+Shift+S saves the scene.</p>
       </div>
       {assetPath && <AssetPreview path={assetPath} asset={assets[assetPath]!} />}
       </div></div>{error && <Alert severity="error">{error}</Alert>}

@@ -68,7 +68,7 @@ export function CodeEditor(props: CodeEditorProps) {
         lineNumbers(), drawSelection(), highlightActiveLine(), history(), bracketMatching(),
         javascript({ typescript: true }), syntaxHighlighting(sourceColors), highlightSelectionMatches(),
         keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap]),
-        EditorView.contentAttributes.of({ 'aria-label': `TypeScript source ${props.path}`, 'aria-describedby': 'source-keyboard-help' }),
+        EditorView.contentAttributes.of({ 'aria-label': `TypeScript source ${props.path}` }),
         behavior.of(handlers),
       ] });
       const state = retained?.state ?? createState.current(props.text);
