@@ -2,3 +2,6 @@
 node_modules/
 dist/
 native/build/
+native/vendor/
+apps/render-host/src/main.cjs
+evidence/**/profile/

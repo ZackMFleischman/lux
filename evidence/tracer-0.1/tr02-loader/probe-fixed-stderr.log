@@ -1,0 +1,10 @@
+[24720:0911/211526.803:INFO:CONSOLE:2] "%cElectron Security Warning (Insecure Content-Security-Policy) font-weight: bold; This renderer process has either no Content Security
+  Policy set or a policy with "unsafe-eval" enabled. This exposes users of
+  this app to unnecessary security risks.
+
+For more information and help, consult
+https://electronjs.org/docs/tutorial/security.
+This warning will not show up
+once the app is packaged.", source: node:electron/js2c/sandbox_bundle (2)
+[24720:0911/211527.054:INFO:CONSOLE:0] "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127", source: file:///C:/Users/zFlei/repos/lux/.worktrees/tr02-gpu/apps/render-host/src/output.html (0)
+[24720:0911/211527.364:INFO:CONSOLE:2] "{"kind":"failure","reason":"DataCloneError: Failed to execute 'postMessage' on 'DedicatedWorkerGlobalScope': GPUAdapterInfo object could not be cloned."}", source: file:///C:/Users/zFlei/repos/lux/.worktrees/tr02-gpu/apps/render-host/src/output.html (2)
