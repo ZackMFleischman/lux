@@ -8,9 +8,9 @@ Prepare modular architecture, subsystem designs, and an executable tracer 0.1 pl
 
 - [x] Read source plans and record conversation decisions.
 - [x] Establish baseline requirements and document ownership.
-- [ ] Three specialists draft runtime/bridge, core/AI, and studio/input designs in isolated worktrees.
-- [ ] Coordinator reconciles architecture and shared contracts.
-- [ ] Write tracer tasks, milestone roadmap, and implementation handoff.
+- [x] Three specialists draft runtime/bridge, core/AI, and studio/input designs in isolated worktrees.
+- [x] Coordinator reconciles architecture and shared contracts.
+- [x] Write tracer tasks, milestone roadmap, and implementation handoff.
 - [ ] Freeze a committed snapshot for three independent reviewers: feasibility/reliability, product/coverage, execution/verification.
 - [ ] Resolve findings in a disposition log and obtain focused independent rechecks.
 - [ ] Validate links, diagrams, requirement coverage, source preservation, and clean Git state; commit final handoff.
@@ -28,3 +28,4 @@ Commit checkpoints: baseline, specialist drafts, reconciled plans, initial revie
 - Current phase: baseline preparation. Technical proposals require evidence or a bounded tracer experiment; documentation readiness is not proof of working GPU integration.
 - Baseline committed as `5ce8919`. Three specialist worktrees created on `codex/docs-runtime`, `codex/docs-core`, and `codex/docs-studio`; disjoint file ownership communicated.
 - Coordinator drafted decision log, system/sequence diagrams, requirement-to-milestone coverage and observed environment. Initial host target: Windows 11 / RTX 2070 / Resolume Avenue 7.27.1. GPU transport remains an explicit feasibility gate.
+- Specialist commits integrated independently. Coordinator aligned native package paths, API limits, independent host activation, capture provenance, and thin tracer versus complete docking scope. Added executable task/evidence plans and copyable implementation prompt. Preparing a frozen snapshot for three independent reviewers.

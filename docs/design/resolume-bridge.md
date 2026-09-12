@@ -48,9 +48,9 @@ Timebox the initial experiment to two engineering days after working compiler/ho
 3. **Open and copy.** In that main process's native addon, open the shared NT handle through the supported D3D interface [S7], inspect texture description/adapter, establish producer-ready semantics from pinned Electron code, and copy on GPU to an owned texture. Release the Electron texture only after copy completion. If readiness cannot be established, this step fails even if the image looks correct.
 4. **Cross-process and API transfer.** Export owned native slots using the selected Spout/DX interop protocol; import into FFGL's GL context. Prove no normal pixel readback, no concurrent overwrite and no render-callback wait. Audit SDK locks before using convenience receive functions. A source-side wait moved into the host callback is a failure.
 5. **Match provenance.** Encode distinct frame/revision/control markers into the pattern. Correlate runtime frame completion, compositor output and consumed host image; force repeats, dropped compositor output, pause and revision switch. Do not label a paint event with the latest submitted frame without evidence.
-6. **Run the real workload.** At 1080p/60 Hz, collect 30-second warmup plus five-minute baseline, controls, starvation, process termination, restart and UI-close evidence. Pass the table below, including color/alpha and completed-frame ownership.
+6. **Run the real workload.** At 1080p/60 Hz, collect 30-second warmup plus five-minute feasibility measurements, control markers, starvation and producer-stop evidence. TR-02 must establish color/alpha, completed-frame ownership, absence of CPU streaming and nonblocking callback behavior. Full supervisor recovery, AI and UI-close gates depend on TR-03–06 and are signed off in TR-07 against the table below. Record early performance failures now; do not claim complete tracer acceptance from this spike.
 
-Deliver `evidence/tracer-0.1/<run-id>/manifest.json`, `summary.md`, timing/event samples, screenshots/host recording, reference source and trace files or stable trace links. Manifest includes OS build, GPU/driver, each adapter LUID, display refresh, host build/bitness, runtime/Chromium/Three.js versions, FFGL/Spout commit, native compiler, render settings, source/bundle hashes, warmup/duration and diagnostic flags.
+Deliver the [acceptance evidence layout](../implementation/tracer-acceptance.md): `evidence/tracer-0.1/<run-id>/manifest.json`, `gpu-feasibility.md`, timing/event samples, screenshots/host recording, reference source and trace files or stable trace links. Manifest includes OS build, GPU/driver, each adapter LUID, display refresh, host build/bitness, runtime/Chromium/Three.js versions, FFGL/Spout commit, native compiler, render settings, source/bundle hashes, warmup/duration and diagnostic flags.
 
 ## GPU ownership and synchronization
 
@@ -93,6 +93,7 @@ interface FrameDescriptor {
   protocolVersion: number;
   instanceId: string;
   generation: number;
+  clockEpoch: number;        // logical reset epoch, not a measurement clock
   frameId: string;            // decimal uint64, not lossy JS number
   revisionId: string;
   bundleHash: string;

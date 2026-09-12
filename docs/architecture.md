@@ -1,6 +1,6 @@
 # Lux architecture
 
-Status: reconciled planning target; subsystem drafts are being integrated. Read [decisions](decisions.md) for authority and [requirements](requirements.md) for outcomes. No runtime implementation or GPU capability has been proved by this document.
+Status: reconciled planning target for independent review. Read [decisions](decisions.md) for authority and [requirements](requirements.md) for outcomes. No runtime implementation or GPU capability has been proved by this document.
 
 ## System boundaries
 
@@ -82,5 +82,6 @@ The detached supervisor remains alive while host consumers exist after the studi
 - [Resolume bridge](design/resolume-bridge.md): GPU ownership/synchronization, FFGL and measurements.
 - [Studio](design/studio.md): dock layouts and UI diagrams, preview/settings/input behavior.
 - [Environment](implementation/environment.md): observed machine and required version pinning.
+- [Tracer contract map](design/tracer-contracts.md): shared type ownership, adapter mappings, fixed host schema and explicit activation.
 
 The tracer plan is the execution order. If subsystem details disagree, the coordinator must reconcile the contract before delegating dependent tasks; implementers must not invent local variants of shared IDs, frame descriptors or operation names.
