@@ -1,0 +1,229 @@
+diff --git a/apps/render-host/src/main.ts b/apps/render-host/src/main.ts
+index faf949c..9676875 100644
+--- a/apps/render-host/src/main.ts
++++ b/apps/render-host/src/main.ts
+@@ -28,8 +28,10 @@ app.whenReady().then(async()=>{
+  record({kind:'gpu',info:await app.getGPUInfo('complete')});
+  bridge.advertise();
+  setInterval(()=>win.webContents.executeJavaScript('window.setIntensity('+bridge.control()+')').catch(()=>{}),50);
+- setTimeout(()=>{clearInterval(timer);record({kind:'summary',paint:count,held:held.size,dropped});fs.writeFileSync(path.join(output,'probe.json'),JSON.stringify(records,null,2));app.exit(0);},15000);
++ setTimeout(()=>{win.webContents.stopPainting();const deadline=Date.now()+2000;const closing=setInterval(()=>{const closed=held.size===0&&JSON.parse(bridge.shutdown()).closed;if(closed||Date.now()>deadline){clearInterval(closing);clearInterval(timer);record({kind:'summary',paint:count,held:held.size,dropped,closed});fs.writeFileSync(path.join(output,'probe.json'),JSON.stringify(records,null,2));app.exit(closed?0:2);}},10);},Number(process.env.LUX_GPU_DURATION_MS||15000));
+ });
+ 
+ 
+ 
++
++
+diff --git a/apps/render-host/src/visual-worker.js b/apps/render-host/src/visual-worker.js
+index 5ec7b70..d3b2edd 100644
+--- a/apps/render-host/src/visual-worker.js
++++ b/apps/render-host/src/visual-worker.js
+@@ -19,6 +19,7 @@ self.onmessage=async({data})=>{
+       If(p.x.lessThan(.2).and(p.y.lessThan(.2)),()=>color.assign(vec3(0,0,1)));
+       If(p.x.greaterThan(.8).and(p.y.lessThan(.2)),()=>color.assign(vec3(1,1,0)));
+       If(p.y.greaterThan(.4).and(p.y.lessThan(.6)),()=>{alpha.assign(floor(p.x.mul(4)).div(3));color.assign(vec3(intensity,.3,.6));});
++      If(p.x.sub(frame.mod(180).div(180)).abs().lessThan(.006).and(p.y.greaterThan(.2)).and(p.y.lessThan(.8)),()=>color.assign(vec3(1)));
+       If(screenCoordinate.y.lessThan(16),()=>{color.assign(vec3(floor(frame.div(pow(2,floor(screenCoordinate.x.div(64))))).mod(2)));alpha.assign(1);});
+       return vec4(color,alpha);
+     })();
+@@ -29,3 +30,4 @@ self.onmessage=async({data})=>{
+   }catch(error){self.postMessage({kind:'failure',reason:String(error)});}
+ };
+ 
++
+diff --git a/native/ffgl-source/src/FrameReceiver.cpp b/native/ffgl-source/src/FrameReceiver.cpp
+index 82aae63..94b4103 100644
+--- a/native/ffgl-source/src/FrameReceiver.cpp
++++ b/native/ffgl-source/src/FrameReceiver.cpp
+@@ -26,10 +26,11 @@ bool FrameReceiver::start(HDC target,HGLRC host) {
+ }
+ void FrameReceiver::run() {
+   wchar_t temp[MAX_PATH];GetTempPathW(MAX_PATH,temp);
+-  std::ofstream log(std::wstring(temp)+L"LuxTracer-tr02-host.jsonl",std::ios::app);
++  wchar_t configured[32768];DWORD length=GetEnvironmentVariableW(L"LUX_HOST_LOG",configured,32768);
++  std::ofstream log(length?std::wstring(configured):std::wstring(temp)+L"LuxTracer-tr02-host.jsonl",std::ios::app);
+   HANDLE mapping=nullptr;SharedRing* ring=nullptr;
+   ComPtr<ID3D11Device1> device;ComPtr<ID3D11DeviceContext> context;
+-  struct Import {ComPtr<ID3D11Texture2D> texture;GLuint gl=0;HANDLE object=nullptr;};
++  struct Import {ComPtr<ID3D11Texture2D> texture,local;ComPtr<ID3D11Query> query;GLuint gl=0;HANDLE object=nullptr;};
+   std::array<Import,3> imports;
+   HANDLE interop=nullptr;GLuint readFbo=0,drawFbo=0;
+   auto open=reinterpret_cast<OpenDevice>(wglGetProcAddress("wglDXOpenDeviceNV"));
+@@ -69,8 +70,7 @@ void FrameReceiver::run() {
+         if(status==GL_ALREADY_SIGNALED||status==GL_CONDITION_SATISFIED) {
+           glDeleteSync(output.fence);output.fence=nullptr;
+           auto& imported=imports[sourceSlot];require(unlock(interop,1,&imported.object),"NV unlock failed");
+-          FrameKey key{ring->generation,ring->outputGeneration,ring->slots[sourceSlot].frame,uint32_t(sourceSlot)};
+-          require(retire(*ring,key),"source retirement key mismatch");
++          
+           output.state.store(Ready);pending=-1;sourceSlot=-1;
+         }
+       }
+@@ -88,7 +88,7 @@ void FrameReceiver::run() {
+         log<<"{\"kind\":\"counters\",\"callbacks\":"<<callbacks.load()<<",\"consumed\":"<<consumed.load()<<"}"<<std::endl;
+       }
+       if(ring) {float value=intensity.load();LONG bits;memcpy(&bits,&value,sizeof(bits));InterlockedExchange(&ring->controlBits,bits);}
+-      if(ring&&pending<0) {
++      if(ring&&pending<0&&InterlockedCompareExchange(&ring->alive,1,1)==1) {
+         int outputIndex=-1;
+         for(int i=0;i<3;++i){int expected=Free;if(outputs[i].state.compare_exchange_strong(expected,Writing)){outputIndex=i;break;}}
+         if(outputIndex>=0) {
+@@ -100,23 +100,30 @@ void FrameReceiver::run() {
+               require(SUCCEEDED(device->OpenSharedResourceByName(source.textureName,DXGI_SHARED_RESOURCE_READ|DXGI_SHARED_RESOURCE_WRITE,IID_PPV_ARGS(&imported.texture))),"open owned named NT texture");
+               D3D11_TEXTURE2D_DESC desc;imported.texture->GetDesc(&desc);
+               require(desc.Width==source.width&&desc.Height==source.height&&desc.Format==source.format,"descriptor mismatch");
+-              glGenTextures(1,&imported.gl);glBindTexture(GL_TEXTURE_2D,imported.gl);SetLastError(0);imported.object=reg(interop,imported.texture.Get(),imported.gl,GL_TEXTURE_2D,0x0000);if(!imported.object){log<<"{\"kind\":\"nv-register-error\",\"win32\":"<<GetLastError()<<",\"glError\":"<<glGetError()<<",\"misc\":"<<desc.MiscFlags<<",\"format\":"<<desc.Format<<"}"<<std::endl;}require(imported.object!=nullptr,"NV registration failed");
++              desc.MiscFlags=0;desc.BindFlags=D3D11_BIND_SHADER_RESOURCE|D3D11_BIND_RENDER_TARGET;
++              require(SUCCEEDED(device->CreateTexture2D(&desc,nullptr,&imported.local)),"local interop texture creation");
++              D3D11_QUERY_DESC queryDesc{D3D11_QUERY_EVENT,0};require(SUCCEEDED(device->CreateQuery(&queryDesc,&imported.query)),"local copy query");
++              glGenTextures(1,&imported.gl);glBindTexture(GL_TEXTURE_2D,imported.gl);SetLastError(0);imported.object=reg(interop,imported.local.Get(),imported.gl,GL_TEXTURE_2D,0x0000);if(!imported.object){log<<"{\"kind\":\"nv-register-error\",\"win32\":"<<GetLastError()<<",\"glError\":"<<glGetError()<<",\"misc\":"<<desc.MiscFlags<<",\"format\":"<<desc.Format<<"}"<<std::endl;}require(imported.object!=nullptr,"NV registration failed");
+             }
+             if(!output.texture) {glGenTextures(1,&output.texture);glBindTexture(GL_TEXTURE_2D,output.texture);glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,source.width,source.height,0,GL_RGBA,GL_UNSIGNED_BYTE,nullptr);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);}
++            context->CopyResource(imported.local.Get(),imported.texture.Get());context->End(imported.query.Get());context->Flush();
++            const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(2);
++            for(;;){BOOL complete=FALSE;HRESULT result=context->GetData(imported.query.Get(),&complete,sizeof(complete),D3D11_ASYNC_GETDATA_DONOTFLUSH);require(SUCCEEDED(result),"local D3D copy query failure");if(result==S_OK&&complete)break;require(!stopping&&std::chrono::steady_clock::now()<deadline,"local D3D copy deadline");std::this_thread::sleep_for(std::chrono::milliseconds(1));}
++            const uint64_t copiedFrame=source.frame;FrameKey copiedKey{ring->generation,ring->outputGeneration,source.frame,uint32_t(newest)};require(retire(*ring,copiedKey),"source retirement key mismatch");
+             // This driver synchronization can wait. It is deliberately confined to this worker.
+             require(lock(interop,1,&imported.object),"NV lock failed");
+             glBindFramebuffer(GL_READ_FRAMEBUFFER,readFbo);glFramebufferTexture2D(GL_READ_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,imported.gl,0);
+             glBindFramebuffer(GL_DRAW_FRAMEBUFFER,drawFbo);glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,output.texture,0);
+             require(glCheckFramebufferStatus(GL_READ_FRAMEBUFFER)==GL_FRAMEBUFFER_COMPLETE&&glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)==GL_FRAMEBUFFER_COMPLETE,"copy FBO incomplete");
+             glBlitFramebuffer(0,0,source.width,source.height,0,0,source.width,source.height,GL_COLOR_BUFFER_BIT,GL_NEAREST);
+-            output.frame=source.frame;output.fence=glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE,0);glFlush();pending=outputIndex;sourceSlot=newest;
++            output.frame=copiedFrame;output.generation=ring->generation;output.fence=glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE,0);glFlush();pending=outputIndex;sourceSlot=newest;
+           } else outputs[outputIndex].state.store(Free);
+         }
+       }
+       ++ticks;std::this_thread::sleep_for(std::chrono::milliseconds(1));
+     }
+     // Lifecycle teardown may drain the worker GPU; never reached from ProcessOpenGL.
+-    glFinish();if(pending>=0){unlock(interop,1,&imports[sourceSlot].object);InterlockedExchange(&ring->slots[sourceSlot].state,Free);}
++    glFinish();if(pending>=0){unlock(interop,1,&imports[sourceSlot].object);}
+     detach();
+   }catch(const std::exception& error){log<<"{\"kind\":\"failure\",\"reason\":\""<<error.what()<<"\"}"<<std::endl;}
+   if(interop&&close)close(interop);
+@@ -126,11 +133,11 @@ void FrameReceiver::run() {
+ GLuint FrameReceiver::acquireLatest() {
+   ++callbacks;
+   for(int i=0;i<3;++i)if(i!=current&&outputs[i].state.load()==Reading&&outputs[i].fence){const GLenum status=glClientWaitSync(outputs[i].fence,0,0);if(status==GL_ALREADY_SIGNALED||status==GL_CONDITION_SATISFIED){glDeleteSync(outputs[i].fence);outputs[i].fence=nullptr;outputs[i].state.store(Free);}}
+-  int newest=-1;uint64_t frame=lastFrame;
+-  for(int i=0;i<3;++i)if(outputs[i].state.load()==Ready&&outputs[i].frame>frame){newest=i;frame=outputs[i].frame;}
+-  if(newest>=0){int expected=Ready;if(outputs[newest].state.compare_exchange_strong(expected,Reading)){current=newest;lastFrame=frame;++consumed;}}
++  int newest=-1;uint64_t frame=lastFrame,generation=lastGeneration;
++  for(int i=0;i<3;++i)if(outputs[i].state.load()==Ready&&(outputs[i].generation>generation||(outputs[i].generation==generation&&outputs[i].frame>frame))){newest=i;frame=outputs[i].frame;generation=outputs[i].generation;}
++  if(newest>=0){int expected=Ready;if(outputs[newest].state.compare_exchange_strong(expected,Reading)){current=newest;lastFrame=frame;lastGeneration=generation;++consumed;}}
+   // Drop completed older outputs atomically; never touch held output storage.
+-  for(int i=0;i<3;++i)if(i!=current&&outputs[i].state.load()==Ready&&outputs[i].frame<lastFrame){int expected=Ready;outputs[i].state.compare_exchange_strong(expected,Free);}
++  for(int i=0;i<3;++i)if(i!=current&&outputs[i].state.load()==Ready&&(outputs[i].generation<lastGeneration||(outputs[i].generation==lastGeneration&&outputs[i].frame<lastFrame))){int expected=Ready;outputs[i].state.compare_exchange_strong(expected,Free);}
+   return current>=0?outputs[current].texture:0;
+ }
+ void FrameReceiver::afterDraw(){if(current>=0){auto& output=outputs[current];if(output.fence)glDeleteSync(output.fence);output.fence=glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE,0);glFlush();}}
+@@ -138,3 +145,7 @@ void FrameReceiver::stop(){stopping=true;if(worker.joinable())worker.join();if(s
+ }
+ 
+ 
++
++
++
++
+diff --git a/native/ffgl-source/src/FrameReceiver.h b/native/ffgl-source/src/FrameReceiver.h
+index 28df9a5..cf5241b 100644
+--- a/native/ffgl-source/src/FrameReceiver.h
++++ b/native/ffgl-source/src/FrameReceiver.h
+@@ -15,10 +15,11 @@ class FrameReceiver {
+   uint64_t frame()const{return lastFrame;}
+   std::atomic<uint64_t> callbacks{0},consumed{0};
+  private:
+-  struct Output {std::atomic<int> state{Free};GLuint texture=0;GLsync fence=nullptr;uint64_t frame=0;};
++  struct Output {std::atomic<int> state{Free};GLuint texture=0;GLsync fence=nullptr;uint64_t frame=0,generation=0;};
+   std::array<Output,3> outputs;
+   std::atomic<bool> stopping{false};std::atomic<float> intensity{0.65f};
+-  std::thread worker;HDC dc=nullptr;HGLRC shared=nullptr;int current=-1;uint64_t lastFrame=0;
++  std::thread worker;HDC dc=nullptr;HGLRC shared=nullptr;int current=-1;uint64_t lastFrame=0,lastGeneration=0;
+   void run();
+ };
+ }
++
+diff --git a/native/texture-bridge/src/electron_texture.cc b/native/texture-bridge/src/electron_texture.cc
+index 3d49d72..c731e97 100644
+--- a/native/texture-bridge/src/electron_texture.cc
++++ b/native/texture-bridge/src/electron_texture.cc
+@@ -50,7 +50,7 @@ void initialize() {
+   if(!mapping||GetLastError()==ERROR_ALREADY_EXISTS)throw std::runtime_error("unique ring mapping failed");
+   ring=static_cast<lux::SharedRing*>(MapViewOfFile(mapping,FILE_MAP_ALL_ACCESS,0,0,sizeof(lux::SharedRing)));
+   if(!ring)throw std::runtime_error("ring view failed");
+-  new(ring) lux::SharedRing();ring->pid=GetCurrentProcessId();ring->generation=counter.QuadPart;ring->adapter=adapterDesc.AdapterLuid;
++  new(ring) lux::SharedRing();ring->pid=GetCurrentProcessId();ring->generation=counter.QuadPart;ring->adapter=adapterDesc.AdapterLuid;float initial=0.65f;memcpy(const_cast<LONG*>(&ring->controlBits),&initial,sizeof(initial));
+ }
+ void allocateSlot(unsigned index,const D3D11_TEXTURE2D_DESC& sourceDesc) {
+   auto& local=slots[index];auto& shared=ring->slots[index];
+@@ -115,11 +115,22 @@ napi_value advertise(napi_env env,napi_callback_info) {
+   try{initialize();std::wofstream file(lux::rendezvousPath(),std::ios::trunc);file<<mappingName;file.close();if(!file)throw std::runtime_error("rendezvous write failed");return text(env,"{\"advertised\":true}");}
+   catch(const std::exception& error){napi_throw_error(env,nullptr,error.what());return nullptr;}
+ }
+-napi_value control(napi_env env,napi_callback_info){float value=0.65f;if(ring){LONG bits=InterlockedCompareExchange(&ring->controlBits,0,0);if(bits)memcpy(&value,&bits,sizeof(value));}napi_value result;napi_create_double(env,value,&result);return result;}
++napi_value control(napi_env env,napi_callback_info){float value=0.65f;if(ring){LONG bits=InterlockedCompareExchange(&ring->controlBits,0,0);memcpy(&value,&bits,sizeof(value));}napi_value result;napi_create_double(env,value,&result);return result;}
++napi_value shutdown(napi_env env,napi_callback_info) {
++  if(!ring)return text(env,"{\"closed\":true}");
++  InterlockedExchange(&ring->alive,0);
++  for(unsigned i=0;i<3;++i)if(slots[i].borrowedId||InterlockedCompareExchange(&ring->slots[i].state,lux::Reading,lux::Reading)==lux::Reading)return text(env,"{\"closed\":false}");
++  for(auto& slot:slots){slot.source.Reset();slot.done.Reset();slot.owned.Reset();if(slot.exportHandle)CloseHandle(slot.exportHandle);slot.exportHandle=nullptr;}
++  context->ClearState();context->Flush();context.Reset();device.Reset();
++  UnmapViewOfFile(ring);ring=nullptr;CloseHandle(mapping);mapping=nullptr;
++  return text(env,"{\"closed\":true}");
++}
+ napi_value module(napi_env env,napi_value exports) {
+-  napi_property_descriptor properties[]={{"submit",nullptr,submit,nullptr,nullptr,nullptr,napi_default,nullptr},{"poll",nullptr,poll,nullptr,nullptr,nullptr,napi_default,nullptr},{"advertise",nullptr,advertise,nullptr,nullptr,nullptr,napi_default,nullptr},{"control",nullptr,control,nullptr,nullptr,nullptr,napi_default,nullptr}};
+-  napi_define_properties(env,exports,4,properties);return exports;
++  napi_property_descriptor properties[]={{"shutdown",nullptr,shutdown,nullptr,nullptr,nullptr,napi_default,nullptr},{"submit",nullptr,submit,nullptr,nullptr,nullptr,napi_default,nullptr},{"poll",nullptr,poll,nullptr,nullptr,nullptr,napi_default,nullptr},{"advertise",nullptr,advertise,nullptr,nullptr,nullptr,napi_default,nullptr},{"control",nullptr,control,nullptr,nullptr,nullptr,napi_default,nullptr}};
++  napi_define_properties(env,exports,5,properties);return exports;
+ }
+ }
+ NAPI_MODULE(NODE_GYP_MODULE_NAME,module)
+ 
++
++
+diff --git a/package.json b/package.json
+index d372a9b..5d936f0 100644
+--- a/package.json
++++ b/package.json
+@@ -1,19 +1,33 @@
+ {
+-  "name": "lux", "version": "0.0.0", "private": true, "type": "module",
++  "name": "lux",
++  "version": "0.0.0",
++  "private": true,
++  "type": "module",
+   "packageManager": "pnpm@10.33.0",
+-  "engines": { "node": "24.12.0", "pnpm": "10.33.0" },
++  "engines": {
++    "node": "24.12.0",
++    "pnpm": "10.33.0"
++  },
+   "scripts": {
+     "preflight": "node scripts/preflight.mjs",
+     "typecheck": "tsc --noEmit",
+     "test:unit": "node --test tests/unit/*.test.ts",
+-    "build": "tsc -p tsconfig.build.json",
++    "build": "tsc -p tsconfig.build.json && node tools/gpu-spike/build.mjs",
+     "native:build": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/native-build.ps1",
+-    "test:gpu": "node scripts/unavailable.mjs TR-02 actual-GPU-and-FFGL-transfer",
++    "test:gpu": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-gpu.ps1",
+     "test:mcp": "node scripts/test-mcp.mjs",
+     "test:studio": "node scripts/unavailable.mjs TR-05 Electron-studio-and-core",
+     "test:host": "node scripts/unavailable.mjs TR-06 live-Resolume-and-native-plugin",
+     "test:acceptance": "node scripts/unavailable.mjs TR-07 measured-host-acceptance"
+   },
+-  "dependencies": { "@modelcontextprotocol/sdk": "1.30.0", "zod": "3.25.76", "three": "0.186.0" },
+-  "devDependencies": { "@types/node": "24.13.4", "electron": "44.3.0", "typescript": "7.0.2" }
++  "dependencies": {
++    "@modelcontextprotocol/sdk": "1.30.0",
++    "zod": "3.25.76",
++    "three": "0.186.0"
++  },
++  "devDependencies": {
++    "@types/node": "24.13.4",
++    "electron": "44.3.0",
++    "typescript": "7.0.2"
++  }
+ }

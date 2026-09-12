@@ -1,0 +1,117 @@
+[
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-01\\final.rgba",
+    "Length": 8294400,
+    "LastWriteTime": "2026-09-11T21:29:48.1853704-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-01\\host-stderr.log",
+    "Length": 0,
+    "LastWriteTime": "2026-09-11T21:29:22.3297263-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-01\\host-stdout.log",
+    "Length": 73,
+    "LastWriteTime": "2026-09-11T21:29:48.2571317-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-01\\probe.json",
+    "Length": 21797,
+    "LastWriteTime": "2026-09-11T21:29:38.4557651-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-01\\producer-stderr.log",
+    "Length": 0,
+    "LastWriteTime": "2026-09-11T21:29:22.3890917-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-01\\producer-stdout.log",
+    "Length": 2,
+    "LastWriteTime": "2026-09-11T21:29:22.4528585-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-01\\README.md",
+    "Length": 572,
+    "LastWriteTime": "2026-09-11T21:31:22.9262552-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-01\\receiver.jsonl",
+    "Length": 386,
+    "LastWriteTime": "2026-09-11T21:29:31.1686407-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-02\\final.rgba",
+    "Length": 8294400,
+    "LastWriteTime": "2026-09-11T21:36:31.6728228-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-02\\host-stderr.log",
+    "Length": 0,
+    "LastWriteTime": "2026-09-11T21:36:06.1559292-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-02\\host-stdout.log",
+    "Length": 73,
+    "LastWriteTime": "2026-09-11T21:36:31.7751252-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-02\\probe.json",
+    "Length": 21788,
+    "LastWriteTime": "2026-09-11T21:36:21.9723785-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-02\\producer-stderr.log",
+    "Length": 0,
+    "LastWriteTime": "2026-09-11T21:36:06.170934-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-02\\producer-stdout.log",
+    "Length": 2,
+    "LastWriteTime": "2026-09-11T21:36:06.2209173-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-02\\receiver.jsonl",
+    "Length": 471,
+    "LastWriteTime": "2026-09-11T21:36:14.5951499-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-03\\final.png",
+    "Length": 110361,
+    "LastWriteTime": "2026-09-11T21:40:00.2401577-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-03\\final.rgba",
+    "Length": 8294400,
+    "LastWriteTime": "2026-09-11T21:39:11.5739175-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-03\\host-stderr.log",
+    "Length": 0,
+    "LastWriteTime": "2026-09-11T21:38:46.1382313-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-03\\host-stdout.log",
+    "Length": 80,
+    "LastWriteTime": "2026-09-11T21:39:11.6747315-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-03\\probe.json",
+    "Length": 35151,
+    "LastWriteTime": "2026-09-11T21:39:01.9762459-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-03\\producer-stderr.log",
+    "Length": 0,
+    "LastWriteTime": "2026-09-11T21:38:46.1526903-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-03\\producer-stdout.log",
+    "Length": 2,
+    "LastWriteTime": "2026-09-11T21:38:46.2018308-07:00"
+  },
+  {
+    "FullName": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\evidence\\tracer-0.1\\tr02-standalone-03\\receiver.jsonl",
+    "Length": 383,
+    "LastWriteTime": "2026-09-11T21:39:04.8522825-07:00"
+  }
+]
