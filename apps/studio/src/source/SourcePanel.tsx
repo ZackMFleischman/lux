@@ -61,7 +61,7 @@ export function SourcePanel({ workspace, readOnly, onApply, onSave, onCompositio
       </div>
       <div className="source-editing"><Tabs ref={tabs} value={assetPath ? false : snapshot.selectedFile || false} onChange={(_, path: string) => openCode(path)} variant="scrollable" scrollButtons="auto" aria-label="Open source files">
         {snapshot.openFiles.map(path => <Tab key={path} value={path} title={path} label={<span className="file-tab-label"><span className="file-path">{path}{snapshot.dirtyFiles.includes(path) ? ' *' : ''}</span><span role="button" tabIndex={0} aria-label={`Close ${path}`} className="file-tab-close"
-          onClick={event => { event.stopPropagation(); closeFile(path); }} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); closeFile(path); } }}>Ã—</span></span>} />)}
+          onClick={event => { event.stopPropagation(); closeFile(path); }} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); closeFile(path); } }}>×</span></span>} />)}
       </Tabs>
       <div className="source-code-content" hidden={!!assetPath}>
       {snapshot.selectedFile && <>

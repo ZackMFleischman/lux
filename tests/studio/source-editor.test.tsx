@@ -30,8 +30,8 @@ test('native selected-text insertion preserves admission, undo, readonly and com
     return event.defaultPrevented;
   };
   await select();
-  assert.equal(await input('export const unicode = "æ—¥æœ¬";'), true);
-  assert.equal(w.getSnapshot().source.files['main.ts'], 'export const unicode = "æ—¥æœ¬";');
+  assert.equal(await input('export const unicode = "日本";'), true);
+  assert.equal(w.getSnapshot().source.files['main.ts'], 'export const unicode = "日本";');
   await act(async () => { assert.equal(undo(view()), true); });
   assert.equal(view().state.doc.toString(), initial);
   await select();
@@ -180,7 +180,7 @@ test('asset selection displays decoded pixels and preserves code drafts and undo
   const editor = view();
   await click(screen.getByRole('button', { name: 'View assets/red.bmp' }));
   assert.deepEqual(painted.get(preview()), [255, 0, 0, 255]);
-  assert.match(screen.getByRole('region', { name: 'Asset preview' }).textContent!, /1 Ã— 1.*58 bytes/);
+  assert.match(screen.getByRole('region', { name: 'Asset preview' }).textContent!, /1 × 1.*58 bytes/);
   assert.equal(screen.queryByRole('textbox', { name: /TypeScript source/ }), null);
   await click(screen.getByRole('button', { name: 'View assets/green.bmp' }));
   assert.deepEqual(painted.get(preview()), [0, 255, 0, 255]);
