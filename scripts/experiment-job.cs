@@ -36,13 +36,15 @@ public static class ExperimentJob {
   [DllImport("kernel32.dll")] static extern bool TerminateProcess(IntPtr p,uint code);
   [DllImport("kernel32.dll")] static extern bool CloseHandle(IntPtr h);
   static void Check(bool ok) { if(!ok) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error()); }
-  public static void Run(string exe,string command,string cwd,string dir,int timeout) {
+  public static void Run(string exe,string command,string cwd,string dir,int timeout,ulong memoryLimitBytes=0) {
+    if(memoryLimitBytes!=0 && (memoryLimitBytes<67108864 || memoryLimitBytes>4294967296)) throw new ArgumentOutOfRangeException("memoryLimitBytes", "Use zero or 64 MiB through 4 GiB");
     IntPtr job=CreateJobObject(IntPtr.Zero,null); Check(job!=IntPtr.Zero);
     PI pi=new PI(); bool assigned=false;
     using(var stdout=new FileStream(Path.Combine(dir,"stdout.log"),FileMode.Create,FileAccess.Write,FileShare.ReadWrite))
     using(var stderr=new FileStream(Path.Combine(dir,"stderr.log"),FileMode.Create,FileAccess.Write,FileShare.ReadWrite)) {
       try {
         var limits=new Extended(); limits.basic.flags=0x2000; // KILL_ON_JOB_CLOSE
+        if(memoryLimitBytes!=0) { limits.basic.flags|=0x200; limits.jm=(UIntPtr)memoryLimitBytes; }
         Check(SetInformationJobObject(job,9,ref limits,Marshal.SizeOf(limits)));
         Check(SetHandleInformation(stdout.SafeFileHandle.DangerousGetHandle(),1,1));
         Check(SetHandleInformation(stderr.SafeFileHandle.DangerousGetHandle(),1,1));
