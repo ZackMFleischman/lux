@@ -19,4 +19,11 @@ int main(){
  state.finished();state.reaped();resource=0;
  // Preparation may fail after allocating (for example, diagnostic allocation).
  CHECK(!lux::launchPreparedContext(state,[&]() -> bool {resource=1;throw std::runtime_error("after create");},[]{},abandon));CHECK(resource==0);CHECK(state.phase()==lux::WorkerPhase::Stopped);
+ // The worker already owns the handle when early logging allocation throws.
+ resource=1;calls.clear();
+ CHECK(!lux::initializeTransferredContext([]{throw std::bad_alloc();},abandon));
+ CHECK(resource==0);CHECK(calls==std::vector<std::string>({"abandon"}));
+ resource=1;calls.clear();
+ CHECK(lux::initializeTransferredContext([]{},abandon));CHECK(resource==1);CHECK(calls.empty());
+ CHECK(!lux::initializeTransferredContext([]{throw 7;},abandon));CHECK(resource==0);
 }

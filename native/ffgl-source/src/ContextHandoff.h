@@ -1,6 +1,10 @@
 #pragma once
 #include "ReceiverLifecycle.h"
 namespace lux {
+template<class Initialize,class Abandon>
+bool initializeTransferredContext(Initialize initialize,Abandon abandon){
+ try{initialize();return true;}catch(...){abandon();return false;}
+}
 // Prepare on the owner thread, then transfer the unused resource to a worker.
 // Failed preparation/thread creation rolls back before lifecycle becomes reusable.
 template<class Prepare,class Launch,class Abandon>

@@ -6,6 +6,8 @@
 #include <wrl/client.h>
 #include <fstream>
 #include <sstream>
+#include <optional>
+#include <type_traits>
 
 using Microsoft::WRL::ComPtr;
 namespace lux {
@@ -87,15 +89,30 @@ bool FrameReceiver::start(HDC target,HGLRC host) {
 }
 void FrameReceiver::run(HGLRC shared) {
  struct Finished {WorkerLifecycle& lifecycle;~Finished(){lifecycle.finished();}} finished{lifecycle};
- wchar_t temp[MAX_PATH]{};GetTempPathW(MAX_PATH,temp);
- wchar_t configured[32768]{};DWORD length=GetEnvironmentVariableW(L"LUX_HOST_LOG",configured,32768);
- std::ofstream log(length>0&&length<32768?std::wstring(configured):std::wstring(temp)+L"LuxTracer-tr02-host.jsonl",std::ios::app);
+ // The transferred context already exists. Even stream/path construction must
+ // run inside an exception boundary, before any drawable/GPU ownership begins.
+ std::optional<std::ofstream> logStorage;
+ if(!initializeTransferredContext([&]{
+  wchar_t temp[MAX_PATH]{};GetTempPathW(MAX_PATH,temp);
+  wchar_t configured[32768]{};const auto length=GetEnvironmentVariableW(L"LUX_HOST_LOG",configured,32768);
+  logStorage.emplace(length>0&&length<32768?std::wstring(configured):std::wstring(temp)+L"LuxTracer-tr02-host.jsonl",std::ios::app);
+ },[&]{
+  OutputDebugStringA("Lux TR02: worker logging setup failed; releasing unused transferred context.\n");
+  if(!wglDeleteContext(shared)){unsupportedUnload();for(;;)std::this_thread::sleep_for(std::chrono::seconds(1));}
+ }))return;
+ auto& log=*logStorage;
  HWND window=nullptr;HDC dc=nullptr;bool currentContext=false;
  std::wstring windowClass;ATOM classAtom=0;
  HANDLE mapping=nullptr;SharedRing* ring=nullptr;
  ComPtr<ID3D11Device1> device;ComPtr<ID3D11DeviceContext> context;
  struct Import {ComPtr<ID3D11Texture2D> texture,local;ComPtr<ID3D11Query> query;GLuint gl=0;HANDLE object=nullptr;GLsync fence=nullptr;FrameKey key{};ImportOwnership ownership;};
  std::array<Import,3> imports;
+ // These are the remaining owner constructions before the main try block.
+ static_assert(std::is_nothrow_default_constructible_v<std::optional<std::ofstream>>);
+ static_assert(std::is_nothrow_default_constructible_v<std::wstring>);
+ static_assert(std::is_nothrow_default_constructible_v<ComPtr<ID3D11Device1>>);
+ static_assert(std::is_nothrow_default_constructible_v<ComPtr<ID3D11DeviceContext>>);
+ static_assert(std::is_nothrow_default_constructible_v<std::array<Import,3>>);
  HANDLE interop=nullptr;GLuint readFbo=0,drawFbo=0;
  OpenDevice open=nullptr;CloseDevice close=nullptr;RegisterObject reg=nullptr;
  UnregisterObject unreg=nullptr;LockObjects lock=nullptr,unlock=nullptr;
