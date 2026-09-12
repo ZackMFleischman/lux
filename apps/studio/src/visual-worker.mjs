@@ -2,6 +2,7 @@
 // desktop bridge is exposed here. The parent owns termination and promotion.
 import { RuntimeClock } from '../../../packages/runtime/src/clock.ts';
 import { SeededRandom } from '../../../packages/runtime/src/seed.ts';
+import { loadAuthoredModule } from './authored-worker-assets.mjs';
 let identity, renderer, device, visual, clock, random, settings, outputTarget, presentation;
 let controls = { intensity: 0.5 }, sequence = 0, frame = 0, tick = 0, lastTime = 0;
 let stopped = false, timer, heartbeat, chain = Promise.resolve();
@@ -30,14 +31,14 @@ async function initialize(message) {
   settings = message.settings;
   if (!settings || settings.width !== 1920 || settings.height !== 1080 || settings.fps !== 60 ||
       !Number.isInteger(settings.seed) || settings.seed < 0 || settings.seed > 0xffffffff) throw Error('Unsupported output settings');
-  if (typeof message.moduleSource !== 'string' || message.moduleSource.length > 16777216) throw Error('Invalid linked module');
   if (!Number.isFinite(message.controls?.intensity) || message.controls.intensity < 0 || message.controls.intensity > 1) throw Error('Invalid intensity');
   controls = { intensity: message.controls.intensity };
   clock = new RuntimeClock(() => performance.now(), 'paused'); random = new SeededRandom(settings.seed);
   heartbeat = setInterval(() => send('heartbeat', { frameId: String(frame) }), 250);
-  const url = URL.createObjectURL(new Blob([message.moduleSource], { type: 'text/javascript' }));
-  let module;
-  try { module = await import(url); } finally { URL.revokeObjectURL(url); }
+  const {module,assets} = await loadAuthoredModule(message, async moduleSource => {
+    const url = URL.createObjectURL(new Blob([moduleSource], { type: 'text/javascript' }));
+    try { return await import(url); } finally { URL.revokeObjectURL(url); }
+  });
   if (module.default?.sdkVersion !== '0.1.0' || typeof module.default.create !== 'function') throw Error('Invalid visual definition');
   if (!navigator.gpu) throw Error('WebGPU is unavailable');
   const adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
@@ -52,7 +53,7 @@ async function initialize(message) {
   const material = new module.MeshBasicNodeMaterial();
   material.fragmentNode = module.sampleTexture(outputTarget.texture);
   presentation = new module.QuadMesh(material);
-  visual = await module.default.create(Object.freeze({ settings: Object.freeze({ ...settings }), assets: new Map(),
+  visual = await module.default.create(Object.freeze({ settings: Object.freeze({ ...settings }), assets,
     random: () => random.next(), reportError: value => { throw Error(String(value)); },
     renderer: Object.freeze({ render: (scene, camera) => {
       renderer.setRenderTarget(outputTarget); renderer.render(scene, camera);
