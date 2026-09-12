@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
+import { createHash } from 'node:crypto';
 import { preflightSchema, integrationReady } from '../packages/runtime-contracts/src/telemetry.ts';
 const root = fileURLToPath(new URL('../', import.meta.url));
 process.chdir(root);
@@ -17,6 +18,8 @@ const discovery = [];
 const git = run('git', ['-c', `safe.directory=${root.replaceAll('\\', '/').replace(/\/$/, '')}`, 'rev-parse', 'HEAD']);
 discovery.push(git);
 if (git.status !== 0) throw new Error(`TR-01 cannot establish source commit: ${git.stderr}`);
+const gitStatus = run('git', ['-c', `safe.directory=${root.replaceAll('\\', '/').replace(/\/$/, '')}`, 'status', '--porcelain']);
+discovery.push(gitStatus);
 const inventory = run('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', resolve(root, 'scripts/collect-windows.ps1')]);
 discovery.push(inventory);
 let observed = {};
@@ -27,7 +30,7 @@ const versions = { node: process.versions.node, pnpm: '10.33.0' };
 for (const name of ['electron', 'three', '@modelcontextprotocol/sdk', 'typescript', 'zod']) {
   try {
     // Resolve package entry and walk to its own package.json (exports may hide package.json).
-    let directory = dirname(require.resolve(name));
+    let directory = dirname(require.resolve(name === '@modelcontextprotocol/sdk' ? `${name}/client/index.js` : name));
     while (true) {
       const path = resolve(directory, 'package.json');
       if (existsSync(path)) { const metadata = JSON.parse(readFileSync(path, 'utf8')); if (metadata.name === name) { versions[name] = metadata.version; break; } }
@@ -44,7 +47,13 @@ for (const [name, value] of Object.entries({ visualStudio: toolchain.visualStudi
   if (value) versions[name] = value;
   check(name, value ? 'pass' : 'unavailable', value || 'TR-01 prerequisite missing: Visual Studio C++ workload/CMake and SDK 10.0.26100.0');
 }
-const electron = run(process.execPath, ['-e', "const {spawnSync}=require('node:child_process'); const r=spawnSync(require('electron'),['-p','JSON.stringify(process.versions)'],{encoding:'utf8',env:{...process.env,ELECTRON_RUN_AS_NODE:'1'}}); process.stdout.write(r.stdout||''); process.stderr.write(r.stderr||''); process.exit(r.status??1)"]);
+// Never require('electron') during inventory: newer packages download implicitly.
+const electronDirectory = dirname(require.resolve('electron'));
+const electronPathFile = resolve(electronDirectory, 'path.txt');
+const electronPath = existsSync(electronPathFile) ? resolve(electronDirectory, 'dist', readFileSync(electronPathFile, 'utf8').trim()) : null;
+const electron = electronPath && existsSync(electronPath)
+  ? run(electronPath, ['-p', 'JSON.stringify(process.versions)'], { env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' } })
+  : { command: [], status: null, stdout: '', stderr: 'Run node node_modules/electron/install.js to install the exact pinned binary explicitly' };
 discovery.push(electron);
 let electronRuntime = null;
 try { if (electron.status === 0) electronRuntime = JSON.parse(electron.stdout); } catch { /* explicit check below */ }
@@ -67,7 +76,9 @@ const result = preflightSchema.parse({ schemaVersion: 1, sourceCommit: git.stdou
   host: { executable: observed.host?.version ? observed.host.executable : null, version: observed.host?.version ?? null, refreshHz: null, pluginDirectory: null },
   adapters: { rendererLuid: null, bridgeLuid: null, hostLuid: null }, versions,
   mcp: { profile: '2025-11-25', client: null, imageObserved: false }, checks,
-  capturedAt: new Date().toISOString(), inventory: observed, electronRuntime, nativeSmoke: smoke, dependencyPins: pins,
+  capturedAt: new Date().toISOString(), sourceTreeDirty: gitStatus.stdout.length > 0,
+  sourceFileHashes: Object.fromEntries(['package.json', 'pnpm-lock.yaml', 'scripts/preflight.mjs', 'scripts/collect-windows.ps1', 'scripts/native-build.ps1', 'native/CMakeLists.txt', 'native/smoke.cc', 'packages/runtime-contracts/src/telemetry.ts'].map(path => [path, createHash('sha256').update(readFileSync(resolve(root, path))).digest('hex')])),
+  inventory: observed, electronRuntime, nativeSmoke: smoke, dependencyPins: pins,
   build: { configuration: 'Release', architecture: 'x64', generator: 'Visual Studio 18 2026', toolset: 'v145,version=14.50.35717', windowsSdk: '10.0.26100.0' }, discovery,
 });
 const runId = new Date().toISOString().replaceAll(':', '-').replaceAll('.', '-');
