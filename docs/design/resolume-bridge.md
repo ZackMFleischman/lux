@@ -4,7 +4,7 @@ Status: proposed design with a mandatory hardware feasibility gate. No GPU path,
 
 ## Selected direction and limits of the evidence
 
-Build a small native FFGL **source** that receives completed GPU images from a separately supervised runtime. The plugin exposes host controls and draws a texture; it never executes generated JavaScript or compiles scene code. Resolume owns mixing, mapping, output routing, audio modulation and MIDI assignment. Incoming-image effects are outside this scope.
+Build a small native FFGL **source** that receives completed GPU images from a separately supervised runtime. The plugin exposes host controls and draws a texture; it never executes generated JavaScript or compiles scene code. Resolume owns mixing, mapping, output routing, audio modulation and MIDI assignment. Incoming-image effects are outside this source/tracer scope; DEC-14 schedules them separately in [milestone 6](../implementation/roadmap.md). Their incoming GPU image path, lifetime and latency require a focused design and actual-host evidence before implementation expands.
 
 First candidate: Three.js WebGPU → output canvas → Electron offscreen shared texture → native D3D adapter → owned shared texture slots → FFGL OpenGL output. Spout is a candidate native transport layer, not a browser texture-export API. GPU copies and color-conversion passes are allowed and measured; normal per-frame CPU pixel copies are not.
 

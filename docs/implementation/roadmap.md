@@ -24,6 +24,7 @@ flowchart LR
     Graph --> Inspect[3 richer inspection]
     Inspect --> Creative[4 full studio and inputs]
     Creative --> Release[5 release hardening and distribution]
+    Release --> Effects[6 reusable Resolume effect exports]
 ```
 
 Features accumulate without removing prior tests. Small docking/presentation experiments belong early to validate lifetime boundaries, but a full graph, library or embedded assistant is not needed to pass 0.1.
@@ -42,6 +43,7 @@ Features accumulate without removing prior tests. Small docking/presentation exp
 | 3 | Output/diagnostic target selection, region/aspect controls, live and controlled sequences, repeatable input playback, measurements and separate inspection/edit scopes. | Three frames at relative 0/500/1000 ms with actual provenance; region validation; frame limits; real intermediate simulation steps; host instance untouched; component scope rejects unrelated edits; supported diagnostics explain rendered behavior. |
 | 4 | Complete dockable studio and layout presets; embedded chat; named looks/macros; studio audio/MIDI, meters/mapping; generated assets; complete preview quality/time/settings controls. | Ultrawide/laptop restore, node inspector lock, graph/preview selection independence, popout return/fullscreen/monitor removal, signal-to-control visibility, external/embedded operation parity, create/import/revise transparent sprite, two looks without dual continuous renders. |
 | 5 | Harden the export path already delivered in tracer: polished installer/distribution and renderer management, explicit update/migration, complete later asset/look/control/input coverage and sustained benchmarks. | Repeat offline installed lifecycle across the full feature set; host audio/MIDI and generated sprite offline; five workload categories; 60-minute resource soak; diagnostic overhead; orientation/color/alpha and final budgets. |
+| 6 | Export reusable FFGL effects: one incoming Resolume image, Lux processing and a returned GPU image. Add an input-image authoring/preview contract, effect packaging and published controls; reuse installed runtime management without Studio. | Apply one exported distortion to both a video clip and a live source. Verify input/output frame association, measured added latency, GPU-only steady-state transfer, orientation/color/alpha, bypass, resize, independent effect copies, saved composition cold reopen, and responsive failure/recovery. |
 
 ## Complete requirement routing
 
@@ -69,6 +71,7 @@ Each ID has a design owner, a completion milestone, and an acceptance home. Requ
 | M01, M02 | [Project model](../design/project-model.md), [AI authoring](../design/ai-authoring.md) | 4 asset workflow and failed replacement; 5 offline generated sprite |
 | P01, P02 | [Project model](../design/project-model.md) | 0.1 basic editable save/open and immutable release closure; 1 durable storage/history; 2 graph/library pins; 5 complete archive/feature coverage |
 | R01, R02, R03 | [Project model](../design/project-model.md), [bridge](../design/resolume-bridge.md), [runtime](../design/runtime.md) | 0.1 minimum installed offline release/lifecycle and tracer budgets; 0.2 upgrade/compatibility expansion; 5 complete release and sustained benchmark suite |
+| E01 | [Bridge](../design/resolume-bridge.md), [runtime](../design/runtime.md), [project model](../design/project-model.md) | 6 incoming-image contract, GPU input/output feasibility and installed effect workflow |
 | U01 | [Studio](../design/studio.md) | Early shell feasibility; full docking 4 |
 | U02, U03 | [Studio](../design/studio.md) | 2 graph/inspector; complete library/layout defaults 4 |
 | U04 | [Studio](../design/studio.md), [runtime](../design/runtime.md) | 0.1 presentation lifetime smoke; complete popout/fullscreen 4 |
@@ -90,5 +93,21 @@ Use the original domain proposal's Loom examples as inspiration and source inspe
 - 3 finalizes capture limits and controlled-job restoration for supported component types.
 - 4 selects embedded AI provider integration and complete input mapping UX; credentials remain outside projects.
 - 5 approves final numerical release budgets against measured evidence and completes installer signing/distribution decisions.
+- 6 adds effect exports after source export is established. First prove the new incoming-image GPU path and define input lifetime/frame matching, latency and failure behavior before broad effect authoring work. Source-output tests do not prove this path.
 
-Later work does not promise cloud rendering, marketplace, accounts, collaboration, seamless loops for arbitrary simulations, identical pixels across GPUs, or an incoming-image FFGL effect.
+## Later effect workflow
+
+Create a distortion in Lux using a test image or video as its input. Export and
+install it as a Resolume **effect**, then apply it to a clip, layer or composition
+and adjust its published controls. The same effect can process a video, camera
+feed or Lux source; it does not generate those inputs itself. Installed playback
+runs without Lux Studio, AI, a development checkout or network access.
+
+The initial scope is one image input per effect. Multiple inputs and audio
+effects are not included. A focused milestone-6 design must define safe input
+ownership, nonblocking output/failure behavior and measured latency targets, then
+validate them in the actual host. Tracer remains source export only; processing
+inside a Lux source and applying existing Resolume effects to it remain useful
+before effect export exists. DEC-14 records this addition, not implementation.
+
+Later work does not promise cloud rendering, marketplace, accounts, collaboration, seamless loops for arbitrary simulations or identical pixels across GPUs.

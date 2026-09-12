@@ -50,6 +50,7 @@ only a live bridge. Original source references remain preserved below.
 | R01 | Immutable installed release includes exact visual/assets/control schema/runtime; runs without Studio, AI, Git/library services, network or manual developer commands. Later looks/features join the same complete closure when supported. | Minimum export/install/offline playback 0.1; full feature/distribution coverage 5 | D 9; P 10; DEC-13 |
 | R02 | Installed host lifecycle, independent instances, compatible updates, failure recovery and current host values; initial source plugin, incoming-image effects deferred. | Basic cold start/instances/reopen/recovery 0.1; wider compatibility 0.2; full hardening 5 | D 9; DEC-13 |
 | R03 | Shader/simulation/particles/3D/effects performance coverage, extreme controls, repeated replacements, diagnostic overhead and 60-minute resource/queue soak with reproducible evidence. | 5 | D 9, Appendix B |
+| E01 | Export/install a reusable single-image-input FFGL effect that processes Resolume content without Studio, AI, network or development tools. Verify GPU input/output ownership and frame matching, latency, color/alpha, bypass, independent copies, composition reopen and failure/recovery in the real host. | 6 | User request; DEC-14 |
 
 ## Accepted UI decisions from this conversation
 

@@ -89,6 +89,11 @@ hardens the already usable export path with polished installation/distribution,
 runtime upgrades/migration, full asset/look/input coverage, broad workloads and
 the 60-minute soak. It is no longer the first offline export milestone.
 
+Milestone 6 adds reusable Resolume **effect** exports under DEC-14: process an
+incoming image and return the result, for example applying a Lux distortion to
+any Resolume clip. This needs a separate GPU input-path/lifetime/latency gate.
+Tracer exports sources only; existing Resolume effects can process those sources.
+
 This scope supersedes older single-host, scratch-only, developer-activation and
 "installed releases later" exclusions in the subsystem proposals. Their frame,
 security, control and ownership contracts still apply. Historical plans and
