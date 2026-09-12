@@ -2,6 +2,7 @@
 #include "FrameReceiver.h"
 #include "ContextDiagnostic.h"
 #include "ContextHandoff.h"
+#include "PollDeadline.h"
 #include <dxgi1_2.h>
 #include <wrl/client.h>
 #include <fstream>
@@ -172,18 +173,22 @@ void FrameReceiver::run(HGLRC shared) {
   require(SUCCEEDED(base.As(&device)),"D3D11.1");interop=open(device.Get());require(interop!=nullptr,"wglDXOpenDeviceNV failed: adapter/context compatibility unproved");
   log<<"{\"kind\":\"adapter\",\"luidLow\":"<<description.AdapterLuid.LowPart<<",\"luidHigh\":"<<description.AdapterLuid.HighPart<<"}"<<std::endl;
   glGenFramebuffers(1,&readFbo);glGenFramebuffers(1,&drawFbo);require(readFbo&&drawFbo,"worker framebuffer allocation failed");
-  std::wstring connected;uint64_t ticks=0;int pending=-1,sourceSlot=-1;
+  std::wstring connected;PollDeadline rendezvousPoll;const auto pollEpoch=std::chrono::steady_clock::now();int pending=-1,sourceSlot=-1;
+  const auto rendezvous=rendezvousPath();
+  log<<"{\"kind\":\"rendezvous-identity\",\"pid\":"<<GetCurrentProcessId()<<",\"path\":";diagnosticString(log,utf8Text(rendezvous));log<<",\"sid\":";diagnosticString(log,utf8Text(userSid()));log<<"}"<<std::endl;
   lifecycle.started();
   while(!lifecycle.stopRequested()) {
    if(pending>=0){
     auto& imported=imports[sourceSlot];const auto status=glCompletion(imported.fence);require(status!=Completion::Failed,"worker fence failed");
     if(status==Completion::Complete){imported.ownership.glPending=false;glDeleteSync(imported.fence);imported.fence=nullptr;require(unlock(interop,1,&imported.object)!=FALSE,"NV unlock failed");imported.ownership.locked=false;outputs[pending].state.store(Ready);pending=-1;sourceSlot=-1;}
    }
-   if(ticks%500==0&&pending<0){
-    std::wifstream file(rendezvousPath());std::wstring name;std::getline(file,name);
+   if(pending<0&&rendezvousPoll.due(std::chrono::steady_clock::now())){
+    std::wifstream file(rendezvous);std::wstring name;const bool lineRead=bool(std::getline(file,name));
+    log<<"{\"kind\":\"rendezvous-poll\",\"elapsedMs\":"<<std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-pollEpoch).count()<<",\"fileOpen\":"<<(file.is_open()?"true":"false")<<",\"lineRead\":"<<(lineRead?"true":"false")<<",\"name\":";diagnosticString(log,utf8Text(name));log<<"}"<<std::endl;
     if(!name.empty()&&name!=connected&&name.rfind(L"Local\\LuxTracerTR02-",0)==0){
-     detach();mapping=OpenFileMappingW(FILE_MAP_ALL_ACCESS,FALSE,name.c_str());
-     if(mapping)ring=static_cast<SharedRing*>(MapViewOfFile(mapping,FILE_MAP_ALL_ACCESS,0,0,sizeof(SharedRing)));
+     detach();SetLastError(ERROR_SUCCESS);mapping=OpenFileMappingW(FILE_MAP_ALL_ACCESS,FALSE,name.c_str());const auto mappingError=GetLastError();
+     DWORD viewError=ERROR_SUCCESS;if(mapping){SetLastError(ERROR_SUCCESS);ring=static_cast<SharedRing*>(MapViewOfFile(mapping,FILE_MAP_ALL_ACCESS,0,0,sizeof(SharedRing)));viewError=GetLastError();}
+     log<<"{\"kind\":\"rendezvous-mapping\",\"opened\":"<<(mapping?"true":"false")<<",\"openWin32\":"<<mappingError<<",\"mapped\":"<<(ring?"true":"false")<<",\"viewWin32\":"<<viewError<<"}"<<std::endl;
      if(ring){require(ring->version==RingVersion,"ring version mismatch");require(ring->adapter.LowPart==description.AdapterLuid.LowPart&&ring->adapter.HighPart==description.AdapterLuid.HighPart,"adapter LUID mismatch");connected=name;log<<"{\"kind\":\"attached\",\"producerPid\":"<<ring->pid<<",\"generation\":"<<ring->generation<<"}"<<std::endl;}
     }
     log<<"{\"kind\":\"counters\",\"callbacks\":"<<callbacks.load()<<",\"consumed\":"<<consumed.load()<<"}"<<std::endl;
@@ -192,7 +197,7 @@ void FrameReceiver::run(HGLRC shared) {
    if(ring&&pending<0){
     int outputIndex=-1;for(int i=0;i<3;++i){int expected=Free;if(outputs[i].state.compare_exchange_strong(expected,Writing)){outputIndex=i;break;}}
     if(outputIndex>=0){
-     if(!beginRead(*ring)){outputs[outputIndex].state.store(Free);++ticks;std::this_thread::sleep_for(std::chrono::milliseconds(1));continue;}
+     if(!beginRead(*ring)){outputs[outputIndex].state.store(Free);std::this_thread::sleep_for(std::chrono::milliseconds(1));continue;}
      int newest=-1;uint64_t frame=0;
      for(int i=0;i<3;++i)if(InterlockedCompareExchange(&ring->slots[i].state,Ready,Ready)==Ready&&ring->slots[i].frame>frame){newest=i;frame=ring->slots[i].frame;}
      if(newest<0||!transition(ring->slots[newest],Ready,Reading)){endRead(*ring);outputs[outputIndex].state.store(Free);}
@@ -226,7 +231,7 @@ void FrameReceiver::run(HGLRC shared) {
      }
     }
    }
-   ++ticks;std::this_thread::sleep_for(std::chrono::milliseconds(1));
+   std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
  }catch(const std::exception& error){log<<"{\"kind\":\"failure\",\"reason\":\""<<error.what()<<"\"}"<<std::endl;}
  catch(...){log<<"{\"kind\":\"failure\",\"reason\":\"unknown worker exception\"}"<<std::endl;}

@@ -1,5 +1,6 @@
 #pragma once
 #include <windows.h>
+#include <filesystem>
 #include <sddl.h>
 #include <string>
 #include <stdexcept>
@@ -35,4 +36,7 @@ inline std::wstring userSid() {
 }
 struct UserSecurity { PSECURITY_DESCRIPTOR descriptor=nullptr;SECURITY_ATTRIBUTES attributes{sizeof(SECURITY_ATTRIBUTES),nullptr,FALSE};UserSecurity(){auto sddl=L"D:P(A;;GA;;;"+userSid()+L")";if(!ConvertStringSecurityDescriptorToSecurityDescriptorW(sddl.c_str(),SDDL_REVISION_1,&descriptor,nullptr))throw std::runtime_error("user DACL");attributes.lpSecurityDescriptor=descriptor;}~UserSecurity(){if(descriptor)LocalFree(descriptor);} };
 inline std::wstring rendezvousPath(){wchar_t tmp[MAX_PATH];GetTempPathW(MAX_PATH,tmp);return std::wstring(tmp)+L"LuxTracerTR02-"+userSid()+L".rendezvous";}
+inline std::string utf8Text(const std::wstring& value){
+ const auto bytes=std::filesystem::path(value).u8string();return {bytes.begin(),bytes.end()};
+}
 }

@@ -6,6 +6,7 @@
 #include <fstream>
 #include <array>
 #include "shared_ring.h"
+#include "../../ffgl-source/src/ContextDiagnostic.h"
 using Microsoft::WRL::ComPtr;
 namespace {
 struct Slot {
@@ -129,7 +130,8 @@ napi_value poll(napi_env env,napi_callback_info) {
   }catch(const std::exception& error){napi_throw_error(env,nullptr,error.what());return nullptr;}
 }
 napi_value advertise(napi_env env,napi_callback_info) {
-  try{initialize();if(lux::isClosing(*ring))throw std::runtime_error("producer is closing");std::wofstream file(lux::rendezvousPath(),std::ios::trunc);file<<mappingName;file.close();if(!file)throw std::runtime_error("rendezvous write failed");return text(env,"{\"advertised\":true}");}
+  try{initialize();if(lux::isClosing(*ring))throw std::runtime_error("producer is closing");const auto rendezvous=lux::rendezvousPath();std::wofstream file(rendezvous,std::ios::trunc);file<<mappingName;file.close();if(!file)throw std::runtime_error("rendezvous write failed");
+    std::ostringstream out;out<<"{\"advertised\":true,\"pid\":"<<GetCurrentProcessId()<<",\"path\":";lux::diagnosticString(out,lux::utf8Text(rendezvous));out<<",\"mapping\":";lux::diagnosticString(out,lux::utf8Text(mappingName));out<<",\"sid\":";lux::diagnosticString(out,lux::utf8Text(lux::userSid()));out<<"}";return text(env,out.str());}
   catch(const std::exception& error){napi_throw_error(env,nullptr,error.what());return nullptr;}
 }
 napi_value control(napi_env env,napi_callback_info){float value=0.65f;if(ring){LONG bits=InterlockedCompareExchange(&ring->controlBits,0,0);memcpy(&value,&bits,sizeof(value));}napi_value result;napi_create_double(env,value,&result);return result;}
@@ -150,6 +152,3 @@ napi_value module(napi_env env,napi_value exports) {
 }
 }
 NAPI_MODULE(NODE_GYP_MODULE_NAME,module)
-
-
-
