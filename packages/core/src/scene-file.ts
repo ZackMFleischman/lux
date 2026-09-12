@@ -2,12 +2,22 @@ import { open, rename, unlink, readFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import { z } from 'zod';
-import { sourceBundleSchema, outputSettingsSchema, controlValuesSchema } from '../../runtime-contracts/src/index.ts';
+import { legacySourceBundleSchema, assetSourceBundleSchema, outputSettingsSchema, controlValuesSchema } from '../../runtime-contracts/src/index.ts';
+import type { SourceBundle, AssetSourceBundle, OutputSettings, ControlValues } from '../../runtime-contracts/src/index.ts';
 import { validateSource } from '../../../apps/build-worker/src/source-policy.mjs';
-const schema = z.object({ format: z.literal('lux-scene'), version: z.literal(1), source: sourceBundleSchema, settings: outputSettingsSchema, controls: controlValuesSchema }).strict();
+const legacySchema = z.object({ format: z.literal('lux-scene'), version: z.literal(1), source: legacySourceBundleSchema, settings: outputSettingsSchema, controls: controlValuesSchema }).strict();
+const schema = z.discriminatedUnion('version',[legacySchema,legacySchema.extend({version:z.literal(2),source:assetSourceBundleSchema}).strict()]);
 export type SceneDocument = z.infer<typeof schema>;
 const cap = 8388608, hash = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
-function document(value: unknown): SceneDocument { const result = schema.parse(value); validateSource(result.source); return result; }
+function document(value: unknown): SceneDocument {
+  const result = schema.parse(value), source = validateSource(result.source);
+  const snapshot = result.version === 2 ? {...result,source:source as AssetSourceBundle} : result;
+  if (snapshot.version === 2 && Buffer.byteLength(JSON.stringify(snapshot,null,2)+'\n') > 7340032) throw Error('Scene v2 JSON exceeds 7 MiB');
+  return snapshot;
+}
+export function createSceneDocument(source: SourceBundle, settings: OutputSettings, controls: ControlValues): SceneDocument {
+  return document({format:'lux-scene',version:'sourceVersion' in source ? 2 : 1,source,settings,controls});
+}
 async function boundedRead(path: string): Promise<Buffer> {
   const file = await open(path, 'r');
   try {
@@ -26,6 +36,7 @@ export class SceneFileStore {
   async open(path: string) {
     const bytes = await boundedRead(resolve(path));
     const snapshot = document(JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes)));
+    if (snapshot.version === 2 && bytes.length > 7340032) throw Error('Scene v2 JSON exceeds 7 MiB');
     const token = randomUUID(), fileHash = hash(bytes); this.bindings.set(token, { path: resolve(path), hash: fileHash });
     return { token, document: snapshot, fileHash, name: path.split(/[\\/]/).pop()! };
   }

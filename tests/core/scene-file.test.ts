@@ -3,8 +3,25 @@ import assert from 'node:assert/strict';
 import { mkdtemp, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { SceneFileStore } from '../../packages/core/src/scene-file.ts';
+import { SceneFileStore, createSceneDocument } from '../../packages/core/src/scene-file.ts';
+import { sourceBundleSchema } from '../../packages/runtime-contracts/src/index.ts';
 const document = { format: 'lux-scene', version: 1, source: { sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': '// 🌈 unfinished draft' } }, settings: { width: 1920, height: 1080, fps: 60, seed: 0 }, controls: { intensity: 0.8 } };
+
+test('scene v2 preserves image bytes and rejects version pairs before replacing files', async () => {
+  const folder = await mkdtemp(join(tmpdir(),'lux-assets-scene-'));
+  try {
+    const source = {...document.source,sourceVersion:2,assets:{'assets/red.bmp':{mediaType:'image/bmp',encoding:'base64',data:'Qk06AAAAAAAAADYAAAAoAAAAAQAAAAEAAAABABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AA=='}}};
+    const next = {...document,version:2,source}, store = new SceneFileStore(), path = join(folder,'image.lux-scene');
+    assert.deepEqual(createSceneDocument(sourceBundleSchema.parse(source),document.settings,document.controls),next);
+    assert.equal(createSceneDocument(sourceBundleSchema.parse(document.source),document.settings,document.controls).version,1);
+    await store.saveAs(path,next);
+    assert.deepEqual((await store.open(path)).document,next);
+    const before = await readFile(path);
+    for(const bad of [{...next,version:1},{...document,version:2},{...next,source:{...source,assets:{'assets/red.bmp':{...source.assets['assets/red.bmp'],data:''}}}}]) {
+      await assert.rejects(store.saveAs(path,bad)); assert.deepEqual(await readFile(path),before);
+    }
+  } finally { await rm(folder,{recursive:true,force:true}); }
+});
 test('scene files roundtrip Unicode drafts, settings and controls; external edits conflict', async () => {
   const folder = await mkdtemp(join(tmpdir(), 'lux-files-'));
   try {
