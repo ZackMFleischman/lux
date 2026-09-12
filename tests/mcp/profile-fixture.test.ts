@@ -4,7 +4,10 @@ import { inflateSync } from 'node:zlib';
 import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js';
 import { runFixture } from './run-fixture.mjs';
 
-test('isolated stdio fixture negotiates legacy profile, discovers tool, and returns decodable PNG', { timeout: 15000 }, async () => {
+// Three independently bounded 10-second phases plus 5 seconds for cleanup per run.
+const fixtureRunBudgetMs = 3 * 10000 + 5000;
+
+test('isolated stdio fixture negotiates legacy profile, discovers tool, and returns decodable PNG', { timeout: fixtureRunBudgetMs }, async () => {
   const { response, transcript } = await runFixture();
   assert.ok(transcript.some((item: any) => item.direction === 'server->client' && item.message.result?.protocolVersion === '2025-11-25'));
   assert.ok(transcript.some((item: any) => item.message.result?.tools?.some((tool: any) => tool.name === 'lux_fixture_image')));
@@ -24,7 +27,7 @@ test('isolated stdio fixture negotiates legacy profile, discovers tool, and retu
   assert.equal(inflateSync(Buffer.concat(chunks)).length, 32 * (1 + 32 * 3));
 });
 
-test('unsupported negotiated profile is rejected and a fresh connection succeeds', { timeout: 15000 }, async () => {
+test('unsupported negotiated profile is rejected and a fresh connection succeeds', { timeout: 2 * fixtureRunBudgetMs }, async () => {
   await assert.rejects(runFixture({ profile: '1900-01-01' }), /Unsupported MCP profile/);
   const result = await runFixture();
   assert.equal(result.imageObserved, false);
