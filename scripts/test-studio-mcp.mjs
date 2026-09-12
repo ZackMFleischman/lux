@@ -32,8 +32,32 @@ try {
   for (let i = 0; i < 20; i++) { read = parsed(await call('lux.studio.read')); if (read.source) break; await new Promise(resolve => setTimeout(resolve, 250)); }
   assert.ok(read.source);
   const first = parsed(await call('lux.studio.build', { expectedDraftVersion: read.draftVersion, source: read.source }));
+  assert.equal(first.status.authoring.playback, 'paused');
+  const target = { instanceId: first.status.authoring.instanceId, expectedGeneration: first.status.authoring.generation };
+  const controlled = parsed(await call('lux.studio.parameters', { ...target, expectedRevisionId: first.status.authoring.revisionId, values: { intensity: 0.8 } }));
+  assert.equal(controlled.status.authoring.intensity, 0.8);
+  assert.ok(controlled.status.authoring.controlSequence > 0);
+  assert.equal(controlled.applied.controlSequence, controlled.status.authoring.controlSequence);
+  for (const action of ['play', 'pause', 'reset']) {
+    const result = parsed(await call('lux.studio.playback', { ...target, action }));
+    assert.equal(result.status.authoring.playback, action === 'play' ? 'playing' : 'paused');
+    if (action === 'reset') assert.equal(result.status.authoring.clockEpoch, 1);
+  }
+  for (const args of [
+    { ...target, expectedRevisionId: first.status.authoring.revisionId, values: { intensity: 2 } },
+    { ...target, expectedRevisionId: 'stale', values: { intensity: 0.5 } },
+    { ...target, expectedRevisionId: first.status.authoring.revisionId, values: { intensity: 0.5, unknown: 1 } },
+  ]) assert.equal((await client.callTool({ name: 'lux.studio.parameters', arguments: args })).isError, true);
   const firstImage = await call('lux.studio.capture');
   const image1 = firstImage.content.find(part => part.type === 'image'); assert.ok(image1?.data);
+  assert.equal(parsed(firstImage).intensity, 0.8);
+  assert.equal(parsed(firstImage).controlSequence, controlled.applied.controlSequence);
+  const restarted = parsed(await call('lux.studio.restart', target));
+  assert.ok(restarted.status.authoring.generation > target.expectedGeneration);
+  assert.equal(restarted.status.authoring.revisionId, first.status.authoring.revisionId);
+  assert.equal(restarted.status.authoring.intensity, 0.8);
+  assert.equal(restarted.status.authoring.playback, 'paused');
+  assert.equal((await client.callTool({ name: 'lux.studio.playback', arguments: { ...target, action: 'reset' } })).isError, true);
   const updated = structuredClone(read.source); updated.files[updated.entry] = updated.files[updated.entry].replace('vec4(level, 0.2, 0.4, 1)', 'vec4(0.1, level, 0.3, 1)');
   assert.notDeepEqual(updated, read.source);
   const second = parsed(await call('lux.studio.build', { expectedDraftVersion: first.draftVersion, source: updated }));
@@ -53,7 +77,7 @@ try {
   assert.equal(recovered.authoring.fault, null);
   await writeFile(join(folder, 'first.png'), Buffer.from(image1.data, 'base64'));
   await writeFile(join(folder, 'revised.png'), Buffer.from(image2.data, 'base64'));
-  await writeFile(join(folder, 'result.json'), JSON.stringify({ ok: true, initial: first.status.authoring, revised: second.status.authoring, metadata: parsed(secondImage), staleEditRejected: true, hangingCandidateRejected: true, previousPreviewRetained: true }, null, 2));
+  await writeFile(join(folder, 'result.json'), JSON.stringify({ ok: true, initial: first.status.authoring, revised: second.status.authoring, metadata: parsed(secondImage), controlsApplied: controlled, restarted: restarted.status.authoring, staleGenerationRejected: true, staleEditRejected: true, hangingCandidateRejected: true, previousPreviewRetained: true }, null, 2));
   console.log('Actual MCP source/image/revision loop passed; stale edit and hanging candidate rejected, previous preview retained.');
 } catch (error) { console.error(error); console.error(logs); process.exitCode = 1; }
 finally {
