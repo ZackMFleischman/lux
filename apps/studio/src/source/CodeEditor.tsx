@@ -46,6 +46,18 @@ export function CodeEditor(props: CodeEditorProps) {
       if (!nonce || !/^[A-Za-z0-9+/=]{24,64}$/.test(nonce)) throw Error('Studio style nonce unavailable');
       const retained = props.cache.get(props.path, props.text);
       const handlers = [EditorView.domEventHandlers({
+        beforeinput: (event, target) => {
+          // Chromium's native rich-text replacement copies token colors into
+          // inline styles before CodeMirror reconciles the DOM, violating CSP.
+          // Composition and other input stay on CodeMirror's native path.
+          if (!event.cancelable || event.inputType !== 'insertText' || event.data === null ||
+              event.isComposing || target.compositionStarted || target.state.selection.main.empty) return false;
+          event.preventDefault();
+          if (!target.state.readOnly && target.state.facet(EditorView.editable)) {
+            target.dispatch(target.state.replaceSelection(event.data), { userEvent: 'input.type', scrollIntoView: true });
+          }
+          return true;
+        },
         compositionstart: () => { latest.current.onCompositionChange?.(true); },
         compositionend: () => { latest.current.onCompositionChange?.(false); },
       }), EditorView.updateListener.of(update => {

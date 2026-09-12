@@ -18,6 +18,37 @@ const fixture = () => createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'main.
   files: { 'main.ts': 'export const main = 1', 'lib/color.ts': 'export const color = 1', 'other/color.ts': 'export const color = 2' } });
 async function click(element: HTMLElement) { await act(async () => { fireEvent.click(element); }); }
 function view() { return EditorView.findFromDOM(document.querySelector('.cm-editor') as HTMLElement)!; }
+
+test('native selected-text insertion preserves admission, undo, readonly and composition paths', async () => {
+  const w = fixture();
+  const ui = render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} />);
+  const initial = view().state.doc.toString();
+  const select = async () => act(async () => { view().dispatch({ selection: { anchor: view().state.doc.length, head: 0 } }); });
+  const input = async (data: string, options: InputEventInit = {}) => {
+    const event = new dom.window.InputEvent('beforeinput', { bubbles: true, cancelable: true, inputType: 'insertText', data, ...options });
+    await act(async () => { view().contentDOM.dispatchEvent(event); });
+    return event.defaultPrevented;
+  };
+  await select();
+  assert.equal(await input('export const unicode = "日本";'), true);
+  assert.equal(w.getSnapshot().source.files['main.ts'], 'export const unicode = "日本";');
+  await act(async () => { assert.equal(undo(view()), true); });
+  assert.equal(view().state.doc.toString(), initial);
+  await select();
+  assert.equal(await input('\ud800'), true);
+  assert.equal(view().state.doc.toString(), initial);
+  assert.equal(w.getSnapshot().source.files['main.ts'], initial);
+  assert.equal(await input('composing', { isComposing: true }), false);
+  assert.equal(await input('composition', { inputType: 'insertCompositionText' }), false);
+  assert.equal(await input('uncancelable', { cancelable: false }), false);
+  fireEvent.compositionStart(view().contentDOM);
+  assert.equal(await input('composition without flag'), false);
+  fireEvent.compositionEnd(view().contentDOM);
+  assert.equal(view().state.doc.toString(), initial);
+  ui.rerender(<SourcePanel workspace={w} readOnly={true} onSave={() => {}} />);
+  await input('blocked');
+  assert.equal(view().state.doc.toString(), initial);
+});
 test('source panel preserves helper edits and undo across close/reopen and document replacement resets history', async () => {
   const w = fixture(); render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} />);
   await click(screen.getByRole('button', { name: 'Open lib/color.ts' }));
