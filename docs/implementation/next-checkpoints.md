@@ -30,9 +30,9 @@ User clarification: asset support is important and continues as a high-priority 
 See [required-assets.md](required-assets.md) for the approved contract. Asset work proceeds alongside creative workflow readiness; a visual brief is not required.
 
 - [x] Foundation: bounded image admission, identity and isolated byte ownership (C12).
-- [ ] C14 — IN PROGRESS: versioned source/scene and compiler/linker envelopes; preserve legacy hashes and pin helper dependencies. Agent owns contracts/build worker/scene file in an isolated worktree.
-- [ ] C15 — IN PROGRESS: Studio workspace, save/open and MCP retain the complete asset-bearing source; asset changes affect document dirty state and replacement undo. Coordinate with C14 schema; do not silently strip assets.
-- [ ] C16 — NEXT: preview worker verification before submitted code, restart retention and a fixture that visibly samples the image. Basic asset list, selection preview and metadata belong in this first usable Studio asset checkpoint.
+- [x] C14 — DONE (CPU PIPELINE): versioned source/scene and compiler/linker envelopes reviewed and integrated as8b1b6fd/fbea47c/84f5a25. Legacy identity behavior and helper closure covered;45 implementer CPU tests and14 independent focused review checks passed.
+- [x] C15 — DONE (AUTHORING PRESERVATION): reviewed55372e1 retains complete assets in workspace/session/save/read/MCP, dirty metadata and replacement undo. Combined73Studio+9editor tests and root/Studio types pass. Explicit preview/export gates remain until the next slices.
+- [ ] C16 — IN PROGRESS IN TWO WORKTREES: asset_foundation connects verified images to preview/restart; checkpoint_fixture_review implements compact asset list/thumbnails/selection preview. Coordinator prepares native six-region image/revision/restart/save/reopen checks. Required image fixture now passes real compiler/linker969c2c7.
 - [ ] C17 — NEXT: versioned immutable transport/release, installed runtime capability and exact byte closure; tamper rejection and offline asset playback evidence.
 - [ ] C18 — FIRST-USE COMPANION: bounded import/replace/remove controls alongside the C16 asset browser, before treating the creative asset workflow as usable. Common image codecs remain a separate scoped step.
 
@@ -108,3 +108,5 @@ User feedback: properties should dominate the Inspector. Performance, Runtime an
 C11 closeout: native tests ran serially and closed owned Electron windows; process inspection showed no Electron/Avenue/Arena. Coordinator inspected desktop/laptop screenshots and independently reviewed the separate editor implementation against admission, composition and undo tests. The12-line handler fixes Chromium selected-text formatting without changing CSP. MCP restart request-to-ready sample241ms is not physical-stop/host-consumed recovery evidence. New test export remains uninstalled.
 
 C15 isolated checkpoint-asset-authoring commit8e99781 passes73Studio+8editor CPU tests and root/Studio typechecks. Independent review found no blockers; discovery now distinguishes per-file and total asset byte limits from shared constants. Playback remains explicitly gated until C16; save/read support does not imply images render.
+
+Integration checkpoint: C14/C15 and fixture compilation are committed; integrated16 asset/fixture checks,73Studio+9editor checks, root and Studio typechecks pass. Native asset script is being prepared but has not run; no actual asset render or export is claimed. Preview worker and asset browser implementations proceed independently.
