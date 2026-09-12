@@ -13,7 +13,7 @@ export function validateSource(source) {
     if (!/^(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.ts$/.test(path) || path.split('/').some(p => /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(p))) throw violation(`Invalid relative TypeScript module path: ${path}`);
     if (path.startsWith('__lux') || seen.has(path.toLowerCase())) throw violation('Reserved path or case-fold collision');
     if (typeof text !== 'string' || !text.isWellFormed()) throw violation(`Source must be valid UTF-8 text: ${path}`);
-    seen.add(path.toLowerCase()); bytes += Buffer.byteLength(text, 'utf8');
+    seen.add(path.toLowerCase()); bytes += new TextEncoder().encode(text).byteLength;
     if (bytes > limits.sourceBytes) throw violation('Source exceeds 1 MiB UTF-8 limit', 'QUOTA_EXCEEDED');
   }
   if (!Object.hasOwn(source.files, source.entry)) throw violation('Entry must name a submitted module');
