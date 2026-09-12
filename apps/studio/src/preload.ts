@@ -13,3 +13,9 @@ const api: StudioWindowClient = {
   },
 };
 contextBridge.exposeInMainWorld('luxStudioWindows', Object.freeze(api));
+contextBridge.exposeInMainWorld('luxAuthoring', Object.freeze({
+  example: () => ipcRenderer.invoke('studio:authoring', 'example'),
+  compile: (source: unknown) => ipcRenderer.invoke('studio:authoring', 'compile', source),
+  smokeResult: (result: unknown) => ipcRenderer.invoke('studio:authoring', 'smoke-result', result),
+  smokeEnabled: () => ipcRenderer.invoke('studio:authoring', 'smoke-enabled'),
+}));

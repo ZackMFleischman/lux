@@ -6,3 +6,4 @@ native/vendor/
 apps/render-host/src/main.cjs
 evidence/**/profile/
 artifacts/experiments/
+artifacts/studio-smoke/

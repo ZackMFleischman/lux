@@ -67,7 +67,7 @@ async function link() {
     apiHash: hash(await readFile(esbuildEntry)), binaryHash: hash(await readFile(esbuildBinary)) };
   const { parse } = await import(pathToFileURL(known['@babel/parser/index.js']).href);
   const virtual = new Map([
-    ['entry', `import visual from 'lux:visual'; export default visual; export { WebGPURenderer } from 'three/webgpu';`],
+    ['entry', `import visual from 'lux:visual'; export default visual; export { WebGPURenderer, RenderTarget, SRGBColorSpace, QuadMesh, MeshBasicNodeMaterial } from 'three/webgpu'; export { texture as sampleTexture } from 'three/tsl';`],
     ...moduleKeys.map(key => [`module/${key}`, artifact.modules[key]]),
     ['dep/three.webgpu.js', snapshots.get('three/webgpu')], ['dep/three.tsl.js', snapshots.get('three/tsl')], ['dep/three.core.js', snapshots.get('three/core')],
   ]);
