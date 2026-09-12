@@ -27,6 +27,8 @@ flowchart LR
 
 Source is a selectable dock panel alongside Graph and Preview. The initial editor upgrade lives in the current collapsible Visual source region; it does not require Dockview or the graph implementation. Later dock integration relocates the same panel adapter.
 
+Library and Inspector are ordinary dock panels too, with the same drag, resize, tab, split, close and reopen behavior as Source, Graph and Preview. Their illustrated side columns are defaults, not reserved regions or special fixed sidebars. Users can move either into any panel group and save the resulting layout. Multiple Inspectors may retain independent selection locks, as specified in the Studio design. User explicitly reaffirmed this requirement when accepting these defaults.
+
 Ultrawide default: keep Preview largest, Graph visible and Source in a tab group below Graph. Source can instead replace Graph in that group or be dragged elsewhere. Library and Inspector remain independent. Laptop default: Preview, Graph and Source share the central tab group; switching tabs preserves each view and does not stop rendering.
 
 ```text
