@@ -10,9 +10,11 @@ class LuxSource : public CFFGLPlugin {
   lux::FrameReceiver receiver;
   std::atomic<float> intensity{0.65f};
   GLint imageLocation=-1,availableLocation=-1;
+  bool initialized=false;
  public:
   LuxSource(){SetMinInputs(0);SetMaxInputs(0);SetParamInfof(0,"Intensity",FF_TYPE_STANDARD);}
   FFResult InitGL(const FFGLViewportStruct* viewport) override {
+    if(initialized)return FF_SUCCESS;
     const char* vertex=R"(#version 410 core
 layout(location=0) in vec4 position;
 layout(location=1) in vec2 texcoord;
@@ -26,12 +28,15 @@ uniform sampler2D image;
 uniform int available;
 void main(){color=available!=0?texture(image,vec2(uv.x,1.0-uv.y)):vec4(0);}
 )";
-    if(!shader.Compile(vertex,fragment)||!quad.Initialise())return FF_FAIL;
+    if(!shader.Compile(vertex,fragment)||!quad.Initialise()){shader.FreeGLResources();quad.Release();return FF_FAIL;}
     imageLocation=shader.FindUniform("image");availableLocation=shader.FindUniform("available");
-    receiver.start(wglGetCurrentDC(),wglGetCurrentContext());
-    return CFFGLPlugin::InitGL(viewport);
+    if(!receiver.start(wglGetCurrentDC(),wglGetCurrentContext())){shader.FreeGLResources();quad.Release();return FF_FAIL;}
+    const auto result=CFFGLPlugin::InitGL(viewport);
+    if(result!=FF_SUCCESS){receiver.stop();shader.FreeGLResources();quad.Release();return result;}
+    initialized=true;return FF_SUCCESS;
   }
   FFResult ProcessOpenGL(ProcessOpenGLStruct*) override {
+    if(!initialized)return FF_FAIL;
     const GLuint texture=receiver.acquireLatest();
     GLint program=0,vao=0,active=0,bound=0;
     glGetIntegerv(GL_CURRENT_PROGRAM,&program);glGetIntegerv(GL_VERTEX_ARRAY_BINDING,&vao);glGetIntegerv(GL_ACTIVE_TEXTURE,&active);
@@ -42,7 +47,7 @@ void main(){color=available!=0?texture(image,vec2(uv.x,1.0-uv.y)):vec4(0);}
     glBindVertexArray(vao);glUseProgram(program);glBindTexture(GL_TEXTURE_2D,bound);glActiveTexture(active);
     return FF_SUCCESS;
   }
-  FFResult DeInitGL() override {receiver.stop();shader.FreeGLResources();quad.Release();return FF_SUCCESS;}
+  FFResult DeInitGL() override {receiver.stop();shader.FreeGLResources();quad.Release();initialized=false;return FF_SUCCESS;}
   FFResult SetFloatParameter(unsigned int index,float value) override {
     if(index||!std::isfinite(value))return FF_FAIL;
     intensity=std::clamp(value,0.0f,1.0f);receiver.setIntensity(intensity);return FF_SUCCESS;

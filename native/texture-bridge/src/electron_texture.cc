@@ -29,7 +29,11 @@ napi_value text(napi_env env,const std::string& value) {
   napi_value result;napi_create_string_utf8(env,value.c_str(),value.size(),&result);return result;
 }
 void initialize() {
-  if(device)return;
+  if(device&&ring)return;
+  // A previous partial initialization has submitted no GPU commands. Roll back
+  // its mapping/device before retry rather than treating a bare device as ready.
+  if(ring){UnmapViewOfFile(ring);ring=nullptr;}if(mapping){CloseHandle(mapping);mapping=nullptr;}
+  context.Reset();device.Reset();
   ComPtr<IDXGIFactory1> factory;
   check(CreateDXGIFactory1(IID_PPV_ARGS(&factory)));
   ComPtr<IDXGIAdapter1> adapter;
@@ -74,6 +78,7 @@ napi_value submit(napi_env env,napi_callback_info info) {
   unsigned index=3;
   try {
     initialize();
+    if(lux::isClosing(*ring))throw std::runtime_error("producer is closing; submissions rejected");
     size_t argc=1; napi_value args[1];napi_get_cb_info(env,info,&argc,args,nullptr,nullptr);
     void* bytes=nullptr;size_t length=0;
     if(argc!=1||napi_get_buffer_info(env,args[0],&bytes,&length)!=napi_ok||length!=sizeof(HANDLE))throw std::runtime_error("NT handle must be 8-byte Buffer");
@@ -89,15 +94,22 @@ napi_value submit(napi_env env,napi_callback_info info) {
     D3D11_TEXTURE2D_DESC desc{};local.source->GetDesc(&desc);
     if(desc.Format!=DXGI_FORMAT_B8G8R8A8_UNORM&&desc.Format!=DXGI_FORMAT_R8G8B8A8_UNORM)throw std::runtime_error("unsupported format");
     allocateSlot(index,desc);
-    local.borrowedId=++sequence;shared.frame=sequence;
+    const auto nextSequence=sequence+1;
+    if(!nextSequence)throw std::runtime_error("frame sequence exhausted");
+    // Complete all fallible acceptance serialization before accepting the
+    // borrowed texture. No C++ allocation/throw is allowed after CopyResource.
+    std::ostringstream out;out<<"{\"id\":"<<nextSequence<<",\"slot\":"<<index<<",\"width\":"<<desc.Width<<",\"height\":"<<desc.Height<<",\"format\":"<<desc.Format<<",\"adapterLuidLow\":"<<adapterDesc.AdapterLuid.LowPart<<",\"adapterLuidHigh\":"<<adapterDesc.AdapterLuid.HighPart<<"}";
+    const auto json=out.str();napi_value accepted;
+    if(napi_create_string_utf8(env,json.c_str(),json.size(),&accepted)!=napi_ok)throw std::runtime_error("acceptance allocation failed");
+    local.borrowedId=nextSequence;sequence=nextSequence;shared.frame=sequence;
     context->CopyResource(local.owned.Get(),local.source.Get());
     context->End(local.done.Get());context->Flush();
-    std::ostringstream out;out<<"{\"id\":"<<sequence<<",\"slot\":"<<index<<",\"width\":"<<desc.Width<<",\"height\":"<<desc.Height<<",\"format\":"<<desc.Format<<",\"adapterLuidLow\":"<<adapterDesc.AdapterLuid.LowPart<<",\"adapterLuidHigh\":"<<adapterDesc.AdapterLuid.HighPart<<"}";
-    return text(env,out.str());
+    return accepted;
   }catch(const std::exception& error){if(index<3&&!slots[index].borrowedId){slots[index].source.Reset();InterlockedExchange(&ring->slots[index].state,lux::Free);}napi_throw_error(env,nullptr,error.what());return nullptr;}
 }
 napi_value poll(napi_env env,napi_callback_info) {
-  std::ostringstream out;out<<"[";bool comma=false;
+  try{
+  std::ostringstream out;out<<"[";bool comma=false;std::array<unsigned,3> completed{};unsigned count=0;
   for(unsigned index=0;index<3;++index) {
     auto& local=slots[index];if(!local.borrowedId)continue;
     BOOL complete=FALSE;
@@ -105,20 +117,27 @@ napi_value poll(napi_env env,napi_callback_info) {
     if(FAILED(result)){napi_throw_error(env,nullptr,"GPU query failed; borrowed leases retained until process teardown");return nullptr;}
     if(result!=S_OK||!complete)continue;
     if(comma)out<<",";out<<local.borrowedId;comma=true;
-    local.source.Reset();local.borrowedId=0;
-    LARGE_INTEGER counter;QueryPerformanceCounter(&counter);ring->slots[index].completeQpc=counter.QuadPart;
-    InterlockedExchange(&ring->slots[index].state,lux::Ready);
+    completed[count++]=index;
   }
-  out<<"]";return text(env,out.str());
+  out<<"]";const auto json=out.str();napi_value response;
+  if(napi_create_string_utf8(env,json.c_str(),json.size(),&response)!=napi_ok)throw std::runtime_error("completion response allocation failed; leases retained");
+  // No completion ID can be lost to allocation failure after its lease reset.
+  for(unsigned n=0;n<count;++n){auto index=completed[n];auto& local=slots[index];local.source.Reset();local.borrowedId=0;
+    LARGE_INTEGER counter;QueryPerformanceCounter(&counter);ring->slots[index].completeQpc=counter.QuadPart;
+    InterlockedExchange(&ring->slots[index].state,lux::Ready);}
+  return response;
+  }catch(const std::exception& error){napi_throw_error(env,nullptr,error.what());return nullptr;}
 }
 napi_value advertise(napi_env env,napi_callback_info) {
-  try{initialize();std::wofstream file(lux::rendezvousPath(),std::ios::trunc);file<<mappingName;file.close();if(!file)throw std::runtime_error("rendezvous write failed");return text(env,"{\"advertised\":true}");}
+  try{initialize();if(lux::isClosing(*ring))throw std::runtime_error("producer is closing");std::wofstream file(lux::rendezvousPath(),std::ios::trunc);file<<mappingName;file.close();if(!file)throw std::runtime_error("rendezvous write failed");return text(env,"{\"advertised\":true}");}
   catch(const std::exception& error){napi_throw_error(env,nullptr,error.what());return nullptr;}
 }
 napi_value control(napi_env env,napi_callback_info){float value=0.65f;if(ring){LONG bits=InterlockedCompareExchange(&ring->controlBits,0,0);memcpy(&value,&bits,sizeof(value));}napi_value result;napi_create_double(env,value,&result);return result;}
 napi_value shutdown(napi_env env,napi_callback_info) {
   if(!ring)return text(env,"{\"closed\":true}");
-  InterlockedExchange(&ring->alive,0);
+  // Atomically close admission before examining borrowers. An admitted reader
+  // may not have reached Ready -> Reading yet, so slot state alone is unsafe.
+  if(!lux::closeAdmission(*ring))return text(env,"{\"closed\":false}");
   for(unsigned i=0;i<3;++i)if(slots[i].borrowedId||InterlockedCompareExchange(&ring->slots[i].state,lux::Reading,lux::Reading)==lux::Reading)return text(env,"{\"closed\":false}");
   for(auto& slot:slots){slot.source.Reset();slot.done.Reset();slot.owned.Reset();if(slot.exportHandle)CloseHandle(slot.exportHandle);slot.exportHandle=nullptr;}
   context->ClearState();context->Flush();context.Reset();device.Reset();
