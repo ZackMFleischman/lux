@@ -20,9 +20,9 @@ Status: implementation design, 11 September 2026; none of the contracts below ha
 
 This resolves S04 and P02: Looks follow the current editable Scene; a Release freezes their exact definitions. A Look that loses compatible controls reports migration needs rather than silently changing meaning. Historical Look versions remain in revision history. A Project is not a Resolume composition (B01, B03).
 
-## Stage 0.1: deliberately small scratch model
+## Stage 0.1: small authoring model and durable exports
 
-Tracer needs one scratch Scene, immutable candidate source bundles, revision checks, and restartable runtime identity (T01–T06). It does not need a general project browser, library registry, durable undo, or graph editor. Store its registry in the application service process, outside the generated-code process. Optional scratch files support explicit evidence export; they are not a crash-safe project format.
+Tracer needs basic editable scene save/open, immutable candidate bundles and revision checks, plus durable installed releases under [DEC-13](../implementation/tracer-export-scope.md). It does not need a general project browser, library registry, durable undo or graph editor. The authoring scratch registry may live in the application service; installed releases and their complete dependencies must survive its shutdown and load without the source project or Studio.
 
 ```ts
 type Id<K extends string> = string & { readonly __kind: K };
@@ -75,7 +75,7 @@ Control compatibility requires stable ID, type, semantic role/units, and valid r
 
 Runtime recovery resets simulation by default, preserving seed, accepted revision, output settings, and current owner-authoritative continuous controls. Do not replay obsolete triggers. A supported simulation checkpoint is an explicit capability, not an assumption. The background service and host bindings outlive Studio/MCP adapters; closing a UI or MCP stdio stream does not terminate host-owned instances (T05, T11).
 
-Even in 0.1, the host has an independent instance bound to an explicit immutable tracer artifact, with its own controls and simulation. An explicit host-artifact activation operation transfers the accepted source/runtime identity to that binding; a Studio auto-apply never mutates host playback implicitly. The tracer proves the same submitted visual code in both runtimes, not shared mutable Studio state. Full installed Release packaging arrives in milestone 5.
+In 0.1, every loaded source has an independent instance bound to an installed immutable release, with its own controls and simulation. Explicit export/install transfers an accepted revision into release storage; Studio auto-apply never mutates host playback. Tracer proves the same submitted code in both runtimes, two sources/copies and offline cold composition reopen. Minimum installed packaging is now 0.1; full distribution and later-feature coverage remain milestone 5.
 
 ## Milestone 1: atomic durable project storage
 
@@ -121,7 +121,7 @@ type CommitPrecondition = {
 
 Autosave commits successful changes automatically, one AI request per undo step. Undo, redo, and restore validate and create a new head referencing historical content; later history is retained. Redo is available until another edit creates a new branch. Named checkpoints pin a revision; a Git commit may represent a checkpoint but is not a Look, autosave, or backup. Migration writes a new snapshot transaction, keeps the original readable, and rejects unknown newer schemas rather than dropping fields.
 
-Retain all accepted revisions by default in milestone 1; offer explicit history compaction with a size estimate later. Never garbage-collect the current/previous-working head, named checkpoints, undo/redo references, pending job inputs, releases, or retained evidence dependencies. Unreferenced failed candidate/build objects expire after 24 hours and are bounded to 256 MiB per project; active jobs are leased and excluded. If the cap cannot be met, reject new work with `QUOTA_EXCEEDED`. Scratch tracer retains current, previous-working, job-leased, active-host-binding and live-runtime-recovery closures, plus bounded diagnostics. A host binding pins its immutable closure before Attach and across unrelated studio revisions; replacement releases it only after new binding success and final lease retirement. Total service restart loses scratch history/binding registry; renderer restart does not. See [host retention contract](tracer-contracts.md).
+Retain all accepted revisions by default in milestone 1; offer explicit history compaction with a size estimate later. Never garbage-collect the current/previous-working head, named checkpoints, undo/redo references, pending job inputs, releases, or retained evidence dependencies. Unreferenced failed candidate/build objects expire after 24 hours and are bounded to 256 MiB per project; active jobs are leased and excluded. If the cap cannot be met, reject new work with `QUOTA_EXCEEDED`. Scratch tracer retains current, previous-working, job-leased and live-runtime-recovery closures, plus bounded diagnostics. Installed releases are durable roots before any Attach and across unrelated Studio revisions and total service restarts. Source-project collection or shutdown cannot remove their closure. Old releases remain installed for saved compositions; updates never silently retarget those compositions. See [host retention contract](tracer-contracts.md).
 
 ## Milestone 2: graph data and custom source
 

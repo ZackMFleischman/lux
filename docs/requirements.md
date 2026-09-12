@@ -2,6 +2,10 @@
 
 This is an outcome index, not a replacement for the source acceptance procedures. `D` means [original design](../plans/ai-visual-workshop-design.md); `P` means [domain proposal](../plans/domain-and-workflow-proposal.md); `U` means user decisions in the planning conversation, captured below. Section references are stable source anchors. Technical implementation choices remain proposals until recorded in the decision log.
 
+DEC-13 (12 September 2026) revises milestone routing: tracer must deliver the
+[minimum reusable export workflow](implementation/tracer-export-scope.md), not
+only a live bridge. Original source references remain preserved below.
+
 ## Tracer and non-negotiable boundaries
 
 | ID | Required outcome | Stage | Source |
@@ -10,16 +14,16 @@ This is an outcome index, not a replacement for the source acceptance procedures
 | T02 | AI receives actual full-output image content, examines it, revises code, and captures again. Capture identifies revision and animation time; a path alone is insufficient. | 0.1 | D 4.1 |
 | T03 | One preview; continuous named parameter; play/pause/reset/restart; separate visual and UI measurements. | 0.1 | D 4.1 |
 | T04 | Real FFGL source in selected Resolume host, continuous parameter visibly controls the same runtime visual, completed frames transfer on GPU with no normal per-frame CPU capture. | 0.1 | D 4.1 additional requirement |
-| T05 | Studio closes while host playback continues; startup and late-frame behavior, responsive host during renderer failure, recovery restores current host control. | 0.1 | D 4.1 additional requirement |
+| T05 | Host playback continues with Studio closed and cold-starts from installed sources with Studio absent; responsive host during renderer failure; first accepted recovery frame uses current host controls. | 0.1 | D 4.1 additional requirement; DEC-13 |
 | T06 | Compilation/execution off UI path; actionable build/runtime errors; bad replacements retain last working result; supervisor recovers unresponsive code. | 0.1 | D 4.1, Appendix B |
 | T07 | Record hardware/software and pass provisional delivery, CPU/GPU/UI, control latency, watchdog and recovery gates without silently reducing workload. Unavailable timing is not a pass. | 0.1 | D Appendix B |
 | T08 | Prove orientation, color, alpha, transfer synchronization, and resource ownership using known image patterns. | 0.1 | D 4.1, 9 |
 | T09 | Choose actual OS/GPU/runtime/host versions and connection; test riskiest GPU integration before broad SDK/editor work. | Start of 0.1 | D 4.4, Appendices A/C/E |
-| T10 | Independent instance identity, parameters/state/resources; saved host composition reopens correct versions/values; stable compatible control indices; resize/deactivation/reconnect lifecycle. | 0.2 | D 4.2 |
+| T10 | Independent source/copy identity, parameters/state/resources; saved host composition cold-reopens correct versions/values; stable compatible control indices; resize/deactivation/reconnect lifecycle. | Minimum independence/reopen 0.1; wider lifecycle 0.2 | D 4.2; DEC-13 |
 | T11 | Native audio modulation, MIDI continuous control and ordered repeated triggers; seeded stateful simulation, recovery and latency/event measurements. | 0.3 | D 4.3, Appendix B |
 | B01 | Dynamic offline Resolume playback; no recorded-video substitute. Resolume owns show mixing, mapping, routing and transitions. | All | D 1, 1.3 |
 | B02 | Same application operations for UI and external/embedded AI; generated code has no privileged desktop or in-host execution. | All | D 5, Appendix A |
-| B03 | One selected scene runs by default; no continuously animated library wall or mandatory decks. | All | D 1, 1.3 |
+| B03 | One selected authoring scene runs by default in Studio; no continuously animated library wall or mandatory decks. This does not limit independent exported sources playing together in Resolume. | All | D 1, 1.3; DEC-13 clarification |
 | B04 | Proposed Windows/Electron/React/TypeScript/Three.js/TSL/WebGPU/FFGL/Spout stack must be validated; additional platforms are not ruled out. | 0.1 onward | D 4.4, Appendix A |
 
 ## Product and later milestones
@@ -41,10 +45,10 @@ This is an outcome index, not a replacement for the source acceptance procedures
 | S05 | Frame-step advances a paused authoring instance by one declared runtime step, remains paused, preserves revision and host independence, and uses explicit input-sampling rules through shared UI/AI operations. | 4 | D 8 required work |
 | M01 | AI-generated/edited images and sprites through discover/generate-or-import/validate/register/connect/render/revise; durable files and provenance; no generation dependency in playback. | 4, offline proof 5 | D 1; P 8 |
 | M02 | Validate media dimensions/alpha/color/sprite layout; failed replacement retains prior asset; consented reference use; credentials outside project/export. | 4 | D 1; P 8 |
-| P01 | Project-local components and pinned library versions, explicit publishing/updating, reusable assets/components/templates, self-contained project archive and release. | 1–5 staged | P 1,6,7 |
+| P01 | Project-local components and pinned library versions, explicit publishing/updating, reusable assets/components/templates, self-contained project archive and release. | Basic save/open and release closure 0.1; complete 1–5 staged | P 1,6,7; DEC-13 |
 | P02 | Graph data/custom source distinction, stable node/component identity, local overrides, saved data separate from transient render state and UI layout. | 1/2 | P 2,3,6,7 |
-| R01 | Immutable installed release includes exact visual/assets/looks/control schema/runtime; runs without studio, AI, Git, or library service and without manual dev commands. | 5 | D 9; P 10 |
-| R02 | Installed host lifecycle, independent instances, compatible updates, failure recovery and current host values; initial source plugin, incoming-image effects deferred. | 5 | D 9 |
+| R01 | Immutable installed release includes exact visual/assets/control schema/runtime; runs without Studio, AI, Git/library services, network or manual developer commands. Later looks/features join the same complete closure when supported. | Minimum export/install/offline playback 0.1; full feature/distribution coverage 5 | D 9; P 10; DEC-13 |
+| R02 | Installed host lifecycle, independent instances, compatible updates, failure recovery and current host values; initial source plugin, incoming-image effects deferred. | Basic cold start/instances/reopen/recovery 0.1; wider compatibility 0.2; full hardening 5 | D 9; DEC-13 |
 | R03 | Shader/simulation/particles/3D/effects performance coverage, extreme controls, repeated replacements, diagnostic overhead and 60-minute resource/queue soak with reproducible evidence. | 5 | D 9, Appendix B |
 
 ## Accepted UI decisions from this conversation
@@ -69,4 +73,4 @@ User authorized the coordinator to resolve routine planning choices. Explicitly 
 
 ## Coverage maintenance
 
-The roadmap must map every ID to a design and milestone. Tracer plan must map T01–T09 and applicable B/U constraints to task IDs and evidence. Later stages may use milestone-level acceptance detail; tracer tasks require exact file targets, contracts, failure checks, and evidence procedures.
+The roadmap must map every ID to a design and milestone. Tracer plan must map T01–T09, promoted T10/minimum P/R export outcomes and applicable B/U constraints to task IDs and evidence. Later stages may use milestone-level acceptance detail; tracer tasks require concrete contracts, failure checks and evidence procedures, with implementation file targets reconciled against current code before work starts.

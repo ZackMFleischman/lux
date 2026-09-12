@@ -4,6 +4,11 @@ Status: documentation and planning complete; reviews closed; ready for tracer im
 
 The original [design and handoff](../plans/ai-visual-workshop-design.md) and [domain proposal](../plans/domain-and-workflow-proposal.md) remain preserved source records. Direct user decisions take precedence. This document set will record implementation decisions explicitly; an earlier proposal is not silently treated as user approval.
 
+**Current scope amendment (12 September 2026):** [tracer export scope](implementation/tracer-export-scope.md)
+and DEC-13 move reusable installed Resolume sources, Studio-free cold start,
+independent instances and composition reopen into tracer. Earlier planning
+reviews predate this change; they do not certify the new scope or its implementation.
+
 ## Document ownership
 
 Requirements own outcomes and source references. Architecture owns cross-subsystem boundaries. Subsystem designs own detailed contracts. Implementation plans own ordered work and acceptance evidence. Link to authoritative definitions instead of duplicating them.

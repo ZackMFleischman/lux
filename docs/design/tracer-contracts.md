@@ -39,9 +39,9 @@ The SDK example is executable code returned by discovery, not a hidden fixed-sce
 
 ## Host artifact activation
 
-Tracer has a single fixed FFGL schema: `intensity`, float, native index 0, range/default 0–1 / 0.5. Discovery examples and generated tracer scenes must retain it. The user's creative code may use it in any visible way but cannot silently change its schema. General control schemas and release wrappers are later work.
+Tracer has one fixed FFGL schema per exported visual: `intensity`, float, native index 0, range/default 0–1 / 0.5. Discovery examples and generated tracer scenes must retain it. Creative code may use it in any visible way but cannot silently change its schema. General control publishing is later; named per-release wrappers and installed persistence are required now by [DEC-13](../implementation/tracer-export-scope.md).
 
-Developer command `pnpm tracer:activate -- --scene <id> --revision <id>` invokes this trusted application-service operation, not a public generated-code capability:
+The following pre-DEC-13 developer-activation DTOs may remain diagnostic helpers, not the required user workflow or a complete installed-release API. Before TR-06 implementation, extend shared contracts with durable release identity and export/install results; do not reuse one global binding across sources. Generated code cannot invoke export/install or choose package paths.
 
 ```ts
 type ActivateTracerHost = {
@@ -54,29 +54,31 @@ type TracerHostBinding = {
 };
 ```
 
-Resolve only an accepted retained revision to its immutable artifact. Validate fixed schema and runtime hash. Atomically advance binding version if expected version matches; otherwise `HOST_BINDING_CONFLICT`. No host instance is required to activate the binding. On first plugin attachment, resolve this artifact and allocate the service-owned runtime identity under the idempotent attachment contract below. Re-activation while the single tracer host instance exists prepares a candidate using its latest host values, then switches generation only after a completed compatible frame; a failed candidate keeps the prior binding/output. Studio head and authoring state are unaffected. A service restart requires reactivation of this scratch binding in 0.1; ordinary renderer restart does not. Installed persistence is 0.2/5.
+Export resolves an accepted retained revision, validates the fixed schema and full code/asset/runtime closure, and creates an immutable installed release with stable host identity. Each source attachment identifies that release and allocates its own runtime under the idempotent contract below. Studio head and authoring state are unaffected. Source installation is durable across service/host shutdown; cold reopen must not require developer reactivation. A new release coexists with the old one; existing compositions never silently retarget. Failed export/install preserves previous releases.
 
-The CLI must read current binding version before activation; it cannot overwrite an intervening activation silently. Return binding/instance/revision identifiers to evidence. Later persistent release installation replaces this developer operation rather than turning it into implicit live-export updating.
+Any retained diagnostic activation helper must compare binding versions and report conflicts. The actual user path is Export for Resolume plus install, returning the installed release identity. Captures, host status and acceptance evidence must identify both the immutable release/revision and the live instance.
 
-An active host binding pins the full immutable source/compiled artifact/runtime-manifest/asset closure, even before any plugin attaches. Live instances separately pin everything needed for restart. Current/previous-working scene revisions and job leases are additional retention roots, not the only roots. During replacement retain both bindings until the new host frame succeeds, then release the old binding's pin only when no instance/job/frame lease still references it. Failed replacement keeps the old binding and recovery bytes. Scratch service shutdown may release this registry; renderer shutdown must not. Test: bind A, accept B then C, collect unrooted revisions, attach/restart the host and still render A.
+An installed release pins its complete immutable closure even with no plugin attached. Live instances separately pin restart and frame resources. Scratch collection and service shutdown cannot delete installed release bytes; old versions remain usable by saved compositions. Test: export/install A, accept B then C, collect scratch data, close all Lux processes, make the source project unavailable, and reopen Resolume to render A with its saved values.
 
 ### Attachment and reconnect identity
 
 ```ts
 type HostAttach = {
   pluginClientId: string; connectionEpoch: number;
+  releaseId: string; // validated installed immutable release identity, not a live runtime ID
   knownServiceEpoch?: string; knownInstanceId?: RuntimeInstanceId;
   bindingVersion: number; controls: ControlSnapshot;
 };
 type HostAttached = {
   serviceEpoch: string; pluginClientId: string; connectionEpoch: number;
+  releaseId: string;
   instanceId: RuntimeInstanceId; generation: number; bindingVersion: number;
 };
 ```
 
-The service creates a fresh `serviceEpoch` UUID at startup and owns a mapping from `pluginClientId` to one canonical runtime UUID while that native object's lease remains live. Only first attachment allocates the runtime; retry after a lost `Attached` response resolves the same mapping. Reconnect increments the native object's `connectionEpoch`, sends its latest full control snapshot, resolves the same runtime and returns its authoritative generation. A newer connection epoch supersedes the old pipe; old-epoch updates/heartbeats cannot renew leases or change controls. Repeated messages in the same epoch are idempotent by request ID and payload. A second native object has a distinct pluginClientId; 0.1 may explicitly reject a second active object with `TRACER_CAPACITY`, never alias it to the first.
+The service creates a fresh `serviceEpoch` UUID at startup and owns a mapping from `pluginClientId` to one canonical runtime UUID and immutable release while that object's lease is live. Only first attachment allocates the runtime; retry after a lost reply resolves the same mapping. Reconnect increments `connectionEpoch`, supplies the latest full host snapshot and returns the authoritative generation. Newer connection epochs supersede old pipes; old messages cannot renew leases or change controls. Retries are idempotent by request ID/payload. A second object has a distinct pluginClientId and independent runtime, even for the same release. Tracer must support the two-source/copy acceptance fixture; larger unsupported capacity fails explicitly, never aliases state.
 
-If clean detach or lease expiry destroyed an instance, a later reconnect allocates a new canonical instance and explicitly reports that reset. A mismatched known instance under a live mapping fails `INSTANCE_CONFLICT`. A changed service epoch means scratch identity was lost: reject the stale known binding with `BINDING_UNAVAILABLE` until explicit developer reactivation, then attach afresh. No transparent claim of persisted composition state is made before 0.2. Required tests include duplicate Attach, lost reply, reconnect during renderer restart, delayed old-connection writes and current-control replay; each live client mapping must own at most one runtime.
+If clean detach or expiry destroyed an instance, reconnect allocates a new instance and reports the reset. A mismatched known instance under a live mapping fails `INSTANCE_CONFLICT`. On changed service epoch, resolve the installed release anew, allocate a fresh runtime and apply the host snapshot before the first accepted frame. Missing/incompatible releases return an actionable unavailable result; service restart alone cannot require Studio or developer reactivation. Test duplicate Attach, lost reply, renderer/service restart, cold composition reopen, two independent objects and delayed old-connection writes. Each live client mapping owns at most one runtime.
 
 ## Unified limits and scope
 

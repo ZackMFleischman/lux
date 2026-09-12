@@ -28,7 +28,7 @@ flowchart LR
 
 Solid arrows express ownership or communication, not an assertion that a GPU sharing primitive already exists. Runtime and bridge designs define which proposed path passes actual frames. UI pixels never travel through React state; captures may use bounded CPU readback, while continuous host transport must remain on GPU.
 
-The same versioned visual implementation and runtime execute in studio and host instances. Instances have separate parameters, clocks and simulation state. Studio edits do not silently change the host's pinned visual or an exported release. The 0.1 developer activation operation explicitly chooses a candidate artifact for its single host instance; 0.2 generalizes identity and saved host composition behavior.
+The same versioned visual implementation and runtime execute in studio and host instances. Instances have separate parameters, clocks and simulation state. Studio edits do not silently change an exported release. Under [DEC-13](implementation/tracer-export-scope.md), 0.1 exports named installed sources, supports independent host instances and saves their release identity in host compositions. Sources start the installed background runtime with Studio absent. Developer activation is only a diagnostic tool, not the final user workflow.
 
 ## Ownership and persistence
 
@@ -36,6 +36,7 @@ The same versioned visual implementation and runtime execute in studio and host 
 | --- | --- | --- |
 | Application core | Scene revisions, accepted changes, jobs, validation and application operations | Panel geometry, GPU frame storage |
 | Project storage | Source, graph, assets, look definitions and exact dependencies (durable in milestone 1 onward) | Live host state or transient captures by default |
+| Installed release storage | Immutable code/assets, fixed control schema and exact runtime dependencies from tracer 0.1; survives authoring/service shutdown | Mutable authoring head or live simulation state |
 | Supervisor | Process lifetime, heartbeats, runtime instance registry, crash recovery and current authoritative control snapshots | Rendering work inside host callback |
 | Render host | One instance's evaluation, GPU resources, animation clock, frame provenance and measurements | Durable project state or privileged generated-code access |
 | FFGL adapter | Native host parameter mapping and most recent completed compatible frame | AI compilation, blocking renderer startup, studio layout |
