@@ -17,7 +17,7 @@ export interface AuthoringApi {
 }
 declare global { interface Window { luxAuthoring: AuthoringApi } }
 type Running = { worker: Worker; canvas: HTMLCanvasElement; instanceId: string; generation: number; revisionId: string;
-  lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; };
+  lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; desiredIntensity?: number; };
 export class StandaloneClient implements StudioClient, PresentationPort {
   private snapshot: StudioSnapshot = { connection: 'connected', message: 'Open an example or write a visual, then Build & preview.', receivedAtMs: Date.now(), authoring: null, host: null, jobs: [], visualFps: null, uiFps: null };
   private listeners = new Set<() => void>();
@@ -49,14 +49,14 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     } catch (error) { this.publish({ jobs: [{ jobId, state: 'failed', summary: 'Build failed; previous preview retained.', fault: String(error) }] }); throw error; }
     finally { this.busy = false; }
   }
-  private async start(moduleSource: string, revisionId: string): Promise<void> {
+  private async start(moduleSource: string, revisionId: string, restartIntensity?: number): Promise<void> {
     const canvas = document.createElement('canvas'); canvas.width = 1920; canvas.height = 1080;
     canvas.style.cssText = 'width:100%;height:100%;position:absolute;inset:0;object-fit:contain';
     const worker = new Worker(new URL('./visual-worker.js', import.meta.url), { type: 'module' });
     const candidate: Running = { worker, canvas, instanceId: this.running?.instanceId ?? crypto.randomUUID(), generation: ++this.generation,
       revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0 };
     const previous = this.running;
-    const intensity = this.snapshot.authoring?.intensity ?? 0.5;
+    const intensity = restartIntensity ?? this.snapshot.authoring?.intensity ?? 0.5;
     const playing = this.snapshot.authoring?.playback === 'playing';
     let ready = false;
     try {
@@ -139,16 +139,19 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     if (operation.name === 'lux.runtime.restart') {
       if (!this.accepted) throw Error('No visual to restart');
       this.busy = true;
-      try { await this.start(this.accepted.moduleSource, this.accepted.revisionId); return this.snapshot.authoring; }
+      try { await this.start(this.accepted.moduleSource, this.accepted.revisionId, runtime.desiredIntensity); return this.snapshot.authoring; }
       finally { this.busy = false; }
     }
     if (this.snapshot.authoring?.playback === 'failed') throw Error('Restart the failed runtime first');
+    if (this.pending.has(input.requestId)) throw Error('Request ID already pending');
     let message;
     if (operation.name === 'lux.parameters.set') {
       if (operation.input.expectedRevisionId !== runtime.revisionId) throw Error('Revision changed; read current runtime state');
+      // Retain admitted authority intent even if execution faults before acknowledgement.
+      // It belongs to this runtime's restart closure, not the next submitted source.
+      runtime.desiredIntensity = operation.input.values.intensity;
       message = { type: 'controls', values: operation.input.values, controlSequence: ++runtime.controls };
     } else message = { type: 'playback', action: operation.input.action };
-    if (this.pending.has(input.requestId)) throw Error('Request ID already pending');
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => this.fault(runtime, 'Runtime command timed out'), 5000);
       this.pending.set(input.requestId, { runtime, kind: 'command', resolve, reject, timer });
