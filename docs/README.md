@@ -1,6 +1,6 @@
 # Lux engineering documentation
 
-Status: documentation and planning complete; reviews closed; ready for tracer implementation. Start with [progress](planning-progress.md) and [requirements](requirements.md). Runtime feasibility remains subject to the planned experiments.
+Status: planning complete; implementation underway. [Saved-visual GPU transport](implementation/transport-status.md) is implemented and verified in Resolume. Full tracer export and acceptance remain open. Start with [progress](planning-progress.md), the implementation checkpoint, and [requirements](requirements.md).
 
 The original [design and handoff](../plans/ai-visual-workshop-design.md) and [domain proposal](../plans/domain-and-workflow-proposal.md) remain preserved source records. Direct user decisions take precedence. This document set will record implementation decisions explicitly; an earlier proposal is not silently treated as user approval.
 

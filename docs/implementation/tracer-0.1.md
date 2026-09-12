@@ -16,6 +16,14 @@
 
 ## Global constraints
 
+**Implementation status:** [Completed transport checkpoint](transport-status.md)
+records the verified saved-scene GPU path and reusable runtime/host work at
+`a5eee83` on `codex/resolume-transport`. Integrate that work before extending it.
+The task checkboxes below describe complete acceptance obligations; an unchecked
+compound item does not mean none of its implementation exists. In particular,
+TR-02/03/06 have completed transport portions, while full TR-02 measurements,
+installed export/cold start and independent sources remain unaccepted.
+
 - Source plans remain preserved; this plan reconciles their outcomes through [decisions](../decisions.md).
 - Actual host/GPU/AI evidence is mandatory; no video substitute, per-frame CPU transport, fixed-example-only demo or path-only image result.
 - Default output is 1920×1080 at 60 Hz for reference tests. No silent quality reduction.
@@ -24,7 +32,7 @@
 - The final workflow is Export for Resolume → install → close Studio → load in Resolume. Cold start must work offline with no checkout, external asset paths, developer activation command or manually started producer. Installed release identity survives service shutdown; mutable runtime IDs may change.
 - UI moves do not reset producers; pane size is not output resolution. Only the selected authoring scene runs by default.
 - Benchmark thresholds and raw evidence are defined once in [acceptance](tracer-acceptance.md); a failed gate requires resolution or an explicit revised decision.
-- User asked the documentation coordinator to stop before implementation. This file is the assignment for the next agent, not a record of tasks already run.
+- The original documentation pass stopped before implementation. Subsequent completed work is tracked in the linked implementation checkpoints; reconcile those results before executing this plan.
 
 ## Proposed repository shape and ownership
 

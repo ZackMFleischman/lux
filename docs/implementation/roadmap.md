@@ -11,6 +11,15 @@ to tracer, not proof that installed export is complete.
 
 ## Dependency sequence
 
+**Completed implementation checkpoint (12 September 2026):**
+[Saved-visual GPU transport](transport-status.md) is implemented on
+`codex/resolume-transport` at `a5eee83`: compiled scenes, live host Intensity,
+persistent single-source playback, freeze/reconnect and clean shutdown have
+been verified in Resolume. Reuse it for TR-02/03/06 rather than scheduling the
+transport implementation again. Full GPU acceptance and the tracer export,
+installation, independent-instance and cold-reopen outcomes remain open; the
+checkpoint records exact evidence, code location and remaining gates.
+
 ```mermaid
 flowchart LR
     Preflight[0.1 preflight] --> GPU[0.1 GPU and host feasibility]

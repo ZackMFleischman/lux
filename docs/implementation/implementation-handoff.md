@@ -1,6 +1,8 @@
 # Prompt for the implementation coordinator
 
-Copy the prompt below into a new agent working in this Lux repository. This planning task stops before application implementation.
+Copy the prompt below into a new agent working in this Lux repository. The
+original planning pass is complete; subsequent implementation includes the
+[verified transport checkpoint](transport-status.md).
 
 ```text
 Coordinate implementation of Lux tracer 0.1 in this repository.
@@ -12,6 +14,16 @@ docs/implementation/tracer-export-scope.md first. It supersedes old single-host,
 scratch-only and installed-export-later exclusions. Inspect current implementation
 branches/evidence for reusable work; do not restart completed authoring or
 transport experiments, and do not mistake them for a completed export workflow.
+
+Read docs/implementation/transport-status.md before planning transport work.
+Saved-scene GPU transport and persistent single-source Resolume playback are
+implemented and verified on codex/resolume-transport at a5eee83 (local checkout
+.worktrees/transport). Reuse its compiler/runtime/native path, control handshake
+and lifecycle fixes. Its detailed reports and tr02-compiled-* evidence are on
+that branch; application code has not been merged by the status-doc update.
+Integrate carefully with newer Studio/core work. Installed export/runtime
+provisioning, automatic cold start, independent sources/copies and the remaining
+measurement/first-exported-frame gates are still required.
 
 Read docs/README.md, docs/decisions.md, docs/architecture.md,
 docs/design/tracer-contracts.md, docs/implementation/tracer-0.1.md,
