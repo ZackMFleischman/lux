@@ -1,5 +1,10 @@
 # Installed runtime foundation
 
+Removal drains run independently of the supervisor polling loop. A draining
+producer retains its capacity slot and cannot be replaced until cleanup finishes;
+supervisor shutdown waits for both pending admissions and removal drains. This
+keeps a slow source teardown from expiring healthy sibling heartbeats.
+
 Implemented CPU/build checkpoint; installed GPU and Resolume acceptance is pending.
 
 Each registered `Lux_<releaseId>.dll` reads its adjacent `.dll.lux-source` descriptor
