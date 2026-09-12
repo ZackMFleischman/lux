@@ -11,7 +11,7 @@ export async function createAgentBridge(invoke: (method: string, params: unknown
     try {
       for await (const chunk of request) { bytes += chunk.length; if (bytes > 8388608) throw Error('Request exceeds 8 MiB'); body += chunk; }
       const command = JSON.parse(body);
-      if (!command || Object.keys(command).some(key => !['id', 'method', 'params'].includes(key)) || typeof command.id !== 'string' || command.id.length > 100 || !['read', 'build', 'capture', 'status'].includes(command.method)) throw Error('Invalid authoring command');
+      if (!command || Object.keys(command).some(key => !['id', 'method', 'params'].includes(key)) || typeof command.id !== 'string' || command.id.length > 100 || !['read', 'build', 'capture', 'status', 'parameters', 'playback', 'restart'].includes(command.method)) throw Error('Invalid authoring command');
       let entry = requests.get(command.id);
       if (entry && entry.body !== body) throw Error('Request ID reused with different payload');
       if (!entry) {

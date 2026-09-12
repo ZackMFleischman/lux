@@ -7,6 +7,7 @@ import { DEFAULT_OUTPUT } from '../../../packages/runtime-contracts/src/index.ts
 import type { SourceBundle } from '../../../packages/runtime-contracts/src/index.ts';
 import { createSourceWorkspace } from './source/workspace.ts';
 import { createAuthoringSession } from './source/authoring-session.ts';
+import { dispatchRuntimeCommand } from './runtime-operations.ts';
 const client = new StandaloneClient(window.luxAuthoring);
 export function AuthoringApp() {
   const windows = useMemo(() => window.luxStudioWindows ? { ...window.luxStudioWindows,
@@ -24,6 +25,7 @@ export function AuthoringApp() {
   const io = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const busy = io.busy || draft.busy, dirty = draft.dirty || io.controlsDirty;
   useEffect(() => window.luxAuthoring.onAgentCommand(async command => {
+    if (['parameters', 'playback', 'restart'].includes(command.method)) return dispatchRuntimeCommand(client, command.method, command.params);
     if (command.method === 'status') return client.getSnapshot();
     if (command.method === 'read') return { ...session.read(), status: client.getSnapshot() };
     if (command.method === 'capture') {
