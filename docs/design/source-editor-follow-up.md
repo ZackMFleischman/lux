@@ -15,3 +15,5 @@ The detailed source navigation experience is not specified in those designs. Bef
 - Source diagnostics navigating to the relevant file and line.
 
 These are proposed elaboration topics, not additional settled UX decisions. Studio remains closed during the separate transport test; this note requires no app launch.
+
+Follow-up completed: [source workspace design](source-workspace.md), [staged implementation plan](../implementation/source-workspace-plan.md), and [CPU coverage audit](../reviews/source-workspace-cpu-audit.md) now elaborate these topics. This records a proposed implementation direction; no editor packages or application changes were made.
