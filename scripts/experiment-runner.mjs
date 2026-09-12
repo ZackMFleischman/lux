@@ -73,7 +73,7 @@ export async function runExperiment(options = {}) {
     const sourcePaths = [fileURLToPath(import.meta.url), join(here, 'experiment-job.cs'), join(here, 'experiment-job.ps1'), join(here, 'experiment-cpu-fixture.mjs')];
     manifest.sources = await Promise.all(sourcePaths.map(hash));
     if (review) { manifest.review = await hash(options.reviewFile); manifest.reviewedSources = review.sources; manifest.binaries = review.binaries; }
-    try { manifest.commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8', windowsHide: true }).trim(); } catch { manifest.commit = null; }
+    try { manifest.commit = execFileSync('git', ['-c', `safe.directory=${root}`, 'rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8', windowsHide: true }).trim(); } catch { manifest.commit = null; }
     const config = { executable, commandLine: [executable, ...args].map(quote).join(' '), cwd: root, directory, timeoutMs };
     await writeFile(join(directory, 'config.json'), JSON.stringify(config, null, 2));
     manifest.outcome = 'running';

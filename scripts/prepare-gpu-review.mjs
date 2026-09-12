@@ -53,7 +53,7 @@ async function collectSources(folder) {
 export async function prepareGpuReview({ root = resolve(dirname(fileURLToPath(import.meta.url)), '..'), output, buildAttribution } = {}) {
   if (!output) throw Error('An output request.json path is required; this command never launches hardware');
   root = resolve(root); output = resolve(output);
-  const git = args => execFileSync('git', ['-C', root, ...args], { encoding: 'utf8', windowsHide: true }).trim();
+  const git = args => execFileSync('git', ['-c', `safe.directory=${root}`, '-C', root, ...args], { encoding: 'utf8', windowsHide: true }).trim();
   const commit = git(['rev-parse', 'HEAD']);
   const status = git(['status', '--porcelain=v1', '--untracked-files=normal']);
   const sourceFiles = inventoryPaths.sources.map(path => join(root, path));
