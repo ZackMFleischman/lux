@@ -24,6 +24,12 @@ The initial handle-readiness question is resolved at the source level for the se
 
 Consumer completion is separate. Open the source using `OpenSharedResource1`, copy into owned GPU memory, end an EVENT query, submit with Flush, and poll query completion off the hot callbacks. Flush is not completion. Retain the Electron source until the query signals; then release and publish. Hardware testing must still validate the actual topology, provenance, formats and lifetime. Safe stress arms delay copying while retaining the lease; do not intentionally release a resource still in GPU use.
 
+### Spout callback risk and bounded experiment
+
+The pinned [Spout GL/DX interop path](https://github.com/leadedge/Spout2/blob/f49e2f469f8cb25f559a6eaa61a3f5b8173fc100/SPOUTSDK/SpoutGL/SpoutGLDXinterop.cpp) includes `wglDXLockObjectsNV`/unlock. A nonblocking named/keyed mutex does not make that driver ownership transition nonblocking. The [interop specification](https://github.com/KhronosGroup/OpenGL-Registry/blob/main/extensions/NV/WGL_NV_DX_interop.txt) makes those calls synchronization points. Do not put unproved Spout convenience receive operations in `ProcessOpenGL`.
+
+TR-02 candidate: a receiver worker with its own GL context shared with the plugin context performs transport acquisition/copy into a bounded pool of plugin-owned GL textures. It publishes completed work with a GL fence; FFGL uses a zero-time fence check and repeats its retained output if no fresh texture is ready. Reuse waits for prior host GPU reads to finish outside any intentional callback wait. Prove that Resolume permits the shared-context topology, state preservation and teardown before accepting it. If it fails, record the precise boundary and evaluate only the bridge design's bounded transport fallback; no silent backend expansion.
+
 ### Actual model image observation
 
 The coordinator executed the SDK's stdio client and forwarded the exact returned PNG ImageContent into the current model context. It visibly contains red upper-left, green upper-right, blue lower-left and yellow lower-right quadrants. [Raw negotiation and observation](../../evidence/tracer-0.1/tr01-model-observation/mcp-observation.json) records the explicit `2025-11-25` profile and the shell/tool bridge topology. This proves fixture image visibility through that topology, not native Codex MCP registration or the later rendered AI loop.
