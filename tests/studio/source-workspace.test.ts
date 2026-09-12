@@ -62,6 +62,6 @@ test('new files share compiler path and complete UTF-8 budget admission', () => 
   assert.throws(() => w.edit('main.ts', '\ud800'));
   assert.throws(() => createSourceWorkspace({ ...source(), entry: 'missing.ts' }));
   const boundary = createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'a.ts', files: { 'a.ts': 'é'.repeat(524288) } });
-  assert.equal(boundary.getSnapshot().source.files['a.ts'].length, 524288);
+  assert.equal(boundary.getSnapshot().source.files['a.ts']!.length, 524288);
   assert.throws(() => boundary.edit('a.ts', boundary.getSnapshot().source.files['a.ts'] + 'a'));
 });
