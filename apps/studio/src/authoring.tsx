@@ -85,10 +85,10 @@ export function AuthoringApp() {
       } catch (error) { setError(String(error)); await window.luxAuthoring.smokeResult?.({ ok: false, error: String(error), snapshot: client.getSnapshot() }); }
     }
   }).catch(reason => setError(String(reason))); }, [session, workspace]);
-  async function build() { if (composing.current) return; setError(''); const current = session.read();
+  async function build() { if (composing.current || session.getSnapshot().busy || workspace.getSnapshot().busy) return; setError(''); const current = session.read();
     try { await session.build(current.source, current.draftVersion); setDiagnostics([]); } catch (reason) { reportError(reason, current.draftVersion, current.source); } }
   async function save(saveAs = false) {
-    if (composing.current) return;
+    if (composing.current || session.getSnapshot().busy || workspace.getSnapshot().busy) return;
     setError('');
     try { await session.save(saveAs); } catch (reason) { setError(String(reason)); }
   }
@@ -98,16 +98,16 @@ export function AuthoringApp() {
     try { await session.open(); setDiagnostics([]); } catch (reason) { const current = workspace.getSnapshot(); reportError(reason, current.version, current.source); }
   }
   const fileMenu = <details className="file-tools" onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }}><summary>File</summary><div className="file-tools-content" onClick={event => { if ((event.target as Element).closest('button')) event.currentTarget.closest('details')!.open = false; }}>
-      <Button disabled={busy} onClick={() => void open()}>Open</Button><Button disabled={busy} onClick={() => void save()}>Save</Button><Button disabled={busy} onClick={() => void save(true)}>Save as</Button>
+      <Button disabled={busy} onClick={() => void open()}>Open</Button><Button disabled={busy} title="Save scene (Ctrl/Cmd+Shift+S in source)" onClick={() => void save()}>Save</Button><Button disabled={busy} onClick={() => void save(true)}>Save as</Button>
       <ExportDialog disabled={busy || composing.current} defaultName={io.name} create={name => session.exportSource(name)} />
     </div></details>;
   const commands = <>
-    <span className="document-name" title={io.name}>{io.name}{dirty ? ' *' : ''}</span>
-    <Button variant="contained" disabled={busy} onClick={() => void build()}>Build</Button>
+    <span className="document-name" title={io.name}><span className="document-label">Scene</span><span className="document-title">{io.name}</span>{dirty && <span aria-label="Unsaved changes"> *</span>}</span>
+    <Button variant="contained" disabled={busy} title="Build preview (Ctrl/Cmd+S in source)" onClick={() => void build()}>Build</Button>
     <span className="build-status" role="status">{draft.runningMatchesDraft ? 'Preview current' : draft.hasRunningSource ? 'Preview shows previous source' : 'Not built'}</span>
   </>;
   return <ThemeProvider theme={studioTheme}><div className="authoring-shell">
     <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} appCommands={commands} appError={error}
-      sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnostics={diagnostics} />} />
+      sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onApply={() => void build()} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnostics={diagnostics} />} />
   </div></ThemeProvider>;
 }
