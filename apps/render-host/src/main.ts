@@ -5,19 +5,27 @@ const { app, BrowserWindow } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 const { ProducerSession } = require('../../../tools/gpu-spike/producer-session.cjs');
+const { readTransportRelease } = require('../../../tools/gpu-spike/transport-release.cjs');
+const { HostStartup } = require('../../../tools/gpu-spike/host-startup.cjs');
+const release = process.env.LUX_TRANSPORT_BUNDLE ? readTransportRelease(process.env.LUX_TRANSPORT_BUNDLE) : null;
+const playback = process.env.LUX_TRANSPORT_PLAYBACK === '1';
+if(playback&&(!release||!process.env.LUX_TRANSPORT_STOP))throw Error('Playback requires a compiled release and supervised stop signal');
 const bridge = require(path.resolve(__dirname, '../../../native/build/Release/lux_texture_bridge.node'));
 const output = process.env.LUX_GPU_OUTPUT || path.resolve(__dirname, '../../../evidence/tracer-0.1/tr02-probe');
 const duration = Number(process.env.LUX_GPU_DURATION_MS || 8000);
 if (!Number.isInteger(duration) || duration < 1000 || duration > 330000) throw Error('Invalid diagnostic duration');
 fs.mkdirSync(output, { recursive: true });
 const records = [], session = new ProducerSession(bridge);
-let count = 0, dropped = 0, failed = false, finishing = false, webgpuReady = false;
+let count = 0, dropped = 0, failed = false, finishing = false, webgpuReady = false, visualReady = false;
 let pollTimer, controlTimer, endTimer;
+let stopProducer=()=>{}, lastHeartbeat=0;
 function record(value) {
+  if(playback&&value.kind==='copy-complete')return;
+  if(playback&&records.length>=1000)records.shift();
   if (records.length < 10000) records.push({ utc: new Date().toISOString(), time: process.hrtime.bigint().toString(), ...value });
   else dropped++;
 }
-function failure(error) { failed = true; record({ kind: 'failure', reason: String(error) }); }
+function failure(error) { failed = true; record({ kind: 'failure', reason: String(error) }); if(playback)stopProducer(); }
 function finish(closed) {
   if (finishing) return;
   finishing = true;
@@ -33,12 +41,17 @@ app.commandLine.appendSwitch('force_high_performance_gpu');
 app.setPath('userData', path.join(output, 'profile'));
 app.whenReady().then(async () => {
   record({ kind: 'versions', versions: process.versions, pid: process.pid });
+  if (release) record({kind:'release',sourceHash:release.sourceHash,linkedHash:release.linked.linkedHash,settings:release.settings});
   const win = new BrowserWindow({ width: 1920, height: 1080, frame: false, useContentSize: true, show: false, transparent: true,
     webPreferences: { offscreen: { useSharedTexture: true }, sandbox: true, contextIsolation: true, nodeIntegration: false, backgroundThrottling: false } });
   win.setContentSize(1920, 1080);
+  if (release) win.webContents.stopPainting();
   record({ kind: 'bounds', bounds: win.getContentBounds() });
   win.webContents.on('console-message', (details, _level, legacyMessage) => {
     const message = details.message ?? legacyMessage;
+    if(typeof message==='string'&&message.includes('runtime-heartbeat')){
+      try{if(JSON.parse(message).kind==='runtime-heartbeat'){lastHeartbeat=performance.now();return;}}catch{}
+    }
     record({ kind: 'console', message });
     try {
       const value = JSON.parse(message);
@@ -50,6 +63,7 @@ app.whenReady().then(async () => {
   win.webContents.on('render-process-gone', (_event, details) => { failure(JSON.stringify(details)); finish(false); });
   win.webContents.on('paint', event => {
     if (!event.texture) { failure('paint without shared texture'); return; }
+    if (release && !visualReady) { event.texture.release(); return; }
     try {
       const result = session.submit(event.texture);
       count++;
@@ -62,20 +76,36 @@ app.whenReady().then(async () => {
     catch (error) { failure(error); finish(false); }
   }, 1);
   win.webContents.setFrameRate(60);
-  await win.loadFile(path.join(__dirname, 'output.html'));
+  await win.loadFile(path.join(__dirname, release ? 'compiled-output.html' : 'output.html'));
   record({ kind: 'gpu', info: await app.getGPUInfo('complete') });
   bridge.advertise();
   let lastHostControl: number | undefined;
-  controlTimer = setInterval(() => {
+  const startup = release ? new HostStartup({revisionId:release.sourceHash,
+    init:value=>win.webContents.executeJavaScript('window.startVisual(' + JSON.stringify(release) + ',' + value + ')'),
+    update:value=>win.webContents.executeJavaScript('window.setIntensity(' + value + ')'),
+    observe:value=>record({kind:'host-control',value}), stopped:()=>session.stopping||finishing,
+    promote:(initial,value)=>{
+      record({kind:'initial-frame',intensity:value,sourceHash:release.sourceHash,frameId:initial.frameId,controlSequence:initial.controlSequence});
+      visualReady=true;webgpuReady=true;lastHeartbeat=performance.now();win.webContents.startPainting();
+    }}) : null;
+  let applyingControl = false;
+  controlTimer = setInterval(async () => {
+    if (applyingControl || session.stopping) return;
+    applyingControl = true;
     try {
       const value = bridge.control();
+      if (startup) { await startup.apply(value); return; }
+      if (value === null) return;
       if (value !== lastHostControl) { record({ kind: 'host-control', value }); lastHostControl = value; }
-      win.webContents.executeJavaScript('window.setIntensity(' + value + ')').catch(failure);
+      await win.webContents.executeJavaScript('window.setIntensity(' + value + ')');
     }
     catch (error) { failure(error); }
+    finally { applyingControl = false; }
   }, 50);
-  endTimer = setTimeout(() => {
+  stopProducer = () => {
+    if(session.stopping||finishing)return;
     session.stop(); win.webContents.stopPainting();
+    clearInterval(endTimer);
     clearInterval(pollTimer); clearInterval(controlTimer);
     const deadline = performance.now() + 2000;
     pollTimer = setInterval(() => {
@@ -84,5 +114,10 @@ app.whenReady().then(async () => {
         else if (performance.now() >= deadline) { failure('Shutdown deadline; outstanding ownership retained'); finish(false); }
       } catch (error) { failure(error); finish(false); }
     }, 10);
-  }, duration);
+  };
+  if(playback)endTimer=setInterval(()=>{
+    if(fs.existsSync(process.env.LUX_TRANSPORT_STOP))stopProducer();
+    else if(visualReady&&performance.now()-lastHeartbeat>2000)failure('Visual worker stopped reporting progress');
+  },100);
+  else endTimer=setTimeout(stopProducer,duration);
 }).catch(error => { failure(error); finish(false); });

@@ -46,6 +46,7 @@ async function initialize(message) {
   device.lost.then(info => { if (!stopped) failure(Error(`WebGPU device lost: ${info.message}`)); });
   renderer = new module.WebGPURenderer({ canvas: message.canvas, device, alpha: true, antialias: false });
   renderer.setSize(settings.width, settings.height, false); await renderer.init();
+  if (!renderer.backend.isWebGPUBackend) throw Error('WebGPU backend required');
   outputTarget = new module.RenderTarget(settings.width, settings.height);
   outputTarget.texture.colorSpace = module.SRGBColorSpace;
   const material = new module.MeshBasicNodeMaterial();

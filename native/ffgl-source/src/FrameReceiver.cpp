@@ -185,14 +185,14 @@ void FrameReceiver::run(HGLRC shared) {
     std::wifstream file(rendezvousPath());std::wstring name;std::getline(file,name);
     log<<"{\"kind\":\"discovery\",\"elapsedMs\":"<<std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count()<<",\"namePresent\":"<<(!name.empty()?"true":"false")<<",\"alreadyConnected\":"<<(name==connected?"true":"false")<<"}"<<std::endl;
     if(!name.empty()&&name!=connected&&name.rfind(L"Local\\LuxTracerTR02-",0)==0){
-     detach();mapping=OpenFileMappingW(FILE_MAP_ALL_ACCESS,FALSE,name.c_str());
+     detach();connected.clear();mapping=OpenFileMappingW(FILE_MAP_ALL_ACCESS,FALSE,name.c_str());
      if(!mapping)log<<"{\"kind\":\"mapping-unavailable\",\"win32\":"<<GetLastError()<<"}"<<std::endl;
      if(mapping){ring=static_cast<SharedRing*>(MapViewOfFile(mapping,FILE_MAP_ALL_ACCESS,0,0,sizeof(SharedRing)));if(!ring)log<<"{\"kind\":\"mapping-view-unavailable\",\"win32\":"<<GetLastError()<<"}"<<std::endl;}
      if(ring){require(ring->version==RingVersion,"ring version mismatch");require(ring->adapter.LowPart==description.AdapterLuid.LowPart&&ring->adapter.HighPart==description.AdapterLuid.HighPart,"adapter LUID mismatch");connected=name;log<<"{\"kind\":\"attached\",\"producerPid\":"<<ring->pid<<",\"generation\":"<<ring->generation<<"}"<<std::endl;}
     }
    }
    if(counters.due(now,true))log<<"{\"kind\":\"counters\",\"callbacks\":"<<callbacks.load()<<",\"consumed\":"<<consumed.load()<<"}"<<std::endl;
-   if(ring){float value=intensity.load();LONG bits;memcpy(&bits,&value,sizeof(bits));InterlockedExchange(&ring->controlBits,bits);}
+   if(ring)publishHostControl(*ring,intensity.load());
    if(ring&&pending<0){
     int outputIndex=-1;for(int i=0;i<3;++i){int expected=Free;if(outputs[i].state.compare_exchange_strong(expected,Writing)){outputIndex=i;break;}}
     if(outputIndex>=0){

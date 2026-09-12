@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateResolumeEvidence } from './gpu-evidence.mjs';
+import releaseIO from '../tools/gpu-spike/transport-release.cjs';
 
 if (process.env.LUX_EXPERIMENT_MODE !== 'hardware' || !process.env.LUX_EXPERIMENT_RUN_ID ||
     !process.env.LUX_EXPERIMENT_DIRECTORY || !/^[1-9]\d*$/.test(process.env.LUX_RESOLUME_PID || '') ||
@@ -37,7 +38,8 @@ try {
   if (!after.startsWith(before)) throw Error('Host log was replaced during the test');
   const receiver = rows(after.slice(before.length));
   await writeFile(join(output, 'receiver.jsonl'), after.slice(before.length));
-  const { ok, consumed } = validateResolumeEvidence(producer, receiver, outcome, initialCounters);
+  const release=process.env.LUX_TRANSPORT_BUNDLE?releaseIO.readTransportRelease(process.env.LUX_TRANSPORT_BUNDLE):null;
+  const { ok, consumed } = validateResolumeEvidence(producer, receiver, outcome, initialCounters, release);
   await writeFile(join(output, 'diagnostic.json'), JSON.stringify({ ok, scope: 'short-resolume-diagnostic-only', outcome,
     externalHostPid: Number(process.env.LUX_RESOLUME_PID), hostSupervised: false, consumed,
     controls: producer.filter(row => row.kind === 'host-control'), manualVisualCheckRequired: true }, null, 2));

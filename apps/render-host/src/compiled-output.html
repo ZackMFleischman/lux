@@ -1,0 +1,37 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' blob:; worker-src 'self' blob:; style-src 'unsafe-inline'; connect-src 'none'">
+<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent}canvas{width:100%;height:100%;display:block}</style>
+<canvas width="1920" height="1080"></canvas>
+<script type="module">
+let worker, identity, sequence = 0;
+const pending = new Map();
+function request(message, transfer = []) {
+  const requestId = crypto.randomUUID();
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => { pending.delete(requestId); reject(Error('Visual worker response deadline')); }, 5000);
+    pending.set(requestId, {resolve,reject,timer});
+    worker.postMessage({...message,requestId}, transfer);
+  });
+}
+window.startVisual = async (release, intensity) => {
+  if (worker) throw Error('Visual already initialized');
+  worker = new Worker('./compiled-worker.js', {type:'module'});
+  identity = {instanceId:crypto.randomUUID(),generation:1,revisionId:release.sourceHash};
+  worker.onmessage = ({data}) => {
+    if (data.type === 'heartbeat') console.log(JSON.stringify({kind:'runtime-heartbeat'}));
+    if (data.type === 'failure') console.error(JSON.stringify({kind:'failure',reason:data.message}));
+    if (data.type === 'ready' || data.type === 'status') console.log(JSON.stringify({kind:'runtime-frame',...data}));
+    const wait = pending.get(data.requestId);
+    if (wait) {
+      clearTimeout(wait.timer); pending.delete(data.requestId);
+      data.type === 'failure' ? wait.reject(Error(data.message)) : wait.resolve(data);
+    }
+  };
+  worker.onerror = event => console.error(JSON.stringify({kind:'failure',reason:event.message}));
+  const canvas = document.querySelector('canvas').transferControlToOffscreen();
+  return request({type:'init',...identity,moduleSource:release.linked.code,settings:release.settings,
+    canvas,controls:{intensity},playing:true},[canvas]);
+};
+window.setIntensity = value => request({type:'controls',...identity,controlSequence:++sequence,values:{intensity:value}});
+</script>

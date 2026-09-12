@@ -3,6 +3,7 @@ import { mkdir, readFile, writeFile, open } from 'node:fs/promises';
 import { dirname, resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateProbeEvidence } from './gpu-evidence.mjs';
+import releaseIO from '../tools/gpu-spike/transport-release.cjs';
 
 if (process.env.LUX_EXPERIMENT_MODE !== 'hardware' || !process.env.LUX_EXPERIMENT_RUN_ID || !process.env.LUX_EXPERIMENT_DIRECTORY) {
   throw Error('Reviewed experiment supervisor required');
@@ -35,7 +36,8 @@ try {
   ]);
   const producer = JSON.parse(await readFile(join(output, 'probe.json'), 'utf8'));
   const receiver = (await readFile(join(output, 'receiver.jsonl'), 'utf8')).trim().split(/\r?\n/).filter(Boolean).map(line => JSON.parse(line));
-  const result = { ...validateProbeEvidence(producer, receiver), outcomes };
+  const release=process.env.LUX_TRANSPORT_BUNDLE?releaseIO.readTransportRelease(process.env.LUX_TRANSPORT_BUNDLE):null;
+  const result = { ...validateProbeEvidence(producer, receiver, release), outcomes };
   await writeFile(join(output, 'diagnostic.json'), JSON.stringify(result, null, 2));
   process.exit(result.ok ? 0 : 2);
 } catch (error) {

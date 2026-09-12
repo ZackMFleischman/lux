@@ -8,3 +8,5 @@ evidence/**/profile/
 artifacts/experiments/
 artifacts/studio-smoke/
 artifacts/studio-mcp/
+artifacts/transport/
+apps/render-host/src/compiled-worker.js

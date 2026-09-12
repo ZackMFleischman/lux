@@ -36,7 +36,12 @@ public static class ExperimentJob {
   [DllImport("kernel32.dll")] static extern bool TerminateProcess(IntPtr p,uint code);
   [DllImport("kernel32.dll")] static extern bool CloseHandle(IntPtr h);
   static void Check(bool ok) { if(!ok) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error()); }
-  public static void Run(string exe,string command,string cwd,string dir,int timeout,ulong memoryLimitBytes=0) {
+  public static void Run(string exe,string command,string cwd,string dir,int timeout,ulong memoryLimitBytes=0,string stopFile=null,int ownerPid=0,int hostPid=0) {
+    bool playback=timeout==-1;
+    if(playback && (String.IsNullOrEmpty(stopFile)||ownerPid<=0||hostPid<=0))throw new ArgumentException("Playback requires stop file, owner and host");
+    if(!playback && timeout<1)throw new ArgumentOutOfRangeException("timeout");
+    using(var owner=playback?Process.GetProcessById(ownerPid):null)
+    using(var host=playback?Process.GetProcessById(hostPid):null) {
     if(memoryLimitBytes!=0 && (memoryLimitBytes<67108864 || memoryLimitBytes>4294967296)) throw new ArgumentOutOfRangeException("memoryLimitBytes", "Use zero or 64 MiB through 4 GiB");
     IntPtr job=CreateJobObject(IntPtr.Zero,null); Check(job!=IntPtr.Zero);
     PI pi=new PI(); bool assigned=false;
@@ -54,22 +59,35 @@ public static class ExperimentJob {
         Check(AssignProcessToJobObject(job,pi.process)); assigned=true;
         File.WriteAllText(Path.Combine(dir,"child.json"),"{\"pid\":"+pi.pid+",\"startUtc\":\""+DateTime.UtcNow.ToString("o")+"\",\"startTicks\":\""+Stopwatch.GetTimestamp()+"\",\"frequency\":"+Stopwatch.Frequency+"}");
         if(ResumeThread(pi.thread)==0xffffffff) throw new Exception("ResumeThread failed");
-        uint waitResult=WaitForSingleObject(pi.process,(uint)timeout);
+        uint waitResult;
+        bool cancelled=false;
+        if(playback) {
+          var stopping=new Stopwatch();
+          for(;;) {
+            waitResult=WaitForSingleObject(pi.process,100);
+            if(waitResult!=258)break;
+            if(!cancelled && (File.Exists(stopFile)||owner.HasExited||host.HasExited)) {
+              cancelled=true;File.WriteAllText(stopFile,"stop");stopping.Start();
+            }
+            if(cancelled&&stopping.ElapsedMilliseconds>=3000)break;
+          }
+        } else waitResult=WaitForSingleObject(pi.process,(uint)timeout);
         if(waitResult!=0 && waitResult!=258) throw new Exception("Process wait failed");
-        bool timed=waitResult==258;
+        bool timed=waitResult==258&&!cancelled;
         uint code; Check(GetExitCodeProcess(pi.process,out code));
         Check(TerminateJobObject(job,timed?124u:0u));
         var wait=Stopwatch.StartNew(); Accounting a;
         do { Check(QueryInformationJobObject(job,1,out a,Marshal.SizeOf(typeof(Accounting)),IntPtr.Zero)); if(a.active==0) break; Thread.Sleep(20); } while(wait.ElapsedMilliseconds<3000);
         if(a.active!=0) throw new Exception("Job cleanup incomplete; retain lock");
         Check(GetExitCodeProcess(pi.process,out code));
-        File.WriteAllText(Path.Combine(dir,"result.json"),"{\"exitCode\":"+code+",\"timeout\":"+(timed?"true":"false")+",\"cleanupComplete\":true,\"endUtc\":\""+DateTime.UtcNow.ToString("o")+"\",\"endTicks\":\""+Stopwatch.GetTimestamp()+"\"}");
+        File.WriteAllText(Path.Combine(dir,"result.json"),"{\"exitCode\":"+code+",\"timeout\":"+(timed?"true":"false")+",\"cancelled\":"+(cancelled?"true":"false")+",\"forcedStop\":"+(cancelled&&waitResult==258?"true":"false")+",\"cleanupComplete\":true,\"endUtc\":\""+DateTime.UtcNow.ToString("o")+"\",\"endTicks\":\""+Stopwatch.GetTimestamp()+"\"}");
       } finally {
         if(pi.process!=IntPtr.Zero && !assigned) TerminateProcess(pi.process,125);
         if(pi.thread!=IntPtr.Zero) CloseHandle(pi.thread);
         if(pi.process!=IntPtr.Zero) CloseHandle(pi.process);
         CloseHandle(job);
       }
+    }
     }
   }
 }

@@ -31,14 +31,17 @@ export function experimentSummary(manifest) {
 export async function validateReviewedInputs(review) {
   if (review.authorized !== true || !review.reviewer || !review.hypothesis || !Array.isArray(review.sources) || !review.sources.length || !Array.isArray(review.binaries) || !review.binaries.length || !Array.isArray(review.args)) throw new Error('Incomplete hardware review');
   if (review.host) {
-    if (review.testKind !== 'resolume-producer' || review.hostClosedConfirmed !== false || !Number.isInteger(review.host.pid) || review.host.pid <= 0 ||
+    const playback=review.testKind==='resolume-playback';
+    const entry=playback?join(root,'apps/render-host/src/main.cjs'):join(root,'scripts/resolume-experiment.mjs');
+    if ((!playback&&review.testKind !== 'resolume-producer') || review.hostClosedConfirmed !== false || !Number.isInteger(review.host.pid) || review.host.pid <= 0 ||
         typeof review.host.executable !== 'string' || !review.host.creationUtc || review.args.length !== 1 ||
-        resolve(review.args[0]) !== join(root, 'scripts/resolume-experiment.mjs') ||
+        resolve(review.args[0]) !== entry || (playback&&resolve(review.executable)!==join(root,'node_modules/electron/dist/electron.exe')) ||
         !review.binaries.some(b => resolve(b.path).toLowerCase() === resolve(review.host.executable).toLowerCase()) ||
-        !review.sources.some(s => resolve(s.path) === join(root, 'scripts/resolume-experiment.mjs'))) throw Error('Incomplete Resolume host review');
+        !review.sources.some(s => resolve(s.path) === entry)) throw Error('Incomplete Resolume host review');
   } else if (review.hostClosedConfirmed !== true) throw Error('Incomplete hardware review: host must be closed');
   const checkExpiry = () => { if (!Number.isFinite(Date.parse(review.expiresUtc)) || Date.parse(review.expiresUtc) <= Date.now()) throw new Error('Hardware review expired'); };
   checkExpiry();
+  if (review.transportRelease && !review.sources.some(s => resolve(s.path) === resolve(review.transportRelease))) throw Error('Transport release missing from reviewed sources');
   const executable = resolve(review.executable);
   if (!review.args.every(a => typeof a === 'string')) throw new Error('Review arguments must be strings');
   for (const entry of [...review.sources, ...review.binaries]) if ((await hash(entry.path)).sha256 !== entry.sha256) throw new Error(`Reviewed hash mismatch: ${entry.path}`);
@@ -113,7 +116,7 @@ export async function runExperiment(options = {}) {
     await powershell(['-ExecutionPolicy', 'Bypass', '-File', join(here, 'experiment-job.ps1'), '-Config', join(directory, 'config.json')], {
       timeout: timeoutMs + 15000,
       env: { ...process.env, LUX_EXPERIMENT_RUN_ID: id, LUX_EXPERIMENT_MODE: mode, LUX_EXPERIMENT_DIRECTORY: directory, LUX_EXPERIMENT_TIMEOUT_MS: String(timeoutMs),
-        LUX_RESOLUME_PID: review?.host ? String(review.host.pid) : '' },
+        LUX_RESOLUME_PID: review?.host ? String(review.host.pid) : '', LUX_TRANSPORT_BUNDLE: review?.transportRelease || '' },
     });
     const child = JSON.parse(await readFile(join(directory, 'child.json'), 'utf8'));
     const result = JSON.parse(await readFile(join(directory, 'result.json'), 'utf8'));

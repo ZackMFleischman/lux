@@ -3,6 +3,14 @@ import assert from 'node:assert/strict';
 import { validateProbeEvidence, validateResolumeEvidence } from '../../scripts/gpu-evidence.mjs';
 const producer = [{kind:'summary',paint:100,held:0,uncertain:0,dropped:0,closed:true,failed:false,webgpuReady:true}];
 const receiver = [{kind:'context',sharedContext:true,nvInterop:true},{kind:'counters',consumed:90}];
+test('compiled transport cannot pass using old diagnostic or mismatched initial controls',()=>{
+  const release={sourceHash:'source',linked:{linkedHash:'linked'}};
+  assert.equal(validateProbeEvidence(producer,receiver,release).ok,false);
+  const records=[...producer,{kind:'release',sourceHash:'source',linkedHash:'linked'},
+    {kind:'host-control',value:.17},{kind:'initial-frame',sourceHash:'source',frameId:'1',controlSequence:0,intensity:.17}];
+  assert.equal(validateProbeEvidence(records,receiver,release).ok,true);
+  assert.equal(validateProbeEvidence([...records.slice(0,-1),{...records.at(-1),intensity:.65}],receiver,release).ok,false);
+});
 test('short GPU diagnostic requires both producer completion and receiver consumption', () => {
   assert.equal(validateProbeEvidence(producer, receiver).ok, true);
   assert.equal(validateProbeEvidence(producer, []).ok, false);
