@@ -23,3 +23,6 @@ if (process.argv.includes('--tests')) await build({ ...common,
 if (process.argv.includes('--tests')) await build({ ...common,
   entryPoints: [join(root, 'tests/studio/interactions.test.tsx')], outfile: join(dist, 'interactions.test.mjs'),
   platform: 'node', format: 'esm', packages: 'external', target: 'node24', jsx: 'automatic' });
+if (process.argv.includes('--tests')) await build({ ...common,
+  entryPoints: [join(root, 'tests/studio/source-editor.test.tsx')], outfile: join(dist, 'source-editor.test.mjs'),
+  platform: 'node', format: 'esm', packages: 'external', target: 'node24', jsx: 'automatic' });
