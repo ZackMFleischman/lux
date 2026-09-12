@@ -2,6 +2,38 @@
 
 This procedure operationalizes [requirements T01–T09](../requirements.md) and original design Appendix B. It is a plan, not a test report. Do not check any acceptance box using source review, a mocked host, or generated fixtures alone.
 
+DEC-13 adds T10 and the minimum installed release outcomes described in
+[tracer export scope](tracer-export-scope.md). Tracer is incomplete until the
+user can create/export in Lux and cold-start those sources in Resolume with
+Studio absent. The existing numerical performance and GPU correctness gates
+remain in force.
+
+## Required export and reuse demonstration
+
+- Create two distinct visuals in Lux through the actual source/AI workflow and
+  export named fixed versions. Include at least one required asset in a package.
+- Install using the provided action/helper. Verify complete code/assets and
+  exact runtime dependencies; no local development tools are required to play.
+- Close Studio and run both sources together in Resolume. Separately run two
+  copies of one source; verify independent controls, state and instance IDs.
+- Save the composition and close Resolume and all Lux runtime processes. With
+  network disabled and the authoring checkout/source asset locations unavailable,
+  reopen using only Resolume. Verify automatic runtime startup and the correct
+  installed release IDs and control values. Continuing the exact old animation
+  time is not required.
+- Edit the source in Lux; verify installed playback does not change. Export a
+  new version alongside the old one. Failed export/install must leave old
+  versions intact, and old compositions must still resolve their original release.
+- Change controls during a renderer outage; require the current host snapshot on
+  the first accepted recovered frame. Remove one source while another runs,
+  then close the host and verify normal resource/instance cleanup.
+
+Record package/runtime hashes, installed locations, source/instance IDs, process
+start/exit evidence, composition save/reopen evidence and user-visible results
+in `export-install.md` and `host-evidence/`. A warmed-up service that survives
+Studio closing is insufficient: the cold-start test must also pass. Measure
+multi-source workloads separately from the single-source performance reference.
+
 Read [profiling and performance monitoring](../design/performance-monitoring.md) for how to implement probes, GPU timing, calibration, bounded collection, summaries and negative measurement tests. This acceptance document owns numerical targets; that design owns measurement implementation. Both are required: correct workload counters cannot compensate for invalid or dropped telemetry, and an accurate profiler cannot compensate for failed hardware budgets.
 
 ## Evidence layout
@@ -75,6 +107,9 @@ If GPU queries are unavailable, record which stage cannot be timed and preserve 
 | Renderer exit during host playback | Host uses last completed owned image, or startup transparent black if none; no blocking callback or invalid handle access. |
 | Restart while native control changed | Current versioned host value wins; stale generation frames are discarded; reference frame restored within five seconds. |
 | Close studio, retain Resolume | Detached supervisor/render instance continues; reopen studio attaches without resetting host instance. |
+| Cold composition reopen with Studio absent | Installed sources start their background runtime automatically and restore pinned release IDs/current saved controls without network, checkout or a manual producer. |
+| Two sources or duplicate copies | Independent runtime/control state; removing one does not stop the other. |
+| Failed export/install or later authoring edit | Installed releases remain usable and unchanged; new versions require explicit selection. |
 | Capture concurrent with revision activation | Image and metadata match the requested revision or an explicit revision conflict/unavailable response; never mislabeled pixels. |
 | Capture timeout/queue full | Bounded failure, released resources, no UI freeze or stalled host transport. |
 | Resize/hide/detach presentation consumer | Render state/clock remains consistent; output resolution changes only by explicit render setting, no double clock advancement. |
@@ -83,7 +118,7 @@ If GPU queries are unavailable, record which stage cannot be timed and preserve 
 
 ## Scope of later evidence
 
-Two independent host instances and composition reopen are 0.2. Stateful simulation and 20 events/sec over ten seconds are 0.3. Recorded-input deterministic capture is 3. The 60-minute resource/queue soak and five workload categories are 5. Keep these visible in the roadmap; do not demand them to complete 0.1 or describe them as already established.
+Independent host instances, complete minimum export/install and offline cold composition reopen are now required in 0.1 under DEC-13. Wider resize/upgrade/capacity coverage remains 0.2. Stateful simulation and 20 events/sec over ten seconds are 0.3. Recorded-input deterministic capture is 3. The 60-minute resource/queue soak, polished distribution and five workload categories are 5. Do not describe any gate as established without its evidence.
 
 ## Sign-off
 

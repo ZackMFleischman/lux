@@ -2,7 +2,9 @@
 
 > **For agentic workers:** Use `superpowers:subagent-driven-development` or `superpowers:executing-plans` where available. Follow tasks and checks in order; equivalent explicit planning/review procedures are acceptable when skills are unavailable. Stop at failed prerequisite gates.
 
-**Goal:** An external AI creates, captures, examines and revises executable visuals in Lux, and the same visual implementation runs dynamically in actual Resolume with a native continuous control and GPU image transfer.
+**Goal:** Use Lux and an external AI to create, inspect and revise visuals, then export/install them as reusable Resolume sources that cold-start and run independently without Lux Studio, AI or development tools. Save and reopen the correct versions and controls in Resolume.
+
+**Scope authority:** [Tracer export scope](tracer-export-scope.md), approved by the user on 12 September 2026 (DEC-13), supersedes the original scratch-only/single-host and deferred-release limits. Existing implementation checkpoints may satisfy parts of this plan; verify their evidence rather than restarting them or assuming export is already complete.
 
 **Architecture:** The application core serializes scene changes and owns accepted revisions. A detached supervisor runs isolated compiler/render processes; the studio is a presentation/control client. A native adapter publishes completed GPU frames to a small FFGL source without waiting for the renderer inside the host callback.
 
@@ -14,14 +16,23 @@
 
 ## Global constraints
 
+**Implementation status:** [Completed transport checkpoint](transport-status.md)
+records the verified saved-scene GPU path and reusable runtime/host work at
+`a5eee83` on `codex/resolume-transport`. Integrate that work before extending it.
+The task checkboxes below describe complete acceptance obligations; an unchecked
+compound item does not mean none of its implementation exists. In particular,
+TR-02/03/06 have completed transport portions, while full TR-02 measurements,
+installed export/cold start and independent sources remain unaccepted.
+
 - Source plans remain preserved; this plan reconciles their outcomes through [decisions](../decisions.md).
 - Actual host/GPU/AI evidence is mandatory; no video substitute, per-frame CPU transport, fixed-example-only demo or path-only image result.
 - Default output is 1920×1080 at 60 Hz for reference tests. No silent quality reduction.
 - Keep generated code outside UI/privileged processes/Resolume; bound queues, captures, initialization and unresponsive execution.
-- One authoring instance and one independent host instance may use the same immutable bundle. One simple continuous control; no general graph editor, library, embedded chat, studio audio setup, installer or durable project history in 0.1.
+- One authoring instance and independent installed host instances use immutable release bytes. Prove two distinct sources together and, separately, two copies of one source. Keep one simple continuous control per source. Include basic export/install and runtime provisioning; no general graph editor, library, embedded chat, studio audio setup, polished signed installer or durable revision history in 0.1.
+- The final workflow is Export for Resolume → install → close Studio → load in Resolume. Cold start must work offline with no checkout, external asset paths, developer activation command or manually started producer. Installed release identity survives service shutdown; mutable runtime IDs may change.
 - UI moves do not reset producers; pane size is not output resolution. Only the selected authoring scene runs by default.
 - Benchmark thresholds and raw evidence are defined once in [acceptance](tracer-acceptance.md); a failed gate requires resolution or an explicit revised decision.
-- User asked the documentation coordinator to stop before implementation. This file is the assignment for the next agent, not a record of tasks already run.
+- The original documentation pass stopped before implementation. Subsequent completed work is tracked in the linked implementation checkpoints; reconcile those results before executing this plan.
 
 ## Proposed repository shape and ownership
 
@@ -36,7 +47,7 @@ packages/runtime/            # instance/clock/capture/metrics
 packages/core/               # scratch scene, revision, job and application services
 packages/mcp/                # stdio protocol adapter and tool schemas
 native/texture-bridge/         # owned GPU frame pool and process handle integration
-native/ffgl-source/          # fixed tracer source and native control client
+native/ffgl-source/          # per-release fixed-schema sources and shared control client
 tests/{runtime,core,mcp}/    # deterministic unit/contract cases
 tests/e2e/tracer/            # AI, desktop and actual-host procedures
 scripts/                    # preflight, build, evidence and acceptance runners
@@ -53,7 +64,7 @@ flowchart LR
     T2 --> T3[TR-03 Runtime and supervisor]
     T3 --> T4[TR-04 Core and MCP loop]
     T4 --> T5[TR-05 Studio and presentation]
-    T4 --> T6[TR-06 Integrated host control / recovery]
+    T4 --> T6[TR-06 Export / install / independent host playback]
     T5 --> T6
     T6 --> T7[TR-07 Acceptance and handoff]
 ```
@@ -168,7 +179,7 @@ The harness helper names above are test-local, not competing production APIs. It
 **Interfaces:** Core consumes runtime DTOs/sessions; MCP exposes the exact `lux.*` operation table in AI design. Canonical public types are `Submit`, `ParameterWrite`, `Playback`, `CaptureRequest`, `Job`, `Fault` and `CaptureMetadata`. Adapter results use the negotiated MCP profile, never mix profile-specific envelopes.
 
 - [ ] Write operation/schema tests for new scratch scene, stale base, payload mismatch for repeated request ID, invalid scope/import, full queues and host authority rejection. Implement discovery and source read with actual SDK contract/examples returned to the client.
-- [ ] Implement serial submit/compile/smoke/activate with default automatic apply and a concise summary. Explicit staging tools remain diagnostic options; do not add a required Keep button. Tracer uses scratch retention with host-binding/live-runtime roots; durable history is milestone 1. Use a service-level retention fixture to pin artifact A as a binding root, accept B/C and collect unrooted data; assert A's closure remains readable. Actual CLI activation and native Attach/restart are delivered/tested in TR-06.
+- [ ] Implement serial submit/compile/smoke/activate with default automatic apply and a concise summary. Explicit staging tools remain diagnostic options; do not add a required Keep button. Keep basic editable save/open, while durable history remains milestone 1. Installed releases are persistent retention roots independent of the authoring scratch registry. Test that exporting A, accepting B/C and collecting unrooted scratch data cannot remove A's complete installed closure. Export/install and native Attach/restart are delivered/tested in TR-06.
 - [ ] Implement status/cancel/retry/idempotency behavior and bounded retention. Test cancellation before commit and late cancellation after commit; the latter must report the actual committed result.
 - [ ] Implement `lux.capture` and `lux.jobs.get({includeResult:true})` returning real PNG ImageContent and metadata. Test revision change before/after frame lease, restart before lease, control sequence barrier, paused repeated frame and queue/timeout cleanup.
 - [ ] Run `pnpm test:unit -- --area core`, `pnpm test:mcp`, `pnpm typecheck` and `pnpm build`. Include real source-to-render capture integration in addition to mocked protocol cases.
@@ -194,28 +205,32 @@ The harness helper names above are test-local, not competing production APIs. It
 
 **Gate:** Visible working controls through shared operations; preview lifetime separate from simulation; output size unaffected by pane geometry.
 
-## TR-06 — Integrated host activation, control and recovery
+## TR-06 — Export, install and independent Resolume playback
 
-**Requirements:** T04/T05/T06/T08; end-to-end T03. **Read:** bridge lifecycle/control contracts and acceptance failure matrix.
+**Requirements:** T04/T05/T06/T08/T10; end-to-end T03; minimum P/R release outcomes promoted by DEC-13. **Read:** [export scope](tracer-export-scope.md), bridge lifecycle/control contracts and acceptance failure matrix.
 
-**Modify:** proven `native/ffgl-source/`, `native/texture-bridge/`, supervisor and native IPC adapter; add `scripts/activate-tracer.mjs`, `tests/e2e/tracer/host-lifecycle.md`, `scripts/test-host.ps1`.
+**Modify:** proven native transport/source, supervisor, release service and Studio export entry; add a basic install helper and actual-host export/lifecycle tests. Reconcile concrete paths and shared release DTOs with the integrated implementation before coding.
 
-**Interfaces:** Developer-only `pnpm tracer:activate -- --scene <id> --revision <id>` pins a validated immutable bundle to the single tracer host source via authenticated service command. This explicit diagnostic operation is not automatic release updating. Use bridge-defined host control snapshots, generations and frame metadata, mapped to runtime's `ControlSnapshot`.
+**Interfaces:** A user-facing Export for Resolume action takes an accepted revision and creates an immutable named release, complete manifest and fixed-schema source wrapper. Installation resolves the release and its exact installed runtime without an authoring service. Native Attach identifies the installed release and the particular plugin object; each object gets an independent runtime. Developer activation may remain a diagnostic helper, but cannot be the required export/playback workflow. Use the existing host snapshots/generations/frame contracts, extended with persistent release identity.
 
 - [ ] Connect the fixed FFGL named control to runtime values with native normalized range conversion and monotonic control sequence. Coalesce continuous snapshots off the render callback; no raw MIDI or FFT claims in 0.1.
-- [ ] Implement explicit host artifact activation and independent runtime allocation from the accepted scene bundle. Reject incompatible fixed control schema; no dynamic arbitrary parameter registry yet.
-- [ ] Exercise the full retention scenario through real integration: activate A before host Attach, accept B/C in Studio, collect eligible scratch revisions, Attach and restart the renderer; both must render A with current host-owned values. Failed host replacement must preserve A and its recovery closure.
+- [ ] Build named immutable packages from validated revisions, including required code/assets, runtime dependencies and fixed control schema. Verify hashes and reject unresolved paths. Give distinct releases stable host source identities; do not retarget one global source when another visual is exported.
+- [ ] Add Export for Resolume and a basic install action/helper. Install complete versioned runtime dependencies; playback needs no developer checkout, compiler, Node/pnpm setup, terminal command or manual producer. Failed export/install preserves existing releases. New releases coexist; old compositions keep their selected release until explicitly changed.
+- [ ] Implement cold-start discovery and independent runtime allocation from installed releases. Recover installed release identity after service restart; reject incompatible fixed schemas. Apply the host snapshot before the first accepted frame. General dynamic control schemas remain later.
+- [ ] Export A, accept B/C in Studio and collect eligible scratch revisions. With the source project and external asset paths unavailable, Attach and renderer/service restart must still load installed A with current host-owned values. Include a required asset in the release-closure test.
 - [ ] Confirm an AI-produced artifact from TR-04 renders in actual Resolume and responds to the native control; capture visible markers proving selected revision.
 - [ ] Close studio and AI while host runs. Change the host control; verify uninterrupted playback and no studio-dependent lifetime or data source. Reopen studio without resetting the host.
+- [ ] Run two different exported sources together, then two copies of one source. Change controls independently and remove one while the other runs. Record separate IDs, state and resource use; reject capacity beyond supported limits explicitly rather than aliasing instances.
+- [ ] Save the Resolume composition, close all Lux/host processes, disable network and make authoring/development paths unavailable. Open only Resolume and restore the exact release versions and saved values. Confirm the installed runtime starts automatically and can exit normally after host shutdown. Animation may restart from its defined initial state.
 - [ ] Kill/restart render process, change host control during outage and verify current host values on recovery. Reject stale generations/frames; preserve last completed image during outage and transparent black before first frame.
 - [ ] Run `pnpm test:host -- --run-id <id>` including producer delay, resource cleanup and callback nonblocking checks; repeat `pnpm test:unit`, `pnpm build`, `pnpm native:build` after integration.
-- [ ] Commit integrated lifecycle and control evidence. Full composition save/reopen and two-host-instance tests remain 0.2.
+- [ ] Commit export/install, cold-start, independent-source and lifecycle/control evidence. Wider resize, upgrade and capacity coverage remains 0.2; polished distribution and sustained workload qualification remains 5.
 
-**Gate:** Studio/AI can close; dynamic host rendering and parameter changes continue; explicit renderer restart restores within five seconds without intentional host waits.
+**Gate:** The user exports visuals from Lux and uses the installed sources in Resolume with Studio absent, including cold composition reopen and independent copies. No developer activation or producer launch is needed. Renderer restart restores current host values within five seconds without intentional host waits; normal source removal and host shutdown complete.
 
 ## TR-07 — Measured acceptance and implementation handoff
 
-**Requirements:** all T01–T09 and applicable B/U constraints. **Read:** [acceptance](tracer-acceptance.md).
+**Requirements:** all T01–T09, promoted T10/minimum P/R export outcomes and applicable B/U constraints. **Read:** [acceptance](tracer-acceptance.md) and [export scope](tracer-export-scope.md).
 
 **Create:** `scripts/acceptance-report.mjs`, actual-host runner completion, evidence manifests/raw traces/reports; update task checkboxes only with artifact links.
 
@@ -240,6 +255,7 @@ The harness helper names above are test-local, not competing production APIs. It
 | T07 | TR-01, TR-07 | Environment, raw timings/counters and every provisional budget |
 | T08 | TR-02, TR-06 | Color/orientation/alpha and synchronized ownership proof |
 | T09 | TR-01, TR-02 | Pinned actual environment and first integration gate |
+| T10 and DEC-13 | TR-03, TR-05, TR-06, TR-07 | Named installed releases, two sources/copies, Studio-free cold start, offline composition reopen and retained controls |
 | B01–B04 | All tasks | Scope, real dynamic playback, shared operations and isolated execution |
 | U04, U07 | TR-03, TR-05 | Presentation detach without reset; explicit output dimensions |
 

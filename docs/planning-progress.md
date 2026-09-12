@@ -24,6 +24,8 @@ Commit checkpoints: baseline, specialist drafts, reconciled plans, initial revie
 
 ## Status log
 
+- Implementation update, 12 September 2026: [saved-visual GPU transport](implementation/transport-status.md) completed and verified on `codex/resolume-transport` at `a5eee83`. Includes compiled scene preparation, persistent single-source playback, initial host Intensity application, live controls, freeze/reconnect and clean producer/host shutdown; 34 unit and 9 native tests plus build/typecheck passed. Roadmap, tracer plan and coordinator handoff now point to this reusable work. This status update does not merge application code or complete installed export, independent sources, cold reopen, full measurement acceptance or exact first-exported-frame provenance. The earlier entries below describe the historical documentation-only pass.
+
 - Baseline: source commit `1c9c884`; clean checkout; no application code or tests. User authorized routine planning decisions, three independent reviewers, worktrees, frequent commits, and architecture/UI diagrams.
 - Technical proposals require evidence or a bounded tracer experiment; documentation readiness is not proof of working GPU integration.
 - Baseline committed as `5ce8919`. Three specialist worktrees created on `codex/docs-runtime`, `codex/docs-core`, and `codex/docs-studio`; disjoint file ownership communicated.

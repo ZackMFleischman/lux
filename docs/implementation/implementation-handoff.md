@@ -1,9 +1,29 @@
 # Prompt for the implementation coordinator
 
-Copy the prompt below into a new agent working in this Lux repository. This planning task stops before application implementation.
+Copy the prompt below into a new agent working in this Lux repository. The
+original planning pass is complete; subsequent implementation includes the
+[verified transport checkpoint](transport-status.md).
 
 ```text
 Coordinate implementation of Lux tracer 0.1 in this repository.
+
+The user revised tracer scope on 12 September 2026 (DEC-13): create visuals in
+Lux, export/install reusable Resolume sources, and use them with Lux Studio
+absent, including cold start and independent sources. Read
+docs/implementation/tracer-export-scope.md first. It supersedes old single-host,
+scratch-only and installed-export-later exclusions. Inspect current implementation
+branches/evidence for reusable work; do not restart completed authoring or
+transport experiments, and do not mistake them for a completed export workflow.
+
+Read docs/implementation/transport-status.md before planning transport work.
+Saved-scene GPU transport and persistent single-source Resolume playback are
+implemented and verified on codex/resolume-transport at a5eee83 (local checkout
+.worktrees/transport). Reuse its compiler/runtime/native path, control handshake
+and lifecycle fixes. Its detailed reports and tr02-compiled-* evidence are on
+that branch; application code has not been merged by the status-doc update.
+Integrate carefully with newer Studio/core work. Installed export/runtime
+provisioning, automatic cold start, independent sources/copies and the remaining
+measurement/first-exported-frame gates are still required.
 
 Read docs/README.md, docs/decisions.md, docs/architecture.md,
 docs/design/tracer-contracts.md, docs/implementation/tracer-0.1.md,
@@ -30,10 +50,12 @@ the promised authoring/runtime capabilities. A failed feasibility gate
 stops dependent work; preserve the experiment and propose the next bounded
 decision, never silently substitute screenshots or video playback.
 
-Keep tracer scope small: one scratch visual, one continuous intensity
-control, external AI submit-render-capture-revise, one large preview,
-play/pause/reset/restart/status, separate host instance, and actual dynamic
-Resolume playback that survives closing Studio and AI. Captures must reach
+Keep the API/UI small: one continuous intensity control per visual, external
+AI submit-render-capture-revise, basic editable save/open and one large preview.
+Include named immutable export, a basic install helper, complete pinned runtime
+and asset bytes, automatic background startup, two independent sources/copies
+and saved-composition cold reopen without Studio, AI, network, development tools
+or manual producer launch. Editing must not change installed releases. Captures must reach
 the model as image content and match their revision/frame metadata.
 Do not build the full graph/library/docking/chat/audio UI or durable
 project system in tracer 0.1. Preserve their documented extension points.

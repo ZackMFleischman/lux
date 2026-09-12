@@ -2,19 +2,38 @@
 
 This is the full-product coverage map. Only [tracer 0.1](tracer-0.1.md) is decomposed into execution tasks now. Later milestones require a focused implementation plan against the contracts below before coding; this avoids freezing speculative file-level details before GPU feasibility is established. Source acceptance procedures remain linked from [requirements](../requirements.md).
 
+**Scope revised 12 September 2026:** tracer means **create in Lux → export/install
+a reusable source → use it in Resolume without Lux Studio running**, including
+cold start, independent sources and composition reopen. The authoritative
+[export scope](tracer-export-scope.md) moves these minimum outcomes forward from
+0.2/5. Existing standalone authoring and GPU transport demonstrations are inputs
+to tracer, not proof that installed export is complete.
+
 ## Dependency sequence
+
+**Completed implementation checkpoint (12 September 2026):**
+[Saved-visual GPU transport](transport-status.md) is implemented on
+`codex/resolume-transport` at `a5eee83`: compiled scenes, live host Intensity,
+persistent single-source playback, freeze/reconnect and clean shutdown have
+been verified in Resolume. Reuse it for TR-02/03/06 rather than scheduling the
+transport implementation again. Full GPU acceptance and the tracer export,
+installation, independent-instance and cold-reopen outcomes remain open; the
+checkpoint records exact evidence, code location and remaining gates.
 
 ```mermaid
 flowchart LR
     Preflight[0.1 preflight] --> GPU[0.1 GPU and host feasibility]
     GPU --> Loop[0.1 AI create-capture-revise plus host]
-    Loop --> Life[0.2 identity and host lifecycle]
+    Loop --> Export[0.1 export and install reusable sources]
+    Export --> Independent[0.1 Studio-free cold start and independent sources]
+    Independent --> Life[0.2 broader host compatibility and lifecycle]
     Life --> Reactive[0.3 audio MIDI and simulation]
     Reactive --> Safe[1 durable safe edits]
     Safe --> Graph[2 graph and inspector]
     Graph --> Inspect[3 richer inspection]
     Inspect --> Creative[4 full studio and inputs]
-    Creative --> Release[5 offline performance release]
+    Creative --> Release[5 release hardening and distribution]
+    Release --> Effects[6 reusable Resolume effect exports]
 ```
 
 Features accumulate without removing prior tests. Small docking/presentation experiments belong early to validate lifetime boundaries, but a full graph, library or embedded assistant is not needed to pass 0.1.
@@ -25,14 +44,15 @@ Features accumulate without removing prior tests. Small docking/presentation exp
 
 | Stage | Deliverables and contract extensions | Acceptance evidence |
 | --- | --- | --- |
-| 0.1 | Environment lock, actual GPU handoff, minimal visual API, external MCP code/capture loop, one named control, preview/transport/status, recovery and measurements. | Real AI images and code revisions, actual host frame/control records, Appendix B budgets. See tracer plan. |
-| 0.2 | Durable scene/artifact identity in host, independent runtime IDs, compatible index map, activation/deactivation/resize/reconnect, composition persistence. | Two loaded copies stay independent; save/close/reopen correct version/values; resize/deactivate one while other runs; compatible and incompatible upgrade cases; no capacity claim. |
+| 0.1 | Usable create/export/install/play loop: minimal visual API and AI capture/revise; immutable source packages, required assets and pinned installed runtime; basic install helper, one named control, automatic background startup, independent sources, composition persistence, recovery and existing measurements. | Export two distinct visuals; close Studio; run both in Resolume. Separately test duplicate copies. Cold reopen restores release IDs/controls with all Lux processes initially stopped, no network, checkout or manual producer. Preserve actual frame/control and Appendix B gates. See tracer export scope. |
+| 0.2 | Broader host lifecycle, resize and compatibility coverage; resource/capacity handling and compatible/incompatible upgrade cases beyond tracer's fixed schema. | Resize/deactivate one while another runs; extend reconnect/device-failure cases and measured concurrency. Retain tracer's independent-source and cold-reopen tests; no unlimited capacity claim. |
 | 0.3 | Explicit fixed-step simulation/overload policy, one event control, native audio modulation/MIDI knob/repeated notes, ordered event transport with generations. | Seeded particle fixture, 20 events/sec for 10 seconds, exact delivered-event count/order, host MIDI-delivery observation, latency/restore gates, stale events discarded. |
 | 1 | Atomic project transactions, accepted revision journal, undo/redo/checkpoints, source/assets/runtime pins, autosave, durable conflict handling, project archive foundation. | Restart/reopen without AI/dev server; crash between multi-file writes cannot create a half-project; invalid/hanging edit retains working data; conflicting clients cannot overwrite; one AI request is one undo action. |
 | 2 | Declared graph registry and typed ports, branch/shared dependency scheduling, groups, meaningful 3D systems, inspector, effect stack/amount/bypass, control publishing, initial compact library. | Corrected Particles→Glow→Composite with Background→Composite then ColorGrade; bypass restores particles without doubling; saved graph round trip; type errors rejected; shared work counted once; manual graph edit survives next AI edit. |
 | 3 | Output/diagnostic target selection, region/aspect controls, live and controlled sequences, repeatable input playback, measurements and separate inspection/edit scopes. | Three frames at relative 0/500/1000 ms with actual provenance; region validation; frame limits; real intermediate simulation steps; host instance untouched; component scope rejects unrelated edits; supported diagnostics explain rendered behavior. |
 | 4 | Complete dockable studio and layout presets; embedded chat; named looks/macros; studio audio/MIDI, meters/mapping; generated assets; complete preview quality/time/settings controls. | Ultrawide/laptop restore, node inspector lock, graph/preview selection independence, popout return/fullscreen/monitor removal, signal-to-control visibility, external/embedded operation parity, create/import/revise transparent sprite, two looks without dual continuous renders. |
-| 5 | Immutable self-contained release, installer/renderer management, exact dependencies/assets/control schema, explicit update/migration, complete offline lifecycle and sustained benchmarks. | Installed real-host run with studio/AI/Git/library absent; save/reopen/two instances/resize/reconnect; host audio/MIDI, generated sprite offline; five workload categories; 60-minute resource soak; diagnostic overhead; orientation/color/alpha and final budgets. |
+| 5 | Harden the export path already delivered in tracer: polished installer/distribution and renderer management, explicit update/migration, complete later asset/look/control/input coverage and sustained benchmarks. | Repeat offline installed lifecycle across the full feature set; host audio/MIDI and generated sprite offline; five workload categories; 60-minute resource soak; diagnostic overhead; orientation/color/alpha and final budgets. |
+| 6 | Export reusable FFGL effects: one incoming Resolume image, Lux processing and a returned GPU image. Add an input-image authoring/preview contract, effect packaging and published controls; reuse installed runtime management without Studio. | Apply one exported distortion to both a video clip and a live source. Verify input/output frame association, measured added latency, GPU-only steady-state transfer, orientation/color/alpha, bypass, resize, independent effect copies, saved composition cold reopen, and responsive failure/recovery. |
 
 ## Complete requirement routing
 
@@ -45,7 +65,7 @@ Each ID has a design owner, a completion milestone, and an acceptance home. Requ
 | T04, T05, T08 | [Bridge](../design/resolume-bridge.md) | 0.1 GPU/control/lifecycle tasks |
 | T06 | [Runtime](../design/runtime.md), [AI authoring](../design/ai-authoring.md) | 0.1 failure tests; durable extension 1 |
 | T07, T09 | [Bridge](../design/resolume-bridge.md), [environment](environment.md) | 0.1 preflight and measured acceptance |
-| T10 | [Bridge](../design/resolume-bridge.md), [project model](../design/project-model.md) | 0.2 independent instances/composition test |
+| T10 | [Bridge](../design/resolume-bridge.md), [project model](../design/project-model.md) | 0.1 independent sources/copies and composition reopen; 0.2 wider lifecycle/compatibility |
 | T11 | [Runtime](../design/runtime.md), [bridge](../design/resolume-bridge.md) | 0.3 simulation/event/host-input test |
 | B01, B03 | [Architecture](../architecture.md) | All stages; 0.1 scope and actual playback review |
 | B02 | [AI authoring](../design/ai-authoring.md), [runtime](../design/runtime.md) | All stages; 0.1 boundary tests, 4 parity tests |
@@ -58,8 +78,9 @@ Each ID has a design owner, a completion milestone, and an acceptance home. Requ
 | S04 | [Project model](../design/project-model.md), [studio](../design/studio.md) | 4 look save/compare |
 | S05 | [Runtime](../design/runtime.md), [studio](../design/studio.md), [AI authoring](../design/ai-authoring.md) | 4 repeated paused frame-step through UI and AI advances exact declared time/ticks with recorded input policy, retains pause/revision/instance and leaves host unchanged |
 | M01, M02 | [Project model](../design/project-model.md), [AI authoring](../design/ai-authoring.md) | 4 asset workflow and failed replacement; 5 offline generated sprite |
-| P01, P02 | [Project model](../design/project-model.md) | 1 storage; 2 graph/library pins; 5 archive/release closure |
-| R01, R02, R03 | [Project model](../design/project-model.md), [bridge](../design/resolume-bridge.md), [runtime](../design/runtime.md) | 5 installed lifecycle and benchmark suite |
+| P01, P02 | [Project model](../design/project-model.md) | 0.1 basic editable save/open and immutable release closure; 1 durable storage/history; 2 graph/library pins; 5 complete archive/feature coverage |
+| R01, R02, R03 | [Project model](../design/project-model.md), [bridge](../design/resolume-bridge.md), [runtime](../design/runtime.md) | 0.1 minimum installed offline release/lifecycle and tracer budgets; 0.2 upgrade/compatibility expansion; 5 complete release and sustained benchmark suite |
+| E01 | [Bridge](../design/resolume-bridge.md), [runtime](../design/runtime.md), [project model](../design/project-model.md) | 6 incoming-image contract, GPU input/output feasibility and installed effect workflow |
 | U01 | [Studio](../design/studio.md) | Early shell feasibility; full docking 4 |
 | U02, U03 | [Studio](../design/studio.md) | 2 graph/inspector; complete library/layout defaults 4 |
 | U04 | [Studio](../design/studio.md), [runtime](../design/runtime.md) | 0.1 presentation lifetime smoke; complete popout/fullscreen 4 |
@@ -75,14 +96,15 @@ Use the original domain proposal's Loom examples as inspiration and source inspe
 ## Decisions deliberately staged
 
 - 0.1 selects exact working platform/dependency tuple and proves native GPU transfer and client image display.
-- 0.2 proves host composition persistence/registration scheme and stable control schema; one generic tracer plugin does not promise arbitrary dynamic parameter schemas.
+- 0.1 proves installed source identity, fixed control schema, independent copies and composition persistence; one global mutable tracer plugin cannot satisfy the export workflow. 0.2 expands registration/upgrade compatibility.
 - 0.3 proves host-delivered audio/MIDI semantics and event capacity; no assumed raw spectrum contract.
 - 1 specifies version migration, atomic recovery and Git checkpoint behavior in its focused plan.
 - 3 finalizes capture limits and controlled-job restoration for supported component types.
 - 4 selects embedded AI provider integration and complete input mapping UX; credentials remain outside projects.
 - 5 approves final numerical release budgets against measured evidence and completes installer signing/distribution decisions.
+- 6 adds effect exports after source export is established. First prove the new incoming-image GPU path and define input lifetime/frame matching, latency and failure behavior before broad effect authoring work. Source-output tests do not prove this path.
 
-Later work does not promise cloud rendering, marketplace, accounts, collaboration, seamless loops for arbitrary simulations, identical pixels across GPUs, or an incoming-image FFGL effect.
+
 
 ## Low-priority follow-up: AI activity visibility
 
@@ -103,3 +125,19 @@ See [current implementation order](current-priorities.md) for the standalone-fir
 ## Feedback placement policy
 
 User direction: integrate roadmap requests and product feedback into the appropriate existing milestone or active implementation task. Small bugs and low-cost fixes may be immediate; larger features follow their dependencies; optional polish belongs in a later polish step. Use scope, impact and dependencies to choose placement rather than treating every suggestion as the next task. Update the relevant existing entry and its acceptance checks instead of accumulating separate competing priority documents. Briefly tell the user where the feedback landed. The current-priorities addendum above records the earlier scope reconciliation; it is not a template for creating a new priority list with each request.
+## Later effect workflow
+
+Create a distortion in Lux using a test image or video as its input. Export and
+install it as a Resolume **effect**, then apply it to a clip, layer or composition
+and adjust its published controls. The same effect can process a video, camera
+feed or Lux source; it does not generate those inputs itself. Installed playback
+runs without Lux Studio, AI, a development checkout or network access.
+
+The initial scope is one image input per effect. Multiple inputs and audio
+effects are not included. A focused milestone-6 design must define safe input
+ownership, nonblocking output/failure behavior and measured latency targets, then
+validate them in the actual host. Tracer remains source export only; processing
+inside a Lux source and applying existing Resolume effects to it remain useful
+before effect export exists. DEC-14 records this addition, not implementation.
+
+Later work does not promise cloud rendering, marketplace, accounts, collaboration, seamless loops for arbitrary simulations or identical pixels across GPUs.
