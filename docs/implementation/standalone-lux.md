@@ -47,3 +47,11 @@ This is a development build, not installed show software. Output is fixed at 192
 Continuous preview and capture share a completed GPU render target; only explicit capture performs CPU readback. The capture test establishes opaque example pixels and frame/control identity, not exhaustive alpha/color/orientation correctness. Detailed performance gauges remain unavailable rather than invented; the separate performance-monitoring design still governs their implementation. The browser worker watchdog and initialization timeout do not establish protection against arbitrary GPU-driver hangs or adversarial JavaScript spoofing within the worker. No claim is made that the earlier native-system freeze is diagnosed or fixed.
 
 Scene replacement is an atomic same-directory rename after flushing a temporary file. External-edit detection is optimistic, not a universal compare-and-swap against unrelated editors. This checkpoint has no crash-recovery journal or autosave. Saving is explicit; closing Studio also ends its local preview.
+
+## QA follow-up: preview fullscreen and control stability
+
+User confirmed reopening a saved file works. Fullscreen now presents only the preview, fitting the 16:9 output within the display with black letterboxing as needed. Studio chrome is hidden, and a top “Press Escape to exit fullscreen” notice fades out after 3.5 seconds. Escape exits independently of the cached UI state. Native transition events determine fullscreen state; a delayed initial state response cannot overwrite a newer event. The existing preview surface remains mounted across transitions.
+
+Routine command-success alerts were removed to prevent preview relayout. Intensity writes no longer toggle transport buttons or their pending label; transport commands retain their own pending guard. Actual command failures still show errors in the workspace.
+
+Validation: 25 CPU tests pass, including seven RTL interactions and a native-event state regression; Studio TypeScript check passes. The fullscreen test checks first-Escape exit, stale state rejection, timed notice removal, hidden controls, and preview DOM continuity. Native fullscreen sizing/fade and visual flicker still need interactive QA. At the user's request, do not launch Studio or run GPU smoke tests until explicit permission is given; a separate agent is running transport experiments.

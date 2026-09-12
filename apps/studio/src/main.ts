@@ -9,6 +9,7 @@ import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
 import { SceneFileStore } from '../../../packages/core/src/scene-file.ts';
 import { createAgentBridge } from './agent-bridge.ts';
+import { observeFullscreen } from './fullscreen.ts';
 
 // This process owns presentation windows only. It never creates a render service,
 // starts an authoring instance, or terminates a host-owned process.
@@ -18,6 +19,7 @@ app.setPath('userData', join(app.getPath('appData'), 'Lux', 'Studio'));
 const page = join(app.getPath('userData'), 'studio-shell.html');
 const pageUrl = pathToFileURL(page).href;
 const owned = new Set<BrowserWindow>();
+const fullscreenStates = new Map<BrowserWindow, () => boolean>();
 let mainWindow: BrowserWindow | null = null;
 let closing = false;
 let compiling = false;
@@ -58,7 +60,7 @@ const coordinator = new StudioWindows(async closed => {
 
 function publishState(): void {
   for (const window of owned) if (!window.isDestroyed()) window.webContents.send('studio:window-state', {
-    detached: coordinator.detached, fullscreen: window.isFullScreen(),
+    detached: coordinator.detached, fullscreen: fullscreenStates.get(window)?.() ?? window.isFullScreen(),
   });
 }
 function createWindow(preview: boolean): BrowserWindow {
@@ -73,8 +75,8 @@ function createWindow(preview: boolean): BrowserWindow {
   window.webContents.on('will-attach-webview', event => event.preventDefault());
   window.webContents.session.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
   window.webContents.session.setPermissionCheckHandler(() => false);
-  window.on('enter-full-screen', publishState); window.on('leave-full-screen', publishState);
-  window.once('closed', () => owned.delete(window));
+  fullscreenStates.set(window, observeFullscreen(window, publishState));
+  window.once('closed', () => { owned.delete(window); fullscreenStates.delete(window); });
   return window;
 }
 
@@ -122,7 +124,7 @@ app.whenReady().then(async () => {
     if (!window || !owned.has(window) || event.senderFrame !== event.sender.mainFrame ||
       !isTrustedStudioUrl(event.senderFrame.url, pageUrl)) throw Error('Untrusted Studio window');
     switch (action) {
-      case 'state': return { detached: coordinator.detached, fullscreen: window.isFullScreen() };
+      case 'state': return { detached: coordinator.detached, fullscreen: fullscreenStates.get(window)?.() ?? window.isFullScreen() };
       case 'popout': if (closing) throw Error('Studio is closing'); return coordinator.popout();
       case 'dock': coordinator.dock(); return;
       case 'fullscreen':

@@ -33,7 +33,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const controller = useMemo(() => new StudioController(client), [client]);
   const [windowState, setWindowState] = useState<WindowState>({ detached: false, fullscreen: false });
   const [maximized, setMaximized] = useState(false);
-  const [pendingCommands, setPendingCommands] = useState(0), [notice, setNotice] = useState<string | null>(null);
+  const [pendingCommands, setPendingCommands] = useState(0);
+  const [fullscreenHint, setFullscreenHint] = useState(false);
   const busy = pendingCommands > 0;
   const [error, setError] = useState<string | null>(null);
   const [clock, setClock] = useState(() => nowMs ?? Date.now());
@@ -48,37 +49,45 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   }, [nowMs]);
   useEffect(() => {
     if (!windows) return;
-    let active = true;
-    const unsubscribe = windows.subscribe(state => { if (active) setWindowState(state); });
-    void windows.getState().then(state => { if (active) setWindowState(state); }).catch(reason => { if (active) setError(String(reason)); });
+    let active = true, receivedEvent = false;
+    const unsubscribe = windows.subscribe(state => { receivedEvent = true; if (active) setWindowState(state); });
+    void windows.getState().then(state => { if (active && !receivedEvent) setWindowState(state); }).catch(reason => { if (active) setError(String(reason)); });
     return () => { active = false; unsubscribe(); };
   }, [windows]);
   useEffect(() => {
     const escape = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
-      if (windowState.fullscreen && windows) void windows.fullscreen(false).catch(reason => setError(String(reason)));
-      else setMaximized(false);
+      if (windows) void windows.fullscreen(false).catch(reason => setError(String(reason)));
+      if (!windowState.fullscreen) setMaximized(false);
     };
     window.addEventListener('keydown', escape);
     return () => window.removeEventListener('keydown', escape);
   }, [windows, windowState.fullscreen]);
-  async function command(action: () => Promise<unknown>): Promise<void> {
-    setPendingCommands(count => count + 1); setError(null); setNotice(null);
-    try { await action(); setNotice('Request accepted. Awaiting applied runtime status.'); }
+  useEffect(() => {
+    setFullscreenHint(windowState.fullscreen);
+    if (!windowState.fullscreen) return;
+    const timer = setTimeout(() => setFullscreenHint(false), 3500);
+    return () => clearTimeout(timer);
+  }, [windowState.fullscreen]);
+  async function command(action: () => Promise<unknown>, transport = true): Promise<void> {
+    if (transport) setPendingCommands(count => count + 1);
+    setError(null);
+    try { await action(); }
     catch (reason) { setError(reason instanceof Error ? reason.message : String(reason)); }
-    finally { setPendingCommands(count => count - 1); }
+    finally { if (transport) setPendingCommands(count => count - 1); }
   }
   function windowAction(action: () => Promise<void>): void { void action().catch(reason => setError(String(reason))); }
-  const compact = previewOnly || maximized;
-  return <div className={`studio ${compact ? 'studio-expanded' : ''}`}>
-    <header className="app-bar">
+  const compact = previewOnly || maximized || windowState.fullscreen;
+  return <div className={`studio ${compact ? 'studio-expanded' : ''} ${windowState.fullscreen ? 'studio-preview-fullscreen' : ''}`}>
+    {windowState.fullscreen && fullscreenHint && <div className="fullscreen-hint" role="status">Press Escape to exit fullscreen</div>}
+    <header className="app-bar" hidden={windowState.fullscreen}>
       <div className="brand"><span className="brand-symbol" aria-hidden="true">L</span><strong>LUX</strong><span>STUDIO</span></div>
       <div className="scene-heading"><span className="eyebrow">AUTHORING</span><span>{runtime?.sceneName ?? 'No scene connected'}</span></div>
       <span className={`connection ${snapshot.connection === 'connected' ? 'connected' : ''}`}><i />{snapshot.connection === 'connected' ? 'Service connected' : snapshot.connection === 'connecting' ? 'Connecting' : 'Disconnected'}</span>
     </header>
     <div className="workspace">
       <Paper component="main" square className="preview-panel">
-        <div className="panel-toolbar"><div><span className="panel-label">Preview</span><Chip label="FINAL" /><span className="subtle">Authoring instance</span></div>
+        <div className="panel-toolbar" hidden={windowState.fullscreen}><div><span className="panel-label">Preview</span><Chip label="FINAL" /><span className="subtle">Authoring instance</span></div>
           <div className="preview-actions">
             {!previewOnly && <Button aria-pressed={maximized} onClick={() => setMaximized(!maximized)}>{maximized ? 'Restore workspace' : 'Maximize'}</Button>}
             <Button disabled={!windows} onClick={() => windows && windowAction(() => previewOnly || windowState.detached ? windows.dock() : windows.popout())}>{previewOnly || windowState.detached ? 'Dock preview' : 'Pop out'}</Button>
@@ -87,8 +96,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
         </div>
         <Preview runtime={runtime} port={presentation} moved={!previewOnly && windowState.detached} onError={setError} onDock={() => windows && windowAction(() => windows.dock())} />
         {runtime?.fault && <Alert severity="error"><strong>{runtime.fault.code}</strong> · {runtime.fault.message}</Alert>}
-        {(error || notice) && <Alert severity={error ? 'error' : 'info'} role={error ? 'alert' : 'status'}>{error ?? notice}</Alert>}
-        <div className="transport"><div className="transport-actions">
+        {error && <Alert severity="error" role="alert">{error}</Alert>}
+        <div className="transport" hidden={windowState.fullscreen}><div className="transport-actions">
           <Button variant="contained" disabled={!available || busy || runtime?.playback === 'playing'} onClick={() => void command(() => controller.playback('play'))}>Play</Button>
           <Button disabled={!available || busy || runtime?.playback === 'paused'} onClick={() => void command(() => controller.playback('pause'))}>Pause</Button>
           <Button disabled={!available || busy} onClick={() => void command(() => controller.playback('reset'))}>Reset</Button>
@@ -101,7 +110,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
           <p className="section-description">Authoring values only. Host controls stay independent.</p>
           <label className="parameter-label" id="intensity-label"><span>{INTENSITY_CONTROL.label}</span><output>{available ? intensity.toFixed(2) : '—'}</output></label>
           <Slider aria-labelledby="intensity-label" min={INTENSITY_CONTROL.min} max={INTENSITY_CONTROL.max} step={0.01} value={intensity}
-            disabled={!available} onChange={(_event, value) => { if (typeof value !== 'number') return; setIntensity(value); void command(() => controller.setIntensity(value)); }} />
+            disabled={!available} onChange={(_event, value) => { if (typeof value !== 'number') return; setIntensity(value); void command(() => controller.setIntensity(value), false); }} />
           <div className="parameter-scale"><span>0</span><span>1</span></div>
           <p className="hint">{available ? `Applied value: ${runtime.intensity.toFixed(2)}` : 'Connect an authoring runtime to change controls.'}</p>
         </section>
@@ -116,6 +125,6 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
       {snapshot.jobs.map(job => <p key={job.jobId} className={job.fault ? 'error' : ''}><span className="tag">{job.state}</span> {job.summary}{job.fault && ` · ${job.fault}`}</p>)}
       {!runtime?.fault && snapshot.jobs.length === 0 && <p>{snapshot.message ?? 'No jobs reported.'}</p>}
     </section>}
-    <footer className="status-bar"><span><i className="status-dot" />{snapshot.connection === 'connected' ? 'Authoring service' : 'Awaiting authoring service'}</span><span>Presentation only · output size is independent of window size</span><span>TRACER 0.1</span></footer>
+    <footer className="status-bar" hidden={windowState.fullscreen}><span><i className="status-dot" />{snapshot.connection === 'connected' ? 'Authoring service' : 'Awaiting authoring service'}</span><span>Presentation only · output size is independent of window size</span><span>TRACER 0.1</span></footer>
   </div>;
 }

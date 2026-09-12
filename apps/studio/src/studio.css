@@ -11,3 +11,13 @@
 .preview-area{container-type:size}.preview-surface{width:min(100%,calc((100cqh - 35px) * 16 / 9));max-height:none;min-height:0;flex:0 0 auto}.preview-caption{max-width:min(100%,calc((100cqh - 35px) * 16 / 9))}
 
 .studio{height:100%;min-height:0}
+.studio [hidden]{display:none!important}
+.authoring-shell:has(.studio-preview-fullscreen)>.authoring-tools{display:none}
+.studio-preview-fullscreen{position:fixed;inset:0;width:100vw;height:100vh;z-index:2000;background:#000;overflow:hidden}
+.studio-preview-fullscreen .workspace{background:#000;overflow:hidden}
+.studio-preview-fullscreen .preview-panel{flex:1;min-height:0;background:#000;border:0}
+.studio-preview-fullscreen .preview-area{padding:0}
+.studio-preview-fullscreen .preview-surface{width:min(100cqw,calc(100cqh * 16 / 9));border:0;border-radius:0;box-shadow:none;background:#000}
+.studio-preview-fullscreen .preview-caption,.studio-preview-fullscreen .preview-panel>.MuiAlert-root{display:none}
+.fullscreen-hint{position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:3000;padding:10px 18px;border-radius:6px;background:#18181dcc;color:#fff;pointer-events:none;white-space:nowrap;animation:fullscreen-hint-fade 3.5s forwards}
+@keyframes fullscreen-hint-fade{0%,75%{opacity:1}100%{opacity:0}}

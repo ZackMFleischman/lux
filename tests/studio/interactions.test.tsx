@@ -2,6 +2,7 @@ import test, { afterEach, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import type { StudioClient, StudioOperation, StudioSnapshot } from '../../apps/studio/src/service-client.ts';
+import type { WindowState } from '../../apps/studio/src/window-client.ts';
 
 // jsdom models DOM events only. It starts no browser, Electron, canvas or GPU.
 const dom = new JSDOM('<!doctype html><html><head></head><body></body></html>', { url: 'http://studio.test/' });
@@ -99,4 +100,51 @@ test('RTL: completing an intensity write cannot clear a pending playback command
   assert.equal(fixture.calls.length, 2);
   await act(async () => finishPlay());
   assert.equal((screen.getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled, false);
+});
+
+test('RTL: intensity writes do not disable transport or insert a success alert', async () => {
+  const fixture = service(); let finish!: () => void;
+  fixture.client.invoke = operation => { fixture.calls.push(operation); return new Promise(resolve => { finish = () => resolve({}); }); };
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+  fireEvent.change(screen.getByRole('slider'), { target: { value: '0.8' } });
+  await waitFor(() => assert.equal(fixture.calls.length, 1));
+  for (const name of ['Play', 'Reset', 'Restart runtime']) assert.equal((screen.getByRole('button', { name }) as HTMLButtonElement).disabled, false);
+  assert.equal(screen.queryByText('Sending request…'), null);
+  await act(async () => finish());
+  assert.equal(screen.queryByText('Request accepted. Awaiting applied runtime status.'), null);
+  assert.equal(screen.queryByRole('alert'), null);
+});
+
+test('RTL: Escape exits native fullscreen even before its state notification arrives', async () => {
+  const values: boolean[] = [];
+  const windows = { getState: async () => ({ detached: false, fullscreen: false }), subscribe: () => () => {},
+    popout: async () => {}, dock: async () => {}, fullscreen: async (value: boolean) => { values.push(value); } };
+  render(<StudioApp client={createDisconnectedClient()} windows={windows} nowMs={1000} />);
+  await userEvent.setup({ document }).keyboard('{Escape}');
+  assert.deepEqual(values, [false]);
+});
+
+test('RTL: fullscreen shows only preview, ignores stale initial state, and exits on first Escape', async () => {
+  let notify!: (state: WindowState) => void, initial!: (state: WindowState) => void;
+  const windows = {
+    getState: () => new Promise<WindowState>(resolve => { initial = resolve; }),
+    subscribe: (listener: (state: WindowState) => void) => { notify = listener; return () => {}; },
+    popout: async () => {}, dock: async () => {},
+    fullscreen: async (fullscreen: boolean) => { notify({ detached: false, fullscreen }); },
+  };
+  const { container } = render(<StudioApp client={service().client} windows={windows} nowMs={1000} />);
+  const surface = container.querySelector('.preview-surface');
+  fireEvent.click(screen.getByRole('button', { name: 'Fullscreen' }));
+  assert.ok(container.querySelector('.studio-preview-fullscreen'));
+  assert.equal(screen.queryByRole('button', { name: 'Play' }), null);
+  assert.equal(screen.queryByRole('slider'), null);
+  assert.ok(screen.getByText('Press Escape to exit fullscreen'));
+  await act(async () => initial({ detached: false, fullscreen: false }));
+  assert.ok(container.querySelector('.studio-preview-fullscreen'));
+  await act(async () => { await new Promise(resolve => setTimeout(resolve, 3600)); });
+  assert.equal(screen.queryByText('Press Escape to exit fullscreen'), null);
+  fireEvent.keyDown(window, { key: 'Escape' });
+  assert.equal(container.querySelector('.studio-preview-fullscreen'), null);
+  assert.ok(screen.getByRole('button', { name: 'Fullscreen' }));
+  assert.equal(container.querySelector('.preview-surface'), surface);
 });

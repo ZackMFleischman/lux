@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { Alert, Button, TextField, ThemeProvider } from '@mui/material';
 import { StudioApp } from './renderer.tsx';
 import { studioTheme } from './theme.ts';
@@ -7,6 +7,8 @@ import { DEFAULT_OUTPUT } from '../../../packages/runtime-contracts/src/index.ts
 import type { SourceBundle } from '../../../packages/runtime-contracts/src/index.ts';
 const client = new StandaloneClient(window.luxAuthoring);
 export function AuthoringApp() {
+  const windows = useMemo(() => window.luxStudioWindows ? { ...window.luxStudioWindows,
+    popout: async () => { throw Error('Separate preview windows are not connected in this standalone checkpoint. Fullscreen is available.'); } } : undefined, []);
   const [code, setCode] = useState(''), [busy, setBusy] = useState(false), [error, setError] = useState('');
   const [bundle, setBundle] = useState<SourceBundle | null>(null), [token, setToken] = useState<string | undefined>(), [name, setName] = useState('Untitled'), [dirty, setDirty] = useState(false);
   const draft = useRef<{ source: SourceBundle | null; version: number; busy: boolean }>({ source: null, version: 0, busy: false });
@@ -84,15 +86,14 @@ export function AuthoringApp() {
       setDirty(false);
     } catch (reason) { setError(String(reason)); } finally { setBusy(false); }
   }
-  return <ThemeProvider theme={studioTheme}><div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-    <details style={{ padding: '8px 16px', background: '#191b23', flexShrink: 0 }}><summary>Visual source</summary>
+  return <ThemeProvider theme={studioTheme}><div className="authoring-shell" style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <details className="authoring-tools" style={{ padding: '8px 16px', background: '#191b23', flexShrink: 0 }}><summary>Visual source</summary>
       <TextField disabled={busy} fullWidth multiline minRows={8} maxRows={16} label="TypeScript visual" value={code} onChange={event => { setCode(event.target.value); setDirty(true);
         const source = currentSource(); source.files[source.entry] = event.target.value; draft.current.source = source; draft.current.version++; }}
         slotProps={{ input: { style: { fontFamily: 'Consolas, monospace', fontSize: 12 } } }} />
-    </details><div style={{ padding: '4px 16px', background: '#191b23' }}><Button variant="contained" disabled={busy || !code} onClick={() => void build()}>{busy ? 'Building…' : 'Build & preview'}</Button>
+    </details><div className="authoring-tools" style={{ padding: '4px 16px', background: '#191b23' }}><Button variant="contained" disabled={busy || !code} onClick={() => void build()}>{busy ? 'Building…' : 'Build & preview'}</Button>
       <Button disabled={busy} onClick={() => void open()}>Open</Button><Button disabled={busy || !code} onClick={() => void save()}>Save</Button><Button disabled={busy || !code} onClick={() => void save(true)}>Save as</Button><span>{name}{dirty ? ' *' : ''}</span>
       {error && <Alert severity="error">{error}</Alert>}</div>
-    <div style={{ flex: 1, minHeight: 0 }}><StudioApp client={client} presentation={client} windows={window.luxStudioWindows ? { ...window.luxStudioWindows,
-      popout: async () => { throw Error('Separate preview windows are not connected in this standalone checkpoint. Fullscreen is available.'); } } : undefined} /></div>
+    <div style={{ flex: 1, minHeight: 0 }}><StudioApp client={client} presentation={client} windows={windows} /></div>
   </div></ThemeProvider>;
 }
