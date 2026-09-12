@@ -110,4 +110,7 @@ test('RGBA allocation budget is enforced before decode and metadata retains orig
   assert.deepEqual(codec.validatePng(bytes),{width:1,height:1,byteLength:bytes.length,rgbaByteLength:4});
   class DisguisedBytes extends Uint8Array { get byteLength() { return 1; } }
   assert.throws(()=>codec.decodePng(new DisguisedBytes(786487)),{code:'QUOTA_EXCEEDED'});
+  const backing = new ArrayBuffer(bytes.length,{maxByteLength:800000});
+  const growing = new Uint8Array(backing); growing.set(bytes);
+  assert.throws(()=>codec.decodePng(growing,{get maxRgbaBytes() { backing.resize(786487); return 2097152; }}),{code:'QUOTA_EXCEEDED'});
 });

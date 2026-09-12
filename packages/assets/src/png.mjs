@@ -8,6 +8,7 @@ const signature = [137, 80, 78, 71, 13, 10, 26, 10];
 const allowedChunks = new Set(['IHDR','PLTE','tRNS','IDAT','IEND','sRGB','gAMA','cHRM','pHYs','tEXt','tIME']);
 const srgbChromaticity = [31270,32900,64000,33000,30000,60000,15000,6000];
 const typedArrayByteLength = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(Uint8Array.prototype),'byteLength').get;
+const typedArraySet = Uint8Array.prototype.set;
 const crcTable = new Uint32Array(256);
 for (let i = 0; i < 256; i++) {
   let n = i;
@@ -157,11 +158,15 @@ function inspect(bytes, maxRgbaBytes) {
 
 function decode(bytes, options = {}) {
   if (!(bytes instanceof Uint8Array)) fail('expected Uint8Array');
-  if (Reflect.apply(typedArrayByteLength,bytes,[]) > assetLimits.imageBytes) fail('file exceeds image byte limit',true);
   const maxRgbaBytes = options.maxRgbaBytes ?? assetLimits.rgbaBytes;
   if (!Number.isSafeInteger(maxRgbaBytes) || maxRgbaBytes < 0 || maxRgbaBytes > assetLimits.rgbaBytes) fail('invalid RGBA budget');
+  const byteLength = Reflect.apply(typedArrayByteLength,bytes,[]);
+  if (byteLength > assetLimits.imageBytes) fail('file exceeds image byte limit',true);
   // Both parsers see the same private immutable snapshot, including for SAB input.
-  const original = new Uint8Array(bytes);
+  // A length-tracking source may grow concurrently: destination allocation uses
+  // the checked length, and intrinsic set rejects a source that outgrew it.
+  const original = new Uint8Array(byteLength);
+  Reflect.apply(typedArraySet,original,[bytes]);
   const info = inspect(original,maxRgbaBytes);
   const {width,height,depth,type,channels,rowBytes,palette,transparency} = info;
   const raw = decodeFastPng(original,{checkCrc:true});
