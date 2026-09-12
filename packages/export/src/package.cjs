@@ -1,6 +1,8 @@
 'use strict';
 // Filesystem-only package contract. Never starts a producer or changes FFGL plugins.
-const fs = require('node:fs');
+// Electron's fs transparently mounts .asar archives, including in RUN_AS_NODE
+// mode. Packages hash and copy physical distribution bytes, not archive members.
+const fs = process.versions.electron ? require('original-fs') : require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { readTransportRelease } = require(fs.existsSync(path.join(__dirname, 'transport-release.cjs')) ? './transport-release.cjs' : '../../../tools/gpu-spike/transport-release.cjs');
