@@ -6,13 +6,13 @@ Started 2026-09-12 after the successful guided Resolume QA. This is the active t
 
 | Checkpoint | Status | Owner | Completion evidence / next action |
 | --- | --- | --- | --- |
-| C0: record the new work and isolate lanes | IN PROGRESS | Coordinator | Commit this tracker, create isolated worktrees and dispatch bounded tasks. |
-| C1: recovery contract and automated failure validation | QUEUED | Recovery agent | Reconcile documented recovery policy with actual Studio/installed behavior, close a bounded verified gap, and report remaining native timing requirements. |
-| C2: dockable Studio panes | QUEUED | Layout agent | Connect existing Dockview adapter to real Preview/Source/Inspector/Jobs, preserve application state, test layouts and real pane behavior. |
-| C3: two distinct exported visuals and asset fixture | QUEUED | Coordinator | Prepare reproducible export fixtures with distinguishable visuals and a required asset; validate complete packages without touching the installed source. |
-| C4: acceptance measurement audit | QUEUED | Performance agent | Map actual telemetry/evaluators to required gates; identify the next concrete implementation step without treating unavailable measurements as passes. |
-| C5: independent review and integration | QUEUED | Coordinator + reviewers | Review each code lane, fix findings, integrate commits, run relevant combined CPU/type/build checks. |
-| C6: graphics and host checkpoint | WAITING FOR C1–C5 | Coordinator | Serialize owned Studio QA with Resolume use. Native installation/replacement only with host closed; obtain missing host evidence without repeating passed basics. |
+| C0: record the new work and isolate lanes | DONE | Coordinator | Tracker committed 4193818; recovery/layout worktrees dispatched from that base. |
+| C1: recovery contract and automated failure validation | DONE (BOUNDED FIX) | checkpoint_recovery + independent review | Fix 5af0eb9 reviewed and integrated as 700ec5f; 13 lifecycle / 71 Studio CPU tests reported, integration rerun underway. Remaining retry/physical timing gaps in recovery-checkpoint.md. |
+| C2: dockable Studio panes | IMPLEMENTED; REVIEW NEXT | checkpoint_layout | Commit 8b80c00 connects real panes via stable portal hosts. Dedicated DOM integration test plus prior CPU/type/build checks pass in lane. Root review/native Electron checks next. |
+| C3: two distinct exported visuals and asset fixture | PACKAGES PREPARED; ASSET GAP OPEN | Coordinator + independent review | 37d3102: real positive/negative compiler test passes; two99-file packages validate with distinct source/release hashes and shared runtime20c587d4. Reviewed with no blockers in bounded scope. Scene asset admission/resolution remains missing; no unused file is counted as an asset. |
+| C4: acceptance measurement audit | DONE | Coordinator + independent review | 37d3102 adds performance-checkpoint.md; source-backed per-gate matrix reviewed. Next measurement implementation is offline validity/accounting core, then bounded native correlation/collection. |
+| C5: independent review and integration | IN PROGRESS | Coordinator + reviewers | Recovery and fixture/audit reviews pass; recovery integrated. Layout review and combined tests next. |
+| C6: graphics and host checkpoint | AUTHORIZED; WAITING FOR INTEGRATION | Coordinator | User confirmed Resolume closed and authorized Studio tests; process check found no Avenue/Arena/Electron. No plugin installation/replacement planned in this batch. |
 
 ## Established baseline
 
@@ -52,4 +52,8 @@ Read performance design, tracer acceptance, existing telemetry and test evaluato
 
 Preflight: tasks 1 and 2 share runtime/shell interfaces but own different files; layout must consume the existing client API without changing runtime policy. Task 3 uses export/fixtures only; task 4 reads all areas without mutating code. All four agree with the constraints above. Any interface change must be coordinated before integration.
 
-No implementations dispatched yet. No new QA requested from the user.
+Recovery and layout agents dispatched; coordinator prepares fixtures locally. No new QA requested from the user. Recovery inspection found one-auto-retry/30-second design policy differs from explicit-only Studio and three-attempt installed runtime; preserve this discrepancy as outstanding, without silently redefining acceptance. No current graphics processes are launched by this batch.
+
+- 37d3102: distinct source fixtures, preparation command, package manifest evidence and performance audit committed. Triangle release5569712e… and ring releasec1b26300… are under artifacts/installed-package/qa-fixtures; host/GPU flags remain false pending actual playback.
+- 700ec5f: independently reviewed recovery correction integrated. Generic desired control intent is preserved within its admitted accepted runtime; rejected/stale commands and source replacement do not inherit it.
+- User cleared graphics lane by closing Resolume. Root verified no host/Electron processes before proceeding. Native Studio QA will run only after layout review and integration.
