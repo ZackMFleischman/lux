@@ -157,3 +157,79 @@ test('new-file Escape cancels locally, restores focus and leaves source unchange
   assert.equal(w.getSnapshot(), before); assert.equal(globalEscapes, 0);
   window.removeEventListener('keydown', listener);
 });
+
+// Canvas rasterization is absent in jsdom. Capture the actual decoded RGBA sent
+// to the canvas boundary; these checks do not claim browser/GPU rendering.
+const painted = new WeakMap<HTMLCanvasElement, number[]>();
+dom.window.HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement) {
+  const canvas = this;
+  return { createImageData: (width: number, height: number) => ({ data: new Uint8ClampedArray(width * height * 4) }),
+    putImageData: (image: ImageData) => painted.set(canvas, [...image.data]) } as any;
+} as any;
+function imageSource() {
+  const data = 'Qk06AAAAAAAAADYAAAAoAAAAAQAAAAEAAAABABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AA==';
+  const green = Buffer.from(data, 'base64'); green[55] = 255; green[56] = 0;
+  return { sourceVersion: 2 as const, sdkVersion: '0.1.0' as const, entry: 'main.ts', files: { 'main.ts': 'export const main = 1' },
+    assets: { 'assets/red.bmp': { mediaType: 'image/bmp' as const, encoding: 'base64' as const, data },
+      'assets/green.bmp': { mediaType: 'image/bmp' as const, encoding: 'base64' as const, data: green.toString('base64') } } };
+}
+const preview = () => screen.getByRole('img', { name: /Image preview:/ }) as HTMLCanvasElement;
+test('asset selection displays decoded pixels and preserves code drafts and undo', async () => {
+  const w = createSourceWorkspace(imageSource()); render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} />);
+  await act(async () => { view().dispatch({ changes: { from: 0, insert: '// draft\n' } }); });
+  const editor = view();
+  await click(screen.getByRole('button', { name: 'View assets/red.bmp' }));
+  assert.deepEqual(painted.get(preview()), [255, 0, 0, 255]);
+  assert.match(screen.getByRole('region', { name: 'Asset preview' }).textContent!, /1 × 1.*58 bytes/);
+  assert.equal(screen.queryByRole('textbox', { name: /TypeScript source/ }), null);
+  await click(screen.getByRole('button', { name: 'View assets/green.bmp' }));
+  assert.deepEqual(painted.get(preview()), [0, 255, 0, 255]);
+  await click(screen.getByRole('button', { name: 'Open main.ts' }));
+  assert.equal(view(), editor); assert.match(view().state.doc.toString(), /draft/);
+  await act(async () => { assert.equal(undo(view()), true); });
+  assert.equal(w.getSnapshot().source.files['main.ts'], 'export const main = 1');
+});
+test('selected asset refreshes on replacement, reports dirty bytes and cannot survive removal or a new document', async () => {
+  const w = createSourceWorkspace(imageSource()); render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} />);
+  await click(screen.getByRole('button', { name: 'View assets/red.bmp' }));
+  const next = imageSource(); next.assets['assets/red.bmp'].data = next.assets['assets/green.bmp'].data;
+  await act(async () => { await w.submit(next, w.getSnapshot().version, async () => {}); });
+  assert.deepEqual(painted.get(preview()), [0, 255, 0, 255]);
+  assert.match(screen.getByRole('button', { name: 'View assets/red.bmp' }).textContent!, /\*/);
+  await act(async () => { await w.submit({ ...next, assets: {} }, w.getSnapshot().version, async () => {}); });
+  assert.equal(screen.queryByRole('img', { name: /Image preview:/ }), null);
+  assert.match(screen.getByText('No image assets.').textContent!, /No image/);
+  await act(async () => { w.replaceDocument(imageSource()); });
+  assert.equal(screen.queryByRole('img', { name: /Image preview:/ }), null);
+  await click(screen.getByRole('button', { name: 'View assets/red.bmp' }));
+  await act(async () => { w.replaceDocument(imageSource()); });
+  assert.equal(screen.queryByRole('img', { name: /Image preview:/ }), null);
+});
+test('legacy files remain editable with an empty asset list', () => {
+  render(<SourcePanel workspace={fixture()} readOnly={false} onSave={() => {}} />);
+  assert.ok(screen.getByText('No image assets.')); assert.equal(view().state.doc.toString(), 'export const main = 1');
+});
+test('malformed image presentation stays local and code remains accessible', async () => {
+  const w = createSourceWorkspace(imageSource()), snapshot = w.getSnapshot();
+  const broken = { ...snapshot, source: { ...imageSource(), assets: { 'assets/red.bmp': { mediaType: 'image/bmp' as const, encoding: 'base64' as const, data: 'bad' } } } };
+  const presentation = { ...w, getSnapshot: () => broken };
+  render(<SourcePanel workspace={presentation} readOnly={false} onSave={() => {}} />);
+  await click(screen.getByRole('button', { name: 'View assets/red.bmp' }));
+  assert.match(screen.getByRole('region', { name: 'Asset preview' }).textContent!, /Image unavailable/);
+  assert.equal(screen.queryByRole('img', { name: /Image preview:/ }), null);
+  await click(screen.getByRole('button', { name: 'Open main.ts' }));
+  assert.equal(view().state.doc.toString(), 'export const main = 1');
+});
+test('keyboard asset activation and source tabs keep navigation accessible', async () => {
+  const { userEvent } = await import('@testing-library/user-event');
+  const user = userEvent.setup({ document });
+  const w = createSourceWorkspace(imageSource()); render(<SourcePanel workspace={w} readOnly={false} onSave={() => {}} />);
+  const asset = screen.getByRole('button', { name: 'View assets/red.bmp' });
+  await act(async () => { asset.focus(); });
+  await user.keyboard('{Enter}');
+  assert.deepEqual(painted.get(preview()), [255, 0, 0, 255]);
+  assert.equal(asset.getAttribute('aria-current'), 'page');
+  await click(screen.getByRole('tab', { name: /main.ts/ }));
+  assert.ok(screen.getByRole('textbox', { name: /TypeScript source/ }));
+  assert.equal(screen.queryByRole('img', { name: /Image preview:/ }), null);
+});
