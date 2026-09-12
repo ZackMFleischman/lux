@@ -1,1 +1,216 @@
-null
+{
+  "format": "lux-manual-installed-observations",
+  "version": 1,
+  "releaseId": "2d2549826ffcb8a3f0265e060e89c0b86b4b09ab0a7c6a758c96a08634e2a468",
+  "runtimeId": "20c587d4e58f118945180ca4a6c3ae8f669121c947f4e22aec00b0359a1be0c3",
+  "rawRoot": "C:\\Users\\zFlei\\AppData\\Local\\Lux\\Installed\\instances\\20c587d4e58f118945180ca4a6c3ae8f669121c947f4e22aec00b0359a1be0c3",
+  "performanceAcceptance": false,
+  "endpoint": "Producer initial completed frame and producer shutdown summary; not host consumption",
+  "notes": [
+    "Five producer attempts from guided manual source QA.",
+    "Two reopened first frames report approximately 0.2 and 0.8; all final summaries report held=0, uncertain=0, closed=true, failed=false.",
+    "A stale .json.error records ENOENT for a host lease removed during scan; new CPU regression and source fix treat normal removal separately. Installed files were not changed."
+  ],
+  "attempts": [
+    {
+      "relativePath": "0000000000001dd800000066d2c0d907\\c3218eb118bda2a523976a3f13d215b7\\probe.json",
+      "sha256": "4d082dd3810bc9a6e97b0624df4db5a9c43cc8b5f45c84e195f0975d0ed10d28",
+      "records": [
+        {
+          "utc": "2026-09-12T20:16:06.455Z",
+          "time": "44163832465400",
+          "kind": "release",
+          "sourceHash": "13edacc1cfb004d79bbbbeb056349f38c8131a717eb4e4ba577b630d23f91c35",
+          "linkedHash": "3197da89cee9126fb7d934fc48d72590a69cb1602d487a331a582b14487b331c",
+          "settings": {
+            "width": 1920,
+            "height": 1080,
+            "fps": 60,
+            "seed": 0
+          }
+        },
+        {
+          "utc": "2026-09-12T20:16:07.809Z",
+          "time": "44165185949100",
+          "kind": "initial-frame",
+          "intensity": 0.5,
+          "sourceHash": "13edacc1cfb004d79bbbbeb056349f38c8131a717eb4e4ba577b630d23f91c35",
+          "frameId": "1",
+          "controlSequence": 0
+        },
+        {
+          "utc": "2026-09-12T20:20:11.275Z",
+          "time": "44408652107900",
+          "kind": "summary",
+          "paint": 11444,
+          "held": 0,
+          "uncertain": 0,
+          "dropped": 0,
+          "closed": true,
+          "failed": false,
+          "webgpuReady": true
+        }
+      ]
+    },
+    {
+      "relativePath": "0000000000001dd800000067203668b4\\97044bd06f912bc2e637159586e5b728\\probe.json",
+      "sha256": "7880c3fa0451a4d74f08fecb1a92327794541c0f6891aaa9afef00fd6faf8b52",
+      "records": [
+        {
+          "utc": "2026-09-12T20:18:15.376Z",
+          "time": "44292754097900",
+          "kind": "release",
+          "sourceHash": "13edacc1cfb004d79bbbbeb056349f38c8131a717eb4e4ba577b630d23f91c35",
+          "linkedHash": "3197da89cee9126fb7d934fc48d72590a69cb1602d487a331a582b14487b331c",
+          "settings": {
+            "width": 1920,
+            "height": 1080,
+            "fps": 60,
+            "seed": 0
+          }
+        },
+        {
+          "utc": "2026-09-12T20:18:16.753Z",
+          "time": "44294131385500",
+          "kind": "initial-frame",
+          "intensity": 0.5,
+          "sourceHash": "13edacc1cfb004d79bbbbeb056349f38c8131a717eb4e4ba577b630d23f91c35",
+          "frameId": "1",
+          "controlSequence": 0
+        },
+        {
+          "utc": "2026-09-12T20:21:44.844Z",
+          "time": "44502221275100",
+          "kind": "summary",
+          "paint": 9786,
+          "held": 0,
+          "uncertain": 0,
+          "dropped": 0,
+          "closed": true,
+          "failed": false,
+          "webgpuReady": true
+        }
+      ]
+    },
+    {
+      "relativePath": "0000000000001dd80000006779b5a494\\74ee4c6345ac0a0ef39517e3f1466212\\probe.json",
+      "sha256": "4593255e665b15e304a10d3e24fcf37ee4d27e44bf6d3f18f481bc30cebb7425",
+      "records": [
+        {
+          "utc": "2026-09-12T20:20:45.592Z",
+          "time": "44442968808700",
+          "kind": "release",
+          "sourceHash": "13edacc1cfb004d79bbbbeb056349f38c8131a717eb4e4ba577b630d23f91c35",
+          "linkedHash": "3197da89cee9126fb7d934fc48d72590a69cb1602d487a331a582b14487b331c",
+          "settings": {
+            "width": 1920,
+            "height": 1080,
+            "fps": 60,
+            "seed": 0
+          }
+        },
+        {
+          "utc": "2026-09-12T20:20:46.882Z",
+          "time": "44444259318600",
+          "kind": "initial-frame",
+          "intensity": 0.5,
+          "sourceHash": "13edacc1cfb004d79bbbbeb056349f38c8131a717eb4e4ba577b630d23f91c35",
+          "frameId": "1",
+          "controlSequence": 0
+        },
+        {
+          "utc": "2026-09-12T20:21:44.844Z",
+          "time": "44502221248300",
+          "kind": "summary",
+          "paint": 2717,
+          "held": 0,
+          "uncertain": 0,
+          "dropped": 0,
+          "closed": true,
+          "failed": false,
+          "webgpuReady": true
+        }
+      ]
+    },
+    {
+      "relativePath": "000000000000617400000067df8878de\\5cf65e6a8a28ec734d186e7a8df253d7\\probe.json",
+      "sha256": "ce8c90a4053fe15276dbaca4030d89cfc030109091d2755cf8b73062d1dcce3a",
+      "records": [
+        {
+          "utc": "2026-09-12T20:23:37.466Z",
+          "time": "44614843643900",
+          "kind": "release",
+          "sourceHash": "13edacc1cfb004d79bbbbeb056349f38c8131a717eb4e4ba577b630d23f91c35",
+          "linkedHash": "3197da89cee9126fb7d934fc48d72590a69cb1602d487a331a582b14487b331c",
+          "settings": {
+            "width": 1920,
+            "height": 1080,
+            "fps": 60,
+            "seed": 0
+          }
+        },
+        {
+          "utc": "2026-09-12T20:23:38.726Z",
+          "time": "44616103437800",
+          "kind": "initial-frame",
+          "intensity": 0.20000000298023224,
+          "sourceHash": "13edacc1cfb004d79bbbbeb056349f38c8131a717eb4e4ba577b630d23f91c35",
+          "frameId": "1",
+          "controlSequence": 0
+        },
+        {
+          "utc": "2026-09-12T20:37:14.157Z",
+          "time": "45431534130700",
+          "kind": "summary",
+          "paint": 31794,
+          "held": 0,
+          "uncertain": 0,
+          "dropped": 0,
+          "closed": true,
+          "failed": false,
+          "webgpuReady": true
+        }
+      ]
+    },
+    {
+      "relativePath": "000000000000617400000067e7b3bc8f\\ad09960f4e3adbdde00702117688559e\\probe.json",
+      "sha256": "46bd640756ebd7fcb8e22d5b316a24b78332f8ee028de938f47927e02219fcee",
+      "records": [
+        {
+          "utc": "2026-09-12T20:23:50.166Z",
+          "time": "44627543432900",
+          "kind": "release",
+          "sourceHash": "13edacc1cfb004d79bbbbeb056349f38c8131a717eb4e4ba577b630d23f91c35",
+          "linkedHash": "3197da89cee9126fb7d934fc48d72590a69cb1602d487a331a582b14487b331c",
+          "settings": {
+            "width": 1920,
+            "height": 1080,
+            "fps": 60,
+            "seed": 0
+          }
+        },
+        {
+          "utc": "2026-09-12T20:23:51.473Z",
+          "time": "44628850400000",
+          "kind": "initial-frame",
+          "intensity": 0.800000011920929,
+          "sourceHash": "13edacc1cfb004d79bbbbeb056349f38c8131a717eb4e4ba577b630d23f91c35",
+          "frameId": "1",
+          "controlSequence": 0
+        },
+        {
+          "utc": "2026-09-12T20:37:14.230Z",
+          "time": "45431607453100",
+          "kind": "summary",
+          "paint": 31208,
+          "held": 0,
+          "uncertain": 0,
+          "dropped": 0,
+          "closed": true,
+          "failed": false,
+          "webgpuReady": true
+        }
+      ]
+    }
+  ]
+}
