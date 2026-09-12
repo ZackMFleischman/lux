@@ -3,7 +3,8 @@
 `src/png.mjs` is an opt-in adapter. `src/index.mjs`, existing BMP admission,
 source paths/media unions, identity branches, compiler/linker inventories and
 runtime capability markers remain unchanged. This slice does **not** enable PNG
-assets in Studio or demonstrate asset playback. JPEG implementation is next.
+assets in Studio or demonstrate asset playback. See `JPEG.md` for the separate
+opt-in JPEG adapter.
 
 ## API and supported input
 
@@ -103,9 +104,8 @@ synchronous JavaScript implementation provides a preemptive CPU deadline.
 ## Remaining gates
 
 1. Independently review this adapter/patch and expand malformed-stream fuzzing.
-2. Implement JPEG baseline/progressive/grayscale and checked EXIF orientations,
-   using the design's marker, scan, sampling, metadata and memory limits. No JPEG
-   dependency or partial permissive JPEG path is included in this slice.
+2. Independently review the separate JPEG baseline/progressive/grayscale and EXIF
+   orientation adapter described in `JPEG.md`.
 3. Adopt media/path unions and shared codec selection across source/scene/build/
    link/transport/worker admission, preserving originals and legacy identities.
 4. Pin the complete codec/helper/patch closure in compiler and linker inventories,
