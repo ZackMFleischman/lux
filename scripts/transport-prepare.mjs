@@ -5,9 +5,11 @@ import { SceneFileStore } from '../packages/core/src/scene-file.ts';
 import { compileVisual } from '../apps/build-worker/src/compile.mjs';
 import { linkRuntime } from '../apps/build-worker/src/link-runtime.mjs';
 import releaseIO from '../tools/gpu-spike/transport-release.cjs';
+import { assertLegacyPlaybackSource } from '../apps/studio/src/source/asset-playback.ts';
 
 export async function prepareTransportScene(filename, directory = 'artifacts/transport') {
   const { document } = await new SceneFileStore().open(filename);
+  assertLegacyPlaybackSource(document.source);
   const { settings } = document;
   if (settings.width !== 1920 || settings.height !== 1080 || settings.fps !== 60) throw Error('Transport currently requires 1920×1080 at 60 fps');
   const dependencyRoot = await realpath(fileURLToPath(new URL('../node_modules', import.meta.url)));

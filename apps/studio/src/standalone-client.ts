@@ -4,6 +4,7 @@ import type { SourceBundle } from '../../../packages/runtime-contracts/src/index
 import { studioOperationSchema } from './runtime-operations.ts';
 import { DEFAULT_OUTPUT } from '../../../packages/runtime-contracts/src/index.ts';
 import { SourceCompileError } from './source/diagnostics.ts';
+import { assertLegacyPlaybackSource } from './source/asset-playback.ts';
 export interface AuthoringApi {
   example(): Promise<SourceBundle>;
   compile(source: SourceBundle): Promise<any>;
@@ -34,6 +35,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
   private publish(patch: Partial<StudioSnapshot>) { this.snapshot = { ...this.snapshot, ...patch, receivedAtMs: Date.now() }; for (const listener of this.listeners) listener(); }
   async submit(source: SourceBundle): Promise<void> {
+    assertLegacyPlaybackSource(source);
     if (this.busy) throw Error('A visual build is already running');
     this.busy = true;
     const jobId = crypto.randomUUID();

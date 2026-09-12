@@ -1,6 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { z } from 'zod';
+import { sourceBuildInputSchema, sourceReadResult } from '../apps/studio/src/source/agent-contract.ts';
+import { assetLimits } from '../packages/assets/src/index.mjs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
@@ -16,11 +17,15 @@ async function call(method, params = {}) {
   const result = await response.json(); if (!result.ok) throw Error(result.error || 'Lux operation failed'); return result.result;
 }
 const text = value => ({ content: [{ type: 'text', text: JSON.stringify(value) }] });
-server.registerTool('lux.studio.discover', { description: 'Read the exact visual SDK, example and standalone Lux capabilities. Start Lux Studio separately.', inputSchema: {} }, async () => text({ ...await discoverVisualSdk(), scope: 'standalone-studio', tools: ['read', 'build', 'capture', 'status', 'parameters', 'playback', 'restart'], resolume: false }));
-server.registerTool('lux.studio.read', { description: 'Read current editor source and draft version before changing it.', inputSchema: {} }, async () => text(await call('read')));
+server.registerTool('lux.studio.discover', { description: 'Read the exact visual SDK, example and standalone Lux capabilities. Start Lux Studio separately.', inputSchema: {} }, async () => text({ ...await discoverVisualSdk(), scope: 'standalone-studio', tools: ['read', 'build', 'capture', 'status', 'parameters', 'playback', 'restart'], resolume: false,
+  sourceDocuments: { versions: [1, 2], replacement: 'complete source; preserve sourceVersion and assets when editing v2',
+    assetPlayback: false, assetFormat: 'image/bmp: 24-bit uncompressed, opaque', assetDimension: assetLimits.dimension, assetCount: assetLimits.count,
+    assetFileBytes: assetLimits.imageBytes, assetTotalBytes: assetLimits.totalBytes,
+    sourceV2JsonBytes: 6291456, requestBytes: 8388608, readToolResultBytes: 16777216 } }));
+server.registerTool('lux.studio.read', { description: 'Read complete source and draft version before changing it. Preserve sourceVersion and all assets when editing v2. The complete escaped tool result is limited to 16 MiB.', inputSchema: {} }, async () => sourceReadResult(await call('read')));
 server.registerTool('lux.studio.status', { description: 'Read actual standalone preview status.', inputSchema: {} }, async () => text(await call('status')));
 server.registerTool('lux.studio.build', { description: 'Compile and preview replacement source. Read first; expectedDraftVersion prevents overwriting intervening edits. Failed builds retain the working preview.',
-  inputSchema: { expectedDraftVersion: z.number().int().nonnegative(), source: z.object({ sdkVersion: z.literal('0.1.0'), entry: z.string(), files: z.record(z.string()) }).strict() } }, async input => text(await call('build', input)));
+  inputSchema: sourceBuildInputSchema.shape }, async input => text(await call('build', input)));
 server.registerTool('lux.studio.capture', { description: 'Return an actual 1920x1080 PNG from Lux with its frame, controls and revision metadata.', inputSchema: {} }, async () => {
   const result = await call('capture'); return { content: [{ type: 'image', mimeType: 'image/png', data: result.base64 }, { type: 'text', text: JSON.stringify(result.metadata) }] };
 });

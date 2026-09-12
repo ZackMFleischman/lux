@@ -4,6 +4,7 @@ import { StudioApp } from './renderer.tsx';
 import { studioTheme } from './theme.ts';
 import { StandaloneClient } from './standalone-client.ts';
 import { DEFAULT_OUTPUT } from '../../../packages/runtime-contracts/src/index.ts';
+import { createSceneDocument } from '../../../packages/core/src/scene-document.ts';
 import type { SourceBundle } from '../../../packages/runtime-contracts/src/index.ts';
 import { dispatchRuntimeCommand } from './runtime-operations.ts';
 import { createSourceWorkspace } from './source/workspace.ts';
@@ -76,7 +77,7 @@ export function AuthoringApp() {
         try { await client.submit({ ...source, files: { [source.entry]: 'this is not valid TypeScript !!' } }); } catch { invalidRejected = true; }
         if (!invalidRejected || client.getSnapshot().authoring?.revisionId !== initial.revisionId) throw Error('Failed source changed active visual');
         const capture = await client.capture();
-        const roundtrip = await window.luxAuthoring.smokeSave({ format: 'lux-scene', version: 1, source, settings: DEFAULT_OUTPUT, controls: { intensity: applied.intensity } });
+        const roundtrip = await window.luxAuthoring.smokeSave(createSceneDocument(source, DEFAULT_OUTPUT, { intensity: applied.intensity }));
         if (roundtrip.document.source.entry !== source.entry || roundtrip.document.source.sdkVersion !== source.sdkVersion ||
             roundtrip.document.source.files[source.entry] !== source.files[source.entry] || roundtrip.document.controls.intensity !== 0.8) throw Error('Save/reopen did not preserve the visual');
         await new Promise(resolve => setTimeout(resolve, 500));

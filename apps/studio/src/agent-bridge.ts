@@ -7,9 +7,10 @@ export async function createAgentBridge(invoke: (method: string, params: unknown
   const server = createServer(async (request, response) => {
     response.setHeader('Content-Type', 'application/json');
     if (request.method !== 'POST' || request.url !== '/' || request.headers.origin || request.headers.authorization !== `Bearer ${token}`) { response.writeHead(403).end('{"error":"Forbidden"}'); return; }
-    let body = '', bytes = 0;
+    const chunks: Buffer[] = []; let bytes = 0;
     try {
-      for await (const chunk of request) { bytes += chunk.length; if (bytes > 8388608) throw Error('Request exceeds 8 MiB'); body += chunk; }
+      for await (const chunk of request) { bytes += chunk.length; if (bytes > 8388608) throw Error('Request exceeds 8 MiB'); chunks.push(chunk); }
+      const body = new TextDecoder('utf-8', { fatal: true }).decode(Buffer.concat(chunks));
       const command = JSON.parse(body);
       if (!command || Object.keys(command).some(key => !['id', 'method', 'params'].includes(key)) || typeof command.id !== 'string' || command.id.length > 100 || !['read', 'build', 'capture', 'status', 'parameters', 'playback', 'restart'].includes(command.method)) throw Error('Invalid authoring command');
       let entry = requests.get(command.id);
@@ -21,7 +22,9 @@ export async function createAgentBridge(invoke: (method: string, params: unknown
         entry = { body, result }; requests.set(command.id, entry);
         if (requests.size > 8) requests.delete(requests.keys().next().value!);
       }
-      response.end(JSON.stringify({ ok: true, result: await entry.result }));
+      const encoded = JSON.stringify({ ok: true, result: await entry.result });
+      if (Buffer.byteLength(encoded) > 16 * 1024 * 1024) throw Error('Authoring response exceeds 16 MiB');
+      response.end(encoded);
     } catch (error) { response.writeHead(400).end(JSON.stringify({ ok: false, error: String((error as Error).message).slice(0, 2000) })); }
   });
   server.requestTimeout = 80000;
