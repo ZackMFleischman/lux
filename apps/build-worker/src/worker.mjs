@@ -8,6 +8,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { limits, validateSource, violation } from './source-policy.mjs';
 import { boundDiagnostics, assertResultBudgets } from './result-budget.mjs';
 import { sdkMetadata } from '../../../packages/visual-sdk/src/metadata.mjs';
+import { deriveAssets } from '../../../packages/assets/src/index.mjs';
+import { artifactBody } from './artifact-identity.mjs';
+import { readBoundedJson } from './bounded-json.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const workspace = process.cwd();
@@ -18,7 +21,7 @@ function diagnostic(error, file) {
   return { code: error.code || 'COMPILE_FAILED', message: String(error.message).slice(0, 4000), ...(file ? { file } : {}), ...(error.loc ? { line: error.loc.line, column: error.loc.column + 1 } : {}) };
 }
 async function main() {
-  const { source: raw, dependencyRoot } = JSON.parse(await readFile(process.argv[2], 'utf8'));
+  const { source: raw, dependencyRoot } = await readBoundedJson(process.argv[2], limits.requestBytes);
   const source = validateSource(raw), dependencyHashes = {};
   for (const [name, version] of Object.entries(pinned)) {
     const bytes = await readFile(join(dependencyRoot, name, 'package.json'));
@@ -102,6 +105,9 @@ async function main() {
     'compiler/worker.mjs': fileURLToPath(import.meta.url),
     'compiler/source-policy.mjs': join(root, 'apps/build-worker/src/source-policy.mjs'),
     'compiler/result-budget.mjs': join(root, 'apps/build-worker/src/result-budget.mjs'),
+    'compiler/artifact-identity.mjs': join(root, 'apps/build-worker/src/artifact-identity.mjs'),
+    'compiler/bounded-json.mjs': join(root, 'apps/build-worker/src/bounded-json.mjs'),
+    'assets/index.mjs': join(root, 'packages/assets/src/index.mjs'),
     'node/executable': process.execPath,
     'sdk/index.ts': join(root, 'packages/visual-sdk/src/index.ts'),
     'sdk/metadata.mjs': join(root, 'packages/visual-sdk/src/metadata.mjs'),
@@ -119,8 +125,9 @@ async function main() {
     if (key.startsWith('../')) throw violation('Compiler loaded a declaration outside the pinned dependency root', 'SOURCE_BOUNDARY_VIOLATION');
     dependencyHashes[`declarations/${key}`] = sha(await readFile(path));
   }
-  const artifact = { sourceHash: sha(JSON.stringify(source)), entry: source.entry.replace(/\.ts$/, '.js'), modules, sourceMaps,
-    sdkVersion: source.sdkVersion, compilerVersion: pinned.typescript, dependencyHashes };
+  const assetFields = source.sourceVersion === 2 ? { artifactVersion:2, ...await deriveAssets(source.assets,sha) } : {};
+  const artifact = artifactBody({ sourceHash: sha(JSON.stringify(source)), entry: source.entry.replace(/\.ts$/, '.js'), modules, sourceMaps,
+    sdkVersion: source.sdkVersion, compilerVersion: pinned.typescript, dependencyHashes, ...assetFields });
   const result = { ok: true, artifact: { ...artifact, bundleHash: sha(JSON.stringify(artifact)) }, diagnostics: [] };
   assertResultBudgets(result);
   return result;
