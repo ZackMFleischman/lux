@@ -11,6 +11,9 @@ import { sdkMetadata } from '../../../packages/visual-sdk/src/metadata.mjs';
 import { deriveAssets } from '../../../packages/assets/src/index.mjs';
 import { artifactBody } from './artifact-identity.mjs';
 import { readBoundedJson } from './bounded-json.mjs';
+import { sdkSourceFile, sourceArtifactVersion } from './sdk-selection.mjs';
+import { extractControlDeclarations } from './parameter-declarations.mjs';
+import { canonicalControlSchemaJson } from '../../../packages/runtime-contracts/src/parameters.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const workspace = process.cwd();
@@ -22,7 +25,8 @@ function diagnostic(error, file) {
 }
 async function main() {
   const { source: raw, dependencyRoot } = await readBoundedJson(process.argv[2], limits.requestBytes);
-  const source = validateSource(raw), dependencyHashes = {};
+  const source = validateSource(raw), dependencyHashes = {}, selectedSdk = sdkSourceFile(source.sdkVersion);
+  let controls;
   for (const [name, version] of Object.entries(pinned)) {
     const bytes = await readFile(join(dependencyRoot, name, 'package.json'));
     if (JSON.parse(bytes).version !== version) throw violation(`Install pinned ${name}@${version}`, 'SERVICE_UNAVAILABLE');
@@ -54,9 +58,12 @@ async function main() {
         }
       }
       if (path === source.entry) {
+        if (source.sdkVersion === '0.2.0') { controls = extractControlDeclarations(ast); }
+        else {
         const imported = ast.program.body.flatMap(n => n.type === 'ImportDeclaration' && n.source.value === '@lux/visual-sdk' ? n.specifiers.filter(s => s.type === 'ImportSpecifier' && s.imported.name === 'defineVisual').map(s => s.local.name) : []);
         const declaration = ast.program.body.find(n => n.type === 'ExportDefaultDeclaration')?.declaration;
         if (declaration?.type !== 'CallExpression' || declaration.callee.type !== 'Identifier' || !imported.includes(declaration.callee.name)) throw violation('Entry must export default defineVisual({...}) imported from @lux/visual-sdk');
+        }
       }
     } catch (error) { return { ok: false, code: error.code, diagnostics: [diagnostic(error, path)] }; }
   }
@@ -65,10 +72,16 @@ async function main() {
     await writeFile(join(workspace, 'source', path), text);
   }
   await mkdir(join(workspace, 'types'));
-  const sdk = await readFile(join(root, 'packages/visual-sdk/src/index.ts'), 'utf8');
+  const sdk = await readFile(join(root, 'packages/visual-sdk/src', selectedSdk), 'utf8');
   const shared = await readFile(join(root, 'packages/runtime-contracts/src/index.ts'), 'utf8');
-  await writeFile(join(workspace, 'types/sdk.ts'), sdk.replace('../../runtime-contracts/src/index.ts', './shared.ts'));
+  await writeFile(join(workspace, 'types/sdk.ts'), sdk.replace('../../runtime-contracts/src/index.ts', './shared.ts')
+    .replaceAll('../../runtime-contracts/src/parameters.mjs', './parameters.js'));
   await writeFile(join(workspace, 'types/shared.ts'), shared);
+  if (source.sdkVersion === '0.2.0') {
+    // Fixed local type copy: emitted SDK resolves only its sibling virtual JS
+    // module. No repo-relative path escapes into generated artifact imports.
+    await writeFile(join(workspace, 'types/parameters.d.ts'), await readFile(join(root, 'packages/runtime-contracts/src/parameters.d.mts')));
+  }
   await writeFile(join(workspace, '__lux_check.ts'), `import visual from './source/${source.entry}';\nimport type { VisualDefinition } from '@lux/visual-sdk';\nconst checked: VisualDefinition = visual;\nexport { checked };\n`);
   const zod = JSON.parse(await readFile(join(dependencyRoot, 'zod/package.json'), 'utf8'));
   const config = { compilerOptions: { target: 'ES2023', module: 'ESNext', moduleResolution: 'Bundler', strict: true,
@@ -101,15 +114,20 @@ async function main() {
   }
   modules['__lux/sdk.js'] = await readFile(join(workspace, 'out/types/sdk.js'), 'utf8');
   sourceMaps['__lux/sdk.js.map'] = await readFile(join(workspace, 'out/types/sdk.js.map'), 'utf8');
+  if (source.sdkVersion === '0.2.0') modules['__lux/parameters.js'] = await readFile(join(root, 'packages/runtime-contracts/src/parameters.mjs'), 'utf8');
   const dependencies = {
     'compiler/worker.mjs': fileURLToPath(import.meta.url),
     'compiler/source-policy.mjs': join(root, 'apps/build-worker/src/source-policy.mjs'),
     'compiler/result-budget.mjs': join(root, 'apps/build-worker/src/result-budget.mjs'),
     'compiler/artifact-identity.mjs': join(root, 'apps/build-worker/src/artifact-identity.mjs'),
     'compiler/bounded-json.mjs': join(root, 'apps/build-worker/src/bounded-json.mjs'),
+    'compiler/sdk-selection.mjs': join(root, 'apps/build-worker/src/sdk-selection.mjs'),
+    'compiler/parameter-declarations.mjs': join(root, 'apps/build-worker/src/parameter-declarations.mjs'),
+    'contracts/parameters.mjs': join(root, 'packages/runtime-contracts/src/parameters.mjs'),
+    'contracts/parameters.d.mts': join(root, 'packages/runtime-contracts/src/parameters.d.mts'),
     'assets/index.mjs': join(root, 'packages/assets/src/index.mjs'),
     'node/executable': process.execPath,
-    'sdk/index.ts': join(root, 'packages/visual-sdk/src/index.ts'),
+    [`sdk/${selectedSdk}`]: join(root, 'packages/visual-sdk/src', selectedSdk),
     'sdk/metadata.mjs': join(root, 'packages/visual-sdk/src/metadata.mjs'),
     'contracts/index.ts': join(root, 'packages/runtime-contracts/src/index.ts'),
     'typescript/compiler': executable, '@babel/parser/index.js': join(dependencyRoot, '@babel/parser/lib/index.js'),
@@ -125,9 +143,11 @@ async function main() {
     if (key.startsWith('../')) throw violation('Compiler loaded a declaration outside the pinned dependency root', 'SOURCE_BOUNDARY_VIOLATION');
     dependencyHashes[`declarations/${key}`] = sha(await readFile(path));
   }
-  const assetFields = source.sourceVersion === 2 ? { artifactVersion:2, ...await deriveAssets(source.assets,sha) } : {};
+  const version = sourceArtifactVersion(source);
+  const assetFields = version === 1 ? {} : { artifactVersion:version, ...await deriveAssets(source.assets ?? {},sha) };
+  const parameterFields = version === 3 ? {controls,controlSchemaHash:sha(canonicalControlSchemaJson(controls))} : {};
   const artifact = artifactBody({ sourceHash: sha(JSON.stringify(source)), entry: source.entry.replace(/\.ts$/, '.js'), modules, sourceMaps,
-    sdkVersion: source.sdkVersion, compilerVersion: pinned.typescript, dependencyHashes, ...assetFields });
+    sdkVersion: source.sdkVersion, compilerVersion: pinned.typescript, dependencyHashes, ...assetFields, ...parameterFields });
   const result = { ok: true, artifact: { ...artifact, bundleHash: sha(JSON.stringify(artifact)) }, diagnostics: [] };
   assertResultBudgets(result);
   return result;

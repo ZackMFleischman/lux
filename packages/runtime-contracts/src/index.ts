@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const SDK_VERSION = '0.1.0' as const;
+export const sourceSdkVersionSchema = z.enum(['0.1.0', '0.2.0']);
 export const hashSchema = z.string().regex(/^[a-f0-9]{64}$/);
 export const runtimeKeySchema = z.object({ instanceId: z.string().uuid(), generation: z.number().int().nonnegative().safe() }).strict();
 export type RuntimeKey = z.infer<typeof runtimeKeySchema>;
@@ -25,7 +26,7 @@ export type ControlValues = z.infer<typeof controlValuesSchema>;
 // Canonical paths, UTF-8 validity and aggregate byte quotas are checked by the
 // compiler admission policy, before files are materialized. These DTOs never
 // authorize filesystem operations or execution of submitted code.
-export const legacySourceBundleSchema = z.object({ entry: z.string().min(1), files: z.record(z.string()), sdkVersion: z.literal(SDK_VERSION) }).strict();
+export const legacySourceBundleSchema = z.object({ entry: z.string().min(1), files: z.record(z.string()), sdkVersion: sourceSdkVersionSchema }).strict();
 export const sourceAssetSchema = z.object({mediaType:z.literal('image/bmp'),encoding:z.literal('base64'),data:z.string().min(1)}).strict();
 export const assetSourceBundleSchema = legacySourceBundleSchema.extend({sourceVersion:z.literal(2),assets:z.record(sourceAssetSchema)}).strict();
 export const sourceBundleSchema = z.union([legacySourceBundleSchema,assetSourceBundleSchema]);
@@ -46,7 +47,18 @@ export const legacyCompiledArtifactSchema = z.object({
 }).strict();
 export const derivedAssetSchema = sourceAssetSchema.extend({byteLength:z.number().int().positive(),sha256:hashSchema,width:z.number().int().min(1).max(512),height:z.number().int().min(1).max(512)}).strict();
 export const assetCompiledArtifactSchema = legacyCompiledArtifactSchema.extend({artifactVersion:z.literal(2),assets:z.record(derivedAssetSchema),assetSetHash:hashSchema}).strict();
-export const compiledArtifactSchema = z.union([legacyCompiledArtifactSchema,assetCompiledArtifactSchema]);
+// Pure parameter policy and identity verification enforce cross-field ranges,
+// own-property provenance, canonical metadata bytes and hashes at admission.
+export const parameterControlDefinitionSchema = z.object({
+  id:z.string().regex(/^[a-z][A-Za-z0-9_]{0,63}$/),type:z.literal('number'),label:z.string().min(1),
+  default:z.number().finite(),min:z.number().finite(),max:z.number().finite(),
+  step:z.number().finite().positive().optional(),unit:z.string().min(1).optional(),changeCost:z.literal('live'),
+}).strict();
+export const parameterCompiledArtifactSchema = assetCompiledArtifactSchema.extend({
+  artifactVersion:z.literal(3),sdkVersion:z.literal('0.2.0'),
+  controls:z.array(parameterControlDefinitionSchema).max(32),controlSchemaHash:hashSchema,
+}).strict();
+export const compiledArtifactSchema = z.union([legacyCompiledArtifactSchema,assetCompiledArtifactSchema,parameterCompiledArtifactSchema]);
 export type CompiledArtifact = z.infer<typeof compiledArtifactSchema>;
 // A compiled artifact has not run a candidate smoke test and is not a ValidatedBundle.
 export const compileFailureCodeSchema = z.enum(['SOURCE_BOUNDARY_VIOLATION', 'COMPILE_FAILED', 'QUOTA_EXCEEDED', 'TIMEOUT', 'SERVICE_UNAVAILABLE']);

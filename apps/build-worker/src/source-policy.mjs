@@ -1,4 +1,5 @@
 import { validateSourceAssets } from '../../../packages/assets/src/index.mjs';
+import { sdkSourceFile } from './sdk-selection.mjs';
 export const limits = Object.freeze({ sourceBytes: 1048576, files: 32, diagnosticBytes: 131072, compileMs: 30000, outputBytes: 4194304, sourceJsonBytes: 6291456, requestBytes: 8388608 });
 export function violation(message, code = 'SOURCE_BOUNDARY_VIOLATION') { return Object.assign(new Error(message), { code }); }
 export function validateSource(source) {
@@ -33,11 +34,11 @@ export function snapshotRecord(value, fields) {
 }
 
 function validateLegacySource(source) {
-  if (!source || source.sdkVersion !== '0.1.0') throw violation('SDK version must be 0.1.0');
-  if (Object.keys(source).some(key => !['sdkVersion', 'entry', 'files'].includes(key))) throw violation('Source bundle contains unsupported fields');
+  source = snapshotRecord(source, ['sdkVersion','entry','files']);
+  sdkSourceFile(source.sdkVersion);
   if (typeof source.entry !== 'string' || source.entry.length > 240) throw violation('Entry must be a module path of at most 240 ASCII characters');
   if (!source.files || typeof source.files !== 'object' || Array.isArray(source.files)) throw violation('files must be a module-path to UTF-8 source record');
-  const entries = Object.entries(source.files);
+  const entries = Object.entries(snapshotRecord(source.files));
   if (!entries.length || entries.length > limits.files) throw violation('Submit 1 to 32 source files', 'QUOTA_EXCEEDED');
   const seen = new Set(); let bytes = 0;
   for (const [path, text] of entries) {

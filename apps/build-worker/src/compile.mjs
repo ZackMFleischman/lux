@@ -9,6 +9,7 @@ import { createHash } from 'node:crypto';
 import { verifyArtifact } from './artifact-identity.mjs';
 import { readBoundedJson, boundedJson } from './bounded-json.mjs';
 import { deriveAssets } from '../../../packages/assets/src/index.mjs';
+import { sourceArtifactVersion } from './sdk-selection.mjs';
 const hash = value => createHash('sha256').update(value).digest('hex');
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -22,8 +23,8 @@ export async function readCompileResult(resultPath, expectedSource) {
     assertResultBudgets(result);
     if(result.ok===true) {
       result.artifact=await verifyArtifact(result.artifact,hash);
-      if(expectedSource && (result.artifact.sourceHash!==hash(JSON.stringify(expectedSource)) || (result.artifact.artifactVersion===2)!==(expectedSource.sourceVersion===2))) throw Error('Compiler source/version identity mismatch');
-      if(expectedSource?.sourceVersion===2 && result.artifact.assetSetHash!==(await deriveAssets(expectedSource.assets,hash)).assetSetHash) throw Error('Compiler source asset identity mismatch');
+      if(expectedSource && (result.artifact.sourceHash!==hash(JSON.stringify(expectedSource)) || result.artifact.sdkVersion!==expectedSource.sdkVersion || (result.artifact.artifactVersion??1)!==sourceArtifactVersion(expectedSource))) throw Error('Compiler source/version identity mismatch');
+      if(expectedSource && (expectedSource.sourceVersion===2 || expectedSource.sdkVersion==='0.2.0') && result.artifact.assetSetHash!==(await deriveAssets(expectedSource.assets??{},hash)).assetSetHash) throw Error('Compiler source asset identity mismatch');
     }
     return result;
   } catch(error) {return failure(error.code || 'SERVICE_UNAVAILABLE',error.message);}
