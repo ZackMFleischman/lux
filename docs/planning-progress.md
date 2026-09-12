@@ -26,3 +26,5 @@ Commit checkpoints: baseline, specialist drafts, reconciled plans, initial revie
 
 - Baseline: source commit `1c9c884`; clean checkout; no application code or tests. User authorized routine planning decisions, three independent reviewers, worktrees, frequent commits, and architecture/UI diagrams.
 - Current phase: baseline preparation. Technical proposals require evidence or a bounded tracer experiment; documentation readiness is not proof of working GPU integration.
+- Baseline committed as `5ce8919`. Three specialist worktrees created on `codex/docs-runtime`, `codex/docs-core`, and `codex/docs-studio`; disjoint file ownership communicated.
+- Coordinator drafted decision log, system/sequence diagrams, requirement-to-milestone coverage and observed environment. Initial host target: Windows 11 / RTX 2070 / Resolume Avenue 7.27.1. GPU transport remains an explicit feasibility gate.
