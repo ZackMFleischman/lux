@@ -1,5 +1,11 @@
 # Current implementation order after standalone QA
 
+## Creative feedback: visual-declared parameters and maintained skill
+
+12 September 2026: the user's first noisy/spiky sphere brief exposed a concrete blocker: independent live spike height, noise scale, sharpness, speed and material controls cannot be declared by the current SDK. **Visual-defined live parameters are now immediate authoring work, ahead of further polish and alongside the asset track.** Each visual's code declares its own parameter schema; Intensity has no universal or mandatory role. The Inspector and generic MCP parameter operation consume that same schema. Implement this coherently through validation, runtime application, scene persistence and exported runtime compatibility; do not replace the fixed Intensity field with another hard-coded list. Preserve explicit compatibility for existing tracer scenes and immutable releases.
+
+The visual-creation Codex skill ships in `skills/lux-visual-creation/`. Keep it current with shipped authoring capabilities, validate examples and tool contracts, and reinstall after each update using `scripts/install-visual-skill.mjs`. Pair the adapter with the running Studio's checkout; discovery describes the adapter, not a negotiated application version. Skill delivery is documentation/tooling work; it does not itself implement live parameters.
+
 ## Active order: creative workflow feedback first
 
 User direction, 12 September 2026, after the docking checkpoint: getting to actual visualization creation and collecting feedback on that workflow is more important than completing the remaining infrastructure. **This section supersedes the historical ordering below.** Full tracer/release acceptance requirements remain unchanged; they are no longer prerequisites for an internal creative-use checkpoint.

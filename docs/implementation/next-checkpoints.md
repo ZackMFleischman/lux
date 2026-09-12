@@ -1,5 +1,11 @@
 # Next implementation checkpoints
 
+## Current creative-session follow-ups
+
+- [ ] C22 — NEXT AUTHORING CAPABILITY, alongside assets: code-declared per-visual live parameters. No globally required Intensity; derive Inspector and generic MCP operations from the visual declaration. Cover validation, runtime changes, persistence and export compatibility. The user's noisy sphere brief is the motivating acceptance case. Prioritize ahead of broader polish.
+- [ ] C23 — IN PROGRESS: repo-shipped `lux-visual-creation` Codex skill, independent workflow review, CPU-compiled noise example, repeatable install/check command, and personal installation. Update and reinstall alongside future author-facing features. Current fixed Intensity and asset limitations must remain explicit until implementation ships.
+- User's working Studio remains available for creative use. This skill/documentation checkpoint does not launch Studio or run live MCP/graphics tests.
+
 Started 2026-09-12 after the successful guided Resolume QA. This is the active tracker; [overnight progress](overnight-progress.md) preserves the preceding work and manual observations. Integration: `.worktrees/tracer`, branch `codex/tracer-0.1`, starting commit `26fc023`.
 
 **Current objective: real visual creation and workflow feedback.** User reprioritized this ahead of additional infrastructure. [Active order](current-priorities.md#active-order-creative-workflow-feedback-first) governs sequencing: creative-use checkpoint first, bounded UI work already underway, then fixes/features driven by observed use. Tracer release acceptance remains open and does not block an internal creative session.
