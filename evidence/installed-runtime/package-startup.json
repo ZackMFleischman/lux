@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "gpuTested": false,
+  "hostTested": false,
+  "cacheState": "OS file cache not cleared; package installed and validated immediately before supervisor launch",
+  "releaseId": "2d2549826ffcb8a3f0265e060e89c0b86b4b09ab0a7c6a758c96a08634e2a468",
+  "runtimeId": "20c587d4e58f118945180ca4a6c3ae8f669121c947f4e22aec00b0359a1be0c3",
+  "installMs": 17040.416,
+  "coldSupervisorReadyMs": 1661.6779000000024,
+  "sharedSupervisorSingleton": true,
+  "idleExitMs": 31716.163000000004
+}
