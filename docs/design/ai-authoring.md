@@ -18,7 +18,7 @@ Bounded profile test: with the actual selected client, allow 10 seconds for conn
 
 ## Tracer operation surface
 
-All IDs below are the branded strings from `packages/core/src/contracts.ts`. `Mutation` means `{requestId: string; sceneId: SceneId; baseRevisionId: RevisionId | null}`. A unique request ID deduplicates retries by payload hash; reusing it with different input is an error. Stage 0.1 supports one scratch Scene; general saved-project selection begins at milestone 1.
+All IDs below are branded strings from `packages/runtime-contracts/src/index.ts`, imported/reexported by `packages/core/src/contracts.ts`. Core alone owns Scene snapshots/head transactions. `Mutation` means `{requestId: string; sceneId: SceneId; baseRevisionId: RevisionId | null}`. A unique request ID deduplicates retries by payload hash; reusing it with different input is an error. Stage 0.1 supports one scratch Scene; general saved-project selection begins at milestone 1.
 
 | Tool | Input → result | Behavior |
 | --- | --- | --- |
@@ -90,13 +90,13 @@ Playback reset resets simulation and clock to zero with current seed/controls, p
 
 Default submit runs all steps. `autoApply:false` explicitly stages source; validate stores a certificate keyed by source/settings/SDK/control-schema hashes. Activate verifies certificate identity and the unchanged starting revision; an expired renderer lease requires another smoke run. Explicit staging is for diagnostics/integration, not the default creative workflow.
 
-Scene-changing jobs are bounded FIFO, one running and at most eight queued per Scene. Compilation does not hold the UI thread or block `status`, `read`, or cancellation. Saved UI edits share the same revision gate. Two jobs submitted from the same base cannot both commit: the second returns `REVISION_CONFLICT` and current head; the AI rereads and deliberately rebases. A project-wide commit lock serializes shared asset/component changes in milestone 1. No automatic text merge or silent last-writer-wins policy (A01).
+Scene-changing jobs are bounded FIFO, one running and at most one queued per Scene. Compilation does not hold the UI thread or block `status`, `read`, or cancellation. Saved UI edits share the same revision gate. Two jobs submitted from the same base cannot both commit: the second returns `REVISION_CONFLICT` and current head; the AI rereads and deliberately rebases. A project-wide commit lock serializes shared asset/component changes in milestone 1. No automatic text merge or silent last-writer-wins policy (A01).
 
 Cancellation before commit removes queued work or terminates its disposable worker and releases leases. During the short commit section return `cancellationPending`; finish atomically, then report the actual terminal result. A completed commit is `succeeded` with revision ID, even if cancellation arrived too late. Undo is a separate optimistic mutation. MCP transport disconnect does not imply cancellation, because reconnect/retry must recover the result.
 
 ## Actual capture and race control
 
-Capture is an inspection readback, separate from the normal host GPU-transfer path (T02, T04). Reserve one capture per instance and at most four queued service-wide. The acceptance point fixes instance, generation, revision, final output, and minimum applied control sequence; later UI selection changes cannot retarget it.
+Capture is an inspection readback, separate from the normal host GPU-transfer path (T02, T04). Reserve one active and one queued capture per instance; cap queued captures at four service-wide when multiple instances arrive. The acceptance point fixes instance, generation, revision, final output, and minimum applied control sequence; later UI selection changes cannot retarget it.
 
 The runtime emits a completed-frame envelope with frame ID, immutable pixel-resource lease, instance/generation/revision, clock epoch, simulation time, effective controls, seed, output settings, runtime build hash, and applied control sequence. Capture selects a matching completed frame and leases that exact resource before asynchronous readback/PNG encoding. Never read metadata from the mutable current Scene after reading pixels. Preserve the lease until GPU completion/readback is acknowledged or the generation is destroyed.
 
