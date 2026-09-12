@@ -1,0 +1,33 @@
+{
+  "format": "lux-installed-qa-fixtures",
+  "version": 1,
+  "preparationPassed": true,
+  "hostTested": false,
+  "gpuTested": false,
+  "requiredAssetCovered": false,
+  "assetGap": "Current source admission permits TypeScript modules only; asset import/bytes/resolution is not wired through the saved scene and release.",
+  "releases": [
+    {
+      "fixture": "triangle",
+      "name": "Lux QA Triangle",
+      "expectedImage": "Cyan triangle rotating and moving horizontally on dark navy",
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tracer\\artifacts\\installed-package\\qa-fixtures\\5569712e0130a6c690d87882ef5a420cd9d1d65867d30adc8ed18f22eb1aedba",
+      "releaseId": "5569712e0130a6c690d87882ef5a420cd9d1d65867d30adc8ed18f22eb1aedba",
+      "runtimeId": "20c587d4e58f118945180ca4a6c3ae8f669121c947f4e22aec00b0359a1be0c3",
+      "sourceHash": "595998a290bcd3c707aa0ac5ac5260cf7c327f0ae7b84fb104f66c489bd2f0b9",
+      "linkedHash": "226b7db93e5008be049a50b4adbbcee8f09c004f5384ca920fcb4a70e8985c76",
+      "runtimeFiles": 99
+    },
+    {
+      "fixture": "ring",
+      "name": "Lux QA Ring",
+      "expectedImage": "Gold ring moving horizontally on dark navy",
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tracer\\artifacts\\installed-package\\qa-fixtures\\c1b26300f22e1b9c1f136aa7c9892d8baf79335148d677916f68232c845d31fd",
+      "releaseId": "c1b26300f22e1b9c1f136aa7c9892d8baf79335148d677916f68232c845d31fd",
+      "runtimeId": "20c587d4e58f118945180ca4a6c3ae8f669121c947f4e22aec00b0359a1be0c3",
+      "sourceHash": "2610c08c4374f93184840607486a29bc00f0eebe10ed537aa41a730d67712662",
+      "linkedHash": "4c6698db2005c07a860def470362ee5c07bb62a586780830b46b554a92903e39",
+      "runtimeFiles": 99
+    }
+  ]
+}

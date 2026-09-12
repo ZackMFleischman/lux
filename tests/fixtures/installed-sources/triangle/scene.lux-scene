@@ -1,0 +1,21 @@
+{
+  "format": "lux-scene",
+  "version": 1,
+  "source": {
+    "sdkVersion": "0.1.0",
+    "entry": "visual.ts",
+    "files": {
+      "visual.ts": "import { defineVisual } from '@lux/visual-sdk';\nimport { Scene, Mesh, CircleGeometry, RingGeometry, MeshBasicNodeMaterial, OrthographicCamera, Color } from 'three/webgpu';\nimport { uniform, vec4 } from 'three/tsl';\nimport { palette } from './palette.ts';\n\nexport default defineVisual({\n  async create(context) {\n    const level = uniform(0.5);\n    const material = new MeshBasicNodeMaterial();\n    material.fragmentNode = vec4(level.mul(palette[0]), level.mul(palette[1]), level.mul(palette[2]), 1);\n    const geometry = new CircleGeometry(0.65, 3);\n    const scene = new Scene();\n    scene.background = new Color(0.012, 0.018, 0.035);\n    const shape = new Mesh(geometry, material);\n    scene.add(shape);\n    const camera = new OrthographicCamera(-1.7778, 1.7778, 1, -1, 0, 1);\n    return {\n      update(frame) {\n        level.value = frame.controls.intensity;\n        shape.position.x = Math.sin(frame.timeSeconds * 0.6) * 0.45;\n        shape.rotation.z = frame.timeSeconds * 0.4;\n      },\n      render(target) { return context.renderer.render(scene, camera, target); },\n      reset(_seed) {},\n      dispose() { geometry.dispose(); material.dispose(); },\n    };\n  },\n});\n",
+      "palette.ts": "export const palette = [0.08, 0.85, 1] as const;\n"
+    }
+  },
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "seed": 0
+  },
+  "controls": {
+    "intensity": 0.8
+  }
+}
