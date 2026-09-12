@@ -77,3 +77,26 @@ test('RTL: failed runtime command shows actionable error without a successful-st
   assert.equal(screen.queryByText('Request accepted. Awaiting applied runtime status.'), null);
   assert.ok(screen.getByText('revision-2'));
 });
+
+test('RTL: completing an intensity write cannot clear a pending playback command', async () => {
+  const fixture = service(), user = userEvent.setup({ document });
+  let finishPlay!: () => void, finishIntensity!: () => void;
+  fixture.client.invoke = operation => {
+    fixture.calls.push(operation);
+    return new Promise(resolve => {
+      if (operation.name === 'lux.playback') finishPlay = () => resolve({});
+      else finishIntensity = () => resolve({});
+    });
+  };
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+  await user.click(screen.getByRole('button', { name: 'Play' }));
+  fireEvent.change(screen.getByRole('slider'), { target: { value: '0.8' } });
+  await waitFor(() => assert.equal(fixture.calls.length, 2));
+  await act(async () => finishIntensity());
+  assert.equal((screen.getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled, true);
+  assert.equal((screen.getByRole('button', { name: 'Restart runtime' }) as HTMLButtonElement).disabled, true);
+  await user.click(screen.getByRole('button', { name: 'Play' }));
+  assert.equal(fixture.calls.length, 2);
+  await act(async () => finishPlay());
+  assert.equal((screen.getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled, false);
+});

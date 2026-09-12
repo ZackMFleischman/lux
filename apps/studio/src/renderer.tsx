@@ -33,7 +33,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const controller = useMemo(() => new StudioController(client), [client]);
   const [windowState, setWindowState] = useState<WindowState>({ detached: false, fullscreen: false });
   const [maximized, setMaximized] = useState(false);
-  const [busy, setBusy] = useState(false), [notice, setNotice] = useState<string | null>(null);
+  const [pendingCommands, setPendingCommands] = useState(0), [notice, setNotice] = useState<string | null>(null);
+  const busy = pendingCommands > 0;
   const [error, setError] = useState<string | null>(null);
   const [clock, setClock] = useState(() => nowMs ?? Date.now());
   const [intensity, setIntensity] = useState(snapshot.authoring?.intensity ?? INTENSITY_CONTROL.default);
@@ -62,10 +63,10 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
     return () => window.removeEventListener('keydown', escape);
   }, [windows, windowState.fullscreen]);
   async function command(action: () => Promise<unknown>): Promise<void> {
-    setBusy(true); setError(null); setNotice(null);
+    setPendingCommands(count => count + 1); setError(null); setNotice(null);
     try { await action(); setNotice('Request accepted. Awaiting applied runtime status.'); }
     catch (reason) { setError(reason instanceof Error ? reason.message : String(reason)); }
-    finally { setBusy(false); }
+    finally { setPendingCommands(count => count - 1); }
   }
   function windowAction(action: () => Promise<void>): void { void action().catch(reason => setError(String(reason))); }
   const compact = previewOnly || maximized;
