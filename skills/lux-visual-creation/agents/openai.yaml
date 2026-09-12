@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lux Visual Creation"
+  short_description: "Create and refine visuals in Lux Studio"
+  default_prompt: "Use $lux-visual-creation to create and refine a visual in my running Lux Studio."
