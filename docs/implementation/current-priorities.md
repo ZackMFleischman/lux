@@ -1,5 +1,25 @@
 # Current implementation order after standalone QA
 
+## Active order: creative workflow feedback first
+
+User direction, 12 September 2026, after the docking checkpoint: getting to actual visualization creation and collecting feedback on that workflow is more important than completing the remaining infrastructure. **This section supersedes the historical ordering below.** Full tracer/release acceptance requirements remain unchanged; they are no longer prerequisites for an internal creative-use checkpoint.
+
+The current build already supports executable multi-file TypeScript authoring with syntax coloring, Studio preview, MCP create/read/build/capture/revise and playback controls, save/reopen, and immutable source export. Native Studio workflow tests and guided installed-source functional QA have passed within their recorded scope. Start from these capabilities rather than building another foundation before trying real work.
+
+| Priority | Work | Exit condition |
+| --- | --- | --- |
+| Now: creative-use checkpoint | Prepare a short, portable Studio/MCP start guide and use actual user-chosen visual briefs. Create a visual, inspect its live/captured output, request meaningful revisions, make a small manual edit, save and reopen it. Use the current procedural-code path; no asset or graph prerequisite. | User can complete a real creation/revision session and identify the next workflow friction. Preserve the actual scene and concise feedback; do not require a fixed number of visuals or full tracer acceptance before proceeding. |
+| Immediate support | Finish the bounded compact UI patch already underway and its affected regressions: clear Build/File actions, source editing, icon playback and local pane recovery. Current working build remains available while it is reviewed. | No regression in draft/undo, capture, controls, save/reopen or preview lifetime; deliver the patch promptly. Broader polish must not hold the creative session. |
+| Next, from observed use | Fix the highest-impact obstacles discovered while creating visuals. Promote missing authoring capabilities when a concrete brief requires them: named visual-specific properties, richer source/scene organization, image assets, audio input or graph composition. Each receives the smallest coherent tested slice. | A previously blocked or awkward creative task becomes straightforward. Feature order follows actual use and technical dependencies, rather than an automatic march through infrastructure milestones. |
+| Parallel only if it does not delay the above | Close out already-finished evaluator review/commits and preserve existing evidence. Retain design work for assets, multiple views and performance. Start no new native telemetry, asset plumbing or broad docking project merely to keep agents occupied. | Work is safely committed with accurate remaining gaps; no claim of hardware/release acceptance. |
+| Release readiness, after workflow feedback | Complete required assets, distinct-source installed/offline isolation evidence, recovery policy/physical timing, performance collection and numerical acceptance, then wider export compatibility/hardening. Thumbnails remain early export usability. | Original tracer and release gates actually pass with evidence; internal creative-use readiness is not mislabeled as release completion. |
+
+Keep compact UI defaults as a product requirement. True multiple views and broader design consistency stay planned; prioritize them from observed friction. AI activity history remains low priority unless its absence materially blocks understanding the authoring session. Settings/output resolution and audio reactivity remain required product work, with timing driven by the first concrete creative briefs that need them.
+
+Coordinator stopped the newly started BMP validator slice before production implementation; only a stub and draft tests had been created, and those uncommitted files were removed. The approved asset design remains available. The existing CPU evaluator is near completion and may be reviewed/committed as housekeeping, but no new measurement collector is scheduled ahead of creative use.
+
+## Historical sequencing before editor and installed-source checkpoints
+
 2026-09-12. This sequencing addendum reconciles [tracer 0.1](tracer-0.1.md), the user-approved [standalone pivot](standalone-lux.md), and subsequent UI requests. It supersedes conversational suggestions to start the source editor immediately after adding MCP controls. It does not rewrite the original tracer's acceptance criteria or declare unavailable gates passed.
 
 ## What the evidence establishes
