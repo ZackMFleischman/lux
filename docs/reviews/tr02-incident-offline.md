@@ -18,3 +18,7 @@ Status: hardware execution paused after user-reported system freeze requiring fo
 - Obtain independent review of ownership/lifecycle and build provenance. Only then select one minimal hardware hypothesis for a user-assisted run. Keep Resolume closed during standalone runs.
 
 The previous requirement remains: actual Resolume1080p transport/performance acceptance has not passed. No downstream runtime/editor expansion yet.
+
+## Independent reviewer completion
+
+Additional current-source findings: LuxSource::InitGL ignores receiver.start failure; start launches a worker even after context creation failure. Repeated lifecycle calls retain stopping/state/deleted handles, so restart/idempotence is undefined. Producer shutdown has a check/use race: receiver can observe alive, producer marks dead and observes no Reading slots, then receiver claims Ready while producer releases resources. A shutdown acknowledgement/state protocol is required. Add deterministic tests for this exact interleaving plus failed initialization and repeated start/stop. These findings concern newer receiver code, not a proven reconstruction of the crashed baseline.
