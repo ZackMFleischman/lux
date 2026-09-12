@@ -82,7 +82,11 @@ async function tick() {
         if (name !== request.instanceId + '.json') throw Error('Instance request filename mismatch');
         try { process.kill(request.hostPid, 0); } catch { continue; }
         requests.push(request);
-      } catch (error) { fs.writeFileSync(path.join(directory, name + '.error'), String(error.message || error)); }
+      } catch (error) {
+        // The host may remove its lease after readdir but before stat/read.
+        // Absence is normal removal; preserve diagnostics for every other fault.
+        if (error.code !== 'ENOENT') fs.writeFileSync(path.join(directory, name + '.error'), String(error.message || error));
+      }
     }
     await registry.reconcile(requests, performance.now());
     for (const [instanceId, error] of registry.errors) fs.writeFileSync(path.join(directory, instanceId + '.error'), error);

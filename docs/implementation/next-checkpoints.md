@@ -13,8 +13,9 @@ Started 2026-09-12 after the successful guided Resolume QA. This is the active t
 | C4: acceptance measurement audit | DONE | Coordinator + independent review | 37d3102 adds performance-checkpoint.md; source-backed per-gate matrix reviewed. Next measurement implementation is offline validity/accounting core, then bounded native correlation/collection. |
 | C5: independent review and integration | DONE (FIRST BATCH) | Coordinator + reviewers | Task and final batch reviews pass; two final harness suggestions applied and rerun successfully. Combined 71 Studio CPU + one real Dockview DOM test, Studio typecheck and native UI/MCP checks pass. |
 | C6: graphics and host checkpoint | STUDIO PASS; DISTINCT-SOURCE HOST QA PENDING | Coordinator | Real Studio docking, fullscreen/editor/export and MCP checks pass; owned test windows closed. Prepared triangle/ring packages remain uninstalled and untested in Resolume. |
-| C7: offline performance validity/evaluation core | QUEUED | Measurement agent | Implement the first CPU-only evaluator from performance-checkpoint.md with negative fixtures. This cannot certify real hardware without actual records. |
-| C8: required asset implementation contract | QUEUED | Asset design agent | Resolve bounded source/asset schema, immutable byte closure, runtime asset access and backward compatibility into an implementation-ready design. |
+| C7: offline performance validity/evaluation core | IN PROGRESS | checkpoint_evaluator | Implementing the first CPU-only evaluator from performance-checkpoint.md with negative fixtures in its isolated worktree. This cannot certify real hardware without actual records. |
+| C8: required asset implementation contract | IN PROGRESS | checkpoint_assets | Resolving bounded source/asset schema, immutable byte closure, runtime asset access and backward compatibility into an implementation-ready design. |
+| C9: installed diagnostic cleanup race | IN PROGRESS | Coordinator | Real QA logs include a missing-lease error after normal host removal. CPU regression reproduces it; suppress only ENOENT while preserving other scan errors. No installed binary changes. |
 
 ## Established baseline
 
