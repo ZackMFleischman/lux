@@ -1,0 +1,43 @@
+{
+  "commands": [
+    "pnpm native:build",
+    "pnpm build",
+    "pnpm typecheck",
+    "pnpm test:unit",
+    "pnpm test:mcp -- --profile-fixture"
+  ],
+  "results": {
+    "typecheck": "pass",
+    "mcpProfileTests": 2,
+    "nativeBuild": "pass",
+    "nativeCpuTests": 5,
+    "unitTests": 18,
+    "syntaxBuild": "pass",
+    "gpuExecuted": false
+  },
+  "schema": 1,
+  "recordedUtc": "2026-09-12T05:18:31.9785654Z",
+  "limitations": [
+    "Native build observations recorded by coordinator; not a reproducible-build certification",
+    "Renderer main build is syntax emission, not semantic TS checking",
+    "No hardware stability or actual host acceptance claimed"
+  ],
+  "sourceCheckpoint": "f69d5b6",
+  "binaries": [
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\native\\build\\Release\\LuxTracerTR02.dll",
+      "modifiedUtc": "2026-09-12T05:16:09.8347601Z",
+      "sha256": "13440a481726246cb7336fd5ede1552d1e45d3241ba7a34f3ed26881c345a30b"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\native\\build\\Release\\lux_texture_bridge.node",
+      "modifiedUtc": "2026-09-12T05:16:19.2609037Z",
+      "sha256": "0b1a130954aeb89b2a677a41011af11f6a479838b715cffece41cb761c1dec59"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tr02-gpu\\native\\build\\Release\\lux_standalone_host.exe",
+      "modifiedUtc": "2026-09-12T05:13:53.1805720Z",
+      "sha256": "3e2abffbc3009601a17398a96308924db1cea7f4ba0fcc1fd81c914191379dd4"
+    }
+  ]
+}
