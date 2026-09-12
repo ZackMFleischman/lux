@@ -17,7 +17,7 @@ export interface AuthoringApi {
 }
 declare global { interface Window { luxAuthoring: AuthoringApi } }
 type Running = { worker: Worker; canvas: HTMLCanvasElement; instanceId: string; generation: number; revisionId: string;
-  lastHeartbeat: number; lastFrame: number; watchdog: ReturnType<typeof setInterval>; controls: number; };
+  lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; };
 export class StandaloneClient implements StudioClient, PresentationPort {
   private snapshot: StudioSnapshot = { connection: 'connected', message: 'Open an example or write a visual, then Build & preview.', receivedAtMs: Date.now(), authoring: null, host: null, jobs: [], visualFps: null, uiFps: null };
   private listeners = new Set<() => void>();
@@ -25,8 +25,9 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private target: HTMLElement | null = null;
   private generation = 0;
   private source: SourceBundle | null = null;
+  private accepted: { moduleSource: string; revisionId: string } | null = null;
   private busy = false;
-  private pending = new Map<string, { resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
+  private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
   private api: AuthoringApi;
   constructor(api: AuthoringApi) { this.api = api; }
   getSnapshot = () => this.snapshot;
@@ -43,6 +44,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       this.publish({ jobs: [{ jobId, state: 'initializing', summary: 'Preparing preview…' }] });
       await this.start(result.linked.code, result.sourceHash);
       this.source = structuredClone(source);
+      this.accepted = { moduleSource: result.linked.code, revisionId: result.sourceHash };
       this.publish({ jobs: [{ jobId, state: 'succeeded', summary: 'Visual is ready in Lux.' }] });
     } catch (error) { this.publish({ jobs: [{ jobId, state: 'failed', summary: 'Build failed; previous preview retained.', fault: String(error) }] }); throw error; }
     finally { this.busy = false; }
@@ -52,42 +54,53 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     canvas.style.cssText = 'width:100%;height:100%;position:absolute;inset:0;object-fit:contain';
     const worker = new Worker(new URL('./visual-worker.js', import.meta.url), { type: 'module' });
     const candidate: Running = { worker, canvas, instanceId: this.running?.instanceId ?? crypto.randomUUID(), generation: ++this.generation,
-      revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), watchdog: undefined as any, controls: 0 };
+      revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0 };
     const previous = this.running;
     const intensity = this.snapshot.authoring?.intensity ?? 0.5;
     const playing = this.snapshot.authoring?.playback === 'playing';
     let ready = false;
     try {
       await new Promise<void>((resolve, reject) => {
-        const timer = setTimeout(() => reject(Error('Visual initialization exceeded five seconds')), 5000);
-        worker.onerror = event => { clearTimeout(timer); if (!ready) reject(Error(event.message)); else this.fault(candidate, event.message); };
+        const abort = (error: Error) => { clearTimeout(timer); this.stop(candidate, error.message); reject(error); };
+        const timer = setTimeout(() => abort(Error('Visual initialization exceeded five seconds')), 5000);
+        candidate.activationTimer = timer;
+        const fail = (message: string) => { if (!ready) abort(Error(message)); else this.fault(candidate, message); };
+        // Candidate JS needs the same liveness deadline as an accepted worker.
+        // Healthy asynchronous startup can still use the independent 5 s cap.
+        candidate.watchdog = setInterval(() => {
+          const now = performance.now();
+          if (now - candidate.lastHeartbeat >= 1250) fail(ready ? 'Visual stopped making progress. Restart the runtime to retry.' : 'Visual initialization stopped making progress');
+          else if (ready && this.snapshot.authoring?.playback === 'playing' && now - candidate.lastFrame >= 1250) fail('Visual stopped completing frames. Restart the runtime to retry.');
+        }, 250);
+        worker.onerror = event => fail(event.message);
         worker.onmessage = event => {
           const message = event.data;
-          if (message?.instanceId !== candidate.instanceId || message.generation !== candidate.generation || message.revisionId !== candidate.revisionId) return;
-          candidate.lastHeartbeat = performance.now();
-          if (message.type === 'failure') { clearTimeout(timer); if (!ready) reject(Error(message.message)); else this.fault(candidate, message.message); return; }
-          if (message.type === 'heartbeat') return;
+          if (candidate.terminal || message?.instanceId !== candidate.instanceId || message.generation !== candidate.generation || message.revisionId !== candidate.revisionId) return;
+          if (message.type === 'failure') { fail(String(message.message)); return; }
+          if (message.type === 'heartbeat') { if (/^\d{1,20}$/.test(message.frameId)) candidate.lastHeartbeat = performance.now(); return; }
           if (message.type === 'capture-error') {
             const wait = this.pending.get(message.requestId);
-            if (wait) { clearTimeout(wait.timer); this.pending.delete(message.requestId); wait.reject(Error(message.message)); }
+            if (wait?.runtime === candidate && wait.kind === 'capture') { candidate.lastHeartbeat = performance.now(); clearTimeout(wait.timer); this.pending.delete(message.requestId); wait.reject(Error(message.message)); }
             return;
           }
           if (message.type === 'capture') {
             const wait = this.pending.get(message.requestId);
-            if (wait && message.bytes instanceof ArrayBuffer && message.bytes.byteLength <= 8388608) {
+            if (wait?.runtime === candidate && wait.kind === 'capture' && message.bytes instanceof ArrayBuffer && message.bytes.byteLength <= 8388608) {
+              candidate.lastHeartbeat = performance.now();
               clearTimeout(wait.timer); this.pending.delete(message.requestId);
               wait.resolve({ bytes: message.bytes, metadata: { ...message.metadata, instanceId: candidate.instanceId, generation: candidate.generation, revisionId: candidate.revisionId } });
             }
             return;
           }
-          if (!['ready', 'frame', 'status'].includes(message.type) || !/^\d+$/.test(message.frameId) ||
+          if (!['ready', 'frame', 'status'].includes(message.type) || !/^\d{1,20}$/.test(message.frameId) ||
               !Number.isFinite(message.timeSeconds) || !Number.isSafeInteger(message.clockEpoch) ||
               !['playing', 'paused'].includes(message.playback) || !Number.isSafeInteger(message.controlSequence) || message.controlSequence < 0 ||
               !Number.isFinite(message.intensity) || message.intensity < 0 || message.intensity > 1) return;
-          candidate.lastFrame = performance.now();
+          candidate.lastHeartbeat = performance.now();
+          if (BigInt(message.frameId) > BigInt(candidate.frameId)) { candidate.frameId = message.frameId; candidate.lastFrame = performance.now(); }
           if (message.type === 'ready' && !ready) {
             ready = true; clearTimeout(timer); this.running = candidate;
-            if (previous) { for (const wait of this.pending.values()) { clearTimeout(wait.timer); wait.reject(Error('Runtime changed before command completed')); } this.pending.clear(); clearInterval(previous.watchdog); previous.worker.terminate(); previous.canvas.remove(); }
+            if (previous) { this.stop(previous, 'Runtime changed before command completed'); previous.canvas.remove(); }
             this.target?.appendChild(canvas);
             resolve();
           }
@@ -97,22 +110,24 @@ export class StandaloneClient implements StudioClient, PresentationPort {
             controlSequence: message.controlSequence, clockEpoch: message.clockEpoch, frameId: message.frameId, intensity: message.intensity,
             output: { width: 1920, height: 1080 }, fault: null } });
           const wait = this.pending.get(message.requestId);
-          if (wait) { clearTimeout(wait.timer); this.pending.delete(message.requestId); wait.resolve(message); }
+          if (wait?.runtime === candidate && wait.kind === 'command') { clearTimeout(wait.timer); this.pending.delete(message.requestId); wait.resolve(message); }
         };
         const offscreen = canvas.transferControlToOffscreen();
         worker.postMessage({ type: 'init', requestId: crypto.randomUUID(), instanceId: candidate.instanceId, generation: candidate.generation,
           revisionId, moduleSource, canvas: offscreen, controls: { intensity }, settings: DEFAULT_OUTPUT, playing }, [offscreen]);
       });
-      candidate.watchdog = setInterval(() => {
-        const now = performance.now();
-        if (now - candidate.lastHeartbeat > 1500 || (this.snapshot.authoring?.playback === 'playing' && now - candidate.lastFrame > 2000)) this.fault(candidate, 'Visual stopped making progress. Restart the runtime to retry.');
-      }, 250);
-    } catch (error) { worker.terminate(); canvas.remove(); throw error; }
+    } catch (error) { this.stop(candidate, String(error)); canvas.remove(); throw error; }
+  }
+  private stop(runtime: Running, message: string) {
+    if (runtime.terminal) return;
+    runtime.terminal = true;
+    clearInterval(runtime.watchdog); clearTimeout(runtime.activationTimer); runtime.worker.onmessage = null; runtime.worker.onerror = null;
+    runtime.worker.terminate(); // Requests browser termination; not native/GPU stop acknowledgement.
+    for (const [id, wait] of this.pending) if (wait.runtime === runtime) { clearTimeout(wait.timer); this.pending.delete(id); wait.reject(Error(message)); }
   }
   private fault(runtime: Running, message: string) {
-    if (runtime !== this.running) return;
-    clearInterval(runtime.watchdog); runtime.worker.terminate();
-    for (const wait of this.pending.values()) { clearTimeout(wait.timer); wait.reject(Error(message)); } this.pending.clear();
+    if (runtime !== this.running || runtime.terminal) return;
+    this.stop(runtime, message);
     if (this.snapshot.authoring) this.publish({ authoring: { ...this.snapshot.authoring, playback: 'failed', fault: { code: 'RUNTIME_FAILED', message } } });
   }
   async invoke(operation: StudioOperation): Promise<unknown> {
@@ -121,7 +136,12 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     if (this.snapshot.authoring?.authority !== 'studio') throw Error('Authority conflict: Studio cannot control this instance');
     if (this.busy) throw Error('A visual build is already running');
     if (!runtime || input.instanceId !== runtime.instanceId || input.expectedGeneration !== runtime.generation) throw Error('Runtime changed; retry using its current state');
-    if (operation.name === 'lux.runtime.restart') { if (!this.source) throw Error('No visual to restart'); await this.submit(this.source); return this.snapshot.authoring; }
+    if (operation.name === 'lux.runtime.restart') {
+      if (!this.accepted) throw Error('No visual to restart');
+      this.busy = true;
+      try { await this.start(this.accepted.moduleSource, this.accepted.revisionId); return this.snapshot.authoring; }
+      finally { this.busy = false; }
+    }
     if (this.snapshot.authoring?.playback === 'failed') throw Error('Restart the failed runtime first');
     let message;
     if (operation.name === 'lux.parameters.set') {
@@ -130,9 +150,10 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     } else message = { type: 'playback', action: operation.input.action };
     if (this.pending.has(input.requestId)) throw Error('Request ID already pending');
     return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => { this.pending.delete(input.requestId); reject(Error('Runtime command timed out')); }, 5000);
-      this.pending.set(input.requestId, { resolve, reject, timer });
-      runtime.worker.postMessage({ ...message, requestId: input.requestId, instanceId: runtime.instanceId, generation: runtime.generation });
+      const timer = setTimeout(() => this.fault(runtime, 'Runtime command timed out'), 5000);
+      this.pending.set(input.requestId, { runtime, kind: 'command', resolve, reject, timer });
+      try { runtime.worker.postMessage({ ...message, requestId: input.requestId, instanceId: runtime.instanceId, generation: runtime.generation }); }
+      catch (error) { this.fault(runtime, String(error)); }
     });
   }
   async attach({ target, runtimeKey }: Parameters<PresentationPort['attach']>[0]) {
@@ -142,12 +163,14 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   }
   async capture(): Promise<{ bytes: ArrayBuffer; metadata: Record<string, unknown> }> {
     const runtime = this.running;
-    if (!runtime || this.snapshot.authoring?.playback === 'failed') throw Error('No working visual to capture');
+    if (!runtime || runtime.terminal || this.snapshot.authoring?.playback === 'failed') throw Error('No working visual to capture');
+    if ([...this.pending.values()].filter(wait => wait.runtime === runtime && wait.kind === 'capture').length >= 2) throw Error('Capture queue is full; retry after the current capture completes');
     const requestId = crypto.randomUUID();
     return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => { this.pending.delete(requestId); reject(Error('Capture timed out')); }, 5000);
-      this.pending.set(requestId, { resolve: value => resolve(value as any), reject, timer });
-      runtime.worker.postMessage({ type: 'capture', requestId, instanceId: runtime.instanceId, generation: runtime.generation });
+      const timer = setTimeout(() => this.fault(runtime, 'Capture timed out'), 5000);
+      this.pending.set(requestId, { runtime, kind: 'capture', resolve: value => resolve(value as any), reject, timer });
+      try { runtime.worker.postMessage({ type: 'capture', requestId, instanceId: runtime.instanceId, generation: runtime.generation }); }
+      catch (error) { this.fault(runtime, String(error)); }
     });
   }
 }
