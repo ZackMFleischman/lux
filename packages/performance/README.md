@@ -58,7 +58,10 @@ Memory is O(opportunities + controls), work O(opportunities + controls log contr
   latest-frame transport; a later rendered frame carrying the same exact version
   can supply its first visible match. Its `renderedAt` and identity must follow
   the first rendered marker, and any consumed copy of that first marker must
-  agree with its version/time. Missing/timeout stages remain null, not
+  agree with its version/time. All first-render markers and consumed frames share
+  one immutable identity registry: conflicting versions/timestamps invalidate
+  evidence even when a marker was never consumed or its receipt is missing.
+  Missing/timeout stages remain null, not
   deleted. The normalizer must preserve raw record links outside this core.
 
 The normalizer must not invent opportunity records from configured FPS, frame

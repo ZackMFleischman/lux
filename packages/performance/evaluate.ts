@@ -96,6 +96,16 @@ export function evaluatePerformance(input: unknown): Evaluation {
     let previous: { generation: number; frame: bigint } | undefined;
     const firstConsumes = new Map<number, bigint>();
     const frameControls = new Map<string, { version: number | null; renderedAt: bigint }>();
+    const registerFrame = (identity: string, version: number | null, renderedAt: bigint) => {
+      const known = frameControls.get(identity);
+      if (known && (known.version !== version || known.renderedAt !== renderedAt)) throw new Error('Frame metadata changed');
+      frameControls.set(identity, { version, renderedAt });
+    };
+    // A skipped render still establishes immutable frame identity, even when
+    // another stage of its control evidence is missing.
+    for (const c of e.controls) {
+      if (c.rendered) registerFrame(`${c.rendered.generation}:${c.rendered.frameId}`, c.version, ticks(c.rendered.at));
+    }
     const controlByVersion = new Map(e.controls.map(c => [c.version, c]));
     for (const [i, o] of e.opportunities.entries()) {
       const at = ticks(o.at);
@@ -110,9 +120,7 @@ export function evaluatePerformance(input: unknown): Evaluation {
       const frame = ticks(o.frameId), identity = `${o.generation}:${o.frameId}`;
       const renderedAt = ticks(o.renderedAt);
       if (renderedAt > at) throw new Error('Frame consumed before rendering');
-      const knownFrame = frameControls.get(identity);
-      if (knownFrame && (knownFrame.version !== o.controlVersion || knownFrame.renderedAt !== renderedAt)) throw new Error('Frame metadata changed');
-      frameControls.set(identity, { version: o.controlVersion, renderedAt });
+      registerFrame(identity, o.controlVersion, renderedAt);
       if (o.controlVersion !== null) {
         if (o.controlVersion < 1 || o.controlVersion > 600) throw new Error('Unknown consumed control version');
         const c = controlByVersion.get(o.controlVersion);
@@ -164,8 +172,6 @@ export function evaluatePerformance(input: unknown): Evaluation {
       rendered++;
       const renderAt = ticks(c.rendered.at);
       if (renderAt < receipt || renderAt > coverageEnd) throw new Error('Invalid rendered time');
-      const observedFirstFrame = frameControls.get(`${c.rendered.generation}:${c.rendered.frameId}`);
-      if (observedFirstFrame && (observedFirstFrame.version !== c.version || observedFirstFrame.renderedAt !== renderAt)) throw new Error('First rendered frame identity contradicts consumption');
       const consumed = firstConsumes.get(c.version);
       if (consumed !== undefined && consumed >= renderAt && consumed <= drainDeadline) samples.push(ms(consumed - receipt));
     }
