@@ -11,9 +11,16 @@ const root = resolve(here, '..');
 export const lockPath = join(homedir(), 'AppData', 'Local', 'Lux', 'experiment.lock');
 const stamp = () => ({ utc: new Date().toISOString(), monotonicNs: process.hrtime.bigint().toString() });
 const hash = async path => ({ path: resolve(path), sha256: createHash('sha256').update(await readFile(path)).digest('hex') });
+const conflictingActivity = processes => processes.filter(p => /^(Avenue|Arena|Resolume.*|electron|standalone_host|lux[-_].*)\.exe$/i.test(p.Name));
 export function assertNoConflictingActivity(processes) {
-  const activity = processes.filter(p => /^(Avenue|Arena|Resolume.*|electron|standalone_host|lux[-_].*)\.exe$/i.test(p.Name));
+  const activity = conflictingActivity(processes);
   if (activity.length) throw new Error(`Conflicting host/standalone activity: ${activity.map(p => `${p.Name} PID ${p.ProcessId}`).join(', ')}`);
+}
+export function experimentSummary(manifest) {
+  return { id: manifest.id, directory: manifest.directory, manifest: join(manifest.directory, 'manifest.json'),
+    outcome: manifest.outcome, exitCode: manifest.exitCode, cleanupComplete: manifest.cleanupComplete,
+    timeoutMs: manifest.timeoutMs, startUtc: manifest.start.utc, endUtc: manifest.end.utc,
+    elapsedMs: Number(BigInt(manifest.end.monotonicNs) - BigInt(manifest.start.monotonicNs)) / 1e6 };
 }
 export async function validateReviewedInputs(review) {
   if (review.authorized !== true || !review.reviewer || !review.hypothesis || review.hostClosedConfirmed !== true || !Array.isArray(review.sources) || !review.sources.length || !Array.isArray(review.binaries) || !review.binaries.length || !Array.isArray(review.args)) throw new Error('Incomplete hardware review');
@@ -67,7 +74,7 @@ export async function runExperiment(options = {}) {
     const activityRaw = await powershell(['-Command', "@(Get-CimInstance Win32_Process -ErrorAction Stop | Select-Object ProcessId,Name,ExecutablePath) | ConvertTo-Json -Compress"]);
     const parsedActivity = activityRaw.trim() ? JSON.parse(activityRaw) : [];
     const activity = Array.isArray(parsedActivity) ? parsedActivity : [parsedActivity];
-    manifest.activity = activity;
+    manifest.activity = conflictingActivity(activity);
     assertNoConflictingActivity(activity);
     manifest.binary = await hash(executable);
     const sourcePaths = [fileURLToPath(import.meta.url), join(here, 'experiment-job.cs'), join(here, 'experiment-job.ps1'), join(here, 'experiment-cpu-fixture.mjs')];
@@ -103,6 +110,6 @@ export async function runExperiment(options = {}) {
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const [mode = 'cpu', input = 'success', timeout] = process.argv.slice(2);
   runExperiment({ mode, ...(mode === 'hardware' ? { reviewFile: resolve(input) } : { fixture: input }), ...(timeout ? { timeoutMs: Number(timeout) } : {}) })
-    .then(result => { console.log(JSON.stringify(result, null, 2)); process.exitCode = result.outcome === 'success' ? 0 : 1; })
+    .then(result => { console.log(JSON.stringify(experimentSummary(result), null, 2)); process.exitCode = result.outcome === 'success' ? 0 : 1; })
     .catch(error => { console.error(error.message); process.exitCode = 1; });
 }

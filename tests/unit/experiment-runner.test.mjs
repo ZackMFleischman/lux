@@ -4,7 +4,18 @@ import { mkdtemp, readFile, open, unlink, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { runExperiment, lockPath, assertNoConflictingActivity, validateReviewedInputs } from '../../scripts/experiment-runner.mjs';
+import { runExperiment, lockPath, assertNoConflictingActivity, validateReviewedInputs, experimentSummary } from '../../scripts/experiment-runner.mjs';
+
+test('CLI summary excludes large inventories while preserving outcome and evidence location', () => {
+  const summary = experimentSummary({ id: 'run', directory: 'C:/runs/run', outcome: 'failure', exitCode: 2,
+    cleanupComplete: true, timeoutMs: 20000, start: { utc: 'start', monotonicNs: '1000000' },
+    end: { utc: 'end', monotonicNs: '6000000' }, sources: Array(3042).fill({ path: 'source' }),
+    activity: [{ Name: 'unrelated.exe' }], error: 'failure detail stored on disk' });
+  assert.deepEqual(summary, { id: 'run', directory: 'C:/runs/run', manifest: join('C:/runs/run', 'manifest.json'),
+    outcome: 'failure', exitCode: 2, cleanupComplete: true, timeoutMs: 20000,
+    startUtc: 'start', endUtc: 'end', elapsedMs: 5 });
+  assert.ok(JSON.stringify(summary).length < 500);
+});
 
 test('actual Resolume Avenue and Arena processes block experiments', () => {
   for (const Name of ['Avenue.exe', 'Arena.exe', 'AVENUE.EXE', 'ResolumeArena.exe', 'electron.exe', 'standalone_host.exe']) {
@@ -42,6 +53,7 @@ test('CPU runs record provenance, failure, deadline and refuse competing owners'
   assert.ok(BigInt(ok.end.monotonicNs) > BigInt(ok.start.monotonicNs));
   assert.equal(ok.binary.sha256.length, 64);
   assert.ok(ok.sources.length > 0);
+  assert.deepEqual(ok.activity, []);
   assert.match(await readFile(join(ok.directory, 'stdout.log'), 'utf8'), /cpu fixture/);
   assert.match(await readFile(join(ok.directory, 'stdout.log'), 'utf8'), new RegExp(ok.id));
   assert.match(await readFile(join(ok.directory, 'stdout.log'), 'utf8'), /experiment timeout 8000/);
