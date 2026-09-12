@@ -4,7 +4,15 @@
     "Real example builds and starts paused",
     "Three real play/pause cycles: no reset/restart disabled transitions or preview relayout",
     "Paused intensity changes preserve layout and transport state",
-    "Preview-only fullscreen, fading notice, first Escape exit and original canvas retention"
+    "Preview-only fullscreen, fading notice, first Escape exit and original canvas retention",
+    "Real CodeMirror syntax colors under CSP; helper draft and undo survive tabs and close/reopen without replacing preview",
+    "Studio exports the validated draft and applied intensity through real IPC/compiler/package writer; native folder-picker response supplied by test"
   ],
-  "errors": []
+  "errors": [],
+  "export": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\tracer\\artifacts\\studio-ui\\exports\\1fde808fcd24440c1af837bb8be949ed198db1b41bee399a6bc128d5b4c9b71f",
+    "releaseId": "1fde808fcd24440c1af837bb8be949ed198db1b41bee399a6bc128d5b4c9b71f",
+    "runtimeId": "0031c75736e11f38fd4f610646a17e6587481800f2cf82a730e08990a2f09391",
+    "files": 99
+  }
 }

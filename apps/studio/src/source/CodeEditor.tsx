@@ -3,7 +3,8 @@ import { Alert, TextField } from '@mui/material';
 import { Compartment, EditorState } from '@codemirror/state';
 import { EditorView, drawSelection, highlightActiveLine, keymap, lineNumbers } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
-import { defaultHighlightStyle, syntaxHighlighting, bracketMatching } from '@codemirror/language';
+import { HighlightStyle, syntaxHighlighting, bracketMatching } from '@codemirror/language';
+import { tags } from '@lezer/highlight';
 import { searchKeymap, highlightSelectionMatches } from '@codemirror/search';
 import { javascript } from '@codemirror/lang-javascript';
 import type { EditorStateCache } from './editor-state.ts';
@@ -15,6 +16,15 @@ export type CodeEditorProps = {
 const access = new Compartment();
 const behavior = new Compartment();
 const readOnlyExtensions = (value: boolean) => [EditorState.readOnly.of(value), EditorView.editable.of(!value)];
+const sourceColors = HighlightStyle.define([
+  { tag: [tags.keyword, tags.modifier], color: '#c792ea' },
+  { tag: [tags.definition(tags.variableName), tags.function(tags.variableName), tags.propertyName], color: '#82aaff' },
+  { tag: [tags.typeName, tags.className, tags.namespace], color: '#80cbc4' },
+  { tag: [tags.string, tags.regexp], color: '#c3e88d' },
+  { tag: [tags.number, tags.bool, tags.atom], color: '#f7b779' },
+  { tag: [tags.comment, tags.meta], color: '#a1adc3' },
+  { tag: tags.invalid, color: '#ff8a98', textDecoration: 'underline' },
+]);
 const theme = EditorView.theme({
   '&': { height: '280px', backgroundColor: '#111217', color: '#e1e2ec', fontSize: '13px' },
   '.cm-scroller': { overflow: 'auto', fontFamily: 'Consolas, monospace' },
@@ -45,7 +55,7 @@ export function CodeEditor(props: CodeEditorProps) {
       createState.current = text => EditorState.create({ doc: text, extensions: [
         access.of(readOnlyExtensions(props.readOnly)), EditorView.cspNonce.of(nonce), theme,
         lineNumbers(), drawSelection(), highlightActiveLine(), history(), bracketMatching(),
-        javascript({ typescript: true }), syntaxHighlighting(defaultHighlightStyle), highlightSelectionMatches(),
+        javascript({ typescript: true }), syntaxHighlighting(sourceColors), highlightSelectionMatches(),
         keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap]),
         EditorView.contentAttributes.of({ 'aria-label': `TypeScript source ${props.path}`, 'aria-describedby': 'source-keyboard-help' }),
         behavior.of(handlers),

@@ -11,6 +11,8 @@ import { createAuthoringSession } from './source/authoring-session.ts';
 import { SourcePanel } from './source/SourcePanel.tsx';
 import { SourceCompileError } from './source/diagnostics.ts';
 import type { SourceDiagnostic } from './source/diagnostics.ts';
+import { ExportDialog } from './ExportDialog.tsx';
+import './export-client.ts';
 const client = new StandaloneClient(window.luxAuthoring);
 export function AuthoringApp() {
   const windows = useMemo(() => window.luxStudioWindows ? { ...window.luxStudioWindows,
@@ -21,6 +23,7 @@ export function AuthoringApp() {
   const workspace = useMemo(() => createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': '' } }), []);
   const session = useMemo(() => createAuthoringSession(workspace, {
     submit: source => client.submit(source), save: request => window.luxAuthoring.save(request), open: () => window.luxAuthoring.open(),
+    export: request => window.luxExport.create(request),
     getControls: () => ({ intensity: client.getSnapshot().authoring?.intensity ?? 0.5 }),
     applyControls: async controls => { const runtime = client.getSnapshot().authoring!;
       await client.invoke({ name: 'lux.parameters.set', input: { requestId: crypto.randomUUID(), instanceId: runtime.instanceId,
@@ -98,6 +101,7 @@ export function AuthoringApp() {
       <SourcePanel workspace={workspace} readOnly={busy} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnostics={diagnostics} />
     </details><div className="authoring-tools" style={{ padding: '4px 16px', background: '#191b23' }}><Button variant="contained" disabled={busy} onClick={() => void build()}>Build & preview</Button>
       <Button disabled={busy} onClick={() => void open()}>Open</Button><Button disabled={busy} onClick={() => void save()}>Save</Button><Button disabled={busy} onClick={() => void save(true)}>Save as</Button><span>{io.name}{dirty ? ' *' : ''}</span>
+      <ExportDialog disabled={busy || composing.current} defaultName={io.name} create={name => session.exportSource(name)} />
       <span role="status">{draft.runningMatchesDraft ? 'Preview matches source' : draft.hasRunningSource ? 'Preview shows previous source' : 'Source has not been built'}</span>
       {error && <Alert severity="error">{error}</Alert>}</div>
     <div style={{ flex: 1, minHeight: 0 }}><StudioApp client={client} presentation={client} windows={windows} /></div>

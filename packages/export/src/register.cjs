@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { noLinks, validateRelease, validateRuntime } = require('./package.cjs');
+const { assertRuntimeCapabilities } = require('./runtime-capability.cjs');
 const hash = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 const protocol = 'lux-installed-source-v1';
 const supervisorFiles = ['apps/installed-runtime/src/supervisor.cjs', 'apps/installed-runtime/src/registry.cjs', 'apps/installed-runtime/src/instance.cjs'];
@@ -23,6 +24,7 @@ function registerSource({ installRoot, releaseId, pluginDirectory }) {
   const runtimePath = path.join(installRoot, 'runtimes', release.runtimeId);
   const runtime = validateRuntime(runtimePath, release.runtimeId);
   for (const name of supervisorFiles) if (!runtime.files.some(file => file.path === name)) throw Error('Installed supervisor is not packaged: ' + name);
+  assertRuntimeCapabilities(runtimePath);
   const identity = sourceIdentity(release);
   const dllName = 'Lux_' + releaseId + '.dll', dllPath = noLinks(path.join(pluginDirectory, dllName));
   const sidecarPath = noLinks(dllPath + '.lux-source');

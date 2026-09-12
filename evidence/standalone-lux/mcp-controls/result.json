@@ -1,7 +1,7 @@
 {
   "ok": true,
   "initial": {
-    "instanceId": "d75b4fa6-0d16-4b0a-91ed-f56e46a71546",
+    "instanceId": "8e6b5d0b-ce7f-44b6-ab51-c96d0d15c124",
     "generation": 1,
     "revisionId": "162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898",
     "sceneName": "Untitled visual",
@@ -18,7 +18,7 @@
     "fault": null
   },
   "revised": {
-    "instanceId": "d75b4fa6-0d16-4b0a-91ed-f56e46a71546",
+    "instanceId": "8e6b5d0b-ce7f-44b6-ab51-c96d0d15c124",
     "generation": 3,
     "revisionId": "0b43b6a165d2dc06ffc29f938ed63b671674f4ac190f5adb7f1582ba8ad3e585",
     "sceneName": "Untitled visual",
@@ -46,17 +46,17 @@
     "seed": 0,
     "colorSpace": "srgb",
     "alphaMode": "straight",
-    "instanceId": "d75b4fa6-0d16-4b0a-91ed-f56e46a71546",
+    "instanceId": "8e6b5d0b-ce7f-44b6-ab51-c96d0d15c124",
     "generation": 3,
     "revisionId": "0b43b6a165d2dc06ffc29f938ed63b671674f4ac190f5adb7f1582ba8ad3e585"
   },
   "controlsApplied": {
     "applied": {
       "type": "status",
-      "instanceId": "d75b4fa6-0d16-4b0a-91ed-f56e46a71546",
+      "instanceId": "8e6b5d0b-ce7f-44b6-ab51-c96d0d15c124",
       "generation": 1,
       "revisionId": "162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898",
-      "requestId": "0e84b70e-153b-419c-9348-65b74d9c2450",
+      "requestId": "1f9212ab-7ffe-4194-8ce0-01ef4125ed0d",
       "playback": "paused",
       "timeSeconds": 0,
       "clockEpoch": 0,
@@ -67,9 +67,9 @@
     "status": {
       "connection": "connected",
       "message": "Open an example or write a visual, then Build & preview.",
-      "receivedAtMs": 1789240108398,
+      "receivedAtMs": 1789241466236,
       "authoring": {
-        "instanceId": "d75b4fa6-0d16-4b0a-91ed-f56e46a71546",
+        "instanceId": "8e6b5d0b-ce7f-44b6-ab51-c96d0d15c124",
         "generation": 1,
         "revisionId": "162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898",
         "sceneName": "Untitled visual",
@@ -88,7 +88,7 @@
       "host": null,
       "jobs": [
         {
-          "jobId": "d42a8a82-14c0-4329-a410-10b63176f572",
+          "jobId": "4862d915-7ab3-40fc-b248-69c85c787a80",
           "state": "succeeded",
           "summary": "Visual is ready in Lux."
         }
@@ -98,7 +98,7 @@
     }
   },
   "restarted": {
-    "instanceId": "d75b4fa6-0d16-4b0a-91ed-f56e46a71546",
+    "instanceId": "8e6b5d0b-ce7f-44b6-ab51-c96d0d15c124",
     "generation": 2,
     "revisionId": "162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898",
     "sceneName": "Untitled visual",
@@ -114,6 +114,7 @@
     },
     "fault": null
   },
+  "restartToReadyMs": 172.4301000000005,
   "staleGenerationRejected": true,
   "staleEditRejected": true,
   "hangingCandidateRejected": true,

@@ -50,3 +50,46 @@ test('stale build cannot submit and opening invalid code preserves the previous 
   assert.equal(w.getSnapshot().runningMatchesDraft, false);
   assert.equal(session.getSnapshot().name, 'new');
 });
+
+test('export validates a complete snapshot, excludes competing operations and preserves dirty state', async () => {
+  const w = createSourceWorkspace(source()); w.edit('lib/color.ts', 'export const red = 0.2');
+  const events: string[] = []; let captured: any, finish!: (value: any) => void;
+  const session = createAuthoringSession(w, { submit: async s => { events.push('validated'); assert.equal(s.files['lib/color.ts'], 'export const red = 0.2'); },
+    save: async () => null, getControls: () => ({ intensity: 0.42 }),
+    export: async request => { events.push('export'); captured = request; return new Promise(resolve => { finish = resolve; }); } });
+  const pending = session.exportSource('Tunnel');
+  await assert.rejects(session.save(), /busy/);
+  await assert.rejects(session.build(source(), w.getSnapshot().version), /busy/);
+  while (!finish) await new Promise(resolve => setTimeout(resolve, 0));
+  assert.deepEqual(events, ['validated', 'export']);
+  assert.equal(captured.name, 'Tunnel'); assert.equal(captured.document.controls.intensity, 0.42);
+  assert.equal(captured.document.source.files['lib/color.ts'], 'export const red = 0.2');
+  finish(null); assert.equal(await pending, null);
+  assert.equal(w.getSnapshot().dirty, true); assert.equal(session.getSnapshot().busy, false);
+});
+
+test('failed preview validation prevents export and releases the session lock', async () => {
+  const w = createSourceWorkspace(source());
+  const session = createAuthoringSession(w, { submit: async () => { throw Error('invalid visual'); },
+    save: async () => null, getControls: () => ({ intensity: 0.5 }), export: async () => assert.fail('invalid visual must not export') });
+  await assert.rejects(session.exportSource('Broken'), /invalid visual/);
+  assert.equal(session.getSnapshot().busy, false);
+});
+
+test('failed open preserves document controls through save and applies them when repaired', async () => {
+  const w = createSourceWorkspace(source()), saved: any[] = [];
+  let invalid = true, intensity = 0.2;
+  const session = createAuthoringSession(w, { submit: async () => { if (invalid) throw Error('broken source'); },
+    save: async request => { saved.push(request); return { token: 'opened', name: 'broken.lux-scene' }; },
+    getControls: () => ({ intensity }), applyControls: async controls => { intensity = controls.intensity; session.controlsChanged(); },
+    open: async () => ({ token: 'opened', name: 'broken.lux-scene', document: { format: 'lux-scene', version: 1,
+      source: source(), settings: { width: 1920, height: 1080, fps: 60, seed: 0 }, controls: { intensity: 0.8 } } }) });
+  await assert.rejects(session.open(), /broken source/);
+  intensity = 0.3; session.controlsChanged();
+  assert.equal(session.getSnapshot().controlsDirty, false, 'Previous preview controls do not mutate the newly opened document');
+  await session.save(); assert.equal(saved[0].document.controls.intensity, 0.8);
+  invalid = false; await session.build(session.read().source, session.read().draftVersion);
+  assert.equal(intensity, 0.8);
+  intensity = 0.9; session.controlsChanged(); await session.save();
+  assert.equal(saved[1].document.controls.intensity, 0.9);
+});

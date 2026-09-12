@@ -7,6 +7,7 @@ import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import packageIO from '../../packages/export/src/package.cjs';
 import registration from '../../packages/export/src/register.cjs';
+import runtimeCapability from '../../packages/export/src/runtime-capability.cjs';
 const hash = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 function fixture(t) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'lux-export-test-'));
@@ -17,9 +18,9 @@ function fixture(t) {
   const runtime = path.join(root, 'input'); fs.mkdirSync(runtime);
   for (const name of packageIO.requiredRuntimeFiles) {
     const target = path.join(runtime, name); fs.mkdirSync(path.dirname(target), { recursive: true });
-    fs.writeFileSync(target, name === 'electron/version' ? '44.3.0' : 'fixture:' + name);
+    fs.writeFileSync(target, name === 'electron/version' ? '44.3.0' : runtimeCapability.capabilities[name] ?? 'fixture:' + name);
   }
-  for (const name of ['package.cjs', 'install.cjs', 'register.cjs']) fs.copyFileSync(new URL('../../packages/export/src/' + name, import.meta.url), path.join(runtime, name));
+  for (const name of ['package.cjs', 'install.cjs', 'register.cjs', 'runtime-capability.cjs']) fs.copyFileSync(new URL('../../packages/export/src/' + name, import.meta.url), path.join(runtime, name));
   fs.copyFileSync(new URL('../../tools/gpu-spike/transport-release.cjs', import.meta.url), path.join(runtime, 'transport-release.cjs'));
   const linked = { code: 'export default {};', sourceMap: '', bundleHash: 'b'.repeat(64), linker: { version: '0.28.2' } };
   linked.linkedHash = hash(JSON.stringify(linked));

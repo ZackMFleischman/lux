@@ -8,14 +8,15 @@ const hash = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 const encode = value => JSON.stringify(value, null, 2) + '\n';
 const digest = value => hash(encode(value));
 const idPattern = /^[a-f0-9]{64}$/;
-const installer = '@echo off\r\nsetlocal\r\nset "ELECTRON_RUN_AS_NODE=1"\r\n"%~dp0runtime\\electron\\electron.exe" "%~dp0runtime\\install.cjs" "%~dp0." %*\r\n';
+const installer = '@echo off\r\nsetlocal\r\nset "ELECTRON_RUN_AS_NODE="\r\nstart "" "%~dp0runtime\\electron\\electron.exe" "%~dp0runtime\\install-gui.cjs" "%~dp0."\r\n';
 const intensityControl = { id: 'intensity', type: 'number', label: 'Intensity', default: 0.5, min: 0, max: 1, changeCost: 'live' };
 const nativeRuntimeFiles = ['msvcp140.dll', 'msvcp140_1.dll', 'msvcp140_2.dll', 'msvcp140_atomic_wait.dll', 'msvcp140_codecvt_ids.dll', 'vcruntime140.dll', 'vcruntime140_1.dll'];
 const electronRuntimeFiles = ['electron.exe', 'version', 'LICENSE', 'LICENSES.chromium.html', 'chrome_100_percent.pak', 'chrome_200_percent.pak',
   'd3dcompiler_47.dll', 'dxcompiler.dll', 'dxil.dll', 'ffmpeg.dll', 'icudtl.dat', 'resources.pak', 'snapshot_blob.bin', 'v8_context_snapshot.bin',
   'vk_swiftshader_icd.json', 'vk_swiftshader.dll', 'vulkan-1.dll', 'locales/en-US.pak', 'resources/default_app.asar'];
 const requiredRuntimeFiles = [
-  'electron/electron.exe', 'electron/version', 'install.cjs', 'package.cjs', 'register.cjs', 'transport-release.cjs',
+  'electron/electron.exe', 'electron/version', 'install.cjs', 'package.cjs', 'register.cjs', 'runtime-capability.cjs', 'transport-release.cjs',
+  'install-gui.cjs', 'install-flow.cjs',
   'apps/render-host/src/main.cjs', 'apps/render-host/src/compiled-output.html',
   'apps/render-host/src/compiled-worker.js', 'native/build/Release/lux_texture_bridge.node',
   'native/build/Release/LuxTracerTR02.dll', 'tools/gpu-spike/producer-session.cjs',

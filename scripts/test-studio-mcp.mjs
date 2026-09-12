@@ -52,7 +52,10 @@ try {
   const image1 = firstImage.content.find(part => part.type === 'image'); assert.ok(image1?.data);
   assert.equal(parsed(firstImage).intensity, 0.8);
   assert.equal(parsed(firstImage).controlSequence, controlled.applied.controlSequence);
+  const restartStarted = performance.now();
   const restarted = parsed(await call('lux.studio.restart', target));
+  const restartToReadyMs = performance.now() - restartStarted;
+  assert.ok(restartToReadyMs < 5000, `Cached preview restart took ${restartToReadyMs.toFixed(0)} ms`);
   assert.ok(restarted.status.authoring.generation > target.expectedGeneration);
   assert.equal(restarted.status.authoring.revisionId, first.status.authoring.revisionId);
   assert.equal(restarted.status.authoring.intensity, 0.8);
@@ -70,14 +73,14 @@ try {
   hanging.files[hanging.entry] = hanging.files[hanging.entry].replace('async create(context) {', 'async create(context) { while (true) {}');
   const failedCandidate = await client.callTool({ name: 'lux.studio.build', arguments: { expectedDraftVersion: second.draftVersion, source: hanging } }, undefined, { timeout: 75000 });
   assert.equal(failedCandidate.isError, true);
-  assert.match(JSON.stringify(failedCandidate.content), /initialization exceeded five seconds/);
+  assert.match(JSON.stringify(failedCandidate.content), /initialization stopped making progress/);
   const recovered = parsed(await call('lux.studio.status'));
   assert.equal(recovered.authoring.generation, second.status.authoring.generation);
   assert.equal(recovered.authoring.revisionId, second.status.authoring.revisionId);
   assert.equal(recovered.authoring.fault, null);
   await writeFile(join(folder, 'first.png'), Buffer.from(image1.data, 'base64'));
   await writeFile(join(folder, 'revised.png'), Buffer.from(image2.data, 'base64'));
-  await writeFile(join(folder, 'result.json'), JSON.stringify({ ok: true, initial: first.status.authoring, revised: second.status.authoring, metadata: parsed(secondImage), controlsApplied: controlled, restarted: restarted.status.authoring, staleGenerationRejected: true, staleEditRejected: true, hangingCandidateRejected: true, previousPreviewRetained: true }, null, 2));
+  await writeFile(join(folder, 'result.json'), JSON.stringify({ ok: true, initial: first.status.authoring, revised: second.status.authoring, metadata: parsed(secondImage), controlsApplied: controlled, restarted: restarted.status.authoring, restartToReadyMs, staleGenerationRejected: true, staleEditRejected: true, hangingCandidateRejected: true, previousPreviewRetained: true }, null, 2));
   console.log('Actual MCP source/image/revision loop passed; stale edit and hanging candidate rejected, previous preview retained.');
 } catch (error) { console.error(error); console.error(logs); process.exitCode = 1; }
 finally {

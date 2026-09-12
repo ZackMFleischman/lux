@@ -26,7 +26,7 @@ export async function exportResolume({ scenePath, name, outputDirectory, root = 
     const electronVersion = JSON.parse(fs.readFileSync(path.join(electronRoot, 'package.json'), 'utf8')).version;
     packageIO.copyTree(path.join(electronRoot, 'dist'), path.join(staging, 'electron'));
     for (const relative of packageIO.requiredRuntimeFiles.filter(value => !value.startsWith('electron/'))) {
-      const source = ['package.cjs', 'install.cjs', 'register.cjs', 'runtime-capability.cjs'].includes(relative)
+      const source = ['package.cjs', 'install.cjs', 'install-gui.cjs', 'install-flow.cjs', 'register.cjs', 'runtime-capability.cjs'].includes(relative)
         ? path.join(root, 'packages/export/src', relative)
         : relative === 'transport-release.cjs' ? path.join(root, 'tools/gpu-spike', relative)
         : packageIO.nativeRuntimeFiles.includes(path.basename(relative)) ? path.join(nativeRuntimeDirectory, path.basename(relative)) : path.join(root, relative);
