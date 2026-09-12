@@ -1,6 +1,6 @@
 # Visual programming in Lux
 
-This reference describes the checked SDK 0.1.0 / Three.js 0.186.0 implementation. Live discovery is authoritative when capabilities change.
+This reference describes the checked SDK 0.1.0 / Three.js 0.186.0 implementation. When capabilities change, use discovery from the adapter paired with the running Studio build plus actual tool results. Discovery describes checkout files, not a verified handshake with the open binary; see [connection](studio-tools.md).
 
 ## Source and lifecycle
 
