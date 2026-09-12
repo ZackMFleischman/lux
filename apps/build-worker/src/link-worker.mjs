@@ -5,19 +5,17 @@ import { createRequire } from 'node:module';
 import { dirname, join, resolve, relative, isAbsolute, posix } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { assertResultBudgets } from './result-budget.mjs';
-import { violation } from './source-policy.mjs';
+import { violation, limits } from './source-policy.mjs';
+import { verifyArtifact, linkedBody } from './artifact-identity.mjs';
+import { readBoundedJson } from './bounded-json.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const hash = value => createHash('sha256').update(value).digest('hex');
 const fail = message => { throw violation(message); };
-function artifactBody(a) {
-  return { sourceHash: a.sourceHash, entry: a.entry, modules: a.modules, sourceMaps: a.sourceMaps,
-    sdkVersion: a.sdkVersion, compilerVersion: a.compilerVersion, dependencyHashes: a.dependencyHashes };
-}
 async function link() {
-  const { artifact, dependencyRoot } = JSON.parse(await readFile(process.argv[2], 'utf8'));
-  assertResultBudgets({ ok: true, artifact, diagnostics: [] });
-  if (hash(JSON.stringify(artifactBody(artifact))) !== artifact.bundleHash) fail('Compiled artifact hash mismatch');
+  const { artifact:raw, dependencyRoot } = await readBoundedJson(process.argv[2],limits.requestBytes);
+  assertResultBudgets({ ok: true, artifact:raw, diagnostics: [] });
+  const artifact=await verifyArtifact(raw,hash);
   if (artifact.sdkVersion !== '0.1.0' || artifact.compilerVersion !== '7.0.2') fail('Unsupported compiler or SDK identity');
   const moduleKeys = Object.keys(artifact.modules), folded = new Set();
   for (const key of moduleKeys) {
@@ -34,6 +32,9 @@ async function link() {
     'compiler/worker.mjs': join(root, 'apps/build-worker/src/worker.mjs'),
     'compiler/source-policy.mjs': join(root, 'apps/build-worker/src/source-policy.mjs'),
     'compiler/result-budget.mjs': join(root, 'apps/build-worker/src/result-budget.mjs'),
+    'compiler/artifact-identity.mjs': join(root, 'apps/build-worker/src/artifact-identity.mjs'),
+    'compiler/bounded-json.mjs': join(root, 'apps/build-worker/src/bounded-json.mjs'),
+    'assets/index.mjs': join(root, 'packages/assets/src/index.mjs'),
     'node/executable': process.execPath, 'sdk/index.ts': join(root, 'packages/visual-sdk/src/index.ts'),
     'sdk/metadata.mjs': join(root, 'packages/visual-sdk/src/metadata.mjs'),
     'contracts/index.ts': join(root, 'packages/runtime-contracts/src/index.ts'),
@@ -117,7 +118,8 @@ async function link() {
   } finally { stop(); }
   const code = output.outputFiles.find(f => f.path.endsWith('linked.js')).text;
   const sourceMap = output.outputFiles.find(f => f.path.endsWith('linked.js.map')).text;
-  const body = { code, sourceMap, bundleHash: artifact.bundleHash, linker };
+  const body = linkedBody({ code, sourceMap, bundleHash: artifact.bundleHash, linker,
+    ...(artifact.artifactVersion===2 ? {linkedVersion:2,assets:artifact.assets,assetSetHash:artifact.assetSetHash}: {}) });
   const linked = { ...body, linkedHash: hash(JSON.stringify(body)) };
   if (Buffer.byteLength(JSON.stringify(linked), 'utf8') > 16777216 - 128) throw violation('Linked ESM result exceeds 16 MiB', 'QUOTA_EXCEEDED');
   return linked;

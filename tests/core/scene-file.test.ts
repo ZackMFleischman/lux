@@ -4,6 +4,7 @@ import { mkdtemp, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { SceneFileStore, createSceneDocument } from '../../packages/core/src/scene-file.ts';
+import {validateSceneDocument} from '../../packages/core/src/scene-document.ts';
 import { sourceBundleSchema } from '../../packages/runtime-contracts/src/index.ts';
 const document = { format: 'lux-scene', version: 1, source: { sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': '// 🌈 unfinished draft' } }, settings: { width: 1920, height: 1080, fps: 60, seed: 0 }, controls: { intensity: 0.8 } };
 
@@ -20,6 +21,10 @@ test('scene v2 preserves image bytes and rejects version pairs before replacing 
     for(const bad of [{...next,version:1},{...document,version:2},{...next,source:{...source,assets:{'assets/red.bmp':{...source.assets['assets/red.bmp'],data:''}}}}]) {
       await assert.rejects(store.saveAs(path,bad)); assert.deepEqual(await readFile(path),before);
     }
+    const inherited = {...next,source:{...source,assets:{'assets/red.bmp':Object.create(source.assets['assets/red.bmp'])}}};
+    assert.throws(()=>validateSceneDocument(inherited));
+    await writeFile(path,' '.repeat(7340032)+JSON.stringify(next));
+    await assert.rejects(store.open(path),/7 MiB/);
   } finally { await rm(folder,{recursive:true,force:true}); }
 });
 test('scene files roundtrip Unicode drafts, settings and controls; external edits conflict', async () => {
