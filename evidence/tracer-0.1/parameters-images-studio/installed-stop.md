@@ -71,3 +71,34 @@ errors and other rename errors remain fatal. Independent review approved the
 change; root reran all 16 health/publication/wiring tests successfully. The new
 regression failed before the fix (two uncaught `EPERM` failures), as verified by
 the implementation agent. A fresh native recovery run remains required.
+
+## Fresh recovery run: observation window exhausted
+
+Run `a0278ae4-3056-4140-acb6-e35ea551089f` used reviewed recovery probe `e197735`
+(integrated as `5317b7c`) and release
+`6b6f7506808b632086d2d342f1c0e1fd56c93c401f9d5b40d166127435b0e7e5`, runtime
+`814fb341d2bfc08e18eeb57e0402874d900c15e90ff33fc52b501b9662ed0b69`.
+All 171 input hashes were independently verified. Studio and Resolume were
+closed and their processes had exited before launch.
+
+The native fixture reached magenta, armed the hang, and submitted normalized
+zero (concrete `arm: -1`) for recovery. It exited **12** at its 10,000 ms work
+deadline without observing cyan. Native deinstantiation/deinitialization and
+outer Job cleanup succeeded; the operation ended after 15,056 ms, below 30 s.
+This run **does not pass recovery**.
+
+The original attempt's physical exit occurred 1,671.4351 ms after the trigger.
+The automatic retry began 246.1392 ms later. However, initial magenta had consumed
+6,309.5121 ms of the total native work window; only 1,741.1751 ms remained from
+retry start to the last host callback. The initial renderer itself had needed
+2,988.3004 ms from attempt start to magenta.
+
+Retry `7598c5ebdc623262d1113347e1fef8ee` received concrete `arm: -1`. Its trace
+contains no failure and ends with `closed: true`, `failed: false`, `paint: 0`,
+`webgpuReady: false`. No further production bug is established by these records;
+startup was unfinished when observation ended. The earlier Windows rename error
+was not observed in this attempt. Root requested review of one test-only 15 s
+recovery observation window, retaining the 30 s outer Job and all production
+deadlines. This is not a change to any performance acceptance gate.
+
+Artifacts: `C:/Users/zFlei/repos/lux/.worktrees/installed-recovery-probe/artifacts/installed-recovery-probe/`.
