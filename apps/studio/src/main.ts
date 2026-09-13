@@ -3,6 +3,7 @@ import { join, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { randomBytes } from 'node:crypto';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { mkdirSync } from 'node:fs';
 import { StudioWindows, isTrustedStudioUrl } from './windows.ts';
 import { createStudioPage } from './page.ts';
 import { spawn } from 'node:child_process';
@@ -12,12 +13,19 @@ import { createAgentBridge } from './agent-bridge.ts';
 import { observeFullscreen } from './fullscreen.ts';
 import { createExportService, runExportChild } from './export-process.ts';
 import { createCloseConfirmation } from './close-confirmation.ts';
+import { resolveStudioSession } from '../../../scripts/studio-session.mjs';
 
 // This process owns presentation windows only. It never creates a render service,
 // starts an authoring instance, or terminates a host-owned process.
 app.setName('Lux Studio');
 app.commandLine.appendSwitch('force_high_performance_gpu');
-app.setPath('userData', join(app.getPath('appData'), 'Lux', 'Studio'));
+const workspace = resolve(__dirname, '../../..');
+const studioProfile = resolveStudioSession({ workspace, appData: app.getPath('appData') });
+const studioSession = { profile: studioProfile.profile, workspace: studioProfile.workspace,
+  sessionId: randomBytes(18).toString('hex'), pid: process.pid };
+mkdirSync(studioProfile.directory, { recursive: true });
+app.setPath('userData', studioProfile.directory);
+app.setPath('sessionData', studioProfile.directory);
 const page = join(app.getPath('userData'), 'studio-shell.html');
 const pageUrl = pathToFileURL(page).href;
 const owned = new Set<BrowserWindow>();
@@ -29,7 +37,6 @@ const files = new SceneFileStore();
 let dirty = false;
 const closeConfirmation = createCloseConfirmation(() => randomBytes(16).toString('hex'), id => mainWindow?.webContents.send('studio:close-request', id));
 const agentRequests = new Map<string, { resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
-const workspace = resolve(__dirname, '../../..');
 const exportShutdown = new AbortController();
 const exportService = createExportService({
   chooseDirectory: async () => {
@@ -174,9 +181,9 @@ app.whenReady().then(async () => {
     if (!mainWindow || mainWindow.isDestroyed()) { reject(Error('Studio is closed')); return; }
     const id = randomBytes(16).toString('hex');
     const timer = setTimeout(() => { agentRequests.delete(id); reject(Error('Studio did not finish the operation in time')); }, 70000);
-    agentRequests.set(id, { resolve, reject, timer }); mainWindow.webContents.send('studio:agent-command', { id, method, params });
+    agentRequests.set(id, { resolve: result => resolve(method === 'status' ? { ...(result as object), studioSession } : result), reject, timer }); mainWindow.webContents.send('studio:agent-command', { id, method, params });
   }));
-  await writeFile(join(app.getPath('userData'), 'agent-endpoint.json'), JSON.stringify({ url: bridge.url, token: bridge.token, pid: process.pid }));
+  await writeFile(studioProfile.endpointPath, JSON.stringify({ version: 1, ...studioSession, url: bridge.url, token: bridge.token }));
   app.once('will-quit', () => { bridge.close(); for (const pending of agentRequests.values()) { clearTimeout(pending.timer); pending.reject(Error('Studio closed')); } agentRequests.clear(); });
   mainWindow.on('close', event => {
     if (process.env.LUX_STUDIO_SMOKE !== '1' && !closeConfirmation.allowClose(dirty)) { event.preventDefault(); return; }

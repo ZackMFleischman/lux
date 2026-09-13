@@ -2,7 +2,7 @@
 
 ## Connection
 
-Use configured `lux.studio.*` tools when available. Tool search can discover a configured server; absence of those tools does not prove Lux lacks an adapter.
+Use configured `lux.studio.*` tools when discovery confirms the intended profile and checkout. Tool search can discover a configured server; absence of those tools does not prove Lux lacks an adapter. For the user creative workflow, **start-lux** supplies a pinned checkout and selects `creative`; a configured development adapter is a different target.
 
 For a local coding agent with terminal access, locate the Lux checkout/build used to launch the current Studio. Use known launch context or inspect its process command line when needed; do not ask the user to reconfirm a path already established. Check that checkout for `scripts/studio-mcp.mjs`; do not assume a particular username, drive, or `.worktrees/tracer` directory exists. Launch that **adapter only**, with the project's installed Node version and dependencies:
 
@@ -10,10 +10,13 @@ For a local coding agent with terminal access, locate the Lux checkout/build use
 command: <absolute path to Node executable>
 args: [<absolute Lux checkout>/scripts/studio-mcp.mjs]
 cwd: <absolute Lux checkout>
+env: { LUX_STUDIO_PROFILE: "creative", LUX_STUDIO_SESSION_ID: "<known live session ID, when available>" }
 transport: stdio
 ```
 
-The checked project pins Node 24.12.0. The Windows adapter finds the already-running Studio through `%APPDATA%/Lux/Studio/agent-endpoint.json`. Keep its token private. Do not hand-edit the endpoint or copy it to another host. A remote/cloud agent cannot reach this local session merely by knowing the checkout path. If the checkout or running Studio is unavailable, explain the concrete missing connection; don't install packages or start test apps to work around it without that task being requested.
+The checked project pins Node 24.12.0. Studio and its adapter must use the same `LUX_STUDIO_PROFILE` and checkout. Without an explicit profile, both derive `worktree-<hash>` from the physical checkout path. On Windows each profile owns `%APPDATA%/Lux/Studio/profiles/<profile>/agent-endpoint.json`, application data and the single-instance lock. The old shared endpoint is not used or migrated. Tests always generate a fresh `test-*` profile, even when launched from a creative environment. Keep tokens private; never hand-edit an endpoint or copy it to another host.
+
+The adapter checks endpoint profile/checkout identity and binds to one process lifetime. It rejects endpoint replacement rather than following another Studio. A new temporary adapter must receive the previously selected `LUX_STUDIO_SESSION_ID`; reconnect to a replacement only after checking the intended new instance. `discover.runningStudio.studioSession` and live `status.studioSession` expose profile, checkout, session ID and PID without credentials. A remote/cloud agent cannot reach this local session merely by knowing its checkout path. If Studio is unavailable, use **start-lux** when startup was requested; do not select a test app or unrelated profile as a workaround.
 
 `discover` reads local adapter-checkout files and can succeed with Studio closed. It does not attest to the open app's build. Even the launching checkout can have changed since its last build. Pair the adapter with known launch/build evidence and actual `read`/`status`/operation results; when they disagree, preserve the source and report or investigate the version mismatch. A newer worktree's discovery does not upgrade the running app.
 
@@ -25,6 +28,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { resolve } from 'node:path';
 
 const client = new Client({ name: 'lux-visual-creator', version: '1.0.0' });
+const selectedSessionId = process.env.LUX_STUDIO_SESSION_ID; // Retain the previous live ID across temporary clients.
 const call = async (name, args = {}) => {
   const result = await client.callTool(
     { name: `lux.studio.${name}`, arguments: args }, undefined,
@@ -37,7 +41,10 @@ const json = result => JSON.parse(result.content.find(x => x.type === 'text').te
 try {
   await client.connect(new StdioClientTransport({
     command: process.execPath,
-    args: [resolve('scripts/studio-mcp.mjs')], cwd: process.cwd()
+    args: [resolve('scripts/studio-mcp.mjs')], cwd: process.cwd(),
+    env: { ...process.env, LUX_STUDIO_PROFILE: 'creative',
+      // Omit only for the initial read when no live session has been selected.
+      ...(selectedSessionId ? { LUX_STUDIO_SESSION_ID: selectedSessionId } : {}) }
   }));
   const discovery = json(await call('discover'));
   const current = json(await call('read'));

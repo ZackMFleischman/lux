@@ -1,6 +1,7 @@
+import { studioTestEnvironment, resolveStudioSession } from './studio-session.mjs';
 import assert from 'node:assert/strict';
 import { _electron } from 'playwright';
-import { createRequire } from 'node:module';
+import { installedElectron } from './studio-electron.mjs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
@@ -8,24 +9,25 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 
 const root = resolve(import.meta.dirname, '..'), folder = join(root, 'artifacts/studio-parameters');
 await mkdir(folder, { recursive: true });
-const env = { ...process.env, LUX_NODE_EXECUTABLE: process.execPath, LUX_STUDIO_MCP_TEST: '1' };
+const env = { ...studioTestEnvironment(), LUX_NODE_EXECUTABLE: process.execPath };
+const testSession = resolveStudioSession({ workspace: root, env });
 delete env.ELECTRON_RUN_AS_NODE; delete env.LUX_STUDIO_SMOKE;
 let app, client;
 const report = { ok: false, checks: [], errors: [] };
 try {
-  app = await _electron.launch({ executablePath: createRequire(import.meta.url)('electron'), args: [join(root, 'apps/studio/dist/main.cjs')], cwd: root, env, timeout: 30000 });
+  app = await _electron.launch({ executablePath: installedElectron(root), args: [join(root, 'apps/studio/dist/main.cjs')], cwd: root, env, timeout: 30000 });
   const page = await app.firstWindow(); page.setDefaultTimeout(15000);
   page.on('pageerror', error => report.errors.push(error.stack ?? error.message));
   await page.getByRole('button', { name: 'Build', exact: true }).waitFor();
   const ownedPid = await app.evaluate(() => process.pid);
   let endpoint;
   for (let attempt = 0; attempt < 80; attempt++) {
-    try { endpoint = JSON.parse(await readFile(join(process.env.APPDATA, 'Lux/Studio/agent-endpoint.json'), 'utf8')); if (endpoint.pid === ownedPid) break; } catch {}
+    try { endpoint = JSON.parse(await readFile(testSession.endpointPath, 'utf8')); if (endpoint.pid === ownedPid) break; } catch {}
     await new Promise(resolve => setTimeout(resolve, 100));
   }
   assert.equal(endpoint?.pid, ownedPid, 'Only control this test app');
   client = new Client({ name: 'lux-parameter-qa', version: '1.0.0' });
-  await client.connect(new StdioClientTransport({ command: process.execPath, args: [join(root, 'scripts/studio-mcp.mjs')], cwd: root }));
+  await client.connect(new StdioClientTransport({ command: process.execPath, args: [join(root, 'scripts/studio-mcp.mjs')], cwd: root, env }));
   const raw = (name, args = {}) => client.callTool({ name: `lux.studio.${name}`, arguments: args }, undefined, { timeout: 75000 });
   const parse = result => JSON.parse(result.content.find(part => part.type === 'text').text);
   const call = async (name, args) => { const result = await raw(name, args); assert.equal(result.isError, undefined, JSON.stringify(result)); return parse(result); };

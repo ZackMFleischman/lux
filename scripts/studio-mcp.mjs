@@ -2,26 +2,21 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { sourceBuildInputSchema, sourceReadResult } from '../apps/studio/src/source/agent-contract.ts';
 import { assetLimits } from '../packages/assets/src/index.mjs';
-import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
-import { randomUUID } from 'node:crypto';
+import { resolve } from 'node:path';
+import { createStudioConnection, resolveStudioSession } from './studio-session.mjs';
 import { discoverVisualSdk } from '../packages/visual-sdk/src/discovery.mjs';
 import { parameterInputSchema, playbackInputSchema, restartInputSchema } from '../apps/studio/src/runtime-operations.ts';
 const server = new McpServer({ name: 'lux-studio', version: '0.1.0' });
-async function call(method, params = {}) {
-  const endpoint = JSON.parse(await readFile(join(process.env.APPDATA, 'Lux/Studio/agent-endpoint.json'), 'utf8'));
-  const url = new URL(endpoint.url);
-  if (url.protocol !== 'http:' || url.hostname !== '127.0.0.1' || url.pathname !== '/') throw Error('Invalid local Lux endpoint');
-  const response = await fetch(url, { method: 'POST', headers: { authorization: `Bearer ${endpoint.token}`, 'content-type': 'application/json' },
-    body: JSON.stringify({ id: randomUUID(), method, params }), signal: AbortSignal.timeout(75000) });
-  const result = await response.json(); if (!result.ok) throw Error(result.error || 'Lux operation failed'); return result.result;
-}
+const selectedSession = resolveStudioSession({ workspace: resolve(import.meta.dirname, '..') });
+const call = createStudioConnection(selectedSession);
 const text = value => ({ content: [{ type: 'text', text: JSON.stringify(value) }] });
 async function runningStudio() {
-  try { const status = await call('status'); return { connected: true, capabilities: status.capabilities ?? null,
+  try { const status = await call('status'); return { connected: true, studioSession: status.studioSession, capabilities: status.capabilities ?? null,
     compatible: status.capabilities?.codeDeclaredParameters === true,
     advice: status.capabilities?.codeDeclaredParameters ? undefined : 'Running Studio predates this adapter; restart from the matching checkout before using SDK 0.2.' }; }
-  catch { return { connected: false, compatible: false, advice: 'Start Studio from this adapter checkout, then discover again.' }; }
+  catch (error) { return { connected: false, compatible: false,
+    selectedSession: { profile: selectedSession.profile, workspace: selectedSession.workspace },
+    advice: `Use the same Studio profile and checkout; reconnect the adapter after replacing Studio. ${error.message}` }; }
 }
 server.registerTool('lux.studio.discover', { description: 'Read the exact visual SDK, example and standalone Lux capabilities. Start Lux Studio separately.', inputSchema: {} }, async () => text({ ...await discoverVisualSdk(), scope: 'standalone-studio', tools: ['read', 'build', 'capture', 'status', 'parameters', 'playback', 'restart'], resolume: false,
   runningStudio: await runningStudio(),

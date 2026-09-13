@@ -1,11 +1,14 @@
 import { spawn } from 'node:child_process';
-import { createRequire } from 'node:module';
+import { installedElectron } from './studio-electron.mjs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { studioTestEnvironment } from './studio-session.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const electron = createRequire(import.meta.url)('electron');
-const env = { ...process.env, LUX_NODE_EXECUTABLE: process.execPath, LUX_WORKSPACE: root };
-if (process.argv.includes('--smoke')) env.LUX_STUDIO_SMOKE = '1';
+const electron = installedElectron(root);
+const smoke = process.argv.includes('--smoke');
+const env = { ...(smoke ? studioTestEnvironment() : process.env), LUX_NODE_EXECUTABLE: process.execPath, LUX_WORKSPACE: root };
+if (smoke) { env.LUX_STUDIO_SMOKE = '1'; delete env.LUX_STUDIO_MCP_TEST; }
+else { delete env.LUX_STUDIO_SMOKE; delete env.LUX_STUDIO_MCP_TEST; }
 delete env.ELECTRON_RUN_AS_NODE;
 const child = spawn(electron, [resolve(root, 'apps/studio/dist/main.cjs')], { cwd: root, env, stdio: 'inherit', windowsHide: false });
 child.on('error', error => { console.error(error); process.exitCode = 1; });
