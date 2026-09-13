@@ -39,6 +39,15 @@ test('refresh advances the selected summary and readable source together',async(
  fireEvent.click(screen.getByRole('button',{name:'Refresh'}));
  await waitFor(()=>assert.ok(screen.getByText('r2')));assert.ok(screen.getByText('export default 2;'));assert.equal(screen.queryByText('export default 1;'),null);
 });
+test('refresh uses the selected read revision when the library changes after listing',async()=>{
+ const revision1={id,revision:1,name:'Shared Violet',description:'Revision one.',updatedAt:'2026-09-13T20:00:00.000Z',source};
+ const revision2={...revision1,revision:2,description:'Revision two.',source:{...source,files:{...source.files,'component.ts':'export default 2;'}}};
+ const revision3={...revision2,revision:3,description:'Revision three.',source:{...source,files:{...source.files,'component.ts':'export default 3;'}}};
+ let refreshing=false;const client={list:async()=>[refreshing?revision2:revision1],read:async()=>refreshing?revision3:revision1,copyRequest:async()=>'request',create:async()=>revision1,update:async()=>revision1};
+ render(<LibraryPanel client={client} links={[]} updates={[]} fallbacks={[]} onApplyUpdates={async()=>{}} onFork={()=>{}} onError={reason=>assert.fail(String(reason))}/>);
+ fireEvent.click(await screen.findByRole('button',{name:/Shared Violet/}));await screen.findByText('export default 1;');refreshing=true;
+ fireEvent.click(screen.getByRole('button',{name:'Refresh'}));await waitFor(()=>assert.ok(screen.getByText('r3')));assert.equal(screen.getAllByText('Revision three.').length,2);assert.ok(screen.getByText('export default 3;'));assert.equal(screen.queryByText('r2'),null);
+});
 test('a late inspection response cannot replace the user’s newer selection',async()=>{
  const alpha={id,revision:1,name:'Alpha',description:'Alpha description.',updatedAt:'2026-09-13T20:00:00.000Z',source:{...source,files:{'component.ts':'alpha source'}}};
  const beta={...alpha,id:'22222222-2222-4222-8222-222222222222',name:'Beta',description:'Beta description.',source:{...source,files:{'component.ts':'beta source'}}};

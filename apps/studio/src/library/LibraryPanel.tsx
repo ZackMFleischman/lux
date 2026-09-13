@@ -5,10 +5,11 @@ import type {LibraryComponent,LibraryComponentSummary,SceneLibraryLink} from '..
 
 type Update=Readonly<{componentId:string;name:string;resolvedRevision:number;availableRevision:number}>;
 type Fallback=Readonly<{componentId:string;resolvedRevision:number;message:string}>;
+const summary=({id,revision,name,description,updatedAt}:LibraryComponent):LibraryComponentSummary=>({id,revision,name,description,updatedAt});
 export function LibraryPanel({client,links,updates,fallbacks,refreshKey=0,onApplyUpdates,onFork,onError}:{client:ComponentLibraryClient;links:readonly SceneLibraryLink[];updates:readonly Update[];fallbacks:readonly Fallback[];refreshKey?:number;onApplyUpdates():Promise<void>;onFork(id:string):void;onError(reason:unknown):void}){
  const [items,setItems]=useState<readonly LibraryComponentSummary[]>([]),[selected,setSelected]=useState<LibraryComponent|null>(null),[file,setFile]=useState(''),[message,setMessage]=useState('');
  const request=useRef(0);
- async function load(){const current=++request.current;try{const next=await client.list(),selectedId=selected?.id,nextSelected=selectedId&&next.some(item=>item.id===selectedId)?await client.read(selectedId):null;if(current!==request.current)return;setItems(next);setSelected(nextSelected);if(nextSelected&&!Object.hasOwn(nextSelected.source.files,file))setFile(nextSelected.source.entry);}catch(reason){if(current===request.current)onError(reason);}}
+ async function load(){const current=++request.current;try{const listed=await client.list(),selectedId=selected?.id,nextSelected=selectedId&&listed.some(item=>item.id===selectedId)?await client.read(selectedId):null,next=nextSelected?listed.map(item=>item.id===nextSelected.id?summary(nextSelected):item):listed;if(current!==request.current)return;setItems(next);setSelected(nextSelected);if(nextSelected&&!Object.hasOwn(nextSelected.source.files,file))setFile(nextSelected.source.entry);}catch(reason){if(current===request.current)onError(reason);}}
  useEffect(()=>{void load();},[refreshKey]);
  async function inspect(id:string){const current=++request.current;try{const value=await client.read(id);if(current!==request.current)return;setSelected(value);setFile(value.source.entry);setMessage('');}catch(reason){if(current===request.current)onError(reason);}}
  async function copy(){if(!selected)return;try{await client.copyRequest(selected.id);setMessage('Agent request copied.');}catch(reason){onError(reason);}}
