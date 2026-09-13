@@ -66,6 +66,33 @@ test('bounds the metadata edge ledger before starting a compiler program',async(
   await assert.rejects(builder.auditDeclarationPack({packRoot:join(dir,'payload'),dependencyRoot,evidenceRoot:join(dir,'evidence'),standardLibraries:[]}),/Audit ledger quota exceeded/);
   await assert.rejects(readFile(join(dir,'evidence/all-declarations-semantic.result.json')),{code:'ENOENT'});
 });
+test('rejects unaccounted zero-match wildcard branches before compiler coverage',async()=>{
+  const cases=[
+    {name:'unknown',pkg:{name:'demo',version:'1.0.0',exports:{'./review-unresolved/*':'./review-missing/*.js'}}},
+    ...[
+      ['condition',{default:'./examples/fonts/*'}],
+      ['custom-condition',{browser:'./examples/fonts/*'}],
+      ['target','./different/fonts/*'],
+      ['multiple-stars','./examples/fonts/**'],
+    ].map(([name,target])=>({name,pkg:{name:'@types/three',version:'0.186.0',exports:{'./examples/fonts/*':target}}})),
+    {name:'version',pkg:{name:'@types/three',version:'0.186.1',exports:{'./examples/fonts/*':'./examples/fonts/*'}}},
+  ];
+  for(const fixture of cases) {
+    const dir=join(root,'dist/project-tooling',`wildcard-${fixture.name}-${process.pid}-${Date.now()}`),packRoot=join(dir,'payload');
+    const metadata=Buffer.from(JSON.stringify(fixture.pkg)),source=`node_modules/${fixture.pkg.name}/package.json`;
+    await mkdir(dirname(join(packRoot,source)),{recursive:true});await writeFile(join(packRoot,source),metadata);
+    await writeFile(join(packRoot,'provenance.json'),JSON.stringify({format:'lux-tooling-provenance',version:1,packages:[{name:fixture.pkg.name,version:fixture.pkg.version,metadataSha256:hash(metadata)}]}));
+    const {default:getExePath}=await import(pathToFileURL(join(dependencyRoot,'typescript/lib/getExePath.js')));
+    const standardLibraries=['lib.es5.d.ts','lib.decorators.d.ts','lib.decorators.legacy.d.ts'].map(name=>`typescript/lib/${name}`);
+    await mkdir(join(packRoot,'typescript/lib'),{recursive:true});
+    for(const file of standardLibraries)await writeFile(join(packRoot,file),await readFile(join(dirname(getExePath()),file.split('/').at(-1))));
+    await assert.rejects(builder.auditDeclarationPack({packRoot,dependencyRoot,evidenceRoot:join(dir,'evidence'),standardLibraries}),/Incomplete wildcard coverage/);
+    const inventory=JSON.parse(await readFile(join(dir,'evidence/metadata/wildcard-inventory.json')));
+    assert.equal(inventory.length,1);assert.equal(inventory[0].classification,'incomplete');
+    assert.equal(inventory[0].source,source);assert.equal(inventory[0].matchCount,0);
+    await assert.rejects(readFile(join(dir,'evidence/all-declarations-semantic.result.json')),{code:'ENOENT'});
+  }
+});
 test('builds reproducibly, checks paired SDK semantics and detects an otherwise unreached dependency', {timeout:240000},async()=>{
   const output=join(root,'dist/project-tooling',`test-${process.pid}-${Date.now()}`);await mkdir(output,{recursive:true});
   await writeFile(join(output,'fixtures.json'),JSON.stringify(fixtures,null,2));
@@ -147,6 +174,51 @@ test('builds reproducibly, checks paired SDK semantics and detects an otherwise 
   await writeFile(join(output,'widening-mutation.json'),JSON.stringify({provenanceBefore,originalHash:hash(parameters),widenedHash:hash(widened),results:widening},null,2));
   const audit=await builder.auditDeclarationPack({packRoot:first.packRoot,dependencyRoot,evidenceRoot:join(output,'audit-pass'),standardLibraries:first.standardLibraries});
   assert.equal(audit.declarations,manifest.files.filter(f=>/\.d\.(ts|mts|cts)$/.test(f.path)).length);assert.ok(audit.edges>1000);assert.ok(audit.metadataEdges>100);
+  const wildcardInventory=JSON.parse(await readFile(join(output,'audit-pass/metadata/wildcard-inventory.json')));
+  const threeWildcards=wildcardInventory.filter(row=>row.source==='node_modules/@types/three/package.json');
+  assert.deepEqual(threeWildcards.map(row=>row.key).sort(),['./addons/*','./examples/fonts/*','./examples/jsm/*','./src/*']);
+  const fonts=threeWildcards.find(row=>row.key==='./examples/fonts/*');
+  assert.equal(fonts.target,'./examples/fonts/*');assert.deepEqual(fonts.conditions,[]);
+  assert.equal(fonts.packageName,'@types/three');assert.equal(fonts.packageVersion,'0.186.0');
+  assert.equal(fonts.classification,'runtime-only');assert.equal(fonts.matchCount,0);assert.match(fonts.reason,/font assets/);
+  assert.equal(fonts.metadataSha256,provenance.packages.find(p=>p.name==='@types/three').metadataSha256);
+  for(const row of threeWildcards.filter(row=>row!==fonts)){assert.equal(row.classification,'declaration-pattern');assert.ok(row.matchCount>0);}
+  assert.equal(audit.metadataWildcards,wildcardInventory.length);assert.equal(audit.runtimeOnlyWildcards,1);
+  const zodSource=wildcardInventory.find(row=>row.packageName==='zod'&&row.conditions.includes('@zod/source'));
+  assert.equal(zodSource.packageVersion,'3.25.76');assert.equal(zodSource.key,'./v4/locales/*');assert.equal(zodSource.target,'./src/v4/locales/*');
+  assert.deepEqual(zodSource.conditions,['@zod/source']);assert.equal(zodSource.classification,'inapplicable-condition');
+  assert.equal(zodSource.applicable,false);assert.equal(zodSource.matchCount,0);assert.match(zodSource.reason,/Bundler/);
+  const threeMetadataPath=join(first.packRoot,'node_modules/@types/three/package.json'),threeMetadata=await readFile(threeMetadataPath);
+  const provenancePath=join(first.packRoot,'provenance.json'),originalProvenance=await readFile(provenancePath);
+  for(const mutation of ['unknown','condition','custom-condition','version','target','provenance']) {
+    const changed=JSON.parse(threeMetadata),changedProvenance=JSON.parse(originalProvenance);
+    if(mutation==='unknown')changed.exports['./review-unresolved/*']='./review-missing/*.js';
+    if(mutation==='condition')changed.exports['./examples/fonts/*']={default:'./examples/fonts/*'};
+    if(mutation==='custom-condition')changed.exports['./examples/fonts/*']={browser:'./examples/fonts/*'};
+    if(mutation==='version')changed.version='0.186.1';
+    if(mutation==='target')changed.exports['./examples/fonts/*']='./review-missing/*';
+    if(mutation==='provenance')changedProvenance.packages.find(p=>p.name==='@types/three').metadataSha256='0'.repeat(64);
+    const dir=join(output,`audit-wildcard-${mutation}`);
+    try {
+      // Preserve exact original package bytes in the provenance-only case;
+      // this distinguishes the provenance gate from package-byte validation.
+      await writeFile(threeMetadataPath,mutation==='provenance'?threeMetadata:JSON.stringify(changed));
+      await writeFile(provenancePath,mutation==='provenance'?JSON.stringify(changedProvenance):originalProvenance);
+      await assert.rejects(builder.auditDeclarationPack({packRoot:first.packRoot,dependencyRoot,evidenceRoot:dir,standardLibraries:first.standardLibraries}),/Incomplete wildcard coverage/);
+      const rows=JSON.parse(await readFile(join(dir,'metadata/wildcard-inventory.json')));
+      assert.ok(rows.some(row=>row.classification==='incomplete'));
+      if(mutation==='unknown'){const unknown=rows.find(row=>row.key==='./review-unresolved/*');assert.equal(unknown.target,'./review-missing/*.js');assert.equal(unknown.matchCount,0);assert.equal(unknown.classification,'incomplete');}
+      await assert.rejects(readFile(join(dir,'all-declarations-semantic.result.json')),{code:'ENOENT'});
+    } finally {await writeFile(threeMetadataPath,threeMetadata);await writeFile(provenancePath,originalProvenance);}
+  }
+  const zodMetadataPath=join(first.packRoot,'node_modules/zod/package.json'),zodMetadata=await readFile(zodMetadataPath);
+  try {
+    const changed=JSON.parse(zodMetadata);changed.exports['./v4/locales/*']['@zod/review-unknown']=changed.exports['./v4/locales/*']['@zod/source'];delete changed.exports['./v4/locales/*']['@zod/source'];
+    await writeFile(zodMetadataPath,JSON.stringify(changed));
+    await assert.rejects(builder.auditDeclarationPack({packRoot:first.packRoot,dependencyRoot,evidenceRoot:join(output,'audit-wildcard-zod-condition'),standardLibraries:first.standardLibraries}),/Incomplete wildcard coverage/);
+    const rows=JSON.parse(await readFile(join(output,'audit-wildcard-zod-condition/metadata/wildcard-inventory.json')));
+    assert.equal(rows.find(row=>row.conditions.includes('@zod/review-unknown')).classification,'incomplete');
+  } finally {await writeFile(zodMetadataPath,zodMetadata);}
   const missing=join(first.packRoot,'node_modules/@dimforge/rapier3d-compat/math.d.ts');await unlink(missing);
   await builder.checkRepresentativePack({packRoot:first.packRoot,dependencyRoot,evidenceRoot:join(output,'mutation-representative'),standardLibraries:first.standardLibraries});
   await assert.rejects(builder.auditDeclarationPack({packRoot:first.packRoot,dependencyRoot,evidenceRoot:join(output,'audit-missing'),standardLibraries:first.standardLibraries}),error=>/rapier3d-compat/.test(error.message)&&/TS2307/.test(error.message)&&/math/.test(error.message));

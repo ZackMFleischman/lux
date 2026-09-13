@@ -111,9 +111,14 @@ async function references(dependencyRoot,packRoot,files) {
 // Bundler modes. Runtime-only and custom non-Bundler conditions are inventoried
 // but never executed. Original metadata bytes remain in the payload.
 async function metadataProbes(packRoot,files,evidenceRoot) {
-  const ledger=[],probes=[];
+  const ledger=[],probes=[],wildcards=[],incomplete=[];
+  // This exception is for the inspected original @types/three metadata only.
+  // It cannot turn a new package condition or unmatched pattern into coverage.
+  const fontsMetadataSha256='b0253caeb8b99b6a64150e6279cc4bbf30e61610683bdf39f8db2667d6103626';
+  const zodMetadataSha256='70eedbe34fd52385a4ae2f3e5759b19682189f0118ea73a6e7c32c677f61668e';
+  let provenance;
   for(const file of files.filter(p=>p.endsWith('/package.json')&&p.startsWith('node_modules/'))) {
-    const pkg=JSON.parse(await readFile(join(packRoot,file),'utf8')),base=posix.dirname(file);
+    const metadataBytes=await readFile(join(packRoot,file)),pkg=JSON.parse(metadataBytes),base=posix.dirname(file);
     const candidates=files.filter(p=>p.startsWith(base+'/')&&declaration(p)).map(p=>p.slice(base.length+1));
     if(!pkg.name)continue;
     const packageName=pkg.name.startsWith('@types/')?pkg.name.slice(7):pkg.name;
@@ -130,23 +135,48 @@ async function metadataProbes(packRoot,files,evidenceRoot) {
       const targets=leaves(value),subpaths=new Set();
       for(const item of targets) {
         const applicable=item.conditions.every(c=>['types','import','require','default'].includes(c));
+        if(key.includes('*')||item.target?.includes('*')) {
+          const row={source:file,packageName:pkg.name,packageVersion:pkg.version,metadataSha256:sha(metadataBytes),key,target:item.target,conditions:item.conditions,applicable,matchCount:0,classification:'incomplete'};
+          // Preserve the original branch independently of expansion rows,
+          // including unsupported patterns and conditions that match nothing.
+          appendBounded(wildcards,row);
+          if(item.target===null){row.classification='blocked';continue;}
+          if(!item.target.startsWith('./')||(item.target.match(/\*/g)||[]).length!==1||(key.match(/\*/g)||[]).length!==1) {
+            row.reason='Unsupported wildcard form';appendBounded(incomplete,row);continue;
+          }
+          const [prefix,suffix]=item.target.slice(2).split('*');
+          for(const candidate of candidates)for(const alias of new Set([candidate,candidate.replace(/\.d\.ts$/,'.js').replace(/\.d\.mts$/,'.mjs').replace(/\.d\.cts$/,'.cjs')])) {
+            if(alias.length>=prefix.length+suffix.length&&alias.startsWith(prefix)&&alias.endsWith(suffix)) {
+              row.matchCount++;
+              if(applicable){const capture=alias.slice(prefix.length,suffix? -suffix.length:undefined);subpaths.add(key.replace('*',capture));appendBounded(ledger,{source:file,field:`exports.${key}`,conditions:item.conditions,target:posix.join(base,candidate),applicable:true,capture});}
+            }
+          }
+          if(row.matchCount){row.classification=applicable?'declaration-pattern':'inapplicable-condition';continue;}
+          const knownFonts=file==='node_modules/@types/three/package.json'&&pkg.name==='@types/three'&&pkg.version==='0.186.0'&&key==='./examples/fonts/*'&&item.target==='./examples/fonts/*'&&item.conditions.length===0&&row.metadataSha256===fontsMetadataSha256;
+          const knownZodSource=file==='node_modules/zod/package.json'&&pkg.name==='zod'&&pkg.version==='3.25.76'&&key==='./v4/locales/*'&&item.target==='./src/v4/locales/*'&&item.conditions.length===1&&item.conditions[0]==='@zod/source'&&row.metadataSha256===zodMetadataSha256;
+          if(knownFonts||knownZodSource) {
+            if(provenance===undefined) {try{provenance=JSON.parse(await readFile(join(packRoot,'provenance.json')));}catch{provenance=null;}}
+            const originals=provenance?.format==='lux-tooling-provenance'&&provenance.version===1&&Array.isArray(provenance.packages)?provenance.packages.filter(p=>p.name===pkg.name):[];
+            if(originals.length===1&&originals[0].version===pkg.version&&originals[0].metadataSha256===row.metadataSha256&&!originals[0].transform) {
+              row.classification=knownFonts?'runtime-only':'inapplicable-condition';
+              row.reason=knownFonts?'Pinned Three font assets have no declarations; payload remains excluded.':'Pinned @zod/source selects source files outside the audited Bundler types/import/require/default conditions.';continue;
+            }
+          }
+          row.reason='No declaration matches and no verified runtime-only or inapplicable classification';appendBounded(incomplete,row);continue;
+        }
         if(item.target===null){appendBounded(ledger,{source:file,field:`exports.${key}`,conditions:item.conditions,target:null,applicable});continue;}
         if(!item.target.startsWith('./'))throw Error(`Unsupported nonrelative package target: ${file}`);
         if(!applicable){appendBounded(ledger,{source:file,field:`exports.${key}`,conditions:item.conditions,target:item.target,applicable:false});continue;}
         if(item.target.endsWith('.json')){const target=posix.normalize(posix.join(base,item.target));if(!files.includes(target))throw Error(`Missing metadata JSON target: ${target}`);appendBounded(ledger,{source:file,field:`exports.${key}`,conditions:item.conditions,target,applicable:true});continue;}
-        if(item.target.includes('*')) {
-          if((item.target.match(/\*/g)||[]).length!==1||(key.match(/\*/g)||[]).length!==1)throw Error(`Unsupported wildcard ${file}`);
-          const [prefix,suffix]=item.target.slice(2).split('*');
-          for(const candidate of candidates)for(const alias of new Set([candidate,candidate.replace(/\.d\.ts$/,'.js').replace(/\.d\.mts$/,'.mjs').replace(/\.d\.cts$/,'.cjs')])) {
-            if(alias.startsWith(prefix)&&alias.endsWith(suffix)){const capture=alias.slice(prefix.length,suffix? -suffix.length:undefined);subpaths.add(key.replace('*',capture));appendBounded(ledger,{source:file,field:`exports.${key}`,conditions:item.conditions,target:posix.join(base,candidate),applicable:true,capture});}
-          }
-        } else {subpaths.add(key);appendBounded(ledger,{source:file,field:`exports.${key}`,conditions:item.conditions,target:item.target,applicable:true});}
+        subpaths.add(key);appendBounded(ledger,{source:file,field:`exports.${key}`,conditions:item.conditions,target:item.target,applicable:true});
       }
       const modes=['import','require'].filter(mode=>targets.some(t=>t.conditions.every(c=>['types','default',mode].includes(c))));
       for(const subpath of subpaths)appendBounded(probes,{specifier:subpath==='.'?packageName:packageName+subpath.slice(1),source:file,modes});
     }
   }
   await mkdir(evidenceRoot,{recursive:true});
+  await writeFile(join(evidenceRoot,'wildcard-inventory.json'),JSON.stringify(wildcards,null,2));
+  if(incomplete.length)throw Error(`Incomplete wildcard coverage: ${incomplete.map(row=>`${row.source} exports.${row.key} [${row.conditions.join(',')}] -> ${row.target}: ${row.reason}`).join('; ').slice(0,16000)}`);
   // Unique files preserve exact metadata-origin attribution for native tracing.
   const probeRoot=await mkdtemp(join(packRoot,'.audit-')),probeFiles=[];
   for(const mode of ['import','require','types']) {
@@ -154,7 +184,7 @@ async function metadataProbes(packRoot,files,evidenceRoot) {
     for(const probe of probes)if(probe.modes.includes(mode)){text+=mode==='types'?`/// <reference types=${JSON.stringify(probe.specifier)} />\n`:`export type Target${index++} = typeof import(${JSON.stringify(probe.specifier)}, { with: { "resolution-mode": "${mode}" } });\n`;probe[mode]=path;}
     await writeFile(path,text);await writeFile(join(evidenceRoot,`metadata-${mode}.ts`),text);probeFiles.push(path);
   }
-  return {ledger,probes,probeFiles,probeRoot};
+  return {ledger,probes,probeFiles,probeRoot,wildcards};
 }
 export async function auditDeclarationPack({packRoot,dependencyRoot,evidenceRoot,standardLibraries}) {
   await mkdir(evidenceRoot,{recursive:true});const files=await walk(packRoot),decls=files.filter(declaration),edges=await references(dependencyRoot,packRoot,decls);
@@ -193,7 +223,7 @@ export async function auditDeclarationPack({packRoot,dependencyRoot,evidenceRoot
     for(const p of standardLibraries.filter(p=>!p.includes('lib.dom')))closure.add(p);
     assertPass(await run(executable,config(packRoot,[],[...closure].map(p=>join(packRoot,p))),join(evidenceRoot,'libraries'),basename(file)),`Library ${file}`);
   }
-  const counts={files:files.length,declarations:decls.length,edges:resolved.length,metadataEdges:metadata.ledger.length,standardLibraries:decls.filter(p=>p.startsWith('typescript/lib/')).length};
+  const counts={files:files.length,declarations:decls.length,edges:resolved.length,metadataEdges:metadata.ledger.length,metadataWildcards:metadata.wildcards.length,runtimeOnlyWildcards:metadata.wildcards.filter(row=>row.classification==='runtime-only').length,standardLibraries:decls.filter(p=>p.startsWith('typescript/lib/')).length};
   await writeFile(join(evidenceRoot,'inventory.json'),JSON.stringify(files));await writeFile(join(evidenceRoot,'declaration-ledger.json'),JSON.stringify(resolved,null,2));await writeFile(join(evidenceRoot,'metadata-ledger.json'),JSON.stringify(metadata.ledger,null,2));await writeFile(join(evidenceRoot,'coverage.json'),JSON.stringify(counts,null,2));return counts;
 }
 
