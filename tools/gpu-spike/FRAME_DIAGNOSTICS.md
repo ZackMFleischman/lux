@@ -1,0 +1,9 @@
+# Controlled frame diagnostics
+
+Set `LUX_CONTROLLED_FRAMES=1` only in a scheduled graphics experiment using a linked-v3 parameter transport. Normal playback does not use this mode. The renderer disables autonomous worker draws, requests one completed draw, and admits one subsequent Electron paint before another request. Initial and control-update draws use the same gate.
+
+This is a correspondence experiment, not proof that an OSR texture belongs to the acknowledged draw: Electron provides no worker-frame tag and can have older compositor work queued. Every attached claim remains `producer-claim-unverified`. Never feed these claims into an acceptance evaluator as verified frame/control correspondence.
+
+`probe.json` records QPC producer-control receipts and worker-frame acknowledgement receipts, including complete normalized values and worker control sequence. Ring slots pin the claim at publication; the receiver never consults mutable current controls to label an older texture. Native `host-opportunity` records contain per-instance contiguous callback sequence, QPC callback time, selected native generation/frame, repeats/no-frame, copy completion time, and the optional claim. Float values retain round-trip precision. The bounded callback queue never waits or writes files from the host callback; `host-telemetry-summary.lostRecords` includes overflow and the 100,000-record cap. Missing final summary or nonzero loss means incomplete evidence.
+
+Installed supervisor attempt files ending `.lifecycle.jsonl` record QPC restart trigger, stop request, and independently observed process exit. Native stop retains Job/process handles until the root process is signalled and the Job reports zero active processes. This proves execution has stopped; it does not prove the replacement's first consumed frame matches authoritative controls. The latter still requires graphics correspondence and harness-owned reference-image evidence.

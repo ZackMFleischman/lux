@@ -7,10 +7,11 @@
 #include <cmath>
 #include <algorithm>
 #include "host_control_snapshot_v4.h"
+#include "frame_telemetry.h"
 namespace lux {
 constexpr LONG Free=0, Writing=1, Ready=2, Reading=3;
 struct FrameKey { uint64_t generation, outputGeneration, frame; uint32_t slot; };
-struct alignas(64) SharedSlot { volatile LONG state=Free; uint32_t width=0,height=0,format=0; uint64_t frame=0,completeQpc=0; wchar_t textureName[160]{}; };
+struct alignas(64) SharedSlot { volatile LONG state=Free; uint32_t width=0,height=0,format=0; uint64_t frame=0,completeQpc=0;FrameProvenanceV4 provenance; wchar_t textureName[160]{}; };
 constexpr uint32_t RingVersion=4;
 inline const ControlSchemaHashV4 LegacyControlSchema=[] {ControlSchemaHashV4 value{};const char* text="2f686a688523e2aa6e5368cd286974b87b324cfa4c67507563658b25cadd5a87";std::copy_n(text,64,value.begin());return value;}();
 // Admission and closing must share one atomic word. A separate alive check cannot

@@ -28,6 +28,7 @@ const registry = new InstanceRegistry({runtimeId, start: async request => {
   fs.mkdirSync(attempts, {recursive:true});
   const requestPath = noLinks(path.join(attempts, attemptId + '.json'));
   const healthPath = noLinks(path.join(attempts, attemptId + '.status'));
+  const trace=value=>fs.appendFileSync(path.join(attempts,attemptId+'.lifecycle.jsonl'),JSON.stringify({instanceId:request.instanceId,revisionId:release.sourceHash,releaseId:release.releaseId,attemptId,...value})+'\n');
   // A fresh attempt file binds each producer to its own status channel. An old
   // process or stale status file cannot renew a replacement producer's deadline.
   fs.writeFileSync(requestPath, JSON.stringify(request), {flag:'wx'});
@@ -35,7 +36,7 @@ const registry = new InstanceRegistry({runtimeId, start: async request => {
   fs.rmSync(stopPath, {force:true});
   const health = new ProducerHealth({attemptId, startedAt:performance.now()});
   let key;
-  try { key = bridge.installedStart(path.join(runtimeDirectory, 'electron/electron.exe'), path.join(__dirname, 'instance.cjs'), requestPath); }
+  try { trace({kind:'restart-trigger',clock:bridge.clock()});key = bridge.installedStart(path.join(runtimeDirectory, 'electron/electron.exe'), path.join(__dirname, 'instance.cjs'), requestPath); }
   catch (error) { fs.rmSync(requestPath, {force:true}); throw error; }
   let closed = false;
   return {
@@ -48,6 +49,7 @@ const registry = new InstanceRegistry({runtimeId, start: async request => {
     },
     async stop({force = false} = {}) {
       if (closed) return;
+      trace({kind:'stop-requested',force,clock:bridge.clock()});
       try {
         if (!force) {
           fs.writeFileSync(stopPath, 'stop');
@@ -56,7 +58,10 @@ const registry = new InstanceRegistry({runtimeId, start: async request => {
         }
       } catch { /* A failed drain signal still closes this producer's Job. */
       } finally {
-        bridge.installedStop(key); closed = true;
+        const deadline=performance.now()+2000;let stopped;
+        do {stopped=bridge.installedStop(key);if(stopped.stopped)break;await delay(10);}while(performance.now()<deadline);
+        if(!stopped.stopped)throw Error('Installed Job exit remains unconfirmed; ownership retained');
+        trace({kind:'process-exit-observed',...stopped});closed = true;
         for (const filename of [path.join(directory, request.instanceId + '.rendezvous'), requestPath, healthPath, healthPath + '.tmp']) {
           try { fs.rmSync(filename, {force:true}); } catch { /* A leftover private diagnostic must not stop unrelated producers. */ }
         }

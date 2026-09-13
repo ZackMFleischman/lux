@@ -6,6 +6,7 @@
 #include <fstream>
 #include <array>
 #include <vector>
+#include <charconv>
 #include "shared_ring.h"
 #include "installed_process.h"
 using Microsoft::WRL::ComPtr;
@@ -33,6 +34,19 @@ void check(HRESULT hr) {
 }
 napi_value text(napi_env env,const std::string& value) {
   napi_value result;napi_create_string_utf8(env,value.c_str(),value.size(),&result);return result;
+}
+lux::FrameProvenanceV4 frameClaim(napi_env env,napi_value input){
+ lux::FrameProvenanceV4 result;result.status=1;
+ auto field=[&](const char* name){napi_value value;if(napi_get_named_property(env,input,name,&value)!=napi_ok)throw std::runtime_error("Missing frame provenance field");return value;};
+ auto string=[&](const char* name,size_t maximum){char buffer[65]{};size_t length=0;if(napi_get_value_string_utf8(env,field(name),buffer,sizeof(buffer),&length)!=napi_ok||length>maximum)throw std::runtime_error("Invalid frame provenance text");return std::string(buffer,length);};
+ auto integer=[&](const char* name){const auto value=string(name,20);uint64_t number;auto parsed=std::from_chars(value.data(),value.data()+value.size(),number);if(parsed.ec!=std::errc()||parsed.ptr!=value.data()+value.size()||value!=std::to_string(number))throw std::runtime_error("Invalid frame provenance sequence");return number;};
+ if(string("correlation",32)!="producer-claim-unverified")throw std::runtime_error("Unsupported frame correlation proof");
+ result.workerFrame=integer("frameId");result.controlSequence=integer("controlSequence");if(!result.workerFrame)throw std::runtime_error("Invalid worker frame");
+ const auto revision=string("revisionId",64),schema=string("schemaHash",64);if(revision.size()!=64||schema.size()!=64)throw std::runtime_error("Invalid frame identity");std::copy_n(revision.data(),64,result.revisionHash.begin());std::copy_n(schema.data(),64,result.schemaHash.begin());
+ if(!lux::host_controls_v4_detail::validSchema(result.revisionHash)||result.schemaHash!=expectedSchema)throw std::runtime_error("Frame provenance schema mismatch");
+ auto values=field("normalized");uint32_t count;bool isArray=false;napi_is_array(env,values,&isArray);if(!isArray||napi_get_array_length(env,values,&count)!=napi_ok||count!=expectedCount)throw std::runtime_error("Frame provenance count mismatch");result.count=count;
+ for(uint32_t i=0;i<count;++i){napi_value item;double value;napi_get_element(env,values,i,&item);if(napi_get_value_double(env,item,&value)!=napi_ok||!std::isfinite(value)||value<0||value>1)throw std::runtime_error("Invalid frame normalized value");result.normalized[i]=static_cast<float>(value);}
+ LARGE_INTEGER at;QueryPerformanceCounter(&at);result.receivedQpc=at.QuadPart;return result;
 }
 void initialize() {
   if(device&&ring)return;
@@ -87,16 +101,17 @@ napi_value submit(napi_env env,napi_callback_info info) {
     if(lux::isClosing(*ring))throw std::runtime_error("producer is closing; submissions rejected");
     lux::HostControlSnapshotV4 hostValue;
     if(lux::tryReadHostControlsV4(ring->controls,expectedSchema,expectedCount,hostValue)!=lux::HostControlStatusV4::Ok)return text(env,"{\"drop\":\"waiting-for-host-control\"}");
-    size_t argc=1; napi_value args[1];napi_get_cb_info(env,info,&argc,args,nullptr,nullptr);
+    size_t argc=2; napi_value args[2];napi_get_cb_info(env,info,&argc,args,nullptr,nullptr);
     void* bytes=nullptr;size_t length=0;
-    if(argc!=1||napi_get_buffer_info(env,args[0],&bytes,&length)!=napi_ok||length!=sizeof(HANDLE))throw std::runtime_error("NT handle must be 8-byte Buffer");
+    if(argc<1||napi_get_buffer_info(env,args[0],&bytes,&length)!=napi_ok||length!=sizeof(HANDLE))throw std::runtime_error("NT handle must be 8-byte Buffer");
+    const auto provenance=argc==2?frameClaim(env,args[1]):lux::FrameProvenanceV4{};
     unsigned pending=0;for(const auto& slot:slots)if(slot.borrowedId)++pending;
     if(pending>=2)return text(env,"{\"drop\":\"producer-inflight-limit\"}");
     for(unsigned i=0;i<3;++i) {
       if(lux::transition(ring->slots[i],lux::Free,lux::Writing)){index=i;break;}
     }
     if(index==3)return text(env,"{\"drop\":\"no-free-slot\"}");
-    auto& local=slots[index];auto& shared=ring->slots[index];
+    auto& local=slots[index];auto& shared=ring->slots[index];shared.provenance=provenance;
     HANDLE borrowed;memcpy(&borrowed,bytes,sizeof(borrowed));
     check(device->OpenSharedResource1(borrowed,IID_PPV_ARGS(&local.source)));
     D3D11_TEXTURE2D_DESC desc{};local.source->GetDesc(&desc);
@@ -191,11 +206,12 @@ napi_value module(napi_env env,napi_value exports) {
   napi_define_properties(env,exports,5,properties);
   napi_property_descriptor parameterApi={"configureControls",nullptr,configureControls,nullptr,nullptr,nullptr,napi_default,nullptr};napi_define_properties(env,exports,1,&parameterApi);
   napi_property_descriptor supervisor[]={
+    {"clock",nullptr,lux::installedClock,nullptr,nullptr,nullptr,napi_default,nullptr},
     {"lockSupervisor",nullptr,lockSupervisor,nullptr,nullptr,nullptr,napi_default,nullptr},
     {"installedStart",nullptr,lux::installedStart,nullptr,nullptr,nullptr,napi_default,nullptr},
     {"installedRunning",nullptr,lux::installedRunning,nullptr,nullptr,nullptr,napi_default,nullptr},
     {"installedStop",nullptr,lux::installedStop,nullptr,nullptr,nullptr,napi_default,nullptr}};
-  napi_define_properties(env,exports,4,supervisor);return exports;
+  napi_define_properties(env,exports,5,supervisor);return exports;
 }
 }
 NAPI_MODULE(NODE_GYP_MODULE_NAME,module)

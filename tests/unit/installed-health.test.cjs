@@ -34,7 +34,7 @@ test('confirmed receiver backpressure tolerates a non-consuming host without hid
   for (let now = 10250; now < 14000; now += 250) health.observe(status(now, { frameId: '10000', backpressureFrames: now }), now);
   assert.match(health.failure(14000), /Visual frame/);
 });
-test('expiry stops only its Job, backs off and disposes even the third failed producer', async () => {
+test('expiry stops only its Job and disposes the second failed producer before suppressing retry', async () => {
   const runtimeId = 'a'.repeat(64), releaseId = 'b'.repeat(64), bad = '1'.repeat(32), good = '2'.repeat(32);
   const request = instanceId => ({ version: 1, runtimeId, releaseId, instanceId, hostPid: 42 });
   const starts = [], stops = [];
@@ -43,8 +43,8 @@ test('expiry stops only its Job, backs off and disposes even the third failed pr
       stop: async options => { stops.push({ id: value.instanceId, force: options?.force }); } };
   } });
   for (const now of [0, 1, 500, 1001, 1002, 3002, 3003, 10000]) await registry.reconcile([request(bad), request(good)], now);
-  assert.equal(starts.filter(id => id === bad).length, 3); assert.equal(starts.filter(id => id === good).length, 1);
-  assert.deepEqual(stops, Array.from({ length: 3 }, () => ({ id: bad, force: true })));
+  assert.equal(starts.filter(id => id === bad).length, 2); assert.equal(starts.filter(id => id === good).length, 1);
+  assert.deepEqual(stops, Array.from({ length: 2 }, () => ({ id: bad, force: true })));
   assert.equal(registry.entries.get(bad).producer, null); assert.match(registry.errors.get(bad), /startup/);
   await registry.reconcile([request(good)], 20000); assert.equal(registry.errors.has(bad), false);
   await registry.close(); assert.equal(stops.at(-1).id, good);

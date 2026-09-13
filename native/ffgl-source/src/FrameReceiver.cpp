@@ -9,6 +9,7 @@
 #include <sstream>
 #include <optional>
 #include <type_traits>
+#include <limits>
 
 using Microsoft::WRL::ComPtr;
 namespace lux {
@@ -174,9 +175,19 @@ void FrameReceiver::run(HGLRC shared) {
   log<<"{\"kind\":\"adapter\",\"luidLow\":"<<description.AdapterLuid.LowPart<<",\"luidHigh\":"<<description.AdapterLuid.HighPart<<"}"<<std::endl;
   glGenFramebuffers(1,&readFbo);glGenFramebuffers(1,&drawFbo);require(readFbo&&drawFbo,"worker framebuffer allocation failed");
   activation.begin();
+  log<<std::setprecision(std::numeric_limits<float>::max_digits10);
+  LARGE_INTEGER frequency;QueryPerformanceFrequency(&frequency);log<<"{\"kind\":\"native-clock\",\"domain\":\"qpc\",\"frequency\":\""<<frequency.QuadPart<<"\"}"<<std::endl;
+  uint64_t opportunityRecords=0,traceCapped=0;
+  auto drainOpportunities=[&]{HostOpportunity item;while(opportunities.pop(item)){
+   if(opportunityRecords++>=100000){++traceCapped;continue;}
+   log<<"{\"kind\":\"host-opportunity\",\"instanceId\":\""<<activation.instanceId()<<"\",\"sequence\":"<<item.sequence<<",\"at\":\""<<item.at<<"\",\"present\":"<<(item.present?"true":"false")<<",\"generation\":"<<item.generation<<",\"frameId\":\""<<item.frame<<"\",\"copyCompletedQpc\":\""<<item.completedQpc<<"\",\"correlation\":\""<<(item.provenance.status?"producer-claim-unverified":"unavailable")<<"\"";
+   if(item.provenance.status){const auto& p=item.provenance;log<<",\"workerFrameId\":\""<<p.workerFrame<<"\",\"controlSequence\":\""<<p.controlSequence<<"\",\"producerReceivedQpc\":\""<<p.receivedQpc<<"\",\"revisionId\":\""<<std::string(p.revisionHash.data(),64)<<"\",\"schemaHash\":\""<<std::string(p.schemaHash.data(),64)<<"\",\"normalized\":[";for(uint32_t i=0;i<p.count;++i){if(i)log<<',';log<<p.normalized[i];}log<<']';}
+   log<<"}\n";
+  }};
   std::wstring connected;ReceiverPoll discovery,counters;int pending=-1,sourceSlot=-1;
   lifecycle.started();
   while(!lifecycle.stopRequested()) {
+   drainOpportunities();
    if(pending>=0){
     auto& imported=imports[sourceSlot];const auto status=glCompletion(imported.fence);require(status!=Completion::Failed,"worker fence failed");
     if(status==Completion::Complete){imported.ownership.glPending=false;glDeleteSync(imported.fence);imported.fence=nullptr;require(unlock(interop,1,&imported.object)!=FALSE,"NV unlock failed");imported.ownership.locked=false;outputs[pending].state.store(Ready);pending=-1;sourceSlot=-1;}
@@ -209,6 +220,7 @@ void FrameReceiver::run(HGLRC shared) {
      if(newest<0||!transition(ring->slots[newest],Ready,Reading)){endRead(*ring);outputs[outputIndex].state.store(Free);}
      else {
       auto& source=ring->slots[newest];auto& imported=imports[newest];auto& output=outputs[outputIndex];
+      output.provenance=source.provenance;output.completedQpc=source.completeQpc;
       imported.ownership.admission=true;imported.ownership.lease=true;imported.key={ring->generation,ring->outputGeneration,source.frame,uint32_t(newest)};
       const auto width=source.width,height=source.height;
       if(!imported.object){
@@ -239,6 +251,7 @@ void FrameReceiver::run(HGLRC shared) {
    }
    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
+  drainOpportunities();log<<"{\"kind\":\"host-telemetry-summary\",\"instanceId\":\""<<activation.instanceId()<<"\",\"lostRecords\":"<<opportunities.lost.load()+traceCapped<<",\"recorded\":"<<std::min<uint64_t>(opportunityRecords,100000)<<"}"<<std::endl;
  }catch(const std::exception& error){log<<"{\"kind\":\"failure\",\"reason\":\""<<error.what()<<"\"}"<<std::endl;}
  catch(...){log<<"{\"kind\":\"failure\",\"reason\":\"unknown worker exception\"}"<<std::endl;}
  activation.end();
@@ -252,13 +265,15 @@ void FrameReceiver::run(HGLRC shared) {
  if(classAtom)UnregisterClassW(windowClass.c_str(),GetModuleHandleW(nullptr));
 }
 GLuint FrameReceiver::acquireLatest() {
- ++callbacks;
+ const auto callbackSequence=++callbacks;LARGE_INTEGER callbackAt;QueryPerformanceCounter(&callbackAt);
  for(int i=0;i<3;++i)if(i!=current&&outputs[i].state.load()==Reading&&outputs[i].fence){if(glCompletion(outputs[i].fence)==Completion::Complete){glDeleteSync(outputs[i].fence);outputs[i].fence=nullptr;outputs[i].state.store(Free);}}
  int newest=-1;uint64_t frame=lastFrame,generation=lastGeneration;
  for(int i=0;i<3;++i)if(outputs[i].state.load()==Ready&&(outputs[i].generation>generation||(outputs[i].generation==generation&&outputs[i].frame>frame))){newest=i;frame=outputs[i].frame;generation=outputs[i].generation;}
  if(newest>=0){int expected=Ready;if(outputs[newest].state.compare_exchange_strong(expected,Reading)){current=newest;lastFrame=frame;lastGeneration=generation;++consumed;}}
  for(int i=0;i<3;++i)if(i!=current&&outputs[i].state.load()==Ready&&(outputs[i].generation<lastGeneration||(outputs[i].generation==lastGeneration&&outputs[i].frame<lastFrame))){int expected=Ready;outputs[i].state.compare_exchange_strong(expected,Free);}
- return current>=0?outputs[current].texture:0;
+ HostOpportunity item;item.sequence=callbackSequence;item.at=callbackAt.QuadPart;item.present=current>=0;
+ if(current>=0){const auto& output=outputs[current];item.generation=output.generation;item.frame=output.frame;item.completedQpc=output.completedQpc;item.provenance=output.provenance;}
+ opportunities.push(item);return current>=0?outputs[current].texture:0;
 }
 void FrameReceiver::afterDraw(){if(current>=0){auto& output=outputs[current];if(output.fence)glDeleteSync(output.fence);output.fence=glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE,0);output.unfenced=!output.fence;glFlush();}}
 void FrameReceiver::stop(){
