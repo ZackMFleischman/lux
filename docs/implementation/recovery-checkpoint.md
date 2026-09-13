@@ -164,3 +164,14 @@ Automatic current-value recovery already passed the subsequent native test
 documented in [installed stop evidence](../../evidence/tracer-0.1/parameters-images-studio/installed-stop.md).
 That functional recovery result does not supply a missing explicit user action
 or establish GPU resource accounting.
+
+### Initialization-hang result — 13 September UTC
+
+The initialization probe now passes the physical stop gate: a persisted timestamp
+before the trusted GO command conservatively precedes the authored `create()`
+loop, and independent native Job observation confirms exit with zero descendants
+within 1,403.89 ms. The automatic retry hung again, stopped within 1,429.9191 ms
+and was suppressed. Native callbacks continued throughout. See the appended
+[startup-hang evidence](../../evidence/tracer-0.1/parameters-images-studio/installed-stop.md)
+for input identities, raw evidence hashes and limits. Actual Resolume, recovered
+output and GPU resource accounting are not certified by this test.

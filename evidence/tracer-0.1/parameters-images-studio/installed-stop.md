@@ -155,3 +155,51 @@ includes supervisor preflight/operation overhead. The retry has a normal stop
 request after cyan but no separate per-attempt exit-observation row; final
 process ownership cleanup is established by the outer Job, not an invented
 retry exit record. This is not GPU-resource accounting.
+
+## Initialization-hang physical stop — 13 September UTC
+
+Run `356838a2-853c-420b-a163-b3a689118635` passed the separate startup-hang
+check. The pinned fixture loops indefinitely inside `create()`, before any
+completed visual frame. A trusted diagnostic gate waits immediately before
+`create()`. Main persists a QPC timestamp before sending an identity-bound GO;
+the fixture's separate console marker confirms that the loop was entered.
+Using the earlier pre-GO origin includes dispatch and persistence delays and
+therefore conservatively bounds actual hang-to-stop time.
+
+At QPC frequency 10,000,000 ticks/s: pre-GO `719793792093`, entered marker
+`719793842517`, and independent producer Job exit `719807830993`. The process
+was signaled and the Job had zero active descendants. The resulting upper bound
+is **1,403.89 ms**, below the unchanged two-second requirement. The native host
+recorded 170 more callbacks after this first stop. Two attempt entry markers were
+retained; this result certifies the first attempt only.
+
+The 10 s native loop ran under the unchanged 30 s outer Job. Total supervised
+duration was 14,897.8599 ms, exit 0, no timeout and confirmed cleanup. Root's
+subsequent process inventory contained no Lux, Electron or Resolume processes.
+There is no recovered image from this deliberately always-hanging fixture.
+Physical process cleanup is established; exact GPU resource accounting and
+actual Resolume fault behavior remain separate.
+
+Source commits: `ddd5c95`, `015062a`, `e204945`. All 236 source/binary review inputs
+matched before dispatch; the emitted main, relay and worker handshake paths were
+independently inspected. Root integrated verification passed 25 CPU checks,
+including the actual bundled worker and compiling/linking the authored fixture
+without executing `create()`. Watchdog policy and deadlines were unchanged.
+
+Package `aff855146388fc2ad3a6e07510a3a5d355d902b4c10b9f94fcfebe71a3c8c65d`;
+runtime `8e2ae55ce554faaf76f7c0ff9cedf6f4a3b16fa777f7be5f7d2db5d8a689ff18`;
+source `ad4dad398200bb284826df045a741c7d761635cb8d5232b75c6816272c833a3d`.
+Original artifacts: `.worktrees/installed-init-stop/artifacts/installed-init-stop/`.
+The [inspection report](installed-init-stop.json) retains individual evidence
+hashes and retrieval paths. No user installation or Resolume registration was
+changed; this used a fresh private test profile.
+
+Independent raw review also verified the second attempt: it started 309.058 ms
+after the first exit, entered the same initialization loop, and reached a
+signaled/empty Job within 1,429.9191 ms of its own pre-GO timestamp. The expected
+second worker-heartbeat fault suppressed further retries. The full native log
+contains 345 contiguous callbacks, zero lost records or receiver failures, and
+42 callbacks after the second stop. This strengthens the lifecycle evidence;
+the committed automated inspector's acceptance population remains first-attempt
+only. Inspection SHA-256:
+`dfd94a8280ee8590595ee9481ecec17e53957c279c695c2de68105c2f591e165`.

@@ -1,0 +1,51 @@
+{
+  "ok": true,
+  "releaseId": "aff855146388fc2ad3a6e07510a3a5d355d902b4c10b9f94fcfebe71a3c8c65d",
+  "runtimeId": "8e2ae55ce554faaf76f7c0ff9cedf6f4a3b16fa777f7be5f7d2db5d8a689ff18",
+  "sourceHash": "ad4dad398200bb284826df045a741c7d761635cb8d5232b75c6816272c833a3d",
+  "instanceId": "00000000000064ec000000a79464c496",
+  "attemptId": "f28bd45cb0bf91ae38acb48ac2f99fd6",
+  "enteredAt": "719793842517",
+  "observedExitAt": "719807830993",
+  "armedAt": "719793792093",
+  "conservativeHangToExitUpperBoundMs": 1403.89,
+  "mainObservedEntryToExitMs": 1398.8476,
+  "physicalExitVerified": true,
+  "exactHangOnsetMeasured": false,
+  "measurementOrigin": "Main QPC persisted before GO permits authored create; includes dispatch and persistence delay",
+  "readyBeforeHang": false,
+  "actualResolumeTested": false,
+  "recoveryImageTested": false,
+  "gpuResourceCleanupVerified": false,
+  "experimentId": "356838a2-853c-420b-a163-b3a689118635",
+  "markerCount": 2,
+  "firstAttemptOnly": true,
+  "callbacksAfterFirstStop": 170,
+  "hashes": [
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\installed-init-stop\\artifacts\\installed-init-stop\\experiments\\356838a2-853c-420b-a163-b3a689118635\\installed-init-hang-armed-f28bd45cb0bf91ae38acb48ac2f99fd6.json",
+      "sha256": "d8b8b6830eaa0af58a8818f08cea52377b5706a4dc83821f9fe05572b6e9714d"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\installed-init-stop\\artifacts\\installed-init-stop\\experiments\\356838a2-853c-420b-a163-b3a689118635\\installed-init-hang-entered-22ef01cfe88b51fc4d730c728ead9b4b.json",
+      "sha256": "c1fa299aeae6accf3f41a7fd8429716707f3ba0c10111aa074f7448cde20b0f1"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\installed-init-stop\\artifacts\\installed-init-stop\\experiments\\356838a2-853c-420b-a163-b3a689118635\\installed-init-hang-entered-f28bd45cb0bf91ae38acb48ac2f99fd6.json",
+      "sha256": "f6010550c187af2f6a117ae3b8cb8fed77e1b2d7b74e6e9bd1c572e8ea9f2990"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\installed-init-stop\\artifacts\\installed-init-stop\\profile\\local\\Lux\\Installed\\instances\\8e2ae55ce554faaf76f7c0ff9cedf6f4a3b16fa777f7be5f7d2db5d8a689ff18\\00000000000064ec000000a79464c496.attempts\\f28bd45cb0bf91ae38acb48ac2f99fd6.lifecycle.jsonl",
+      "sha256": "ef546d39d1b9701bb7f1fb5384f4a457ffb650c6fbd2bd90e69c59791aac9b9f"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\installed-init-stop\\artifacts\\installed-init-stop\\receiver.jsonl",
+      "sha256": "aa569d35da608fc746136e2054684b58c13ecbc70c9d828401b7a9fd6777de2c"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\installed-init-stop\\artifacts\\installed-init-stop\\last-experiment.json",
+      "sha256": "2edaa0268dd90a590ce5f2415615ff49cc10746dc1b4efe3d6dd451129d3d157"
+    }
+  ],
+  "scope": "Conservative initialization hang physical stop from persisted pre-GO origin; retry may be cut short by normal host exit. No recovered image or exact worker onset claim."
+}
