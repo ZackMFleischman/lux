@@ -62,6 +62,19 @@ try {
   await page.getByLabel('Live performance').waitFor();
   report.performanceText = await page.getByLabel('Live performance').innerText();
   await page.locator('summary').filter({ hasText: /^Performance$/ }).click();
+  // Keep default-lane UI work active while frame notifications arrive. This
+  // reproduced the real React nested-update failure before view coalescing.
+  const monitor = page.locator('summary').filter({ hasText: /^Performance$/ });
+  const startingFrame = BigInt((await call('status')).authoring.frameId);
+  for (let step = 0; step < 12; step++) {
+    await monitor.click();
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await monitor.click();
+    await new Promise(resolve => setTimeout(resolve, 250));
+  }
+  const settled = await call('status');
+  assert.ok(BigInt(settled.authoring.frameId) > startingFrame + 30n, 'Preview keeps advancing during repeated UI interactions');
+  report.steadyPerformance = settled.performance;
   await call('playback', { ...playbackTarget, action: 'pause' });
   report.checks.push('Real running CPU/GPU capability telemetry reaches agent status and the collapsed monitor without claiming budget acceptance');
   const target = () => ({ instanceId: runtime.instanceId, expectedGeneration: runtime.generation, expectedRevisionId: runtime.revisionId, expectedControlSchemaHash: runtime.controlSchemaHash });
