@@ -15,6 +15,14 @@ function invalid(graph:unknown, definitions:unknown, path:RegExp, rule:RegExp) {
     assert.ok(error.message.length<=768); return true;
   });
 }
+test('long invalid data paths retain the violated rule in bounded diagnostics',()=>{
+  const f=basic();
+  let nested:unknown=undefined;
+  for(let i=0;i<10;i++)nested={['x'.repeat(96)]:nested};
+  (f.graph as any).extra=nested;
+  invalid(f.graph,f.definitions,/^graph\.extra\./,/expected JSON data value/);
+});
+
 test('basic graph is detached, recursively frozen and locally authentic',()=>{
   const f=basic(), saved=clone(f), result=validateGraph(f.graph,f.definitions);
   assert.ok(isValidatedGraph(result)); assert.ok(!isValidatedGraph(clone(result)));

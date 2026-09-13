@@ -10,7 +10,10 @@ const stringify = JSON.stringify;
 const encoder = new TextEncoder();
 const compare = (a:string,b:string) => a<b?-1:a>b?1:0;
 function invalid(path:string, rule:string): never {
-  throw Object.assign(new Error(`${path}: ${rule}`.slice(0,768)), {code:'INVALID_GRAPH',path});
+  // Reserve message space for the violated rule even when the raw path is long.
+  const location=path.length>384?`${path.slice(0,381)}...`:path;
+  const reason=rule.length>380?`${rule.slice(0,377)}...`:rule;
+  throw Object.assign(new Error(`${location}: ${reason}`), {code:'INVALID_GRAPH',path});
 }
 type Inspected = { array:boolean; entries:readonly (readonly [string,unknown])[] };
 
