@@ -62,3 +62,45 @@ The test runner required normal subprocess execution for esbuild after sandbox
 native producer, GPU workload or Resolume was launched. No physical-stop timing,
 GPU teardown, current-host-value consumed-frame recovery within five seconds,
 automatic retry window or installed cold-start gate is claimed by these tests.
+
+## Current-state reconciliation — 13 September 2026 UTC
+
+Inspected stable checkpoint `b3b72ba`. The sections above retain the earlier
+CPU-only audit; their **explicit-only Studio recovery** and **three total installed
+starts** descriptions are historical and are superseded by the implementation
+below. This reconciliation changes no policy or numerical acceptance budget.
+
+| Area | Implemented at this checkpoint | Evidence boundary |
+| --- | --- | --- |
+| Studio automatic retry | `StandaloneClient.fault` uses monotonic fault timestamps. A first fault, or a fault at least 30 seconds after the previous fault, permits one cached restart queued after 250 ms. A second fault within that window suppresses automatic restart. Failed automatic startup terminates that candidate without a retry storm; passage of time alone does not restart a suppressed runtime. | Deterministic lifecycle tests cover first/second faults, failed retry startup, the 30-second boundary, and queued retry cancellation. This is implemented policy, not measured physical-stop/recovery acceptance. |
+| Studio retry ownership | Automatic recovery uses the accepted linked source and its schema, original assets and latest admitted full control snapshot, without compilation. It advances generation and preserves the last acknowledged playing/paused state. Source replacement cancels an old queued retry; a new source does not inherit old unacknowledged control intent. | Generic numeric controls now use schema/revision guards; legacy Intensity remains compatible. A retained intent is not a successful acknowledgement of the failed original command. |
+| Studio explicit recovery | Guarded Restart remains available after suppression or a failed automatic candidate. It cancels the queued automatic action and reuses the accepted closure. It retains fault history rather than granting a fresh automatic retry budget; explicit restart from failed playback starts paused. | Worker-ready and successful cached restart are functional endpoints, not independently observed host-consumed recovery. |
+| Installed recovery | `InstanceRegistry.fault` applies the same previous-fault/30-second eligibility rule on the supervisor's monotonic clock, with a 250 ms retry delay. Successful activation does not clear fault history. The old fixed three-start cap is gone. A suppressed attached instance stays failed; removing and re-adding it resets its policy through a new registry entry. | Registry tests cover suppression, healthy generations, exact-window eligibility, removal/re-attachment and rejected backward clocks. There is no separate installed Restart command. |
+| Cleanup and health | Studio still marks the worker terminal, removes handlers/timers and rejects pending work before requesting termination. Installed failure awaits forced producer stop before retry; removal retains draining ownership/capacity. Installed health defaults remain 15 s startup, 2.5 s heartbeat and 4 s frame/output progress, polled every 250 ms. | Browser termination requests, watchdog thresholds and supervisor stop deadlines do not independently establish execution exit or GPU-resource release within the acceptance gate. |
+
+Implementation references: [Studio client](../../apps/studio/src/standalone-client.ts),
+[Studio lifecycle tests](../../tests/studio/runtime-lifecycle.test.ts),
+[installed registry](../../apps/installed-runtime/src/registry.cjs), and
+[registry tests](../../tests/unit/installed-registry.test.cjs).
+
+The [integrated Studio evidence](../../evidence/tracer-0.1/parameters-images-studio/validation.md)
+records real scene-v3 save/open and cached restart retaining generic controls,
+PNG/JPEG originals and rendered output. Failed code and missing required images
+retain the previous working runtime. These functional checks supersede the older
+Intensity-only scope, but do not inject and independently observe a complete
+physical failure/recovery attempt.
+
+The [installed image fixture](../../evidence/tracer-0.1/parameters-images-studio/installed-image.md)
+records packaged PNG output matching Studio, fixture exit 0 and outer Job
+descendant-cleanup confirmation. It does **not** exercise restart recovery or
+measure injection-to-execution-stop. Its 4,405.5242 ms first-output observation is
+startup from the first native callback, not recovery from an explicit restart.
+
+`packages/performance/recovery.ts` now evaluates independently supplied stop and
+consumed-reference-frame endpoints and rejects incomplete/lost evidence. Its CPU
+fixtures validate arithmetic and identity checks; overall hardware acceptance
+remains unavailable. The required **2 s injected-JavaScript physical stop** and
+**5 s explicit restart to a host-consumed reference frame with current host
+controls**, host responsiveness, GPU teardown and real Resolume failure recovery
+remain unverified. Do not substitute a terminate request, worker-ready response,
+successful clean shutdown or startup timing for those endpoints.

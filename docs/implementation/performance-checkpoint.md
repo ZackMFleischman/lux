@@ -40,3 +40,44 @@ Then integrate bounded native opportunity/receipt/consumption recording and comp
 The bounded CPU evaluator is now in `packages/performance/evaluate.ts`, with its normalized record contract in the adjacent README. Independent review corrections are integrated through 3956931; 19 synthetic tests validate window/freshness, exact control-version causality, skipped first-rendered frames, immutable frame metadata and final-stimulus drain accounting. Overall hardware acceptance and unimplemented metric gates remain unavailable. This is evaluator validation, not a measured host result.
 
 User direction now prioritizes real creative workflow feedback; see current-priorities.md. Do not begin the native instrumentation/collector work described above as a prerequisite for creating visuals in Studio. Preserve this design and resume the remaining measurement work for release readiness or a concrete performance problem encountered during creation.
+
+## Current-state reconciliation — 13 September 2026 UTC
+
+Inspected stable checkpoint `b3b72ba`. Earlier coverage tables and proposed work
+above describe their original checkpoints. The following delivered measurements
+supersede statements that Studio has only unavailable gauges, no GPU query
+collector, scalar-only controls, or aggregate-only native callback records.
+The [performance design](../design/performance-monitoring.md) and
+[acceptance procedure](tracer-acceptance.md) continue to own all numerical gates;
+no budgets or workload requirements are changed here.
+
+| Area | Delivered implementation / recorded observation | Still not established |
+| --- | --- | --- |
+| Studio CPU and frame measurements | The worker records update call, synchronous render call, asynchronous render await and queue-completion wait separately. CPU-call quantiles sum update/render per frame. Completed worker-frame rate is exposed through MCP and the collapsed monitor. | Thenable render continuations cannot be separated into CPU time from await wall time and mark CPU coverage incomplete. Worker fps is not host delivery or physical UI cadence. No complete CPU-budget workload is recorded. |
+| Studio GPU measurements | Actual adapter `timestamp-query` support is requested and render/compute passes are measured through a bounded three-slot query/readback pool. Per-frame pass sums feed quantiles. The integrated sphere run observed live query measurements. | Copies, uploads and clears outside passes are excluded and explicitly mark coverage incomplete. Queue waits are not GPU cost. Native bridge GPU cost and complete GPU attribution/paired overhead remain unverified. |
+| Collection and receiver validity | `live.mjs` bounds records to 4,096, retains up to 120 seconds and publishes summaries every 500 ms. Invalid, lost, expired, pending and incomplete samples remain explicit. The parent validates schema/sequence/window/owner and marks silent telemetry stale after 1,500 ms. | Routine summaries do not provide the independent full acceptance window or prove loss-free end-to-end host collection. They never turn metric values into budget passes. |
+| Native opportunities and provenance | Ring v4 carries schema-aware full host control snapshots and an explicit frame-provenance representation. A bounded native queue records QPC host opportunities, selected frames, copy completion and loss; log output labels correspondence `unavailable` or `producer-claim-unverified`. | Worker-frame-to-Electron-compositor correspondence is not independently established. Current controls cannot substitute for frame-pinned provenance. The 600-version consumed-control test, full cadence/freshness/gap run, exact connection-delay endpoints and callback-duration gate remain unverified. |
+| UI behavior under measurements | After the extra scheduler delay was removed, real stable Studio exposed React update-depth failures. The committed fix coalesces frame/metric notifications at the React boundary every 100 ms while owner/control/playback/fault/job changes remain immediate and raw MCP/capture state stays current. | Functional responsiveness and bounded notification tests are not calibrated input-to-physical-presentation latency, nor paired instrumentation-overhead measurements. |
+| Recovery | One automatic retry with previous-fault/30-second suppression is implemented in Studio and installed playback; full control snapshots survive cached restart. A recovery evidence evaluator is delivered. | Physical execution stop, GPU teardown and explicit restart-to-correct-host-consumption budgets remain unverified; see the updated [recovery checkpoint](recovery-checkpoint.md). |
+
+Implementation references: [routine measurement contract](../../packages/performance/LIVE.md),
+[worker](../../apps/studio/src/visual-worker.mjs),
+[receiver](../../apps/studio/src/performance/performance-state.ts),
+[native opportunity/provenance contract](../../native/texture-bridge/include/frame_telemetry.h),
+and [offline evaluator](../../packages/performance/README.md). These delivered
+components narrow the earlier implementation gaps; their existence does not
+certify provenance, full workload coverage or budgets.
+
+Recorded evidence, with scopes kept separate:
+
+- [Integrated and stable Studio validation](../../evidence/tracer-0.1/parameters-images-studio/validation.md): generic controls, common-image pixels/alpha, save/open/restart, and real CPU/GPU observations passed their functional checks. Stable `b0a844f` completed the parameter harness with zero page errors and 24 monitor toggles during playing output. Its final short interval observed 58.3 worker fps and zero lost/invalid records. This is not a 60 Hz host acceptance run; excluded GPU work still makes pass coverage incomplete.
+- [Installed native image fixture](../../evidence/tracer-0.1/parameters-images-studio/installed-image.md): a private installed package, with Studio closed, rendered PNG-over-white output matching the Studio reference. The 10-second fixture recorded 343 callbacks, summary loss zero, first output 4,405.5242 ms after the first callback, and confirmed descendant cleanup. There was no file-cache clearing. This is neither the 300-second workload nor a complete cold/warm/additional-source startup comparison. It does not verify transparent host composition, live FFGL gestures, multiple-instance persistence or recovery.
+
+Generic controls, image admission/offline packaging and routine measurements are
+therefore delivered functional capabilities, rather than prerequisites still
+awaiting implementation as the earlier tables imply. Actual Resolume image/alpha
+and control behavior, the locked host workload, complete CPU/GPU/control/UI timing,
+collection calibration and paired overhead, startup categories and physical
+stop/recovery acceptance remain open. Preserve missing or unverified measurements
+as unavailable; do not infer a pass from functional screenshots, short intervals,
+synthetic evaluator results or unverified frame-correspondence fields.
