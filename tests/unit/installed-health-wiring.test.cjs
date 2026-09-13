@@ -7,7 +7,7 @@ test('lifecycle telemetry failure cannot prevent native stop or reopen a release
  for(const failAt of ['stop-requested','process-exit-observed','clock','all']){
   const runtimeId='a'.repeat(64),local=path.resolve('fixture/local'),root=path.join(local,'Lux/Installed'),runtime=path.join(root,'runtimes',runtimeId);
   let start,stopCalls=0,active=false,failed=false;const records=[],warnings=[];
-  class Registry{entries=new Map();errors=new Map();constructor(options){start=options.start;}async reconcile(){}}
+  class Registry{entries=new Map();errors=new Map();draining=new Map();constructor(options){start=options.start;}async reconcile(){}}
   const context={__dirname:path.join(runtime,'apps/installed-runtime/src'),performance:{now:()=>0},setInterval(){return 1;},clearInterval(){},setTimeout,
    process:{argv:['node','supervisor','--lux-runtime-id',runtimeId],env:{LOCALAPPDATA:local},on(){},exit(){assert.fail('Unexpected exit');},stderr:{write:value=>warnings.push(value)}},
    require(name){
