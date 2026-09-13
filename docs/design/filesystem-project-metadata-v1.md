@@ -47,7 +47,7 @@ type CodeExport = Pick<ComponentFile,
 
 ## Versioned identity bodies
 
-SHA-256 operates on UTF-8 JSON arrays. Object keys sort by JavaScript code-unit order recursively; arrays preserve order. Numeric semantic metadata normalizes negative zero. Raw file bytes never normalize, and compiler sourceHash uses its existing algorithm unchanged.
+SHA-256 operates on UTF-8 JSON arrays. Object keys sort by JavaScript code-unit order recursively; arrays preserve order. The encoder emits object members directly, so integer-like names such as `10` and `2` retain that lexical order instead of JavaScript's numeric property enumeration order. Numeric semantic metadata normalizes negative zero. Raw file bytes never normalize, and compiler sourceHash uses its existing algorithm unchanged.
 
 | Operation | Exact body |
 | --- | --- |

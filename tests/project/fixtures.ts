@@ -33,14 +33,14 @@ export function fixture() {
   return structuredClone({ project, scenes, components: [shared, helper, unique], assets, pkg, lock });
 }
 // Independently specified canonical metadata/package bodies, not production helpers.
-function canonical(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(canonical);
-  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([k, v]) => [k, canonical(v)]));
-  return value;
+function canonicalJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+  if (value && typeof value === 'object') return `{${Object.entries(value).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([k, v]) => `${JSON.stringify(k)}:${canonicalJson(v)}`).join(',')}}`;
+  return JSON.stringify(value);
 }
 export function documents(f = fixture()): Record<string, Uint8Array> {
-  const manifestHash = hash(JSON.stringify(['lux-project-metadata', 1, 'package', canonical(f.pkg)]));
-  const contentHash = hash(JSON.stringify(['lux-project-package', 1, canonical(f.pkg), Object.entries(f.pkg.files).sort()]));
+  const manifestHash = hash(canonicalJson(['lux-project-metadata', 1, 'package', f.pkg]));
+  const contentHash = hash(canonicalJson(['lux-project-package', 1, f.pkg, Object.entries(f.pkg.files).sort()]));
   f.lock.packages[f.pkg.packageId] = { version: f.pkg.version, manifestHash, contentHash };
   const result: Record<string, unknown> = { 'project.json': f.project, 'assets/manifest.json': f.assets, 'dependencies.lock.json': f.lock, [`libraries/${contentHash}/package.json`]: f.pkg };
   for (const scene of f.scenes) result[`${f.project.scenes[scene.sceneId as keyof typeof f.project.scenes]}/scene.json`] = scene;

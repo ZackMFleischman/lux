@@ -194,3 +194,20 @@ test('package original inventory can retain non-source files without admitting t
   f.pkg.exports.noise.files.push('LICENSE.txt');
   assert.throws(() => validateMetadata('package', f.pkg), /TypeScript path/i);
 });
+
+// Literal canonical bytes are independent of both production and fixture encoders.
+// In particular, object key "10" must precede "2" despite JS index enumeration.
+const numericManifestJson = `{"assets":{},"dependencies":{},"exports":{"noise":{"assets":{},"entry":"src/main.ts","files":["src/main.ts"],"kind":"code","references":[],"sdkVersion":"0.2.0","sourceVersion":2}},"files":{"10":"${h}","2":"${h}","src/main.ts":"${h}"},"format":"lux-package","packageId":"demo/noise","schemaVersion":1,"sdkRange":"0.1.0 || 0.2.0","version":"1.2.3"}`;
+const numericInventoryJson = `[["10","${h}"],["2","${h}"],["src/main.ts","${h}"]]`;
+test('metadata identity preserves the golden lexical bytes for integer-like object keys', async () => {
+  const pkg = fixture().pkg; Object.assign(pkg.files, { '2': h, '10': h });
+  const expected = hash(`["lux-project-metadata",1,"package",${numericManifestJson}]`);
+  assert.equal(expected, 'e5bb46673e7b154d6286bdc112d62773e2702b95d3c05d535c46c82d61e8e1cf');
+  assert.equal(await hashMetadata('package', pkg), expected);
+});
+test('package identity preserves golden manifest bytes as well as sorted inventory pairs', async () => {
+  const pkg = fixture().pkg; Object.assign(pkg.files, { '2': h, '10': h });
+  const expected = hash(`["lux-project-package",1,${numericManifestJson},${numericInventoryJson}]`);
+  assert.equal(expected, 'f508bfdc20a6bcb58ea5c29386e6cb86b2efc727f953b05da959dd55601b1ad5');
+  assert.equal(await hashPackage(pkg, pkg.files), expected);
+});

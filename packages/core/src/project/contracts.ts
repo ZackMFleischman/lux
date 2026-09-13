@@ -114,16 +114,20 @@ export type MetadataOf<K extends MetadataKind> = z.infer<(typeof schemas)[K]>;
 /** Shape/relationship checks within one document. Full admission verifies caches. */
 export function validateMetadata<K extends MetadataKind>(kind: K, input: unknown): MetadataOf<K> { return schemas[kind].parse(input) as MetadataOf<K>; }
 
-function canonical(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(canonical);
-  if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map(key => [key, canonical((value as Record<string, unknown>)[key])]));
-  return Object.is(value, -0) ? 0 : value;
+function canonicalJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+  // Serialize members directly: JSON.stringify(object) reorders integer-index
+  // keys numerically even when the object was constructed in lexical order.
+  if (value && typeof value === 'object') return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${canonicalJson((value as Record<string, unknown>)[key])}`).join(',')}}`;
+  const encoded = JSON.stringify(Object.is(value, -0) ? 0 : value);
+  if (encoded === undefined) throw Error('Expected canonical JSON metadata');
+  return encoded;
 }
 /** Semantic identity, not raw-file identity or the compiler's sourceHash. */
 export async function hashMetadata<K extends MetadataKind>(kind: K, input: unknown): Promise<Hash> {
   const value = validateMetadata(kind, input);
   if (kind === 'scene') await verifySavedControlSnapshot((value as SceneFile).savedControls);
-  return sceneHash(JSON.stringify(['lux-project-metadata', 1, kind, canonical(value)]));
+  return sceneHash(canonicalJson(['lux-project-metadata', 1, kind, value]));
 }
 async function rawHash(bytes: Uint8Array): Promise<Hash> {
   const digest = await crypto.subtle.digest('SHA-256', new Uint8Array(bytes));
@@ -141,8 +145,8 @@ export async function hashPackage(input: unknown, inventory: unknown): Promise<H
   const manifest = validateMetadata('package', input);
   const files = z.record(path, hashSchema).parse(snapshotJsonData(inventory));
   uniquePaths(Object.keys(files));
-  if (JSON.stringify(canonical(files)) !== JSON.stringify(canonical(manifest.files))) throw Error('Package file inventory mismatch');
-  return sceneHash(JSON.stringify(['lux-project-package', 1, canonical(manifest), Object.keys(files).sort().map(path => [path, files[path]])]));
+  if (canonicalJson(files) !== canonicalJson(manifest.files)) throw Error('Package file inventory mismatch');
+  return sceneHash(canonicalJson(['lux-project-package', 1, manifest, Object.keys(files).sort().map(path => [path, files[path]])]));
 }
 
 export type ProjectMetadata = Readonly<{ project: ProjectManifest; scenes: Record<string, SceneFile>; components: Record<string, ComponentFile>; assets: AssetManifest; lock: DependencyLock; packages: Record<string, PackageManifest> }>;
@@ -164,7 +168,7 @@ export async function admitProjectMetadata(input: Record<string, Uint8Array>, su
   }
   const project = read('project.json', 'project'), assets = read('assets/manifest.json', 'assets'), lock = read('dependencies.lock.json', 'lock');
   const installed = toolchain.parse(snapshotJsonData(supportedToolchain));
-  if (JSON.stringify(canonical(installed)) !== JSON.stringify(canonical(lock.toolchain))) throw Error('Unsupported toolchain selection');
+  if (canonicalJson(installed) !== canonicalJson(lock.toolchain)) throw Error('Unsupported toolchain selection');
   const scenes: Record<string, SceneFile> = Object.create(null), components: Record<string, ComponentFile> = Object.create(null), packages: Record<string, PackageManifest> = Object.create(null);
   const identities = new Set<string>();
   function identity(id: string) { if (identities.has(id.toLowerCase())) throw Error('Duplicate UUID identity'); identities.add(id.toLowerCase()); }
@@ -200,7 +204,7 @@ export async function admitProjectMetadata(input: Record<string, Uint8Array>, su
   }
   if (assetCount > projectLimits.assets || assetBytes > projectLimits.assetBytes) throw Error('Project asset quota exceeded');
   for (const pkg of Object.values(packages)) for (const [id, pin] of Object.entries(pkg.dependencies)) {
-    if (!Object.hasOwn(lock.packages, id) || JSON.stringify(canonical(pin)) !== JSON.stringify(canonical(lock.packages[id]))) throw Error('Missing or mismatched package dependency pin');
+    if (!Object.hasOwn(lock.packages, id) || canonicalJson(pin) !== canonicalJson(lock.packages[id])) throw Error('Missing or mismatched package dependency pin');
   }
   checkPackageCycles(packages);
   validateClosures({ project, scenes, components, assets, lock, packages });
