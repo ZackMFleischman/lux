@@ -23,3 +23,25 @@ export function inspectNativeStop({experiment,probe,marker,lifecycle,expected}) 
   return {ok:true,instanceId:marker.instanceId,attemptId:marker.attemptId,triggerAt:probe.triggerAt,observedExitAt:exit[0].observedExitAt,
     upperBoundMs:Number(observed-trigger)*1000/Number(frequency),physicalExitVerified:true,exactHangOnsetMeasured:false,disarmWasWorkerAcknowledged:false,actualResolumeTested:false};
 }
+
+/** Observed current-value recovery of the pinned binary-color fixture. This is
+ * not a first-frame, explicit-restart or recovery-performance measurement. */
+export function inspectNativeRecovery(input) {
+  const stopped=inspectNativeStop(input),{probe,marker,lifecycle,expected}=input;
+  const color=(value,wanted)=>Array.isArray(value)&&value.length===4&&value.every((v,i)=>integer(v)&&v<=255&&Math.abs(v-wanted[i])<=5);
+  assert(probe.recoveryMode===true&&probe.recovered===true&&probe.currentNormalizedValue===0&&color(probe.initialRGBA,[255,0,255,255])&&color(probe.recoveredRGBA,[0,255,255,255]),'Missing recovered cyan/current host value');
+  const recovered=ticks(probe.recoveredAt),observed=ticks(stopped.observedExitAt),frequency=ticks(probe.clock.frequency);
+  assert(ticks(probe.disarmAt)<recovered&&observed<=recovered,'Recovery predates disarm or confirmed old exit');
+  assert(lifecycle.every(row=>row.instanceId===marker.instanceId&&row.releaseId===expected.releaseId&&row.revisionId===expected.revisionId&&/^[a-f0-9]{32}$/.test(row.attemptId)&&row.incomplete===false&&row.lostRecords===0&&row.clock?.domain==='qpc'&&ticks(row.clock.frequency)===frequency),'Incomplete or mismatched recovery evidence');
+  const starts=lifecycle.filter(row=>row.kind==='restart-trigger'&&ticks(row.clock.at)<=recovered);
+  assert(starts.length===2&&starts.filter(row=>row.attemptId===marker.attemptId).length===1,'Expected one original and one retry attempt');
+  const original=starts.find(row=>row.attemptId===marker.attemptId),retry=starts.find(row=>row.attemptId!==marker.attemptId);
+  assert(ticks(original.clock.at)<=ticks(probe.readyAt)&&observed<=ticks(retry.clock.at)&&ticks(retry.clock.at)<=recovered,'Retry did not follow confirmed original exit');
+  assert(lifecycle.every(row=>{
+    if(row.attemptId===marker.attemptId)return true;
+    const at=ticks(row.kind==='process-exit-observed'?row.observedExitAt:row.clock.at);
+    return at>recovered||(row.attemptId===retry.attemptId&&row.kind==='restart-trigger');
+  }),'Retry fault or extra attempt precedes recovered image');
+  return {...stopped,recoveryImageVerified:true,retryAttemptId:retry.attemptId,recoveredAt:probe.recoveredAt,currentNormalizedValue:0,
+    initialRGBA:probe.initialRGBA,recoveredRGBA:probe.recoveredRGBA,firstAcceptedFrameMeasured:false,explicitRestartTested:false,recoveryFiveSecondGateMeasured:false};
+}

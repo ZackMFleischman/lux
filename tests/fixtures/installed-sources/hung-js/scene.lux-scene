@@ -5,7 +5,7 @@
     "sdkVersion": "0.2.0",
     "entry": "visual.ts",
     "files": {
-      "visual.ts": "import { defineVisual } from '@lux/visual-sdk';\nimport { Scene, Mesh, PlaneGeometry, MeshBasicNodeMaterial, OrthographicCamera } from 'three/webgpu';\nimport { vec4 } from 'three/tsl';\n\nexport default defineVisual({\n  controls: { arm: { type: 'number', label: 'Arm test hang', default: 0, min: 0, max: 1, step: 1 } },\n  async create(context) {\n    const material = new MeshBasicNodeMaterial();\n    material.fragmentNode = vec4(1, 0, 1, 1);\n    const geometry = new PlaneGeometry(1.4, 1.4);\n    const scene = new Scene();\n    scene.add(new Mesh(geometry, material));\n    const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);\n    return {\n      update(frame) {\n        if (frame.controls.arm >= 0.5) {\n          console.log('LUX_QA_INSTALLED_HANG_ENTERED');\n          while (true) {}\n        }\n      },\n      render(target) { return context.renderer.render(scene, camera, target); },\n      reset(_seed) {},\n      dispose() { geometry.dispose(); material.dispose(); },\n    };\n  },\n});\n"
+      "visual.ts": "import { defineVisual } from '@lux/visual-sdk';\nimport { Scene, Mesh, PlaneGeometry, MeshBasicNodeMaterial, OrthographicCamera } from 'three/webgpu';\nimport { vec4, uniform } from 'three/tsl';\n\nexport default defineVisual({\n  controls: { arm: { type: 'number', label: 'Arm test hang', default: 0, min: -1, max: 1, step: 1 } },\n  async create(context) {\n    const material = new MeshBasicNodeMaterial();\n    const recovered = uniform(0);\n    material.fragmentNode = vec4(recovered.oneMinus(), recovered, 1, 1);\n    const geometry = new PlaneGeometry(1.4, 1.4);\n    const scene = new Scene();\n    scene.add(new Mesh(geometry, material));\n    const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);\n    return {\n      update(frame) {\n        recovered.value = frame.controls.arm < 0 ? 1 : 0;\n        if (frame.controls.arm >= 0.5) {\n          console.log('LUX_QA_INSTALLED_HANG_ENTERED');\n          while (true) {}\n        }\n      },\n      render(target) { return context.renderer.render(scene, camera, target); },\n      reset(_seed) {},\n      dispose() { geometry.dispose(); material.dispose(); },\n    };\n  },\n});\n"
     }
   },
   "settings": {
@@ -15,20 +15,20 @@
     "seed": 0
   },
   "controls": {
-    "sourceHash": "4360862d38c743c2d54c9fde150912f15a77b926ba46f1fad730b89224005acf",
+    "sourceHash": "9fea4b0c36d44b5faa75a0126d38b23380f31e9889ebce722c1be5d8b09a9d5d",
     "schema": [
       {
         "id": "arm",
         "type": "number",
         "label": "Arm test hang",
         "default": 0,
-        "min": 0,
+        "min": -1,
         "max": 1,
         "step": 1,
         "changeCost": "live"
       }
     ],
-    "schemaHash": "bf3b578c86ffa7b303afafc8cd6a0b87f243a593df65c133ca0d30d60d86c2be",
+    "schemaHash": "e47323acd0030ef5916c85a3e1c3c06bb6472bfbe900dacdcb5ba443214d8ba4",
     "values": {
       "arm": 0
     }
