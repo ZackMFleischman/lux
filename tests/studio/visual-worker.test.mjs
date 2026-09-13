@@ -5,6 +5,7 @@ import { webcrypto, createHash } from 'node:crypto';
 import { build } from 'esbuild';
 import { fileURLToPath } from 'node:url';
 import { canonicalControlSchemaJson, normalizeControlDeclarations } from '../../packages/runtime-contracts/src/parameters.mjs';
+import { decode } from 'fast-png';
 const schema=normalizeControlDeclarations({height:{type:'number',label:'Height',default:1,min:0,max:4},speed:{type:'number',label:'Speed',default:0.5,min:0,max:2}});
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const bundle=(await build({entryPoints:[fileURLToPath(new URL('../../apps/studio/src/visual-worker.mjs',import.meta.url))],bundle:true,write:false,format:'esm',platform:'browser',logLevel:'silent'})).outputFiles[0].text;
@@ -24,7 +25,7 @@ async function fixture(controls=schema,declared=controls,mutation='',sdkVersion=
   });
   vm.runInContext('const parseForHarness=JSON.parse; globalThis.deliver=raw=>onmessage({data:parseForHarness(raw)});',context);
   const visualCode=`${mutation}
-    export class WebGPURenderer {backend={isWebGPUBackend:true};setSize(){}async init(){}setRenderTarget(){}render(){}dispose(){}async readRenderTargetPixelsAsync(){return new Uint8Array(4);}}
+    export class WebGPURenderer {backend={isWebGPUBackend:true};setSize(){}async init(){}setRenderTarget(){}render(){}dispose(){}async readRenderTargetPixelsAsync(){const pixels=new Uint8Array(1920*1080*4);pixels.set([188,0,0,128]);return pixels;}}
     export class RenderTarget{texture={};dispose(){}} export const SRGBColorSpace='srgb';
     export class MeshBasicNodeMaterial {dispose(){}} export class QuadMesh {constructor(material){this.material=material;}render(){}} export const sampleTexture=()=>({});
     export default {sdkVersion:${JSON.stringify(sdkVersion)},controls:${typeof declared==='string'?declared:JSON.stringify(declared)},async create(){recordCreate();return {update(frame){recordFrame(frame)},${gpuTimed?'render(){gpuDraw();}':timed?'async render(){advanceClock(7);await Promise.resolve();advanceClock(11);}':'render(){}'},reset(){},dispose(){}}}};`;
@@ -68,6 +69,7 @@ test('actual worker applies complete initial/live controls and captures exact me
   assert.equal(applied.type,'status');assert.deepEqual(f.frames.at(-1).controls,{height:2,speed:1.5});
   const reset=await f.send({type:'playback',requestId:'reset',action:'reset'});assert.deepEqual(reset.controls,applied.controls);assert.equal(reset.clockEpoch,1);
   const capture=await f.send({type:'capture',requestId:'capture'});assert.equal(capture.type,'capture');assert.deepEqual(capture.metadata.controls,applied.controls);assert.equal(capture.metadata.controlSchemaHash,f.initial.controlSchemaHash);assert.equal(capture.metadata.controlSequence,1);
+  assert.deepEqual(Array.from(decode(new Uint8Array(capture.bytes)).data.slice(0,4)),[255,0,0,128]);
 });
 test('actual worker supports empty controls and rejects mismatched metadata before create',async()=>{
   const empty=await fixture([]);assert.equal((await empty.send(empty.initial)).type,'ready');assert.deepEqual(empty.frames[0].controls,{});

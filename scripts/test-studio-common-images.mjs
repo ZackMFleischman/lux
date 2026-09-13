@@ -78,7 +78,7 @@ try {
     return call('parameters', { instanceId: runtime.instanceId, expectedGeneration: runtime.generation,
       expectedRevisionId: runtime.revisionId, expectedControlSchemaHash: runtime.controlSchemaHash, values });
   }
-  async function capture(name, expected, { alphaOnly = false, tolerance = 5 } = {}) {
+  async function capture(name, expected, { tolerance = 5 } = {}) {
     const response = await raw('capture'); assert.equal(response.isError, undefined, JSON.stringify(response));
     const bytes = Buffer.from(response.content.find(part => part.type === 'image').data, 'base64');
     await writeFile(join(output, `${name}.png`), bytes);
@@ -90,11 +90,32 @@ try {
       const at = (Math.floor(y * image.height) * image.width + Math.floor(x * image.width)) * image.channels;
       return [...image.data.slice(at, at + 3), image.channels === 4 ? image.data[at + 3] : 255];
     }));
-    for (let region = 0; region < 4; region++) for (const channel of alphaOnly ? [3] : [0,1,2,3]) {
+    for (let region = 0; region < 4; region++) for (const channel of [0,1,2,3]) {
       assert.ok(Math.abs(samples[region][channel] - expected[region][channel]) <= tolerance,
         `${name} region ${region} channel ${channel}: expected ${expected[region]}, got ${samples[region]}`);
     }
     const record = { name, samples, metadata: parse(response) }; report.captures.push(record); return record;
+  }
+  async function previewOver(background) {
+    // Browser compositing consumes premultiplied *encoded* sRGB, unlike the
+    // scene's linear-light accumulation tested below. This catches double
+    // premultiplication and halo errors that a correct capture alone misses.
+    const canvas = page.locator('.preview-surface canvas');
+    await canvas.evaluate((element, value) => { element.style.backgroundColor = value ? '#fff' : '#000'; }, background);
+    const bytes = await canvas.screenshot();
+    await writeFile(join(output, `preview-over-${background ? 'white' : 'black'}.png`), bytes);
+    const image = decode(bytes), samples = [];
+    let region = 0;
+    for (const y of [0.25, 0.75]) for (const x of [0.25, 0.75]) {
+      const at = (Math.floor(y * image.height) * image.width + Math.floor(x * image.width)) * image.channels;
+      const source = originalPixels[region++], alpha = source[3] / 255;
+      const expected = source.slice(0, 3).map(value => Math.round(value * alpha + 255 * background * (1 - alpha)));
+      const actual = Array.from(image.data.slice(at, at + 3)); samples.push(actual);
+      expected.forEach((value, channel) => assert.ok(Math.abs(actual[channel] - value) <= 5,
+        `Browser alpha composition on ${background}: expected ${expected}, got ${actual}`));
+    }
+    report.captures.push({ name: `preview-over-${background ? 'white' : 'black'}`, samples });
+    await canvas.evaluate(element => element.style.removeProperty('background-color'));
   }
   await until(state => state.source.files[state.source.entry]?.length, 'initial example');
   await page.locator('.layout-tools summary').click();
@@ -102,10 +123,13 @@ try {
   if (await page.locator('.layout-tools').evaluate(element => element.open)) await page.locator('.layout-tools summary').click();
   const imported = await importImage('alpha.png', 'image/png', png);
   await build(scene(imported.source.assets));
-  await capture('png-alpha', originalPixels, { alphaOnly: true, tolerance: 2 });
+  // Transparent output must be straight RGB, not merely preserve alpha. Hidden
+  // input blue at alpha zero is canonical transparent black after composition.
+  await capture('png-alpha', [originalPixels[0], originalPixels[1], [0,0,0,0], originalPixels[3]], { tolerance: 3 });
+  await previewOver(0); await previewOver(1);
   await parameters({ backdrop: 0 }); await capture('png-over-black', over(originalPixels, 0));
   await parameters({ backdrop: 1 }); await capture('png-over-white', over(originalPixels, 1));
-  report.checks.push('PNG file-input admission and actual GPU alpha 128/255/0/64; linear-sRGB composition over black and white');
+  report.checks.push('PNG straight RGBA capture, browser alpha composition, and linear scene composition over black and white');
 
   const beforeReplace = await call('read');
   await page.getByRole('button', { name: 'View assets/alpha.png', exact: true }).click();

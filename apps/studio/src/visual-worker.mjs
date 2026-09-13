@@ -1,3 +1,4 @@
+import { encodeCapturedTarget } from './capture-png.mjs';
 // Generated modules run only in this dedicated browser worker. No Node or
 // desktop bridge is exposed here. The parent owns termination and promotion.
 import { RuntimeClock } from '../../../packages/runtime/src/clock.ts';
@@ -69,6 +70,10 @@ async function initialize(message) {
   if (!renderer.backend.isWebGPUBackend) throw Error('WebGPU backend required');
   outputTarget = new module.RenderTarget(settings.width, settings.height);
   outputTarget.texture.colorSpace = module.SRGBColorSpace;
+  // This attachment stores E(premultiplied linear RGB). Sampling decodes it
+  // back to linear. Pinned Three RenderOutputNode handles the screen boundary:
+  // unpremultiply -> encode sRGB -> premultiply for the canvas compositor.
+  // Do not premultiply this presentation material again.
   const material = new module.MeshBasicNodeMaterial();
   material.fragmentNode = module.sampleTexture(outputTarget.texture);
   presentation = new module.QuadMesh(material);
@@ -106,11 +111,8 @@ onmessage = event => {
         // Same completed output as presentation; no user-code rerender during
         // capture. The serialized execution queue pins it until encoding ends.
         const pixels = await renderer.readRenderTargetPixelsAsync(outputTarget, 0, 0, settings.width, settings.height);
-        const image = new OffscreenCanvas(settings.width, settings.height);
-        image.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(pixels.buffer, pixels.byteOffset, pixels.byteLength), settings.width, settings.height), 0, 0);
-        const blob = await image.convertToBlob({ type: 'image/png' });
-        if (blob.size > 8388608) throw Error('Capture exceeds 8 MiB');
-        const bytes = await blob.arrayBuffer();
+        const png = encodeCapturedTarget(pixels, settings.width, settings.height);
+        const bytes = png.slice().buffer;
         const metadata = { ...state(), timeSeconds: lastTime, width: settings.width, height: settings.height, seed: settings.seed, colorSpace: 'srgb', alphaMode: 'straight' };
         postMessage({ type: 'capture', ...identity, requestId: message.requestId, metadata, bytes }, [bytes]);
       } catch (error) { send('capture-error', { requestId: message.requestId, message: String(error.message) }); }
