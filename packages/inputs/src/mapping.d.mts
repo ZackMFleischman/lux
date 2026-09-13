@@ -27,3 +27,23 @@ export function normalizeNumericMappingPlan(input: unknown): NumericMappingPlan;
 /** Both arguments are revalidated as data; readonly types confer no trust. */
 export function evaluateNumericMappings(plan: NumericMappingPlan, frame: MappingFrame): MappingResult;
 export const inputMappingLimits: Readonly<{ targets: 256; bindings: 256; sources: 256; nodeDepth: 8; metadataBytes: 262144 }>;
+
+export type BindingSmoothing = Readonly<{ bindingId: string; tauMs: number }>;
+export type TimedMappingPlan = Readonly<{ version: 2; mapping: NumericMappingPlan; smoothing: readonly BindingSmoothing[] }>;
+export type TimedSignalValue = Readonly<{ source: SourceRef; generation: number; value: number }>;
+export type TimedMappingFrame = Readonly<{
+  epoch: number; deltaMs: number; authority: 'studio' | 'host'; base: readonly InputValue[];
+  signals: readonly TimedSignalValue[]; hostValues: readonly InputValue[];
+}>;
+export type TimedBindingState = Readonly<{ bindingId: string; sourceGeneration: number; value: number }>;
+export type TimedMappingState = Readonly<{ version: 2; planKey: string; epoch: number; bindings: readonly TimedBindingState[] }>;
+export type TimedBindingTrace = BindingTrace & Readonly<{ shaped: number | null; smoothed: number | null }>;
+export type TimedTargetTrace = Omit<TargetTrace, 'bindings'> & Readonly<{ bindings: readonly TimedBindingTrace[] }>;
+export type TimedMappingResult = Readonly<{ version: 2; values: readonly InputValue[]; traces: readonly TimedTargetTrace[]; state: TimedMappingState }>;
+/** Detached bounded plan; smoothing entries normalize into binding order. */
+export function normalizeTimedMappingPlan(input: unknown): TimedMappingPlan;
+/** Exact normalized-plan equality key, not a cryptographic or persistence identity. */
+export function createTimedMappingState(plan: TimedMappingPlan, epoch: number): TimedMappingState;
+/** All inputs are revalidated; caller owns elapsed time, epochs and source generations. */
+export function evaluateTimedNumericMappings(plan: TimedMappingPlan, frame: TimedMappingFrame, state: TimedMappingState): TimedMappingResult;
+export const timedMappingLimits: Readonly<{ metadataBytes: 262144; stateBytes: 524288; maxDeltaMs: 60000; maxTauMs: 60000 }>;

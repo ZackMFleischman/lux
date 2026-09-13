@@ -1,8 +1,9 @@
-// Internal, stateless numeric mapping policy. Call before executing authored code;
+// Internal numeric mapping policy with optional explicit timing state. Call before executing authored code;
 // this boundary does not defend intrinsics already modified by that code.
 import { normalizeControlSchema, validateControlSnapshot } from '../../runtime-contracts/src/parameters.mjs';
 
 export const inputMappingLimits = Object.freeze({ targets: 256, bindings: 256, sources: 256, nodeDepth: 8, metadataBytes: 262144 });
+export const timedMappingLimits = Object.freeze({ metadataBytes: 262144, stateBytes: 524288, maxDeltaMs: 60000, maxTauMs: 60000 });
 const encoder = new TextEncoder();
 const targetFields = ['sceneId', 'nodePath', 'controlId'];
 const bindingFields = ['id', 'phase', 'source', 'target', 'inputMin', 'inputMax', 'outputMin', 'outputMax', 'exponent', 'invert', 'mode', 'enabled'];
@@ -15,15 +16,15 @@ function invalid(path, message) {
 
 // Copy only bounded own data descriptors before any property-value access or
 // JSON encoding. Charge the raw representation, including whitespace in labels.
-function data(input, root) {
+function data(input, root, byteLimit = inputMappingLimits.metadataBytes, depthLimit = 6) {
   let bytes = 0;
   function charge(n, path) {
     bytes += n;
-    if (bytes > inputMappingLimits.metadataBytes) invalid(path, 'metadata exceeds 256 KiB UTF-8');
+    if (bytes > byteLimit) invalid(path, `metadata exceeds ${byteLimit / 1024} KiB UTF-8`);
   }
   function copy(value, path, depth) {
     if (typeof value === 'string') {
-      if (value.length > inputMappingLimits.metadataBytes) invalid(path, 'string exceeds metadata budget');
+      if (value.length > byteLimit) invalid(path, 'string exceeds metadata budget');
       charge(encoder.encode(JSON.stringify(value)).byteLength, path);
       return value;
     }
@@ -33,7 +34,7 @@ function data(input, root) {
       return normalized;
     }
     if (typeof value === 'boolean') { charge(value ? 4 : 5, path); return value; }
-    if (!value || typeof value !== 'object' || depth > 6) invalid(path, 'expected bounded plain data');
+    if (!value || typeof value !== 'object' || depth > depthLimit) invalid(path, 'expected bounded plain data');
     const array = Array.isArray(value), prototype = Object.getPrototypeOf(value);
     if (array ? prototype !== Array.prototype : prototype !== Object.prototype && prototype !== null) invalid(path, 'unexpected prototype');
     if (array) {
@@ -155,7 +156,12 @@ export function normalizeNumericMappingPlan(input) {
 
 export function evaluateNumericMappings(input, inputFrame) {
   const plan = normalizeNumericMappingPlan(input);
-  const frame = fields(data(inputFrame, 'frame'), ['authority', 'base', 'signals', 'hostValues'], 'frame');
+  return evaluate(plan, normalizeFrame(plan, inputFrame));
+}
+
+function normalizeFrame(plan, inputFrame, timed = false) {
+  const frame = fields(data(inputFrame, 'frame'), timed ? ['epoch', 'deltaMs', 'authority', 'base', 'signals', 'hostValues'] : ['authority', 'base', 'signals', 'hostValues'], 'frame');
+  if (timed) { frame.epoch = generation(frame.epoch, 'frame.epoch'); frame.deltaMs = milliseconds(frame.deltaMs, timedMappingLimits.maxDeltaMs, 'frame.deltaMs'); }
   choice(frame.authority, ['studio', 'host'], 'frame.authority');
   const catalogue = new Map(plan.targets.map(row => [targetKey(row.target), row]));
   function values(rows, path, complete) {
@@ -174,12 +180,31 @@ export function evaluateNumericMappings(input, inputFrame) {
   if (frame.authority === 'studio' && host.size) invalid('frame.hostValues', 'Studio authority cannot supply host values');
   const signals = new Map(), sourceIds = new Set(plan.bindings.map(row => sourceKey(row.source)));
   for (const [i, row] of array(frame.signals, inputMappingLimits.sources, 'frame.signals').entries()) {
-    const path = `frame.signals[${i}]`; fields(row, ['source', 'value'], path);
+    const path = `frame.signals[${i}]`; fields(row, timed ? ['source', 'generation', 'value'] : ['source', 'value'], path);
     const key = sourceKey(source(row.source, `${path}.source`));
     if (signals.has(key)) invalid(path, 'duplicate source signal');
-    signals.set(key, finite(row.value, path)); sourceIds.add(key);
+    signals.set(key, { value: finite(row.value, path), generation: timed ? generation(row.generation, `${path}.generation`) : 0 }); sourceIds.add(key);
   }
   if (sourceIds.size > inputMappingLimits.sources) invalid('frame.signals', 'too many distinct source references');
+  return { base, host, signals, epoch: frame.epoch, deltaMs: frame.deltaMs };
+}
+
+function shape(row, value, path) {
+  const offset = finite(value - row.inputMin, path);
+  const ratio = finite(offset / (row.inputMax - row.inputMin), path);
+  const unit = Math.max(0, Math.min(1, ratio));
+  const shaped = finite((row.invert ? 1 - unit : unit) ** row.exponent, path);
+  const scaled = finite((row.outputMax - row.outputMin) * shaped, path);
+  return finite(row.outputMin + scaled, path);
+}
+
+function combine(row, current, mapped, path) {
+  return finite(row.mode === 'replace' ? mapped : row.mode === 'add' ? current + mapped : current * mapped, path);
+}
+
+function evaluate(plan, frame, timing) {
+  const { base, host, signals } = frame;
+  const next = new Map();
   const traces = [], output = [];
   for (const { target: address, definition } of plan.targets) {
     const key = targetKey(address), owned = host.has(key), authored = base.get(key);
@@ -189,22 +214,35 @@ export function evaluateNumericMappings(input, inputFrame) {
       for (const row of plan.bindings) {
         if (row.phase !== phase || targetKey(row.target) !== key) continue;
         const before = current, signal = sourceKey(row.source);
-        let status, mapped = null;
+        let status, mapped = null, shaped = null;
         if (owned) status = 'host-owned';
         else if (!row.enabled) status = 'disabled';
         else if (!signals.has(signal)) status = 'unresolved-source';
         else {
           const path = `evaluation.${row.id}`;
-          const offset = finite(signals.get(signal) - row.inputMin, path);
-          const ratio = finite(offset / (row.inputMax - row.inputMin), path);
-          const unit = Math.max(0, Math.min(1, ratio));
-          const shaped = finite((row.invert ? 1 - unit : unit) ** row.exponent, path);
-          const scaled = finite((row.outputMax - row.outputMin) * shaped, path);
-          mapped = finite(row.outputMin + scaled, path);
-          current = finite(row.mode === 'replace' ? mapped : row.mode === 'add' ? current + mapped : current * mapped, path);
+          const sample = signals.get(signal);
+          shaped = shape(row, sample.value, path);
+          mapped = shaped;
+          if (timing) {
+            const previous = timing.previous.get(row.id), tauMs = timing.taus.get(row.id);
+            if (previous && previous.sourceGeneration === sample.generation && tauMs !== 0) {
+              if (frame.deltaMs === 0) mapped = previous.value;
+              else {
+                const ratio = finite(frame.deltaMs / tauMs, path);
+                const alpha = finite(-Math.expm1(-ratio), path);
+                const difference = finite(shaped - previous.value, path);
+                const adjustment = finite(difference * alpha, path);
+                mapped = finite(previous.value + adjustment, path);
+              }
+            }
+            next.set(row.id, { bindingId: row.id, sourceGeneration: sample.generation, value: mapped });
+          }
+          current = combine(row, current, mapped, path);
           status = 'applied';
         }
-        bindings.push({ bindingId: row.id, phase, status, before, mapped, after: current });
+        const trace = { bindingId: row.id, phase, status, before, mapped, after: current };
+        if (timing) Object.assign(trace, { shaped, smoothed: mapped });
+        bindings.push(trace);
       }
       if (phase === 'macro') afterMacros = current;
     }
@@ -212,5 +250,70 @@ export function evaluateNumericMappings(input, inputFrame) {
     output.push({ target: address, value: effective });
     traces.push({ target: address, authority: owned ? 'host' : 'studio', base: authored, afterMacros, beforeClamp: current, effective, clamped: effective !== current, bindings });
   }
-  return freeze({ version: 1, values: output, traces });
+  if (!timing) return freeze({ version: 1, values: output, traces });
+  const state = { version: 2, planKey: timing.planKey, epoch: frame.epoch, bindings: plan.bindings.filter(row => next.has(row.id)).map(row => next.get(row.id)) };
+  return freeze({ version: 2, values: output, traces, state });
+}
+
+function generation(value, path) {
+  const result = finite(value, path);
+  if (!Number.isSafeInteger(result) || result < 0) invalid(path, 'expected nonnegative safe integer');
+  return result;
+}
+
+function milliseconds(value, limit, path) {
+  const result = finite(value, path);
+  if (result < 0 || result > limit) invalid(path, 'milliseconds outside bounds');
+  return result;
+}
+
+export function normalizeTimedMappingPlan(input) {
+  // The extra wrapper adds one structural level; nested v1 admission retains
+  // its original independent limits and error policy.
+  const raw = fields(data(input, 'plan', timedMappingLimits.metadataBytes, 7), ['version', 'mapping', 'smoothing'], 'plan');
+  if (raw.version !== 2) invalid('plan.version', 'unsupported version');
+  const mapping = normalizeNumericMappingPlan(raw.mapping), byId = new Map();
+  const ids = new Set(mapping.bindings.map(row => row.id));
+  for (const [i, row] of array(raw.smoothing, inputMappingLimits.bindings, 'plan.smoothing').entries()) {
+    const path = `plan.smoothing[${i}]`; fields(row, ['bindingId', 'tauMs'], path);
+    const bindingId = uuid(row.bindingId, `${path}.bindingId`);
+    if (!ids.has(bindingId) || byId.has(bindingId)) invalid(path, 'unknown or duplicate binding');
+    byId.set(bindingId, milliseconds(row.tauMs, timedMappingLimits.maxTauMs, `${path}.tauMs`));
+  }
+  if (byId.size !== ids.size) invalid('plan.smoothing', 'smoothing must cover every binding');
+  const result = { version: 2, mapping, smoothing: mapping.bindings.map(row => ({ bindingId: row.id, tauMs: byId.get(row.id) })) };
+  // Independently bound the constructed normalized representation before
+  // deriving its exact equality key.
+  data(result, 'plan', timedMappingLimits.metadataBytes, 7);
+  return freeze(result);
+}
+
+export function createTimedMappingState(input, epoch) {
+  const plan = normalizeTimedMappingPlan(input);
+  return freeze({ version: 2, planKey: JSON.stringify(plan), epoch: generation(epoch, 'state.epoch'), bindings: [] });
+}
+
+function normalizeState(input) {
+  const raw = fields(data(input, 'state', timedMappingLimits.stateBytes), ['version', 'planKey', 'epoch', 'bindings'], 'state');
+  if (raw.version !== 2) invalid('state.version', 'unsupported version');
+  if (typeof raw.planKey !== 'string' || raw.planKey.length > timedMappingLimits.metadataBytes || encoder.encode(raw.planKey).byteLength > timedMappingLimits.metadataBytes) invalid('state.planKey', 'plan key exceeds 256 KiB UTF-8');
+  const epoch = generation(raw.epoch, 'state.epoch'), ids = new Set();
+  const bindings = array(raw.bindings, inputMappingLimits.bindings, 'state.bindings').map((row, i) => {
+    const path = `state.bindings[${i}]`; fields(row, ['bindingId', 'sourceGeneration', 'value'], path);
+    const bindingId = uuid(row.bindingId, `${path}.bindingId`); unique(ids, bindingId, path);
+    return { bindingId, sourceGeneration: generation(row.sourceGeneration, `${path}.sourceGeneration`), value: finite(row.value, `${path}.value`) };
+  });
+  return { planKey: raw.planKey, epoch, bindings };
+}
+
+export function evaluateTimedNumericMappings(input, inputFrame, inputState) {
+  const plan = normalizeTimedMappingPlan(input), frame = normalizeFrame(plan.mapping, inputFrame, true), state = normalizeState(inputState);
+  const planKey = JSON.stringify(plan), previous = new Map(), ids = new Set(plan.mapping.bindings.map(row => row.id));
+  if (state.planKey === planKey && state.epoch === frame.epoch) {
+    for (const row of state.bindings) {
+      if (!ids.has(row.bindingId)) invalid('state.bindings', 'unknown binding under matching identity');
+      previous.set(row.bindingId, row);
+    }
+  }
+  return evaluate(plan.mapping, frame, { previous, planKey, taus: new Map(plan.smoothing.map(row => [row.bindingId, row.tauMs])) });
 }
