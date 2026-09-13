@@ -26,9 +26,12 @@ async function link() {
     folded.add(key.toLowerCase());
   }
   if (!Object.hasOwn(artifact.modules, artifact.entry) || !Object.hasOwn(artifact.modules, '__lux/sdk.js')) fail('Missing entry or emitted SDK module');
-  if (artifact.artifactVersion===3 && !Object.hasOwn(artifact.modules, '__lux/parameters.js')) fail('Missing SDK parameter policy module');
+  if (artifact.artifactVersion>=3 && !Object.hasOwn(artifact.modules, '__lux/parameters.js')) fail('Missing SDK parameter policy module');
   const { default: getExePath } = await import(pathToFileURL(join(dependencyRoot, 'typescript/lib/getExePath.js')).href);
+  if(artifact.artifactVersion===4 && !Object.hasOwn(artifact.modules,'__lux/components.js')) fail('Missing SDK component policy module');
   const known = {
+    ...(artifact.artifactVersion===4 ? Object.fromEntries(['components.mjs','components.d.mts','component-profile.mjs'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
+    ...(artifact.artifactVersion===4 ? {'compiler/component-declarations.mjs':join(root,'apps/build-worker/src/component-declarations.mjs')} : {}),
     ...await assetDependencyPaths(root),
     'typescript/package.json': join(dependencyRoot, 'typescript/package.json'),
     '@babel/parser/package.json': join(dependencyRoot, '@babel/parser/package.json'),
@@ -70,6 +73,12 @@ async function link() {
     if (['three/webgpu', 'three/tsl', 'three/core'].includes(key)) snapshots.set(key, bytes.toString('utf8'));
   }
   const esbuildPackage = JSON.parse(await readFile(join(dependencyRoot, 'esbuild/package.json'), 'utf8'));
+  if(artifact.artifactVersion===4){
+    for(const name of ['components','parameters']){
+      const expected=(await readFile(known[`contracts/${name}.mjs`],'utf8')).replaceAll('./parameters.mjs','./parameters.js');
+      if(artifact.modules[`__lux/${name}.js`]!==expected)fail('Emitted component policy module mismatch: '+name);
+    }
+  }
   if (esbuildPackage.version !== '0.28.2') fail('Install pinned esbuild 0.28.2');
   const esbuildEntry = join(dependencyRoot, 'esbuild/lib/main.js');
   const esbuildBinary = createRequire(await realpath(join(dependencyRoot, 'esbuild/package.json'))).resolve('@esbuild/win32-x64/esbuild.exe');
@@ -129,7 +138,8 @@ async function link() {
   const sourceMap = output.outputFiles.find(f => f.path.endsWith('linked.js.map')).text;
   const body = linkedBody({ code, sourceMap, bundleHash: artifact.bundleHash, linker,
     ...(artifact.artifactVersion ? {linkedVersion:artifact.artifactVersion,assets:artifact.assets,assetSetHash:artifact.assetSetHash}: {}),
-    ...(artifact.artifactVersion===3 ? {controls:artifact.controls,controlSchemaHash:artifact.controlSchemaHash} : {}) });
+    ...(artifact.artifactVersion>=3 ? {controls:artifact.controls,controlSchemaHash:artifact.controlSchemaHash} : {}),
+    ...(artifact.artifactVersion===4 ? {sdkVersion:artifact.sdkVersion,executionModel:artifact.executionModel,component:artifact.component,componentMetadataHash:artifact.componentMetadataHash}: {}) });
   const linked = { ...body, linkedHash: hash(JSON.stringify(body)) };
   if (Buffer.byteLength(JSON.stringify(linked), 'utf8') > 16777216 - 128) throw violation('Linked ESM result exceeds 16 MiB', 'QUOTA_EXCEEDED');
   return linked;

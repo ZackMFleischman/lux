@@ -10,6 +10,7 @@ import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { SceneFileStore, createSceneDocument } from '../../packages/core/src/scene-file.ts';
 import { prepareTransportScene } from '../../scripts/transport-prepare.mjs';
+import {validateSceneDocument} from '../../packages/core/src/scene-document.ts';
 import { exportSceneDocument } from '../../scripts/studio-export.mjs';
 
 const source = { sourceVersion: 2 as const, sdkVersion: '0.1.0' as const, entry: 'main.ts', files: { 'main.ts': 'export const label = "日本";' }, assets: {} };
@@ -62,4 +63,20 @@ test('asset export reaches validation and invalid source never publishes a trans
       prepare: async () => {throw Error('invalid asset scene source');}, exporter: async () => assert.fail('must not publish'),
     }), /invalid asset scene source/);
   } finally { await rm(directory, { recursive: true, force: true }); }
+});
+test('ordinary Studio rejects internal SDK before clone, compile or job mutation',async()=>{
+ let compiled=0,readFiles=0;
+ const client=new StandaloneClient({compile:async()=>{compiled++;throw Error('compile called');}} as any);
+ const before=client.getSnapshot();
+ const source={sdkVersion:'0.3.0',entry:'main.ts',get files(){readFiles++;throw Error('clone called');}};
+ await assert.rejects(client.submit(source as any),/Unsupported.*SDK/i);
+ assert.equal(compiled,0);assert.equal(readFiles,0);assert.equal(client.getSnapshot(),before);
+});
+test('MCP source-build DTO rejects SDK 0.3 before a handler can mutate draft state',()=>{
+ const source={sdkVersion:'0.3.0',entry:'main.ts',files:{'main.ts':''}};
+ assert.equal(sourceBuildInputSchema.safeParse({expectedDraftVersion:0,source}).success,false);
+ for(const sdkVersion of ['0.1.0','0.2.0'])assert.equal(sourceBuildInputSchema.safeParse({expectedDraftVersion:0,source:{...source,sdkVersion}}).success,true);
+});
+test('all existing scene readers reject internal SDK sources before persistence',()=>{
+ for(const version of [1,2,3])assert.throws(()=>validateSceneDocument({format:'lux-scene',version,source:{sdkVersion:'0.3.0',entry:'main.ts',files:{'main.ts':''},...(version===2?{sourceVersion:2,assets:{}}:{})},settings:{width:1920,height:1080,fps:60,seed:0},controls:{intensity:0.5}}));
 });

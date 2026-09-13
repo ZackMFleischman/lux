@@ -14,7 +14,7 @@ for (const args of [
     join(tests, 'capture-alpha.test.mjs'),
     join(directory, 'dist/view.test.cjs'), join(directory, 'dist/interactions.test.mjs')],
   ['--test', '--test-isolation=none', join(directory, 'dist/source-editor.test.mjs')],
-  ['--experimental-vm-modules', '--test', join(tests, 'visual-worker.test.mjs')],
+  ['--experimental-vm-modules', '--test', join(tests, 'visual-worker.test.mjs'), join(tests, 'component-worker.test.mjs')],
   ['--test','--test-isolation=none',join(root,'tests/performance/live.test.mjs'),join(root,'tests/performance/recovery.test.ts'),join(root,'tests/performance/gpu-pass.test.mjs')],
 ]) {
   const result = spawnSync(process.execPath, args, { cwd: root, stdio: 'inherit', windowsHide: true, timeout: 60000 });

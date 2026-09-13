@@ -158,26 +158,38 @@ errors; subsequent runs passed. The helper remains internal, with no executable
 components, public SDK admission, graph UI, runtime or filesystem-project changes.
 Independent implementation review and integration are owned by the coordinator.
 
-## C02: Executable declaration, compiler and closed resources
+## C02: Internal single-image component compiler and worker bridge
 
-**Files:** add `visual-sdk/src/sdk-components.ts`,
-`runtime-contracts/src/component-runtime.ts`, `build-worker/src/component-declarations.mjs`;
-extend `sdk-selection.mjs`, `compile.mjs`, `artifact-identity.mjs`, `link-runtime.mjs`,
-runtime contract discriminants, SDK discovery and the repo skill. Add
-`tests/compiler/component-declarations.test.mjs`, `component-compiler.test.mjs`.
+The approved scope is [the C02 contract](components-c02-contract.md), including
+its execution-plan corrections and atomic project-v1 SDK capability gate. This
+narrows the earlier broad resource-variant paragraph to a root-output profile:
+SDK0.3.0, artifact4 and linked4, no inputs and one image output. C03-C09 remain gated.
 
-**Interfaces:** consume C01 metadata; produce `defineComponent({metadata,create})`,
-`ComponentInstance` from the architecture and sealed `CompiledComponentArtifact`
-with exact SDK/artifact versions, source/bundle/metadata hashes and port metadata.
-`InputResources`/`OutputResources` are readonly port-ID maps of closed
-`SignalResource | ImageResource` leases; resource identity includes runtime key,
-owning node path and lease generation. Image metadata includes dimensions/color/alpha.
-`NodeFrame` carries tick/time/delta plus this node's ControlValues and empty events.
+Implementation candidate for LUX-8: the existing compiler/linker selects the new
+SDK, seals C01 metadata/control projection, verifies its conditional policy closure,
+and executes through the real visual-worker entry. A two-phase loader validates
+and prepares captured checks before import. Runtime-issued ephemeral image tokens
+admit only the current owner/evaluation. Independent backend settlement and the
+worker GPU queue barrier precede once-only terminal teardown. Cleanup also retains
+the current initialization, draw, reset or capture command until settlement;
+device loss cannot publish a late frame or capture. Failures preserve
+the original error and prevent presentation/capture admission. Forced termination
+cannot acknowledge graceful authored disposal or GPU drain.
 
-- [ ] Freeze an explicit new SDK and artifact discriminant, literal metadata syntax, resource lease constructors and runtime equality check in the slice contract; retain 0.1/0.2 selectors unchanged.
-- [ ] Test AST extraction of aliases, duplicate literal fields, getters, calls, spreads and dynamic metadata without running source. Test tampered sealed metadata and runtime declarations disagreeing with compiler metadata are rejected.
-- [ ] Implement extraction using shared normalization and the existing bounded compiler/linker. Verify new source works through compiler and browser module loading while legacy 0.1/0.2 fixtures still pass.
-- [ ] Run new compiler tests, existing `tests/compiler/sdk-v2.test.mjs`, parameter compiler/identity tests and `pnpm typecheck`. Update/reinstall/check the skill only when actual SDK execution capability is enabled, with partial runtime scope stated.
+Public Studio/MCP, existing scene readers, project-v1 component/direct-export/
+toolchain metadata and installed/export readers retain SDK0.1/0.2 capability.
+The shared internal SourceBundle union alone admits0.3. Public discovery and the
+installed skill are unchanged. The source/agent-contract.ts DTO and StandaloneClient
+both enforce the narrower public gate before their mutation handlers.
+
+CPU validation uses the actual linked envelope code in the actual worker entry
+with fake GPU resources. Compiler/API/identity, project hash/admission, token,
+worker/control/capture/cleanup and installed-reader regression evidence is recorded
+in the worker's `task-C02-completion.md` and `fresh-c02/` raw logs under
+`.superpowers/sdd/components-plan/`. The earlier `task-C02-report.md` remains the
+interrupted worker's historical checkpoint. This does not certify actual GPU
+rendering, graph scheduling, public authoring, installed component playback or the
+broader resource variants. Independent review and serial integration remain required.
 
 ## C03: Pure graph validation and scheduling
 

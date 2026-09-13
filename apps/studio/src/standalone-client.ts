@@ -49,6 +49,8 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
   private publish(patch: Partial<StudioSnapshot>) { this.snapshot = { ...this.snapshot, ...patch, receivedAtMs: Date.now() }; for (const listener of this.listeners) listener(); }
   async submit(source: SourceBundle, options:{savedControls?:SavedControlSnapshot}={}): Promise<void> {
+    if(source.sdkVersion!=='0.1.0'&&source.sdkVersion!=='0.2.0')throw Error('Unsupported Studio SDK');
+    const supportedSdkVersion=source.sdkVersion;
     if(source.sdkVersion==='0.2.0'&&!this.codeDeclaredParameters)throw Error('Code-declared parameters are not enabled in this Studio UI yet');
     if (this.busy) throw Error('A visual build is already running');
     this.cancelAutomaticRetry();
@@ -73,7 +75,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       const saved=options.savedControls?await validateSavedControls(options.savedControls):undefined;
       const previous=this.snapshot.authoring?getRuntimeControlState(this.snapshot.authoring):undefined;
       const initial=initialControlValues(schema,saved??(previous?{schema:previous.controlSchema,values:previous.controls}:undefined));
-      const state:RuntimeControlState={sdkVersion:submittedSource.sdkVersion,controlSchema:schema,controlSchemaHash:schemaHash,controls:initial.values,controlSequence:0};
+      const state:RuntimeControlState={sdkVersion:supportedSdkVersion,controlSchema:schema,controlSchemaHash:schemaHash,controls:initial.values,controlSequence:0};
       this.publish({ jobs: [{ jobId, state: 'initializing', summary: 'Preparing preview…' }] });
       await this.start(linked, result.sourceHash,state,initial.changes);
       this.source = submittedSource;

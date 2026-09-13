@@ -34,8 +34,8 @@ and `create/update/render/reset/dispose`. `parameters.mjs` owns normalization,
 defaults, strict patches and ID/unit/range reconciliation. The compiler reads
 literal metadata without executing authored code and seals artifact v3 control
 metadata. Studio already exposes live sliders, frozen-time redraw and saved
-`SavedControlSnapshot`. BMP, PNG and JPEG are supported. The pinned SDK selector
-still admits only 0.1.0/0.2.0. `visual-worker.mjs` owns the actual update/render
+`SavedControlSnapshot`. BMP, PNG and JPEG are supported. The public SDK selector
+still advertises only 0.1.0/0.2.0. `visual-worker.mjs` owns the actual update/render
 loop; the installed/transport path also has runtime integration to preserve.
 
 At the pre-C01 baseline there was no component registry, typed graph evaluator,
@@ -170,7 +170,17 @@ fields or silently changing existing ControlSchema hashes.
 
 ## Executable definition and typed resources
 
-A later explicitly pinned SDK component entry adds `defineComponent` around the
+C02 implements an unadvertised SDK0.3.0 root-output bridge under the
+[reviewed internal contract](../implementation/components-c02-contract.md).
+It admits no inputs and exactly one linear-premultiplied image output; CPU tests
+execute actual envelope code through the real worker with fake GPU resources.
+Public authoring and actual GPU validation remain pending C04. Project-v1 and
+existing scene/export/installed readers retain SDK0.1/0.2 support. This is a narrow
+exception to the broader resource-variant rollout below, not an image-per-component
+architecture. Tokens are ephemeral runtime ownership checks, not signatures or a
+same-realm sandbox guarantee.
+
+The pinned SDK component entry adds `defineComponent` around the
 same metadata, with an isolated factory. Its first executable version uses a new
 SDK version and artifact discriminant; do not loosen 0.2's sealed literal shape.
 Compiler extraction and runtime definition verification must agree before enabling
@@ -190,7 +200,7 @@ interface ComponentInstance {
 // EvaluationContext: runtime-owned resource/pass builder, never desktop handles.
 ```
 
-Before implementing this interface, add closed resource variants and constructors
+Before broadening this root-only interface for graphs, add closed resource variants and constructors
 alongside their runtime implementations: signal (unit and clock); image (dimensions,
 linear premultiplied color); field (numeric channels, grid and coordinate space,
 no automatic color conversion); geometry/points (attributes and coordinate space);

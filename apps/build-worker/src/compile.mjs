@@ -24,7 +24,7 @@ export async function readCompileResult(resultPath, expectedSource) {
     if(result.ok===true) {
       result.artifact=await verifyArtifact(result.artifact,hash);
       if(expectedSource && (result.artifact.sourceHash!==hash(JSON.stringify(expectedSource)) || result.artifact.sdkVersion!==expectedSource.sdkVersion || (result.artifact.artifactVersion??1)!==sourceArtifactVersion(expectedSource))) throw Error('Compiler source/version identity mismatch');
-      if(expectedSource && (expectedSource.sourceVersion===2 || expectedSource.sdkVersion==='0.2.0') && result.artifact.assetSetHash!==(await deriveAssets(expectedSource.assets??{},hash)).assetSetHash) throw Error('Compiler source asset identity mismatch');
+      if(expectedSource && (expectedSource.sourceVersion===2 || expectedSource.sdkVersion!=='0.1.0') && result.artifact.assetSetHash!==(await deriveAssets(expectedSource.assets??{},hash)).assetSetHash) throw Error('Compiler source asset identity mismatch');
     }
     return result;
   } catch(error) {return failure(error.code || 'SERVICE_UNAVAILABLE',error.message);}

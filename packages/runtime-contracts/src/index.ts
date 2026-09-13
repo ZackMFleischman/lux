@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const SDK_VERSION = '0.1.0' as const;
-export const sourceSdkVersionSchema = z.enum(['0.1.0', '0.2.0']);
+export const sourceSdkVersionSchema = z.enum(['0.1.0', '0.2.0', '0.3.0']);
 export const hashSchema = z.string().regex(/^[a-f0-9]{64}$/);
 export const runtimeKeySchema = z.object({ instanceId: z.string().uuid(), generation: z.number().int().nonnegative().safe() }).strict();
 export type RuntimeKey = z.infer<typeof runtimeKeySchema>;
@@ -58,7 +58,25 @@ export const parameterCompiledArtifactSchema = assetCompiledArtifactSchema.exten
   artifactVersion:z.literal(3),sdkVersion:z.literal('0.2.0'),
   controls:z.array(parameterControlDefinitionSchema).max(32),controlSchemaHash:hashSchema,
 }).strict();
-export const compiledArtifactSchema = z.union([legacyCompiledArtifactSchema,assetCompiledArtifactSchema,parameterCompiledArtifactSchema]);
+// Structural DTO only. The pure C01 policy and identity verifier additionally
+// enforce text/count/canonical-byte bounds, descriptions and control agreement.
+const componentPortSchema = z.object({
+  type:z.union([
+    z.object({kind:z.literal('image'),colorSpace:z.literal('linear-srgb'),alphaMode:z.literal('premultiplied')}).strict(),
+    z.object({kind:z.literal('signal'),value:z.literal('number'),unit:z.string().nullable(),clock:z.literal('frame')}).strict(),
+  ]),label:z.string(),description:z.string(),
+}).strict();
+const componentMetadataDtoSchema = z.object({
+  declarationVersion:z.literal(1),key:z.string(),label:z.string(),description:z.string(),tags:z.array(z.string()),
+  inputs:z.record(componentPortSchema),outputs:z.record(componentPortSchema),
+  controls:z.array(parameterControlDefinitionSchema).max(32),controlDescriptions:z.record(z.string()),
+  lifecycle:z.object({state:z.enum(['stateless','stateful']),reset:z.literal('seed')}).strict(),
+}).strict();
+export const componentCompiledArtifactSchema = parameterCompiledArtifactSchema.extend({
+  artifactVersion:z.literal(4),sdkVersion:z.literal('0.3.0'),executionModel:z.literal('single-image-source-v1'),
+  component:componentMetadataDtoSchema,componentMetadataHash:hashSchema,
+}).strict();
+export const compiledArtifactSchema = z.union([legacyCompiledArtifactSchema,assetCompiledArtifactSchema,parameterCompiledArtifactSchema,componentCompiledArtifactSchema]);
 export type CompiledArtifact = z.infer<typeof compiledArtifactSchema>;
 // A compiled artifact has not run a candidate smoke test and is not a ValidatedBundle.
 export const compileFailureCodeSchema = z.enum(['SOURCE_BOUNDARY_VIOLATION', 'COMPILE_FAILED', 'QUOTA_EXCEEDED', 'TIMEOUT', 'SERVICE_UNAVAILABLE']);
