@@ -18,6 +18,26 @@ const { useDiscardConfirmation } = await import('../../apps/studio/src/Confirmat
 afterEach(() => cleanup());
 after(() => dom.window.close());
 
+test('RTL: frame bursts leave Performance responsive and applied controls publish immediately', async context => {
+  context.mock.timers.enable({ apis: ['setTimeout'] });
+  const fixture = service();
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+  const initialFrame = fixture.client.getSnapshot().authoring!.frameId!;
+  await act(async () => {
+    for (let frame = 100; frame <= 159; frame++) fixture.publish({ frameId: String(frame) });
+  });
+  assert.ok(screen.getByText(initialFrame));
+  assert.equal(screen.queryByText('159'), null, 'worker observations must not synchronously render the full UI');
+  const summary = screen.getByText('Performance');
+  fireEvent.click(summary); assert.equal(summary.parentElement!.hasAttribute('open'), true);
+  fireEvent.click(summary); assert.equal(summary.parentElement!.hasAttribute('open'), false);
+  await act(async () => context.mock.timers.tick(100));
+  assert.ok(screen.getByText('159'));
+  await act(async () => { fixture.publish({ frameId: '160' }); fixture.publish({ intensity: 0.8 }); });
+  assert.equal((screen.getByRole('slider') as HTMLInputElement).value, '0.8');
+  assert.ok(screen.getByText('160'));
+});
+
 test('RTL: discard confirmation is an accessible in-app dialog with safe cancel, Escape and explicit approval', async () => {
   const answers: boolean[] = [];
   function Fixture() { const confirmation = useDiscardConfirmation(); return <>{confirmation.dialog}<button onClick={() => void confirmation.confirm('open').then(answer => answers.push(answer))}>Choose another scene</button></>; }
