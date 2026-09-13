@@ -1,47 +1,46 @@
 # Four-workstream orchestration checkpoint
 
-User grant: task01a09967-d0ac-75d2-bea3-ccda2980ed32, 13 September2026 UTC, authorizes overall orchestration and all four roadmap workstreams; user delegates routine decisions while sleeping. Preserve plans and exact acceptance evidence.
+The user designated this task as the sole coordinator on 13 September 2026 and authorized autonomous execution of all four roadmap workstreams. Routine implementation, review and integration decisions remain delegated. The phone portal works; leave its service running and spend no further work on it.
 
-Conductor project34723eb7-f57d-45c3-8831-adcb2bbfe485; ordinary workflow. Overall agent77de5ef7-a72d-43f2-8d3b-8dabbaef06f1, session27df4cd0-6ac6-41b1-b1ae-41af49240d64, run345554f0-0896-4ea2-8fb4-942317f65fda. Coordination/profile and journal live in docs/conductor-onboarding/team-start.json, team-profile.json and operations/results.jsonl. Never replay changed payloads or recover human fences without authorization.
+## Ownership and current delivery
 
-## Resource and file ownership
+Conductor project: `34723eb7-f57d-45c3-8831-adcb2bbfe485` (LUX). Coordinator identity: `77de5ef7-a72d-43f2-8d3b-8dabbaef06f1`; live session: `27df4cd0-6ac6-41b1-b1ae-41af49240d64`; run: `345554f0-0896-4ea2-8fb4-942317f65fda`. The current registry and actual native host observations are authoritative; source checkpoints are historical snapshots.
 
-- Existing task Identify parallel Lux workstreams (01a0993a-0e08-7ec2-9455-b85075bf2b1c) coordinates ordinary tracked LUX-6/7/8, parentsLUX-2/3. Stable coordinator70a02df3-167b-46c7-913c-49d83b6a871f, session219f0a8c-88c4-4669-8134-a566b9bd7de2. Existing contexts are not retroactive managed launches.
-- LUX-6 merged filesystem1a into components main at f95f3975892bf612bb63b94111893b18b84fff20; combined141/141, project41/41 and both typechecks reported with raw evidence; independent acceptance underway. Shared-main write window is released.
-- C02/LUX-8 reservation: source SDK/artifact/selector/compiler/linker; runtime-contracts/index.ts additive internal profile; visual-worker.mjs, authored-worker-assets, control preparation/narrow cleanup; standalone-client public guards; transport-release/package profile rejection; Studio CPU runner; one atomic project/contracts.ts v1 SDK gate plus tests. New lanes must avoid these until joint coordination.
-- Native2a/LUX-7 reservation: native/project-files/, core/project/filesystem.ts and narrow path adapter; no project contracts.ts change; no GPU.
-- Inputs planning/LUX-9 worktree .worktrees/creative-inputs-plan branch codex/creative-inputs-plan baselinef95f397. Only new creative-inputs-plan.md and its independent review in first ticket.
-- Reliability planning/LUX-10 worktree .worktrees/reliability-plan branch codex/reliability-plan baselinef95f397. Only new reliability-plan.md and its independent review in first ticket; read retained experiment evidence without modifying it.
-- Root owns docs/conductor-onboarding*, overall integration/resource arbitration and root pool (5 slots including root: improver,2workers,1reviewer). Existing external coordinator+2workers are budgeted separately; avoid unnecessary agent proliferation.
-- All graphics/Studio/Resolume tests serialized and explicitly reserved with root. No GPU session currently granted. CPU planning/native metadata work may proceed concurrently.
+Every Lux ticket has an assignee. Root owns the four epics and integration tickets. Each new delivery leaf is assigned before launch; its fresh worker claims only that ticket in its recorded worktree. Reviewers use distinct identities and preserve source/plan evidence. The unassigned-ticket query returned an empty, non-truncated result during this checkpoint.
 
-## Verified environment corrections
+| Workstream | Reviewed and integrated foundation | Current and next delivery |
+| --- | --- | --- |
+| Filesystem projects, LUX-2 | Metadata/C01 main `f95f397`; pure resolver source `e1c8707fe2dd589be084964bda9302f755ed82bb`, integrated as `f1bbe51a42506dc94ff0e03c7fb8806065a9d705`, LUX-24 accepted | LUX-25 offline coding-kit plan, assignee `lux-offline-tooling-plan-01a09967`; fresh independent critique precedes implementation. File acquisition/store/buffers/stage/apply remain separate. |
+| Components, LUX-3 | C02 source `e28a5a8142074463a7aec0309cc81cd6a2977707`, integrated as `c4bdd33a4b38b258fd0a83c5828d20d312fb3e46`, LUX-21 accepted | LUX-23 C03 graph plan source `f9a30161abf24c4f0cf5e90896cdd22a2f1ba337` is under independent critique. Root owns review dispositions; only the exact approved first leaf may be dispatched. |
+| Creative controls and inputs, LUX-4 | I01 mapping source `fab83026`, LUX-16 accepted; I02a timed mapping source `cf09ece81d09279595ab2cfdcc2b392f3b6f1015`, integrated as `7cff0e571731dd8778765093a98f4c4b5867dbdf`, LUX-26 accepted | LUX-27 prepares I02b live timeline, assignee `lux-live-timeline-plan-01a09967`. Replay, runtime adapters and device sources remain later reviewed leaves. |
+| Reliability, LUX-5 | R1 source `c17e679824a0fed79ce52621a0df4fe85cd659d7`, main `d101a16483e354a3612806eb03cbc1107785bc25`, LUX-18 accepted | R2a ownership source `b07888e158773483ad65f94ef29bba3f2b22d063` independently accepted as LUX-22; LUX-28 records its main integration and final native validation. R2b timing/package/paired graphics preparation remains open. |
 
-CON-24: exact installed Conductor executable/home requires require_escalated for every call. LUX-P1: Git ownership caused discovery unknown; process-local exact safe.directory resolved it, no global trust. Git inspections use exact checkout with -c core.excludesFile= -c safe.directory=CHECKOUT and matching -C. Pinned tooling from existing coordinator: C:/Program Files/nodejs/node.exe24.12.0; C:/Program Files/nodejs/corepack.cmd and COREPACK_HOME=C:/Users/zFlei/repos/lux/.worktrees/_tooling/corepack select pnpm10.33.0. PATH pnpm11.19.0/Node24.19.0 mismatch must not be assumed valid. New planner worktrees contain no node_modules; inspect first and do not install just for documentation.
+The former task **Identify parallel Lux workstreams** (`01a0993a-0e08-7ec2-9455-b85075bf2b1c`) and its transferred children stopped their sessions and released claims. Preserve `.worktrees/_coordination/final-coordinator-handoff.md`; do not resume that coordinator or its stopped sessions. The immutable active run profile retains the historical two-coordinator wording, superseded by the explicit user direction above. Its current limit is five contexts including root and the required workflow improver. Do not silently change that profile or infer extra capacity from old external reservations.
 
-## Resume
+## Validation and remaining boundaries
 
-Onboarding LUX-1 submitted review, its session stopped successfully. Team is starting until required improver has real host registration/observation/ack. No new-lane implementation dispatched. Improver launchb7653cfa-7a7f-410b-8f65-783650b2be61 native host/root/workflow_improver is running, awaiting session/registration. Planner identities created; launch intents follow team readiness. Read team show and actual host list before further dispatch; never infer readiness from a saved status string.
+Source acceptance and integration acceptance are separate. Root integrates serially and records the exact landed commit plus source comparison and focused validation. Root integration decisions are ordinary integrator verification; their cited independent source reviews remain distinct evidence.
 
-Onboarding completion: LUX-1 accepted under ordinary author-context verification
-at revision4; the decision explicitly does not claim independent or human review.
-The onboarding session is stopped with no claim. LUX-6 separately received fresh
-independent acceptance at revision5 for integrated mainf95f397; its validator
-session stopped. This makes LUX-7/8 eligible for the existing coordinator's fresh
-workers. Current live run state must be read from Conductor rather than the initial
-starting checkpoint above.
+- C02 main validation: 27 compiler/runtime tests, Studio CPU groups 137+16+27+21, 100 project/export/asset/input/parameter checks, both TypeScript configurations. Groups overlap; these are per-command counts, not unique-test totals. All 37 changed paths matched the accepted source.
+- Resolver plus C02 main validation: 97 project checks, both TypeScript configurations, five compiler cases including ten real contained resolver compilations and component identity/admission regressions. Original helper diagnostics retain exact TS2322 paths at line 2, column 14. All eleven resolver source paths matched.
+- I02a main validation: 55 focused tests and a strict TypeScript declaration fixture against main. Independent source review additionally retained 432 comparisons with the original mapping behavior. All four source paths matched.
+- R1 main validation: pinned Release DLL and CPU targets built, five native CPU checks and seven cadence/options tests passed. The options test executed only `--validate-options`, which returns before graphics. This exception does not authorize host playback.
+- R2a independent source review: seven Release targets built, six native CPU checks passed, 37 native/test source files and 203 vendor files verified, active Release assertions checked. LUX-28 owns new landed-main evidence; source review is not that evidence.
 
-## Sole coordinator checkpoint — 13 September 2026
+C02 remains an internal sealed root-output profile. Public Studio/MCP/project-v1/export admission continues to support existing SDK0.1/0.2 behavior. No graph execution, persisted graph, live input device or new author-facing skill capability is claimed. Later author-facing SDK/source/assets/MCP work must update the repository skill and reinstall/check it.
 
-The user's latest direction supersedes the earlier two-coordinator arrangement: task `01a09967-d0ac-75d2-bea3-ccda2980ed32` is the sole coordinator of all four workstreams. The former coordinator and its C02/resolver children reported completed host states, released claims and stopped sessions; the full handoff is retained at `.worktrees/_coordination/final-coordinator-handoff.md`. Do not resume those stopped sessions. The existing immutable run profile records the historical delegation arrangement; its four-workstream delivery scope continues under this explicit user supersession, without changing the acknowledged profile string.
+LUX-7 remains blocked at its recorded host safety stop. Preserve partial native filesystem files and evidence. No retry, rephrasing or substitute execution of that stopped native acquisition task is authorized by this checkpoint. The pure resolver and offline coding-kit work are independent roadmap slices.
 
-All Lux tickets now use assignees. Root owns the four epics and blocked/prerequisite coordination. Fresh implementation tickets are assigned before launch; reviewers keep independent identities and recorded decisions. Assignee changes wait for active claims to be released through normal submission or handoff. Current tracker revisions and native host observations remain authoritative.
+No GPU/Studio/Resolume reservation is active. Native CPU compilation is distinct from hardware acceptance. The R2b paired diagnostic, physical shutdown/recovery, sustained freshness/performance, real-host behavior and clean-machine distribution gates remain incomplete until their actual setups and raw evidence exist. Never lower their numerical targets, replace fresh images with callback opportunities, or describe a private development directory as a clean machine.
 
-| Workstream | Current delivery path |
-| --- | --- |
-| Filesystem projects | LUX-12 pure resolver plan independently accepted at `037fec859f81e121b934fa7eb74035bc6857a731`; prepare one R3a implementation worker. LUX-7 remains blocked at its recorded host safety stop, with partial evidence preserved. |
-| Components | LUX-8 fresh worker `lux-components-c02-01a09967` continues the preserved uncommitted C02 patch in `component-projects`; actual tests, exact commit and independent review are required before integration. |
-| Creative controls and inputs | LUX-13 I01 mapping source `fab83026c7baadb845bb6617c355dc6c6df421db` submitted with 31 focused tests and declaration audit; fresh independent code review underway. Later input slices retain their individual preparation gates. |
-| Reliability | LUX-10 plan independently accepted at `6221e4b0734446606df460a87ca8f66ea72cd279`; LUX-14 receiver diagnostics assigned to `lux-receiver-diagnostics-01a09967`. Isolated source-only FFGL prerequisite prepared and hash-verified; no hardware acceptance inferred. |
+## Resume protocol and durable evidence
 
-Main integration stays serial and requires focused validation at the exact resulting source. No graphics/Studio/Resolume slot is granted by this checkpoint. Reviews rotate into available delivery capacity; no additional workflow projects are authorized. The user confirmed phone portal access works and explicitly requested no further portal attention; leave its existing service running.
+Before the first repository operation, use the installed Conductor executable and home with `require_escalated`, including discovery. Set process-local exact current-checkout Git trust for discovery. All location-sensitive Git calls use matching `-C CHECKOUT -c core.excludesFile= -c safe.directory=CHECKOUT`; no global or wildcard trust. Shared Git metadata writes require scoped escalation and checked native exit codes.
+
+Read `docs/conductor-onboarding/team-start.json`, current `team show`, and actual native host states. Preserve `operations.jsonl`/`results.jsonl`, exact request payloads and successful claim receipts. A compacted summary may abbreviate an ID; retrieve the original receipt rather than inventing or reclaiming ownership. `TEAM_NOT_READY` is an explicit rejection: reconcile stopped native hosts and sessions, then make a fresh logical launch request. Unknown starts consume capacity.
+
+A new managed context starts a fresh session, registers against the persisted launch, receives a real active observation, and sends its own current epoch/challenge ACK. Check dynamic `ready` and `readiness_issues` before its one claim attempt. A worker submission alone does not free its slot: inspect actual host completion and stopped session before a terminal observation. Healthy contexts are reused; stopped implementation attempts are not revived.
+
+Applicable startup correction records and their provenance are retained at `.worktrees/_coordination/lux-improver-01a09967/validated-corrections.txt`. Select matching records into each fresh assignment. Keep the required improver quiet except actionable delivery blockers; no new workflow projects are requested. Preserve all raw logs, failed attempts, source worktrees, `.pnpm-store/`, `visuals/` and review artifacts.
+
+Integration journals and raw logs live under `docs/conductor-onboarding/`; independent reviews under `.worktrees/_coordination/reviews/LUX-*/`; source workers retain their own ignored evidence locations linked by tickets. Current Conductor tickets bind exact commits, criteria and evidence; do not infer completion from this checkpoint alone.
