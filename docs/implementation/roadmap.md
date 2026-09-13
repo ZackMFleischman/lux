@@ -4,9 +4,15 @@
 
 User direction, 13 September 2026 UTC: prepare these four workstreams to run
 concurrently in isolated Git worktrees, with regular integration back to main.
-**Workstreams 1 and 2 are now authorized to start, with the primary agent
-coordinating and implementation delegated to other agents. Workstreams 3 and 4
-remain paused.** This records scope and coordination, not completed
+**All four workstreams are now authorized.** The subsequent user direction in
+Codex task `01a09967-d0ac-75d2-bea3-ccda2980ed32` authorizes Conductor onboarding,
+overall orchestration, and advancing workstreams 3 and 4 alongside the existing
+filesystem/component work. The user delegates routine decisions while asleep.
+The existing agent retains execution coordination for workstreams 1 and 2;
+the overall orchestrator arbitrates shared interfaces, integrations and graphics.
+See [Conductor onboarding](../conductor-onboarding.md) and the
+[orchestration checkpoint](../conductor-orchestration.md).
+This records scope and coordination, not completed
 implementation plans. It supersedes earlier priority ordering where it conflicts;
 technical dependencies and the existing acceptance requirements still apply.
 
@@ -31,7 +37,8 @@ technical dependencies and the existing acceptance requirements still apply.
   rather than waiting for a whole workstream to finish. Serialize integrations,
   validate affected combined behavior, then bring the other worktrees forward
   to the integrated main before their next dependent slice. Regular merges are
-  authorized for the active execution phase of workstreams 1 and 2.
+  authorized for the active execution phase, with the same review and validation
+  requirements applied to the newly authorized workstreams 3 and 4.
 - Run CPU development/tests and reviews in parallel. Serialize graphics,
   Studio and Resolume test sessions so evidence and runtime ownership remain
   attributable. Preserve existing experiment artifacts.
