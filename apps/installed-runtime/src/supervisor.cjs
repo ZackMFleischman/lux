@@ -28,7 +28,11 @@ const registry = new InstanceRegistry({runtimeId, start: async request => {
   fs.mkdirSync(attempts, {recursive:true});
   const requestPath = noLinks(path.join(attempts, attemptId + '.json'));
   const healthPath = noLinks(path.join(attempts, attemptId + '.status'));
-  const trace=value=>fs.appendFileSync(path.join(attempts,attemptId+'.lifecycle.jsonl'),JSON.stringify({instanceId:request.instanceId,revisionId:release.sourceHash,releaseId:release.releaseId,attemptId,...value})+'\n');
+  let traceLost=0;
+  const trace=read=>{
+    try {fs.appendFileSync(path.join(attempts,attemptId+'.lifecycle.jsonl'),JSON.stringify({instanceId:request.instanceId,revisionId:release.sourceHash,releaseId:release.releaseId,attemptId,...read(),incomplete:traceLost>0,lostRecords:traceLost})+'\n');}
+    catch {traceLost++;if(traceLost===1)try {process.stderr.write(JSON.stringify({kind:'lifecycle-evidence-incomplete',instanceId:request.instanceId,attemptId,incomplete:true,lostRecords:traceLost})+'\n');}catch { /* Telemetry cannot retain execution ownership. Missing completion evidence remains incomplete. */ }}
+  };
   // A fresh attempt file binds each producer to its own status channel. An old
   // process or stale status file cannot renew a replacement producer's deadline.
   fs.writeFileSync(requestPath, JSON.stringify(request), {flag:'wx'});
@@ -36,7 +40,7 @@ const registry = new InstanceRegistry({runtimeId, start: async request => {
   fs.rmSync(stopPath, {force:true});
   const health = new ProducerHealth({attemptId, startedAt:performance.now()});
   let key;
-  try { trace({kind:'restart-trigger',clock:bridge.clock()});key = bridge.installedStart(path.join(runtimeDirectory, 'electron/electron.exe'), path.join(__dirname, 'instance.cjs'), requestPath); }
+  try { trace(()=>({kind:'restart-trigger',clock:bridge.clock()}));key = bridge.installedStart(path.join(runtimeDirectory, 'electron/electron.exe'), path.join(__dirname, 'instance.cjs'), requestPath); }
   catch (error) { fs.rmSync(requestPath, {force:true}); throw error; }
   let closed = false;
   return {
@@ -49,7 +53,7 @@ const registry = new InstanceRegistry({runtimeId, start: async request => {
     },
     async stop({force = false} = {}) {
       if (closed) return;
-      trace({kind:'stop-requested',force,clock:bridge.clock()});
+      trace(()=>({kind:'stop-requested',force,clock:bridge.clock()}));
       try {
         if (!force) {
           fs.writeFileSync(stopPath, 'stop');
@@ -61,7 +65,8 @@ const registry = new InstanceRegistry({runtimeId, start: async request => {
         const deadline=performance.now()+2000;let stopped;
         do {stopped=bridge.installedStop(key);if(stopped.stopped)break;await delay(10);}while(performance.now()<deadline);
         if(!stopped.stopped)throw Error('Installed Job exit remains unconfirmed; ownership retained');
-        trace({kind:'process-exit-observed',...stopped});closed = true;
+        closed = true;
+        trace(()=>({kind:'process-exit-observed',...stopped}));
         for (const filename of [path.join(directory, request.instanceId + '.rendezvous'), requestPath, healthPath, healthPath + '.tmp']) {
           try { fs.rmSync(filename, {force:true}); } catch { /* A leftover private diagnostic must not stop unrelated producers. */ }
         }
@@ -97,7 +102,7 @@ async function tick() {
     for (const [instanceId, error] of registry.errors) fs.writeFileSync(path.join(directory, instanceId + '.error'), error);
     if (registry.entries.size) idleSince = Date.now();
     else if (Date.now() - idleSince >= 30000) await close();
-  } catch (error) { fs.writeFileSync(path.join(directory, 'supervisor.error'), String(error.stack || error)); await close(); }
+  } catch (error) { try {fs.writeFileSync(path.join(directory, 'supervisor.error'), String(error.stack || error));}finally {await close();} }
   finally { ticking = false; }
 }
 const timer = setInterval(() => void tick(), 250);

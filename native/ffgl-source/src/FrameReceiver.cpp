@@ -220,8 +220,10 @@ void FrameReceiver::run(HGLRC shared) {
      if(newest<0||!transition(ring->slots[newest],Ready,Reading)){endRead(*ring);outputs[outputIndex].state.store(Free);}
      else {
       auto& source=ring->slots[newest];auto& imported=imports[newest];auto& output=outputs[outputIndex];
-      output.provenance=source.provenance;output.completedQpc=source.completeQpc;
       imported.ownership.admission=true;imported.ownership.lease=true;imported.key={ring->generation,ring->outputGeneration,source.frame,uint32_t(newest)};
+      const auto provenance=source.provenance;
+      require(validFrameProvenanceV4(provenance,controlSchema,controlCount),"Invalid producer frame provenance");
+      output.provenance=provenance;output.completedQpc=source.completeQpc;
       const auto width=source.width,height=source.height;
       if(!imported.object){
        require(SUCCEEDED(device->OpenSharedResourceByName(source.textureName,DXGI_SHARED_RESOURCE_READ|DXGI_SHARED_RESOURCE_WRITE,IID_PPV_ARGS(&imported.texture))),"open owned named NT texture");
