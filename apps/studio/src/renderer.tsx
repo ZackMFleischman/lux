@@ -118,9 +118,9 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
         </div><span className="playback-state">{runtime?.playback ?? 'Awaiting service'}</span></div>
       </Paper>;
   const inspectorPane = <Paper component="aside" square className="inspector" aria-label="Scene controls and status">
-        <section><div className="section-heading"><h2>Controls</h2><Chip label="LIVE" /></div>
+        <section><details className="controls-section" open><summary className="section-heading"><span className="section-title">Controls</span><Chip label="LIVE" /></summary>
           <ParameterInspector runtime={runtime} available={!!available} client={client} controller={controller} onError={setError} edits={controlEdits} />
-        </section>
+        </details></section>
         <section><details><summary>Performance</summary><PerformanceStatus performance={snapshot.performance} /><MetricView label="Visual delivery" metric={snapshot.visualFps} nowMs={nowMs ?? clock} /><MetricView label="UI cadence" metric={snapshot.uiFps} nowMs={nowMs ?? clock} />
           <p className="hint">Delivery and interface cadence are measured separately.</p></details></section>
         <section><details><summary>Runtime</summary><dl className="identity"><dt>Authoring revision</dt><dd>{runtime?.revisionId ?? 'Unavailable'}</dd><dt>Instance</dt><dd>{runtime?.instanceId ?? 'Unavailable'}</dd><dt>Generation / clock epoch</dt><dd>{runtime ? `${runtime.generation} / ${runtime.clockEpoch}` : 'Unavailable'}</dd><dt>Completed frame</dt><dd>{runtime?.frameId ?? 'Unavailable'}</dd></dl></details></section>
