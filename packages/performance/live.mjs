@@ -8,7 +8,7 @@ export const LIVE_LIMITS=freeze({records:4096,windowMs:120000,summaryMs:500});
 export function createFrameCollector({startMs,capacity=4096,windowMs=120000}={}) {
   if(!finite(startMs)||startMs<0||!integer(capacity)||capacity<1||capacity>4096||!integer(windowMs)||windowMs<1||windowMs>120000)throw Error('Invalid bounded collector options');
   // time, frame, update, synchronous render call, queue wait, async, render await.
-  const records=new FloatBuffer(capacity*7);
+  const records=new FloatBuffer(capacity*9);
   let count=0,completed=0,lost=0,invalid=0,totalLost=0,totalInvalid=0,lastFrame=0,lastAt=startMs,windowStart=startMs,sequence=0;
   const distribution=(values,expected,reason)=>{
     const n=values.length,missing=max(0,expected-n);
@@ -29,17 +29,24 @@ export function createFrameCollector({startMs,capacity=4096,windowMs=120000}={})
       }
       completed++;
       if(count===capacity){lost++;totalLost++;return false;}
-      const i=count++*7;
+      const i=count++*9;
       records[i]=at;records[i+1]=frame;records[i+2]=update;records[i+3]=renderCall;records[i+4]=queueWait;records[i+5]=asyncRender?1:0;records[i+6]=renderAwait;
+      records[i+7]=-1;records[i+8]=0;
       return true;
     },
-    summary(now,{timestampQuerySupported=null,timestampQueryEnabled=false}={}) {
+    recordGpu(frame,ms,complete) {
+      if(!integer(frame)||!finite(ms)||ms<0||typeof complete!=='boolean')return false;
+      for(let row=count-1;row>=0;row--){const i=row*9;if(records[i+1]===frame){if(records[i+7]>=0)return false;records[i+7]=ms;records[i+8]=complete?1:0;return true;}}
+      return false;
+    },
+    summary(now,{timestampQuerySupported=null,timestampQueryEnabled=false,failedSamples=0,droppedSamples=0,pendingSamples=0}={}) {
       if(!finite(now)||now<lastAt||now<windowStart)throw Error('Collector clock must be monotonic');
-      const update=[],render=[],cpu=[],wait=[],awaited=[];
-      let asyncCount=0,expired=0;
+      const update=[],render=[],cpu=[],wait=[],awaited=[],gpu=[];
+      let asyncCount=0,expired=0,gpuPartial=0;
       for(let row=0;row<count;row++) {
-        const i=row*7;if(records[i]<now-windowMs){expired++;continue;}
+        const i=row*9;if(records[i]<now-windowMs){expired++;continue;}
         push(update,records[i+2]);push(render,records[i+3]);push(cpu,records[i+2]+records[i+3]);push(wait,records[i+4]);push(awaited,records[i+6]);asyncCount+=records[i+5];
+        if(records[i+7]>=0){push(gpu,records[i+7]);if(!records[i+8])gpuPartial++;}
       }
       const expected=completed+invalid,reason=lost||invalid||expired?'Telemetry lost, invalid or expired; duration distribution is incomplete':undefined;
       const elapsed=now-windowStart;
@@ -50,8 +57,8 @@ export function createFrameCollector({startMs,capacity=4096,windowMs=120000}={})
         update:distribution(update,expected,reason),renderCall:distribution(render,expected,reason),
         cpuCall:distribution(cpu,expected,asyncCount?'Asynchronous render continuation CPU work is not fully measured':reason),
         renderAwait:distribution(awaited,expected,reason),queueWait:distribution(wait,expected,reason),
-        gpu:freeze({unit:'ms',availability:'unsupported',reason:'Full visual GPU pass coverage is unavailable; queue completion wait is not GPU duration',sampleCount:0,expectedCount:completed,missingCount:completed,
-          samplingPolicy:'none',validity:'incomplete',gate:'not_evaluated',timestampQuerySupported,timestampQueryEnabled}),
+        gpu:freeze({... (timestampQueryEnabled?distribution(gpu,expected,gpuPartial?'GPU copies, uploads or clears outside passes are excluded':reason):{unit:'ms',availability:'unsupported',reason:'GPU pass queries are unavailable; queue completion wait is not GPU duration',sampleCount:0,expectedCount:completed,missingCount:completed,
+          samplingPolicy:'none',validity:'incomplete',gate:'not_evaluated'}),timestampQuerySupported,timestampQueryEnabled,failedSamples,droppedSamples,pendingSamples}),
       });
       count=0;completed=0;lost=0;invalid=0;windowStart=now;
       return result;

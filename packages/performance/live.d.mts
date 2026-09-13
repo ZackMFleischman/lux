@@ -10,10 +10,11 @@ export interface FrameSummary {
   readonly intervalLostRecords:number;readonly intervalInvalidRecords:number;readonly retainedRecords:number;
   readonly produced:LiveMetric;readonly update:LiveMetric;readonly renderCall:LiveMetric;readonly cpuCall:LiveMetric;
   readonly renderAwait:LiveMetric;readonly queueWait:LiveMetric;
-  readonly gpu:LiveMetric & Readonly<{timestampQuerySupported:boolean|null;timestampQueryEnabled:boolean}>;
+  readonly gpu:LiveMetric & Readonly<{timestampQuerySupported:boolean|null;timestampQueryEnabled:boolean;failedSamples:number;droppedSamples:number;pendingSamples:number}>;
 }
 export const LIVE_LIMITS:Readonly<{records:4096;windowMs:120000;summaryMs:500}>;
 export function createFrameCollector(options:{startMs:number;capacity?:number;windowMs?:number}):Readonly<{
   record(at:number,frame:number,update:number,renderCall:number,queueWait:number,asyncRender:boolean,renderAwait?:number):boolean;
-  summary(now:number,capability?:{timestampQuerySupported?:boolean|null;timestampQueryEnabled?:boolean}):FrameSummary;
+  recordGpu(frame:number,ms:number,complete:boolean):boolean;
+  summary(now:number,capability?:{timestampQuerySupported?:boolean|null;timestampQueryEnabled?:boolean;failedSamples?:number;droppedSamples?:number;pendingSamples?:number}):FrameSummary;
 }>;

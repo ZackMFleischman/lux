@@ -1,6 +1,6 @@
 # Routine Studio measurements and recovery evidence
 
-`live.mjs` retains at most 4,096 numeric frame records (229,376 bytes) in one
+`live.mjs` retains at most 4,096 numeric frame records (294,912 bytes) in one
 worker. The worker drains at 500 ms intervals and the parent retains one detached
 summary. Expired records (older than 120 seconds), invalid observations and
 overflow make duration coverage incomplete; cumulative loss is retained. These
@@ -27,11 +27,34 @@ It exposes compact measurements and detailed coverage via its title. No renderer
 or authoring files are changed by this slice.
 
 GPU capability comes from the selected adapter's actual `timestamp-query`
-feature. Full visual GPU coverage is initially unsupported, not zero. The pinned
-Three public timestamp resolver returns cached values when query resolution
-fails or is busy and groups separate renderer calls; it cannot certify freshness
-or the complete visual plus presentation passes. Direct bounded pass-query
-instrumentation is the next integration point.
+feature and is explicitly requested on its device. `gpu-pass.mjs` instruments
+render and compute pass timestamp writes on that device, including the visual
+and presentation calls. It uses three query/readback slots, each with 256 query
+indices (128 passes) and two 2,048-byte buffers: 12,288 buffer bytes plus bounded
+query storage. All pass durations are summed per frame before quantiles. BigInt
+timestamps are subtracted before conversion from nanoseconds to milliseconds.
+The capture awaits both asynchronous validation-scope completion and readback;
+zero/reset/backward pairs, validation errors and mapping failures are rejected.
+No cached Three timing result is used. Pending, failed, dropped, missing and
+late readbacks remain visible; no more than three asynchronous slots are retained.
+
+Copies, uploads and clears outside passes are excluded from pass timing and mark
+that frame incomplete. Untracked command submissions, conflicting query writes,
+pass overflow and uninstrumentable encoders cannot produce a complete sample.
+The capture covers commands issued within the completed update/render call;
+authored background GPU submissions outside that lifecycle are not a supported
+measurement workload. Queries do not measure the native bridge or physical UI
+presentation. An unavailable API/feature remains unsupported, never numeric zero.
+The relevant timestamp-write fields are defined by the
+[WebGPU render pass interface](https://gpuweb.github.io/types/interfaces/GPURenderPassTimestampWrites.html)
+and [compute pass interface](https://gpuweb.github.io/types/interfaces/GPUComputePassTimestampWrites.html).
+Hardware still needs to validate instrumentability, valid query coverage and
+paired overhead on the pinned runtime; CPU fixtures cannot establish these.
+
+The worker also accepts the native host's opt-in `externallyDriven: true` init
+flag. It still draws the initial frame and existing control updates, but does
+not schedule autonomous frames; explicit `type: 'frame'` requests draw once
+and echo their request ID. Ordinary Studio playback retains its scheduler.
 
 `recovery.ts` validates one independent recovery attempt: injection-to-observed
 execution exit within 2 s and explicit restart-to-consumed reference frame with
