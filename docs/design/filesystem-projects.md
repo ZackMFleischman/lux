@@ -1,6 +1,6 @@
 # Filesystem projects and accepted revisions
 
-Status: proposed implementation architecture, 12 September 2026. This implements the approved direction in [project model](project-model.md#filesystem-first-authoring-clarification--12-september-2026) and [source workspace](source-workspace.md#normal-coding-environments--approved-direction-12-september). It describes future behavior, not evidence that the tracer has completed its active property/asset work. The companion [implementation plan](../implementation/filesystem-projects-plan.md) owns execution order and acceptance gates.
+Status: architecture and implementation plan reviewed by three independent reviewers, 12 September 2026; see the [resolved review record](../reviews/filesystem-projects-review.md). This implements the approved direction in [project model](project-model.md#filesystem-first-authoring-clarification--12-september-2026) and [source workspace](source-workspace.md#normal-coding-environments--approved-direction-12-september). It describes future behavior, not evidence that the tracer has completed its active property/asset work. The companion [implementation plan](../implementation/filesystem-projects-plan.md) owns execution order and acceptance gates.
 
 ## Decision and current baseline
 
@@ -65,7 +65,7 @@ MySet/
   .lux/cache/                           # disposable compile/capture outputs
 ```
 
-The following is the version-1 contract shape. `Hash`, branded IDs, `OutputSettings` and the final tracer saved-control DTO are imported from their owning shared contract modules; these examples do not introduce duplicate runtime types. Validation rejects unknown versions, duplicate keys/IDs, unknown fields, invalid UTF-8, nonfinite values and dangling references.
+The following is the version-1 contract shape. `Hash`, branded IDs, `OutputSettings` and the final tracer saved-control DTO are imported from their owning shared contract modules; these examples do not introduce duplicate runtime types. Admission first scans bounded raw UTF-8 JSON with a duplicate-key-aware parser (before ordinary JSON object construction), with depth/count/string limits; JSON.parse plus Zod alone cannot detect overwritten duplicate keys. Validation then rejects unknown versions, duplicate IDs, unknown fields, nonfinite values and dangling references.
 
 ```ts
 type ComponentRef =
@@ -83,6 +83,7 @@ type SceneFile = {
 };
 type ComponentFile = {
   schemaVersion: 1; componentId: ComponentId; name: string; kind: 'code';
+  sdkVersion: '0.1.0' | '0.2.0'; sourceVersion: 1 | 2;
   entry: string; files: string[]; // relative to this component directory
   references: ComponentRef[];    // explicit transitive closure edges
   assets: Record<string, AssetId>; // compiler logical asset path -> stable ID
@@ -98,8 +99,9 @@ type AssetManifest = {
 };
 type DependencyLock = {
   schemaVersion: 1;
-  toolchain: { sdkVersion: string; typescriptVersion: string; threeVersion: string;
-    threeTypesVersion: string; declarationPackHash: Hash; runtimeBuildHash: Hash };
+  toolchain: { sdkVariants: Record<string, { declarationEntry: string; contractHash: Hash }>;
+    typescriptVersion: string; threeVersion: string; threeTypesVersion: string;
+    declarationPackHash: Hash; runtimeBuildHash: Hash };
   packages: Record<string, { version: string; manifestHash: Hash; contentHash: Hash }>;
 };
 type AcceptedProject = {
@@ -112,6 +114,8 @@ type AcceptedProject = {
 
 For example, Scene A and Scene B both set `implementation` to `{ "kind": "local", "componentId": "<particles-id>" }`, while keeping different `savedControls`. The component declares `entry: "src/main.ts"`, `files: ["src/main.ts", "src/noise.ts"]`, and `assets: { "assets/spark.bmp": "<spark-asset-id>" }`. `main.ts` imports `./noise.ts`. Replacing spark bytes updates its manifest hash in the same explicit batch; leaving the old hash fails staging rather than silently trusting a filename.
 
+Each definition records its authored SDK and source-envelope version. `sourceVersion: 1` reconstructs the legacy envelope without a sourceVersion field; `2` reconstructs the explicit v2 envelope even when assets are empty. The entry definition selects the resolved SourceBundle SDK/envelope. A closure with images requires entry sourceVersion 2; adding an asset to a v1 entry must include that explicit manifest change. A project can contain SDK 0.1 and 0.2 scenes, provided its exact installed runtime/toolchain and declaration pack support both pinned variants. Every referenced code definition within one compiler closure must use the entry SDK; incompatible cross-SDK references fail before writing/acceptance. An unsupported import offers a separate compatible project or a deliberate upgrade operation, never silent SDK conversion. SDK upgrades change manifests and lock together under project-wide scope. These per-definition fields preserve the difference between legacy v1 and empty-assets v2 on import/re-export.
+
 Component manifests declare every source file, including an unused helper that should travel with editable source. Adding a file requires adding its manifest entry. Discovery reports unregistered source files under managed component folders; they are not silently compiled. Deleted entries or missing manifests are errors. Stage 1 rejects component-reference cycles and ambiguous ownership rather than guessing intended module boundaries. Later schema versions add graph definitions, node placement and Looks without changing file/buffer/accepted-state ownership.
 
 ## Shared definitions, libraries and reference resolution
@@ -120,13 +124,21 @@ A local definition edit computes a reverse dependency closure: every referring l
 
 “Make unique” copies a local definition with a new ID, rewrites its internal relative paths where required, and repoints the selected scene in one staged project candidate. At the graph milestone the same operation can repoint one node. Copying a scene creates a new scene ID; its implementation remains shared unless uniqueness is explicitly chosen. Templates copy independent entities with remapped IDs and references. Duplicating a whole directory or making a Git worktree preserves logical project IDs but creates an independent physical workspace session.
 
-A library is a catalog; a package is an immutable content bundle. Package manifests declare a namespaced `packageId`, exact version, export IDs, source files, asset entries, dependency pins and compatible SDK range. The lock chooses one exact version/hash per package ID in stage 1. The package hash covers canonical manifest plus every declared original file hash; unknown, missing or changed vendored files fail verification. Hashes prove integrity relative to a chosen pin, not publisher trust. Library search and network publication are separate later operations; importing an already available validated package is sufficient initially.
+A library is a catalog; a package is an immutable content bundle. Package manifests declare a namespaced `packageId`, exact version, export IDs, source files, asset entries, dependency pins and compatible SDK range. Each code export carries the same explicit authored sdkVersion, sourceVersion (1 or 2), entry, source-file inventory, reference and asset-binding metadata as a local code definition. A scene pointing directly to a package export therefore selects a defined SDK/envelope, including legacy v1 versus empty-assets v2; a compatible SDK range alone is insufficient. The lock chooses one exact version/hash per package ID in stage 1. The package hash covers canonical manifest plus every declared original file hash; unknown, missing or changed vendored files fail verification. Hashes prove integrity relative to a chosen pin, not publisher trust. Library search and network publication are separate later operations; importing an already available validated package is sufficient initially.
 
 Pinning copies complete verified bytes into `libraries/<contentHash>` before the candidate can reference the package. No mutable symlinks into a personal cache and no “latest” resolution are permitted. Offline apply, Git checkout and archive reopen require those bytes and exact toolchain support locally. Missing pins return `DEPENDENCY_UNAVAILABLE`, with package/version/hash; an update is a new candidate, never a startup repair. Editing an immutable package in an external editor returns `PACKAGE_MODIFIED`; keep the edit on disk, then explicitly restore it or create a local override. Lux never repairs it by overwriting the edit automatically.
 
 First delivery preserves the existing import grammar: SDK and supported Three bare imports, plus relative `.ts` imports within the complete admitted virtual bundle. Components may relatively import files belonging to declared local references or pinned package dependencies; package files may import their own files and declared package dependencies. Core flattens the verified closure using canonical project-relative module names and passes source bytes to the existing compiler. It rejects imports outside the declared closure before compiler admission. It does not add arbitrary npm imports, evaluate package scripts or ask the compiler to read working paths.
 
 Root-relative placement preserves ordinary TypeScript navigation: for instance, a local file can import a declared package helper through a relative path into `libraries/<hash>/src/noise.ts`. Pin updates and “make unique” produce an explicit import/reference diff when relative paths change. `ComponentRef.exportId` selects the package's declared entry; helper reuse still uses explicit files and reference ownership. Export flattens that same closure and preserves a path map for diagnostics. If source/asset logical names collide after resolution, reject with both owners rather than prefixing names invisibly and changing source semantics.
+
+### Saved controls after edits and path relocation
+
+`SceneFile.savedControls` is the final tracer saved snapshot (`sourceHash`, `schema`, `schemaHash`, `values`), retained as the user's cached origin and intent. Validate its own schema hash and full value shape; a sourceHash referring to an earlier source is allowed and does not prove authenticity or grant privileges. Source edits, folder renames and flattening an imported bundle normally change compiler sourceHash. Do not reject such a candidate merely for having a valid older cache or relabel that cache as already validated for the new code.
+
+Compile the newly resolved closure, obtain its sealed schema/hash, reconcile cached values by the existing parameter policy (ID/type/unit and valid range), and produce an `AcceptedScene` record containing the new sourceHash, schema/hash, complete effective saved values and explicit migration report. Removed/incompatible values receive the policy's documented defaults and report; no silent clamping. Validate and smoke with those derived values before acceptance. Keep the raw SceneFile bytes unchanged in the accepted raw inventory and store the derived record separately in `resolvedScenes`; both are part of the revision closure. Thus raw disk, cached origin and validated runtime provenance remain distinguishable.
+
+Applying never rewrites scene.json just to refresh its cache. An explicit Save scene controls action writes the accepted-derived snapshot (plus any completed saved-control edits) through the guarded draft-write path; it becomes a new ordinary pending file change. A live-only adjustment is not automatically saved. UI shows migration details and whether the on-disk cache is older. Release and portable accepted export use the derived accepted record, not an unverified stale raw cache. Import retains original cached provenance; its first apply derives new provenance after path relocation and schema validation. Source-only edits with compatible values preserve those values. Invalid schema hashes or malformed cache values remain errors.
 
 ## Ordinary editor types and validation
 
@@ -147,7 +159,7 @@ Project creation copies a complete, versioned declaration pack from the installe
 }
 ```
 
-The generated configuration and declaration pack work from a fresh clone with no Lux repository or ancestor `node_modules`. Standard editor TypeScript servers can provide diagnostics, completion and navigation. The installed CLI provides the exact pinned validation version; an editor using a different TypeScript version may show different diagnostics. Its version is visible in discovery. Do not run or auto-select project-supplied editor plugins. A language service that needs Node-related types to explain declaration internals does not grant those APIs to authored code.
+This example is a per-definition configuration; its SDK path selects that definition's pinned variant. Generate a nearest tsconfig.json in each component directory, with paths adjusted relative to that directory and an include list for its declared closure. The root config is a solution index of those component configs, not one global SDK mapping applied to mixed-SDK sources. The installed check command validates each entry with its matching trusted SDK; it does not use tsc --build as the runtime authority. Package source viewed through a definition uses that closure's matching SDK. The generated configuration and declaration pack work from a fresh clone with no Lux repository or ancestor `node_modules`. Standard editor TypeScript servers can provide diagnostics, completion and navigation. The installed CLI provides the exact pinned validation version; an editor using a different TypeScript version may show different diagnostics. Its version is visible in discovery. Do not run or auto-select project-supplied editor plugins. A language service that needs Node-related types to explain declaration internals does not grant those APIs to authored code.
 
 `lux project check --project <directory>` parses and snapshots the declared batch, resolves its closure and invokes the trusted compiler without acceptance or activation. `lux project apply --project <directory> --scene <id>` stages the complete declared batch and submits an apply job through the local authenticated core endpoint. A successful shared-definition apply may affect additional explicitly scoped scenes. `--scope all` is an explicit project-wide scope, not the default expansion of a single scene. If no service is running, check still works; apply returns a service connection error with startup guidance, not a hidden second project writer.
 
@@ -162,11 +174,13 @@ An expected inventory is the author's declaration of a complete batch, not an in
 Core traverses declarations from the supplied `project.json`, checks the expected inventory exactly matches that declaration closure, safely reads every member, verifies byte hashes and snapshots those exact bytes into immutable storage. Additions/deletions of declared content change the manifests and inventory. Unregistered files are reported separately. A file change, incomplete write, dirty overlapping buffer or expected membership mismatch fails staging. Once staged, compilation never rereads the working directory.
 
 ```ts
-type Scope = { sceneIds: SceneId[]; componentIds: ComponentId[]; assetIds: AssetId[] };
+type Scope = { kind: 'project' } | { kind: 'entities'; sceneIds: SceneId[];
+  componentIds: ComponentId[]; assetIds: AssetId[] };
 type BufferExpectation = Record<string, number>; // document key -> version
 type ProjectPrecondition = {
   projectSessionId: string; expectedHead: ProjectRevisionId | null;
   expectedWorkspaceGeneration: number; expectedBufferVersions: BufferExpectation;
+  expectedGitConflictFingerprint: Hash | null; // null only for verified non-repository roots
 };
 discover({ projectSessionId }): Promise<{
   projectId: ProjectId; projectSessionId: string; rootPath: string;
@@ -174,6 +188,7 @@ discover({ projectSessionId }): Promise<{
   inventoryHash: Hash; files: Record<string, Hash>; buffers: BufferStatus[];
   scenes: SceneLocation[]; components: ComponentLocation[]; impact: ReferenceIndex;
   toolchain: DependencyLock['toolchain']; selectedSceneId: SceneId | null;
+  git: GitStatus;
 }>;
 stage(input: ProjectPrecondition & {
   requestId: string; expectedFiles: Record<string, Hash>; scope: Scope;
@@ -193,7 +208,36 @@ type ApplyResult = {
 };
 ```
 
-Stage and apply use different request IDs; retrying an ID with different payload returns `REQUEST_ID_REUSED`. Candidate metadata retains scope, buffer expectations, original session and head, exact inventory, toolchain hashes and expiry. Apply cannot expand that scope or substitute a candidate from another session. Full inventory is rechecked at admission and immediately before commit; protected buffers, saved-control intent sequence and selected-instance binding are also checked. Protected buffers are the changed files plus all files/metadata in affected scene closures, including old and new reference users. Dirty unrelated buffers remain open and are not consumed; their disk versions in the unchanged part of the candidate cannot replace their in-memory text. Rechecking the complete disk inventory deliberately serializes unrelated saved-content edits in the initial small-project implementation.
+Bootstrap and recovery are explicit operations on the authenticated application endpoint:
+
+```ts
+listOpenProjects(): Promise<{ selectedSessionId: string | null;
+  projects: { projectSessionId: string; projectId: ProjectId; rootPath: string }[] }>;
+openProject({ directoryPath, mode: 'read-write' | 'read-only' }):
+  Promise<{ projectSessionId: string; projectId: ProjectId }>;
+closeProject({ projectSessionId }): Promise<{ closed: boolean }>;
+jobStatus({ projectSessionId, jobId }): Promise<JobState>;
+requestStatus({ projectSessionId, requestId }): Promise<
+  { state: 'running'; jobId: string } |
+  { state: 'completed'; result: ApplyResult } |
+  { state: 'rejected'; code: string; diagnostics: Diagnostic[] } |
+  { state: 'unknown-or-expired' }>;
+type GitStatus = { repository: 'none' | 'present' | 'unknown';
+  worktreeRoot?: string; branch?: string | null; headOid?: string | null;
+  operation?: 'normal' | 'merge' | 'rebase';
+  contentStatus: 'available' | 'unavailable'; changedPaths?: string[];
+  untrackedPaths?: string[]; unavailableReason?: string;
+  conflictStatus: 'clear' | 'unmerged' | 'unknown';
+  unmergedPaths?: string[]; conflictFingerprint: Hash | null };
+```
+
+New MCP clients call listOpenProjects to find the selected binding, then discover; no guessed session ID or filesystem scan is needed. Explicit CLI --project paths use openProject or an existing matching canonical-root session, subject to the same project lease. read-only opens cannot stage/apply/save. No application service means read-only check can run, while apply reports unavailable. Opening through MCP is an authorized agent operation, never a capability of submitted visual code.
+
+JobState reports queued/running phase, terminal result or rejection, and request ID. After service restart the agent opens the same physical project to get a new session, then queries durable request status by the original request ID; old job/session/candidate IDs cannot authorize new mutations. Request lookup is scoped to the newly authorized physical root and recorded project identity. A lost apply response with no job ID is therefore recoverable. Completed receipts include request digests; different-payload reuse is rejected. If a request is unknown or expired, report uncertainty and reread accepted head/content; never assume failure or automatically resubmit the mutation. After explicit user/agent reconsideration, a new candidate/request may be made against the current head. The normal 24-hour receipt retention is bounded; accepted revisions retain their commit request identity even after transient job cleanup.
+
+Scope kind project (`--scope all`) explicitly authorizes the complete reviewed diff. Entity scope must include each changed/affected entity, including old and new reference users. Project name/identity, toolchain changes, package-lock/vendor changes (even unused packages), and other project-wide metadata require project scope; empty entity arrays never authorize them. Registry changes strictly required to add/remove/rename listed entities are allowed only with those entities and all affected references in scope. Asset-manifest changes follow their listed asset IDs. A project ID change invalidates the session rather than becoming an ordinary scoped update. First acceptance of a new project requires project scope.
+
+Stage and apply use different request IDs; retrying an ID with different payload returns `REQUEST_ID_REUSED`. Candidate metadata retains scope, buffer expectations, original session and head, exact inventory, toolchain hashes and expiry. Apply cannot expand that scope or substitute a candidate from another session. Full inventory and the mandatory Git conflict fingerprint are rechecked at admission and immediately before commit; protected buffers, saved-control intent sequence and selected-instance binding are also checked. Protected buffers are the changed files plus all files/metadata in affected scene closures, including old and new reference users. Dirty unrelated buffers remain open and are not consumed; their disk versions in the unchanged part of the candidate cannot replace their in-memory text. Rechecking the complete disk inventory deliberately serializes unrelated saved-content edits in the initial small-project implementation.
 
 The core reports structured paths/entity IDs for `WORKSPACE_CHANGED`, `BUFFER_CONFLICT`, `REVISION_CONFLICT`, `SCOPE_VIOLATION`, `PROJECT_ID_CHANGED`, `PACKAGE_MODIFIED`, `DEPENDENCY_UNAVAILABLE`, `PROJECT_BUSY`, `QUOTA_EXCEEDED` and compile/runtime errors. Conflict keeps candidate evidence and working files; the caller rereads and deliberately stages again. CLI text diagnostics and MCP structured diagnostics carry candidate ID, original path, line/column and content hash so stale errors never underline unrelated new text.
 
@@ -273,6 +317,8 @@ Every buffer keeps base disk hash, current text, version and owning entity. Exte
 
 In directory projects, Ctrl+S saves the active file and then stages/applies its affected scene set when the required inputs are saved and conflict-free. Other dirty protected files offer **Save all and apply**; they are never mixed with older disk versions. A separate Save draft action persists text without apply. Invalid source remains saved and editable after build failure while the previous working visual remains visible. Shared-definition scope is shown persistently and previously selected shared-edit scope remains valid until its impact changes; no generic confirmation is added to every build. Standalone tracer whole-bundle shortcuts remain unchanged until its explicit project migration.
 
+Whole-project candidates deliberately include every saved content change since acceptance. If Scene B has a separate saved draft, Ctrl+S in Scene A first saves A, then reports the additional pending project diff; it does not silently expand A's apply scope. Offer Review all pending changes and an explicit project-scope apply, or leave the preview unchanged. If B is invalid, that expanded transaction cannot pass until B is repaired or explicitly reverted through conflict-aware user action. Save all and apply handles dirty buffers, not this separate saved-diff case. Selective acceptance of A while retaining B as a saved pending draft is a later project-transaction extension, not a hidden promise of first delivery. This limitation must be visible in CLI/MCP scope errors as well as Studio.
+
 Use a recoverable working-write protocol for Studio save: record expected old bytes/hash and proposed new bytes, then replace each file through the safe filesystem adapter. If external edits intervene, stop and report the actually written subset; acceptance has not changed. On restart, finish only entries whose current bytes still match the journal's old or already-written hashes. A third value is a conflict retained as recovery material, never overwritten. Prefer single-file saves for ordinary typing; metadata-plus-file operations remain explicit batches.
 
 A pre-save hash check followed by ordinary replacing rename has a lost-update race. The native working-save protocol must avoid it: acquire the expected target by an exclusive handle, verify identity/hash, move that handle-owned original to a unique journal backup, and exclusively create the replacement target without overwriting an intervening external creation. The transient missing/partly written working file is allowed; it cannot activate. If another writer creates the target first, preserve its bytes, the original backup and proposed replacement and return conflict. Recovery uses the same no-clobber rule. The accepted head uses its separate core-owned atomic replacement protocol.
@@ -281,7 +327,17 @@ Track source, metadata, original assets, dependency lock, vendored packages, dec
 
 Git awareness ships with the first directory-project release: discover/status reports repository/worktree identity, current branch or detached HEAD, modified/untracked paths, unmerged paths and merge/rebase state. A project outside a repository reports that plainly. Unmerged managed content blocks apply even if its text happens to parse; a branch/HEAD change marks status stale and triggers reconciliation, not activation. Commits may contain invalid Lux drafts. Lux does not automatically commit, change branches, fetch or reset, and a full Git history/staging UI is outside this delivery.
 
-A bounded read-only `project/git.ts` adapter invokes the installed Git directly with fixed argument arrays, sanitized environment, time/output limits and optional locks disabled. It first reads configuration as data, disables fsmonitor, hooks/pagers and external diff behavior, and refuses content-status inspection when configured clean/process filters or other executable extension settings cannot be safely excluded; basic identity can remain available with an explicit status-unavailable reason. It never runs diff textconv, submodule recursion, hooks, credential helpers or repository scripts. Tests use sentinel executable configs to prove nonexecution; `--no-optional-locks` alone is not a security boundary. Git metadata may legitimately live outside the working directory for a worktree, but it is never admitted as Lux source or write authority.
+The first adapter requires Git 2.39.0 or newer plus a passing capability probe for the fixed commands; record the actual executable/version and reject unsupported versions. This floor avoids the older interpretation of boolean fsmonitor settings as executable hook paths, documented by [Git](https://git-scm.com/docs/git-config#Documentation/git-config.txt-corefsmonitor). A newer version alone is not a security proof.
+
+Do not pre-read live configuration and then run status against the original Git directory: repository/include/worktree configuration could change between those steps. Instead create a private, core-owned Git observation directory from a bounded immutable capture of the per-worktree index and required HEAD/ref metadata. It has a core-generated allowlisted configuration, no commondir link, no inherited repository configuration/includes/remotes, an empty hooks directory, and no executable extensions. Disable system/global config, environment overrides, fsmonitor, credential prompting, pagers, submodule recursion, external diff/textconv and optional locks. Invoke a verified Git executable directly with fixed argument arrays and explicit private --git-dir plus the authorized --work-tree; never use a shell. Git writes, if any, are confined to disposable private metadata, never the user's index/config.
+
+Mandatory unmerged-index inspection uses the copied index in this directory and requires no content filters or object fetching. Optional full content status additionally requires a safely captured local object/attribute/config interpretation sufficient to describe the real repository. Capture only bounded required local metadata/objects (64 MiB / 4096 entries); never fetch missing objects or copy remote/partial-clone configuration. If repository semantics need executable filters, unknown includes/extensions, unsafe object indirection or an unavailable local closure, report content status unavailable. Safe boolean/text settings may be copied only through the explicit allowlist and are never reloaded from the original config during invocation. Changing repository, include or worktree config during inspection cannot introduce commands into the private configuration; it invalidates the returned optional status fingerprint. Standard simple repositories must still get useful changed/untracked status, and the independent merge gate remains required.
+
+Tests use both static and racing hook/filter/fsmonitor/include/worktree-config sentinel programs and verify none execute, including when the source config changes after capture. Bound time/output and reject unsupported Git index extensions rather than treating parse failure as clear. `--no-optional-locks` alone is not a security boundary. Git metadata may live outside a worktree and receives a separately scoped read capability; it is never Lux source or arbitrary write authority.
+
+Mandatory merge admission is separate from optional Git working-tree status. The adapter obtains unmerged index stages through a fixed, nonrecursive metadata-only query with fsmonitor disabled (or a verified equivalent index reader); it does not invoke clean filters or content conversion. Restrict path interpretation to literal managed paths. Fingerprint the resolved per-worktree index bytes/identity and conflict result, and check the same fingerprint at stage and final admission. Hold a short native read lease against index replacement across the durable head swap, alongside content leases. On a new repository without an index, require an explicit verified no-index fingerprint and recheck noncreation; if the platform adapter cannot protect that case, reject apply with a retryable Git-state conflict rather than inventing a lock guarantee. Repository metadata receives a separate read-only capability bound to the Git-identified worktree; it is never source or an arbitrary path-write capability.
+
+An unmerged managed path blocks apply even if the text parses. Missing Git, unreadable/unsupported index metadata, unknown repository detection or failed safe conflict inspection produces GIT_STATE_UNAVAILABLE and blocks apply in a detected/possible repository; saving drafts remains allowed. A verified non-repository root needs no Git installation or conflict fingerprint. Configured filters may make optional changed-file status unavailable while the independent conflict query still permits apply. HEAD/branch/operation changes trigger reconciliation; the index guard supplies the conflict gate. Changes after leases release make Git/working status stale on observation and do not retroactively change the accepted snapshot. Test identical file bytes with changed index stages, configured filters, missing Git, dropped watcher events, and conflict changes during compilation.
 
 Watchers invalidate inventories and report likely external changes, but perform full safe scans on stage/apply, reopen and explicit refresh. Node documents watcher platform limitations and lack of protection against filesystem substitution; it is a hint source, not the transaction boundary. [Node filesystem documentation](https://nodejs.org/api/fs.html#caveats).
 
@@ -325,7 +381,7 @@ Disk full before head replacement leaves acceptance unchanged. Failure after rep
 | Storage | Accepted objects/history quota 1 GiB per project, candidates/cache 256 MiB; preflight worst-case writes before starting |
 | Retention | Accepted history retained until explicit compaction; unleased candidates expire after 24 hours; durable request records retained at least 24 hours and referenced accepted request identities remain in revisions |
 
-These are proposed engineering bounds, not measured performance. All transitive local/package source and assets count against per-scene limits; splitting files across packages cannot evade admission. Validate full declared package integrity once per stage, then compile only each scene's declared resolved closure. Enforce nested JSON depth and record/path counts before allocation and stream/hash bytes under limits. The check/apply result identifies the exceeded dimension and actual count. If retained roots consume the quota, reject new work without deleting them; offer explicit compaction/export choices later.
+The declaration pack is streamed and verified directly into the immutable object store, counts against its 1 GiB quota, and is not charged again to the separate 256 MiB candidate/cache allowance; candidate metadata references those verified objects. Temporary/in-flight object writes are reserved against the store quota before starting. These are proposed engineering bounds, not measured performance. All transitive local/package source and assets count against per-scene limits; splitting files across packages cannot evade admission. Validate full declared package integrity once per stage, then compile only each scene's declared resolved closure. Enforce nested JSON depth and record/path counts before allocation and stream/hash bytes under limits. The check/apply result identifies the exceeded dimension and actual count. If retained roots consume the quota, reject new work without deleting them; offer explicit compaction/export choices later.
 
 GC roots include accepted and previous-working revisions, recovery journals, active candidate/worker leases, pending runtime promotion, checkpoints and retained evidence. Installed release storage owns independent roots and cannot be collected through project GC. Failed builds and unused temporary files are collectible only after their leases/retention expire. Service-wide capture retention and result limits remain those in [AI authoring](ai-authoring.md); adding filesystem access does not enlarge image-result quotas.
 

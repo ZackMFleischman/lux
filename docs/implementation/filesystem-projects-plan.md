@@ -10,6 +10,8 @@
 
 **Spec:** [Filesystem project architecture](../design/filesystem-projects.md). Its schemas and transaction semantics are authoritative for this plan. [Review record](../reviews/filesystem-projects-review.md) must have no unresolved blocking findings before implementation begins.
 
+**Planning status:** all three independent reviews and correction rechecks passed; see the review record. Implementation has not begun.
+
 ## Scope and baseline
 
 This is the first project-workflow checkpoint after the tracer. It does not reopen tracer completion or imply project storage already exists. The first deliverable supports multiple scenes, each referencing a single code component, project-local shared definitions and exact vendored dependencies; graph composition and library publishing UI remain later work. Preserve a standalone `.lux-scene` interchange path.
@@ -93,8 +95,8 @@ Use separate worktrees for independent slices. Freeze contracts after slice 1. F
 
 **Deliverable:** strict schemas matching the architecture and fixtures for two scenes sharing one component, a unique component, nested helpers, one pinned library dependency, assets and named controls.
 
-- [ ] Write negative fixtures: duplicate IDs, stale references, unsupported versions, duplicate/case-colliding paths, extra fields, bad pins, missing dependency closure and mismatched source/control provenance.
-- [ ] Implement and export the exact manifest/session/candidate contracts, quotas and deterministic hash-body format. Use explicit versioned identity bodies rather than arbitrary JSON property order.
+- [ ] Write negative fixtures: duplicate IDs, stale references, unsupported versions, duplicate/case-colliding paths, extra fields, bad pins, missing dependency closure malformed schema hashes/control caches, legacy-v1 versus empty-assets-v2 distinction, and mixed-SDK imports. Valid prior-source control provenance is not itself an error.
+- [ ] Implement bounded raw duplicate-key-aware JSON parsing before object/schema validation; include literal duplicate-key, deep nesting, oversized string and invalid UTF-8 fixtures. Implement and export the exact manifest/session/candidate contracts, quotas and deterministic hash-body format. Use explicit versioned identity bodies rather than arbitrary JSON property order.
 - [ ] Test that display renames preserve IDs, reference changes alter the relevant content identity, and invalid metadata cannot invoke submitted code.
 - [ ] Run `node --test tests/project/contracts.test.ts`; review schema examples against the architecture and commit.
 
@@ -117,10 +119,10 @@ Use separate worktrees for independent slices. Freeze contracts after slice 1. F
 
 **Deliverable:** convert supported scene/component/reference metadata into the existing compiler's bounded source and asset envelope with a reversible diagnostic origin map.
 
-- [ ] Test two scenes sharing a component and two component instances sharing a helper; distinguish definition ownership from scene/node values.
+- [ ] Test two scenes sharing a component, two definitions sharing a helper, and distinct scenes using supported SDK 0.1/0.2 variants; reject incompatible mixed-SDK references inside one closure; distinguish definition ownership from scene/node values.
 - [ ] Implement exact UUID/pin lookup, dependency-cycle rejection, transitive affected-scene calculation and deterministic virtual module paths. No prefix matching or global-library fallback.
 - [ ] Reject unknown IDs, direct cross-project filesystem imports, path escapes, missing vendored bytes, mutable edits to pinned package content and unsupported graph manifests.
-- [ ] Cover duplicate filenames in different components/packages, relative import resolution, asset aliases, renamed component folders, removal of used assets and pin updates affecting several scenes.
+- [ ] Cover scenes directly referencing package exports with explicit SDK/source-envelope/entry metadata (legacy v1 and empty-assets v2), duplicate filenames in different components/packages, relative import resolution, asset aliases, renamed component folders, removal of used assets and pin updates affecting several scenes.
 - [ ] Compile a resolved fixture through the real existing compiler and verify diagnostics map to the original project file. Apply existing 32-file/1 MiB source and asset limits to the resulting closure, not separately to each library to evade quotas.
 - [ ] Verify an unused invalid managed manifest is reported by project validation as specified; selected-scene filtering cannot hide broken shared references. Commit after independent review.
 
@@ -131,10 +133,10 @@ Use separate worktrees for independent slices. Freeze contracts after slice 1. F
 **Deliverable:** a project opens in an ordinary coding environment with usable pinned SDK/Three types, completion and source navigation, independent of the Lux development checkout.
 
 - [ ] Package the exact supported SDK declarations and required type closure from the installed Lux distribution. Record provenance/version hashes and license inventory.
-- [ ] Generate the documented tsconfig/type resolution layout using relative project-local paths. Do not rely on absolute development paths, global node_modules, symlinked compiler state or a reachable registry.
+- [ ] Generate per-definition tsconfigs selecting the declared SDK variant and a root solution index, with relative project-local paths; the check command validates each entry with its matching trusted SDK. Do not rely on absolute development paths, global node_modules, symlinked compiler state or a reachable registry.
 - [ ] Test clean-room offline typechecking of an entry/helper and declared numeric parameters with the pinned compiler; wrong keys/imports must produce useful diagnostics.
 - [ ] Deliberately edit project tsconfig, package.json and type declarations. Editor configuration may affect editor suggestions, but trusted build must ignore/reject semantic overrides and never run lifecycle scripts or arbitrary TS plugins.
-- [ ] Test SDK upgrade/downgrade mismatch reporting and repair as an explicit operation that preserves edited content; opening a project cannot silently install packages or overwrite a customization.
+- [ ] Test mixed-SDK project editor/CLI diagnostics and SDK upgrade/downgrade mismatch reporting and repair as an explicit operation that preserves edited content; opening a project cannot silently install packages or overwrite a customization.
 - [ ] Run the tooling tests with the Lux checkout hidden from resolution. Commit the distribution/type closure and evidence together.
 
 ## Slice 5: immutable snapshots, durable head and recovery
@@ -156,11 +158,11 @@ Use separate worktrees for independent slices. Freeze contracts after slice 1. F
 
 **Deliverable:** every file has a known base, optional dirty buffer and observed disk version; file tabs remain views rather than owners. Git repository/branch/worktree and conflict status is available from the first project release.
 
-- [ ] Implement the architecture's read-only Git adapter with bounded execution/output, sanitized environment and no repository-configured code execution. Test normal branch, detached HEAD, unborn branch, nested project root, no repository, worktree .git indirection, merge/rebase/unmerged files, missing Git and changed index/HEAD. Hook/filter/fsmonitor/external-diff sentinel commands must not execute; unavailable/unsupported status must stay truthful.
+- [ ] Implement the architecture's isolated Git observation-directory adapter (captured index/metadata and core-owned allowlisted config, never live repository config) with Git >=2.39.0 plus capability probes, bounded execution/output and sanitized environment. Optional content status requires a safely captured local semantic/object closure; otherwise report unavailable. Test normal branch, detached HEAD, unborn branch, nested project root, no repository, worktree .git indirection, merge/rebase/unmerged files, missing Git and changed index/HEAD. Static and racing hook/filter/fsmonitor/external-diff/include/worktree-config sentinel commands must not execute, including changes between capture and invocation. Test the independent unmerged-index fingerprint/lease gate, unchanged content with changed index stages, filters disabling optional status, missing Git in a repository, and verified non-repository mode. Unknown mandatory conflict state blocks apply while draft saving remains possible.
 - [ ] Test clean-buffer external edit reload, dirty-buffer external edit conflict, same-byte convergent edits, delete/rename with dirty buffers, external Git checkout and project-switch cleanup.
 - [ ] Implement conflict records with both versions preserved and explicit keep/reload/merge outcomes. Merge resolution itself must recheck the current disk base.
 - [ ] Preserve editor cursor/undo for unchanged files and stable identities; never copy dirty buffers into another checkout merely because project IDs match.
-- [ ] Implement guarded Save and Save All, independent of runtime activation. In a directory project Ctrl+S saves the active file, then stages/applies the affected scene only when required buffers are saved and conflict-free. Other dirty required files offer Save all and apply; do not mix disk and unsaved inputs. Saving invalid source still succeeds as a draft even if build fails. Keep standalone tracer shortcut semantics unchanged until an explicit migration.
+- [ ] Implement guarded Save and Save All, independent of runtime activation. In a directory project Ctrl+S saves the active file, then stages/applies the affected scene only when required buffers are saved and conflict-free. Other dirty required files offer Save all and apply; do not mix disk and unsaved inputs. Unrelated already-saved draft changes require reviewing the whole pending diff and explicit wider scope; preserve the preview and do not silently include them. Saving invalid source still succeeds as a draft even if build fails. Keep standalone tracer shortcut semantics unchanged until an explicit migration.
 - [ ] Exercise edits arriving during compile and during activation: no successful result may falsely mark newer buffers/disk content applied or saved.
 - [ ] Run unit and RTL workspace tests; commit without changing dock layouts.
 
@@ -174,9 +176,9 @@ Use separate worktrees for independent slices. Freeze contracts after slice 1. F
 - [ ] Implement immutable staging from the exact expected inventory. Stage does not execute source, rewrite files or activate the preview.
 - [ ] Apply validates every affected scene closure, prepares temporary candidates serially, verifies first-frame/schema/assets, rechecks all admission guards, and follows the documented durable-commit/activation ordering.
 - [ ] Define cancellation at every phase, including the commit boundary; a timed-out client obtains the actual result by request ID rather than assuming failure or retrying a mutation under a new ID.
-- [ ] Test external writes before staging, during compile, after the final read and after head publication. Never claim arbitrary external writers share an atomic multi-file lock; immutable staged bytes and explicit stale-working-tree status preserve the stated contract.
+- [ ] Test external writes and Git index changes before staging, during compile, after the final read and after head publication. Include project metadata, unused package-pin changes and explicit project-vs-entity scope. Never claim arbitrary external writers share an atomic multi-file lock; immutable staged bytes and explicit stale-working-tree status preserve the stated contract.
 - [ ] Test no selected scene, selected scene unaffected, scene switch during apply, shared component impacting several scenes, missing dependencies and failed inactive-scene validation.
-- [ ] Test current numeric parameter intents during apply/reset/restart, schema migration reporting and first-frame values. Installed host instances remain independent.
+- [ ] Test current numeric parameter intents during apply/reset/restart, schema migration reporting and first-frame values. Path relocation and source-only edits preserve valid cached-origin metadata, derive new accepted source/schema/value provenance without rewriting disk, and export the derived accepted record; explicit Save scene controls persists a new guarded cache. Installed host instances remain independent.
 - [ ] Run service tests with injected compiler/runtime ports, then real compiler fixtures; commit with the precise partial-success/recovery semantics in evidence.
 
 ## Slice 8: CLI and MCP adapters
@@ -185,7 +187,7 @@ Use separate worktrees for independent slices. Freeze contracts after slice 1. F
 
 **Deliverable:** an agent knows the selected project, scene, editable locations, SDK and expected versions and can apply its filesystem edits without uploading all source text.
 
-- [ ] Add the architecture's bounded discovery/stage/apply/status schemas, session binding and request IDs. Report standalone vs project mode truthfully; old Studio endpoints do not inherit newer adapter capabilities.
+- [ ] Add the architecture's listOpenProjects/openProject/discover/stage/apply/jobStatus/requestStatus schemas, Git DTO, session binding and request IDs. Test first connection without a known session, lost response without jobId, new session after service restart, and unknown/expired receipt uncertainty without automatic retry. Report standalone vs project mode truthfully; old Studio endpoints do not inherit newer adapter capabilities.
 - [ ] CLI stages a deliberate snapshot, exposes scope/affected scenes and waits or polls the same job API; it never edits the accepted store directly or finds a project by guessed cwd.
 - [ ] Validate same-host file paths and capability scope; remote agents use existing bounded submission or a future explicit transfer capability, not fabricated local access.
 - [ ] Verify authentication, wrong-origin/sender denial, token redaction, duplicate requests, reconnect, process restart and stale candidate rejection.
@@ -211,7 +213,7 @@ Use separate worktrees for independent slices. Freeze contracts after slice 1. F
 
 **Deliverable:** useful project reuse without hidden mutable dependencies, plus a lossless path from existing scenes.
 
-- [ ] Import v1/v2 and integrated v3 `.lux-scene` fixtures into a new project location; allocate new identities, retain entry/helper/asset bytes, SDK settings and control provenance; preserve the original file.
+- [ ] Import v1/v2 (including empty-assets v2) and integrated v3 `.lux-scene` fixtures into a new project location and a compatible mixed-SDK project; allocate new identities, retain entry/helper/asset bytes, per-definition SDK/source-envelope versions and cached control provenance; derive relocated accepted provenance only after validation; preserve the original file.
 - [ ] Test local shared definition edits, unique copies with internal reference remapping, pinned package overrides and explicit pin upgrades/downgrades. Reject direct edits to immutable vendor content with a clear local-copy action.
 - [ ] Validate a project from Git checkout with no private cache, duplicate project IDs in independent worktrees, an unresolved Git merge and concurrent external branch switch. Runtime session IDs and locks are checkout-scoped.
 - [ ] Verify Git ignore rules exclude generated caches, credentials, endpoint files and machine preferences while retaining everything needed for offline source reconstruction and declared dependency resolution.
