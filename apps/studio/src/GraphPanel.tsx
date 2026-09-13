@@ -30,7 +30,7 @@ export function GraphPanel({runtime,selected,onSelect}:{runtime:RuntimeView|null
     <div className="graph-toolbar"><Button onClick={()=>onSelect(null)} aria-pressed={selected===null}>Composition controls</Button>
       <Button onClick={()=>zoom(1/1.2)} aria-label="Zoom out">−</Button><span>{Math.round(view.zoom*100)}%</span>
       <Button onClick={()=>zoom(1.2)} aria-label="Zoom in">+</Button><Button onClick={fit}>Fit</Button></div>
-    {!runtime?<p className="hint">Build a visual to see its composition.</p>:!body?<p className="hint">This visual uses a single source file. Its controls are in Inspector.</p>:
+    {!runtime?<p className="hint">Build a visual to see its composition.</p>:!body?<p className="hint">This visual has no component graph. Adjust its controls in Inspector.</p>:
     <div className="graph-viewport" ref={viewport} aria-label="Graph canvas" onWheel={event=>{if(event.ctrlKey){event.preventDefault();zoom(event.deltaY<0?1.1:1/1.1);}}}
       onPointerDown={event=>{if(event.button!==0||(event.target as HTMLElement).closest('button'))return;drag.current={x:event.clientX,y:event.clientY,left:view.x,top:view.y};event.currentTarget.setPointerCapture(event.pointerId);}}
       onPointerMove={event=>{if(drag.current){const start=drag.current;setView(current=>({...current,x:start.left+event.clientX-start.x,y:start.top+event.clientY-start.y}));}}}

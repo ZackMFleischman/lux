@@ -144,7 +144,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
       </Paper>;
   const inspectorPane = <Paper component="aside" square className="inspector" aria-label="Scene controls and status">
         <section><details className="controls-section" open><summary className="section-heading"><span className="section-title">Controls</span><Chip label="LIVE" /></summary>
-          <p className="inspector-target">{selectedNode?.label??'Composition controls'}</p>
+          <p className="inspector-target">{selectedNode?.label??(runtime?.composition?'Composition controls':'Visual controls')}</p>
           <ParameterInspector nodePath={selectedNode?.nodePath} runtime={runtime} available={!!available} client={client} controller={controller} onError={setError} edits={controlEdits} />
         </details></section>
         <section><details><summary>Performance</summary><PerformanceStatus performance={snapshot.performance} /><MetricView label="Visual delivery" metric={snapshot.visualFps} nowMs={nowMs ?? clock} /><MetricView label="UI cadence" metric={snapshot.uiFps} nowMs={nowMs ?? clock} />
