@@ -107,6 +107,15 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   await click('Open Inspector');
   assert.ok(screen.getByText('11'));
   await click('Open Preview');
+  fireEvent.change(screen.getByLabelText('Move panel'), { target: { value: 'jobs' } });
+  await click('Close selected panel');
+  assert.equal(document.querySelector('.studio-dock-grid .studio-pane-jobs'), null);
+  const problems = screen.getByRole('button', { name: 'Problems: 0. Open Jobs and diagnostics' });
+  problems.focus();
+  assert.equal(document.activeElement, problems);
+  await click('Problems: 0. Open Jobs and diagnostics');
+  assert.ok(document.querySelector('.studio-dock-grid .studio-pane-jobs'));
+  assert.ok([...document.querySelectorAll('.studio-dock-grid .dv-tab')].some(node => node.textContent?.trim() === 'Jobs'));
   assert.equal(document.querySelector('.cm-editor'), editorNode);
   assert.equal(attaches, 1); assert.equal(detaches, 0); assert.equal(subscriptions, 1);
   for (const kind of ['preview', 'source', 'library', 'inspector', 'jobs']) {

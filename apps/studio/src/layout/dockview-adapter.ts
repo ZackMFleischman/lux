@@ -66,7 +66,7 @@ export class LuxDockviewAdapter {
     this.live(); const definition = this.registry.get(kind);
     if (!/^[A-Za-z0-9_-]{1,64}$/.test(id) || isReservedPanelKey(id)) throw Error('Invalid panel identity');
     const existing = this.api.getPanel(id);
-    if (existing) { if (existing.view.contentComponent !== kind) throw Error('Panel identity already belongs to another kind'); existing.api.setActive(); return; }
+    if (existing) { if (existing.view.contentComponent !== kind) throw Error('Panel identity already belongs to another kind'); existing.api.setActive(); existing.group.focus(); return; }
     if (!definition.multiple && this.api.panels.some(panel => panel.view.contentComponent === kind)) throw Error('Panel is already open');
     if (!definition.multiple && Object.entries(this.closed).some(([key, panel]) => key !== id && !this.api.getPanel(key) && panel.contentComponent === kind)) throw Error('Reopen the existing panel identity to preserve its view state');
     const previous = this.closed[id];
@@ -74,6 +74,7 @@ export class LuxDockviewAdapter {
     if (this.api.panels.length + Object.keys(this.closed).filter(key => !this.api.getPanel(key)).length >= 32 && !previous) throw Error('Too many panels');
     this.api.addPanel({ ...(group ? { position: { referenceGroup: group, direction: 'within' as const } } : {}), id, component: kind, title: definition.title, renderer: 'always', params: { viewState: definition.parseViewState(previous?.params?.viewState) } });
     delete this.closed[id];
+    const opened = this.api.getPanel(id); opened?.api.setActive(); opened?.group.focus();
   }
   close(id: string): void { this.live(); const panel = this.api.getPanel(id); if (panel) this.api.removePanel(panel); }
   move(id: string, referenceId: string, position: 'left' | 'right' | 'top' | 'bottom' | 'center'): void {
