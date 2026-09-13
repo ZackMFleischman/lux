@@ -12,6 +12,7 @@
 #include <filesystem>
 #include "standalone_alpha.h"
 #include "pixel-marker.h"
+#include "cadence.h"
 extern "C" __declspec(dllexport) DWORD NvOptimusEnablement=1;
 int main(int argc,char** argv) {
   // Refuse unsupervised launches before creating a window or touching the driver.
@@ -35,12 +36,17 @@ int main(int argc,char** argv) {
   const bool pixelProbe=pixelText&&std::strcmp(pixelText,"1")==0;
   if((pixelText&&!pixelProbe)||(pixelProbe&&(alpha||hang||recovery))){std::cerr<<"Invalid pixel probe mode\n";return 2;}
   const long probeWorkLimit=(recovery||pixelProbe)?15000:10000;
+  const char* cadenceText=std::getenv("LUX_STANDALONE_CADENCE");
+  const bool cadence=cadenceText&&std::strcmp(cadenceText,"1")==0;
+  if(cadenceText&&(!cadence||alpha||hang||recovery||pixelProbe||duration!=10000)){
+    std::cerr<<"Cadence requires exclusive 10 s mode\n";return 2;
+  }
   std::string hangMarker;
   LARGE_INTEGER frequency{};QueryPerformanceFrequency(&frequency);
-  if(alpha||hang||pixelProbe){
+  if(alpha||hang||pixelProbe||cadence){
     const char* outerText=std::getenv("LUX_EXPERIMENT_TIMEOUT_MS");char* outerEnd=nullptr;
     const long outer=outerText?std::strtol(outerText,&outerEnd,10):0;
-    if(duration>probeWorkLimit||outer<1000||outer>30000||!outerEnd||*outerEnd||std::strlen(runId)>128||std::strspn(runId,"0123456789abcdefABCDEF-")!=std::strlen(runId)){
+    if(duration>probeWorkLimit||outer<1000||outer>30000||(cadence&&(outer!=30000||frequency.QuadPart<60||frequency.QuadPart>1000000000))||!outerEnd||*outerEnd||std::strlen(runId)>128||std::strspn(runId,"0123456789abcdefABCDEF-")!=std::strlen(runId)){
       std::cerr<<"Probe exceeds work limit (recovery 15 s; alpha/hang 10 s), 30 s supervised budget, or safe run identity\n";return 2;
     }
   }
@@ -58,10 +64,14 @@ int main(int argc,char** argv) {
   }
   if(argc==2&&std::strcmp(argv[1],"--validate-options")==0){std::cout<<"options valid, no graphics initialized\n";return 0;}
   if(argc<2){std::cerr<<"DLL path required\n";return 2;}
-  const std::string capturePath=argc>2?argv[2]:"standalone.rgba",probePath=capturePath+(pixelProbe?".pixels.json":hang?".hang.json":".alpha.json");
-  if((alpha||hang||pixelProbe)&&(argc<3||GetFileAttributesA(capturePath.c_str())!=INVALID_FILE_ATTRIBUTES||GetFileAttributesA(probePath.c_str())!=INVALID_FILE_ATTRIBUTES)){
+  const std::string capturePath=argc>2?argv[2]:"standalone.rgba",probePath=capturePath+(cadence?".cadence.json":pixelProbe?".pixels.json":hang?".hang.json":".alpha.json");
+  if((alpha||hang||pixelProbe||cadence)&&(argc<3||GetFileAttributesA(capturePath.c_str())!=INVALID_FILE_ATTRIBUTES||GetFileAttributesA(probePath.c_str())!=INVALID_FILE_ATTRIBUTES)){
     std::cerr<<"Alpha probe requires fresh explicit capture/evidence paths\n";return 2;
   }
+  // A one-shot high-resolution wait is mandatory for this opt-in mode. No fallback or global timer changes.
+  struct Timer { HANDLE handle=nullptr; ~Timer(){if(handle)CloseHandle(handle);} } cadenceTimer;
+  if(cadence){cadenceTimer.handle=CreateWaitableTimerExW(nullptr,nullptr,CREATE_WAITABLE_TIMER_HIGH_RESOLUTION,TIMER_MODIFY_STATE|SYNCHRONIZE);
+    if(!cadenceTimer.handle){std::cerr<<"High-resolution timer unavailable "<<GetLastError()<<"\n";return 14;}}
   WNDCLASSW wc{};wc.style=CS_OWNDC;wc.lpfnWndProc=DefWindowProcW;wc.hInstance=GetModuleHandle(nullptr);wc.lpszClassName=L"LuxStandaloneGL";RegisterClassW(&wc);
   HWND window=CreateWindowW(wc.lpszClassName,L"Lux standalone diagnostic",WS_OVERLAPPEDWINDOW,0,0,1920,1080,nullptr,nullptr,wc.hInstance,nullptr);
   HDC dc=GetDC(window);PIXELFORMATDESCRIPTOR pfd{sizeof(pfd),1,PFD_DRAW_TO_WINDOW|PFD_SUPPORT_OPENGL|PFD_DOUBLEBUFFER,PFD_TYPE_RGBA,32};int format=ChoosePixelFormat(dc,&pfd);SetPixelFormat(dc,format,&pfd);
@@ -94,7 +104,17 @@ int main(int argc,char** argv) {
   auto bindRead=[&](){glBindFramebuffer(GL_FRAMEBUFFER,fbo);glReadBuffer(GL_COLOR_ATTACHMENT0);};
   auto quarters=[&](){lux::probe::Quartet samples{};bindRead();unsigned row=0;for(int y:{270,810})for(int x:{480,1440})glReadPixels(x,1079-y,1,1,GL_RGBA,GL_UNSIGNED_BYTE,samples[row++].data());return samples;};
   if(alpha||hang||pixelProbe){glDisable(GL_BLEND);glDisable(GL_FRAMEBUFFER_SRGB);bindRead();if(glCheckFramebufferStatus(GL_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE||glGetError()!=GL_NO_ERROR)result=9;}
-  while(!result&&elapsed()<((hang||pixelProbe)?duration-25:duration)) {
+  lux::probe::Cadence cadenceEvidence;
+  if(cadence){
+    value.PointerValue=&process;
+    const auto wait=[&](uint64_t units){LARGE_INTEGER due{};due.QuadPart=-static_cast<LONGLONG>(units);
+      if(!SetWaitableTimerEx(cadenceTimer.handle,&due,0,nullptr,nullptr,nullptr,0))return false;
+      return WaitForSingleObject(cadenceTimer.handle,30000)==WAIT_OBJECT_0;
+    };
+    if(!lux::probe::runCadence(cadenceEvidence,uint64_t(frequency.QuadPart),qpc,wait,[&]{return main(FF_PROCESS_OPENGL,value,instance).UIntValue==FF_SUCCESS;}))result=14;
+    count=cadenceEvidence.calls;
+  }
+  while(!cadence&&!result&&elapsed()<((hang||pixelProbe)?duration-25:duration)) {
     if(alpha||hang||pixelProbe){glDisable(GL_BLEND);glDisable(GL_FRAMEBUFFER_SRGB);glBindFramebuffer(GL_FRAMEBUFFER,fbo);}
     const auto callbackBefore=pixelProbe?qpc():0;
     value.PointerValue=&process;if(main(FF_PROCESS_OPENGL,value,instance).UIntValue!=FF_SUCCESS){result=6;break;}++count;
@@ -159,7 +179,7 @@ int main(int argc,char** argv) {
   if(recovery&&!recovered&&!result){std::cerr<<"Recovered cyan image deadline exceeded\n";result=12;}
   if(pixelProbe&&(!pixelReady||!pixelComplete||pixelControls.size()!=8)&&!result){std::cerr<<"Pixel correlation deadline exceeded\n";result=13;}
   // One diagnostic capture only. Not transport or performance evidence.
-  if(!result&&!hang&&!pixelProbe){
+  if(!result&&!hang&&!pixelProbe&&!cadence){
     std::vector<unsigned char> pixels(1920*1080*4);if(alpha)bindRead();glReadPixels(0,0,1920,1080,GL_RGBA,GL_UNSIGNED_BYTE,pixels.data());
     if(alpha&&glGetError()!=GL_NO_ERROR)result=9;
     if(alpha){lux::probe::Quartet samples{};unsigned row=0;for(int y:{270,810})for(int x:{480,1440})std::memcpy(samples[row++].data(),pixels.data()+((1079-y)*1920+x)*4,4);if(!lux::probe::matches(samples,lux::probe::transparent))result=10;}
@@ -168,6 +188,12 @@ int main(int argc,char** argv) {
   }
   const auto workElapsed=elapsed();if((alpha||hang||pixelProbe)&&workElapsed>probeWorkLimit&&!result)result=10;
   auto evidence=[&](bool deinstantiated,bool deinitialized){
+    if(cadence){
+      const auto& c=cadenceEvidence;
+      std::ofstream file(probePath);file<<"{\"mode\":\"cadence-v1\",\"runId\":\""<<runId<<"\",\"hostPid\":"<<GetCurrentProcessId()<<",\"ok\":"<<(!result&&deinstantiated&&deinitialized?"true":"false")<<",\"deinstantiated\":"<<(deinstantiated?"true":"false")<<",\"deinitialized\":"<<(deinitialized?"true":"false")<<",\"lostRecords\":0,\"clock\":{\"domain\":\"qpc\",\"frequency\":\""<<frequency.QuadPart<<"\"},\"start\":\""<<c.start<<"\",\"end\":\""<<c.end<<"\",\"coverageEnd\":\""<<c.coverageEnd<<"\",\"slots\":[";
+      for(unsigned i=0;i<600;++i){if(i)file<<',';const auto& s=c.slots[i];file<<"{\"slot\":"<<i<<",\"due\":\""<<s.due<<"\",\"before\":\""<<s.before<<"\",\"after\":\""<<s.after<<"\",\"sequence\":"<<s.sequence<<",\"missed\":"<<(s.missed?"true":"false")<<",\"success\":"<<(s.success?"true":"false")<<'}';}
+      file<<"]}\n";file.close();if(!file&&!result)result=11;return;
+    }
     if(pixelProbe){
       std::ofstream file(probePath);file<<"{\"mode\":\"pixel-correlation-v1\",\"runId\":\""<<runId<<"\",\"hostPid\":"<<GetCurrentProcessId()<<",\"ok\":"<<(!result&&deinstantiated&&deinitialized?"true":"false")<<",\"deinstantiated\":"<<(deinstantiated?"true":"false")<<",\"deinitialized\":"<<(deinitialized?"true":"false")<<",\"elapsedMs\":"<<workElapsed<<",\"lostRecords\":"<<pixelLost<<",\"clock\":{\"domain\":\"qpc\",\"frequency\":\""<<frequency.QuadPart<<"\"},\"controls\":[";
       for(size_t i=0;i<pixelControls.size();++i){if(i)file<<',';const auto& c=pixelControls[i];file<<"{\"step\":"<<c.step<<",\"due\":\""<<c.due<<"\",\"before\":\""<<c.before<<"\",\"after\":\""<<c.after<<"\",\"accepted\":"<<(c.accepted?"true":"false")<<'}';}file<<"],\"samples\":[";
