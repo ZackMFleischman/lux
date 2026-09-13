@@ -1,5 +1,5 @@
 export interface SourceAsset {
-  readonly mediaType: 'image/bmp';
+  readonly mediaType: 'image/bmp' | 'image/png' | 'image/jpeg';
   readonly encoding: 'base64';
   readonly data: string;
 }
@@ -33,9 +33,13 @@ export function decodeCanonicalBase64(data: unknown): Uint8Array;
 export function validateBmp(bytes: Uint8Array): BmpInfo;
 export function decodeBmp(bytes: Uint8Array): { width: number; height: number; data: Uint8Array };
 export function validateSourceAssets(input: unknown): SourceAssets;
+/** Cheap descriptor snapshot only; does NOT validate base64, bytes or images. */
+export function snapshotSourceAssetRecords(input: unknown): SourceAssets;
 /** Validates derived shape/size/dimensions, but does not verify the SHA-256 claims. */
 export function canonicalAssetSet(assets: unknown): string;
 export function deriveAssets(input: unknown, hashBytes: HashBytes): Promise<DerivedAssetSet>;
 export function verifyDerivedAssets(input: unknown, expectedAssetSetHash: string, hashBytes: HashBytes): Promise<DerivedAssetSet & { readonly sourceAssets: SourceAssets }>;
 /** Construct before importing submitted code; every returned byte array is a fresh copy. */
 export function createReadonlyAssetMap(input: unknown): ReadonlyMap<string, Readonly<Uint8Array>>;
+export interface DecodedImage { readonly width: number; readonly height: number; readonly colorSpace: 'srgb'; readonly alphaMode: 'straight'; readonly data: Uint8Array; }
+export function createReadonlyImageMap(input: unknown): ReadonlyMap<string, DecodedImage>;

@@ -1,5 +1,5 @@
 import type { SourceBundle } from '../../../../packages/runtime-contracts/src/index.ts';
-import { validateSource } from '../../../build-worker/src/source-policy.mjs';
+import { createSourceAdmissionSession, type AdmissionWorkerFactory } from './admission.mjs';
 import { equalSource as equal, changedAssets } from './source-equality.ts';
 
 export type SourceSnapshot = Readonly<{
@@ -17,14 +17,12 @@ export interface SourceWorkspace {
   closeFile(path: string): void;
   markSaved(version: number): void;
   replaceDocument(source: SourceBundle): void;
+  replaceDocumentAsync(source: SourceBundle, createWorker: AdmissionWorkerFactory, timeoutMs?: number): Promise<void>;
   undoReplacement(): void;
   submit(source: SourceBundle, expectedVersion: number, activate: (source: SourceBundle) => Promise<void>): Promise<void>;
 }
-function admit(source: SourceBundle): SourceBundle {
-  const admitted = validateSource(source) as SourceBundle;
-  Object.freeze(admitted.files); return Object.freeze(admitted);
-}
 export function createSourceWorkspace(initial: SourceBundle): SourceWorkspace {
+  const admission = createSourceAdmissionSession(), admit = admission.admit;
   let source = admit(initial), saved = source, running: SourceBundle | null = null, undo: SourceBundle | null = null;
   let version = 0, documentKey = 0, busy = false, selectedFile = source.entry, openFiles = [source.entry];
   const listeners = new Set<() => void>();
@@ -46,9 +44,9 @@ export function createSourceWorkspace(initial: SourceBundle): SourceWorkspace {
     getSnapshot: () => current,
     subscribe(listener) { listeners.add(listener); return () => { listeners.delete(listener); }; },
     edit(path, text) { editable(); exists(path); if (source.files[path] === text) return;
-      source = admit({ ...source, files: { ...source.files, [path]: text } }); version++; publish(); },
+      source = admission.edit(source, { ...source.files, [path]: text }); version++; publish(); },
     addFile(path, text) { editable(); if (Object.hasOwn(source.files, path)) throw Error('Source file already exists');
-      source = admit({ ...source, files: { ...source.files, [path]: text } }); version++;
+      source = admission.edit(source, { ...source.files, [path]: text }); version++;
       selectedFile = path; openFiles.push(path); publish(); },
     openFile(path) { exists(path); selectedFile = path; if (!openFiles.includes(path)) openFiles.push(path); publish(); },
     closeFile(path) { openFiles = openFiles.filter(file => file !== path);
@@ -56,6 +54,14 @@ export function createSourceWorkspace(initial: SourceBundle): SourceWorkspace {
     markSaved(atVersion) { if (atVersion !== version) return; saved = source; publish(); },
     replaceDocument(next) { editable(); source = admit(next); saved = source; undo = null; version++; documentKey++;
       selectedFile = source.entry; openFiles = [source.entry]; publish(); },
+    async replaceDocumentAsync(next, createWorker, timeoutMs) {
+      editable(); busy = true; publish();
+      try {
+        const admitted = await admission.admitAsync(next, createWorker, timeoutMs);
+        source = admitted; saved = source; undo = null; version++; documentKey++;
+        selectedFile = source.entry; openFiles = [source.entry];
+      } finally { busy = false; publish(); }
+    },
     undoReplacement() { editable(); if (!undo) return; source = undo; undo = null; version++; reconcile(); publish(); },
     async submit(next, expectedVersion, activate) {
       editable();

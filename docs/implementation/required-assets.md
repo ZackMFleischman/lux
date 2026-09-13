@@ -129,3 +129,113 @@ to ImageData while labeling them straight, and presentation uses a premultiplied
 WebGPU canvas; these are unverified representation boundaries, not passing alpha
 evidence. Exported/installed alpha is a separate required validation after Studio.
 Codec and alpha implementation details are being developed in asset-alpha.md.
+
+## First asynchronous admission/cache implementation plan
+
+Plan, 12 September 2026. This is an explicitly bounded integration foundation
+after the opt-in PNG/JPEG CPU adapters, not common-codec product activation.
+SDK A/B changes (`7e257a1`, `2a33a53`) are prerequisites: retain their SDK 0.1/0.2
+selection, descriptor snapshots and canonical source ordering. Runtime C owns the
+authored-worker asset bridge; this slice does not modify runtime or compiler
+artifact formats. Execute inline in the isolated image-codecs worktree.
+
+**Goal:** text edits reuse internally owned, previously admitted assets without
+decoding them; unknown source replacements have a bounded asynchronous full
+admission path and preserve the last good workspace on failure.
+
+**Architecture:** retain `validateSource` as full verification at every existing
+build/worker boundary. Add a separately named cheap envelope validator plus a
+per-workspace admission session. A session owns canonical source objects in a
+private WeakSet; only edits derived from those exact objects can reuse their
+exact frozen asset record. A dedicated trusted worker fully validates unknown
+source snapshots and returns a request-correlated acknowledgement. No serialized
+token, claimed hash or derived metadata can grant cached trust.
+
+**Constraints:** preserve four assets, 512-by-512 image dimensions, 786486 encoded
+file bytes, 1 MiB original bytes and 2 MiB RGBA. Preserve SDK 0.1 and all legacy
+identity branches. The cheap envelope is not an admitted source. Existing media
+and paths remain BMP-only; PNG/JPEG activation waits for complete codec closure,
+installed inventories/capabilities and worker-based entry paths. The first cache
+stores admission provenance, not derived pixels; a later worker-local decoded
+pixel cache is bounded separately and never authorizes a new trust boundary.
+
+### Task 1: distinguish envelope checks from full asset admission
+
+Files: `packages/assets/src/index.mjs` and `.d.mts`,
+`apps/build-worker/src/source-policy.mjs` and `.d.mts`,
+`tests/assets/source-admission.test.mjs`.
+
+- [ ] Add `snapshotSourceAssetRecords(input)`: snapshot exact own descriptor
+  fields, validate logical path/media/encoding/count/case-fold rules and bound
+  base64 string lengths without decoding image data. This function explicitly
+  does not certify canonical base64, signatures, pixels or aggregate decoded bytes.
+- [ ] Add `validateSourceEnvelope(source)` using the existing SDK/file/serialized
+  JSON checks and the cheap descriptor snapshot. Keep `validateSource(source)`
+  fully validating by substituting `validateSourceAssets(envelope.assets)` before
+  returning. Both preserve existing canonical field and file ordering.
+- [ ] First write red tests showing a structurally bounded malformed BMP can
+  pass only the envelope and still fails full validation; source SDK 0.1/0.2,
+  accessors, unknown fields, path collisions and byte limits retain behavior.
+- [ ] Run `node --test --test-isolation=none tests/assets/assets.test.mjs
+  tests/assets/source-admission.test.mjs tests/compiler/parameter-declarations.test.mjs`.
+
+### Task 2: exact-owned edit reuse and terminable asynchronous admission
+
+Files: create `apps/studio/src/source/admission.mjs` and `.d.mts`,
+`admission-worker.mjs`, `admission-worker-handler.mjs`;
+tests `tests/studio/source-admission.test.mjs` and a Node worker bridge fixture.
+
+- [ ] Implement `createSourceAdmissionSession()` with `admit(source)`,
+  `edit(ownedSource, files)` and `admitAsync(source, createWorker, timeoutMs=2000)`.
+  `admit` fully verifies then freezes/registers source+files+assets. `edit` rejects
+  objects not owned by this session, validates fresh files through the envelope,
+  and reuses only the exact previous frozen assets record. Weak ownership allows
+  unreachable snapshots to be collected and never retains decoded pixel buffers.
+- [ ] `admitAsync` snapshots/freezes a cheap envelope, then sends it to a fresh
+  trusted worker with a private monotonic request ID. The worker calls full
+  `validateSource`, including every declared asset, before acknowledging success.
+  The client accepts only a bounded exact response shape matching the active ID;
+  worker errors, malformed responses, timeout and postMessage failure reject.
+  Terminate the worker and remove listeners on every completion path. Timeout
+  must be an integer from 1 to 5000 ms. On success register the private canonical
+  snapshot that was sent, never arbitrary returned source or trust metadata.
+- [ ] Browser worker entry installs the shared handler on its own message port.
+  CPU tests use the same handler in a real Node worker bridge; the worktree test
+  may bundle it in-memory, but production worker packaging is a later activation
+  gate. `createWorker` is a trusted host dependency, never an untrusted DTO field.
+- [ ] Red tests: foreign-session/JSON-cloned source cannot use `edit`; a genuine
+  owned edit preserves assets by reference and has no image-header decode; worker
+  malformed images fail; valid requests succeed; wrong-ID/schema responses and a
+  hanging worker reject and terminate; caller mutation after dispatch is isolated.
+
+### Task 3: workspace adoption without activating new codecs
+
+Files: `apps/studio/src/source/workspace.ts`,
+`tests/studio/source-workspace.test.ts`, new asynchronous workspace tests.
+
+- [ ] Give each workspace a private admission session. Existing initial/sync
+  replacement/build submission paths retain full BMP validation. `edit` and
+  `addFile` call `session.edit(source, nextFiles)` and preserve asset identity.
+  Store every accepted replacement/undo source as an owned immutable snapshot.
+- [ ] Add explicit `replaceDocumentAsync(source, createWorker, timeoutMs?)` using
+  the existing synchronous busy lock and the session's async admission. Commit
+  source/saved/version/documentKey only after worker success; finally release busy.
+  Failure preserves source, dirty state, version, selection and running candidate.
+  No UI button, MIME union or production browser worker URL is activated here.
+- [ ] Red tests: valid owned text edits still succeed when image-header access is
+  disabled after initialization, proving no repeated decoder call; foreign asset
+  replacement cannot reuse the token; worker rejection/timeout leaves the exact
+  last-good source reference and version; successful replacement changes once.
+- [ ] Run all existing source-workspace/authoring-session CPU tests plus admission,
+  codecs and SDK/compiler policy tests; run TypeScript and browser-bundle checks.
+  Commit and obtain independent review before integration.
+
+### Following activation slice
+
+Connect import/open/MCP replacement to the asynchronous worker path, change
+compile-parent envelope handling so full decode starts inside its existing
+contained build worker, and add a bounded worker-local decoded cache keyed by
+verified original bytes and codec-policy identity. Separately update the runtime
+bridge to reverify received originals before module import and expose protected
+`context.images`. Only after dependency closure/inventory/capability and original-
+byte round-trip tests pass should PNG/JPEG media/path support become visible.
