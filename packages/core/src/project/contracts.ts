@@ -17,6 +17,10 @@ const exactVersion = z.string().regex(/^(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?
 const packageId = z.string().regex(/^[a-z][a-z0-9-]{0,63}\/[a-z][a-z0-9-]{0,63}$/);
 const exportId = z.string().regex(/^[a-z][A-Za-z0-9_]{0,63}$/);
 const path = z.string().transform(metadataPath);
+// Existing declaration packs use these exact versioned directories; all other
+// entries retain the historical metadata grammar. This is lexical admission only.
+const declarationEntry = z.string().transform(value =>
+  value === 'sdk/0.1.0/index.d.ts' || value === 'sdk/0.2.0/index.d.ts' ? value : metadataPath(value));
 const modulePath = z.string().transform(sourcePath);
 const assetPath = z.string().transform(logicalAssetPath);
 const name = z.string().min(1);
@@ -70,11 +74,12 @@ const assetRecords = z.record(uuidKey, asset).superRefine(value => {
 });
 const assets = z.object({ schemaVersion: z.literal(1), assets: assetRecords }).strict();
 const toolchain = z.object({
-  sdkVariants: z.record(z.string().refine(value => projectV1SdkVersionSchema.safeParse(value).success), z.object({ declarationEntry: path, contractHash: hashSchema }).strict()),
+  sdkVariants: z.record(z.string().refine(value => projectV1SdkVersionSchema.safeParse(value).success), z.object({ declarationEntry, contractHash: hashSchema }).strict()),
   typescriptVersion: exactVersion, threeVersion: exactVersion, threeTypesVersion: exactVersion, declarationPackHash: hashSchema, runtimeBuildHash: hashSchema,
 }).strict().superRefine(value => {
   if (!Object.keys(value.sdkVariants).length) throw Error('Toolchain must declare a supported SDK');
-  uniquePaths(Object.values(value.sdkVariants).map(variant => variant.declarationEntry));
+  const entries = Object.values(value.sdkVariants).map(variant => variant.declarationEntry.toLowerCase());
+  if (new Set(entries).size !== entries.length) throw Error('Duplicate or case-colliding metadata paths');
 });
 const lock = z.object({ schemaVersion: z.literal(1), toolchain, packages: pins }).strict();
 const packageManifest = z.object({ format: z.literal('lux-package'), schemaVersion: z.literal(1), packageId, version: exactVersion, sdkRange: z.enum(['0.1.0', '0.2.0', '0.1.0 || 0.2.0']), exports: z.record(exportId, code), files: z.record(path, hashSchema), assets: assetRecords, dependencies: pins }).strict().superRefine(value => {
