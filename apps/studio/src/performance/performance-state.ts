@@ -5,19 +5,18 @@ export type PerformanceSnapshot=Readonly<{
 }>;
 const count=(v:unknown):v is number=>Number.isSafeInteger(v)&&Number(v)>=0;
 const duration=(v:unknown):v is number=>typeof v==='number'&&Number.isFinite(v)&&v>=0;
-function metric(raw:any,unit:'ms'|'Hz',gpu=false):LiveMetric {
+function metric(raw:any,unit:'ms'|'Hz'):LiveMetric {
  if(!raw||raw.unit!==unit||!['available','pending','unsupported'].includes(raw.availability)||
   !['complete','incomplete'].includes(raw.validity)||raw.gate!=='not_evaluated'||
   !count(raw.sampleCount)||!count(raw.expectedCount)||!count(raw.missingCount)||
   raw.sampleCount+raw.missingCount!==raw.expectedCount||
   typeof raw.samplingPolicy!=='string'||raw.samplingPolicy.length>160||
   (raw.reason!==undefined&&(typeof raw.reason!=='string'||raw.reason.length>256)))throw Error('Invalid metric');
- if(gpu&&(raw.availability!=='unsupported'||raw.sampleCount!==0||raw.validity!=='incomplete'))throw Error('GPU coverage unavailable');
  const result:any={unit,availability:raw.availability,validity:raw.validity,gate:'not_evaluated',
   sampleCount:raw.sampleCount,expectedCount:raw.expectedCount,missingCount:raw.missingCount,samplingPolicy:raw.samplingPolicy};
  if(raw.reason!==undefined)result.reason=raw.reason;
  for(const key of ['value','p50','p95','p99','max'])if(raw[key]!==undefined){
-  if(!duration(raw[key])||raw.availability!=='available'||gpu)throw Error('Invalid duration');result[key]=raw[key];
+  if(!duration(raw[key])||raw.availability!=='available')throw Error('Invalid duration');result[key]=raw[key];
  }
  if(raw.availability==='available') {
   if(unit==='Hz'?!duration(raw.value):!(raw.sampleCount>0&&['p50','p95','p99','max'].every(key=>duration(raw[key]))&&raw.p50<=raw.p95&&raw.p95<=raw.p99&&raw.p99<=raw.max))throw Error('Missing statistics');
@@ -36,8 +35,13 @@ function summary(raw:any):FrameSummary {
  for(const key of ['update','renderCall','cpuCall','renderAwait','queueWait']){
   result[key]=metric(raw[key],'ms');if(result[key].sampleCount!==raw.retainedRecords||result[key].expectedCount!==result.produced.expectedCount)throw Error('Invalid coverage');
  }
- result.gpu=Object.freeze({...metric(raw.gpu,'ms',true),timestampQuerySupported:raw.gpu.timestampQuerySupported,timestampQueryEnabled:false});
- if(![true,false,null].includes(raw.gpu.timestampQuerySupported)||raw.gpu.timestampQueryEnabled!==false)throw Error('Invalid GPU capability');
+ const gpu=raw.gpu;
+ if(!gpu||![true,false,null].includes(gpu.timestampQuerySupported)||typeof gpu.timestampQueryEnabled!=='boolean'||
+  !count(gpu.failedSamples)||!count(gpu.droppedSamples)||!count(gpu.pendingSamples)||gpu.pendingSamples>3)throw Error('Invalid GPU capability');
+ if(gpu.timestampQueryEnabled?gpu.timestampQuerySupported!==true||gpu.availability==='unsupported':gpu.availability!=='unsupported'||gpu.sampleCount!==0||gpu.validity!=='incomplete')throw Error('Invalid GPU coverage');
+ if(gpu.sampleCount>raw.retainedRecords)throw Error('Invalid GPU samples');
+ if(gpu.expectedCount!==(gpu.timestampQueryEnabled?result.produced.expectedCount:result.produced.sampleCount))throw Error('Invalid GPU coverage count');
+ result.gpu=Object.freeze({...metric(gpu,'ms'),timestampQuerySupported:gpu.timestampQuerySupported,timestampQueryEnabled:gpu.timestampQueryEnabled,failedSamples:gpu.failedSamples,droppedSamples:gpu.droppedSamples,pendingSamples:gpu.pendingSamples});
  return Object.freeze(result);
 }
 /** Holds one bounded, detached summary. Arrival timestamps belong to the UI
@@ -50,7 +54,7 @@ export class PerformanceReceiver {
   if(this.snapshot.status==='failed'||!duration(now)||now<this.lastArrival)return false;
   try {
    const value=summary(raw),previous=this.snapshot.worker;
-   if(previous&&(value.sequence<=previous.sequence||value.windowStartMs<previous.windowEndMs||value.lostRecords<previous.lostRecords||value.invalidRecords<previous.invalidRecords))return false;
+   if(previous&&(value.sequence<=previous.sequence||value.windowStartMs<previous.windowEndMs||value.lostRecords<previous.lostRecords||value.invalidRecords<previous.invalidRecords||value.gpu.failedSamples<previous.gpu.failedSamples||value.gpu.droppedSamples<previous.gpu.droppedSamples))return false;
    this.lastArrival=now;this.snapshot=Object.freeze({...this.snapshot,status:'live',observedAtMs:now,worker:value});return true;
   }catch{return false;}
  }

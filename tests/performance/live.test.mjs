@@ -2,6 +2,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createFrameCollector } from '../../packages/performance/live.mjs';
 
+test('GPU readbacks correlate once to retained frames; missing or late samples never reuse earlier values',()=>{
+ const c=createFrameCollector({startMs:0});c.record(10,1,1,2,3,false);c.record(20,2,1,2,3,false);
+ assert.equal(c.recordGpu(1,4,true),true);assert.equal(c.recordGpu(1,99,true),false);
+ const summary=c.summary(500,{timestampQuerySupported:true,timestampQueryEnabled:true,failedSamples:1,droppedSamples:0,pendingSamples:0});
+ assert.equal(summary.gpu.p95,4);assert.equal(summary.gpu.sampleCount,1);assert.equal(summary.gpu.missingCount,1);assert.equal(summary.gpu.validity,'incomplete');assert.equal(summary.gpu.failedSamples,1);
+ assert.equal(c.recordGpu(2,8,true),false);
+ c.record(510,3,1,2,3,false);c.recordGpu(3,5,false);
+ const next=c.summary(1000,{timestampQuerySupported:true,timestampQueryEnabled:true});assert.equal(next.gpu.p95,5);assert.equal(next.gpu.validity,'incomplete');assert.match(next.gpu.reason,/outside passes/);
+});
+
 test('collector measures completed-frame throughput and per-frame CPU sums with nearest-rank quantiles',()=>{
   const c=createFrameCollector({startMs:0,capacity:32,windowMs:1000});
   for(let i=1;i<=10;i++)c.record(i*100, i, i%2?1:9, i%2?9:1, 3, false);
