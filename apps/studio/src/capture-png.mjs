@@ -13,14 +13,16 @@ for (let alpha = 1; alpha < 256; alpha++) for (let byte = 0; byte < 256; byte++)
 }
 
 export function encodeCapturedTarget(pixels, width, height) {
-  if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1 || width > 3840 || height > 2160 ||
-      !(pixels instanceof Uint8Array) || pixels.byteLength !== width * height * 4) throw Error('Invalid capture target readback');
-  const data = new Uint8Array(pixels.length);
-  for (let at = 0; at < pixels.length; at += 4) {
-    const alpha = pixels[at + 3], row = alpha * 256;
-    data[at] = straight[row + pixels[at]];
-    data[at + 1] = straight[row + pixels[at + 1]];
-    data[at + 2] = straight[row + pixels[at + 2]];
+  if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1 || width > 3840 || height > 2160 || !(pixels instanceof Uint8Array)) throw Error('Invalid capture target readback');
+  const rowBytes = width * 4, tightLength = rowBytes * height, paddedRowBytes = Math.ceil(rowBytes / 256) * 256;
+  if (pixels.byteLength !== tightLength && pixels.byteLength !== paddedRowBytes * height) throw Error('Invalid capture target readback');
+  const source = pixels.byteLength === tightLength ? pixels : (() => { const tight = new Uint8Array(tightLength); for (let row = 0; row < height; row++) tight.set(pixels.subarray(row * paddedRowBytes, row * paddedRowBytes + rowBytes), row * rowBytes); return tight; })();
+  const data = new Uint8Array(source.length);
+  for (let at = 0; at < source.length; at += 4) {
+    const alpha = source[at + 3], row = alpha * 256;
+    data[at] = straight[row + source[at]];
+    data[at + 1] = straight[row + source[at + 1]];
+    data[at + 2] = straight[row + source[at + 2]];
     data[at + 3] = alpha;
   }
   // Encode straight bytes directly. A 2D canvas would quantize through another

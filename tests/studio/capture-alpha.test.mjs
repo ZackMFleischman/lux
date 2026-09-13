@@ -32,3 +32,11 @@ test('Studio preview capture accepts a non-default render size', () => {
   const pixels = new Uint8Array(1280 * 720 * 4); pixels[3] = 255;
   assert.ok(encodeCapturedTarget(pixels, 1280, 720).byteLength > 0);
 });
+
+test('Studio preview capture removes only WebGPU row padding for a non-aligned width', () => {
+  const width = 2400, height = 2, row = width * 4, stride = Math.ceil(row / 256) * 256;
+  const pixels = new Uint8Array(stride * height); pixels.set([188, 0, 0, 128], 0); pixels.set([0, 255, 0, 255], stride);
+  const image = decode(encodeCapturedTarget(pixels, width, height));
+  assert.equal(image.data.length, row * height); assert.deepEqual(Array.from(image.data.slice(0, 4)), [255, 0, 0, 128]);
+  assert.deepEqual(Array.from(image.data.slice(row, row + 4)), [0, 255, 0, 255]);
+});
