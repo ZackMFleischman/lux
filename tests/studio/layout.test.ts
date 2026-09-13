@@ -12,9 +12,10 @@ test('versioned desktop split and laptop tab layouts contain only registered rea
   assert.deepEqual(parsePersonalLayout(JSON.stringify(desktop), registry), desktop);
   assert.equal((laptop.dock.grid.root.data as any[])[0].data.views.length, 5);
   assert.notDeepEqual(desktop.dock.grid.root, laptop.dock.grid.root);
-  assert.throws(() => registry.get('graph'), /Unavailable/);
-  const expanded = createStudioPanelRegistry([{ kind: 'graph', title: 'Graph', multiple: false, parseViewState: () => ({}) }]);
-  assert.equal(expanded.get('graph').title, 'Graph');
+  assert.equal(registry.get('graph').title,'Graph');
+  assert.throws(() => registry.get('timeline'), /Unavailable/);
+  const expanded = createStudioPanelRegistry([{ kind: 'timeline', title: 'Timeline', multiple: false, parseViewState: () => ({}) }]);
+  assert.equal(expanded.get('timeline').title, 'Timeline');
   assert.throws(() => new PanelRegistry([registry.get('preview'), registry.get('preview')]), /duplicate/);
   for (const kind of ['__proto__', 'constructor', 'prototype']) {
     assert.throws(() => new PanelRegistry([{ ...registry.get('preview'), kind }]), /Invalid/);
