@@ -64,7 +64,7 @@ Before another acceptance run, validate timestamp accuracy for this pinned
 backend and a reference covering the complete monitored workload. Repeating
 the same noisy test alone would not establish the missing coverage or accuracy.
 
-Integrated CPU verification: 16 diagnostic tests passed using Node 24.12.0 with
+Integrated CPU verification: 26 timer and diagnostic tests passed using Node 24.12.0 with
 `--experimental-vm-modules --test --test-isolation=none`. The initial root command
 omitted the VM flag and failed four VM-based tests; rerunning with the required
 flag passed all tests. Neither hardware run overlapped another graphics test.
