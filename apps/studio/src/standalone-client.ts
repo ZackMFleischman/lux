@@ -25,7 +25,8 @@ export interface AuthoringApi {
   onAgentCommand(listener: (command: any) => Promise<unknown>): () => void;
 }
 declare global { interface Window { luxAuthoring: AuthoringApi } }
-type Running = { worker: Worker; canvas: HTMLCanvasElement; instanceId: string; generation: number; revisionId: string; performance:PerformanceReceiver;
+type RetryPolicy={lastFaultAt:number|null};
+type Running = { worker: Worker; canvas: HTMLCanvasElement; instanceId: string; generation: number; revisionId: string; performance:PerformanceReceiver;retryPolicy:RetryPolicy;autoRetry:boolean;
   lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; state:RuntimeControlState; desiredControls?:ControlValues; };
 export class StandaloneClient implements StudioClient, PresentationPort {
   private snapshot: StudioSnapshot = { connection: 'connected', message: 'Open an example or write a visual, then Build & preview.', receivedAtMs: Date.now(), authoring: null, host: null, jobs: [], visualFps: null, uiFps: null };
@@ -36,6 +37,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private source: SourceBundle | null = null;
   private accepted: { linked: LinkedEnvelope; revisionId: string; state:RuntimeControlState } | null = null;
   private busy = false;
+  private automaticRetry:ReturnType<typeof setTimeout>|undefined;
   private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; expectedControlSequence?:number; expectedControls?:ControlValues; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
   private api: AuthoringApi;
   private codeDeclaredParameters:boolean;
@@ -46,6 +48,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   async submit(source: SourceBundle, options:{savedControls?:SavedControlSnapshot}={}): Promise<void> {
     if(source.sdkVersion==='0.2.0'&&!this.codeDeclaredParameters)throw Error('Code-declared parameters are not enabled in this Studio UI yet');
     if (this.busy) throw Error('A visual build is already running');
+    this.cancelAutomaticRetry();
     this.busy = true;
     const jobId = crypto.randomUUID();
     this.publish({ jobs: [{ jobId, state: 'compiling', summary: 'Compiling visual…' }] });
@@ -72,16 +75,16 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       await this.start(linked, result.sourceHash,state,initial.changes);
       this.source = submittedSource;
       this.accepted = { linked, revisionId: result.sourceHash,state };
-      this.publish({ jobs: [{ jobId, state: 'succeeded', summary: 'Visual is ready in Lux.' }] });
+      this.publish({ message:null,jobs: [{ jobId, state: 'succeeded', summary: 'Visual is ready in Lux.' }] });
     } catch (error) { this.publish({ jobs: [{ jobId, state: 'failed', summary: 'Build failed; previous preview retained.', fault: String(error) }] }); throw error; }
-    finally { this.busy = false; }
+    finally { this.busy = false; this.scheduleAutomaticRetry(); }
   }
-  private async start(linked: LinkedEnvelope, revisionId: string, state:RuntimeControlState, migration:readonly ControlMigration[]=[]): Promise<void> {
+  private async start(linked: LinkedEnvelope, revisionId: string, state:RuntimeControlState, migration:readonly ControlMigration[]=[],retryPolicy:RetryPolicy={lastFaultAt:null}): Promise<void> {
     const canvas = document.createElement('canvas'); canvas.width = 1920; canvas.height = 1080;
     canvas.style.cssText = 'width:100%;height:100%;position:absolute;inset:0;object-fit:contain';
     const worker = new Worker(new URL('./visual-worker.js', import.meta.url), { type: 'module' });
     const candidate: Running = { worker, canvas, instanceId: this.running?.instanceId ?? crypto.randomUUID(), generation: ++this.generation,
-      revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0,state,performance:undefined as any };
+      revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0,state,performance:undefined as any,retryPolicy,autoRetry:false };
     candidate.performance=new PerformanceReceiver({instanceId:candidate.instanceId,generation:candidate.generation,revisionId},performance.now());
     const previous = this.running;
     const playing = this.snapshot.authoring?.playback === 'playing';
@@ -177,9 +180,27 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   }
   private fault(runtime: Running, message: string) {
     if (runtime !== this.running || runtime.terminal) return;
+    const at=performance.now(),last=runtime.retryPolicy.lastFaultAt;
+    runtime.autoRetry=last===null||at-last>=30000;runtime.retryPolicy.lastFaultAt=at;
     this.stop(runtime, message);
     runtime.performance.fail();
-    if (this.snapshot.authoring) this.publish({ performance:runtime.performance.snapshot,authoring: { ...this.snapshot.authoring, playback: 'failed', fault: { code: 'RUNTIME_FAILED', message } } });
+    if (this.snapshot.authoring) this.publish({ message:runtime.autoRetry?'Preview failed. One automatic restart is queued.':'Preview failed twice within 30 seconds. Restart explicitly to retry.',performance:runtime.performance.snapshot,authoring: { ...this.snapshot.authoring, playback: 'failed', fault: { code: 'RUNTIME_FAILED', message } } });
+    this.scheduleAutomaticRetry();
+  }
+  private cancelAutomaticRetry(){clearTimeout(this.automaticRetry);this.automaticRetry=undefined;}
+  private scheduleAutomaticRetry(){
+    const runtime=this.running,accepted=this.accepted;
+    if(this.busy||this.automaticRetry!==undefined||!runtime?.terminal||!runtime.autoRetry||!accepted||accepted.revisionId!==runtime.revisionId)return;
+    // Briefly yield to explicit source/restart actions; one timer and one candidate.
+    this.automaticRetry=setTimeout(()=>{
+      this.automaticRetry=undefined;
+      if(this.busy||this.running!==runtime||!runtime.autoRetry)return;
+      runtime.autoRetry=false;this.busy=true;this.publish({message:'Automatically restarting the accepted visual…'});
+      void this.start(accepted.linked,accepted.revisionId,{...runtime.state,controls:runtime.desiredControls??runtime.state.controls,controlSequence:0},[],runtime.retryPolicy)
+        .then(()=>{if(!this.running?.terminal)this.publish({message:null});})
+        .catch(error=>{runtime.retryPolicy.lastFaultAt=performance.now();if(this.running===runtime)this.publish({message:`Automatic restart failed. Restart explicitly to retry. ${String(error).slice(0,500)}`});})
+        .finally(()=>{this.busy=false;this.scheduleAutomaticRetry();});
+    },250);
   }
   async invoke(operation: StudioOperation): Promise<unknown> {
     const raw=snapshotRecord(operation),inputRaw=snapshotRecord(raw.input);
@@ -192,9 +213,11 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     if (!runtime || input.instanceId !== runtime.instanceId || input.expectedGeneration !== runtime.generation) throw Error('Runtime changed; retry using its current state');
     if (operation.name === 'lux.runtime.restart') {
       if (!this.accepted) throw Error('No visual to restart');
+      this.cancelAutomaticRetry();runtime.autoRetry=false;
       this.busy = true;
-      try { await this.start(this.accepted.linked, this.accepted.revisionId, {...runtime.state,controls:runtime.desiredControls??runtime.state.controls,controlSequence:0}); return this.snapshot.authoring; }
-      finally { this.busy = false; }
+      try { await this.start(this.accepted.linked, this.accepted.revisionId, {...runtime.state,controls:runtime.desiredControls??runtime.state.controls,controlSequence:0},[],runtime.retryPolicy); this.publish({message:null});return this.snapshot.authoring; }
+      catch(error){if(runtime.terminal)runtime.retryPolicy.lastFaultAt=performance.now();throw error;}
+      finally { this.busy = false;this.scheduleAutomaticRetry(); }
     }
     if (this.snapshot.authoring?.playback === 'failed') throw Error('Restart the failed runtime first');
     if (this.pending.has(input.requestId)) throw Error('Request ID already pending');
