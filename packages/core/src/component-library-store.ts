@@ -1,4 +1,4 @@
-import { open, readFile, rename, unlink } from 'node:fs/promises';
+import { open, rename, unlink } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { componentIdSchema } from '../../runtime-contracts/src/identities.ts';
@@ -13,7 +13,7 @@ const empty=():LibraryFile=>Object.freeze({format:'lux-component-library',versio
 export class ComponentLibraryStore{
  private queue:Promise<unknown>=Promise.resolve();private readonly path:string;private readonly id:()=>string;private readonly now:()=>string;private readonly validateCandidate:(source:SourceBundle)=>Promise<void>;
  constructor(path:string,options:StoreOptions={}){this.path=path;this.id=options.id??randomUUID;this.now=options.now??(()=>new Date().toISOString());this.validateCandidate=options.validateCandidate??(async()=>{});}
- private async load():Promise<LibraryFile>{let bytes:Buffer;try{bytes=await readFile(this.path);}catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return empty();throw error;}if(bytes.length>libraryBytes)throw Error('Component library exceeds 8 MiB');return file(JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes)));}
+ private async load():Promise<LibraryFile>{let handle;try{handle=await open(this.path,'r');}catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return empty();throw error;}try{if((await handle.stat()).size>libraryBytes)throw Error('Component library exceeds 8 MiB');const buffer=Buffer.alloc(libraryBytes+1);let offset=0;while(offset<buffer.length){const {bytesRead}=await handle.read(buffer,offset,buffer.length-offset,null);if(!bytesRead)break;offset+=bytesRead;}if(offset>libraryBytes)throw Error('Component library exceeds 8 MiB');return file(JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(buffer.subarray(0,offset))));}finally{await handle.close();}}
  private async write(snapshot:LibraryFile):Promise<void>{const bytes=Buffer.from(JSON.stringify(snapshot,null,2)+'\n');if(bytes.length>libraryBytes)throw Error('Component library exceeds 8 MiB');const temporary=join(dirname(this.path),`.lux-library-${randomUUID()}.tmp`);let committed=false;try{const handle=await open(temporary,'wx');try{await handle.writeFile(bytes);await handle.sync();}finally{await handle.close();}await rename(temporary,this.path);committed=true;}finally{if(!committed)await unlink(temporary).catch(()=>{});}}
  private exclusive<T>(operation:()=>Promise<T>):Promise<T>{const result=this.queue.then(operation,operation);this.queue=result.catch(()=>{});return result;}
  async list():Promise<readonly LibraryComponentSummary[]>{return(await this.load()).components.map(({source:_source,...summary})=>Object.freeze(summary));}

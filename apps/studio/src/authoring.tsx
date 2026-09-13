@@ -18,6 +18,7 @@ import './export-client.ts';
 import { studioCapabilities } from './capabilities.ts';
 import { useDiscardConfirmation } from './Confirmation.tsx';
 import { LibraryPanel } from './library/LibraryPanel.tsx';
+import { completeLibraryMutation } from './library/library-mutation.ts';
 import './library-client.ts';
 const client = new StandaloneClient(window.luxAuthoring, { codeDeclaredParameters: true });
 const agentStatus = () => ({ ...client.getSnapshot(), capabilities: studioCapabilities });
@@ -65,8 +66,10 @@ export function AuthoringApp() {
     if(command.method==='library.list')return window.luxLibrary.list();
     if(command.method==='library.read')return window.luxLibrary.read(command.params.id);
     if(command.method==='library.create'||command.method==='library.update'){
-      const result=command.method==='library.create'?await window.luxLibrary.create(command.params):await window.luxLibrary.update(command.params);
-      await session.checkLibraryUpdates();setLibraryVersion(value=>value+1);return result;
+      const result=await completeLibraryMutation(
+        ()=>command.method==='library.create'?window.luxLibrary.create(command.params):window.luxLibrary.update(command.params),
+        ()=>session.checkLibraryUpdates(),reason=>setError(String(reason)));
+      setLibraryVersion(value=>value+1);return result;
     }
     if (command.method === 'status') return agentStatus();
     if (command.method === 'read') return { ...session.read(), status: agentStatus() };

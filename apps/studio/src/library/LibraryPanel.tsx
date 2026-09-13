@@ -1,4 +1,4 @@
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {Alert,Button,Chip} from '@mui/material';
 import type {ComponentLibraryClient} from '../library-client.ts';
 import type {LibraryComponent,LibraryComponentSummary,SceneLibraryLink} from '../../../../packages/core/src/component-library.ts';
@@ -7,9 +7,10 @@ type Update=Readonly<{componentId:string;name:string;resolvedRevision:number;ava
 type Fallback=Readonly<{componentId:string;resolvedRevision:number;message:string}>;
 export function LibraryPanel({client,links,updates,fallbacks,refreshKey=0,onApplyUpdates,onFork,onError}:{client:ComponentLibraryClient;links:readonly SceneLibraryLink[];updates:readonly Update[];fallbacks:readonly Fallback[];refreshKey?:number;onApplyUpdates():Promise<void>;onFork(id:string):void;onError(reason:unknown):void}){
  const [items,setItems]=useState<readonly LibraryComponentSummary[]>([]),[selected,setSelected]=useState<LibraryComponent|null>(null),[file,setFile]=useState(''),[message,setMessage]=useState('');
- async function load(){try{const next=await client.list();setItems(next);if(selected&&!next.some(item=>item.id===selected.id))setSelected(null);}catch(reason){onError(reason);}}
+ const request=useRef(0);
+ async function load(){const current=++request.current;try{const next=await client.list(),selectedId=selected?.id,nextSelected=selectedId&&next.some(item=>item.id===selectedId)?await client.read(selectedId):null;if(current!==request.current)return;setItems(next);setSelected(nextSelected);if(nextSelected&&!Object.hasOwn(nextSelected.source.files,file))setFile(nextSelected.source.entry);}catch(reason){if(current===request.current)onError(reason);}}
  useEffect(()=>{void load();},[refreshKey]);
- async function inspect(id:string){try{const value=await client.read(id);setSelected(value);setFile(value.source.entry);setMessage('');}catch(reason){onError(reason);}}
+ async function inspect(id:string){const current=++request.current;try{const value=await client.read(id);if(current!==request.current)return;setSelected(value);setFile(value.source.entry);setMessage('');}catch(reason){if(current===request.current)onError(reason);}}
  async function copy(){if(!selected)return;try{await client.copyRequest(selected.id);setMessage('Agent request copied.');}catch(reason){onError(reason);}}
  async function apply(){try{await onApplyUpdates();await load();}catch(reason){onError(reason);}}
  const names=new Map(items.map(item=>[item.id,item.name]));

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile } from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
@@ -89,4 +89,10 @@ test('checking an empty library link set does not require an SDK 0.4 scene', asy
   assert.deepEqual(checked.source, legacy);
   assert.deepEqual(checked.updates, []);
   assert.deepEqual(checked.fallbacks, []);
+});
+
+test('library reads reject an oversized profile file through the bounded file path', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'lux-library-large-')), path = join(directory, 'component-library.json');
+  await writeFile(path, Buffer.alloc(8 * 1024 * 1024 + 1, 32));
+  await assert.rejects(new ComponentLibraryStore(path).list(), /exceeds 8 MiB/);
 });
