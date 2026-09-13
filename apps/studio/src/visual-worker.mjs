@@ -194,6 +194,10 @@ onmessage = event => {
     } else if (message.type === 'controls') {
       controlState.apply(message.values,message.controlSequence,message.controlSchemaHash);
       await draw(message.requestId, 'status'); schedule();
+    } else if (message.type === 'node-controls') {
+      if(!controlState.applyNode)throw Error('This visual has no composition nodes');
+      controlState.applyNode(message.nodePath,message.values,message.controlSequence,message.controlSchemaHash);
+      await draw(message.requestId, 'status'); schedule();
     } else if (message.type === 'playback') {
       if (!['play', 'pause', 'reset'].includes(message.action)) throw Error('Invalid playback command');
       clearTimeout(timer);

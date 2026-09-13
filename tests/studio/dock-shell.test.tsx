@@ -155,3 +155,43 @@ test('group menu targets its owning group, cancels with focus and rejects a vani
   assert.deepEqual(adapter.capture('check'), before);
   ui.unmount();
 });
+
+test('Graph selects an instance, opens Inspector, writes only that node and preserves selection across panel closure',async()=>{
+  const {parse}=await import('@babel/parser');
+  const {createHash}=await import('node:crypto');
+  const {extractCompositionDeclaration}=await import('../../apps/build-worker/src/composition-declarations.mjs');
+  const {compositionSourceBundle,kaleidoscopeAId,kaleidoscopeBId}=await import('../compiler/composition-fixture.mjs');
+  const {createCompositionControlState}=await import('../../packages/runtime/src/components/composition-controls.ts');
+  const source=compositionSourceBundle(),asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));
+  const composition=extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash:(value:string)=>createHash('sha256').update(value).digest('hex')})!;
+  const state=createCompositionControlState(composition);
+  let runtime:any={instanceId:'graph-instance',generation:1,revisionId:'graph-revision',sceneName:'Graph fixture',authority:'studio',playback:'paused',clockEpoch:0,frameId:'1',output:{width:1280,height:720},fault:null,sdkVersion:'0.4.0',controlSchema:composition.publicControls,controlSchemaHash:'a'.repeat(64),controls:state.values(),controlSequence:0,nodeControls:{sourceHash:'graph-revision',nodes:state.snapshot().nodes},composition};
+  let snapshot:any={connection:'connected',message:null,receivedAtMs:1000,authoring:runtime,host:null,jobs:[],visualFps:null,uiFps:null};
+  const calls:any[]=[],listeners=new Set<()=>void>();
+  const client={getSnapshot:()=>snapshot,subscribe:(fn:()=>void)=>{listeners.add(fn);return()=>{listeners.delete(fn);};},invoke:async(op:any)=>{
+    calls.push(op);assert.equal(op.name,'lux.node.parameters.set');state.applyNode(op.input.nodePath,op.input.values,op.input.expectedControlSchemaHash);
+    runtime={...runtime,controls:state.values(),nodeControls:{sourceHash:runtime.revisionId,nodes:state.snapshot().nodes},controlSequence:runtime.controlSequence+1};snapshot={...snapshot,authoring:runtime};listeners.forEach(fn=>fn());
+  }};
+  window.localStorage.clear();
+  const ui=render(<StudioApp client={client} nowMs={1000} sourcePanel={<div>Source fixture</div>}/>);
+  await act(async()=>{fireEvent.click(screen.getByText('View'));});await click('Open Graph');
+  const nodes=[...document.querySelectorAll<HTMLButtonElement>('.graph-node')];assert.equal(nodes.length,3);
+  assert.equal(document.querySelectorAll('.graph-wires path').length,2);
+  assert.equal(document.querySelectorAll('.graph-final-output').length,1);
+  fireEvent.change(screen.getByLabelText('Move panel'),{target:{value:'inspector'}});await click('Close selected panel');
+  await act(async()=>{nodes[1]!.focus();fireEvent.click(nodes[1]!);});
+  assert.ok(document.querySelector('.inspector'));
+  assert.equal(calls.length,0,'selection must not invoke a runtime operation');
+  const input=document.querySelector<HTMLInputElement>('.inspector input[type="number"]')!;
+  await act(async()=>{fireEvent.change(input,{target:{value:'8'}});fireEvent.keyDown(input,{key:'Enter'});});
+  assert.equal(calls.length,1);assert.deepEqual(calls[0].input.nodePath,[kaleidoscopeAId]);
+  assert.equal(runtime.controls.segmentsA,8);assert.equal(runtime.controls.segmentsB,6);
+  await click('Zoom in');const transform=document.querySelector<HTMLElement>('.graph-content')!.style.transform;
+  fireEvent.change(screen.getByLabelText('Move panel'),{target:{value:'graph'}});await click('Close selected panel');await click('Open Graph');
+  assert.equal(document.querySelector<HTMLElement>('.graph-content')!.style.transform,transform);
+  assert.equal(nodes[1]!.getAttribute('aria-pressed'),'true');
+  await act(async()=>{fireEvent.click(nodes[2]!);});
+  assert.equal(document.querySelector<HTMLInputElement>('.inspector input[type="number"]')!.value,'6');
+  assert.equal(runtime.nodeControls.nodes.find((node:any)=>node.nodePath[0]===kaleidoscopeBId).values.segments,6);
+  assert.equal(runtime.generation,1);assert.equal(runtime.playback,'paused');ui.unmount();
+});

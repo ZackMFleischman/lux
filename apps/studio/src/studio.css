@@ -84,3 +84,20 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 .parameter-row .MuiIconButton-root{width:22px;height:22px;padding:2px;font-size:14px}
 .parameter-row .MuiSlider-root{display:block;width:calc(100% - 8px);height:2px;padding:8px 0;margin:0 4px}
 .parameter-row .MuiSlider-thumb{width:9px;height:9px}
+.graph-panel { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.graph-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; padding: 6px 10px; border-bottom: 1px solid #343943; }
+.graph-toolbar button { min-width: 32px; }
+.graph-viewport { position: relative; flex: 1; min-height: 180px; overflow: hidden; touch-action: none; background-color: #15181e; background-image: radial-gradient(#343943 1px, transparent 1px); background-size: 20px 20px; }
+.graph-content { position: absolute; transform-origin: top left; }
+.graph-wires { position: absolute; overflow: visible; pointer-events: none; }
+.graph-wires path { fill: none; stroke: #7e91ae; stroke-width: 2; }
+.graph-node { position: absolute; top: 0; width: 220px; min-height: 142px; text-align: left; padding: 14px; border: 1px solid #596271; border-radius: 8px; background: #242a34; color: #f0f2f5; cursor: pointer; font: inherit; }
+.graph-node strong { display: block; overflow-wrap: anywhere; }
+.graph-node[aria-pressed="true"] { border: 2px solid #9bc3ff; padding: 13px; background: #2c3a50; }
+.graph-node:focus-visible { outline: 3px solid #d9e8ff; outline-offset: 4px; }
+.graph-node-kind { display: block; margin-top: 4px; color: #b9c2d1; font-size: 12px; }
+.graph-ports { display: flex; justify-content: space-between; margin-top: 14px; gap: 12px; font-size: 12px; }
+.graph-ports > span > span { display: block; }
+.graph-final-output { display: block; margin-top: 14px; color: #b4d9c3; font-size: 12px; }
+.graph-hint { margin: 0; padding: 8px 12px; font-size: 12px; color: #b9c2d1; }
+.inspector-target { margin: 8px 0; font-weight: 600; }

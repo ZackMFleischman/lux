@@ -1,6 +1,6 @@
 import {normalizeImageCompositionProfile} from '../../../runtime-contracts/src/composition-profile.mjs';
 import type {ImageCompositionProfile} from '../../../runtime-contracts/src/composition-profile.mjs';
-import {defaultControlValues,normalizeControlSchema,validateControlSnapshot,reconcileControlValues} from '../../../runtime-contracts/src/parameters.mjs';
+import {defaultControlValues,normalizeControlSchema,validateControlSnapshot,validateControlPatch,reconcileControlValues} from '../../../runtime-contracts/src/parameters.mjs';
 import type {ControlMigration,ControlSchema,ControlValues} from '../../../runtime-contracts/src/parameters.mjs';
 import type {NodePath} from '../../../runtime-contracts/src/graph.ts';
 export type SavedNodeControls=Readonly<{nodes:readonly Readonly<{nodePath:NodePath;definitionHash:string;schema:ControlSchema;schemaHash:string;values:ControlValues}>[]}>;
@@ -27,6 +27,13 @@ export function createCompositionControlState(input:ImageCompositionProfile,save
  function publicValues(){const result:Record<string,number>={};for(const row of profile.publicControls){const binding=target(row.id),value=find(binding.nodePath)[binding.controlId];if(value===undefined)throw Error('Missing composition control value');result[row.id]=value;}return Object.freeze(result);}
  return Object.freeze({
   values:publicValues,
+  applyNode(path:NodePath,input:unknown,schemaHash:string){
+   const node=profile.nodes.find(row=>key(row.nodePath)===key(path));
+   if(!node)throw Error('Unknown composition node path');
+   if(node.schemaHash!==schemaHash)throw Error('Composition node control schema changed');
+   const patch=validateControlPatch(node.schema,input);
+   values.set(key(path),Object.freeze({...find(path),...patch}));
+  },
   apply(input:unknown){const next=validateControlSnapshot(profile.publicControls,input);for(const row of profile.publicControls){const binding=target(row.id),value=next[row.id];if(value===undefined)throw Error('Missing composition control value');const path=key(binding.nodePath),leaf:Record<string,number>={...find(binding.nodePath),[binding.controlId]:value};values.set(path,Object.freeze(leaf));}},
   nodeValues(path:NodePath){return Object.freeze({...find(path)});},
   changes(){return Object.freeze([...changes]);},

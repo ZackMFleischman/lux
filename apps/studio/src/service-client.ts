@@ -4,6 +4,8 @@ import { normalizeControlSchema, validateControlSnapshot, validateControlPatch }
 import { LEGACY_CONTROL_SCHEMA, LEGACY_CONTROL_SCHEMA_HASH } from './controls/control-state.ts';
 import type { RuntimeControlState } from './controls/control-state.ts';
 import type { PerformanceSnapshot } from './performance/performance-state.ts';
+import type { ImageCompositionProfile } from '../../../packages/runtime-contracts/src/composition-profile.mjs';
+import type { NodePath } from '../../../packages/runtime-contracts/src/graph.ts';
 export type { RuntimeKey } from '../../../packages/runtime-contracts/src/index.ts';
 /** Provisional Studio view port over canonical runtime identity/output/control
  * DTOs. This is not a competing application service or frozen core API. */
@@ -16,6 +18,7 @@ export type RuntimeView = RuntimeKey & Readonly<{
   clockEpoch: number; frameId: string | null; controlMigration?: readonly ControlMigration[];
   output: Readonly<Pick<OutputSettings, 'width' | 'height'>>;
   fault: Readonly<{ code: string; message: string }> | null;
+  composition?: ImageCompositionProfile;
 }> & (RuntimeControlState & Readonly<{sdkVersion:'0.2.0'|'0.4.0';intensity?:never}> |
   Partial<RuntimeControlState> & Readonly<{sdkVersion?:'0.1.0';intensity:number}>);
 export function getRuntimeControlState(runtime:RuntimeView):RuntimeControlState {
@@ -36,6 +39,8 @@ export type StudioSnapshot = Readonly<{
 // These payloads match docs/design/ai-authoring.md. Acknowledgement is admission,
 // never a local change to applied controls, playback state, generation, or pixels.
 export type StudioOperation =
+  | { name: 'lux.node.parameters.set'; input: { requestId: string; instanceId: string; expectedGeneration: number;
+      expectedRevisionId: string; expectedControlSchemaHash:string; nodePath:NodePath; values:ControlValues; mode:'live' } }
   | { name: 'lux.parameters.set'; input: { requestId: string; instanceId: string; expectedGeneration: number;
       expectedRevisionId: string; expectedControlSchemaHash?:string; values: ControlValues; mode: 'live' } }
   | { name: 'lux.playback'; input: { requestId: string; instanceId: string; expectedGeneration: number; action: 'play' | 'pause' | 'reset' } }
@@ -71,6 +76,15 @@ export class StudioController {
   async setIntensity(value: number): Promise<unknown> {
     if (!Number.isFinite(value) || value < 0 || value > 1) throw Error('Intensity must be a finite number from 0 to 1');
     return this.setParameters({intensity:value});
+  }
+  async setNodeParameters(nodePath:NodePath,values:ControlValues):Promise<unknown> {
+    const target=this.target();
+    const node=target.nodeControls?.nodes.find(row=>JSON.stringify(row.nodePath)===JSON.stringify(nodePath));
+    if(target.sdkVersion!=='0.4.0'||!node)throw Error('Composition node is unavailable');
+    const patch=validateControlPatch(node.schema,values);
+    return this.client.invoke({name:'lux.node.parameters.set',input:{requestId:this.requestId(),instanceId:target.instanceId,
+      expectedGeneration:target.generation,expectedRevisionId:target.revisionId,expectedControlSchemaHash:node.schemaHash,
+      nodePath:[...node.nodePath],values:patch,mode:'live'}});
   }
   async setParameters(values:ControlValues):Promise<unknown> {
     const target = this.target();

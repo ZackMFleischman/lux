@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import {GraphPanel,compositionNodes,nodeKey} from './GraphPanel.tsx';
+import type {NodePath} from '../../../packages/runtime-contracts/src/graph.ts';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { Alert, Button, Chip, CssBaseline, Paper, ThemeProvider, IconButton, Tooltip, Menu, MenuItem } from '@mui/material';
 import { studioTheme } from './theme.ts';
 import { ParameterInspector, parameterOwner } from './controls/ParameterInspector.tsx';
@@ -55,6 +57,11 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const [error, setError] = useState<string | null>(null);
   const [clock, setClock] = useState(() => nowMs ?? Date.now());
   const runtime = snapshot.authoring;
+  const openPanelRef=useRef<null|((kind:'inspector')=>void)>(null);
+  const bindOpenPanel=useCallback((action:null|((kind:'inspector')=>void))=>{openPanelRef.current=action;},[]);
+  const [graphSelection,setGraphSelection]=useState<{revision:string;path:NodePath}|null>(null);
+  const selectedNode=graphSelection?.revision===runtime?.revisionId?compositionNodes(runtime).find(node=>nodeKey(node.nodePath)===nodeKey(graphSelection!.path)):undefined;
+  function selectGraphNode(path:NodePath|null){setGraphSelection(path&&runtime?{revision:runtime.revisionId,path}:null);openPanelRef.current?.('inspector');}
   const available = snapshot.connection === 'connected' && runtime?.authority === 'studio';
   useEffect(() => {
     if (nowMs !== undefined) return;
@@ -137,7 +144,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
       </Paper>;
   const inspectorPane = <Paper component="aside" square className="inspector" aria-label="Scene controls and status">
         <section><details className="controls-section" open><summary className="section-heading"><span className="section-title">Controls</span><Chip label="LIVE" /></summary>
-          <ParameterInspector runtime={runtime} available={!!available} client={client} controller={controller} onError={setError} edits={controlEdits} />
+          <p className="inspector-target">{selectedNode?.label??'Composition controls'}</p>
+          <ParameterInspector nodePath={selectedNode?.nodePath} runtime={runtime} available={!!available} client={client} controller={controller} onError={setError} edits={controlEdits} />
         </details></section>
         <section><details><summary>Performance</summary><PerformanceStatus performance={snapshot.performance} /><MetricView label="Visual delivery" metric={snapshot.visualFps} nowMs={nowMs ?? clock} /><MetricView label="UI cadence" metric={snapshot.uiFps} nowMs={nowMs ?? clock} />
           <p className="hint">Delivery and interface cadence are measured separately.</p></details></section>
@@ -160,7 +168,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
     </header>
     {appError && <Alert severity="error">{appError}</Alert>}
     <div className="workspace">
-      {sourcePanel ? <StudioDockShell toolsHost={toolsHost} compact={compact} showInspector={showMaximizedInspector} preview={previewPane} source={sourcePanel} library={libraryPanel??<section aria-label="Shared component library">Library unavailable.</section>} inspector={inspectorPane} jobs={jobsPane} /> : <>{previewPane}{(!compact || showMaximizedInspector) && inspectorPane}</>}
+      {sourcePanel ? <StudioDockShell onOpenPanelReady={bindOpenPanel} toolsHost={toolsHost} compact={compact} showInspector={showMaximizedInspector} preview={previewPane} source={sourcePanel} library={libraryPanel??<section aria-label="Shared component library">Library unavailable.</section>} inspector={inspectorPane} jobs={jobsPane} graph={<GraphPanel key={runtime?.revisionId??'empty'} runtime={runtime} selected={selectedNode?nodeKey(selectedNode.nodePath):null} onSelect={selectGraphNode}/>} /> : <>{previewPane}{(!compact || showMaximizedInspector) && inspectorPane}</>}
     </div>
     {!sourcePanel && !compact && jobsPane}
     <footer className="status-bar" hidden={windowState.fullscreen}><span><i className="status-dot" />{snapshot.connection === 'connected' ? 'Authoring service' : 'Awaiting authoring service'}</span><span>Presentation only · output size is independent of window size</span><span>TRACER 0.1</span></footer>

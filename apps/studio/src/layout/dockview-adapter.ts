@@ -76,6 +76,13 @@ export class LuxDockviewAdapter {
     delete this.closed[id];
   }
   close(id: string): void { this.live(); const panel = this.api.getPanel(id); if (panel) this.api.removePanel(panel); }
+  openBeside(kind:string,referenceId:string):void {
+    this.live();
+    const reference=this.api.getPanel(referenceId);
+    this.open(kind);
+    const panel=this.api.getPanel(kind);
+    if(reference&&panel&&panel!==reference&&panel.group===reference.group)panel.api.moveTo({group:reference.group,position:'right'});
+  }
   move(id: string, referenceId: string, position: 'left' | 'right' | 'top' | 'bottom' | 'center'): void {
     this.live(); const panel = this.api.getPanel(id), target = this.api.getPanel(referenceId);
     if (!panel || !target || panel === target) throw Error('Choose two different open panels');

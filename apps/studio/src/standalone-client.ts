@@ -31,7 +31,7 @@ export interface AuthoringApi {
 declare global { interface Window { luxAuthoring: AuthoringApi } }
 type RetryPolicy={lastFaultAt:number|null};
 type Running = { worker: Worker; canvas: HTMLCanvasElement; instanceId: string; generation: number; revisionId: string; performance:PerformanceReceiver;retryPolicy:RetryPolicy;autoRetry:boolean;playback:'playing'|'paused';
-  lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>>; desiredControls?:ControlValues; };
+  lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>>; desiredControls?:ControlValues; desiredNodeControls?:SavedNodeControlSnapshot; };
 export class StandaloneClient implements StudioClient, PresentationPort {
   private snapshot: StudioSnapshot = { connection: 'connected', message: 'Open an example or write a visual, then Build & preview.', receivedAtMs: Date.now(), authoring: null, host: null, jobs: [], visualFps: null, uiFps: null };
   private listeners = new Set<() => void>();
@@ -43,7 +43,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private previewOutput: Readonly<Pick<OutputSettings,'width'|'height'>> = DEFAULT_OUTPUT;
   private busy = false;
   private automaticRetry:ReturnType<typeof setTimeout>|undefined;
-  private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; playback?:boolean; expectedControlSequence?:number; expectedControls?:ControlValues; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
+  private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; playback?:boolean; expectedControlSequence?:number; expectedControls?:ControlValues; expectedNodeControls?:SavedNodeControlSnapshot; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
   private api: AuthoringApi;
   private codeDeclaredParameters:boolean;
   private readonly performanceMode:CollectionMode;
@@ -187,6 +187,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           }
           if (this.running !== candidate) return;
           this.publish({ authoring: { instanceId: candidate.instanceId, generation: candidate.generation, revisionId,
+            ...('linkedVersion' in linked&&linked.linkedVersion===5?{composition:linked.composition}:{}),
             sceneName: 'Untitled visual', authority: 'studio', playback: message.playback,
             ...candidate.state,controlMigration:migration,clockEpoch: message.clockEpoch, frameId: message.frameId,
             ...(state.sdkVersion==='0.1.0'?{intensity:applied.intensity}:{}),
@@ -194,7 +195,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           const wait = this.pending.get(message.requestId);
           if (wait?.runtime === candidate && wait.kind === 'command' &&
               (wait.expectedControlSequence === undefined ||
-                (message.controlSequence === wait.expectedControlSequence && JSON.stringify(applied) === JSON.stringify(wait.expectedControls)))) {
+                (message.controlSequence === wait.expectedControlSequence && JSON.stringify(applied) === JSON.stringify(wait.expectedControls) && (!wait.expectedNodeControls || JSON.stringify(compositionNodeControls)===JSON.stringify(wait.expectedNodeControls))))) {
             clearTimeout(wait.timer); this.pending.delete(message.requestId); wait.resolve(message);
           }
         };
@@ -231,7 +232,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       this.automaticRetry=undefined;
       if(this.busy||this.running!==runtime||!runtime.autoRetry)return;
       runtime.autoRetry=false;this.busy=true;this.publish({message:'Automatically restarting the accepted visual…'});
-      void this.start(accepted.linked,accepted.revisionId,{...runtime.state,controls:runtime.desiredControls??runtime.state.controls,controlSequence:0},[],runtime.retryPolicy,runtime.playback==='playing',accepted.output)
+      void this.start(accepted.linked,accepted.revisionId,{...runtime.state,controls:runtime.desiredControls??runtime.state.controls,nodeControls:runtime.desiredNodeControls??runtime.state.nodeControls,controlSequence:0},[],runtime.retryPolicy,runtime.playback==='playing',accepted.output)
         .then(()=>{if(!this.running?.terminal)this.publish({message:null});})
         .catch(error=>{runtime.retryPolicy.lastFaultAt=performance.now();if(this.running===runtime)this.publish({message:`Automatic restart failed. Restart explicitly to retry. ${String(error).slice(0,500)}`});})
         .finally(()=>{this.busy=false;this.scheduleAutomaticRetry();});
@@ -239,7 +240,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   }
   async invoke(operation: StudioOperation): Promise<unknown> {
     const raw=snapshotRecord(operation),inputRaw=snapshotRecord(raw.input);
-    if(raw.name==='lux.parameters.set')inputRaw.values=snapshotRecord(inputRaw.values);
+    if(raw.name==='lux.parameters.set'||raw.name==='lux.node.parameters.set')inputRaw.values=snapshotRecord(inputRaw.values);
     operation={...raw,input:inputRaw} as StudioOperation;
     const parsed = studioOperationSchema.safeParse(operation);
     if (!parsed.success) {
@@ -255,7 +256,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       if (!this.accepted) throw Error('No visual to restart');
       this.cancelAutomaticRetry();runtime.autoRetry=false;
       this.busy = true;
-      try { await this.start(this.accepted.linked, this.accepted.revisionId, {...runtime.state,controls:runtime.desiredControls??runtime.state.controls,controlSequence:0},[],runtime.retryPolicy,undefined,this.accepted.output); this.publish({message:null});return this.snapshot.authoring; }
+      try { await this.start(this.accepted.linked, this.accepted.revisionId, {...runtime.state,controls:runtime.desiredControls??runtime.state.controls,nodeControls:runtime.desiredNodeControls??runtime.state.nodeControls,controlSequence:0},[],runtime.retryPolicy,undefined,this.accepted.output); this.publish({message:null});return this.snapshot.authoring; }
       catch(error){if(runtime.terminal)runtime.retryPolicy.lastFaultAt=performance.now();throw error;}
       finally { this.busy = false;this.scheduleAutomaticRetry(); }
     }
@@ -263,7 +264,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       if (!this.accepted) throw Error('No visual to resize');
       const output = { width: operation.input.width, height: operation.input.height };
       this.busy = true;
-      try { await this.start(this.accepted.linked, this.accepted.revisionId, {...runtime.state,controls:runtime.desiredControls??runtime.state.controls,controlSequence:0},[],runtime.retryPolicy,undefined,output);
+      try { await this.start(this.accepted.linked, this.accepted.revisionId, {...runtime.state,controls:runtime.desiredControls??runtime.state.controls,nodeControls:runtime.desiredNodeControls??runtime.state.nodeControls,controlSequence:0},[],runtime.retryPolicy,undefined,output);
         this.previewOutput = output; this.accepted = {...this.accepted,output}; this.publish({message:null}); return this.snapshot.authoring; }
       finally { this.busy = false; this.scheduleAutomaticRetry(); }
     }
@@ -278,12 +279,27 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       // Retain admitted authority intent even if execution faults before acknowledgement.
       // It belongs to this runtime's restart closure, not the next submitted source.
       runtime.desiredControls = validateControlSnapshot(runtime.state.controlSchema,{...(runtime.desiredControls??runtime.state.controls),...patch});
+      if(this.accepted && 'linkedVersion' in this.accepted.linked && this.accepted.linked.linkedVersion===5){
+        const state=createCompositionControlState(this.accepted.linked.composition,runtime.desiredNodeControls??runtime.state.nodeControls);
+        state.apply(runtime.desiredControls);runtime.desiredNodeControls={sourceHash:runtime.revisionId,nodes:state.snapshot().nodes};
+      }
       message = { type: 'controls', values: runtime.desiredControls, controlSchemaHash:runtime.state.controlSchemaHash,controlSequence: ++runtime.controls };
+    } else if(operation.name==='lux.node.parameters.set') {
+      const linked=this.accepted?.linked;
+      if(!linked||!('linkedVersion' in linked)||linked.linkedVersion!==5)throw Error('This visual has no composition nodes');
+      if(operation.input.expectedRevisionId!==runtime.revisionId)throw Error('Revision changed; read current runtime state');
+      if(runtime.controls>=Number.MAX_SAFE_INTEGER)throw Error('Control sequence exhausted; restart runtime');
+      const state=createCompositionControlState(linked.composition,runtime.desiredNodeControls??runtime.state.nodeControls);
+      state.applyNode(operation.input.nodePath,operation.input.values,operation.input.expectedControlSchemaHash);
+      runtime.desiredNodeControls={sourceHash:runtime.revisionId,nodes:state.snapshot().nodes};
+      runtime.desiredControls=state.values();
+      message={type:'node-controls',nodePath:operation.input.nodePath,values:operation.input.values,
+        controlSchemaHash:operation.input.expectedControlSchemaHash,controlSequence:++runtime.controls};
     } else message = { type: 'playback', action: operation.input.action };
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => this.fault(runtime, 'Runtime command timed out'), 5000);
       this.pending.set(input.requestId, { runtime, kind: 'command', playback: message.type === 'playback', resolve, reject, timer,
-        ...(message.type === 'controls' ? { expectedControlSequence: message.controlSequence, expectedControls: message.values } : {}) });
+        ...((message.type === 'controls'||message.type==='node-controls') ? { expectedControlSequence: message.controlSequence, expectedControls: runtime.desiredControls,expectedNodeControls:runtime.desiredNodeControls } : {}) });
       try { runtime.worker.postMessage({ ...message, requestId: input.requestId, instanceId: runtime.instanceId, generation: runtime.generation }); }
       catch (error) { this.fault(runtime, String(error)); }
     });
