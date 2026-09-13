@@ -17,6 +17,10 @@ int main(){
  assert(slow.slots[1].missed&&slow.slots[2].missed&&slow.slots[3].success&&slow.slots[3].before==35);
  // Rounded-up 100 ns waits plus the fake clock's tick granularity may overshoot one tick.
  assert(slow.slots[4].due==40&&slow.slots[4].before==41&&slow.calls==598&&waits>590);
+ // A clock jump between admission and completion must not relabel the admitted slot.
+ now=0;unsigned reads=0;Cadence interrupted;
+ assert(lux::probe::runCadence(interrupted,600,[&]{if(++reads==4)now=35;return now;},[&](uint64_t units){now+=(units*600+9999999)/10000000;return true;},[]{return true;}));
+ for(unsigned i=0;i<599;++i)if(interrupted.slots[i].success)assert(interrupted.slots[i].before<interrupted.slots[i+1].due);
  // Overshooting the endpoint retains every missed slot and never invokes another callback.
  now=0;Cadence end;
  assert(lux::probe::runCadence(end,600,clock,[&](uint64_t){now=6100;return true;},[]{return true;}));
