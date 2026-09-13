@@ -4,6 +4,7 @@
 #include "ContextHandoff.h"
 #include "ReceiverPoll.h"
 #include "ReceiverRun.h"
+#include "ReceiverWorkerTiming.h"
 #include <dxgi1_2.h>
 #include <wrl/client.h>
 #include <fstream>
@@ -21,6 +22,9 @@ using RegisterObject=HANDLE(WINAPI*)(HANDLE,void*,GLuint,GLenum,GLenum);
 using UnregisterObject=BOOL(WINAPI*)(HANDLE,HANDLE);
 using LockObjects=BOOL(WINAPI*)(HANDLE,GLint,HANDLE*);
 void require(bool result,const char* message){if(!result)throw std::runtime_error(message);}
+uint64_t receiverTimingClock() noexcept {
+ LARGE_INTEGER at{};return QueryPerformanceCounter(&at)&&at.QuadPart>0?static_cast<uint64_t>(at.QuadPart):0;
+}
 void unsupportedUnload() noexcept {
  OutputDebugStringA("Lux TR02: bounded-unload-unsupported; retaining worker and GPU resources until completion.\n");
  try{
@@ -148,6 +152,10 @@ void FrameReceiver::run(HGLRC shared) {
  };
  auto detach=[&]{drainImports();if(ring){UnmapViewOfFile(ring);ring=nullptr;}if(mapping){CloseHandle(mapping);mapping=nullptr;}};
  bool beginSucceeded=false;
+ ReceiverWorkerTiming<> timing;
+ ReceiverWorkerTimingFinalization timingFinalization;
+ std::optional<ReceiverWorkerTimingSpan<32768>> pendingTiming;
+ uint64_t timingFrequency=0;
   uint64_t opportunityRecords=0,traceCapped=0;
   auto drainOpportunities=[&]{if(!beginSucceeded)return;HostOpportunity item;while(opportunities.pop(item)){
    if(opportunityRecords++>=100000){++traceCapped;continue;}
@@ -156,6 +164,12 @@ void FrameReceiver::run(HGLRC shared) {
    log<<"}\n";
   }};
  runReceiverBody([&] {
+  wchar_t timingOption[2]{};
+  timing.initialize(GetEnvironmentVariableW(L"LUX_RECEIVER_WORKER_TIMING",timingOption,2)==1&&timingOption[0]==L'1');
+  if(timing.enabled()){
+   LARGE_INTEGER timingHz{};
+   if(QueryPerformanceFrequency(&timingHz)&&timingHz.QuadPart>0)timingFrequency=static_cast<uint64_t>(timingHz.QuadPart);
+  }
   // The worker creates, uses and destroys its own drawable/DC. The host's DC is
   // consulted only in start for format/context creation; never made current here.
   windowClass=L"LuxTR02Drawable-"+std::to_wstring(GetCurrentThreadId())+L"-"+std::to_wstring(reinterpret_cast<uintptr_t>(this));
@@ -187,12 +201,17 @@ void FrameReceiver::run(HGLRC shared) {
   log<<std::setprecision(std::numeric_limits<float>::max_digits10);
   LARGE_INTEGER frequency;QueryPerformanceFrequency(&frequency);log<<"{\"kind\":\"native-clock\",\"domain\":\"qpc\",\"frequency\":\""<<frequency.QuadPart<<"\"}"<<std::endl;
   std::wstring connected;ReceiverPoll discovery,counters;int pending=-1,sourceSlot=-1;
+  auto timingKey=[](const Import& imported){return ReceiverWorkerTimingKey{imported.key.generation,imported.key.outputGeneration,imported.key.frame};};
+  auto outerSleep=[&]{
+   ReceiverWorkerTimingSpan span(timing,ReceiverWorkerStage::OuterSleep,pending>=0?timingKey(imports[sourceSlot]):ReceiverWorkerTimingKey{},receiverTimingClock);
+   std::this_thread::sleep_for(std::chrono::milliseconds(1));span.finish(true);
+  };
   lifecycle.started();
   while(!lifecycle.stopRequested()) {
    drainOpportunities();
    if(pending>=0){
     auto& imported=imports[sourceSlot];const auto status=glCompletion(imported.fence);require(status!=Completion::Failed,"worker fence failed");
-    if(status==Completion::Complete){imported.ownership.glPending=false;glDeleteSync(imported.fence);imported.fence=nullptr;require(unlock(interop,1,&imported.object)!=FALSE,"NV unlock failed");imported.ownership.locked=false;outputs[pending].state.store(Ready);pending=-1;sourceSlot=-1;}
+    if(status==Completion::Complete){imported.ownership.glPending=false;glDeleteSync(imported.fence);imported.fence=nullptr;require(unlock(interop,1,&imported.object)!=FALSE,"NV unlock failed");imported.ownership.locked=false;outputs[pending].state.store(Ready);pendingTiming->finish(true);pendingTiming.reset();pending=-1;sourceSlot=-1;}
    }
    const auto now=ReceiverPoll::Clock::now();
    if(discovery.due(now,pending<0)){
@@ -216,7 +235,7 @@ void FrameReceiver::run(HGLRC shared) {
    if(ring&&pending<0){
     int outputIndex=-1;for(int i=0;i<3;++i){int expected=Free;if(outputs[i].state.compare_exchange_strong(expected,Writing)){outputIndex=i;break;}}
     if(outputIndex>=0){
-     if(!beginRead(*ring)){outputs[outputIndex].state.store(Free);std::this_thread::sleep_for(std::chrono::milliseconds(1));continue;}
+     if(!beginRead(*ring)){outputs[outputIndex].state.store(Free);outerSleep();continue;}
      int newest=-1;uint64_t frame=0;
      for(int i=0;i<3;++i)if(InterlockedCompareExchange(&ring->slots[i].state,Ready,Ready)==Ready&&ring->slots[i].frame>frame){newest=i;frame=ring->slots[i].frame;}
      if(newest<0||!transition(ring->slots[newest],Ready,Reading)){endRead(*ring);outputs[outputIndex].state.store(Free);}
@@ -240,6 +259,7 @@ void FrameReceiver::run(HGLRC shared) {
       if(!output.texture){glGenTextures(1,&output.texture);require(output.texture!=0,"output texture allocation");}
       if(output.width!=width||output.height!=height){glBindTexture(GL_TEXTURE_2D,output.texture);glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,nullptr);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);output.width=width;output.height=height;}
       imported.ownership.copyPending=true;
+      ReceiverWorkerTimingSpan copyTiming(timing,ReceiverWorkerStage::CopyQuery,timingKey(imported),receiverTimingClock);
       context->CopyResource(imported.local.Get(),imported.texture.Get());context->End(imported.query.Get());context->Flush();
       const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(2);
       for(;;){
@@ -249,21 +269,28 @@ void FrameReceiver::run(HGLRC shared) {
        if(action==CopyPollAction::Complete)break;
        if(action==CopyPollAction::Stop)throw ReceiverStopRequested{};
        require(action!=CopyPollAction::Deadline,"local D3D copy deadline");
-       std::this_thread::sleep_for(std::chrono::milliseconds(1));
+       ReceiverWorkerTimingSpan sleepTiming(timing,ReceiverWorkerStage::LocalCopySleep,timingKey(imported),receiverTimingClock);
+       std::this_thread::sleep_for(std::chrono::milliseconds(1));sleepTiming.finish(true);
       }
+      copyTiming.finish(true);
       imported.ownership.copyPending=false;require(retire(*ring,imported.key),"source retirement key mismatch");imported.ownership.lease=false;endRead(*ring);imported.ownership.admission=false;
       // Driver synchronization stays on the worker; it is not assumed bounded.
-      require(lock(interop,1,&imported.object)!=FALSE,"NV lock failed");imported.ownership.locked=true;
+      {ReceiverWorkerTimingSpan lockTiming(timing,ReceiverWorkerStage::NvLock,timingKey(imported),receiverTimingClock);
+       require(lock(interop,1,&imported.object)!=FALSE,"NV lock failed");lockTiming.finish(true);}
+      imported.ownership.locked=true;
       glBindFramebuffer(GL_READ_FRAMEBUFFER,readFbo);glFramebufferTexture2D(GL_READ_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,imported.gl,0);
       glBindFramebuffer(GL_DRAW_FRAMEBUFFER,drawFbo);glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,output.texture,0);
       require(glCheckFramebufferStatus(GL_READ_FRAMEBUFFER)==GL_FRAMEBUFFER_COMPLETE&&glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)==GL_FRAMEBUFFER_COMPLETE,"copy FBO incomplete");
       imported.ownership.glPending=true;glBlitFramebuffer(0,0,width,height,0,0,width,height,GL_COLOR_BUFFER_BIT,GL_NEAREST);
-      output.frame=imported.key.frame;output.generation=imported.key.generation;imported.fence=glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE,0);require(imported.fence!=nullptr,"worker fence allocation failed");glFlush();pending=outputIndex;sourceSlot=newest;
+      output.frame=imported.key.frame;output.generation=imported.key.generation;
+      pendingTiming.emplace(timing,ReceiverWorkerStage::GlFenceReady,timingKey(imported),receiverTimingClock);
+      imported.fence=glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE,0);require(imported.fence!=nullptr,"worker fence allocation failed");glFlush();pending=outputIndex;sourceSlot=newest;
      }
     }
    }
-   std::this_thread::sleep_for(std::chrono::milliseconds(1));
+   outerSleep();
   }
+  timingFinalization.bodyCompleted();
  },[&](const char* reason){writeReceiverFailure(log,reason);},[&]{
   finalizeReceiverDiagnostics(beginSucceeded,[&]{
   drainOpportunities();log<<"{\"kind\":\"host-telemetry-summary\",\"instanceId\":\""<<activation.instanceId()<<"\",\"lostRecords\":"<<opportunities.lost.load()+traceCapped<<",\"recorded\":"<<std::min<uint64_t>(opportunityRecords,100000)<<"}"<<std::endl;
@@ -271,6 +298,7 @@ void FrameReceiver::run(HGLRC shared) {
    log<<"{\"kind\":\"host-telemetry-unavailable\",\"reason\":\"activation initialization incomplete\"}"<<std::endl;
   });
  });
+ timingFinalization.prepare(beginSucceeded,beginSucceeded?std::string_view(activation.instanceId()):std::string_view{},pendingTiming);
  activation.end();
  detach(); // always before closing interop or releasing its D3D device
  if(interop&&!close(interop)){unsupportedUnload();for(;;)std::this_thread::sleep_for(std::chrono::seconds(1));}
@@ -280,6 +308,8 @@ void FrameReceiver::run(HGLRC shared) {
  if(shared&&!wglDeleteContext(shared)){unsupportedUnload();for(;;)std::this_thread::sleep_for(std::chrono::seconds(1));}
  if(dc)ReleaseDC(window,dc);if(window)DestroyWindow(window);
  if(classAtom)UnregisterClassW(windowClass.c_str(),GetModuleHandleW(nullptr));
+ if(!timingFinalization.drain(timing,log,timingFrequency))
+  OutputDebugStringA("Lux TR02: receiver timing diagnostic output/flush failed; evidence unavailable.\n");
 }
 GLuint FrameReceiver::acquireLatest() {
  const auto callbackSequence=++callbacks;LARGE_INTEGER callbackAt;QueryPerformanceCounter(&callbackAt);
