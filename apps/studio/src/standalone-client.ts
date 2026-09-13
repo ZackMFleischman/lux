@@ -12,6 +12,7 @@ import { LEGACY_CONTROL_SCHEMA, LEGACY_CONTROL_SCHEMA_HASH, initialControlValues
 import type { SavedControlSnapshot, RuntimeControlState } from './controls/control-state.ts';
 import { validateSource, snapshotRecord } from '../../build-worker/src/source-policy.mjs';
 import { verifyLinked } from '../../build-worker/src/artifact-identity.mjs';
+import { PerformanceReceiver } from './performance/performance-state.ts';
 export interface AuthoringApi {
   example(): Promise<SourceBundle>;
   compile(source: SourceBundle): Promise<any>;
@@ -24,7 +25,7 @@ export interface AuthoringApi {
   onAgentCommand(listener: (command: any) => Promise<unknown>): () => void;
 }
 declare global { interface Window { luxAuthoring: AuthoringApi } }
-type Running = { worker: Worker; canvas: HTMLCanvasElement; instanceId: string; generation: number; revisionId: string;
+type Running = { worker: Worker; canvas: HTMLCanvasElement; instanceId: string; generation: number; revisionId: string; performance:PerformanceReceiver;
   lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; state:RuntimeControlState; desiredControls?:ControlValues; };
 export class StandaloneClient implements StudioClient, PresentationPort {
   private snapshot: StudioSnapshot = { connection: 'connected', message: 'Open an example or write a visual, then Build & preview.', receivedAtMs: Date.now(), authoring: null, host: null, jobs: [], visualFps: null, uiFps: null };
@@ -80,7 +81,8 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     canvas.style.cssText = 'width:100%;height:100%;position:absolute;inset:0;object-fit:contain';
     const worker = new Worker(new URL('./visual-worker.js', import.meta.url), { type: 'module' });
     const candidate: Running = { worker, canvas, instanceId: this.running?.instanceId ?? crypto.randomUUID(), generation: ++this.generation,
-      revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0,state };
+      revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0,state,performance:undefined as any };
+    candidate.performance=new PerformanceReceiver({instanceId:candidate.instanceId,generation:candidate.generation,revisionId},performance.now());
     const previous = this.running;
     const playing = this.snapshot.authoring?.playback === 'playing';
     let ready = false;
@@ -94,6 +96,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
         // Healthy asynchronous startup can still use the independent 5 s cap.
         candidate.watchdog = setInterval(() => {
           const now = performance.now();
+          if(this.running===candidate&&candidate.performance.age(now))this.publish({performance:candidate.performance.snapshot});
           if (now - candidate.lastHeartbeat >= 1250) fail(ready ? 'Visual stopped making progress. Restart the runtime to retry.' : 'Visual initialization stopped making progress');
           else if (ready && this.snapshot.authoring?.playback === 'playing' && now - candidate.lastFrame >= 1250) fail('Visual stopped completing frames. Restart the runtime to retry.');
         }, 250);
@@ -101,6 +104,10 @@ export class StandaloneClient implements StudioClient, PresentationPort {
         worker.onmessage = event => {
           const message = event.data;
           if (candidate.terminal || message?.instanceId !== candidate.instanceId || message.generation !== candidate.generation || message.revisionId !== candidate.revisionId) return;
+          if(message.type==='performance') {
+            if(this.running===candidate&&candidate.performance.receive(message.summary,performance.now()))this.publish({performance:candidate.performance.snapshot});
+            return;
+          }
           if (message.type === 'failure') { fail(String(message.message)); return; }
           if (message.type === 'heartbeat') { if (/^\d{1,20}$/.test(message.frameId)) candidate.lastHeartbeat = performance.now(); return; }
           if (message.type === 'capture-error') {
@@ -139,6 +146,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
             ready = true; clearTimeout(timer); this.running = candidate;
             if (previous) { this.stop(previous, 'Runtime changed before command completed'); previous.canvas.remove(); }
             this.target?.appendChild(canvas);
+            this.publish({performance:candidate.performance.snapshot});
             resolve();
           }
           if (this.running !== candidate) return;
@@ -170,7 +178,8 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private fault(runtime: Running, message: string) {
     if (runtime !== this.running || runtime.terminal) return;
     this.stop(runtime, message);
-    if (this.snapshot.authoring) this.publish({ authoring: { ...this.snapshot.authoring, playback: 'failed', fault: { code: 'RUNTIME_FAILED', message } } });
+    runtime.performance.fail();
+    if (this.snapshot.authoring) this.publish({ performance:runtime.performance.snapshot,authoring: { ...this.snapshot.authoring, playback: 'failed', fault: { code: 'RUNTIME_FAILED', message } } });
   }
   async invoke(operation: StudioOperation): Promise<unknown> {
     const raw=snapshotRecord(operation),inputRaw=snapshotRecord(raw.input);

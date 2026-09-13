@@ -3,6 +3,7 @@ import type { ControlValues, ControlMigration } from '../../../packages/runtime-
 import { normalizeControlSchema, validateControlSnapshot, validateControlPatch } from '../../../packages/runtime-contracts/src/parameters.mjs';
 import { LEGACY_CONTROL_SCHEMA, LEGACY_CONTROL_SCHEMA_HASH } from './controls/control-state.ts';
 import type { RuntimeControlState } from './controls/control-state.ts';
+import type { PerformanceSnapshot } from './performance/performance-state.ts';
 export type { RuntimeKey } from '../../../packages/runtime-contracts/src/index.ts';
 /** Provisional Studio view port over canonical runtime identity/output/control
  * DTOs. This is not a competing application service or frozen core API. */
@@ -29,6 +30,7 @@ export type StudioSnapshot = Readonly<{
   host: Readonly<{ instanceId: string; revisionId: string }> | null;
   jobs: readonly Readonly<{ jobId: string; state: string; summary: string; fault?: string }>[];
   visualFps: Metric | null; uiFps: Metric | null;
+  performance?:PerformanceSnapshot;
 }>;
 // These payloads match docs/design/ai-authoring.md. Acknowledgement is admission,
 // never a local change to applied controls, playback state, generation, or pixels.

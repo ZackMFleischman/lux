@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { StandaloneClient } from '../../apps/studio/src/standalone-client.ts';
+import { createFrameCollector } from '../../packages/performance/live.mjs';
 
 class WorkerFixture {
   static all: WorkerFixture[] = [];
@@ -12,6 +13,7 @@ class WorkerFixture {
   terminate() { this.terminated = true; }
 }
 const source = { sdkVersion: '0.1.0' as const, entry: 'visual.ts', files: { 'visual.ts': '' } };
+function telemetry(){const c=createFrameCollector({startMs:0});c.record(20,1,2,3,4,false);return c.summary(500);}
 function fixture(t: any, linked: any = {code:'accepted'}) {
   let now = 0, next = 0, compiles = 0;
   const scheduled = new Map<number, { at: number; callback: () => void; interval: number }>();
@@ -152,4 +154,23 @@ test('source replacement does not inherit unacknowledged control intent from the
     instanceId: state.instanceId, expectedGeneration: state.generation, expectedRevisionId: state.revisionId, mode: 'live', values: { intensity: 0.8 } } }), /Runtime changed/);
   await f.start(); await pending;
   assert.equal(f.client.getSnapshot().authoring!.intensity, 0.5);
+});
+
+test('performance belongs to promoted runtime and failed candidates or late old workers cannot replace it',async t=>{
+ const f=fixture(t),old=await f.start(),callback=old.onmessage;
+ old.reply({type:'performance',summary:telemetry()});const previous=f.client.getSnapshot().performance;
+ assert.equal(previous?.worker?.cpuCall.p95,5);
+ const rejected=assert.rejects(f.client.submit(source),/candidate failed/);await f.flush();const candidate=WorkerFixture.all.at(-1)!;
+ candidate.reply({type:'performance',summary:telemetry()});candidate.reply({type:'failure',message:'candidate failed'});await rejected;
+ assert.equal(f.client.getSnapshot().performance,previous);
+ await f.start();assert.equal(f.client.getSnapshot().performance?.status,'pending');
+ callback({data:{...old.init,type:'performance',summary:{...telemetry(),sequence:99}}});
+ assert.equal(f.client.getSnapshot().performance?.status,'pending');
+});
+test('telemetry silence becomes stale despite healthy heartbeats, and faults preserve labeled last measurements',async t=>{
+ const f=fixture(t),worker=await f.start();worker.reply({type:'performance',summary:telemetry()});
+ for(let i=0;i<6;i++){await f.advance(250);worker.reply({type:'heartbeat'});}
+ assert.equal(f.client.getSnapshot().performance?.status,'stale');assert.equal(worker.terminated,false);
+ worker.reply({type:'failure',message:'failed'});assert.equal(f.client.getSnapshot().performance?.status,'failed');
+ assert.equal(f.client.getSnapshot().performance?.worker?.cpuCall.p95,5);
 });
