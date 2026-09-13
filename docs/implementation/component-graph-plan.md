@@ -1,6 +1,6 @@
 # C03 component graph contracts and execution sequence
 
-Plan revision 1, LUX-23 specification 2. Planning baseline:
+Plan revision 2, LUX-23 specification 2. Planning baseline:
 `09e280f1e7892612795d40a7519ffeb0de156901`, including accepted C02 source
 `e28a5a8142074463a7aec0309cc81cd6a2977707` and its combined integration.
 This document requires fresh independent critique before an implementation ticket
@@ -195,6 +195,16 @@ and contain `id,from,to,delay`; each port reference is `nodeId,portId`. Definiti
 sort by hash. UUID input passes the shared schemas without trimming/case folding;
 identity equality is exact string equality, consistent with those schema outputs.
 Do not add another UUID acceptance policy. Dynamic metadata ordering remains C01.
+The shared Zod schema is syntax-only and preserves its admitted strings; uppercase,
+nil and max UUIDs are examples of values accepted here, not an exhaustive account
+of its difference from RFC version/variant validation. C03a therefore preserves
+case-distinct node IDs as distinct identities. Current numeric input mappings use
+the narrower canonical lower-case RFC versions1–8 policy, and core project duplicate
+detection folds UUID case. Before any mapping or persistence adapter consumes graph
+addresses, require a separately reviewed address and duplicate/collision policy.
+That adapter must reject unsupported identities or perform an explicit validated
+migration with collision handling; it cannot silently lowercase graph IDs, merge
+nodes or widen the input-mapping contract. C03a does not provide that adapter.
 Freeze all arrays, objects, metadata and path segments recursively. Record the
 successful result in a module-private WeakSet. `isValidatedGraph` consults it;
 `planGraph` throws `TypeError('Expected validated graph')` for a forged or cloned
@@ -211,8 +221,11 @@ unreachable ones, must be valid before pruning. Use these rules:
   or edge namespace. Identical ID strings in different namespaces are allowed.
 - An edge source names an existing node output, and its destination names an
   existing node input. Membership in normalized port records supplies port-ID
-  policy; no new port regex. A destination has exactly one writer. Every required
-  input of every node has one incoming edge. Self-edges fail the cycle check.
+  policy; no new port regex. A destination has exactly one writer. Every declared
+  input of every node is required and has exactly one incoming edge: current C01
+  metadata has no optional/default input marker. This also applies to unreachable
+  nodes. Do not infer optionality from labels or lack of a runtime consumer.
+  Self-edges fail the cycle check.
 - Only literal `delay:'none'` is accepted. Missing delay, `previous-step`, numeric
   delays or any other value reject, even on an unreachable edge. Feedback is not
   implemented by deleting delayed edges from the cycle check.
@@ -326,6 +339,14 @@ shape errors. Any failure returns no partial result and leaves input unchanged.
    and escaped characters. Giant length, sparse array, depth17, property/value
    budget, nonenumerable/symbol/accessor/custom-prototype and nonfinite fixtures
    must fail before normalization/copy. Keep test setup bounded itself.
+
+   Add neutral-schema identity fixtures with uppercase UUID text, nil and max
+   sentinel values, and two case-distinct spellings of a UUID containing A–F.
+   Each admitted string stays byte-identical; the case-distinct IDs denote two
+   graph nodes and retain separate edges/planned paths. Reject exact duplicates.
+   Verify graph IDs are admitted through the shared schema, not the mapping regex.
+   These tests establish only C03a identity semantics; they cannot claim that the
+   future input or persisted-project adapters accept these graphs.
 
 6. Run these explicit CPU commands in the exact worker checkout with existing
    pinned dependencies and Node24.12.0; capture actual versions and exit codes:
