@@ -11,6 +11,14 @@ function sourceIdentity(release) {
   if (!/^[a-f0-9]{64}$/.test(release.releaseId) || !/^[a-f0-9]{64}$/.test(release.runtimeId)) throw Error('Invalid source identity');
   const pluginId = (Number.parseInt(hash(release.releaseId).slice(0, 8), 16) % (36 ** 4)).toString(36).toUpperCase().padStart(4, '0');
   const displayName = release.name.normalize('NFKD').replace(/[^\x20-\x7e]/g, '').trim().slice(0, 16) || 'Lux Source';
+  if(release.version===2){
+    const {parameterMapping}=require(fs.existsSync(path.join(__dirname,'parameter-mapping.cjs'))?'./parameter-mapping.cjs':'../../../tools/gpu-spike/parameter-mapping.cjs');
+    const mapping=parameterMapping(release.controls,release.savedControls,release.controlSchemaHash);
+    const sidecar=['lux-installed-source-v2',release.releaseId,release.runtimeId,pluginId,displayName,release.controlSchemaHash,String(mapping.length),
+      ...mapping.map(row=>[row.id,row.hostLabel,String(row.initial)].join('\t')),''].join('\n');
+    if(Buffer.byteLength(sidecar)>8192)throw Error('Installed descriptor exceeds limit');
+    return {pluginId,displayName,sidecar};
+  }
   return { pluginId, displayName, sidecar: [protocol, release.releaseId, release.runtimeId, pluginId, displayName, ''].join('\n') };
 }
 /** Explicit trusted registration step; never called by package installation automatically. */
