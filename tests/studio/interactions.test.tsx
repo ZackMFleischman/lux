@@ -84,10 +84,10 @@ test('RTL: duplicate component labels show and announce their public aliases', (
     { id: 'segmentsB', type: 'number' as const, label: 'Segments', min: 2, max: 16, default: 6, changeCost: 'live' as const },
   ], controlSchemaHash: 'c'.repeat(64), controls: { segmentsA: 6, segmentsB: 6 }, controlSequence: 0 });
   render(<StudioApp client={fixture.client} nowMs={1000} />);
-  assert.ok(screen.getByText('Segments (segmentsA)'));
-  assert.ok(screen.getByText('Segments (segmentsB)'));
-  assert.ok(screen.getByRole('slider', { name: 'Segments (segmentsA)' }));
-  assert.ok(screen.getByRole('spinbutton', { name: 'Segments (segmentsB) value' }));
+  assert.ok(screen.getByText('segmentsA · Segments'));
+  assert.ok(screen.getByText('segmentsB · Segments'));
+  assert.ok(screen.getByRole('slider', { name: 'segmentsA · Segments' }));
+  assert.ok(screen.getByRole('spinbutton', { name: 'segmentsB · Segments value' }));
 });
 
 test('RTL: an empty authored schema has no invented control', () => {

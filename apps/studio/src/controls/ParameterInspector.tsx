@@ -76,7 +76,7 @@ export function ParameterInspector({ runtime, available, client, controller, onE
   const state = getRuntimeControlState(runtime), owner = parameterOwner(runtime);
   const labelCounts = new Map<string, number>();
   for (const definition of state.controlSchema) labelCounts.set(definition.label, (labelCounts.get(definition.label) ?? 0) + 1);
-  const displayLabel = (definition: NumberControlDefinition) => labelCounts.get(definition.label)! > 1 ? `${definition.label} (${definition.id})` : definition.label;
+  const displayLabel = (definition: NumberControlDefinition) => labelCounts.get(definition.label)! > 1 ? `${definition.id} · ${definition.label}` : definition.label;
   return <>{state.controlSchema.length === 0 && <p className="hint">This visual defines no live controls.</p>}
     {state.controlSchema.map(definition => <ParameterRow key={`${owner}:${definition.id}`} definition={definition} displayLabel={displayLabel(definition)}
       applied={state.controls[definition.id]!} owner={owner} available={available} client={client} controller={controller} onError={onError} edits={edits} />)}
