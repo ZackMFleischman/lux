@@ -5,5 +5,6 @@
     "jsx": "react-jsx", "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "types": ["node", "react", "react-dom"]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "../../tests/studio/**/*.ts", "../../tests/studio/**/*.tsx"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "../../tests/studio/**/*.ts", "../../tests/studio/**/*.tsx"],
+  "exclude": ["../../tests/studio/fixtures/prismatic-composition/**/*.ts"]
 }
