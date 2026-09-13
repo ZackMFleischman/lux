@@ -3,11 +3,11 @@ const ticks=value=>{if(typeof value!=='string'||! /^(0|[1-9][0-9]{0,19})$/.test(
 const assert=(condition,message)=>{if(!condition)throw Error(message);};
 /** Measures a conservative host-trigger-to-confirmed-Job-exit bound, not a
  * worker acknowledgement or exact hang-onset timestamp. No Resolume claim. */
-export function inspectNativeStop({experiment,probe,marker,lifecycle,expected}) {
+function inspectStop({experiment,probe,marker,lifecycle,expected},maximumWorkMs) {
   assert(experiment?.outcome==='success'&&experiment.cleanupComplete===true&&experiment.result?.cleanupComplete===true&&experiment.result.exitCode===0&&experiment.result.timeout===false&&experiment.result.cancelled===false,'Supervised completion/cleanup failed');
   assert(integer(experiment.timeoutMs)&&experiment.timeoutMs>=1000&&experiment.timeoutMs<=30000,'Invalid outer budget');
   assert(probe?.runId===experiment.id&&probe.ok===true&&probe.deinstantiated===true&&probe.deinitialized===true&&probe.hostPid===experiment.child?.pid,'Invalid native probe ownership/teardown');
-  assert(integer(probe.elapsedMs)&&probe.elapsedMs<=10000&&probe.ready===true&&probe.armAccepted===true&&probe.disarmSubmitted===true&&integer(probe.callbacksAfterMarker)&&probe.callbacksAfterMarker>0,'Missing bounded ready/arm/disarm evidence');
+  assert(integer(probe.elapsedMs)&&probe.elapsedMs<=maximumWorkMs&&probe.ready===true&&probe.armAccepted===true&&probe.disarmSubmitted===true&&integer(probe.callbacksAfterMarker)&&probe.callbacksAfterMarker>0,'Missing bounded ready/arm/disarm evidence');
   assert(marker?.kind==='hang-entered'&&marker.runId===experiment.id&&marker.hostPid===probe.hostPid&&marker.ready===true&&integer(marker.workerHeartbeat)&&marker.workerHeartbeat>0&&integer(marker.completedFrames)&&marker.completedFrames>0,'Missing durable hang entry/readiness');
   assert(expected&&/^[a-f0-9]{64}$/.test(expected.releaseId)&&/^[a-f0-9]{64}$/.test(expected.revisionId)&&marker.revisionId===expected.revisionId&&/^[a-f0-9]{32}$/.test(marker.instanceId)&&/^[a-f0-9]{32}$/.test(marker.attemptId),'Invalid release/attempt identity');
   assert(Array.isArray(lifecycle)&&lifecycle.length>0&&lifecycle.length<=100,'Invalid bounded lifecycle evidence');
@@ -23,11 +23,12 @@ export function inspectNativeStop({experiment,probe,marker,lifecycle,expected}) 
   return {ok:true,instanceId:marker.instanceId,attemptId:marker.attemptId,triggerAt:probe.triggerAt,observedExitAt:exit[0].observedExitAt,
     upperBoundMs:Number(observed-trigger)*1000/Number(frequency),physicalExitVerified:true,exactHangOnsetMeasured:false,disarmWasWorkerAcknowledged:false,actualResolumeTested:false};
 }
+export function inspectNativeStop(input) { return inspectStop(input,10000); }
 
 /** Observed current-value recovery of the pinned binary-color fixture. This is
  * not a first-frame, explicit-restart or recovery-performance measurement. */
 export function inspectNativeRecovery(input) {
-  const stopped=inspectNativeStop(input),{probe,marker,lifecycle,expected}=input;
+  const stopped=inspectStop(input,15000),{probe,marker,lifecycle,expected}=input;
   const color=(value,wanted)=>Array.isArray(value)&&value.length===4&&value.every((v,i)=>integer(v)&&v<=255&&Math.abs(v-wanted[i])<=5);
   assert(probe.recoveryMode===true&&probe.recovered===true&&probe.currentNormalizedValue===0&&color(probe.initialRGBA,[255,0,255,255])&&color(probe.recoveredRGBA,[0,255,255,255]),'Missing recovered cyan/current host value');
   const recovered=ticks(probe.recoveredAt),observed=ticks(stopped.observedExitAt),frequency=ticks(probe.clock.frequency);

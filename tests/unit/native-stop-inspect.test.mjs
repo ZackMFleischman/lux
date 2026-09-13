@@ -20,6 +20,12 @@ function recoveryFixture(){const f=fixture(),identity={...f.expected},retry={...
 test('observed recovery binds cyan/current host value to exactly one retry after physical old exit',()=>{
  const result=inspectNativeRecovery(recoveryFixture());assert.equal(result.recoveryImageVerified,true);assert.equal(result.retryAttemptId,'e'.repeat(32));assert.equal(result.firstAcceptedFrameMeasured,false);assert.equal(result.recoveryFiveSecondGateMeasured,false);
 });
+test('only recovery permits fifteen-second work and never relaxes physical stop or outer budget',()=>{
+ const f=recoveryFixture();f.probe.elapsedMs=15000;assert.equal(inspectNativeRecovery(f).ok,true);assert.throws(()=>inspectNativeStop(f),/bounded/);
+ f.probe.elapsedMs=15001;assert.throws(()=>inspectNativeRecovery(f),/bounded/);f.probe.elapsedMs=15000;
+ f.experiment.timeoutMs=30001;assert.throws(()=>inspectNativeRecovery(f),/outer/);f.experiment.timeoutMs=30000;
+ f.lifecycle[2].observedExitAt='30000001';assert.throws(()=>inspectNativeRecovery(f),/2s/);
+});
 test('recovery rejects missing pixels, stale value, early retry, faults and equivocal extra attempts',()=>{
  for(const change of [f=>f.probe.recoveryMode=false,f=>f.probe.recovered=false,f=>f.probe.currentNormalizedValue=0.5,f=>f.probe.initialRGBA=[0,255,255,255],f=>f.probe.recoveredRGBA=[255,0,255,255],f=>f.probe.recoveredRGBA[3]=0,f=>f.probe.recoveredAt='24000000',f=>f.lifecycle[3].clock.at='24000000',f=>f.lifecycle[3].revisionId='f'.repeat(64),f=>f.lifecycle[3].incomplete=true,f=>f.lifecycle[3].clock.frequency='100',f=>f.lifecycle[4].clock.at='39000000',f=>f.lifecycle.push({...f.lifecycle[3],attemptId:'f'.repeat(32)}),f=>f.lifecycle.splice(3,1)]){const f=recoveryFixture();change(f);assert.throws(()=>inspectNativeRecovery(f));}
 });
