@@ -16,6 +16,9 @@ function quota(path) { invalid(path, 'replay result or work budget exceeded', 'R
 function epoch(value, path) { if (!Number.isSafeInteger(value) || value < 0) invalid(path, 'expected nonnegative safe epoch'); return value === 0 ? 0 : value; }
 function time(value, path) { if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) invalid(path, 'expected finite nonnegative time'); return value === 0 ? 0 : value; }
 function stateOf(cursor) { const state = cursors.get(cursor); if (!state) invalid('cursor', 'expected authentic cursor'); return state; }
+function checkCurrent(cursor, state) {
+  if (stateOf(cursor) !== state) invalid('request', 'cursor changed during request');
+}
 
 // Requests have only two exact record levels and numeric leaves. Inspect every
 // descriptor before reading its value; never invoke a caller's getter/toJSON.
@@ -158,26 +161,34 @@ function execute(start, nextMs, budget) {
 }
 export function advanceScriptedReplayCursor(cursor, input) {
   const state = stateOf(cursor), r = request(input, ['runtimeEpoch', 'previousMs', 'nextMs', 'budget']);
+  // Plain-looking Proxy descriptors can reenter any mutator during capture.
+  // Preserve that successful nested transaction, even at the same epoch/time.
+  checkCurrent(cursor, state);
   checkEpoch(state, r);
   if (r.previousMs !== state.positionMs) invalid('request.previousMs', 'position must match cursor');
   if (r.nextMs < r.previousMs || r.nextMs > state.fixture.durationMs) invalid('request.nextMs', 'outside forward fixture interval');
   const { candidate, result } = execute(state, r.nextMs, r.budget);
+  checkCurrent(cursor, state);
   cursors.set(cursor, candidate);
   return result;
 }
 export function resetScriptedReplayCursor(cursor, input) {
   const state = stateOf(cursor), r = request(input, ['runtimeEpoch', 'nextEpoch']);
+  checkCurrent(cursor, state);
   checkEpoch(state, r);
   const candidate = initial(state.fixture, state.fixtureHash, r.nextEpoch), result = detached(view(candidate));
+  checkCurrent(cursor, state);
   cursors.set(cursor, candidate);
   return result;
 }
 export function seekScriptedReplayCursor(cursor, input) {
   const state = stateOf(cursor), r = request(input, ['runtimeEpoch', 'nextEpoch', 'nextMs', 'budget']);
+  checkCurrent(cursor, state);
   checkEpoch(state, r);
   if (r.nextMs > state.fixture.durationMs) invalid('request.nextMs', 'outside fixture interval');
   const start = initial(state.fixture, state.fixtureHash, r.nextEpoch);
   const { candidate, result } = execute(start, r.nextMs, r.budget);
+  checkCurrent(cursor, state);
   cursors.set(cursor, candidate);
   return result;
 }

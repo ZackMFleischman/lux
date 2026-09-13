@@ -49,6 +49,78 @@ test('all methods reject forged handles before touching request properties', asy
   assert.equal(reads, 0);
 });
 
+// Reflection can execute caller code even when a Proxy reports ordinary own
+// data. Publishing from a pre-reflection snapshot would lose the nested commit.
+for (const [method, mutate] of Object.entries({ advance, reset, seek })) {
+  for (const location of method === 'reset' ? ['request'] : ['request', 'budget']) {
+    for (const trap of ['getPrototypeOf', 'ownKeys', 'getOwnPropertyDescriptor']) {
+      for (const nested of ['reset', 'seek', 'advance', 'zero']) {
+        test(`${method} preserves nested ${nested} committed by ${location}.${trap}`, async () => {
+          const c = await cursor(); let fired = false, inner;
+          const r = method === 'advance' ? req() : method === 'reset'
+            ? { runtimeEpoch: 7, nextEpoch: 8 }
+            : { runtimeEpoch: 7, nextEpoch: 8, nextMs: 10, budget: { ...budget } };
+          const handler = { [trap](...args) {
+            if (!fired) {
+              fired = true;
+              inner = nested === 'reset' ? reset(c, { runtimeEpoch: 7, nextEpoch: 9 })
+                : nested === 'seek' ? seek(c, { runtimeEpoch: 7, nextEpoch: 9, nextMs: 5, budget })
+                : advance(c, { ...req(), nextMs: nested === 'zero' ? 0 : 5 });
+            }
+            return Reflect[trap](...args);
+          } };
+          const input = location === 'request' ? new Proxy(r, handler)
+            : { ...r, budget: new Proxy(r.budget, handler) };
+          invalid(() => mutate(c, input));
+          assert.equal(fired, true);
+          const expected = inner.view ?? inner;
+          assert.equal(expected.runtimeEpoch, nested === 'reset' || nested === 'seek' ? 9 : 7);
+          assert.equal(expected.positionMs, nested === 'reset' || nested === 'zero' ? 0 : 5);
+          assert.equal(expected.zeroConsumed, nested !== 'reset');
+          assert.deepEqual(inspect(c), expected);
+          // The inner transaction remains usable, including its consumed zero
+          // batch: successful nested advances cannot be silently rolled back.
+          const tail = advance(c, { runtimeEpoch: expected.runtimeEpoch, previousMs: expected.positionMs, nextMs: 10, budget });
+          assert.equal(tail.evaluations.filter(row => row.reason === 'initial').length, nested === 'reset' ? 1 : 0);
+        });
+      }
+    }
+  }
+}
+
+test('reflection without a successful nested mutation leaves the outer request usable', async () => {
+  const c = await cursor(); let fired = false;
+  const input = new Proxy(req(), { ownKeys(target) {
+    if (!fired) {
+      fired = true;
+      assert.equal(inspect(c).runtimeEpoch, 7);
+      quota(() => seek(c, { runtimeEpoch: 7, nextEpoch: 9, nextMs: 10, budget: { evaluations: 0, events: 0, work: 0 } }));
+    }
+    return Reflect.ownKeys(target);
+  } });
+  const result = advance(c, input);
+  assert.equal(result.view.runtimeEpoch, 7); assert.equal(result.view.positionMs, 10);
+});
+
+test('rejected outer advance preserves nested zero-batch event consumption', async () => {
+  const f = empty(), source = { sourceId: 'a', signalId: 'note' };
+  f.definition = { version: 1, sources: [{ sourceId: 'a', generation: 0, connected: true, calibrationId: 'cal0' }], signals: [{ source, kind: 'event' }] };
+  f.sourceConfigs = [{ sourceId: 'a', calibrationId: 'cal0', configuration: {} }];
+  f.operations = [0, 1].map(sequence => ({ kind: 'input', atMs: 0, envelope: { version: 1, epoch: 0, source, generation: 0, calibrationId: 'cal0', sequence, timestampMs: 0, kind: 'event', payload: { type: 'note', values: [0.5] } } }));
+  const c = await cursor(f); let inner;
+  const input = { ...req(), budget: new Proxy({ ...budget }, { ownKeys(target) {
+    inner = advance(c, { ...req(), nextMs: 0 });
+    return Reflect.ownKeys(target);
+  } }) };
+  invalid(() => advance(c, input));
+  assert.equal(inner.events.length, 2);
+  assert.deepEqual(inner.events.map(event => event.operationIndex), [0, 1]);
+  assert.deepEqual(inspect(c), inner.view);
+  const result = advance(c, req());
+  assert.equal(result.events.length, 0);
+  assert.equal(result.evaluations.filter(row => row.reason === 'initial').length, 0);
+});
+
 test('fractional times, negative zero and exact epoch/position checks include repeated-time no-ops', async () => {
   const c = await cursor();
   const r = advance(c, { ...req(), previousMs: -0, nextMs: 0.25 }); assert.equal(r.previousMs, 0); assert.equal(r.nextMs, 0.25);
