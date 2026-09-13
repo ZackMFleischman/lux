@@ -27,7 +27,7 @@ function MetricView({ label, metric, nowMs }: { label: string; metric: Metric | 
 }
 export type StudioProps = {
   controlEdits?: ControlEdits;
-  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; appError?: string;
+  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; libraryPanel?:ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; appError?: string;
 };
 export function StudioApp(props: StudioProps) {
   return <ThemeProvider theme={studioTheme}><CssBaseline /><StudioLayout {...props} /></ThemeProvider>;
@@ -37,7 +37,7 @@ function controlOwner(snapshot: StudioSnapshot): string | null {
   return snapshot.connection === 'connected' && runtime?.authority === 'studio'
     ? parameterOwner(runtime) : null;
 }
-function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel, appCommands, fileMenu, appError, controlEdits }: StudioProps) {
+function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel,libraryPanel, appCommands, fileMenu, appError, controlEdits }: StudioProps) {
   const [toolsHost, setToolsHost] = useState<HTMLElement | null>(null);
   const [transportMenu, setTransportMenu] = useState<HTMLElement | null>(null);
   const view = useMemo(() => createRendererSnapshot(client), [client]);
@@ -142,7 +142,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
     </header>
     {appError && <Alert severity="error">{appError}</Alert>}
     <div className="workspace">
-      {sourcePanel ? <StudioDockShell toolsHost={toolsHost} compact={compact} preview={previewPane} source={sourcePanel} inspector={inspectorPane} jobs={jobsPane} /> : <>{previewPane}{!compact && inspectorPane}</>}
+      {sourcePanel ? <StudioDockShell toolsHost={toolsHost} compact={compact} preview={previewPane} source={sourcePanel} library={libraryPanel??<section aria-label="Shared component library">Library unavailable.</section>} inspector={inspectorPane} jobs={jobsPane} /> : <>{previewPane}{!compact && inspectorPane}</>}
     </div>
     {!sourcePanel && !compact && jobsPane}
     <footer className="status-bar" hidden={windowState.fullscreen}><span><i className="status-dot" />{snapshot.connection === 'connected' ? 'Authoring service' : 'Awaiting authoring service'}</span><span>Presentation only · output size is independent of window size</span><span>TRACER 0.1</span></footer>

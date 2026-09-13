@@ -17,6 +17,8 @@ import { ExportDialog } from './ExportDialog.tsx';
 import './export-client.ts';
 import { studioCapabilities } from './capabilities.ts';
 import { useDiscardConfirmation } from './Confirmation.tsx';
+import { LibraryPanel } from './library/LibraryPanel.tsx';
+import './library-client.ts';
 const client = new StandaloneClient(window.luxAuthoring, { codeDeclaredParameters: true });
 const agentStatus = () => ({ ...client.getSnapshot(), capabilities: studioCapabilities });
 export function AuthoringApp() {
@@ -25,6 +27,7 @@ export function AuthoringApp() {
     popout: undefined } : undefined, []);
   const [error, setError] = useState('');
   const [diagnostics, setDiagnostics] = useState<SourceDiagnostic[]>([]);
+  const [libraryVersion, setLibraryVersion] = useState(0);
   const composing = useRef(false);
   const workspace = useMemo(() => createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': '' } }), []);
   const session = useMemo(() => createAuthoringSession(workspace, {
@@ -41,6 +44,7 @@ export function AuthoringApp() {
       }
       return { sourceHash: runtime.revisionId, schema: state.controlSchema, schemaHash: state.controlSchemaHash, values: state.controls };
     },
+    readLibraryComponent:id=>window.luxLibrary.read(id),
   }), [workspace]);
   const pendingControlWrites = useRef(new Set<Promise<unknown>>());
   const controlEdits = useMemo(() => ({ changed: () => session.controlsChanged(), track: (write: Promise<unknown>) => {
@@ -50,14 +54,20 @@ export function AuthoringApp() {
   async function finishControlWrites() { while (pendingControlWrites.current.size) await Promise.all([...pendingControlWrites.current]); }
   const draft = useSyncExternalStore(workspace.subscribe, workspace.getSnapshot);
   const io = useSyncExternalStore(session.subscribe, session.getSnapshot);
-  const busy = io.busy || draft.busy, dirty = draft.dirty || io.controlsDirty;
+  const busy = io.busy || draft.busy, dirty = draft.dirty || io.controlsDirty || io.libraryDirty;
   function reportError(reason: unknown, draftVersion: number, submittedSource: SourceBundle) {
     setError(String(reason));
     if (reason instanceof SourceCompileError) setDiagnostics(diagnosticsForSource(reason.diagnostics, submittedSource, draftVersion, workspace.getSnapshot()));
   }
   useEffect(() => window.luxAuthoring.onAgentCommand(async command => {
-    if (confirmation.isPending() && !['read', 'status', 'capture'].includes(command.method)) throw Error('Studio is waiting for a user confirmation');
+    if (confirmation.isPending() && !['read', 'status', 'capture','library.list','library.read'].includes(command.method)) throw Error('Studio is waiting for a user confirmation');
     if (['parameters', 'playback', 'restart'].includes(command.method)) return dispatchRuntimeCommand(client, command.method, command.params);
+    if(command.method==='library.list')return window.luxLibrary.list();
+    if(command.method==='library.read')return window.luxLibrary.read(command.params.id);
+    if(command.method==='library.create'||command.method==='library.update'){
+      const result=command.method==='library.create'?await window.luxLibrary.create(command.params):await window.luxLibrary.update(command.params);
+      await session.checkLibraryUpdates();setLibraryVersion(value=>value+1);return result;
+    }
     if (command.method === 'status') return agentStatus();
     if (command.method === 'read') return { ...session.read(), status: agentStatus() };
     if (command.method === 'capture') {
@@ -70,7 +80,7 @@ export function AuthoringApp() {
     setError('');
     try {
       if (pendingControlWrites.current.size) await finishControlWrites();
-      await session.build(source, command.params?.expectedDraftVersion);
+      await session.build(source, command.params?.expectedDraftVersion,command.params?.libraryLinks);
       return { draftVersion: workspace.getSnapshot().version, status: agentStatus() };
     } catch (reason) { reportError(reason, command.params?.expectedDraftVersion, source); throw reason; }
   }), [session, workspace]);
@@ -130,9 +140,13 @@ export function AuthoringApp() {
     <Button variant="contained" disabled={busy} title="Build preview (Ctrl/Cmd+S in source)" onClick={() => void build()}>Build</Button>
     <span className="build-status" role="status">{draft.runningMatchesDraft ? 'Preview current' : draft.hasRunningSource ? 'Preview shows previous source' : 'Not built'}</span>
   </>;
+  const links=session.read().libraryLinks;
+  const libraryPanel=<LibraryPanel client={window.luxLibrary} links={links} updates={io.libraryUpdates} fallbacks={io.libraryFallbacks} refreshKey={libraryVersion}
+    onApplyUpdates={async()=>{setError('');try{await session.applyLibraryUpdates();setDiagnostics([]);}catch(reason){setError(String(reason));throw reason;}}}
+    onFork={id=>{try{session.forkLibraryComponent(id);}catch(reason){setError(String(reason));}}} onError={reason=>setError(String(reason))}/>;
   return <ThemeProvider theme={studioTheme}><div className="authoring-shell">
     {confirmation.dialog}
-    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} appCommands={commands} appError={error} controlEdits={controlEdits}
+    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} appCommands={commands} appError={error} controlEdits={controlEdits} libraryPanel={libraryPanel}
       sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onApply={() => void build()} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnostics={diagnostics} />} />
   </div></ThemeProvider>;
 }

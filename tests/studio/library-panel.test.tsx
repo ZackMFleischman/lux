@@ -1,0 +1,31 @@
+import test,{after,afterEach} from 'node:test';
+import assert from 'node:assert/strict';
+import {JSDOM} from 'jsdom';
+const dom=new JSDOM('<!doctype html><html><head></head><body></body></html>',{url:'http://studio.test/'});
+for(const name of ['window','document','navigator','HTMLElement','Element','Node','ShadowRoot','DocumentFragment','Event','KeyboardEvent','MouseEvent','getComputedStyle'] as const)Object.defineProperty(globalThis,name,{configurable:true,value:dom.window[name]});
+Object.defineProperty(globalThis,'IS_REACT_ACT_ENVIRONMENT',{configurable:true,writable:true,value:true});
+const {render,screen,cleanup,waitFor,fireEvent}=await import('@testing-library/react');
+const {LibraryPanel}=await import('../../apps/studio/src/library/LibraryPanel.tsx');
+afterEach(()=>cleanup());after(()=>dom.window.close());
+const id='11111111-1111-4111-8111-111111111111';
+const source={sdkVersion:'0.4.0' as const,entry:'component.ts',files:{'component.ts':'export default 1;','helper.ts':'export const value=1;'}};
+test('library panel browses readable source and copies the exact agent request without inserting code',async()=>{
+ const calls:string[]=[];const component={id,revision:2,name:'Shared Violet',description:'A reusable violet image.',updatedAt:'2026-09-13T20:00:00.000Z',source};
+ const client={list:async()=>[component],read:async()=>{calls.push('read');return component;},copyRequest:async()=>{calls.push('copy');return 'request';},create:async()=>component,update:async()=>component};
+ render(<LibraryPanel client={client} links={[]} updates={[]} fallbacks={[]} onApplyUpdates={async()=>{}} onFork={()=>{}} onError={reason=>assert.fail(String(reason))}/>);
+ await waitFor(()=>screen.getByRole('button',{name:/Shared Violet/}));
+ assert.ok(screen.getByText('A reusable violet image.'));
+ fireEvent.click(screen.getByRole('button',{name:/Shared Violet/}));
+ await waitFor(()=>screen.getByText('export default 1;'));
+ fireEvent.click(screen.getByRole('button',{name:'helper.ts'}));assert.ok(screen.getByText('export const value=1;'));
+ fireEvent.click(screen.getByRole('button',{name:'Copy agent request'}));
+ await waitFor(()=>assert.deepEqual(calls,['read','copy']));assert.ok(screen.getByRole('status').textContent?.includes('copied'));
+});
+test('library panel offers explicit apply and fork actions with visible fallback status',async()=>{
+ const actions:string[]=[];const component={id,revision:2,name:'Shared Violet',description:'A reusable violet image.',updatedAt:'2026-09-13T20:00:00.000Z',source};
+ const client={list:async()=>[component],read:async()=>component,copyRequest:async()=>'request',create:async()=>component,update:async()=>component};
+ render(<LibraryPanel client={client} links={[{componentId:id,mountPath:'library/shared',resolvedRevision:1,files:['library/shared/component.ts']}]} updates={[{componentId:id,name:'Shared Violet',resolvedRevision:1,availableRevision:2}]} fallbacks={[{componentId:id,resolvedRevision:1,message:'Library missing'}]} onApplyUpdates={async()=>{actions.push('apply');}} onFork={value=>actions.push(`fork:${value}`)} onError={reason=>assert.fail(String(reason))}/>);
+ await waitFor(()=>screen.getByText(/revision 2 is available/i));assert.ok(screen.getByText(/using saved revision 1/i));
+ fireEvent.click(screen.getByRole('button',{name:'Apply update'}));fireEvent.click(screen.getByRole('button',{name:'Fork Shared Violet'}));
+ await waitFor(()=>assert.deepEqual(actions,['apply',`fork:${id}`]));
+});

@@ -6,7 +6,7 @@ import { LuxDockLayout } from './LuxDockLayout.tsx';
 import { createStudioPanelRegistry, PanelRegistry } from './registry.ts';
 import type { LuxDockviewAdapter, LayoutStorage } from './dockview-adapter.ts';
 
-const kinds = ['preview', 'source', 'inspector', 'jobs'] as const;
+const kinds = ['preview', 'source', 'library', 'inspector', 'jobs'] as const;
 type Kind = typeof kinds[number];
 // Resolve Storage only during an operation so denied access uses adapter recovery.
 const storage: LayoutStorage = {

@@ -70,12 +70,12 @@ export function parsePersonalLayout(text: string, registry: PanelRegistry): Pers
   return validatePersonalLayout(JSON.parse(text), registry);
 }
 export function defaultPersonalLayout(registry: PanelRegistry, mode: 'desktop' | 'laptop'): PersonalLayout {
-  const panels = Object.fromEntries(['preview', 'source', 'inspector', 'jobs'].map(kind => [kind, { id: kind, contentComponent: kind, title: registry.get(kind).title, renderer: 'always' as const, params: { viewState: {} } }]));
+  const panels = Object.fromEntries(['preview', 'source','library', 'inspector', 'jobs'].map(kind => [kind, { id: kind, contentComponent: kind, title: registry.get(kind).title, renderer: 'always' as const, params: { viewState: {} } }]));
   const leaf = (id: string, views: string[], size: number): GridNode => ({ type: 'leaf', size, data: { id, views, activeView: views[0] } });
   const root: GridNode = mode === 'laptop' ? { type: 'branch', data: [leaf('workspace', Object.keys(panels), 900)] } : {
     type: 'branch', data: [
       { type: 'branch', size: 1200, data: [
-        { type: 'branch', size: 800, data: [leaf('source-group', ['source'], 400), leaf('preview-group', ['preview'], 800)] },
+        { type: 'branch', size: 800, data: [leaf('source-group', ['source','library'], 400), leaf('preview-group', ['preview'], 800)] },
         leaf('jobs-group', ['jobs'], 100),
       ] }, leaf('inspector-group', ['inspector'], 240),
     ],

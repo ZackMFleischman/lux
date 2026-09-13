@@ -18,7 +18,7 @@ test('local agent bridge forwards runtime controls through the application dispa
   const calls: unknown[] = [];
   const bridge = await createAgentBridge(async (method, params) => { calls.push({ method, params }); return { applied: true }; });
   try {
-    for (const method of ['parameters', 'playback', 'restart']) {
+    for (const method of ['parameters', 'playback', 'restart', 'library.list', 'library.read', 'library.create', 'library.update']) {
       const params = { instanceId: 'runtime', expectedGeneration: 2 };
       const response = await fetch(bridge.url, { method: 'POST', headers: { authorization: `Bearer ${bridge.token}` }, body: JSON.stringify({ id: method, method, params }) });
       assert.equal(response.status, 200);

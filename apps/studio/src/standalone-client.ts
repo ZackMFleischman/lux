@@ -86,6 +86,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
         if(!('linkedVersion' in linked)||linked.linkedVersion!==5)throw Error('Image composition requires linked version 5');
         const nodeSaved=saved&&'nodes' in saved?saved:previous?.nodeControls;
         const composition=createCompositionControlState(linked.composition,nodeSaved);
+        migration=composition.changes();
         state={sdkVersion:'0.4.0',controlSchema:schema,controlSchemaHash:schemaHash,controls:composition.values(),controlSequence:0,
           nodeControls:Object.freeze({sourceHash:result.sourceHash,nodes:composition.snapshot().nodes})};
       }else{

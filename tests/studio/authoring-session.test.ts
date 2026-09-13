@@ -5,7 +5,10 @@ import { createAuthoringSession } from '../../apps/studio/src/source/authoring-s
 import { createHash } from 'node:crypto';
 import { normalizeControlDeclarations, canonicalControlSchemaJson, reconcileControlValues } from '../../packages/runtime-contracts/src/parameters.mjs';
 import { validateSource } from '../../apps/build-worker/src/source-policy.mjs';
+import { DEFAULT_OUTPUT } from '../../packages/runtime-contracts/src/index.ts';
 import type { SourceBundle } from '../../packages/runtime-contracts/src/index.ts';
+import { nodeIdSchema } from '../../packages/runtime-contracts/src/identities.ts';
+import { createSceneDocument } from '../../packages/core/src/scene-document.ts';
 const source = () => ({ sdkVersion: '0.1.0' as const, entry: 'main.ts', files: { 'main.ts': 'export {}', 'lib/color.ts': 'export const red = 1' } });
 test('session reads, builds and saves a complete isolated draft', async () => {
   const w = createSourceWorkspace(source()), submitted: unknown[] = [], saved: any[] = [];
@@ -169,4 +172,43 @@ test('opening a saved draft whose cache migrates marks the accepted controls dir
     open:async()=>({token:'saved',name:'saved',document:{format:'lux-scene',version:3,source:changed,settings:{width:1920,height:1080,fps:60,seed:0},controls:incoming}})});
   await session.open();assert.equal(w.getSnapshot().dirty,false);assert.equal(session.getSnapshot().controlsDirty,true);
   await session.save();assert.equal(session.getSnapshot().controlsDirty,false);
+});
+
+const libraryId='11111111-1111-4111-8111-111111111111';
+const compositionSource=()=>({sdkVersion:'0.4.0' as const,entry:'composition.ts',files:{'composition.ts':'import shared from "./library/shared/component.ts"; export default shared;'}});
+const componentRecord=(revision:number,color:string)=>({id:libraryId,revision,name:'Shared color',description:'A shared color component.',updatedAt:'2026-09-13T20:00:00.000Z',source:{sdkVersion:'0.4.0' as const,entry:'component.ts',files:{'component.ts':`export const color = "${color}";`}}});
+const compositionCache=(s:SourceBundle)=>({sourceHash:hash(JSON.stringify(validateSource(s))),nodes:[{nodePath:[nodeIdSchema.parse('22222222-2222-4222-8222-222222222222')],definitionHash:'b'.repeat(64),schema:parameterSchema,schemaHash:hash(canonicalControlSchemaJson(parameterSchema)),values:{height:1.8}}]});
+
+test('linked build resolves the latest library source, persists its revision, shows updates, and fork keeps source',async()=>{
+ const w=createSourceWorkspace(compositionSource());let current=componentRecord(1,'violet'),accepted=compositionCache(compositionSource()),saved:any;
+ const submissions:SourceBundle[]=[];
+ const session=createAuthoringSession(w,{readLibraryComponent:async()=>current,getControlSnapshot:()=>accepted,
+  submit:async s=>{submissions.push(s);accepted=compositionCache(s);},save:async r=>{saved=r.document;return {token:'saved',name:'linked.lux-scene'};}});
+ await session.build(session.read().source,session.read().draftVersion,[{componentId:libraryId,mountPath:'library/shared'}]);
+ assert.equal(submissions[0]!.files['library/shared/component.ts'],'export const color = "violet";');
+ assert.equal(session.read().libraryLinks[0]?.resolvedRevision,1);
+ await session.save();assert.equal(saved.version,5);assert.equal(saved.libraryLinks[0].resolvedRevision,1);
+
+ current=componentRecord(2,'blue');await session.checkLibraryUpdates();
+ assert.deepEqual(session.getSnapshot().libraryUpdates,[{componentId:libraryId,name:'Shared color',resolvedRevision:1,availableRevision:2}]);
+ await session.applyLibraryUpdates();
+ assert.equal(session.read().source.files['library/shared/component.ts'],'export const color = "blue";');
+ assert.equal(session.read().libraryLinks[0]?.resolvedRevision,2);
+ session.forkLibraryComponent(libraryId);assert.deepEqual(session.read().libraryLinks,[]);
+ assert.equal(session.read().source.files['library/shared/component.ts'],'export const color = "blue";');
+ await session.save();assert.equal(saved.version,4);
+});
+
+test('opening a linked scene tries the latest revision then visibly falls back to the saved working source',async()=>{
+ const fallbackSource={...compositionSource(),files:{...compositionSource().files,'library/shared/component.ts':'export const color = "violet";'}};
+ const link={componentId:libraryId,mountPath:'library/shared',resolvedRevision:1,files:['library/shared/component.ts']};
+ const document=createSceneDocument(fallbackSource,DEFAULT_OUTPUT,compositionCache(fallbackSource),[link]);
+ const w=createSourceWorkspace(compositionSource()),attempts:string[]=[];let accepted=compositionCache(compositionSource());
+ const session=createAuthoringSession(w,{readLibraryComponent:async()=>componentRecord(2,'invalid'),getControlSnapshot:()=>accepted,save:async()=>null,
+  open:async()=>({token:'opened',name:'linked.lux-scene',document}),submit:async s=>{attempts.push(s.files['library/shared/component.ts']!);if(s.files['library/shared/component.ts']!.includes('invalid'))throw Error('updated component failed');accepted=compositionCache(s);}});
+ await session.open();
+ assert.deepEqual(attempts,['export const color = "invalid";','export const color = "violet";']);
+ assert.equal(session.read().libraryLinks[0]?.resolvedRevision,1);
+ assert.match(session.getSnapshot().libraryFallbacks[0]?.message??'',/updated component failed/);
+ assert.equal(w.getSnapshot().hasRunningSource,true);
 });

@@ -36,3 +36,6 @@ if (process.argv.includes('--tests')) await build({ ...common,
 if (process.argv.includes('--tests')) await build({ ...common,
   entryPoints: [join(root, 'tests/studio/source-editor.test.tsx')], outfile: join(dist, 'source-editor.test.mjs'),
   platform: 'node', format: 'esm', packages: 'external', plugins: [testCss], target: 'node24', jsx: 'automatic' });
+if (process.argv.includes('--tests')) await build({ ...common,
+  entryPoints: [join(root, 'tests/studio/library-panel.test.tsx')], outfile: join(dist, 'library-panel.test.mjs'),
+  platform: 'node', format: 'esm', packages: 'external', plugins: [testCss], target: 'node24', jsx: 'automatic' });

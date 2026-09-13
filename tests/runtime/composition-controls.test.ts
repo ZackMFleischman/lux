@@ -12,9 +12,22 @@ const kaleidoA=nodeIdSchema.parse(kaleidoscopeAId),kaleidoB=nodeIdSchema.parse(k
 test('composition controls keep one canonical leaf state and derive independent public aliases',()=>{
  const p=profile(),state=createCompositionControlState(p);assert.deepEqual(state.values(),{ballIntensity:.6,segmentsA:6,segmentsB:6});state.apply({ballIntensity:.6,segmentsA:4,segmentsB:9});assert.deepEqual(state.nodeValues([kaleidoA]),{segments:4});assert.deepEqual(state.nodeValues([kaleidoB]),{segments:9});assert.deepEqual(state.values(),{ballIntensity:.6,segmentsA:4,segmentsB:9});
 });
-test('node snapshots survive declaration reorder but never retarget through alias rebinding or changed definition identity',()=>{
+test('node snapshots survive declaration reorder and compatible definition updates without retargeting aliases',()=>{
  const p=profile(),before=createCompositionControlState(p);before.apply({ballIntensity:.6,segmentsA:5,segmentsB:11});const saved=before.snapshot();
  const reordered:any=structuredClone(p);reordered.nodes.reverse();reordered.declaration.nodes.reverse();const restored=createCompositionControlState(reordered,saved);assert.deepEqual(restored.nodeValues([kaleidoA]),{segments:5});assert.deepEqual(restored.nodeValues([kaleidoB]),{segments:11});
  const rebound:any=structuredClone(p);rebound.declaration.expose.find((x:any)=>x.id==='segmentsA').nodeId=kaleidoscopeBId;rebound.publicControlBindings.segmentsA[0].nodePath=[kaleidoscopeBId];assert.throws(()=>createCompositionControlState(rebound,saved),/profile|binding|composition/i);
- const changed:any=structuredClone(p),node=changed.nodes.find((x:any)=>x.nodePath[0]===kaleidoscopeAId);node.definitionHash='f'.repeat(64);assert.throws(()=>createCompositionControlState(changed,saved),/profile|schema|definition/i);
+ const changed:any=structuredClone(p),declarationNode=changed.declaration.nodes.find((x:any)=>x.id===kaleidoscopeAId),oldHash=changed.definitionNames[declarationNode.definition],nextHash='f'.repeat(64);
+ changed.definitionNames[declarationNode.definition]=nextHash;changed.definitions[nextHash]=changed.definitions[oldHash];delete changed.definitions[oldHash];
+ for(const node of changed.nodes)if(node.definitionHash===oldHash)node.definitionHash=nextHash;
+ for(const node of changed.definitions[changed.graph.rootDefinitionHash].body.nodes)if(node.definitionHash===oldHash)node.definitionHash=nextHash;
+ const updated=createCompositionControlState(changed,saved);assert.deepEqual(updated.nodeValues([kaleidoA]),{segments:5});assert.deepEqual(updated.nodeValues([kaleidoB]),{segments:11});assert.deepEqual(updated.changes(),[]);
+});
+test('component updates retain compatible values and report values reset by a narrowed schema',()=>{
+ const p=profile(),before=createCompositionControlState(p);before.apply({ballIntensity:.6,segmentsA:5,segmentsB:11});const saved=before.snapshot(),changed:any=structuredClone(p);
+ const sharedHash=changed.nodes.find((x:any)=>x.nodePath[0]===kaleidoscopeAId).definitionHash;
+ changed.definitions[sharedHash].metadata.controls[0].max=8;
+ for(const node of changed.nodes)if(node.definitionHash===sharedHash){node.schema[0].max=8;node.schemaHash='e'.repeat(64);}
+ const updated=createCompositionControlState(changed,saved);
+ assert.deepEqual(updated.nodeValues([kaleidoA]),{segments:5});assert.deepEqual(updated.nodeValues([kaleidoB]),{segments:6});
+ assert.deepEqual(updated.changes(),[{id:`${kaleidoscopeBId}:segments`,reason:'out-of-range',previousValue:11,value:6}]);
 });
