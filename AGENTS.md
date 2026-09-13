@@ -45,9 +45,13 @@ authorized, but their later features do not take priority over this QA loop.
 - Keep one next usable milestone per workstream. State the user action, expected
   visible result and a short demonstration in its parent ticket. Read the current
   targets in `docs/conductor-orchestration.md` before dispatch.
-- Each child ticket must name that milestone and explain why it needs this work
-  now. For internal code, state the connection to the actual application and why
-  existing code cannot support the demonstration. Otherwise defer the task.
+- Create tickets for features and bugs. Keep review, landing and validation as
+  checklist items and status changes on that work. Do not create a ticket just
+  for a workflow stage. This user rule overrides the Conductor skill convention
+  that calls for separate integration tickets.
+- Each feature or bug must name its user result and explain why it is needed now.
+  For internal code, state its connection to the application and why existing
+  code cannot support the demonstration. Otherwise defer the work.
 - Prefer connecting and demonstrating existing code before adding another helper
   system. A plan, parser, ledger or test suite is not a usable feature.
 - After each accepted slice, check the shortest remaining path to the demonstration.
@@ -67,6 +71,13 @@ authorized, but their later features do not take priority over this QA loop.
   user-visible result. Do not use ticket counts or test totals as feature progress.
 - Use short STE-style sentences in tickets and handoffs. Separate technical
   references from the main copy. Preserve historical evidence and exact contracts.
+- Put full commit hashes, commands and logs in linked evidence. Keep the ticket
+  description focused on the user result, acceptance and current checklist.
+- Record user workflow corrections in the Conductor problem feed before resuming
+  unrelated delivery. Retain the successful receipt. The workflow observer must
+  discover these reports and apply current user rules when assessing remedies.
+- Send coordination messages only when they affect the recipient's assignment,
+  dependencies, shared resources or integration.
 
 These rules change execution priority, not the authorized four-workstream scope.
 They do not authorize bypassing native-input provenance or policy-stopped work.
