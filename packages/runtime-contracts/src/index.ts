@@ -27,7 +27,7 @@ export type ControlValues = z.infer<typeof controlValuesSchema>;
 // compiler admission policy, before files are materialized. These DTOs never
 // authorize filesystem operations or execution of submitted code.
 export const legacySourceBundleSchema = z.object({ entry: z.string().min(1), files: z.record(z.string()), sdkVersion: sourceSdkVersionSchema }).strict();
-export const sourceAssetSchema = z.object({mediaType:z.literal('image/bmp'),encoding:z.literal('base64'),data:z.string().min(1)}).strict();
+export const sourceAssetSchema = z.object({mediaType:z.enum(['image/bmp','image/png','image/jpeg']),encoding:z.literal('base64'),data:z.string().min(1)}).strict();
 export const assetSourceBundleSchema = legacySourceBundleSchema.extend({sourceVersion:z.literal(2),assets:z.record(sourceAssetSchema)}).strict();
 export const sourceBundleSchema = z.union([legacySourceBundleSchema,assetSourceBundleSchema]);
 export type LegacySourceBundle = z.infer<typeof legacySourceBundleSchema>;

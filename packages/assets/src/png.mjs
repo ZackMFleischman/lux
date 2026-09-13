@@ -2,7 +2,7 @@
 import { decode as decodeFastPng } from 'fast-png';
 import zlib from 'pako/lib/zlib/inflate.js';
 import ZStream from 'pako/lib/zlib/zstream.js';
-import { assetLimits } from './index.mjs';
+import { assetLimits } from './limits.mjs';
 
 const signature = [137, 80, 78, 71, 13, 10, 26, 10];
 const allowedChunks = new Set(['IHDR','PLTE','tRNS','IDAT','IEND','sRGB','gAMA','cHRM','pHYs','tEXt','tIME']);

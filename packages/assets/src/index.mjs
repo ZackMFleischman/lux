@@ -1,5 +1,9 @@
 // Pure bounded asset admission. No Node, browser codec, filesystem or network APIs.
-export const assetLimits = Object.freeze({ count: 4, imageBytes: 786486, totalBytes: 1048576, rgbaBytes: 2097152, dimension: 512, pathCharacters: 240 });
+import { assetLimits } from './limits.mjs';
+import { decodePng } from './png.mjs';
+import { decodeJpeg } from './jpeg.mjs';
+export { assetLimits };
+const admissions = new WeakMap();
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 const sourceFields = ['mediaType', 'encoding', 'data'];
 const derivedFields = [...sourceFields, 'byteLength', 'sha256', 'width', 'height'];
@@ -29,11 +33,16 @@ function dataRecord(value, fields, path) {
 }
 
 export function validateAssetPath(path) {
-  if (typeof path !== 'string' || path.length > assetLimits.pathCharacters || !/^assets\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.bmp$/.test(path)) fail('Invalid logical BMP asset path', typeof path === 'string' ? path : undefined);
+  if (typeof path !== 'string' || path.length > assetLimits.pathCharacters || !/^assets\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.(?:bmp|png|jpg|jpeg)$/.test(path)) fail('Invalid logical image asset path', typeof path === 'string' ? path : undefined);
   for (const segment of path.split('/')) {
     if (/^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(segment) || /^__lux/i.test(segment)) fail('Reserved asset path', path);
   }
   return path;
+}
+
+function validateMedia(path, descriptor) {
+  const expected = path.endsWith('.bmp') ? 'image/bmp' : path.endsWith('.png') ? 'image/png' : 'image/jpeg';
+  if (descriptor.mediaType !== expected || descriptor.encoding !== 'base64') fail('Image extension/media type must match and encoding must be base64',path);
 }
 
 export function decodeCanonicalBase64(data) {
@@ -97,15 +106,16 @@ export function snapshotSourceAssetRecords(input) {
     if (seen.has(path.toLowerCase())) fail('Case-fold asset path collision',path);
     seen.add(path.toLowerCase());
     const descriptor = dataRecord(records[path],sourceFields,path);
-    if (descriptor.mediaType !== 'image/bmp' || descriptor.encoding !== 'base64') fail('Asset must use image/bmp and base64',path);
+    validateMedia(path,descriptor);
     if (typeof descriptor.data !== 'string' || !descriptor.data.length) fail('Asset base64 must be a nonempty string',path);
     if (descriptor.data.length > Math.ceil(assetLimits.imageBytes/3)*4) fail('Encoded asset exceeds image byte limit',path,true);
-    result[path] = Object.freeze({mediaType:'image/bmp',encoding:'base64',data:descriptor.data});
+    result[path] = Object.freeze({mediaType:descriptor.mediaType,encoding:'base64',data:descriptor.data});
   }
   return Object.freeze(result);
 }
 
 function admit(input, derived = false) {
+  if (!derived && admissions.has(input)) return admissions.get(input);
   const records = dataRecord(input), keys = Object.keys(records);
   if (keys.length > assetLimits.count) fail('At most four image assets are supported', undefined, true);
   keys.sort(); // Code-unit ASCII order; never localeCompare.
@@ -116,21 +126,34 @@ function admit(input, derived = false) {
     if (seen.has(path.toLowerCase())) fail('Case-fold asset path collision', path);
     seen.add(path.toLowerCase());
     const descriptor = dataRecord(records[path], derived ? derivedFields : sourceFields, path);
-    if (descriptor.mediaType !== 'image/bmp' || descriptor.encoding !== 'base64') fail('Asset must use image/bmp and base64', path);
-    let bytes, info;
-    try { bytes = decodeCanonicalBase64(descriptor.data); info = validateBmp(bytes); }
+    validateMedia(path,descriptor);
+    let bytes, info, pixels;
+    try {
+      bytes = decodeCanonicalBase64(descriptor.data);
+      if (totalBytes + bytes.byteLength > assetLimits.totalBytes) fail('Aggregate asset byte budget exceeded',path,true);
+      if (descriptor.mediaType === 'image/bmp') {
+        info = validateBmp(bytes);
+        if (info.rgbaByteLength > assetLimits.rgbaBytes-totalRgba) fail('Aggregate decoded image budget exceeded',path,true);
+        pixels = {...decodeBmp(bytes),colorSpace:'srgb',alphaMode:'straight'};
+      } else {
+        pixels = (descriptor.mediaType === 'image/png' ? decodePng : decodeJpeg)(bytes,{maxRgbaBytes:assetLimits.rgbaBytes-totalRgba});
+        info = {width:pixels.width,height:pixels.height,byteLength:bytes.byteLength,rgbaByteLength:pixels.data.byteLength};
+      }
+    }
     catch (error) { fail(error.message, path, error.code === 'QUOTA_EXCEEDED'); }
     totalBytes += info.byteLength; totalRgba += info.rgbaByteLength;
     if (totalBytes > assetLimits.totalBytes || totalRgba > assetLimits.rgbaBytes) fail('Aggregate asset byte budget exceeded', path, true);
-    const normalized = { mediaType: 'image/bmp', encoding: 'base64', data: descriptor.data };
+    const normalized = { mediaType: descriptor.mediaType, encoding: 'base64', data: descriptor.data };
     if (derived) {
       if (descriptor.byteLength !== info.byteLength || descriptor.width !== info.width || descriptor.height !== info.height || typeof descriptor.sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(descriptor.sha256)) fail('Invalid derived asset metadata', path);
       Object.assign(normalized, { byteLength: info.byteLength, sha256: descriptor.sha256, width: info.width, height: info.height });
     }
     result[path] = Object.freeze(normalized);
-    decoded.push({ path, bytes, info });
+    decoded.push({ path, bytes, info, pixels });
   }
-  return { assets: Object.freeze(result), decoded };
+  const admission = { assets: Object.freeze(result), decoded };
+  if (!derived) admissions.set(admission.assets,admission);
+  return admission;
 }
 
 export function validateSourceAssets(input) { return admit(input).assets; }
@@ -169,22 +192,33 @@ export async function verifyDerivedAssets(input, expectedAssetSetHash, hashBytes
   }
   const assetSetHash = await digest(new TextEncoder().encode(identity(assets)), hashBytes);
   if (assetSetHash !== expectedAssetSetHash) fail('Asset set SHA-256 mismatch');
-  return Object.freeze({ assets, assetSetHash, sourceAssets: Object.freeze(sourceAssets) });
+  Object.freeze(sourceAssets);
+  admissions.set(sourceAssets,{assets:sourceAssets,decoded});
+  return Object.freeze({ assets, assetSetHash, sourceAssets });
 }
 
 // Construct BEFORE importing submitted code. Admission and hash wrappers above
 // are trusted pre-import operations; only this facade supports a modified realm.
 export function createReadonlyAssetMap(input) {
-  const { decoded } = admit(input);
+  return readonlyMap(admit(input).decoded,false);
+}
+
+/** Predecoded top-down sRGB straight-alpha RGBA, constructed before authored code. */
+export function createReadonlyImageMap(input) {
+  return readonlyMap(admit(input).decoded,true);
+}
+
+function readonlyMap(decoded, images) {
   const Bytes = Uint8Array, freeze = Object.freeze, create = Object.create, apply = Reflect.apply;
   const iteratorSymbol = Symbol.iterator, count = decoded.length;
   // Private dense entries: never passed to a method, callback or constructor.
   // Copy byte-by-byte using the saved constructor and stored lengths: no species,
   // buffer getter, slice/subarray, typed-array set or backing Map receiver.
   const copy = index => {
-    const row = decoded[index], length = row.info.byteLength, out = new Bytes(length);
-    for (let i = 0; i < length; i++) out[i] = row.bytes[i];
-    return out;
+    const row = decoded[index], length = images ? row.info.rgbaByteLength : row.info.byteLength, out = new Bytes(length);
+    const bytes = images ? row.pixels.data : row.bytes;
+    for (let i = 0; i < length; i++) out[i] = bytes[i];
+    return images ? freeze({width:row.info.width,height:row.info.height,colorSpace:'srgb',alphaMode:'straight',data:out}) : out;
   };
   const lookup = key => {
     for (let i = 0; i < count; i++) if (decoded[i].path === key) return i;

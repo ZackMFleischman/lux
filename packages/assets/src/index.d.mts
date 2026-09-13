@@ -1,5 +1,5 @@
 export interface SourceAsset {
-  readonly mediaType: 'image/bmp';
+  readonly mediaType: 'image/bmp' | 'image/png' | 'image/jpeg';
   readonly encoding: 'base64';
   readonly data: string;
 }
@@ -41,3 +41,5 @@ export function deriveAssets(input: unknown, hashBytes: HashBytes): Promise<Deri
 export function verifyDerivedAssets(input: unknown, expectedAssetSetHash: string, hashBytes: HashBytes): Promise<DerivedAssetSet & { readonly sourceAssets: SourceAssets }>;
 /** Construct before importing submitted code; every returned byte array is a fresh copy. */
 export function createReadonlyAssetMap(input: unknown): ReadonlyMap<string, Readonly<Uint8Array>>;
+export interface DecodedImage { readonly width: number; readonly height: number; readonly colorSpace: 'srgb'; readonly alphaMode: 'straight'; readonly data: Uint8Array; }
+export function createReadonlyImageMap(input: unknown): ReadonlyMap<string, DecodedImage>;

@@ -1,6 +1,6 @@
 // Opt-in bounded JPEG adapter; existing asset admission remains BMP-only.
 import decodeJpegJs from 'jpeg-js/lib/decoder.js';
-import { assetLimits } from './index.mjs';
+import { assetLimits } from './limits.mjs';
 
 const typedArrayByteLength = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(Uint8Array.prototype),'byteLength').get;
 const typedArraySet = Uint8Array.prototype.set;
