@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { legacySourceBundleSchema,assetSourceBundleSchema } from '../../../../packages/runtime-contracts/src/index.ts';
 // Public authoring capabilities are intentionally narrower than internal builds.
-const studioSdkVersion=z.enum(['0.1.0','0.2.0']);
+const studioSdkVersion=z.enum(['0.1.0','0.2.0','0.4.0']);
 const sourceBundleSchema=z.union([legacySourceBundleSchema.extend({sdkVersion:studioSdkVersion}),assetSourceBundleSchema.extend({sdkVersion:studioSdkVersion})]);
 export const sourceBuildInputSchema = z.object({ expectedDraftVersion: z.number().int().nonnegative(),
   source: sourceBundleSchema }).strict();

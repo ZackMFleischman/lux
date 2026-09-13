@@ -75,7 +75,7 @@ test('ordinary Studio rejects internal SDK before clone, compile or job mutation
 test('MCP source-build DTO rejects SDK 0.3 before a handler can mutate draft state',()=>{
  const source={sdkVersion:'0.3.0',entry:'main.ts',files:{'main.ts':''}};
  assert.equal(sourceBuildInputSchema.safeParse({expectedDraftVersion:0,source}).success,false);
- for(const sdkVersion of ['0.1.0','0.2.0'])assert.equal(sourceBuildInputSchema.safeParse({expectedDraftVersion:0,source:{...source,sdkVersion}}).success,true);
+ for(const sdkVersion of ['0.1.0','0.2.0','0.4.0'])assert.equal(sourceBuildInputSchema.safeParse({expectedDraftVersion:0,source:{...source,sdkVersion}}).success,true);
 });
 test('all existing scene readers reject internal SDK sources before persistence',()=>{
  for(const version of [1,2,3])assert.throws(()=>validateSceneDocument({format:'lux-scene',version,source:{sdkVersion:'0.3.0',entry:'main.ts',files:{'main.ts':''},...(version===2?{sourceVersion:2,assets:{}}:{})},settings:{width:1920,height:1080,fps:60,seed:0},controls:{intensity:0.5}}));
