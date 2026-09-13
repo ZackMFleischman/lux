@@ -6,7 +6,7 @@ import type { SourceWorkspace } from './workspace.ts';
 
 const createWorker = () => new Worker(new URL('./source-admission-worker.js',import.meta.url),{type:'module'});
 /** Imports originals as an unsaved source edit; rendering still needs explicit apply. */
-export function AssetImport({workspace,readOnly=false}:{workspace:SourceWorkspace;readOnly?:boolean}) {
+export function AssetImport({workspace,readOnly=false,selectedPath=null}:{workspace:SourceWorkspace;readOnly?:boolean;selectedPath?:string|null}) {
   const snapshot=useSyncExternalStore(workspace.subscribe,workspace.getSnapshot);
   const input=useRef<HTMLInputElement>(null),target=useRef<string|null>(null);
   const [reading,setReading]=useState(false),[error,setError]=useState('');
@@ -34,14 +34,14 @@ export function AssetImport({workspace,readOnly=false}:{workspace:SourceWorkspac
     } catch(reason) {setError(String(reason instanceof Error?reason.message:reason));}
     finally {setReading(false);target.current=null;if(input.current)input.current.value='';}
   }
-  return <section aria-label="Image assets">
+  return <div className="asset-import" aria-label="Image actions">
     <Button disabled={locked} onClick={()=>{target.current=null;if(input.current){input.current.multiple=true;input.current.click();}}}>Import images</Button>
     <input ref={input} type="file" accept=".bmp,.png,.jpg,.jpeg" hidden aria-label="Choose image files" onChange={event=>{const files=Array.from(event.target.files??[]);if(files.length)void readFiles(files);}} />
-    {Object.keys(assets).map(path=><div key={path}><span>{path}</span>
+    {Object.keys(assets).filter(path=>path===selectedPath).map(path=><span key={path}>
       <Button disabled={locked} aria-label={`Replace ${path}`} onClick={()=>{target.current=path;if(input.current){input.current.multiple=false;input.current.click();}}}>Replace</Button>
       <Button disabled={locked} aria-label={`Remove ${path}`} onClick={()=>{const before=workspace.getSnapshot(),next={...sourceAssets(before.source)};delete next[path];void workspace.editAssetsAsync(next,before.version,createWorker).catch(reason=>setError(String(reason)));}}>Remove</Button>
-    </div>)}
+    </span>)}
     {reading&&<span role="status">Reading image…</span>}{snapshot.busy&&<span role="status">Validating images…</span>}
     {error&&<Alert severity="error">{error}</Alert>}
-  </section>;
+  </div>;
 }

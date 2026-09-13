@@ -7,6 +7,7 @@ import { ProblemsPanel } from './ProblemsPanel.tsx';
 import type { SourceDiagnostic } from './diagnostics.ts';
 import { AssetItem, AssetPreview } from './AssetPreview.tsx';
 import { sourceAssets } from './source-equality.ts';
+import { AssetImport } from './AssetImport.tsx';
 export function SourcePanel({ workspace, readOnly, onApply, onSave, onCompositionChange, diagnosticTarget, diagnostics = [] }: {
   workspace: SourceWorkspace; readOnly: boolean; onApply(): void; onSave(): void; onCompositionChange?(value: boolean): void;
   diagnosticTarget?: { path: string; offset: number; request: number } | null;
@@ -45,6 +46,7 @@ export function SourcePanel({ workspace, readOnly, onApply, onSave, onCompositio
       <nav aria-label="Source files">{Object.keys(snapshot.source.files).map(path => <Button key={path} title={path} aria-label={`Open ${path}`} aria-current={!assetPath && snapshot.selectedFile === path ? 'page' : undefined}
         onClick={() => openCode(path)}><span className="file-path">{path}</span>{path === snapshot.source.entry && <span className="file-marker">Entry</span>}{snapshot.dirtyFiles.includes(path) && <span aria-label="Unsaved">*</span>}</Button>)}</nav>
       <div className="source-files-heading"><span>Assets</span></div>
+      <AssetImport workspace={workspace} readOnly={locked} selectedPath={assetPath} />
       <nav aria-label="Image assets">{Object.keys(assets).map(path => <AssetItem key={path} path={path} asset={assets[path]!}
         selected={assetPath === path} dirty={snapshot.dirtyAssets.includes(path)}
         onSelect={() => setAssetSelection({ path, documentKey: snapshot.documentKey })} />)}</nav>
