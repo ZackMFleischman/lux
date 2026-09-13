@@ -159,7 +159,8 @@ async function initialize(message) {
       try{renderer.render(scene,camera);}finally{renderer.setRenderTarget(null);}
       presentation.render(renderer);
     }})}));
-    authoredCleanup=componentDisposer(visual);
+    // Legacy visuals support prototype methods with the visual as receiver.
+    authoredCleanup=()=>visual?.dispose?.();
     for(const name of ['update','render','reset','dispose'])if(typeof visual?.[name]!=='function')throw new RuntimeError('Visual missing '+name);
   }
   if(stopped)throw new RuntimeError('Worker stopped during initialization');
