@@ -180,3 +180,14 @@ and [installed alpha/reopen evidence](../../evidence/tracer-0.1/parameters-image
 with their stated limits. Remaining tracer acceptance is distinct from these
 delivered capabilities. The filesystem-first milestone-1a placement after
 tracer and the existing later-feature order are unchanged.
+
+## User-approved preview closeout — 12 September 2026
+
+The user accepted the tracer as a usable preview release and moved remaining
+show-readiness validation and performance work after tracer. This supersedes
+earlier ordering and completion requirements in this document; it does not
+claim the unmeasured gates passed or change their numerical targets.
+See [the closeout decision, remaining lanes and preserved experiment handoff](tracer-preview-closeout.md).
+Filesystem/Git and creative feature work may proceed in parallel with runtime
+hardening when resumed. Graphics tests remain serialized. Merge the verified
+tracer branch to main, push, then stop; do not automatically start later work.

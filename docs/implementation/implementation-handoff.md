@@ -82,3 +82,14 @@ validated, or after documenting a genuine external blocker requiring my
 decision. Report commits, checks, evidence, limitations and the next
 milestone handoff. Do not automatically implement 0.2 or later milestones.
 ```
+
+## User-approved preview closeout — 12 September 2026
+
+The user accepted the tracer as a usable preview release and moved remaining
+show-readiness validation and performance work after tracer. This supersedes
+earlier ordering and completion requirements in this document; it does not
+claim the unmeasured gates passed or change their numerical targets.
+See [the closeout decision, remaining lanes and preserved experiment handoff](tracer-preview-closeout.md).
+Filesystem/Git and creative feature work may proceed in parallel with runtime
+hardening when resumed. Graphics tests remain serialized. Merge the verified
+tracer branch to main, push, then stop; do not automatically start later work.

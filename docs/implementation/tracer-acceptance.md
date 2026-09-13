@@ -135,3 +135,14 @@ The implementing coordinator fills `acceptance.md` with source commit, environme
 The failure-matrix row “Close studio, retain Resolume” retains earlier wording about reopening Studio attaching to the host instance. That attachment requirement is superseded by the explicit user decision in [DEC-13](../decisions.md) and the [export workflow](tracer-export-scope.md#user-workflow): build and preview in Lux, then export independent immutable installed Resolume sources. Reopening Studio does not attach the authoring preview to an installed host instance. Opening or closing Studio must not reset that instance, change its installed release or overwrite its authoritative host controls; later authoring edits affect it only through explicit selection of a separately exported release.
 
 This clarifies that one row; all other lifecycle, current-control, offline, independent-instance, recovery and performance gates remain unchanged. The [installed native evidence](../../evidence/tracer-0.1/parameters-images-studio/installed-image.md) records a bounded Studio-absent run and its limitations; it does not establish every independence or offline gate. Use [PROGRESS](../../PROGRESS.md) and its evidence links for current validation status rather than treating this reconciliation as an acceptance pass.
+
+## User-approved preview closeout — 12 September 2026
+
+The user accepted the tracer as a usable preview release and moved remaining
+show-readiness validation and performance work after tracer. This supersedes
+earlier ordering and completion requirements in this document; it does not
+claim the unmeasured gates passed or change their numerical targets.
+See [the closeout decision, remaining lanes and preserved experiment handoff](tracer-preview-closeout.md).
+Filesystem/Git and creative feature work may proceed in parallel with runtime
+hardening when resumed. Graphics tests remain serialized. Merge the verified
+tracer branch to main, push, then stop; do not automatically start later work.
