@@ -1,0 +1,45 @@
+[
+  {
+    "path": "C:/Users/zFlei/repos/lux",
+    "head": "6726f5e420e4136082c864ff85e3216976b3cb63",
+    "status": [
+      "?? .pnpm-store/",
+      "?? visuals/"
+    ]
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/.worktrees/reliability-plan",
+    "head": "f95f3975892bf612bb63b94111893b18b84fff20",
+    "status": [
+      "?? .superpowers/"
+    ]
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/.worktrees/receiver-worker-timing",
+    "head": "30719ff8d235dfa373f3c8fc73fd3e10d7ed2004",
+    "status": [
+      "?? artifacts/"
+    ]
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/.worktrees/receiver-timing-treatment",
+    "head": "24afa99e32af81ed2466a386574b43234b20f1a7",
+    "status": [
+      "?? artifacts/"
+    ]
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement",
+    "head": "8c55c506bacf9e6511d1cd19360c8ccc6042db8c",
+    "status": [
+      "?? artifacts/"
+    ]
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/.worktrees/parameter-integration",
+    "head": "ab32b165c6123b908039a8c2a243606df4dffa0b",
+    "status": [
+      "?? artifacts/"
+    ]
+  }
+]
