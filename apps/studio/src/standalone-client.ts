@@ -240,7 +240,12 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     const raw=snapshotRecord(operation),inputRaw=snapshotRecord(raw.input);
     if(raw.name==='lux.parameters.set')inputRaw.values=snapshotRecord(inputRaw.values);
     operation={...raw,input:inputRaw} as StudioOperation;
-    operation = studioOperationSchema.parse(operation);
+    const parsed = studioOperationSchema.safeParse(operation);
+    if (!parsed.success) {
+      if (raw.name === 'lux.preview.resize') throw Error('Preview resolution must use whole-pixel dimensions up to 3840 × 2160.');
+      throw parsed.error;
+    }
+    operation = parsed.data;
     const runtime = this.running, input = operation.input;
     if (this.snapshot.authoring?.authority !== 'studio') throw Error('Authority conflict: Studio cannot control this instance');
     if (this.busy) throw Error('A visual build is already running');

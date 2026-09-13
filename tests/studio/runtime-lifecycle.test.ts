@@ -169,6 +169,12 @@ test('preview resolution restarts at the requested dimensions and retains the wo
   assert.equal(f.client.getSnapshot().authoring, before);
   assert.equal(old.terminated, false);
 });
+test('invalid preview resolution reports a concise limit without replacing the working runtime', async t => {
+  const f = fixture(t), worker = await f.start(), before = f.client.getSnapshot().authoring!;
+  await assert.rejects(f.client.invoke({ name: 'lux.preview.resize', input: { requestId: 'invalid-size', instanceId: before.instanceId,
+    expectedGeneration: before.generation, width: 3841, height: 2160 } } as any), /whole-pixel dimensions up to 3840 × 2160/);
+  assert.equal(f.client.getSnapshot().authoring, before); assert.equal(worker.terminated, false);
+});
 
 test('v2 restart retains the whole accepted envelope after compile-result mutation and failed replacement',async t=>{
   const data='Qk06AAAAAAAAADYAAAAoAAAAAQAAAAEAAAABABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AA==';
