@@ -1,6 +1,32 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGpuPassTimer } from '../../packages/performance/gpu-pass.mjs';
+
+test('baseline leaves GPU APIs untouched and allocates no query resources',()=>{
+ const f=fixture(),encoder=f.device.createCommandEncoder,submit=f.device.queue.submit;
+ const timer=createGpuPassTimer(f.device,()=>assert.fail('No baseline GPU samples'),{mode:'baseline'});
+ assert.equal(f.buffers.length,0);assert.equal(f.queries.length,0);
+ assert.equal(f.device.createCommandEncoder,encoder);assert.equal(f.device.queue.submit,submit);
+ timer.begin(1);timer.end();assert.equal(timer.status().timestampQueryEnabled,false);
+ assert.equal(timer.status().failedSamples,0);timer.dispose();
+});
+
+test('routine samples frames 1 and 31 without treating intervening draws as failures',async()=>{
+ const f=fixture(),samples=[];const timer=createGpuPassTimer(f.device,(frame)=>{samples.push(frame);return true;});
+ for(let frame=1;frame<=31;frame++){
+  timer.begin(frame);const e=f.device.createCommandEncoder(),p=e.beginRenderPass({});
+  assert.equal(Boolean(p.descriptor.timestampWrites),frame===1||frame===31);
+  p.end();f.device.queue.submit([e.finish()]);timer.end();await f.flush();
+ }
+ assert.deepEqual(samples,[1,31]);assert.equal(timer.status().failedSamples,0);assert.equal(timer.status().droppedSamples,0);timer.dispose();
+});
+
+test('an uninstrumented encoder from an unsampled frame cannot certify a sampled submission',async()=>{
+ const f=fixture(),samples=[];const timer=createGpuPassTimer(f.device,(frame)=>{samples.push(frame);return true;});
+ timer.begin(2);const old=f.device.createCommandEncoder();old.beginRenderPass({}).end();timer.end();
+ timer.begin(31);f.device.queue.submit([old.finish()]);timer.end();await f.flush();
+ assert.equal(timer.status().failedSamples,1);assert.deepEqual(samples,[]);timer.dispose();
+});
 function fixture({blocked=false,fail=false}={}) {
  const submits=[],buffers=[],queries=[];let pending=[];
  const device={features:new Set(['timestamp-query']),pushErrorScope(){},popErrorScope:async()=>null,queue:{submit(v){submits.push(v);}},
@@ -15,12 +41,12 @@ test('GPU timer captures every render/compute pass, subtracts uint64 before conv
  timer.begin(1);const encoder=f.device.createCommandEncoder();const a=encoder.beginRenderPass({colorAttachments:[]}),b=encoder.beginComputePass({});a.end();b.end();f.device.queue.submit([encoder.finish()]);timer.end();await f.flush();
  assert.equal(a.descriptor.timestampWrites.beginningOfPassWriteIndex,0);assert.equal(b.descriptor.timestampWrites.endOfPassWriteIndex,3);
  assert.deepEqual(samples,[{frame:1,ms:3}]);assert.equal(timer.status().completedSamples,1);
- timer.begin(2);timer.end();await f.flush();assert.equal(samples.length,1);assert.equal(timer.status().failedSamples,1);
+ timer.begin(31);timer.end();await f.flush();assert.equal(samples.length,1);assert.equal(timer.status().failedSamples,1);
  timer.dispose();assert.ok(f.buffers.every(b=>b.destroyed));assert.ok(f.queries.every(q=>q.destroyed));
 });
 test('readback pool stays bounded and overflow/failure/late completion are explicit',async()=>{
  const f=fixture({blocked:true}),samples=[];const timer=createGpuPassTimer(f.device,(frame,ms)=>{samples.push([frame,ms]);return true;});
- for(let frame=1;frame<=5;frame++){timer.begin(frame);const e=f.device.createCommandEncoder();e.beginRenderPass({}).end();f.device.queue.submit([e.finish()]);timer.end();}
+ for(let frame=1;frame<=121;frame+=30){timer.begin(frame);const e=f.device.createCommandEncoder();e.beginRenderPass({}).end();f.device.queue.submit([e.finish()]);timer.end();}
  assert.equal(f.buffers.length,6);assert.equal(f.queries.length,3);assert.equal(timer.status().pendingSamples,3);assert.equal(timer.status().droppedSamples,2);
  timer.dispose();f.release();await f.flush();assert.equal(samples.length,0);
  const bad=fixture({fail:true}),other=createGpuPassTimer(bad.device,()=>true);other.begin(1);bad.device.createCommandEncoder().beginRenderPass({}).end();other.end();await bad.flush();assert.equal(other.status().failedSamples,1);other.dispose();
@@ -33,7 +59,7 @@ test('copies retain useful pass timing with incomplete coverage and old command 
  const f=fixture(),samples=[];const timer=createGpuPassTimer(f.device,(frame,ms,complete)=>{samples.push({frame,ms,complete});return true;});
  timer.begin(1);const first=f.device.createCommandEncoder();first.beginRenderPass({}).end();first.copyBufferToBuffer();const old=first.finish();f.device.queue.submit([old]);timer.end();await f.flush();
  assert.deepEqual(samples,[{frame:1,ms:1,complete:false}]);
- timer.begin(2);f.device.queue.submit([old]);timer.end();await f.flush();assert.equal(samples.length,1);assert.equal(timer.status().failedSamples,1);timer.dispose();
+ timer.begin(31);f.device.queue.submit([old]);timer.end();await f.flush();assert.equal(samples.length,1);assert.equal(timer.status().failedSamples,1);timer.dispose();
 });
 test('pass overflow and non-extensible WebGPU objects invalidate instrumentation without breaking rendering',async()=>{
  const f=fixture(),samples=[];const timer=createGpuPassTimer(f.device,(...args)=>samples.push(args));timer.begin(1);const encoder=f.device.createCommandEncoder();

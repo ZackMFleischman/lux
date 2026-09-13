@@ -2,7 +2,9 @@
 // One owner device, three in-flight readbacks, 128 render/compute passes per frame.
 const freeze=Object.freeze,define=Object.defineProperty,descriptor=Object.getOwnPropertyDescriptor;
 const Uint64=BigUint64Array,finite=Number.isFinite,integer=Number.isSafeInteger;
-export function createGpuPassTimer(device,onSample) {
+import { collectionMode, gpuSampleFrame } from './collection-mode.mjs';
+export function createGpuPassTimer(device,onSample,{mode='routine'}={}) {
+ mode=collectionMode(mode);
  const supported=typeof device.features?.has==='function'?device.features.has('timestamp-query'):null;
  let enabled=false,disposed=false,active=null,completedSamples=0,failedSamples=0,droppedSamples=0,reason='Timestamp queries unavailable';
  const slots=[],restores=[],commands=new WeakMap();
@@ -11,7 +13,7 @@ export function createGpuPassTimer(device,onSample) {
  const closeFailed=slot=>{void device.popErrorScope().catch(()=>{}).finally(()=>{slot.busy=false;});};
  function release(){for(const restore of restores.splice(0).reverse())try{restore();}catch{}for(const slot of slots){try{slot.read.destroy();}catch{}try{slot.resolve.destroy();}catch{}try{slot.query.destroy();}catch{}}}
  const api={status,
-  begin(frame){if(!enabled||disposed)return;if(active){active.invalid=true;failedSamples++;closeFailed(active);active=null;}if(!integer(frame)||frame<1){failedSamples++;return;}
+  begin(frame){if(!enabled||disposed)return;if(active){active.invalid=true;failedSamples++;closeFailed(active);active=null;}if(!integer(frame)||frame<1){failedSamples++;return;}if(!gpuSampleFrame(frame))return;
    const slot=slots.find(s=>!s.busy);if(!slot){droppedSamples++;return;}device.pushErrorScope('validation');slot.busy=true;slot.count=0;slot.invalid=false;slot.nonPass=false;slot.frame=frame;slot.submitted=0;active=slot;},
   end(){const slot=active;active=null;if(!slot||disposed)return;
    if(slot.invalid||slot.count===0||slot.submitted===0){failedSamples++;closeFailed(slot);return;}
@@ -33,6 +35,7 @@ export function createGpuPassTimer(device,onSample) {
   dispose(){if(disposed)return;disposed=true;active=null;release();},
  };
  let originalEncoder,originalSubmit;
+ if(mode==='baseline'){reason='GPU timing disabled in baseline mode';return freeze(api);}
  if(supported!==true)return freeze(api);
  try {
   originalEncoder=device.createCommandEncoder;originalSubmit=device.queue.submit;
@@ -42,7 +45,9 @@ export function createGpuPassTimer(device,onSample) {
    slot.query=device.createQuerySet({type:'timestamp',count:256});slot.resolve=device.createBuffer({size:2048,usage:512|4});slot.read=device.createBuffer({size:2048,usage:1|8});
   }
   replace(device,'createCommandEncoder',function(...args){
-   const encoder=originalEncoder.apply(device,args),meta={slot:null,frame:0,nonPass:false};
+   const encoder=originalEncoder.apply(device,args);
+   if(!active)return encoder;
+   const meta={slot:null,frame:0,nonPass:false};
    try {
    for(const name of ['beginRenderPass','beginComputePass']) {
     const original=encoder[name];

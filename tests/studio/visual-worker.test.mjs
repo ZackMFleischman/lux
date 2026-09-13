@@ -11,11 +11,11 @@ const hash=value=>createHash('sha256').update(value).digest('hex');
 const bundle=(await build({entryPoints:[fileURLToPath(new URL('../../apps/studio/src/visual-worker.mjs',import.meta.url))],bundle:true,write:false,format:'esm',platform:'browser',logLevel:'silent'})).outputFiles[0].text;
 async function fixture(controls=schema,declared=controls,mutation='',sdkVersion='0.2.0',timed=false,gpuTimed=false,workMs=0,waitCreate=false) {
   const messages=[],frames=[],intervals=new Map(),scheduled=[],timers=new Map();let created=0,imports=0,now=0,nextTimer=0;
-  const requested=[];
+  const requested=[],allocations={query:0,buffer:0,duration:0,clock:0};
   const device={lost:new Promise(()=>{}),features:new Set(gpuTimed?['timestamp-query']:[]),pushErrorScope(){},popErrorScope:async()=>null,queue:{onSubmittedWorkDone:async()=>{now+=timed?17:workMs;},submit(){}},destroy(){},
-    createQuerySet(){return {destroy(){}};},createBuffer(){return {mapAsync:async()=>{},getMappedRange:()=>new BigUint64Array([100n,1000100n]).buffer,unmap(){},destroy(){}};},
+    createQuerySet(){allocations.query++;return {destroy(){}};},createBuffer(){allocations.buffer++;return {mapAsync:async()=>{},getMappedRange:()=>new BigUint64Array([100n,1000100n]).buffer,unmap(){},destroy(){}};},
     createCommandEncoder(){return {beginRenderPass:()=>({end(){}}),beginComputePass:()=>({end(){}}),resolveQuerySet(){},copyBufferToBuffer(){},finish:()=>({})};}};
-  const context=vm.createContext({TextEncoder,TextDecoder,Uint8Array,Uint8ClampedArray,ArrayBuffer,Blob,crypto:webcrypto,performance:{now:()=>now},onmessage:null,
+  const context=vm.createContext({TextEncoder,TextDecoder,Uint8Array,Uint8ClampedArray,ArrayBuffer,Blob,crypto:webcrypto,Float64Array:class extends Float64Array{constructor(...args){super(...args);allocations.duration++;}},performance:{now:()=>{allocations.clock++;return now;}},onmessage:null,
     postMessage:message=>messages.push(structuredClone(message)),setTimeout:(fn,ms)=>{scheduled.push(ms);const id=++nextTimer;timers.set(id,{fn,at:now+ms});return id;},clearTimeout:id=>timers.delete(id),setInterval:(callback,ms)=>{intervals.set(ms,callback);return ms;},clearInterval:id=>intervals.delete(id),close(){},
     URL:{createObjectURL:()=> 'memory:visual',revokeObjectURL(){}},
     navigator:{gpu:{requestAdapter:async()=>({features:new Set(['timestamp-query']),requestDevice:async options=>{requested.push(options);return device;}})}},
@@ -38,7 +38,7 @@ async function fixture(controls=schema,declared=controls,mutation='',sdkVersion=
   const post=message=>context.deliver(JSON.stringify({...identity,...message}));
   async function send(message){const before=messages.length;post(message);const response=()=>messages.slice(before).find(row=>row.type!=='heartbeat');for(let i=0;i<200&&!response();i++)await new Promise(resolve=>setImmediate(resolve));assert.ok(response(),'worker must respond');return response();}
   const flush=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};
-  return {send,post,initial,messages,frames,requested,scheduled,timers,flush,async fireTimer(late=0){const [id,timer]=timers.entries().next().value;timers.delete(id);now=Math.max(now,timer.at)+late;timer.fn();await flush();},created:()=>created,imports:()=>imports,telemetry(){now=500;intervals.get(500)?.();return messages.at(-1);},intervals};
+  return {send,post,initial,messages,frames,requested,allocations,scheduled,timers,flush,async fireTimer(late=0){const [id,timer]=timers.entries().next().value;timers.delete(id);now=Math.max(now,timer.at)+late;timer.fn();await flush();},created:()=>created,imports:()=>imports,telemetry(){now=500;intervals.get(500)?.();return messages.at(-1);},intervals};
 }
 
 test('worker announces liveness before top-level/create and heartbeats continue through healthy async initialization',async()=>{
@@ -48,6 +48,26 @@ test('worker announces liveness before top-level/create and heartbeats continue 
   assert.equal(f.imports(),1);assert.equal(f.created(),stage==='create'?1:0);assert.equal(f.messages.length,1);assert.equal(f.messages[0].workerHeartbeat,1);assert.equal(f.messages[0].frameId,'0');
   f.intervals.get(250)();assert.equal(f.messages.at(-1).workerHeartbeat,2);assert.equal(f.messages.at(-1).frameId,'0');assert.equal(f.messages.some(row=>row.type==='ready'),false);
  }
+});
+
+test('baseline worker retains controls, frames and heartbeat with no query allocations or optional CPU spans',async()=>{
+ const base=await fixture(schema,schema,'','0.2.0',false,true),routine=await fixture(schema,schema,'','0.2.0',false,true);
+ await base.send({...base.initial,performanceMode:'baseline'});await routine.send(routine.initial);await routine.flush();
+ assert.deepEqual(structuredClone(base.requested),[{}]);assert.equal(base.allocations.query,0);assert.equal(base.allocations.buffer,0);assert.equal(base.allocations.duration,0);
+ assert.equal(routine.allocations.duration,1);assert.equal(routine.allocations.clock-base.allocations.clock,4);
+ const summary=base.telemetry().summary;assert.equal(summary.mode,'baseline');assert.equal(summary.gpu.timestampQuerySupported,true);assert.equal(summary.gpu.timestampQueryEnabled,false);
+ assert.equal(summary.cpuCall.availability,'unsupported');assert.equal(summary.produced.sampleCount,1);
+ assert.ok(base.intervals.has(250),'correctness heartbeat remains enabled');
+ const changed=await base.send({type:'controls',controlSequence:1,controlSchemaHash:base.initial.controlSchemaHash,values:{height:2,speed:1}});
+ assert.deepEqual(changed.controls,{height:2,speed:1});assert.equal(base.frames.length,2);
+ const bad=await fixture();assert.equal((await bad.send({...bad.initial,performanceMode:'unknown'})).type,'failure');
+});
+
+test('worker keeps routine sampling phase through unsampled frame notifications',async()=>{
+ const f=await fixture(schema,schema,'','0.2.0',false,true);await f.send(f.initial);
+ for(let i=2;i<=31;i++)await f.send({type:'frame',requestId:`frame-${i}`});await f.flush();
+ const summary=f.telemetry().summary;assert.equal(summary.produced.sampleCount,31);assert.equal(summary.cpuCall.sampleCount,31);
+ assert.equal(summary.gpu.sampleCount,2);assert.equal(summary.gpu.expectedCount,2);assert.equal(summary.gpu.missingCount,0);assert.equal(summary.gpu.validity,'sampled');
 });
 
 test('playing cadence subtracts full completed-frame work from its next delay',async()=>{
@@ -72,7 +92,7 @@ test('a queued old timer cannot add a draw after a control command replaces its 
 test('actual worker requests timestamp support and publishes a fresh correlated GPU pass result',async()=>{
  const f=await fixture(schema,schema,'','0.2.0',false,true);await f.send(f.initial);for(let i=0;i<10;i++)await Promise.resolve();
  assert.deepEqual(structuredClone(f.requested),[{requiredFeatures:['timestamp-query']}]);
- const gpu=f.telemetry().summary.gpu;assert.equal(gpu.timestampQueryEnabled,true);assert.equal(gpu.p95,1);assert.equal(gpu.sampleCount,1);assert.equal(gpu.failedSamples,0);assert.equal(gpu.validity,'complete');
+ const gpu=f.telemetry().summary.gpu;assert.equal(gpu.timestampQueryEnabled,true);assert.equal(gpu.p95,1);assert.equal(gpu.sampleCount,1);assert.equal(gpu.failedSamples,0);assert.equal(gpu.validity,'sampled');
 });
 test('externally driven worker advances only for explicit frames and existing control draws',async()=>{
  const f=await fixture();await f.send({...f.initial,externallyDriven:true,playing:true});assert.equal(f.frames.length,1);assert.deepEqual(f.scheduled,[]);

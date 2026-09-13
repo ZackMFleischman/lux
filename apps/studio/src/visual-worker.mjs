@@ -7,12 +7,14 @@ import { loadAuthoredModule } from './authored-worker-assets.mjs';
 import { prepareWorkerControlState } from './controls/worker-control-state.mjs';
 import { createFrameCollector } from '../../../packages/performance/live.mjs';
 import { createGpuPassTimer } from '../../../packages/performance/gpu-pass.mjs';
+import { collectionMode } from '../../../packages/performance/collection-mode.mjs';
 const freeze=Object.freeze;
 const now=performance.now.bind(performance);
 const post=postMessage.bind(globalThis);
 let identity, renderer, device, visual, clock, random, settings, outputTarget, presentation;
 let controlState, frame = 0, tick = 0, lastTime = 0;
 let drawStarted=0,scheduleEpoch=0;
+let performanceMode='routine';
 let stopped = false, externallyDriven=false, timer, heartbeat, telemetryTimer, collector, gpuTimer, gpuCapability, chain = Promise.resolve();
 const send = (type, extra = {}) => post({ type, ...identity, ...extra });
 function state() { return { ...clock.snapshot(), frameId: String(frame),...controlState.state() }; }
@@ -24,21 +26,22 @@ function failure(error, requestId) {
 async function draw(requestId, type = 'frame') {
   drawStarted=now();
   const time = clock.snapshot();
-  gpuTimer.begin(frame+1);
-  const updateStart=now();
+  const profiling=performanceMode==='routine';
+  if(profiling)gpuTimer.begin(frame+1);
+  const updateStart=profiling?now():0;
   visual.update(freeze({ tick: tick++, timeSeconds: time.timeSeconds,
     deltaSeconds: Math.max(0, time.timeSeconds - lastTime), controls: controlState.values(), events: freeze([]) }));
-  const updateEnd=now();
+  const updateEnd=profiling?now():0;
   const renderResult=visual.render(freeze({ width: settings.width, height: settings.height, colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }));
-  const renderCallEnd=now();
-  const asynchronous=renderResult != null && typeof renderResult.then === 'function';
+  const renderCallEnd=profiling?now():0;
+  const asynchronous=profiling&&renderResult != null && typeof renderResult.then === 'function';
   await renderResult;
-  const renderEnd=now();
+  const renderEnd=profiling?now():0;
   await device.queue.onSubmittedWorkDone();
   const completed=now();
   lastTime = time.timeSeconds; frame++;
-  collector.record(completed,frame,updateEnd-updateStart,renderCallEnd-updateEnd,completed-renderEnd,asynchronous,renderEnd-renderCallEnd);
-  gpuTimer.end();
+  if(profiling){collector.record(completed,frame,updateEnd-updateStart,renderCallEnd-updateEnd,completed-renderEnd,asynchronous,renderEnd-renderCallEnd);gpuTimer.end();}
+  else collector.record(completed,frame);
   send(type, { requestId, ...state(), timeSeconds: time.timeSeconds });
 }
 function schedule() {
@@ -57,6 +60,7 @@ function schedule() {
 async function initialize(message) {
   identity = { instanceId: message.instanceId, generation: message.generation, revisionId: message.revisionId };
   externallyDriven=message.externallyDriven===true;
+  performanceMode=collectionMode(message.performanceMode);
   settings = message.settings;
   if (!settings || settings.width !== 1920 || settings.height !== 1080 || settings.fps !== 60 ||
       !Number.isInteger(settings.seed) || settings.seed < 0 || settings.seed > 0xffffffff) throw Error('Unsupported output settings');
@@ -76,8 +80,8 @@ async function initialize(message) {
   const adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
   if (!adapter) throw Error('No WebGPU adapter available');
   gpuCapability=freeze({timestampQuerySupported:typeof adapter.features?.has === 'function' ? adapter.features.has('timestamp-query') : null,timestampQueryEnabled:false});
-  device = await adapter.requestDevice(gpuCapability.timestampQuerySupported?{requiredFeatures:['timestamp-query']}:{});
-  gpuTimer=createGpuPassTimer(device,(frame,ms,complete)=>collector?.recordGpu(frame,ms,complete)??false);
+  device = await adapter.requestDevice(performanceMode==='routine'&&gpuCapability.timestampQuerySupported?{requiredFeatures:['timestamp-query']}:{});
+  gpuTimer=createGpuPassTimer(device,(frame,ms,complete)=>collector?.recordGpu(frame,ms,complete)??false,{mode:performanceMode});
   device.lost.then(info => { if (!stopped) failure(Error(`WebGPU device lost: ${info.message}`)); });
   renderer = new module.WebGPURenderer({ canvas: message.canvas, device, alpha: true, antialias: false });
   renderer.setSize(settings.width, settings.height, false); await renderer.init();
@@ -98,7 +102,7 @@ async function initialize(message) {
       renderer.setRenderTarget(null); presentation.render(renderer);
     } }) }));
   for (const name of ['update', 'render', 'reset', 'dispose']) if (typeof visual?.[name] !== 'function') throw Error(`Visual missing ${name}`);
-  collector=createFrameCollector({startMs:now()});
+  collector=createFrameCollector({startMs:now(),mode:performanceMode});
   telemetryTimer=setInterval(()=>{if (!stopped) send('performance',{summary:collector.summary(now(),{...gpuTimer.status(),timestampQuerySupported:gpuCapability.timestampQuerySupported})});},500);
   if (message.playing) clock.play();
   await draw(message.requestId, 'ready');

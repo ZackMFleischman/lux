@@ -15,7 +15,7 @@ class WorkerFixture {
 const source = { sdkVersion: '0.1.0' as const, entry: 'visual.ts', files: { 'visual.ts': '' } };
 function telemetry(){const c=createFrameCollector({startMs:0});c.record(20,1,2,3,4,false);return c.summary(500);}
 function onlyQueuedRetry(scheduled:Map<number,{interval:number;at:number}>){assert.equal(scheduled.size,1);assert.equal([...scheduled.values()][0]!.interval,0,'only one-shot retry remains; no worker watchdog/command timers');}
-function fixture(t: any, linked: any = {code:'accepted'}) {
+function fixture(t: any, linked: any = {code:'accepted'}, performanceMode:'baseline'|'routine'='routine') {
   let now = 0, next = 0, compiles = 0;
   const scheduled = new Map<number, { at: number; callback: () => void; interval: number }>();
   const originals = new Map<string, PropertyDescriptor | undefined>();
@@ -28,7 +28,7 @@ function fixture(t: any, linked: any = {code:'accepted'}) {
   replace('setInterval', (callback: () => void, ms: number) => schedule(callback, ms, ms));
   replace('clearTimeout', (id: number) => scheduled.delete(id)); replace('clearInterval', (id: number) => scheduled.delete(id));
   const api={compile:async()=>{compiles++;return {ok:true,linked,sourceHash:'revision'};}};
-  const client = new StandaloneClient(api as any);
+  const client = new StandaloneClient(api as any,{performanceMode});
   const flush = async () => { for (let i = 0; i < 8; i++) await Promise.resolve(); };
   const advance = async (ms: number) => { const end = now + ms; while (true) { const due = [...scheduled].filter(([, timer]) => timer.at <= end).sort((a, b) => a[1].at - b[1].at)[0]; if (!due) break; const [id, timer] = due; now = timer.at; if (timer.interval) timer.at += timer.interval; else scheduled.delete(id); timer.callback(); await flush(); } now = end; await flush(); };
   const start = async (input: any = source) => { const pending = client.submit(input); await flush(); const worker = WorkerFixture.all.at(-1)!; worker.reply({ type: 'ready' }); await pending; return worker; };
@@ -36,6 +36,13 @@ function fixture(t: any, linked: any = {code:'accepted'}) {
   const operation = (requestId: string) => { const state = client.getSnapshot().authoring!; return { name: 'lux.playback' as const, input: { requestId, instanceId: state.instanceId, expectedGeneration: state.generation, action: 'play' as const } }; };
   return { client, api,start, flush, advance, scheduled, operation, compiles: () => compiles };
 }
+test('baseline selection reaches initial and restarted workers without changing watchdog termination',async t=>{
+ const f=fixture(t,{code:'accepted'},'baseline'),worker=await f.start();assert.equal(worker.init.performanceMode,'baseline');
+ await f.advance(1250);assert.equal(worker.terminated,true);assert.equal(f.client.getSnapshot().authoring!.playback,'failed');
+ await f.advance(250);const retry=WorkerFixture.all.at(-1)!;assert.equal(retry.init.performanceMode,'baseline');
+ retry.reply({type:'ready'});await f.flush();assert.equal(f.client.getSnapshot().authoring!.playback,'paused');
+});
+
 test('silent candidate is terminated at 1250 ms while previous preview survives', async t => {
   const f = fixture(t), old = await f.start(), previous = f.client.getSnapshot().authoring;
   const rejected = assert.rejects(f.client.submit(source), /initialization stopped making progress/); await f.flush();

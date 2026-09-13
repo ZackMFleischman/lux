@@ -3,12 +3,15 @@
 const freeze=Object.freeze, finite=Number.isFinite, integer=Number.isSafeInteger;
 const ceil=Math.ceil, max=Math.max, sort=Function.call.bind(Array.prototype.sort),push=Function.call.bind(Array.prototype.push);
 const FloatBuffer=Float64Array;
+import { collectionMode, gpuSampleFrame, GPU_SAMPLING_POLICY } from './collection-mode.mjs';
 export const LIVE_LIMITS=freeze({records:4096,windowMs:120000,summaryMs:500});
 
-export function createFrameCollector({startMs,capacity=4096,windowMs=120000}={}) {
+export function createFrameCollector({startMs,capacity=4096,windowMs=120000,mode='routine'}={}) {
+  mode=collectionMode(mode);
   if(!finite(startMs)||startMs<0||!integer(capacity)||capacity<1||capacity>4096||!integer(windowMs)||windowMs<1||windowMs>120000)throw Error('Invalid bounded collector options');
   // time, frame, update, synchronous render call, queue wait, async, render await.
-  const records=new FloatBuffer(capacity*9);
+  const records=mode==='routine'?new FloatBuffer(capacity*9):null;
+  let gpuExpected=0;
   let count=0,completed=0,lost=0,invalid=0,totalLost=0,totalInvalid=0,lastFrame=0,lastAt=startMs,windowStart=startMs,sequence=0;
   const distribution=(values,expected,reason)=>{
     const n=values.length,missing=max(0,expected-n);
@@ -24,6 +27,8 @@ export function createFrameCollector({startMs,capacity=4096,windowMs=120000}={})
         invalid++;totalInvalid++;return false;
       }
       lastAt=at;lastFrame=frame;
+      if(mode==='baseline'){completed++;return true;}
+      if(gpuSampleFrame(frame))gpuExpected++;
       if(!finite(update)||update<0||!finite(renderCall)||renderCall<0||!finite(queueWait)||queueWait<0||!finite(renderAwait)||renderAwait<0||typeof asyncRender!=='boolean') {
         invalid++;totalInvalid++;return false;
       }
@@ -35,7 +40,7 @@ export function createFrameCollector({startMs,capacity=4096,windowMs=120000}={})
       return true;
     },
     recordGpu(frame,ms,complete) {
-      if(!integer(frame)||!finite(ms)||ms<0||typeof complete!=='boolean')return false;
+      if(mode==='baseline'||!integer(frame)||!gpuSampleFrame(frame)||!finite(ms)||ms<0||typeof complete!=='boolean')return false;
       for(let row=count-1;row>=0;row--){const i=row*9;if(records[i+1]===frame){if(records[i+7]>=0)return false;records[i+7]=ms;records[i+8]=complete?1:0;return true;}}
       return false;
     },
@@ -50,17 +55,20 @@ export function createFrameCollector({startMs,capacity=4096,windowMs=120000}={})
       }
       const expected=completed+invalid,reason=lost||invalid||expired?'Telemetry lost, invalid or expired; duration distribution is incomplete':undefined;
       const elapsed=now-windowStart;
-      const result=freeze({schemaVersion:1,mode:'routine',sequence:++sequence,clockDomain:'dedicated-worker-monotonic-ms',windowStartMs:windowStart,windowEndMs:now,
+      const disabled=freeze({unit:'ms',availability:'unsupported',reason:'Optional timing disabled in baseline mode',sampleCount:0,expectedCount:0,missingCount:0,samplingPolicy:'none',validity:'incomplete',gate:'not_evaluated'});
+      const cpuMetric=(values,detail)=>mode==='baseline'?disabled:distribution(values,expected,detail);
+      const gpuMetric=timestampQueryEnabled&&mode==='routine'?distribution(gpu,gpuExpected,gpuPartial?'GPU copies, uploads or clears outside passes are excluded':reason):null;
+      const result=freeze({schemaVersion:1,mode,sequence:++sequence,clockDomain:'dedicated-worker-monotonic-ms',windowStartMs:windowStart,windowEndMs:now,
         lostRecords:totalLost,invalidRecords:totalInvalid,intervalLostRecords:lost,intervalInvalidRecords:invalid,retainedRecords:cpu.length,
         produced:freeze({unit:'Hz',availability:elapsed>0?'available':'pending',...(elapsed>0?{value:completed*1000/elapsed}:{}),sampleCount:completed,expectedCount:completed+invalid,missingCount:invalid,
           samplingPolicy:'completed frames over independent summary interval',validity:invalid?'incomplete':'complete',gate:'not_evaluated'}),
-        update:distribution(update,expected,reason),renderCall:distribution(render,expected,reason),
-        cpuCall:distribution(cpu,expected,asyncCount?'Asynchronous render continuation CPU work is not fully measured':reason),
-        renderAwait:distribution(awaited,expected,reason),queueWait:distribution(wait,expected,reason),
-        gpu:freeze({... (timestampQueryEnabled?distribution(gpu,expected,gpuPartial?'GPU copies, uploads or clears outside passes are excluded':reason):{unit:'ms',availability:'unsupported',reason:'GPU pass queries are unavailable; queue completion wait is not GPU duration',sampleCount:0,expectedCount:completed,missingCount:completed,
-          samplingPolicy:'none',validity:'incomplete',gate:'not_evaluated'}),timestampQuerySupported,timestampQueryEnabled,failedSamples,droppedSamples,pendingSamples}),
+        update:cpuMetric(update,reason),renderCall:cpuMetric(render,reason),
+        cpuCall:cpuMetric(cpu,asyncCount?'Asynchronous render continuation CPU work is not fully measured':reason),
+        renderAwait:cpuMetric(awaited,reason),queueWait:cpuMetric(wait,reason),
+        gpu:freeze({... (mode==='baseline'?disabled:gpuMetric?{...gpuMetric,samplingPolicy:GPU_SAMPLING_POLICY,validity:gpuMetric.validity==='complete'?'sampled':'incomplete'}:{unit:'ms',availability:'unsupported',reason:'GPU pass queries are unavailable; queue completion wait is not GPU duration',sampleCount:0,expectedCount:gpuExpected,missingCount:gpuExpected,
+          samplingPolicy:GPU_SAMPLING_POLICY,validity:'incomplete',gate:'not_evaluated'}),timestampQuerySupported,timestampQueryEnabled:mode==='routine'&&timestampQueryEnabled,failedSamples,droppedSamples,pendingSamples}),
       });
-      count=0;completed=0;lost=0;invalid=0;windowStart=now;
+      count=0;completed=0;lost=0;invalid=0;gpuExpected=0;windowStart=now;
       return result;
     },
   });

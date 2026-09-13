@@ -4,6 +4,19 @@ import { PerformanceReceiver } from '../../apps/studio/src/performance/performan
 import { createFrameCollector } from '../../packages/performance/live.mjs';
 const owner={instanceId:'instance',generation:1,revisionId:'revision'};
 function sample(){const c=createFrameCollector({startMs:0});c.record(20,1,2,3,4,false);return c.summary(500);}
+
+test('receiver accepts explicit baseline and sampled routine summaries without accepting false full coverage',()=>{
+ const baseline=createFrameCollector({startMs:0,mode:'baseline'});baseline.record(20,1);
+ const r=new PerformanceReceiver(owner,0);assert.equal(r.receive(baseline.summary(500,{timestampQuerySupported:true}),10),true);
+ assert.equal(r.snapshot.worker!.mode,'baseline');assert.equal(r.snapshot.worker!.cpuCall.availability,'unsupported');
+ const routine=createFrameCollector({startMs:0});routine.record(20,1,2,3,4,false);routine.recordGpu(1,1,true);
+ const s=routine.summary(500,{timestampQuerySupported:true,timestampQueryEnabled:true});
+ assert.equal(new PerformanceReceiver(owner,0).receive(s,10),true);
+ assert.equal(new PerformanceReceiver(owner,0).receive({...s,gpu:{...s.gpu,validity:'complete'}},10),false);
+ assert.equal(new PerformanceReceiver(owner,0).receive({...s,gpu:{...s.gpu,expectedCount:2,missingCount:1}},10),false);
+ assert.equal(new PerformanceReceiver(owner,0).receive({...s,mode:'baseline'},10),false);
+ assert.equal(new PerformanceReceiver(owner,0).receive({...s,cpuCall:{...s.cpuCall,validity:'sampled'}},10),false);
+});
 test('telemetry uses parent arrival age and monotonic worker sequences, with detached bounded data',()=>{
  const r=new PerformanceReceiver(owner,100),raw:any=structuredClone(sample());
  assert.equal(r.snapshot.status,'pending');assert.equal(r.receive(raw,110),true);

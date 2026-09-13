@@ -2,13 +2,40 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createFrameCollector } from '../../packages/performance/live.mjs';
 
+test('baseline disables duration collection while preserving completed-frame health counts',()=>{
+ const c=createFrameCollector({startMs:0,mode:'baseline'});
+ for(let frame=1;frame<=5000;frame++)assert.equal(c.record(frame,frame),true);
+ assert.equal(c.recordGpu(1,1,true),false);
+ const s=c.summary(5000,{timestampQuerySupported:true});
+ assert.equal(s.mode,'baseline');assert.equal(s.retainedRecords,0);assert.equal(s.lostRecords,0);
+ assert.equal(s.produced.sampleCount,5000);assert.equal(s.cpuCall.availability,'unsupported');
+ assert.equal(s.cpuCall.expectedCount,0);assert.equal(s.gpu.expectedCount,0);assert.match(s.gpu.reason,/baseline/i);
+ assert.throws(()=>createFrameCollector({startMs:0,mode:'invalid'}));
+});
+
+test('routine GPU populations include only eligible frames, including across summary boundaries',()=>{
+ const c=createFrameCollector({startMs:0});
+ for(let frame=1;frame<=60;frame++)c.record(frame,frame,1,1,1,false);
+ assert.equal(c.recordGpu(2,99,true),false);assert.equal(c.recordGpu(1,1,true),true);assert.equal(c.recordGpu(31,2,true),true);
+ const s=c.summary(100,{timestampQuerySupported:true,timestampQueryEnabled:true});
+ assert.equal(s.gpu.expectedCount,2);assert.equal(s.gpu.missingCount,0);assert.equal(s.gpu.validity,'sampled');
+ assert.equal(s.gpu.p95,2);assert.match(s.gpu.samplingPolicy,/30/);assert.equal(s.cpuCall.sampleCount,60);
+ c.record(110,61,1,1,1,false);
+ const pending=c.summary(120,{timestampQuerySupported:true,timestampQueryEnabled:true,pendingSamples:1});
+ assert.equal(pending.gpu.expectedCount,1);assert.equal(pending.gpu.missingCount,1);assert.equal(pending.gpu.validity,'incomplete');
+ assert.equal(c.recordGpu(61,8,true),false,'late results cannot enter another summary');
+ c.record(130,62,1,1,1,false);
+ const unsampled=c.summary(140,{timestampQuerySupported:true,timestampQueryEnabled:true});
+ assert.equal(unsampled.gpu.expectedCount,0);assert.equal(unsampled.gpu.missingCount,0);assert.equal(unsampled.gpu.validity,'sampled');
+});
+
 test('GPU readbacks correlate once to retained frames; missing or late samples never reuse earlier values',()=>{
- const c=createFrameCollector({startMs:0});c.record(10,1,1,2,3,false);c.record(20,2,1,2,3,false);
+ const c=createFrameCollector({startMs:0});c.record(10,1,1,2,3,false);c.record(20,31,1,2,3,false);
  assert.equal(c.recordGpu(1,4,true),true);assert.equal(c.recordGpu(1,99,true),false);
  const summary=c.summary(500,{timestampQuerySupported:true,timestampQueryEnabled:true,failedSamples:1,droppedSamples:0,pendingSamples:0});
  assert.equal(summary.gpu.p95,4);assert.equal(summary.gpu.sampleCount,1);assert.equal(summary.gpu.missingCount,1);assert.equal(summary.gpu.validity,'incomplete');assert.equal(summary.gpu.failedSamples,1);
- assert.equal(c.recordGpu(2,8,true),false);
- c.record(510,3,1,2,3,false);c.recordGpu(3,5,false);
+ assert.equal(c.recordGpu(31,8,true),false);
+ c.record(510,61,1,2,3,false);c.recordGpu(61,5,false);
  const next=c.summary(1000,{timestampQuerySupported:true,timestampQueryEnabled:true});assert.equal(next.gpu.p95,5);assert.equal(next.gpu.validity,'incomplete');assert.match(next.gpu.reason,/outside passes/);
 });
 

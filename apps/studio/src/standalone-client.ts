@@ -13,6 +13,8 @@ import type { SavedControlSnapshot, RuntimeControlState } from './controls/contr
 import { validateSource, snapshotRecord } from '../../build-worker/src/source-policy.mjs';
 import { verifyLinked } from '../../build-worker/src/artifact-identity.mjs';
 import { PerformanceReceiver } from './performance/performance-state.ts';
+import { collectionMode } from '../../../packages/performance/collection-mode.mjs';
+import type { CollectionMode } from '../../../packages/performance/collection-mode.mjs';
 export interface AuthoringApi {
   example(): Promise<SourceBundle>;
   compile(source: SourceBundle): Promise<any>;
@@ -41,7 +43,8 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; expectedControlSequence?:number; expectedControls?:ControlValues; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
   private api: AuthoringApi;
   private codeDeclaredParameters:boolean;
-  constructor(api: AuthoringApi, options:{codeDeclaredParameters?:boolean}={}) { this.api = api; this.codeDeclaredParameters=options.codeDeclaredParameters===true; }
+  private readonly performanceMode:CollectionMode;
+  constructor(api: AuthoringApi, options:{codeDeclaredParameters?:boolean;performanceMode?:CollectionMode}={}) { this.api = api; this.codeDeclaredParameters=options.codeDeclaredParameters===true; this.performanceMode=collectionMode(options.performanceMode); }
   getSnapshot = () => this.snapshot;
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
   private publish(patch: Partial<StudioSnapshot>) { this.snapshot = { ...this.snapshot, ...patch, receivedAtMs: Date.now() }; for (const listener of this.listeners) listener(); }
@@ -168,7 +171,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
         };
         const offscreen = canvas.transferControlToOffscreen();
         worker.postMessage({ type: 'init', requestId: crypto.randomUUID(), instanceId: candidate.instanceId, generation: candidate.generation,
-          revisionId, linked: structuredClone(linked), canvas: offscreen,...state,settings: DEFAULT_OUTPUT, playing }, [offscreen]);
+          revisionId, linked: structuredClone(linked), canvas: offscreen,...state,settings: DEFAULT_OUTPUT, playing, performanceMode:this.performanceMode }, [offscreen]);
       });
     } catch (error) { this.stop(candidate, String(error)); canvas.remove(); throw error; }
   }
