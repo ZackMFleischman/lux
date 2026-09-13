@@ -28,11 +28,28 @@ test('installed admission rejects traversal, identity changes and bounds simulta
   assert.match(registry.errors.get('1'.repeat(32)), /identity/);
   await registry.close();
 });
-test('a failed producer retries with backoff and stops after three attempts', async () => {
+test('a failed producer retries once and remains failed after the second fault in 30 seconds', async () => {
   let starts = 0;
   const registry = new InstanceRegistry({runtimeId, start: async () => { starts++; throw Error('missing package'); }});
   for (const time of [0, 100, 1000, 3000, 9000, 20000]) await registry.reconcile([request('1'.repeat(32))], time);
-  assert.equal(starts, 3);
+  assert.equal(starts, 2);
   assert.match(registry.errors.get('1'.repeat(32)), /missing package/);
   await registry.close();
+});
+test('healthy generations retain fault history, renew retry eligibility after 30 seconds, and removal resets policy',async()=>{
+ let starts=0;const producers=[];
+ const registry=new InstanceRegistry({runtimeId,start:async()=>{starts++;const producer={exited:false,stop:async()=>{}};producers.push(producer);return producer;}});
+ const lease=request('1'.repeat(32));await registry.reconcile([lease],0);
+ producers[0].exited=true;await registry.reconcile([lease],100);await registry.reconcile([lease],350);assert.equal(starts,2);
+ producers[1].exited=true;await registry.reconcile([lease],30099);await registry.reconcile([lease],40000);assert.equal(starts,2,'second fault less than 30s suppresses despite successful restart');
+ await registry.reconcile([],40001);await Promise.resolve();await registry.reconcile([lease],40002);assert.equal(starts,3,'deliberate removal/re-attach resets the instance policy');
+ producers[2].exited=true;await registry.reconcile([lease],40100);await registry.reconcile([lease],40350);assert.equal(starts,4);
+ producers[3].exited=true;await registry.reconcile([lease],70100);await registry.reconcile([lease],70350);assert.equal(starts,5,'fault at exactly 30s permits a fresh automatic retry');
+ await registry.close();
+});
+test('invalid and backward clocks cannot bypass suppressed recovery',async()=>{
+ let starts=0;const registry=new InstanceRegistry({runtimeId,start:async()=>{starts++;throw Error('failed');}}),lease=request('1'.repeat(32));
+ await registry.reconcile([lease],10);await registry.reconcile([lease],260);
+ for(const now of [NaN,Infinity,-1,259])await assert.rejects(registry.reconcile([lease],now),/monotonic/);
+ await registry.reconcile([lease],40000);assert.equal(starts,2);await registry.close();
 });
