@@ -1,0 +1,40 @@
+{
+  "ok": true,
+  "scope": "10 s cold-start native fixture cadence and elapsed callback diagnostic",
+  "instanceId": "00000000000051bc000000a980f72d16",
+  "releaseId": "e8611254431e3544ba01a73e84f0dcecf01b59c057a327a7d9d2c254bfb239f4",
+  "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+  "expectedSlots": 600,
+  "opportunities": 600,
+  "missedSlots": 0,
+  "rateHz": 60,
+  "noFrame": 254,
+  "selectedTransport": 148,
+  "heldTransport": 198,
+  "callbackMs": {
+    "p50": 0.0967,
+    "p95": 0.2496,
+    "p99": 0.4646,
+    "max": 1.167
+  },
+  "latenessMs": {
+    "p50": 0.3063,
+    "p95": 0.5448,
+    "p99": 0.7789,
+    "max": 7.2926
+  },
+  "window": {
+    "start": "728019621025",
+    "end": "728119621025",
+    "coverageEnd": "728119625611",
+    "overshootMs": 0.4586
+  },
+  "freshImageMeasured": false,
+  "performanceAcceptance": false,
+  "actualResolumeTested": false,
+  "callbackTiming": "QPC elapsed including descheduling and driver time; not exclusive CPU execution",
+  "runtimeId": "db7c70ff2b58e29cd281bd5e2e236266e29d1a6e78d6a3be44f721e8d65f0e90",
+  "lifecyclePaths": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-cadence-probe\\artifacts\\native-cadence-probe\\profile\\local\\Lux\\Installed\\instances\\db7c70ff2b58e29cd281bd5e2e236266e29d1a6e78d6a3be44f721e8d65f0e90\\00000000000051bc000000a980f72d16.attempts\\076753c1ae31868da71cb852fb52ae3f.lifecycle.jsonl"
+  ]
+}

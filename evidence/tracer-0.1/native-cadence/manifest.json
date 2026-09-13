@@ -1,0 +1,32 @@
+[
+  {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-cadence-probe\\artifacts\\native-cadence-probe\\cadence.cadence.json",
+    "sha256": "9a12af5585e9508120961f5ddabc69044094c7146f1c5499569029351d795e36",
+    "bytes": 75668
+  },
+  {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-cadence-probe\\artifacts\\native-cadence-probe\\receiver.jsonl",
+    "sha256": "1129abcae4d9f5d1e1fe2c09c6bdc38eb7d45956612309e42337309bc82aeee1",
+    "bytes": 137762
+  },
+  {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-cadence-probe\\artifacts\\native-cadence-probe\\last-experiment.json",
+    "sha256": "32a695a26211c30f3fc7f543c22c6b76915fa20b677c7d45deecf645b35d4e08",
+    "bytes": 56755
+  },
+  {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-cadence-probe\\artifacts\\native-cadence-probe\\inspection.json",
+    "sha256": "0de0ec26ab5b1778b308541b4a3571c0b226a0ca8241463d39a9945636645172",
+    "bytes": 1421
+  },
+  {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-cadence-probe\\artifacts\\native-cadence-probe\\review-request.json",
+    "sha256": "a1444c265409b5c2e19d96c0e547ad1b7e6bc9b87f1116b703436f76c58defef",
+    "bytes": 55614
+  },
+  {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-cadence-probe\\artifacts\\native-cadence-probe\\profile\\local\\Lux\\Installed\\instances\\db7c70ff2b58e29cd281bd5e2e236266e29d1a6e78d6a3be44f721e8d65f0e90\\00000000000051bc000000a980f72d16.attempts\\076753c1ae31868da71cb852fb52ae3f.lifecycle.jsonl",
+    "sha256": "7e79c41e6497355ab7e14af1070c7492487bd9b19a29ba902f36f1e199caa8c1",
+    "bytes": 384
+  }
+]
