@@ -17,6 +17,33 @@ const { createDisconnectedClient } = await import('../../apps/studio/src/service
 afterEach(() => cleanup());
 after(() => dom.window.close());
 
+test('RTL: code-defined controls expose independent values, numeric entry and defaults without Intensity', async () => {
+  const fixture = service();
+  const schema = [
+    { id: 'spikeHeight', type: 'number' as const, label: 'Spike height', min: 0, max: 4, default: 1, step: 0.1, changeCost: 'live' as const },
+    { id: 'noiseScale', type: 'number' as const, label: 'Noise scale', min: 1, max: 20, default: 5, changeCost: 'live' as const },
+  ];
+  fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: schema, controlSchemaHash: 'a'.repeat(64), controls: { spikeHeight: 2, noiseScale: 7 }, controlSequence: 0 });
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+  assert.equal(screen.queryByRole('slider', { name: 'Intensity' }), null);
+  assert.equal(screen.getAllByRole('slider').length, 2);
+  fireEvent.change(screen.getByRole('spinbutton', { name: 'Noise scale value' }), { target: { value: '12' } });
+  fireEvent.keyDown(screen.getByRole('spinbutton', { name: 'Noise scale value' }), { key: 'Enter' });
+  await waitFor(() => assert.equal(fixture.calls.length, 1));
+  assert.deepEqual(fixture.calls[0]?.input, { requestId: fixture.calls[0]?.input.requestId, instanceId: '44ff55f0-8ea6-4fbf-89d5-665923f65cad', expectedGeneration: 2, expectedRevisionId: 'revision-2', expectedControlSchemaHash: 'a'.repeat(64), values: { noiseScale: 12 }, mode: 'live' });
+  fireEvent.click(screen.getByRole('button', { name: 'Reset Spike height to default' }));
+  await waitFor(() => assert.equal(fixture.calls.length, 2));
+  assert.deepEqual((fixture.calls[1] as any).input.values, { spikeHeight: 1 });
+});
+
+test('RTL: an empty authored schema has no invented control', () => {
+  const fixture = service();
+  fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [], controlSchemaHash: 'b'.repeat(64), controls: {}, controlSequence: 0 });
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+  assert.equal(screen.queryByRole('slider'), null);
+  assert.ok(screen.getByText('This visual defines no live controls.'));
+});
+
 function service() {
   let snapshot: StudioSnapshot = {
     connection: 'connected', message: null, receivedAtMs: 1000,
@@ -33,7 +60,7 @@ function service() {
     invoke: async operation => { calls.push(operation); if (fail) throw Error('Runtime unavailable. Retry after reconnecting.'); return { accepted: true }; },
   };
   return { client, calls, fail: () => { fail = true; }, publish: (values: Partial<RuntimeView>) => {
-    snapshot = { ...snapshot, authoring: { ...snapshot.authoring!, ...values } };
+    snapshot = { ...snapshot, authoring: { ...snapshot.authoring!, ...values } as RuntimeView };
     for (const listener of listeners) listener();
   }, update: () => {
     snapshot = { ...snapshot, authoring: { ...snapshot.authoring!, generation: 3, playback: 'playing' } };
@@ -41,11 +68,11 @@ function service() {
   } };
 }
 
-test('RTL: disconnected buttons and MUI slider refuse input while workspace remains operable', async () => {
+test('RTL: disconnected controls refuse input while workspace remains operable', async () => {
   const user = userEvent.setup({ document });
   render(<StudioApp client={createDisconnectedClient()} nowMs={1000} />);
   assert.equal((screen.getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled, true);
-  assert.equal((screen.getByRole('slider') as HTMLInputElement).disabled, true);
+  assert.equal(screen.queryByRole('slider'), null);
   await user.click(screen.getByRole('button', { name: 'Maximize' }));
   assert.ok(screen.getByRole('button', { name: 'Restore workspace' }));
   assert.ok(screen.getByRole('heading', { name: 'Awaiting runtime' }));
@@ -161,13 +188,14 @@ test('RTL: rejected slider input restores confirmed value and replacement ignore
   let reject!: (reason: Error) => void;
   fixture.client.invoke = operation => { fixture.calls.push(operation); return new Promise((_resolve, fail) => { reject = fail; }); };
   render(<StudioApp client={fixture.client} nowMs={1000} />);
-  const slider = screen.getByRole('slider') as HTMLInputElement;
+  let slider = screen.getByRole('slider') as HTMLInputElement;
   fireEvent.change(slider, { target: { value: '0.8' } });
   await act(async () => reject(Error('Parameter rejected')));
   assert.equal(slider.value, '0.5');
   assert.match(screen.getByRole('alert').textContent ?? '', /Parameter rejected/);
   fireEvent.change(slider, { target: { value: '0.9' } });
   await act(async () => fixture.publish({ revisionId: 'new-revision', intensity: 0.2 }));
+  slider = screen.getByRole('slider') as HTMLInputElement;
   assert.equal(slider.value, '0.2');
   await act(async () => reject(Error('Old revision rejected')));
   assert.equal(slider.value, '0.2');
@@ -185,9 +213,10 @@ test('RTL: a replaced runtime has an independent input queue while old writes ar
     }, reject }));
   };
   render(<StudioApp client={fixture.client} nowMs={1000} />);
-  const slider = screen.getByRole('slider') as HTMLInputElement;
+  let slider = screen.getByRole('slider') as HTMLInputElement;
   fireEvent.change(slider, { target: { value: '0.8' } });
   await act(async () => fixture.publish({ revisionId: 'new-revision', intensity: 0.2 }));
+  slider = screen.getByRole('slider') as HTMLInputElement;
   fireEvent.change(slider, { target: { value: '0.4' } });
   assert.equal(fixture.calls.length, 2, 'new runtime input cannot queue behind the obsolete target');
   await act(async () => pending[1]!.resolve());

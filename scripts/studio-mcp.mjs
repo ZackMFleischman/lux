@@ -17,7 +17,15 @@ async function call(method, params = {}) {
   const result = await response.json(); if (!result.ok) throw Error(result.error || 'Lux operation failed'); return result.result;
 }
 const text = value => ({ content: [{ type: 'text', text: JSON.stringify(value) }] });
+async function runningStudio() {
+  try { const status = await call('status'); return { connected: true, capabilities: status.capabilities ?? null,
+    compatible: status.capabilities?.codeDeclaredParameters === true,
+    advice: status.capabilities?.codeDeclaredParameters ? undefined : 'Running Studio predates this adapter; restart from the matching checkout before using SDK 0.2.' }; }
+  catch { return { connected: false, compatible: false, advice: 'Start Studio from this adapter checkout, then discover again.' }; }
+}
 server.registerTool('lux.studio.discover', { description: 'Read the exact visual SDK, example and standalone Lux capabilities. Start Lux Studio separately.', inputSchema: {} }, async () => text({ ...await discoverVisualSdk(), scope: 'standalone-studio', tools: ['read', 'build', 'capture', 'status', 'parameters', 'playback', 'restart'], resolume: false,
+  runningStudio: await runningStudio(),
+  parameters: { kinds: ['number'], maxCount: 32, declaredInCode: true, requiredGuard: 'expectedControlSchemaHash from current runtime status', implicitControls: false },
   sourceDocuments: { versions: [1, 2], replacement: 'complete source; preserve sourceVersion and assets when editing v2',
     assetPlayback: true, assetExport: false, assetFormat: 'image/bmp: 24-bit uncompressed, opaque', assetDimension: assetLimits.dimension, assetCount: assetLimits.count,
     assetFileBytes: assetLimits.imageBytes, assetTotalBytes: assetLimits.totalBytes,
@@ -30,7 +38,7 @@ server.registerTool('lux.studio.capture', { description: 'Return an actual 1920x
   const result = await call('capture'); return { content: [{ type: 'image', mimeType: 'image/png', data: result.base64 }, { type: 'text', text: JSON.stringify(result.metadata) }] };
 });
 for (const [method, schema, description] of [
-  ['parameters', parameterInputSchema, 'Set published runtime parameters. Read status first for instance, generation and revision guards. Returns actual applied frame state; live mode only.'],
+  ['parameters', parameterInputSchema, 'Set a partial map of code-defined numeric parameters. Read status for controlSchema IDs/ranges, instance, generation, revision and expectedControlSchemaHash guards. Returns actual applied frame state; live mode only.'],
   ['playback', playbackInputSchema, 'Play, pause or reset the Studio runtime using current instance and generation guards. Reset preserves playing/paused state. Returns applied state.'],
   ['restart', restartInputSchema, 'Restart the Studio runtime using current instance and generation guards. Retains source and controls; returns replacement runtime state.'],
 ]) server.registerTool(`lux.studio.${method}`, { description, inputSchema: schema.shape }, async input => text(await call(method, input)));

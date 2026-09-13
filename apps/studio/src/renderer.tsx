@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
-import { Alert, Button, Chip, CssBaseline, Paper, Slider, ThemeProvider, IconButton, Tooltip, Menu, MenuItem } from '@mui/material';
+import { Alert, Button, Chip, CssBaseline, Paper, ThemeProvider, IconButton, Tooltip, Menu, MenuItem } from '@mui/material';
 import { studioTheme } from './theme.ts';
-import { INTENSITY_CONTROL } from '../../../packages/runtime-contracts/src/index.ts';
+import { ParameterInspector, parameterOwner } from './controls/ParameterInspector.tsx';
 import { Preview } from './preview.tsx';
 import { StudioController } from './service-client.ts';
 import type { ReactNode } from 'react';
@@ -31,7 +31,7 @@ export function StudioApp(props: StudioProps) {
 function controlOwner(snapshot: StudioSnapshot): string | null {
   const runtime = snapshot.authoring;
   return snapshot.connection === 'connected' && runtime?.authority === 'studio'
-    ? JSON.stringify([runtime.instanceId, runtime.generation, runtime.revisionId]) : null;
+    ? parameterOwner(runtime) : null;
 }
 function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel, appCommands, fileMenu, appError }: StudioProps) {
   const [toolsHost, setToolsHost] = useState<HTMLElement | null>(null);
@@ -50,18 +50,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const busy = pendingCommands > 0;
   const [error, setError] = useState<string | null>(null);
   const [clock, setClock] = useState(() => nowMs ?? Date.now());
-  const [intensity, setIntensity] = useState(snapshot.authoring?.intensity ?? INTENSITY_CONTROL.default);
-  const intensityIntent = useRef<{ owner: string } | null>(null);
   const runtime = snapshot.authoring;
   const available = snapshot.connection === 'connected' && runtime?.authority === 'studio';
-  useEffect(() => {
-    // Runtime status can confirm earlier points while a drag has moved ahead.
-    // Keep local input until the coalesced write drain settles for this target.
-    if (owner && intensityIntent.current?.owner === owner) return;
-    intensityIntent.current = null;
-    setIntensity(runtime?.intensity ?? INTENSITY_CONTROL.default);
-  }, [runtime?.intensity, owner]);
-  useEffect(() => () => { intensityIntent.current = null; }, [client]);
   useEffect(() => {
     if (nowMs !== undefined) return;
     const timer = setInterval(() => setClock(Date.now()), 1000);
@@ -98,24 +88,6 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
     finally { if (transport) { transportPending.current = false; setPendingCommands(count => count - 1); } }
   }
   function windowAction(action: () => Promise<void>): void { void action().catch(reason => setError(String(reason))); }
-  async function changeIntensity(value: number): Promise<void> {
-    if (!owner) return;
-    const intent = { owner };
-    intensityIntent.current = intent;
-    setIntensity(value); setError(null);
-    try { await controller.setIntensity(value); }
-    catch (reason) {
-      if (intensityIntent.current === intent && controlOwner(client.getSnapshot()) === owner) {
-        setError(reason instanceof Error ? reason.message : String(reason));
-      }
-    } finally {
-      if (intensityIntent.current === intent) {
-        intensityIntent.current = null;
-        const current = client.getSnapshot();
-        if (controlOwner(current) === owner) setIntensity(current.authoring!.intensity);
-      }
-    }
-  }
   const compact = previewOnly || maximized || windowState.fullscreen;
   const previewPane = <Paper component="main" square className="preview-panel">
         <div className="panel-toolbar" hidden={windowState.fullscreen}><div><Chip label="FINAL" /></div>
@@ -145,11 +117,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const inspectorPane = <Paper component="aside" square className="inspector" aria-label="Scene controls and status">
         <section><div className="section-heading"><h2>Controls</h2><Chip label="LIVE" /></div>
           <p className="section-description">Authoring values only. Host controls stay independent.</p>
-          <label className="parameter-label" id="intensity-label"><span>{INTENSITY_CONTROL.label}</span><output>{available ? intensity.toFixed(2) : '—'}</output></label>
-          <Slider aria-labelledby="intensity-label" min={INTENSITY_CONTROL.min} max={INTENSITY_CONTROL.max} step={0.01} value={intensity}
-            disabled={!available} onChange={(_event, value) => { if (typeof value === 'number') void changeIntensity(value); }} />
-          <div className="parameter-scale"><span>0</span><span>1</span></div>
-          <p className="hint">{available ? `Applied value: ${runtime.intensity.toFixed(2)}` : 'Connect an authoring runtime to change controls.'}</p>
+          <ParameterInspector runtime={runtime} available={!!available} client={client} controller={controller} onError={setError} />
         </section>
         <section><h2>Performance</h2><MetricView label="Visual delivery" metric={snapshot.visualFps} nowMs={nowMs ?? clock} /><MetricView label="UI cadence" metric={snapshot.uiFps} nowMs={nowMs ?? clock} />
           <p className="hint">Delivery and interface cadence are measured separately.</p></section>

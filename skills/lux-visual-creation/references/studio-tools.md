@@ -61,14 +61,14 @@ Read live tool schemas if available; these are the checked adapter's contracts. 
 | `status` | `{}` → snapshot containing `authoring`, which is null before a working runtime exists. |
 | `capture` | `{}` → PNG image block plus JSON metadata. Captures the current completed frame; it does not advance paused playback. |
 | `playback` | `{ instanceId, expectedGeneration, action: 'play' | 'pause' | 'reset' }` → `{ applied, status }`. Reset preserves playing/paused state. |
-| `parameters` | `{ instanceId, expectedGeneration, expectedRevisionId, values: { intensity: 0.5 }, mode: 'live' }` → `{ applied, status }`. Checked intensity range is 0–1; unknown controls are rejected. |
+| `parameters` | `{ instanceId, expectedGeneration, expectedRevisionId, expectedControlSchemaHash, values: { spikeHeight: 0.5 }, mode: 'live' }` → `{ applied, status }`. Use actual runtime `controlSchema` IDs/ranges and `controlSchemaHash`; the patch can change several keys atomically. Unknown keys and stale schemas are rejected. |
 | `restart` | `{ instanceId, expectedGeneration }` → replacement runtime status; source and controls retained. Use for recovery when needed, not every edit. |
 
 Obtain `instanceId`, `generation`, `revisionId`, and `playback` from `status.authoring` (or a tool response's `status.authoring`). Map `generation` to `expectedGeneration` and `revisionId` to `expectedRevisionId`; do not invent them. Restart replaces the generation, so refresh guards afterward. For rejected stale guards, reread state and reconsider the action instead of forcing it against an unrelated runtime.
 
 For source edits, `structuredClone(current.source)` is a useful starting point. Modify only the intended entries in `.files`; preserve the remaining bundle. A complete-source build is atomic and version guarded. Typing through Playwright or streaming characters into the user's editor has different concurrency behavior and is not the creation path; token-by-token edit visualization is not exposed by the checked MCP API.
 
-Current tools do not expose scene Save/Open, export, resolution changes, audio inputs, or arbitrary visual-defined controls. Do not claim a tool result performed those actions. Inspect updated discovery for newer capabilities before concluding they remain unavailable.
+Current tools do not expose scene Save/Open, export, resolution changes or audio inputs. Numeric visual-defined controls are available; color/Boolean/enum controls are not yet supported. Do not claim a tool result performed those actions. Inspect updated discovery for newer capabilities before concluding they remain unavailable.
 
 ## Editor and scene commands
 

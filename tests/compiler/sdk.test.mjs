@@ -15,7 +15,10 @@ test('SDK fixes and freezes literal intensity schema without calling visual crea
 
 test('discovery exposes real SDK source and the submitted example without execution', async () => {
   const discovery = await discoverVisualSdk();
-  assert.equal(discovery.sdkVersion, sdkVersion);
+  assert.equal(discovery.sdkVersion, '0.2.0');
+  assert.equal(discovery.legacy.sdkVersion, sdkVersion);
+  assert.match(discovery.parameterContractSource, /NumberDeclaration/);
+  assert.match(discovery.example, /brightness:/);
   assert.deepEqual(discovery.allowedImports, ['@lux/visual-sdk', 'three/webgpu', 'three/tsl']);
   assert.match(discovery.contractSource, /interface VisualContext/);
   assert.match(discovery.example, /export default defineVisual/);

@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo, useRef, useSyncExternalStore } from 'reac
 import { Button, ThemeProvider } from '@mui/material';
 import { StudioApp } from './renderer.tsx';
 import { studioTheme } from './theme.ts';
+import { getRuntimeControlState } from './service-client.ts';
 import { StandaloneClient } from './standalone-client.ts';
 import { DEFAULT_OUTPUT } from '../../../packages/runtime-contracts/src/index.ts';
 import { createSceneDocument } from '../../../packages/core/src/scene-document.ts';
@@ -14,7 +15,9 @@ import { SourceCompileError, diagnosticsForSource } from './source/diagnostics.t
 import type { SourceDiagnostic } from './source/diagnostics.ts';
 import { ExportDialog } from './ExportDialog.tsx';
 import './export-client.ts';
-const client = new StandaloneClient(window.luxAuthoring);
+import { studioCapabilities } from './capabilities.ts';
+const client = new StandaloneClient(window.luxAuthoring, { codeDeclaredParameters: true });
+const agentStatus = () => ({ ...client.getSnapshot(), capabilities: studioCapabilities });
 export function AuthoringApp() {
   const windows = useMemo(() => window.luxStudioWindows ? { ...window.luxStudioWindows,
     popout: undefined } : undefined, []);
@@ -23,12 +26,15 @@ export function AuthoringApp() {
   const composing = useRef(false);
   const workspace = useMemo(() => createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': '' } }), []);
   const session = useMemo(() => createAuthoringSession(workspace, {
-    submit: source => client.submit(source), save: request => window.luxAuthoring.save(request), open: () => window.luxAuthoring.open(),
+    submit: (source, options) => client.submit(source, options), save: request => window.luxAuthoring.save(request), open: () => window.luxAuthoring.open(),
     export: request => window.luxExport.create(request),
     getControls: () => ({ intensity: client.getSnapshot().authoring?.intensity ?? 0.5 }),
-    applyControls: async controls => { const runtime = client.getSnapshot().authoring!;
-      await client.invoke({ name: 'lux.parameters.set', input: { requestId: crypto.randomUUID(), instanceId: runtime.instanceId,
-        expectedGeneration: runtime.generation, expectedRevisionId: runtime.revisionId, values: controls, mode: 'live' } }); },
+    getControlSnapshot: () => {
+      const runtime = client.getSnapshot().authoring;
+      if (!runtime) return null;
+      const state = getRuntimeControlState(runtime);
+      return { sourceHash: runtime.revisionId, schema: state.controlSchema, schemaHash: state.controlSchemaHash, values: state.controls };
+    },
   }), [workspace]);
   const draft = useSyncExternalStore(workspace.subscribe, workspace.getSnapshot);
   const io = useSyncExternalStore(session.subscribe, session.getSnapshot);
@@ -39,8 +45,8 @@ export function AuthoringApp() {
   }
   useEffect(() => window.luxAuthoring.onAgentCommand(async command => {
     if (['parameters', 'playback', 'restart'].includes(command.method)) return dispatchRuntimeCommand(client, command.method, command.params);
-    if (command.method === 'status') return client.getSnapshot();
-    if (command.method === 'read') return { ...session.read(), status: client.getSnapshot() };
+    if (command.method === 'status') return agentStatus();
+    if (command.method === 'read') return { ...session.read(), status: agentStatus() };
     if (command.method === 'capture') {
       const capture = await client.capture(), bytes = new Uint8Array(capture.bytes);
       let binary = ''; for (let i = 0; i < bytes.length; i += 8192) binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
@@ -51,13 +57,14 @@ export function AuthoringApp() {
     setError('');
     try {
       await session.build(source, command.params?.expectedDraftVersion);
-      return { draftVersion: workspace.getSnapshot().version, status: client.getSnapshot() };
+      return { draftVersion: workspace.getSnapshot().version, status: agentStatus() };
     } catch (reason) { reportError(reason, command.params?.expectedDraftVersion, source); throw reason; }
   }), [session, workspace]);
   useEffect(() => { void window.luxAuthoring.dirty(dirty); }, [dirty]);
   useEffect(() => {
-    let value = client.getSnapshot().authoring?.intensity;
-    return client.subscribe(() => { const next = client.getSnapshot().authoring?.intensity; if (value !== undefined && next !== undefined && next !== value) session.controlsChanged(); value = next; });
+    const signature = () => { const runtime = client.getSnapshot().authoring; return runtime ? JSON.stringify(getRuntimeControlState(runtime).controls) : null; };
+    let value = signature();
+    return client.subscribe(() => { const next = signature(); if (value !== null && next !== null && next !== value) session.controlsChanged(); value = next; });
   }, [session]);
   useEffect(() => { void window.luxAuthoring.example().then(async source => {
     // Do not overwrite a draft edited while the initial example was loading.
@@ -79,7 +86,7 @@ export function AuthoringApp() {
         const capture = await client.capture();
         const roundtrip = await window.luxAuthoring.smokeSave(createSceneDocument(source, DEFAULT_OUTPUT, { intensity: applied.intensity }));
         if (roundtrip.document.source.entry !== source.entry || roundtrip.document.source.sdkVersion !== source.sdkVersion ||
-            roundtrip.document.source.files[source.entry] !== source.files[source.entry] || roundtrip.document.controls.intensity !== 0.8) throw Error('Save/reopen did not preserve the visual');
+            roundtrip.document.source.files[source.entry] !== source.files[source.entry] || ('intensity' in roundtrip.document.controls ? roundtrip.document.controls.intensity : undefined) !== 0.8) throw Error('Save/reopen did not preserve the visual');
         await new Promise(resolve => setTimeout(resolve, 500));
         await window.luxAuthoring.smokeResult?.({ ok: true, initial, applied, invalidRejected, capture, savedAndReopened: true });
       } catch (error) { setError(String(error)); await window.luxAuthoring.smokeResult?.({ ok: false, error: String(error), snapshot: client.getSnapshot() }); }
