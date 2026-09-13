@@ -1,0 +1,5 @@
+import { defineVisual } from '@lux/visual-sdk';
+import { start } from './helper.ts';
+export default defineVisual({ controls: {}, async create(context) {
+  return { update(frame) { const value: number = start; }, render(target) {}, reset(seed) {}, dispose() {} };
+}});
