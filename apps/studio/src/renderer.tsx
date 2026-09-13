@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { Alert, Button, Chip, CssBaseline, Paper, ThemeProvider, IconButton, Tooltip, Menu, MenuItem } from '@mui/material';
 import { studioTheme } from './theme.ts';
 import { ParameterInspector, parameterOwner } from './controls/ParameterInspector.tsx';
@@ -11,6 +11,7 @@ import { StudioDockShell } from './layout/StudioDockShell.tsx';
 import type { StudioClient, StudioSnapshot, Metric } from './service-client.ts';
 import type { PresentationPort } from './presentation.ts';
 import type { StudioWindowClient, WindowState } from './window-client.ts';
+import { createRendererSnapshot } from './renderer-snapshot.ts';
 
 export function metricText(metric: Metric | null, nowMs: number): { value: string; detail: string } {
   if (!metric || !Number.isFinite(metric.value) || metric.value < 0 || !Number.isFinite(metric.sampledAtMs) ||
@@ -39,9 +40,8 @@ function controlOwner(snapshot: StudioSnapshot): string | null {
 function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel, appCommands, fileMenu, appError, controlEdits }: StudioProps) {
   const [toolsHost, setToolsHost] = useState<HTMLElement | null>(null);
   const [transportMenu, setTransportMenu] = useState<HTMLElement | null>(null);
-  const subscribe = useCallback((listener: () => void) => client.subscribe(listener), [client]);
-  const getSnapshot = useCallback(() => client.getSnapshot(), [client]);
-  const snapshot = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  const view = useMemo(() => createRendererSnapshot(client), [client]);
+  const snapshot = useSyncExternalStore(view.subscribe, view.getSnapshot, view.getSnapshot);
   const owner = controlOwner(snapshot);
   // A rejected old-target write must not discard a new runtime's queued input.
   const controller = useMemo(() => new StudioController(client), [client, owner]);
