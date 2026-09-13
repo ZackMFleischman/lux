@@ -82,3 +82,14 @@ Original full reference result SHA-256:
 `5857f49ac953602a852ff5a4c52e47483dd34bb19a7870f6b61343636e9f8c67`.
 Root recomputed both analyses from the committed raw evidence and obtained exact
 matches after integration.
+
+### Bounded timestamp-accuracy follow-up
+
+Read-only inspection of the pinned Electron 44.3.0 / Chromium 152.0.7977.78
+binary found Dawn timestamp conversion code using an integer multiplier, shift
+and quantization mask. The selected runtime values and backend clock calibration
+were not recorded, and no matching local implementation source established a
+formal accuracy bound. All 80 direct-test endpoints are nonmultiples of 65,536 ns;
+their 32 ns lattice therefore does not justify reusing that old observed lattice
+or claiming 32 ns accuracy. The 100 microsecond envelope remains an explicit
+assumption. This follow-up made no code changes and ran no additional GPU test.

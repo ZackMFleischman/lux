@@ -140,3 +140,27 @@ Native callbacks continued and normal fixture teardown/outer cleanup succeeded.
 This supersedes the blanket unavailable physical-stop statement for this tested
 case only. Initialization hangs, actual Resolume faults, recovered-image timing
 with current controls and GPU-resource accounting retain their stated gaps.
+
+### Explicit installed recovery action audit — 13 September UTC
+
+Independent review confirmed that installed playback has no same-instance
+Restart command. Its supported recovery guidance is to remove and re-add a
+failed source; activation creates a new instance. Studio's Restart acts only
+on its separate preview and cannot satisfy an installed-host consumption gate.
+The user has been asked whether tracer acceptance should validate the existing
+source-restoration workflow or include a dedicated installed Restart control.
+No requirement or product behavior has changed pending that decision.
+
+If source reactivation is selected, the smallest useful native test starts its
+monotonic clock immediately before deactivation, recreates the same immutable
+source, replays the complete host control snapshot through the FFGL setters,
+and requires the first present frame of the new instance to contain the expected
+pixels and controls. The interval includes teardown and startup. A later corrected
+frame must not hide an incorrect first frame. This would measure explicit source
+reactivation, not a same-instance restart; actual Resolume's value-restoration
+behavior remains separate from the native harness.
+
+Automatic current-value recovery already passed the subsequent native test
+documented in [installed stop evidence](../../evidence/tracer-0.1/parameters-images-studio/installed-stop.md).
+That functional recovery result does not supply a missing explicit user action
+or establish GPU resource accounting.
