@@ -93,7 +93,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   function windowAction(action: () => Promise<void>): void { void action().catch(reason => setError(String(reason))); }
   const compact = previewOnly || maximized || windowState.fullscreen;
   const previewPane = <Paper component="main" square className="preview-panel">
-        <div className="panel-toolbar" hidden={windowState.fullscreen}><div><Chip label="FINAL" /></div>
+        <div className="panel-toolbar" hidden={windowState.fullscreen}>
           <div className="preview-actions">
             {!previewOnly && <Button aria-pressed={maximized} onClick={() => setMaximized(!maximized)}>{maximized ? 'Restore workspace' : 'Maximize'}</Button>}
             {(previewOnly || windowState.detached || windows?.popout) && <Button disabled={!windows} onClick={() => windows && windowAction(() => previewOnly || windowState.detached ? windows.dock() : windows.popout!())}>{previewOnly || windowState.detached ? 'Dock preview' : 'Pop out'}</Button>}
