@@ -47,6 +47,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const controller = useMemo(() => new StudioController(client), [client, owner]);
   const [windowState, setWindowState] = useState<WindowState>({ detached: false, fullscreen: false });
   const [maximized, setMaximized] = useState(false);
+  const [maximizedInspector, setMaximizedInspector] = useState(false);
   const [pendingCommands, setPendingCommands] = useState(0);
   const transportPending = useRef(false);
   const [fullscreenHint, setFullscreenHint] = useState(false);
@@ -92,10 +93,12 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   }
   function windowAction(action: () => Promise<void>): void { void action().catch(reason => setError(String(reason))); }
   const compact = previewOnly || maximized || windowState.fullscreen;
+  const showMaximizedInspector = maximized && maximizedInspector && !windowState.fullscreen;
   const previewPane = <Paper component="main" square className="preview-panel">
         <div className="panel-toolbar" hidden={windowState.fullscreen}>
           <div className="preview-actions">
-            {!previewOnly && <Button aria-pressed={maximized} onClick={() => setMaximized(!maximized)}>{maximized ? 'Restore workspace' : 'Maximize'}</Button>}
+            {!previewOnly && <Button aria-pressed={maximized} onClick={() => setMaximized(value => !value)}>{maximized ? 'Restore workspace' : 'Maximize'}</Button>}
+            {maximized && !windowState.fullscreen && <Button aria-pressed={maximizedInspector} onClick={() => setMaximizedInspector(value => !value)}>{maximizedInspector ? 'Hide Inspector' : 'Show Inspector'}</Button>}
             {(previewOnly || windowState.detached || windows?.popout) && <Button disabled={!windows} onClick={() => windows && windowAction(() => previewOnly || windowState.detached ? windows.dock() : windows.popout!())}>{previewOnly || windowState.detached ? 'Dock preview' : 'Pop out'}</Button>}
             <Button disabled={!windows} onClick={() => windows && windowAction(() => windows.fullscreen(!windowState.fullscreen))}>{windowState.fullscreen ? 'Exit fullscreen' : 'Fullscreen'}</Button>
           </div>
@@ -142,7 +145,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
     </header>
     {appError && <Alert severity="error">{appError}</Alert>}
     <div className="workspace">
-      {sourcePanel ? <StudioDockShell toolsHost={toolsHost} compact={compact} preview={previewPane} source={sourcePanel} inspector={inspectorPane} jobs={jobsPane} /> : <>{previewPane}{!compact && inspectorPane}</>}
+      {sourcePanel ? <StudioDockShell toolsHost={toolsHost} compact={compact} showInspector={showMaximizedInspector} preview={previewPane} source={sourcePanel} inspector={inspectorPane} jobs={jobsPane} /> : <>{previewPane}{(!compact || showMaximizedInspector) && inspectorPane}</>}
     </div>
     {!sourcePanel && !compact && jobsPane}
     <footer className="status-bar" hidden={windowState.fullscreen}><span><i className="status-dot" />{snapshot.connection === 'connected' ? 'Authoring service' : 'Awaiting authoring service'}</span><span>Presentation only · output size is independent of window size</span><span>TRACER 0.1</span></footer>
