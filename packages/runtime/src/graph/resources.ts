@@ -350,6 +350,14 @@ export function disposeResourceHost(host:ResourceHost):Promise<void> {return sta
 export function readResourceStatus(host:ResourceHost):ResourceStatus {
   const h=getHost(host);return Object.freeze({state:h.state,clockEpoch:h.profile.initialClockEpoch,counts:h.ledger.snapshot(),openCallbacks:h.openCallbacks,cleanupPending:h.cleanupPending,releaseFailed:h.failures.length});
 }
+/** Trusted scheduler bridge. Authored code receives only a detached ImageResource. */
+export function readResourceInputImage(host:ResourceHost,scope:EvaluationScope,inputView:InputView):BackendImage {
+  const h=getHost(host),s=getScope(h,scope);return input(s,inputView,'image').allocation!.image!;
+}
+/** Trusted scheduler bridge for the output currently owned by this callback. */
+export function readResourceOutputImage(host:ResourceHost,scope:EvaluationScope,outputToken:OutputToken):BackendImage {
+  const h=getHost(host),s=getScope(h,scope),o=outputs.get(outputToken);if(!o||o.host!==h||o.scope!==s||!o.allocation.image)invalid();return o.allocation.image;
+}
 function retire(a:Allocation):void {
   a.released=true;a.host.ledger.release(a.reservation);a.host.allocations.delete(a);a.descriptor=undefined;a.image=undefined;
 }

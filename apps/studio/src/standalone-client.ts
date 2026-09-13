@@ -15,6 +15,8 @@ import { verifyLinked } from '../../build-worker/src/artifact-identity.mjs';
 import { PerformanceReceiver } from './performance/performance-state.ts';
 import { collectionMode } from '../../../packages/performance/collection-mode.mjs';
 import type { CollectionMode } from '../../../packages/performance/collection-mode.mjs';
+import { createCompositionControlState } from '../../../packages/runtime/src/components/composition-controls.ts';
+import type { SavedNodeControlSnapshot } from '../../../packages/core/src/scene-document.ts';
 export interface AuthoringApi {
   example(): Promise<SourceBundle>;
   compile(source: SourceBundle): Promise<any>;
@@ -49,7 +51,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
   private publish(patch: Partial<StudioSnapshot>) { this.snapshot = { ...this.snapshot, ...patch, receivedAtMs: Date.now() }; for (const listener of this.listeners) listener(); }
   async submit(source: SourceBundle, options:{savedControls?:SavedControlSnapshot}={}): Promise<void> {
-    if(source.sdkVersion!=='0.1.0'&&source.sdkVersion!=='0.2.0')throw Error('Unsupported Studio SDK');
+    if(source.sdkVersion!=='0.1.0'&&source.sdkVersion!=='0.2.0'&&source.sdkVersion!=='0.4.0')throw Error('Unsupported Studio SDK');
     const supportedSdkVersion=source.sdkVersion;
     if(source.sdkVersion==='0.2.0'&&!this.codeDeclaredParameters)throw Error('Code-declared parameters are not enabled in this Studio UI yet');
     if (this.busy) throw Error('A visual build is already running');
@@ -66,22 +68,33 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       const result = await this.api.compile(submittedSource);
       if (!result.ok) throw new SourceCompileError(result.diagnostics ?? []);
       let linked = structuredClone(result.linked) as LinkedEnvelope;
-      const expectedLinkedVersion = submittedSource.sdkVersion === '0.2.0' ? 3 : ('sourceVersion' in submittedSource ? 2 : 1);
+      const expectedLinkedVersion = submittedSource.sdkVersion === '0.4.0' ? 5 : submittedSource.sdkVersion === '0.2.0' ? 3 : ('sourceVersion' in submittedSource ? 2 : 1);
       if (('linkedVersion' in linked ? linked.linkedVersion : 1) !== expectedLinkedVersion) throw Error('Compiled source and linked payload versions do not match');
       let schema=LEGACY_CONTROL_SCHEMA, schemaHash=LEGACY_CONTROL_SCHEMA_HASH;
-      if(submittedSource.sdkVersion==='0.2.0') {
+      if(submittedSource.sdkVersion==='0.2.0'||submittedSource.sdkVersion==='0.4.0') {
         linked=await verifyLinked(linked,sha256);
-        if(!('linkedVersion' in linked)||linked.linkedVersion!==3)throw Error('Code-declared parameters require linked version 3');
+        if(!('linkedVersion' in linked)||linked.linkedVersion!==expectedLinkedVersion)throw Error('Code-declared parameters require the matching sealed linked version');
         const sourceHash=await sha256(new TextEncoder().encode(JSON.stringify(validateSource(submittedSource))));
         if(result.sourceHash!==sourceHash)throw Error('Compiled source identity mismatch');
+        if(linked.linkedVersion!==3&&linked.linkedVersion!==5)throw Error('Missing parameter schema in linked payload');
         schema=normalizeControlSchema(linked.controls);schemaHash=linked.controlSchemaHash;
       }
       const saved=options.savedControls?await validateSavedControls(options.savedControls):undefined;
       const previous=this.snapshot.authoring?getRuntimeControlState(this.snapshot.authoring):undefined;
-      const initial=initialControlValues(schema,saved??(previous?{schema:previous.controlSchema,values:previous.controls}:undefined));
-      const state:RuntimeControlState={sdkVersion:supportedSdkVersion,controlSchema:schema,controlSchemaHash:schemaHash,controls:initial.values,controlSequence:0};
+      let state:RuntimeControlState,migration:readonly ControlMigration[]=[];
+      if(submittedSource.sdkVersion==='0.4.0'){
+        if(!('linkedVersion' in linked)||linked.linkedVersion!==5)throw Error('Image composition requires linked version 5');
+        const nodeSaved=saved&&'nodes' in saved?saved:previous?.nodeControls;
+        const composition=createCompositionControlState(linked.composition,nodeSaved);
+        state={sdkVersion:'0.4.0',controlSchema:schema,controlSchemaHash:schemaHash,controls:composition.values(),controlSequence:0,
+          nodeControls:Object.freeze({sourceHash:result.sourceHash,nodes:composition.snapshot().nodes})};
+      }else{
+        const flatSaved=saved&&'schema' in saved?saved:undefined;
+        const initial=initialControlValues(schema,flatSaved??(previous?{schema:previous.controlSchema,values:previous.controls}:undefined));
+        migration=initial.changes;state={sdkVersion:supportedSdkVersion,controlSchema:schema,controlSchemaHash:schemaHash,controls:initial.values,controlSequence:0};
+      }
       this.publish({ jobs: [{ jobId, state: 'initializing', summary: 'Preparing preview…' }] });
-      await this.start(linked, result.sourceHash,state,initial.changes);
+      await this.start(linked, result.sourceHash,state,migration);
       this.source = submittedSource;
       this.accepted = { linked, revisionId: result.sourceHash,state };
       this.publish({ message:null,jobs: [{ jobId, state: 'succeeded', summary: 'Visual is ready in Lux.' }] });
@@ -130,7 +143,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           if (message.type === 'capture') {
             const wait = this.pending.get(message.requestId);
             if (wait?.runtime === candidate && wait.kind === 'capture' && message.bytes instanceof ArrayBuffer && message.bytes.byteLength <= 8388608) {
-              if(state.sdkVersion==='0.2.0') {
+              if(state.sdkVersion!=='0.1.0') {
                 try {validateControlSnapshot(state.controlSchema,message.metadata?.controls);
                   if(message.metadata.controlSchemaHash!==state.controlSchemaHash||!Number.isSafeInteger(message.metadata.controlSequence)||message.metadata.controlSequence<0||message.metadata.controlSequence>candidate.controls||!/^\d{1,20}$/.test(message.metadata.frameId))throw Error('Invalid capture parameter metadata');
                 } catch(error) {fail(String(error));return;}
@@ -144,14 +157,22 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           if (!['ready', 'frame', 'status'].includes(message.type) || !/^\d{1,20}$/.test(message.frameId) ||
               !Number.isFinite(message.timeSeconds) || !Number.isSafeInteger(message.clockEpoch) ||
               !['playing', 'paused'].includes(message.playback) || !Number.isSafeInteger(message.controlSequence) || message.controlSequence < 0) return;
-          let applied:ControlValues;
+          let applied:ControlValues,compositionNodeControls:SavedNodeControlSnapshot|undefined;
           try {
             applied=validateControlSnapshot(state.controlSchema,state.sdkVersion==='0.1.0'?{intensity:message.intensity}:message.controls);
-            if(state.sdkVersion==='0.2.0'&&(message.controlSchemaHash!==state.controlSchemaHash||message.sdkVersion!=='0.2.0'||message.controlSequence>candidate.controls))throw Error('Invalid runtime schema identity');
+            if(state.sdkVersion!=='0.1.0'&&(message.controlSchemaHash!==state.controlSchemaHash||message.sdkVersion!==state.sdkVersion||message.controlSequence>candidate.controls))throw Error('Invalid runtime schema identity');
+            if(state.sdkVersion==='0.4.0'){
+              if(!('linkedVersion' in linked)||linked.linkedVersion!==5)throw Error('Invalid composition linked payload');
+              const nodeControls=message.nodeControls as SavedNodeControlSnapshot;
+              const composition=createCompositionControlState(linked.composition,nodeControls);
+              if(JSON.stringify(composition.values())!==JSON.stringify(applied))throw Error('Composition public controls do not match canonical node values');
+              compositionNodeControls=Object.freeze({sourceHash:revisionId,nodes:composition.snapshot().nodes});
+            }
             if(message.type==='ready'&&(message.controlSequence!==0||JSON.stringify(applied)!==JSON.stringify(state.controls)))throw Error('Initial control snapshot mismatch');
           } catch(error) {if(message.type==='ready')fail(String(error));return;}
           if(ready&&message.controlSequence<candidate.state.controlSequence)return;
-          candidate.state={...state,controls:applied,controlSequence:message.controlSequence};
+          candidate.state={...state,controls:applied,controlSequence:message.controlSequence,
+            ...(compositionNodeControls?{nodeControls:compositionNodeControls}:{})};
           candidate.playback=message.playback;
           candidate.lastHeartbeat = performance.now();
           if (BigInt(message.frameId) > BigInt(candidate.frameId)) { candidate.frameId = message.frameId; candidate.lastFrame = performance.now(); }
@@ -236,7 +257,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     let message;
     if (operation.name === 'lux.parameters.set') {
       if (operation.input.expectedRevisionId !== runtime.revisionId) throw Error('Revision changed; read current runtime state');
-      if((runtime.state.sdkVersion==='0.2.0'||operation.input.expectedControlSchemaHash!==undefined)&&operation.input.expectedControlSchemaHash!==runtime.state.controlSchemaHash)throw Error('Control schema changed; read current runtime state');
+      if((runtime.state.sdkVersion!=='0.1.0'||operation.input.expectedControlSchemaHash!==undefined)&&operation.input.expectedControlSchemaHash!==runtime.state.controlSchemaHash)throw Error('Control schema changed; read current runtime state');
       const patch=validateControlPatch(runtime.state.controlSchema,operation.input.values);
       if(runtime.controls>=Number.MAX_SAFE_INTEGER)throw Error('Control sequence exhausted; restart runtime');
       // Retain admitted authority intent even if execution faults before acknowledgement.

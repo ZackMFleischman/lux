@@ -1,16 +1,18 @@
 import { DEFAULT_OUTPUT, controlValuesSchema } from '../../../../packages/runtime-contracts/src/index.ts';
 import type { SourceBundle, ControlValues } from '../../../../packages/runtime-contracts/src/index.ts';
 import type { SceneDocument } from '../../../../packages/core/src/scene-file.ts';
-import { createSceneDocument, verifySceneDocument, verifySavedControlSnapshot, validateSavedControlSnapshot, sceneControlSnapshot, sceneSourceHash, sceneHash } from '../../../../packages/core/src/scene-document.ts';
-import type { SavedControlSnapshot } from '../../../../packages/core/src/scene-document.ts';
+import { createSceneDocument, verifySceneDocument, verifySavedControlSnapshot, verifySavedNodeControlSnapshot, validateSavedControlSnapshot, validateSavedNodeControlSnapshot, sceneControlSnapshot, sceneSourceHash, sceneHash } from '../../../../packages/core/src/scene-document.ts';
+import type { SavedControlSnapshot, SavedNodeControlSnapshot } from '../../../../packages/core/src/scene-document.ts';
 import type { SourceWorkspace } from './workspace.ts';
+
+type SavedControls=SavedControlSnapshot|SavedNodeControlSnapshot;
 
 type SavedFile = { token: string; name: string };
 type Ports = {
-  submit(source: SourceBundle, options?: {savedControls?:SavedControlSnapshot}): Promise<void>;
+  submit(source: SourceBundle, options?: {savedControls?:SavedControls}): Promise<void>;
   save(request: { token?: string; saveAs: boolean; document: SceneDocument }): Promise<SavedFile | null>;
   getControls?(): ControlValues;
-  getControlSnapshot?(): SavedControlSnapshot | null;
+  getControlSnapshot?(): SavedControls | null;
   open?(): Promise<(SavedFile & { document: SceneDocument }) | null>;
   /** Legacy port retained for fixture compatibility; controls now enter submit before activation. */
   applyControls?(controls: ControlValues): Promise<void>;
@@ -23,7 +25,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
   let controlsVersion = 0;
   // An opened document retains its own values until its visual activates.
   // The previous preview can remain alive when the new source is invalid.
-  let pendingDocumentControls: SavedControlSnapshot | null = null;
+  let pendingDocumentControls: SavedControls | null = null;
   const listeners = new Set<() => void>();
   function update(patch: Partial<typeof state>) { state = Object.freeze({ ...state, ...patch }); for (const listener of listeners) listener(); }
   async function exclusive<T>(operation: () => Promise<T>): Promise<T> {
@@ -31,7 +33,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
     update({ busy: true });
     try { return await operation(); } finally { update({ busy: false }); }
   }
-  async function documentControls(source:SourceBundle, requireAccepted=false):Promise<ControlValues | SavedControlSnapshot> {
+  async function documentControls(source:SourceBundle, requireAccepted=false):Promise<ControlValues | SavedControls> {
     const candidate=pendingDocumentControls ?? ports.getControlSnapshot?.();
     if(source.sdkVersion==='0.1.0') {
       if(candidate) {
@@ -43,11 +45,12 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
       return controlValuesSchema.parse(ports.getControls());
     }
     if(candidate) {
-      const snapshot=await verifySavedControlSnapshot(candidate);
+      const snapshot=source.sdkVersion==='0.4.0'?await verifySavedNodeControlSnapshot(candidate):await verifySavedControlSnapshot(candidate);
       if(requireAccepted && snapshot.sourceHash!==await sceneSourceHash(source)) throw Error('Accepted controls do not belong to the exported source');
       return snapshot;
     }
     if(requireAccepted || workspace.getSnapshot().hasRunningSource) throw Error('Accepted controls are unavailable for this source');
+    if(source.sdkVersion==='0.4.0')throw Error('Accepted composition controls are unavailable for this source');
     return Object.freeze({sourceHash:await sceneSourceHash(source),schema:Object.freeze([]),schemaHash:await sceneHash('[]'),values:Object.freeze({})});
   }
   async function activate(source: SourceBundle, expectedVersion: number) {
@@ -55,9 +58,10 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
     await workspace.submit(source, expectedVersion, admitted => ports.submit(admitted,
       pendingDocumentControls ? {savedControls:pendingDocumentControls} : undefined));
     pendingDocumentControls = null;
-    if(openedControls && source.sdkVersion==='0.2.0') {
+    if(openedControls && (source.sdkVersion==='0.2.0'||source.sdkVersion==='0.4.0')) {
       const accepted=ports.getControlSnapshot?.();
-      if(accepted && JSON.stringify(validateSavedControlSnapshot(accepted))!==JSON.stringify(openedControls)) {
+      const normalized=accepted?(source.sdkVersion==='0.4.0'?validateSavedNodeControlSnapshot(accepted):validateSavedControlSnapshot(accepted)):undefined;
+      if(normalized && JSON.stringify(normalized)!==JSON.stringify(openedControls)) {
         controlsVersion++;update({controlsDirty:true});
       }
     }

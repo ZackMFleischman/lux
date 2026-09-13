@@ -9,12 +9,13 @@ import type {SourceBundle} from '../../packages/runtime-contracts/src/index.ts';
 type Equal<A,B>=(<T>()=>T extends A?1:2) extends (<T>()=>T extends B?1:2)?true:false;
 const projectComponentSdkExact:Equal<ComponentFile['sdkVersion'],'0.1.0'|'0.2.0'>=true;
 const projectExportSdkExact:Equal<CodeExport['sdkVersion'],'0.1.0'|'0.2.0'>=true;
-const internalSdkExact:Equal<SourceBundle['sdkVersion'],'0.1.0'|'0.2.0'|'0.3.0'>=true;
+const internalSdkExact:Equal<SourceBundle['sdkVersion'],'0.1.0'|'0.2.0'|'0.3.0'|'0.4.0'>=true;
 void [projectComponentSdkExact,projectExportSdkExact,internalSdkExact];
 
 test('internal SDK 0.3 never widens persisted project-v1 source or toolchain capabilities', async()=>{
   assert.equal(sourceSdkVersionSchema.safeParse('0.3.0').success,true);
   assert.equal(sourceBundleSchema.safeParse({sdkVersion:'0.3.0',entry:'main.ts',files:{'main.ts':''}}).success,true);
+  assert.equal(sourceBundleSchema.safeParse({sdkVersion:'0.4.0',entry:'main.ts',files:{'main.ts':''}}).success,true);
   const f=fixture();
   for(const sourceVersion of [1,2]) {
     assert.equal(componentFileSchema.safeParse({...f.components[0],sourceVersion,sdkVersion:'0.3.0'}).success,false);
