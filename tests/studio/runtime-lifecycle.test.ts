@@ -158,6 +158,17 @@ test('restart uses cached accepted linked bytes without compiling and retains co
   assert.equal(f.compiles(), 1); assert.equal(restarted.init.linked.code, 'accepted'); assert.equal(restarted.init.controls.intensity, 0.8);
   restarted.reply({ type: 'ready' }); await pending; assert.equal(worker.terminated, true);
 });
+test('preview resolution restarts at the requested dimensions and retains the working preview when its candidate fails', async t => {
+  const f = fixture(t), old = await f.start(), before = f.client.getSnapshot().authoring!;
+  const resize = f.client.invoke({ name: 'lux.preview.resize', input: { requestId: 'resize', instanceId: before.instanceId,
+    expectedGeneration: before.generation, width: 1280, height: 720 } } as any);
+  await f.flush(); const candidate = WorkerFixture.all.at(-1)!;
+  assert.deepEqual(candidate.init.settings, { width: 1280, height: 720, fps: 60, seed: 0 });
+  candidate.reply({ type: 'failure', message: 'unsupported preview size' });
+  await assert.rejects(resize, /unsupported preview size/);
+  assert.equal(f.client.getSnapshot().authoring, before);
+  assert.equal(old.terminated, false);
+});
 
 test('v2 restart retains the whole accepted envelope after compile-result mutation and failed replacement',async t=>{
   const data='Qk06AAAAAAAAADYAAAAoAAAAAQAAAAEAAAABABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AA==';

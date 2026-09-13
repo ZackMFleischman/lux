@@ -94,6 +94,14 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   function windowAction(action: () => Promise<void>): void { void action().catch(reason => setError(String(reason))); }
   const compact = previewOnly || maximized || windowState.fullscreen;
   const showMaximizedInspector = maximized && maximizedInspector && !windowState.fullscreen;
+  const previewOutput = runtime?.output;
+  const presetValue = previewOutput && [[1280,720],[1920,1080],[2560,1440]].some(([width,height]) => width === previewOutput.width && height === previewOutput.height)
+    ? `${previewOutput.width}x${previewOutput.height}` : 'custom';
+  const resizePreview = (height: number) => {
+    if (!previewOutput) return;
+    const width = Math.round(height * previewOutput.width / previewOutput.height);
+    void command(() => controller.resize(width, height));
+  };
   const previewPane = <Paper component="main" square className="preview-panel">
         <div className="panel-toolbar" hidden={windowState.fullscreen}>
           <div className="preview-actions">
@@ -101,6 +109,13 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
             {maximized && !windowState.fullscreen && <Button aria-pressed={maximizedInspector} onClick={() => setMaximizedInspector(value => !value)}>{maximizedInspector ? 'Hide Inspector' : 'Show Inspector'}</Button>}
             {(previewOnly || windowState.detached || windows?.popout) && <Button disabled={!windows} onClick={() => windows && windowAction(() => previewOnly || windowState.detached ? windows.dock() : windows.popout!())}>{previewOnly || windowState.detached ? 'Dock preview' : 'Pop out'}</Button>}
             <Button disabled={!windows} onClick={() => windows && windowAction(() => windows.fullscreen(!windowState.fullscreen))}>{windowState.fullscreen ? 'Exit fullscreen' : 'Fullscreen'}</Button>
+            <label className="preview-resolution">Resolution
+              <select aria-label="Preview resolution preset" disabled={!available || busy} value={presetValue} onChange={event => { const parts = event.target.value.split('x'); const width = Number(parts[0]), height = Number(parts[1]); if (Number.isInteger(width) && Number.isInteger(height)) void command(() => controller.resize(width, height)); }}>
+                <option value="custom">Custom</option><option value="1280x720">1280 × 720</option><option value="1920x1080">1920 × 1080</option><option value="2560x1440">2560 × 1440</option>
+              </select>
+            </label>
+            <label className="preview-resolution-scale">Scale <input aria-label="Preview resolution scale" type="range" min="360" max="2160" step="90" disabled={!available || busy || !previewOutput} value={previewOutput ? Math.min(2160, Math.max(360, previewOutput.height)) : 1080} onChange={event => resizePreview(Number(event.target.value))} /></label>
+            {previewOutput && <span className="preview-resolution-value" aria-live="polite">{previewOutput.width} × {previewOutput.height}</span>}
           </div>
         </div>
         <Preview runtime={runtime} port={presentation} moved={!previewOnly && windowState.detached} onError={setError} onDock={() => windows && windowAction(() => windows.dock())} />

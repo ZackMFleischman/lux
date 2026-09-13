@@ -39,7 +39,8 @@ export type StudioOperation =
   | { name: 'lux.parameters.set'; input: { requestId: string; instanceId: string; expectedGeneration: number;
       expectedRevisionId: string; expectedControlSchemaHash?:string; values: ControlValues; mode: 'live' } }
   | { name: 'lux.playback'; input: { requestId: string; instanceId: string; expectedGeneration: number; action: 'play' | 'pause' | 'reset' } }
-  | { name: 'lux.runtime.restart'; input: { requestId: string; instanceId: string; expectedGeneration: number } };
+  | { name: 'lux.runtime.restart'; input: { requestId: string; instanceId: string; expectedGeneration: number } }
+  | { name: 'lux.preview.resize'; input: { requestId: string; instanceId: string; expectedGeneration: number; width: number; height: number } };
 export interface StudioClient {
   getSnapshot(): StudioSnapshot;
   subscribe(listener: () => void): () => void;
@@ -112,5 +113,10 @@ export class StudioController {
     return this.client.invoke({ name: 'lux.runtime.restart', input: {
       requestId: this.requestId(), instanceId: target.instanceId, expectedGeneration: target.generation,
     } });
+  }
+  async resize(width: number, height: number): Promise<unknown> {
+    const target = this.target();
+    return this.client.invoke({ name: 'lux.preview.resize', input: { requestId: this.requestId(), instanceId: target.instanceId,
+      expectedGeneration: target.generation, width, height } });
   }
 }

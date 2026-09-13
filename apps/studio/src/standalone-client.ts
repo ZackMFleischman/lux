@@ -1,7 +1,7 @@
 import type { StudioClient, StudioSnapshot, StudioOperation, RuntimeView } from './service-client.ts';
 import { getRuntimeControlState } from './service-client.ts';
 import type { PresentationPort } from './presentation.ts';
-import type { SourceBundle } from '../../../packages/runtime-contracts/src/index.ts';
+import type { SourceBundle, OutputSettings } from '../../../packages/runtime-contracts/src/index.ts';
 import { studioOperationSchema } from './runtime-operations.ts';
 import { DEFAULT_OUTPUT } from '../../../packages/runtime-contracts/src/index.ts';
 import { SourceCompileError } from './source/diagnostics.ts';
@@ -31,7 +31,7 @@ export interface AuthoringApi {
 declare global { interface Window { luxAuthoring: AuthoringApi } }
 type RetryPolicy={lastFaultAt:number|null};
 type Running = { worker: Worker; canvas: HTMLCanvasElement; instanceId: string; generation: number; revisionId: string; performance:PerformanceReceiver;retryPolicy:RetryPolicy;autoRetry:boolean;playback:'playing'|'paused';
-  lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; state:RuntimeControlState; desiredControls?:ControlValues; };
+  lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>>; desiredControls?:ControlValues; };
 export class StandaloneClient implements StudioClient, PresentationPort {
   private snapshot: StudioSnapshot = { connection: 'connected', message: 'Open an example or write a visual, then Build & preview.', receivedAtMs: Date.now(), authoring: null, host: null, jobs: [], visualFps: null, uiFps: null };
   private listeners = new Set<() => void>();
@@ -39,7 +39,8 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private target: HTMLElement | null = null;
   private generation = 0;
   private source: SourceBundle | null = null;
-  private accepted: { linked: LinkedEnvelope; revisionId: string; state:RuntimeControlState } | null = null;
+  private accepted: { linked: LinkedEnvelope; revisionId: string; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>> } | null = null;
+  private previewOutput: Readonly<Pick<OutputSettings,'width'|'height'>> = DEFAULT_OUTPUT;
   private busy = false;
   private automaticRetry:ReturnType<typeof setTimeout>|undefined;
   private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; playback?:boolean; expectedControlSequence?:number; expectedControls?:ControlValues; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
@@ -94,20 +95,20 @@ export class StandaloneClient implements StudioClient, PresentationPort {
         migration=initial.changes;state={sdkVersion:supportedSdkVersion,controlSchema:schema,controlSchemaHash:schemaHash,controls:initial.values,controlSequence:0};
       }
       this.publish({ jobs: [{ jobId, state: 'initializing', summary: 'Preparing preview…' }] });
-      await this.start(linked, result.sourceHash,state,migration);
+      await this.start(linked, result.sourceHash,state,migration, {lastFaultAt:null}, undefined, this.previewOutput);
       this.source = submittedSource;
-      this.accepted = { linked, revisionId: result.sourceHash,state };
+      this.accepted = { linked, revisionId: result.sourceHash,state,output:this.previewOutput };
       this.publish({ message:null,jobs: [{ jobId, state: 'succeeded', summary: 'Visual is ready in Lux.' }] });
     } catch (error) { this.publish({ jobs: [{ jobId, state: 'failed', summary: 'Build failed; previous preview retained.', fault: String(error) }] }); throw error; }
     finally { this.busy = false; this.scheduleAutomaticRetry(); }
   }
-  private async start(linked: LinkedEnvelope, revisionId: string, state:RuntimeControlState, migration:readonly ControlMigration[]=[],retryPolicy:RetryPolicy={lastFaultAt:null},playingOverride?:boolean): Promise<void> {
+  private async start(linked: LinkedEnvelope, revisionId: string, state:RuntimeControlState, migration:readonly ControlMigration[]=[],retryPolicy:RetryPolicy={lastFaultAt:null},playingOverride?:boolean, output:Readonly<Pick<OutputSettings,'width'|'height'>>=this.previewOutput): Promise<void> {
     const playing = playingOverride ?? this.snapshot.authoring?.playback === 'playing';
-    const canvas = document.createElement('canvas'); canvas.width = 1920; canvas.height = 1080;
+    const canvas = document.createElement('canvas'); canvas.width = output.width; canvas.height = output.height;
     canvas.style.cssText = 'width:100%;height:100%;position:absolute;inset:0;object-fit:contain';
     const worker = new Worker(new URL('./visual-worker.js', import.meta.url), { type: 'module' });
     const candidate: Running = { worker, canvas, instanceId: this.running?.instanceId ?? crypto.randomUUID(), generation: ++this.generation,
-      revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0,state,performance:undefined as any,retryPolicy,autoRetry:false,playback:playing?'playing':'paused' };
+      revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0,state,output,performance:undefined as any,retryPolicy,autoRetry:false,playback:playing?'playing':'paused' };
     candidate.performance=new PerformanceReceiver({instanceId:candidate.instanceId,generation:candidate.generation,revisionId},performance.now());
     const previous = this.running;
     let ready = false;
@@ -188,7 +189,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
             sceneName: 'Untitled visual', authority: 'studio', playback: message.playback,
             ...candidate.state,controlMigration:migration,clockEpoch: message.clockEpoch, frameId: message.frameId,
             ...(state.sdkVersion==='0.1.0'?{intensity:applied.intensity}:{}),
-            output: { width: 1920, height: 1080 }, fault: null } as RuntimeView });
+            output: candidate.output, fault: null } as RuntimeView });
           const wait = this.pending.get(message.requestId);
           if (wait?.runtime === candidate && wait.kind === 'command' &&
               (wait.expectedControlSequence === undefined ||
@@ -198,7 +199,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
         };
         const offscreen = canvas.transferControlToOffscreen();
         worker.postMessage({ type: 'init', requestId: crypto.randomUUID(), instanceId: candidate.instanceId, generation: candidate.generation,
-          revisionId, linked: structuredClone(linked), canvas: offscreen,...state,settings: DEFAULT_OUTPUT, playing, performanceMode:this.performanceMode }, [offscreen]);
+          revisionId, linked: structuredClone(linked), canvas: offscreen,...state,settings: {...DEFAULT_OUTPUT,...output}, playing, performanceMode:this.performanceMode }, [offscreen]);
       });
     } catch (error) { this.stop(candidate, String(error)); canvas.remove(); throw error; }
   }
@@ -229,7 +230,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       this.automaticRetry=undefined;
       if(this.busy||this.running!==runtime||!runtime.autoRetry)return;
       runtime.autoRetry=false;this.busy=true;this.publish({message:'Automatically restarting the accepted visual…'});
-      void this.start(accepted.linked,accepted.revisionId,{...runtime.state,controls:runtime.desiredControls??runtime.state.controls,controlSequence:0},[],runtime.retryPolicy,runtime.playback==='playing')
+      void this.start(accepted.linked,accepted.revisionId,{...runtime.state,controls:runtime.desiredControls??runtime.state.controls,controlSequence:0},[],runtime.retryPolicy,runtime.playback==='playing',accepted.output)
         .then(()=>{if(!this.running?.terminal)this.publish({message:null});})
         .catch(error=>{runtime.retryPolicy.lastFaultAt=performance.now();if(this.running===runtime)this.publish({message:`Automatic restart failed. Restart explicitly to retry. ${String(error).slice(0,500)}`});})
         .finally(()=>{this.busy=false;this.scheduleAutomaticRetry();});
@@ -248,9 +249,17 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       if (!this.accepted) throw Error('No visual to restart');
       this.cancelAutomaticRetry();runtime.autoRetry=false;
       this.busy = true;
-      try { await this.start(this.accepted.linked, this.accepted.revisionId, {...runtime.state,controls:runtime.desiredControls??runtime.state.controls,controlSequence:0},[],runtime.retryPolicy); this.publish({message:null});return this.snapshot.authoring; }
+      try { await this.start(this.accepted.linked, this.accepted.revisionId, {...runtime.state,controls:runtime.desiredControls??runtime.state.controls,controlSequence:0},[],runtime.retryPolicy,undefined,this.accepted.output); this.publish({message:null});return this.snapshot.authoring; }
       catch(error){if(runtime.terminal)runtime.retryPolicy.lastFaultAt=performance.now();throw error;}
       finally { this.busy = false;this.scheduleAutomaticRetry(); }
+    }
+    if (operation.name === 'lux.preview.resize') {
+      if (!this.accepted) throw Error('No visual to resize');
+      const output = { width: operation.input.width, height: operation.input.height };
+      this.busy = true;
+      try { await this.start(this.accepted.linked, this.accepted.revisionId, {...runtime.state,controls:runtime.desiredControls??runtime.state.controls,controlSequence:0},[],runtime.retryPolicy,undefined,output);
+        this.previewOutput = output; this.accepted = {...this.accepted,output}; this.publish({message:null}); return this.snapshot.authoring; }
+      finally { this.busy = false; this.scheduleAutomaticRetry(); }
     }
     if (this.snapshot.authoring?.playback === 'failed') throw Error('Restart the failed runtime first');
     if (this.pending.has(input.requestId)) throw Error('Request ID already pending');
