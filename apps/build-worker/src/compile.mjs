@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { mkdtemp, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, writeFile, rm, realpath } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -47,7 +47,11 @@ export async function compileVisual(request, options = {}) {
   let cleanupConfirmed = false, keepEvidence = false;
   try {
     const input = join(directory, 'input.json');
-    await writeFile(input, boundedJson({ source, dependencyRoot: resolve(options.dependencyRoot || join(root, 'node_modules')) },limits.requestBytes));
+    // A configured dependency root is a trusted host capability. Resolve its
+    // physical location once so declaration paths through a worktree junction
+    // are checked against that same root, without relaxing child containment.
+    const dependencyRoot = await realpath(resolve(options.dependencyRoot || join(root, 'node_modules')));
+    await writeFile(input, boundedJson({ source, dependencyRoot },limits.requestBytes));
     const config = join(directory, 'config.json');
     await writeFile(config, JSON.stringify({ executable: process.execPath,
       commandLine: [process.execPath, '--max-old-space-size=256', join(here, 'worker.mjs'), input].map(quote).join(' '),
