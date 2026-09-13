@@ -47,6 +47,23 @@ try {
   assert.ok(rows.every(height => height <= 54), 'Each parameter fits a compact row');
   report.controlHeights = rows;
   report.checks.push('Five code-defined sphere controls, no invented Intensity, matching running-app discovery');
+  const playbackTarget = { instanceId: runtime.instanceId, expectedGeneration: runtime.generation };
+  await call('playback', { ...playbackTarget, action: 'play' });
+  for (let attempt = 0; attempt < 40; attempt++) {
+    report.performance = (await call('status')).performance;
+    if (report.performance?.status === 'live' && report.performance.worker?.cpuCall.sampleCount >= 10) break;
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  assert.equal(report.performance?.status, 'live');
+  assert.ok(report.performance.worker.cpuCall.sampleCount >= 10);
+  assert.equal(report.performance.worker.cpuCall.gate, 'not_evaluated');
+  assert.equal(report.performance.worker.gpu.gate, 'not_evaluated');
+  await page.locator('summary').filter({ hasText: /^Performance$/ }).click();
+  await page.getByLabel('Live performance').waitFor();
+  report.performanceText = await page.getByLabel('Live performance').innerText();
+  await page.locator('summary').filter({ hasText: /^Performance$/ }).click();
+  await call('playback', { ...playbackTarget, action: 'pause' });
+  report.checks.push('Real running CPU/GPU capability telemetry reaches agent status and the collapsed monitor without claiming budget acceptance');
   const target = () => ({ instanceId: runtime.instanceId, expectedGeneration: runtime.generation, expectedRevisionId: runtime.revisionId, expectedControlSchemaHash: runtime.controlSchemaHash });
   const zero = await call('parameters', { ...target(), values: { spikeHeight: 0, noiseScale: 2 } });
   assert.equal(zero.status.authoring.controls.roughness, 0.38);
