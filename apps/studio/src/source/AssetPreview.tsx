@@ -13,7 +13,7 @@ function loadPreview(asset:Asset):Promise<Preview> {
     const finish=(result:Preview)=>{clearTimeout(timer);worker?.terminate();resolve(result);};
     const failed=()=>finish({pixels:null,byteLength:0,error:'Image unavailable: unsupported or invalid image.'});
     try {
-      worker=new Worker(new URL('./image-preview-worker.js',window.location.href),{type:'module'});
+      worker=new Worker(new URL('./image-preview-worker.js',import.meta.url),{type:'module'});
       timer=setTimeout(failed,2000);worker.onerror=failed;worker.onmessageerror=failed;
       worker.onmessage=event=>{
         const result=event.data,p=result?.pixels;

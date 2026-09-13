@@ -4,7 +4,7 @@ import { assetLimits, validateAssetPath, type SourceAssets } from '../../../../p
 import { sourceAssets } from './source-equality.ts';
 import type { SourceWorkspace } from './workspace.ts';
 
-const createWorker = () => new Worker(new URL('./source-admission-worker.js',window.location.href),{type:'module'});
+const createWorker = () => new Worker(new URL('./source-admission-worker.js',import.meta.url),{type:'module'});
 /** Imports originals as an unsaved source edit; rendering still needs explicit apply. */
 export function AssetImport({workspace,readOnly=false}:{workspace:SourceWorkspace;readOnly?:boolean}) {
   const snapshot=useSyncExternalStore(workspace.subscribe,workspace.getSnapshot);
