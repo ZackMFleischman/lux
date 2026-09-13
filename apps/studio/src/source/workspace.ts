@@ -1,6 +1,7 @@
 import type { SourceBundle } from '../../../../packages/runtime-contracts/src/index.ts';
 import { createSourceAdmissionSession, type AdmissionWorkerFactory } from './admission.mjs';
 import { equalSource as equal, changedAssets } from './source-equality.ts';
+import type { SourceAssets } from '../../../../packages/assets/src/index.mjs';
 
 export type SourceSnapshot = Readonly<{
   source: SourceBundle; version: number; documentKey: number; dirty: boolean;
@@ -18,6 +19,7 @@ export interface SourceWorkspace {
   markSaved(version: number): void;
   replaceDocument(source: SourceBundle): void;
   replaceDocumentAsync(source: SourceBundle, createWorker: AdmissionWorkerFactory, timeoutMs?: number): Promise<void>;
+  editAssetsAsync(assets: SourceAssets, expectedVersion: number, createWorker: AdmissionWorkerFactory, timeoutMs?: number): Promise<void>;
   undoReplacement(): void;
   submit(source: SourceBundle, expectedVersion: number, activate: (source: SourceBundle) => Promise<void>): Promise<void>;
 }
@@ -60,6 +62,15 @@ export function createSourceWorkspace(initial: SourceBundle): SourceWorkspace {
         const admitted = await admission.admitAsync(next, createWorker, timeoutMs);
         source = admitted; saved = source; undo = null; version++; documentKey++;
         selectedFile = source.entry; openFiles = [source.entry];
+      } finally { busy = false; publish(); }
+    },
+    async editAssetsAsync(assets, expectedVersion, createWorker, timeoutMs) {
+      editable();
+      if (!Number.isSafeInteger(expectedVersion) || expectedVersion !== version) throw Error('Editor changed; select the image again');
+      busy = true; publish();
+      try {
+        const admitted = await admission.admitAsync({...source,sourceVersion:2,assets},createWorker,timeoutMs);
+        undo = source; source = admitted; version++; reconcile();
       } finally { busy = false; publish(); }
     },
     undoReplacement() { editable(); if (!undo) return; source = undo; undo = null; version++; reconcile(); publish(); },

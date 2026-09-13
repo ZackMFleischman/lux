@@ -1,10 +1,10 @@
 # Bounded PNG codec CPU slice
 
-`src/png.mjs` is an opt-in adapter. `src/index.mjs`, existing BMP admission,
-source paths/media unions, identity branches, compiler/linker inventories and
-runtime capability markers remain unchanged. This slice does **not** enable PNG
-assets in Studio or demonstrate asset playback. See `JPEG.md` for the separate
-opt-in JPEG adapter.
+`src/png.mjs` supplies the bounded PNG decoder used by `src/index.mjs` admission,
+Studio image workers, and the pre-import runtime image map. The compiler/linker
+inventory its implementation and codec dependencies. The tests below establish
+CPU decoding; actual GPU alpha/playback evidence is a separate integration gate.
+See `JPEG.md` for the JPEG decoder.
 
 ## API and supported input
 

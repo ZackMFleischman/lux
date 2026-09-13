@@ -1,8 +1,9 @@
 # Bounded JPEG codec CPU slice
 
-`src/jpeg.mjs` is opt-in, alongside `src/png.mjs`. Existing asset admission stays
-BMP-only until a coordinated source/runtime integration. This is CPU decoding
-infrastructure, not a claim of PNG/JPEG Studio playback or alpha rendering.
+`src/jpeg.mjs` supplies bounded JPEG decoding to `src/index.mjs`, Studio image
+workers and the pre-import runtime image map. Compiler/linker inventories pin the
+actual codec implementation. CPU decoding evidence below is separate from the
+required Studio/installed-host playback checks.
 
 `decodeJpeg(bytes, {maxRgbaBytes?})` returns `{width,height,colorSpace:'srgb',
 alphaMode:'straight',data:Uint8Array}`. Alpha is verified as 255. A private bounded

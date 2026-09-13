@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createSourceWorkspace } from '../../apps/studio/src/source/workspace.ts';
 import { workerFactory } from './fixtures/admission-worker-factory.mjs';
+import { png } from '../assets/png-fixtures.mjs';
 const red = 'Qk06AAAAAAAAADYAAAAoAAAAAQAAAAEAAAABABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AA==';
 const source = (data = red) => ({sourceVersion:2 as const,sdkVersion:'0.1.0' as const,entry:'main.ts',files:{'main.ts':'export {}'},assets:{'assets/red.bmp':{mediaType:'image/bmp' as const,encoding:'base64' as const,data}}});
 
@@ -40,4 +41,21 @@ test('asynchronous replacement commits only after full worker admission and pres
   assert.equal(workspace.getSnapshot().source.files['main.ts'],'export {}');
   assert.equal(workspace.getSnapshot().dirty,false);
   for (const item of [...factory.created,...hung.created]) { assert.equal(item.terminated,true); await item.exited; }
+});
+
+test('asset import is a worker-validated draft edit preserving text, saved state and undo', async () => {
+  const workspace = createSourceWorkspace(source()); workspace.edit('main.ts','unsaved text');
+  const before=workspace.getSnapshot(), factory=workerFactory();
+  const images={'assets/alpha.png':{mediaType:'image/png' as const,encoding:'base64' as const,data:png().toString('base64')}};
+  assert.equal(typeof workspace.editAssetsAsync,'function');
+  await workspace.editAssetsAsync(images,before.version,factory);
+  const next=workspace.getSnapshot();
+  assert.equal(next.dirty,true); assert.equal(next.documentKey,before.documentKey);
+  assert.equal(next.source.files['main.ts'],'unsaved text');
+  assert.deepEqual(next.dirtyAssets,['assets/alpha.png','assets/red.bmp']);
+  await assert.rejects(workspace.editAssetsAsync(images,before.version,factory),/changed/);
+  await assert.rejects(workspace.editAssetsAsync({'assets/x.png':{...images['assets/alpha.png'],data:'AA=='}},next.version,factory));
+  assert.equal(workspace.getSnapshot().source,next.source);
+  workspace.undoReplacement();assert.equal(workspace.getSnapshot().source,before.source);
+  for(const item of factory.created)await item.exited;
 });

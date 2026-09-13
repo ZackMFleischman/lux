@@ -5,6 +5,7 @@ import * as assets from '../../packages/assets/src/index.mjs';
 import { png } from './png-fixtures.mjs';
 import { fixture, exif, insert } from './jpeg-fixtures.mjs';
 import { sourceAssetSchema } from '../../packages/runtime-contracts/src/index.ts';
+import {readFile} from 'node:fs/promises';
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const descriptor = (mediaType, bytes) => ({mediaType,encoding:'base64',data:Buffer.from(bytes).toString('base64')});
 
@@ -40,4 +41,9 @@ test('trusted decoded facade retains straight alpha and returns isolated copies'
   assert.deepEqual([...map.get('assets/alpha.png').data],[255,0,0,128,23,45,67,0]);
   assert.equal(map.get('missing'),undefined);
   assert.equal(map.size,1);
+});
+test('common-image runtime fixture retains independent translucent and hidden-RGB pixels',async()=>{
+  const document=JSON.parse(await readFile(new URL('../fixtures/installed-sources/common-images/scene.lux-scene',import.meta.url),'utf8'));
+  const pixels=assets.createReadonlyImageMap(document.source.assets).get('assets/alpha.png');
+  assert.deepEqual([...pixels.data],[255,0,0,128,0,255,0,255,0,0,255,0,255,255,255,64]);
 });

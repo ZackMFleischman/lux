@@ -1,0 +1,28 @@
+{
+  "format": "lux-scene",
+  "version": 2,
+  "source": {
+    "sourceVersion": 2,
+    "sdkVersion": "0.1.0",
+    "entry": "visual.ts",
+    "files": {
+      "visual.ts": "import { defineVisual } from '@lux/visual-sdk';\nimport { Scene, Mesh, PlaneGeometry, MeshBasicNodeMaterial, OrthographicCamera, DataTexture, RGBAFormat, UnsignedByteType, NearestFilter, SRGBColorSpace } from 'three/webgpu';\n\nexport default defineVisual({\n  async create(context) {\n    const pixels = context.images.get('assets/alpha.png');\n    if (!pixels) throw Error('Missing required decoded image: assets/alpha.png');\n    const image = new DataTexture(pixels.data, pixels.width, pixels.height, RGBAFormat, UnsignedByteType);\n    image.colorSpace = SRGBColorSpace;\n    image.minFilter = NearestFilter; image.magFilter = NearestFilter;\n    image.flipY = true; image.generateMipmaps = false; image.premultiplyAlpha = false; image.needsUpdate = true;\n    const material = new MeshBasicNodeMaterial();\n    material.map = image; material.toneMapped = false; material.transparent = true; material.depthWrite = false;\n    const geometry = new PlaneGeometry(2, 2), scene = new Scene();\n    scene.add(new Mesh(geometry, material));\n    const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);\n    return {\n      update(_frame) {},\n      render(target) { return context.renderer.render(scene, camera, target); },\n      reset(_seed) {},\n      dispose() { image.dispose(); material.dispose(); geometry.dispose(); },\n    };\n  },\n});\n"
+    },
+    "assets": {
+      "assets/alpha.png": {
+        "mediaType": "image/png",
+        "encoding": "base64",
+        "data": "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFklEQVR4nGP4z8DQwPCfAUiByP//HQA9HAe6h6QALgAAAABJRU5ErkJggg=="
+      }
+    }
+  },
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "seed": 42
+  },
+  "controls": {
+    "intensity": 0.5
+  }
+}
