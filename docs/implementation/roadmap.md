@@ -165,3 +165,18 @@ Later work does not promise cloud rendering, marketplace, accounts, collaboratio
 ### Compact status-bar follow-up (C19)
 
 Consolidate the compact footer and routine Jobs/Diagnostics summaries into one status bar: current build activity, problem counts and useful runtime/connection health, with click/keyboard access to detail panes. Keep Jobs and Diagnostics available as normal dockable panes without consuming default workspace space for idle or duplicated information. Preserve a stable, concise height and make failures discoverable without preview reflow. This belongs with the Inspector density pass, after the required code-defined properties and image workflow; persistent editor shortcut hints are removed immediately.
+
+## Current tracer capability reconciliation — 13 September 2026 UTC
+
+The [SDK 0.2 scope addendum](tracer-export-scope.md#current-sdk-02-requirement-addendum--13-september-2026-utc)
+supersedes this roadmap's historical "one named control" tracer entry and any
+reading that defers visual-declared live numeric controls to milestone 2.
+Those controls and the required PNG/JPEG authoring workflow are integrated;
+they are not missing prerequisites to implement again. Later graph publishing,
+broader asset/input coverage and release hardening retain their existing scope.
+
+Use the linked [Studio validation](../../evidence/tracer-0.1/parameters-images-studio/validation.md)
+and [installed alpha/reopen evidence](../../evidence/tracer-0.1/parameters-images-studio/installed-alpha.md)
+with their stated limits. Remaining tracer acceptance is distinct from these
+delivered capabilities. The filesystem-first milestone-1a placement after
+tracer and the existing later-feature order are unchanged.

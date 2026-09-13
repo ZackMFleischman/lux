@@ -99,3 +99,31 @@ This scope supersedes older single-host, scratch-only, developer-activation and
 security, control and ownership contracts still apply. Historical plans and
 review results remain preserved; implementation coordinators must reconcile old
 DTO examples with durable release IDs before coding the export step.
+
+## Current SDK 0.2 requirement addendum — 13 September 2026 UTC
+
+The [required authoring-property acceptance addendum](tracer-acceptance.md#required-authoring-property-addendum--12-september-2026)
+supersedes the fixed `intensity` minimum and milestone-2 deferral above. Tracer
+requires live numeric properties declared by each visual's code, with matching
+Studio Inspector, guarded MCP operations, saved values, restart and installed
+export behavior. `intensity` is optional; a visual may declare no controls. A
+release's schema remains immutable, but it is that visual's declared schema,
+not a universal one-control schema. SDK 0.1 scenes and existing installed bytes
+retain their explicit legacy behavior. Broader graph/control-publishing work
+remains in its existing later milestone.
+
+The historical planning-only status above is not the current implementation
+status. SDK 0.2 controls, scene-v3 persistence, cached restart, schema-aware
+exports and bounded BMP/PNG/JPEG asset admission/rendering are integrated.
+See [Studio properties and image validation](../../evidence/tracer-0.1/parameters-images-studio/validation.md)
+for executed authoring checks and [installed alpha evidence](../../evidence/tracer-0.1/parameters-images-studio/installed-alpha.md)
+for native PNG/control checks and the user's actual Resolume transparency,
+saved-value and process-cold composition-reopen result for one immutable release.
+
+Those scoped results do not complete the export/reuse demonstration above:
+multiple independent sources/controls, unavailable checkout/source paths with network disabled,
+applicable recovery and quantitative acceptance still require their own evidence.
+The [acceptance procedure](tracer-acceptance.md), [performance checkpoint](performance-checkpoint.md)
+and [recovery checkpoint](recovery-checkpoint.md) retain their existing gates.
+This addendum reconciles delivered functionality with the required scope; it
+adds no new requirement or benchmark and does not declare tracer complete.
