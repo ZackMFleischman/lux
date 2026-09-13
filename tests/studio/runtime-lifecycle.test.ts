@@ -14,6 +14,7 @@ class WorkerFixture {
 }
 const source = { sdkVersion: '0.1.0' as const, entry: 'visual.ts', files: { 'visual.ts': '' } };
 function telemetry(){const c=createFrameCollector({startMs:0});c.record(20,1,2,3,4,false);return c.summary(500);}
+function onlyQueuedRetry(scheduled:Map<number,{interval:number;at:number}>){assert.equal(scheduled.size,1);assert.equal([...scheduled.values()][0]!.interval,0,'only one-shot retry remains; no worker watchdog/command timers');}
 function fixture(t: any, linked: any = {code:'accepted'}) {
   let now = 0, next = 0, compiles = 0;
   const scheduled = new Map<number, { at: number; callback: () => void; interval: number }>();
@@ -26,13 +27,14 @@ function fixture(t: any, linked: any = {code:'accepted'}) {
   replace('setTimeout', (callback: () => void, ms: number) => schedule(callback, ms, 0));
   replace('setInterval', (callback: () => void, ms: number) => schedule(callback, ms, ms));
   replace('clearTimeout', (id: number) => scheduled.delete(id)); replace('clearInterval', (id: number) => scheduled.delete(id));
-  const client = new StandaloneClient({ compile: async () => { compiles++; return { ok: true, linked, sourceHash: 'revision' }; } } as any);
+  const api={compile:async()=>{compiles++;return {ok:true,linked,sourceHash:'revision'};}};
+  const client = new StandaloneClient(api as any);
   const flush = async () => { for (let i = 0; i < 8; i++) await Promise.resolve(); };
   const advance = async (ms: number) => { const end = now + ms; while (true) { const due = [...scheduled].filter(([, timer]) => timer.at <= end).sort((a, b) => a[1].at - b[1].at)[0]; if (!due) break; const [id, timer] = due; now = timer.at; if (timer.interval) timer.at += timer.interval; else scheduled.delete(id); timer.callback(); await flush(); } now = end; await flush(); };
   const start = async (input: any = source) => { const pending = client.submit(input); await flush(); const worker = WorkerFixture.all.at(-1)!; worker.reply({ type: 'ready' }); await pending; return worker; };
   t.after(() => { for (const [name, descriptor] of originals) if (descriptor) Object.defineProperty(globalThis, name, descriptor); else Reflect.deleteProperty(globalThis, name); });
   const operation = (requestId: string) => { const state = client.getSnapshot().authoring!; return { name: 'lux.playback' as const, input: { requestId, instanceId: state.instanceId, expectedGeneration: state.generation, action: 'play' as const } }; };
-  return { client, start, flush, advance, scheduled, operation, compiles: () => compiles };
+  return { client, api,start, flush, advance, scheduled, operation, compiles: () => compiles };
 }
 test('silent candidate is terminated at 1250 ms while previous preview survives', async t => {
   const f = fixture(t), old = await f.start(), previous = f.client.getSnapshot().authoring;
@@ -57,7 +59,7 @@ test('paused stalled commands fault the runtime and settle all pending waiters',
   for (let i = 0; i < 19; i++) { await f.advance(250); worker.reply({ type: 'heartbeat' }); }
   await f.advance(250); await Promise.all([command, capture]);
   assert.equal(worker.terminated, true); assert.equal(f.client.getSnapshot().authoring!.playback, 'failed');
-  assert.equal((f.client as any).pending.size, 0); assert.equal(f.scheduled.size, 0);
+  assert.equal((f.client as any).pending.size, 0); onlyQueuedRetry(f.scheduled);
 });
 test('capture admission allows one active and one queued; replacement rejects both', async t => {
   const f = fixture(t), worker = await f.start();
@@ -94,13 +96,13 @@ test('v2 restart retains the whole accepted envelope after compile-result mutati
 test('postMessage failure faults and clears every pending operation', async t => {
   const f = fixture(t), worker = await f.start(); const capture = assert.rejects(f.client.capture(), /post failed/);
   worker.throwOnPost = true; await assert.rejects(f.client.invoke(f.operation('play')), /post failed/); await capture;
-  assert.equal((f.client as any).pending.size, 0); assert.equal(f.scheduled.size, 0); assert.equal(worker.terminated, true);
+  assert.equal((f.client as any).pending.size, 0); onlyQueuedRetry(f.scheduled); assert.equal(worker.terminated, true);
 });
 test('late terminal callbacks cannot revive a faulted runtime', async t => {
   const f = fixture(t), worker = await f.start(), callback = worker.onmessage;
   worker.reply({ type: 'failure', message: 'failed' });
   callback({ data: { ...worker.init, type: 'status', frameId: '2', timeSeconds: 1, clockEpoch: 0, controlSequence: 0, intensity: 0.5, playback: 'playing' } });
-  assert.equal(f.client.getSnapshot().authoring!.playback, 'failed'); assert.equal(f.scheduled.size, 0);
+  assert.equal(f.client.getSnapshot().authoring!.playback, 'failed'); onlyQueuedRetry(f.scheduled);
 });
 test('initialization post failure clears activation and watchdog timers', async t => {
   const f = fixture(t); WorkerFixture.failInit = true;
@@ -124,7 +126,7 @@ test('completed captures release admission while capture deadline tears down an 
   const second = assert.rejects(f.client.capture(), /Capture timed out/), third = assert.rejects(f.client.capture(), /Capture timed out/);
   for (let i = 0; i < 19; i++) { await f.advance(250); worker.reply({ type: 'heartbeat' }); }
   await f.advance(250); await Promise.all([second, third]);
-  assert.equal(worker.terminated, true); assert.equal(f.scheduled.size, 0); assert.equal((f.client as any).pending.size, 0);
+  assert.equal(worker.terminated, true); onlyQueuedRetry(f.scheduled); assert.equal((f.client as any).pending.size, 0);
 });
 
 test('restart retains admitted controls across failure and failed recovery; rejected commands cannot replace intent', async t => {
@@ -173,4 +175,35 @@ test('telemetry silence becomes stale despite healthy heartbeats, and faults pre
  assert.equal(f.client.getSnapshot().performance?.status,'stale');assert.equal(worker.terminated,false);
  worker.reply({type:'failure',message:'failed'});assert.equal(f.client.getSnapshot().performance?.status,'failed');
  assert.equal(f.client.getSnapshot().performance?.worker?.cpuCall.p95,5);
+});
+
+test('first accepted-runtime fault retries cached source once with admitted values; a second fault suppresses automatic restart',async t=>{
+ const f=fixture(t),worker=await f.start(),state=f.client.getSnapshot().authoring!;
+ const rejected=assert.rejects(f.client.invoke({name:'lux.parameters.set',input:{requestId:'control',instanceId:state.instanceId,expectedGeneration:state.generation,expectedRevisionId:state.revisionId,values:{intensity:.8},mode:'live'}}),/failed/);
+ worker.reply({type:'failure',message:'failed'});await rejected;await f.advance(250);
+ const retry=WorkerFixture.all.at(-1)!;assert.notEqual(retry,worker);assert.equal(retry.init.controls.intensity,.8);assert.equal(f.compiles(),1);assert.equal(worker.terminated,true);
+ retry.reply({type:'ready'});await f.flush();assert.equal(f.client.getSnapshot().authoring!.intensity,.8);
+ retry.reply({type:'failure',message:'failed again'});await f.advance(1000);assert.equal(WorkerFixture.all.length,2);assert.equal(f.client.getSnapshot().authoring!.playback,'failed');assert.match(f.client.getSnapshot().message!,/30 seconds/);
+ const current=f.client.getSnapshot().authoring!;const explicit=f.client.invoke({name:'lux.runtime.restart',input:{requestId:'explicit',instanceId:current.instanceId,expectedGeneration:current.generation}});await f.flush();
+ WorkerFixture.all.at(-1)!.reply({type:'ready'});await explicit;assert.equal(WorkerFixture.all.length,3);
+});
+test('failed automatic startup is terminal without a retry storm and explicit restart can still recover',async t=>{
+ const f=fixture(t),worker=await f.start();worker.reply({type:'failure',message:'failed'});await f.advance(250);
+ const retry=WorkerFixture.all.at(-1)!;retry.reply({type:'failure',message:'retry init failed'});await f.flush();await f.advance(30000);
+ assert.equal(WorkerFixture.all.length,2);assert.equal(retry.terminated,true);assert.match(f.client.getSnapshot().message!,/Automatic restart failed/);assert.equal(f.scheduled.size,0);
+ const state=f.client.getSnapshot().authoring!,explicit=f.client.invoke({name:'lux.runtime.restart',input:{requestId:'explicit',instanceId:state.instanceId,expectedGeneration:state.generation}});await f.flush();WorkerFixture.all.at(-1)!.reply({type:'ready'});await explicit;
+});
+test('a healthy 30-second interval permits one new retry and source replacement cancels a queued old retry',async t=>{
+ const f=fixture(t),worker=await f.start();worker.reply({type:'failure',message:'first'});await f.advance(250);let current=WorkerFixture.all.at(-1)!;current.reply({type:'ready'});await f.flush();
+ for(let i=0;i<120;i++){await f.advance(250);current.reply({type:'heartbeat'});}
+ current.reply({type:'failure',message:'after healthy interval'});await f.advance(250);assert.equal(WorkerFixture.all.length,3);current=WorkerFixture.all.at(-1)!;current.reply({type:'ready'});await f.flush();
+ await f.start();const replacement=WorkerFixture.all.at(-1)!;replacement.reply({type:'failure',message:'new source fault'});
+ const before=WorkerFixture.all.length;await f.start();await f.advance(250);assert.equal(WorkerFixture.all.length,before+1);assert.equal(f.client.getSnapshot().authoring!.playback,'paused');
+});
+test('a fault during source compilation defers recovery; rejected replacement retries only the accepted artifact',async t=>{
+ const f=fixture(t),old=await f.start(),compile=f.api.compile;let release!:()=>void;
+ f.api.compile=async()=>{await new Promise<void>(resolve=>{release=resolve;});return compile();};
+ const replacement=assert.rejects(f.client.submit(source),/candidate rejected/);await f.flush();old.reply({type:'failure',message:'old failed'});await f.advance(500);
+ assert.equal(WorkerFixture.all.length,1);release();await f.flush();WorkerFixture.all.at(-1)!.reply({type:'failure',message:'candidate rejected'});await replacement;
+ await f.advance(250);assert.equal(WorkerFixture.all.length,3);const retry=WorkerFixture.all.at(-1)!;assert.equal(retry.init.linked.code,'accepted');retry.reply({type:'ready'});await f.flush();assert.equal(f.client.getSnapshot().authoring!.playback,'paused');
 });
