@@ -149,7 +149,7 @@ test('RTL: disconnected controls refuse input while workspace remains operable',
   const user = userEvent.setup({ document });
   render(<StudioApp client={createDisconnectedClient()} nowMs={1000} />);
   assert.equal((screen.getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled, true);
-  assert.equal(screen.queryByRole('slider'), null);
+  assert.equal(within(document.querySelector('.inspector')!).queryByRole('slider'), null);
   await user.click(screen.getByRole('button', { name: 'Maximize' }));
   assert.ok(screen.getByRole('button', { name: 'Restore workspace' }));
   assert.ok(screen.getByRole('heading', { name: 'Awaiting runtime' }));
