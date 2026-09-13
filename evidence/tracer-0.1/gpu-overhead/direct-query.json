@@ -1,0 +1,861 @@
+{
+  "runId": "eff1cc1b-f3d4-4a3a-84b9-698f94ff0d47",
+  "versions": {
+    "node": "24.20.0",
+    "acorn": "8.18.0",
+    "ada": "4.0.0",
+    "amaro": "1.1.11",
+    "ares": "1.34.8",
+    "brotli": "1.2.0",
+    "cldr": "48.0",
+    "icu": "78.2",
+    "llhttp": "9.4.3",
+    "merve": "1.2.2",
+    "modules": "149",
+    "napi": "10",
+    "nbytes": "0.1.4",
+    "ncrypto": "0.0.1",
+    "nghttp2": "1.70.0",
+    "nghttp3": "",
+    "ngtcp2": "",
+    "openssl": "0.0.0",
+    "simdjson": "4.6.6",
+    "simdutf": "7.7.0",
+    "sqlite": "3.53.4",
+    "tz": "2025c",
+    "undici": "7.29.0",
+    "unicode": "17.0",
+    "uv": "1.52.1",
+    "uvwasi": "0.0.23",
+    "v8": "15.2.124.19-electron.0",
+    "zlib": "1.3.2.1-motley",
+    "zstd": "1.6.0",
+    "electron": "44.3.0",
+    "chrome": "152.0.7977.78"
+  },
+  "pid": 26872,
+  "flags": [
+    "enable-unsafe-webgpu",
+    "force_high_performance_gpu"
+  ],
+  "schema": 1,
+  "batches": [
+    {
+      "index": 0,
+      "mode": "baseline",
+      "warmup": true,
+      "firstFrame": 1,
+      "frames": 30,
+      "start": "1789270264638665728",
+      "end": "1789270264641240064",
+      "durationMs": 2.574336,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 1,
+      "mode": "routine",
+      "warmup": true,
+      "firstFrame": 31,
+      "frames": 30,
+      "start": "1789270264643816448",
+      "end": "1789270264646304768",
+      "durationMs": 2.48832,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 2,
+      "mode": "baseline",
+      "warmup": true,
+      "firstFrame": 61,
+      "frames": 30,
+      "start": "1789270264648784128",
+      "end": "1789270264651265024",
+      "durationMs": 2.480896,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 3,
+      "mode": "routine",
+      "warmup": true,
+      "firstFrame": 91,
+      "frames": 30,
+      "start": "1789270264652800352",
+      "end": "1789270264655289152",
+      "durationMs": 2.4888,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 4,
+      "mode": "baseline",
+      "warmup": true,
+      "firstFrame": 121,
+      "frames": 30,
+      "start": "1789270264656385024",
+      "end": "1789270264658867200",
+      "durationMs": 2.482176,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 5,
+      "mode": "routine",
+      "warmup": true,
+      "firstFrame": 151,
+      "frames": 30,
+      "start": "1789270264662757440",
+      "end": "1789270264665244672",
+      "durationMs": 2.487232,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 6,
+      "mode": "baseline",
+      "warmup": true,
+      "firstFrame": 181,
+      "frames": 30,
+      "start": "1789270264666889216",
+      "end": "1789270264669369344",
+      "durationMs": 2.480128,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 7,
+      "mode": "routine",
+      "warmup": true,
+      "firstFrame": 211,
+      "frames": 30,
+      "start": "1789270264670803968",
+      "end": "1789270264673287168",
+      "durationMs": 2.4832,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 8,
+      "mode": "baseline",
+      "warmup": false,
+      "firstFrame": 241,
+      "frames": 30,
+      "start": "1789270264675717376",
+      "end": "1789270264678195936",
+      "durationMs": 2.47856,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 9,
+      "mode": "routine",
+      "warmup": false,
+      "firstFrame": 271,
+      "frames": 30,
+      "start": "1789270264679994240",
+      "end": "1789270264682480288",
+      "durationMs": 2.486048,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 10,
+      "mode": "routine",
+      "warmup": false,
+      "firstFrame": 301,
+      "frames": 30,
+      "start": "1789270264684921376",
+      "end": "1789270264687408128",
+      "durationMs": 2.486752,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 11,
+      "mode": "baseline",
+      "warmup": false,
+      "firstFrame": 331,
+      "frames": 30,
+      "start": "1789270264689123520",
+      "end": "1789270264691600384",
+      "durationMs": 2.476864,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 12,
+      "mode": "baseline",
+      "warmup": false,
+      "firstFrame": 361,
+      "frames": 30,
+      "start": "1789270264692943872",
+      "end": "1789270264695423072",
+      "durationMs": 2.4792,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 13,
+      "mode": "routine",
+      "warmup": false,
+      "firstFrame": 391,
+      "frames": 30,
+      "start": "1789270264697149472",
+      "end": "1789270264699632640",
+      "durationMs": 2.483168,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 14,
+      "mode": "routine",
+      "warmup": false,
+      "firstFrame": 421,
+      "frames": 30,
+      "start": "1789270264701651968",
+      "end": "1789270264704140096",
+      "durationMs": 2.488128,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 15,
+      "mode": "baseline",
+      "warmup": false,
+      "firstFrame": 451,
+      "frames": 30,
+      "start": "1789270264708817920",
+      "end": "1789270264711295296",
+      "durationMs": 2.477376,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 16,
+      "mode": "baseline",
+      "warmup": false,
+      "firstFrame": 481,
+      "frames": 30,
+      "start": "1789270264713392352",
+      "end": "1789270264715869184",
+      "durationMs": 2.476832,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 17,
+      "mode": "routine",
+      "warmup": false,
+      "firstFrame": 511,
+      "frames": 30,
+      "start": "1789270264717671264",
+      "end": "1789270264720151520",
+      "durationMs": 2.480256,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 18,
+      "mode": "routine",
+      "warmup": false,
+      "firstFrame": 541,
+      "frames": 30,
+      "start": "1789270264721636032",
+      "end": "1789270264724118528",
+      "durationMs": 2.482496,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 19,
+      "mode": "baseline",
+      "warmup": false,
+      "firstFrame": 571,
+      "frames": 30,
+      "start": "1789270264725505024",
+      "end": "1789270264727984384",
+      "durationMs": 2.47936,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 20,
+      "mode": "baseline",
+      "warmup": false,
+      "firstFrame": 601,
+      "frames": 30,
+      "start": "1789270264730110976",
+      "end": "1789270264732590656",
+      "durationMs": 2.47968,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 21,
+      "mode": "routine",
+      "warmup": false,
+      "firstFrame": 631,
+      "frames": 30,
+      "start": "1789270264734013824",
+      "end": "1789270264736516352",
+      "durationMs": 2.502528,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 22,
+      "mode": "routine",
+      "warmup": false,
+      "firstFrame": 661,
+      "frames": 30,
+      "start": "1789270264739109600",
+      "end": "1789270264741542112",
+      "durationMs": 2.432512,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 23,
+      "mode": "baseline",
+      "warmup": false,
+      "firstFrame": 691,
+      "frames": 30,
+      "start": "1789270264743321824",
+      "end": "1789270264745720064",
+      "durationMs": 2.39824,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 24,
+      "mode": "baseline",
+      "warmup": false,
+      "firstFrame": 721,
+      "frames": 30,
+      "start": "1789270264747109376",
+      "end": "1789270264749507584",
+      "durationMs": 2.398208,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 25,
+      "mode": "routine",
+      "warmup": false,
+      "firstFrame": 751,
+      "frames": 30,
+      "start": "1789270264751669440",
+      "end": "1789270264754070528",
+      "durationMs": 2.401088,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 26,
+      "mode": "routine",
+      "warmup": false,
+      "firstFrame": 781,
+      "frames": 30,
+      "start": "1789270264757398528",
+      "end": "1789270264759802880",
+      "durationMs": 2.404352,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 27,
+      "mode": "baseline",
+      "warmup": false,
+      "firstFrame": 811,
+      "frames": 30,
+      "start": "1789270264761069760",
+      "end": "1789270264763470048",
+      "durationMs": 2.400288,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 28,
+      "mode": "baseline",
+      "warmup": false,
+      "firstFrame": 841,
+      "frames": 30,
+      "start": "1789270264765881344",
+      "end": "1789270264768279552",
+      "durationMs": 2.398208,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 29,
+      "mode": "routine",
+      "warmup": false,
+      "firstFrame": 871,
+      "frames": 30,
+      "start": "1789270264770071552",
+      "end": "1789270264772473856",
+      "durationMs": 2.402304,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 30,
+      "mode": "routine",
+      "warmup": false,
+      "firstFrame": 901,
+      "frames": 30,
+      "start": "1789270264773696512",
+      "end": "1789270264776101952",
+      "durationMs": 2.40544,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 31,
+      "mode": "baseline",
+      "warmup": false,
+      "firstFrame": 931,
+      "frames": 30,
+      "start": "1789270264777849856",
+      "end": "1789270264780248064",
+      "durationMs": 2.398208,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 32,
+      "mode": "baseline",
+      "warmup": false,
+      "firstFrame": 961,
+      "frames": 30,
+      "start": "1789270264783368992",
+      "end": "1789270264785767424",
+      "durationMs": 2.398432,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 33,
+      "mode": "routine",
+      "warmup": false,
+      "firstFrame": 991,
+      "frames": 30,
+      "start": "1789270264787311232",
+      "end": "1789270264789711040",
+      "durationMs": 2.399808,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 34,
+      "mode": "routine",
+      "warmup": false,
+      "firstFrame": 1021,
+      "frames": 30,
+      "start": "1789270264791630528",
+      "end": "1789270264794033152",
+      "durationMs": 2.402624,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 35,
+      "mode": "baseline",
+      "warmup": false,
+      "firstFrame": 1051,
+      "frames": 30,
+      "start": "1789270264795714304",
+      "end": "1789270264798110720",
+      "durationMs": 2.396416,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 36,
+      "mode": "baseline",
+      "warmup": false,
+      "firstFrame": 1081,
+      "frames": 30,
+      "start": "1789270264801095904",
+      "end": "1789270264803492864",
+      "durationMs": 2.39696,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    },
+    {
+      "index": 37,
+      "mode": "routine",
+      "warmup": false,
+      "firstFrame": 1111,
+      "frames": 30,
+      "start": "1789270264804962880",
+      "end": "1789270264807361536",
+      "durationMs": 2.398656,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 38,
+      "mode": "routine",
+      "warmup": false,
+      "firstFrame": 1141,
+      "frames": 30,
+      "start": "1789270264808971264",
+      "end": "1789270264811371520",
+      "durationMs": 2.400256,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 33,
+        "logicalSubmissionGroups": 31,
+        "deferredMaps": 1
+      }
+    },
+    {
+      "index": 39,
+      "mode": "baseline",
+      "warmup": false,
+      "firstFrame": 1171,
+      "frames": 30,
+      "start": "1789270264813806592",
+      "end": "1789270264816202080",
+      "durationMs": 2.395488,
+      "staging": {
+        "realSubmissions": 1,
+        "commandBuffers": 32,
+        "logicalSubmissionGroups": 30,
+        "deferredMaps": 0
+      }
+    }
+  ],
+  "samples": [
+    {
+      "frame": 31,
+      "ms": 0.08192,
+      "complete": true
+    },
+    {
+      "frame": 91,
+      "ms": 0.08192,
+      "complete": true
+    },
+    {
+      "frame": 151,
+      "ms": 0.081856,
+      "complete": true
+    },
+    {
+      "frame": 211,
+      "ms": 0.081856,
+      "complete": true
+    },
+    {
+      "frame": 271,
+      "ms": 0.08192,
+      "complete": true
+    },
+    {
+      "frame": 301,
+      "ms": 0.08192,
+      "complete": true
+    },
+    {
+      "frame": 391,
+      "ms": 0.08192,
+      "complete": true
+    },
+    {
+      "frame": 421,
+      "ms": 0.081792,
+      "complete": true
+    },
+    {
+      "frame": 511,
+      "ms": 0.08192,
+      "complete": true
+    },
+    {
+      "frame": 541,
+      "ms": 0.08192,
+      "complete": true
+    },
+    {
+      "frame": 631,
+      "ms": 0.08192,
+      "complete": true
+    },
+    {
+      "frame": 661,
+      "ms": 0.081696,
+      "complete": true
+    },
+    {
+      "frame": 751,
+      "ms": 0.078848,
+      "complete": true
+    },
+    {
+      "frame": 781,
+      "ms": 0.0784,
+      "complete": true
+    },
+    {
+      "frame": 871,
+      "ms": 0.077856,
+      "complete": true
+    },
+    {
+      "frame": 901,
+      "ms": 0.078912,
+      "complete": true
+    },
+    {
+      "frame": 991,
+      "ms": 0.07888,
+      "complete": true
+    },
+    {
+      "frame": 1021,
+      "ms": 0.078592,
+      "complete": true
+    },
+    {
+      "frame": 1111,
+      "ms": 0.078496,
+      "complete": true
+    },
+    {
+      "frame": 1141,
+      "ms": 0.0784,
+      "complete": true
+    }
+  ],
+  "errors": [],
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "framesPerBatch": 30,
+    "warmupBatches": 8,
+    "abbaBlocks": 8,
+    "batchLimitMs": 100,
+    "shaderIterations": 8
+  },
+  "timer": {
+    "timestampQuerySupported": true,
+    "timestampQueryEnabled": true,
+    "completedSamples": 20,
+    "failedSamples": 0,
+    "droppedSamples": 0,
+    "pendingSamples": 0,
+    "reason": "Render and compute pass timestamps; copies, uploads and clears outside passes are excluded"
+  },
+  "adapter": {
+    "vendor": "nvidia",
+    "architecture": "turing",
+    "device": "",
+    "description": "",
+    "isFallbackAdapter": false
+  },
+  "summary": {
+    "scope": "Direct GPU query/resolve/copy cost on a controlled30-frame batch",
+    "batchEffectsMs": [
+      0.008687999999999807,
+      0.007360000000000255,
+      0.0032800000000001717,
+      0.02856000000000014,
+      0.0034719999999999196,
+      0.005663999999999891,
+      0.0037919999999997955,
+      0.0032319999999996796
+    ],
+    "meanDeltaMs": 0.008005999999999958,
+    "amortizedDeltaPerFrameMs": 0.0002668666666666653,
+    "meanBaselineBatchMs": 2.43302,
+    "meanRoutineBatchMs": 2.441026,
+    "deltaPercentOfBaseline": 0.3290560702336996,
+    "expanded95PercentOfBaseline": [
+      -16.405367589504273,
+      17.063479729971675
+    ],
+    "percentDenominator": "Observed baseline mean held fixed; same conditional assumptions as delta interval",
+    "statistical95IntervalMs": [
+      0.0008541254738430974,
+      0.015157874526156818
+    ],
+    "expanded95IntervalMs": [
+      -0.3991458745261569,
+      0.4151578745261568
+    ],
+    "amortizedExpanded95IntervalMs": [
+      -0.01330486248420523,
+      0.013838595817538562
+    ],
+    "uncertainty": {
+      "method": "Student t across8 ABBA block effects; descriptive conditional interval",
+      "observedEndpointLatticeNs": "32",
+      "assumedEndpointErrorEnvelopeNs": 100000,
+      "deltaEnvelopeMs": 0.4,
+      "calibrated": false,
+      "source": "https://developer.chrome.com/blog/new-in-webgpu-121"
+    },
+    "conclusion": "Inconclusive: sign and magnitude not resolved above noise/envelope",
+    "fullStudioOverheadAcceptance": "unavailable",
+    "cpuHookCostMeasured": false,
+    "activeGpuBusyTimeMeasured": false,
+    "quantizationDisabled": false
+  },
+  "ok": true
+}

@@ -1,0 +1,3606 @@
+{
+  "ok": true,
+  "measurementValid": true,
+  "actual": {
+    "legs": [
+      {
+        "pair": 0,
+        "mode": "baseline",
+        "readyMs": 817.2000000029802,
+        "elapsedMs": 5875.4000000059605,
+        "data": {
+          "type": "diagnostic-finalize",
+          "instanceId": "b84c8bb6-9b41-43e4-bd9c-f07ca5b512c7",
+          "generation": 1,
+          "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+          "requestId": "701dee68-3d59-4646-86e3-05016ed22a22",
+          "raw": [
+            {
+              "timer": "reference",
+              "frame": 16,
+              "ms": 0.249152,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270124858960800",
+                  "1789270124859077632",
+                  "1789270124859101600",
+                  "1789270124859180032",
+                  "1789270124859511168",
+                  "1789270124859565056"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 46,
+              "ms": 0.252416,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270125362286976",
+                  "1789270125362404352",
+                  "1789270125362422784",
+                  "1789270125362502656",
+                  "1789270125362564096",
+                  "1789270125362619264"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 76,
+              "ms": 0.254016,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270125867782368",
+                  "1789270125867901952",
+                  "1789270125867922240",
+                  "1789270125868001376",
+                  "1789270125868196864",
+                  "1789270125868252160"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 106,
+              "ms": 0.251552,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270126375106592",
+                  "1789270126375223360",
+                  "1789270126375261184",
+                  "1789270126375341056",
+                  "1789270126375653920",
+                  "1789270126375708832"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 136,
+              "ms": 0.25088,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270126882767776",
+                  "1789270126882884608",
+                  "1789270126882903040",
+                  "1789270126882982912",
+                  "1789270126883051616",
+                  "1789270126883105792"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 166,
+              "ms": 2.49888,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270127389804960",
+                  "1789270127391422784",
+                  "1789270127391476736",
+                  "1789270127391964160",
+                  "1789270127391996064",
+                  "1789270127392389696"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 196,
+              "ms": 2.532864,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270127899169792",
+                  "1789270127900811552",
+                  "1789270127900867360",
+                  "1789270127901359104",
+                  "1789270127901393152",
+                  "1789270127901792512"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 226,
+              "ms": 2.618848,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270128408181216",
+                  "1789270128409920352",
+                  "1789270128409981344",
+                  "1789270128410466688",
+                  "1789270128410506272",
+                  "1789270128410900640"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 256,
+              "ms": 2.616832,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270128918659232",
+                  "1789270128920402656",
+                  "1789270128920463776",
+                  "1789270128920945184",
+                  "1789270128920981696",
+                  "1789270128921373696"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 286,
+              "ms": 2.655776,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270129425700960",
+                  "1789270129427477504",
+                  "1789270129427538464",
+                  "1789270129428022208",
+                  "1789270129428060960",
+                  "1789270129428456448"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            }
+          ],
+          "reference": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": true,
+            "completedSamples": 10,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "Render and compute pass timestamps; copies, uploads and clears outside passes are excluded"
+          },
+          "routine": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": false,
+            "completedSamples": 0,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "GPU timing disabled in baseline mode"
+          },
+          "adapter": {
+            "vendor": "nvidia",
+            "architecture": "turing",
+            "device": "",
+            "description": ""
+          },
+          "performanceMode": "baseline",
+          "playback": "paused",
+          "timeSeconds": 0,
+          "clockEpoch": 0,
+          "frameId": "300",
+          "sdkVersion": "0.2.0",
+          "controlSchemaHash": "297bc0bf1131f8a46dcb56f87631f45c0f0d7a66f583d9605ff2b06c795dd3a2",
+          "controls": {
+            "spikeHeight": 0.85,
+            "noiseScale": 8,
+            "sharpness": 2,
+            "motionSpeed": 0.28,
+            "roughness": 0.38
+          },
+          "controlSequence": 0
+        }
+      },
+      {
+        "pair": 0,
+        "mode": "routine",
+        "readyMs": 552.6999999880791,
+        "elapsedMs": 5597.399999991059,
+        "data": {
+          "type": "diagnostic-finalize",
+          "instanceId": "739b5f18-02fe-4a91-bee6-f681d15a84a8",
+          "generation": 1,
+          "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+          "requestId": "24ea8caf-44a1-4049-af21-28187aff9816",
+          "raw": [
+            {
+              "timer": "routine",
+              "frame": 1,
+              "ms": 0.261184,
+              "complete": false,
+              "raw": {
+                "timestampsNs": [
+                  "1789270130199814496",
+                  "1789270130199941568",
+                  "1789270130211103744",
+                  "1789270130211185088",
+                  "1789270130219271168",
+                  "1789270130219323936"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 16,
+              "ms": 0.250144,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270130472379392",
+                  "1789270130472497248",
+                  "1789270130472516384",
+                  "1789270130472594432",
+                  "1789270130472742944",
+                  "1789270130472797184"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 31,
+              "ms": 0.251904,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270130725972992",
+                  "1789270130726091264",
+                  "1789270130726110208",
+                  "1789270130726190080",
+                  "1789270130726326784",
+                  "1789270130726380544"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 46,
+              "ms": 0.25072,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270130973866752",
+                  "1789270130973983744",
+                  "1789270130974003616",
+                  "1789270130974082048",
+                  "1789270130974249984",
+                  "1789270130974305280"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 61,
+              "ms": 0.251968,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270131226082304",
+                  "1789270131226201088",
+                  "1789270131226221248",
+                  "1789270131226300416",
+                  "1789270131226513664",
+                  "1789270131226567680"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 76,
+              "ms": 0.250656,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270131483450016",
+                  "1789270131483567104",
+                  "1789270131483587136",
+                  "1789270131483665408",
+                  "1789270131483804672",
+                  "1789270131483859968"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 91,
+              "ms": 0.251872,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270131739110400",
+                  "1789270131739228672",
+                  "1789270131739249184",
+                  "1789270131739327488",
+                  "1789270131739419648",
+                  "1789270131739474944"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 106,
+              "ms": 0.252352,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270131994517600",
+                  "1789270131994635264",
+                  "1789270131994655744",
+                  "1789270131994735328",
+                  "1789270131994809344",
+                  "1789270131994864448"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 121,
+              "ms": 0.251296,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270132252222464",
+                  "1789270132252339200",
+                  "1789270132252357632",
+                  "1789270132252437440",
+                  "1789270132252451840",
+                  "1789270132252506592"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 136,
+              "ms": 0.2512,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270132506260448",
+                  "1789270132506377216",
+                  "1789270132506397696",
+                  "1789270132506477440",
+                  "1789270132506678240",
+                  "1789270132506732928"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 151,
+              "ms": 0.253472,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270132756904960",
+                  "1789270132757025792",
+                  "1789270132757045376",
+                  "1789270132757124096",
+                  "1789270132757197152",
+                  "1789270132757251072"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 166,
+              "ms": 2.497088,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270133010078720",
+                  "1789270133011698688",
+                  "1789270133011754016",
+                  "1789270133012237312",
+                  "1789270133012271520",
+                  "1789270133012665344"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 181,
+              "ms": 2.46608,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270133261185984",
+                  "1789270133261536256",
+                  "1789270133261587104",
+                  "1789270133263303680",
+                  "1789270133263338176",
+                  "1789270133263737408"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 196,
+              "ms": 2.528768,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270133508606624",
+                  "1789270133510255360",
+                  "1789270133510310944",
+                  "1789270133510795424",
+                  "1789270133510830816",
+                  "1789270133511226368"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 211,
+              "ms": 2.534912,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270133757795072",
+                  "1789270133759454208",
+                  "1789270133759511008",
+                  "1789270133759990784",
+                  "1789270133760024864",
+                  "1789270133760420864"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 226,
+              "ms": 2.58832,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270134010090496",
+                  "1789270134011788160",
+                  "1789270134011845664",
+                  "1789270134012343104",
+                  "1789270134012380160",
+                  "1789270134012773376"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 241,
+              "ms": 2.62096,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270134263829504",
+                  "1789270134265569632",
+                  "1789270134265629728",
+                  "1789270134266114624",
+                  "1789270134266153120",
+                  "1789270134266549056"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 256,
+              "ms": 2.640928,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270134518756384",
+                  "1789270134520507392",
+                  "1789270134520570592",
+                  "1789270134521063872",
+                  "1789270134521103360",
+                  "1789270134521500000"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 271,
+              "ms": 1.386112,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270134774651872",
+                  "1789270134775077888",
+                  "1789270134775155744",
+                  "1789270134775655424",
+                  "1789270134776839200",
+                  "1789270134777299616"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 286,
+              "ms": 2.684192,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270135029191520",
+                  "1789270135030997184",
+                  "1789270135031059456",
+                  "1789270135031542112",
+                  "1789270135031581088",
+                  "1789270135031976960"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            }
+          ],
+          "reference": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": true,
+            "completedSamples": 10,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "Render and compute pass timestamps; copies, uploads and clears outside passes are excluded"
+          },
+          "routine": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": true,
+            "completedSamples": 10,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "Render and compute pass timestamps; copies, uploads and clears outside passes are excluded"
+          },
+          "adapter": {
+            "vendor": "nvidia",
+            "architecture": "turing",
+            "device": "",
+            "description": ""
+          },
+          "performanceMode": "routine",
+          "playback": "paused",
+          "timeSeconds": 0,
+          "clockEpoch": 0,
+          "frameId": "300",
+          "sdkVersion": "0.2.0",
+          "controlSchemaHash": "297bc0bf1131f8a46dcb56f87631f45c0f0d7a66f583d9605ff2b06c795dd3a2",
+          "controls": {
+            "spikeHeight": 0.85,
+            "noiseScale": 8,
+            "sharpness": 2,
+            "motionSpeed": 0.28,
+            "roughness": 0.38
+          },
+          "controlSequence": 0
+        }
+      },
+      {
+        "pair": 1,
+        "mode": "routine",
+        "readyMs": 543.5999999940395,
+        "elapsedMs": 5587.79999999702,
+        "data": {
+          "type": "diagnostic-finalize",
+          "instanceId": "64f25a29-d5f1-46a9-ac41-22f8ab66d261",
+          "generation": 1,
+          "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+          "requestId": "8ee162a5-0fdc-4a50-801e-b248337382ee",
+          "raw": [
+            {
+              "timer": "routine",
+              "frame": 1,
+              "ms": 0.258368,
+              "complete": false,
+              "raw": {
+                "timestampsNs": [
+                  "1789270135794234368",
+                  "1789270135794361344",
+                  "1789270135802928000",
+                  "1789270135803008000",
+                  "1789270135809227584",
+                  "1789270135809278976"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 16,
+              "ms": 0.251584,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270136060779520",
+                  "1789270136060896256",
+                  "1789270136060935168",
+                  "1789270136061015040",
+                  "1789270136061364608",
+                  "1789270136061419584"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 31,
+              "ms": 0.250336,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270136310710880",
+                  "1789270136310828032",
+                  "1789270136310848256",
+                  "1789270136310926336",
+                  "1789270136311176192",
+                  "1789270136311231296"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 46,
+              "ms": 0.252928,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270136559492096",
+                  "1789270136559609888",
+                  "1789270136559629312",
+                  "1789270136559709184",
+                  "1789270136560069632",
+                  "1789270136560124896"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 61,
+              "ms": 0.25248,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270136812489056",
+                  "1789270136812606400",
+                  "1789270136812684288",
+                  "1789270136812764160",
+                  "1789270136813062496",
+                  "1789270136813117760"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 76,
+              "ms": 0.252608,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270137065108480",
+                  "1789270137065226720",
+                  "1789270137065245696",
+                  "1789270137065324992",
+                  "1789270137065548800",
+                  "1789270137065603872"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 91,
+              "ms": 0.253056,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270137317587968",
+                  "1789270137317706752",
+                  "1789270137317727232",
+                  "1789270137317806528",
+                  "1789270137318136224",
+                  "1789270137318191200"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 106,
+              "ms": 0.251808,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270137574679552",
+                  "1789270137574797440",
+                  "1789270137574820064",
+                  "1789270137574898688",
+                  "1789270137575355392",
+                  "1789270137575410688"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 121,
+              "ms": 0.249888,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270137831412736",
+                  "1789270137831529472",
+                  "1789270137831553600",
+                  "1789270137831631872",
+                  "1789270137831922624",
+                  "1789270137831977504"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 136,
+              "ms": 2.447584,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270138086816544",
+                  "1789270138088383488",
+                  "1789270138088438176",
+                  "1789270138088924160",
+                  "1789270138088956576",
+                  "1789270138089351232"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 151,
+              "ms": 2.486496,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270138341204224",
+                  "1789270138342814720",
+                  "1789270138342870016",
+                  "1789270138343350720",
+                  "1789270138343383232",
+                  "1789270138343778528"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 166,
+              "ms": 2.505312,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270138592596352",
+                  "1789270138594214912",
+                  "1789270138594292768",
+                  "1789270138594780160",
+                  "1789270138594810880",
+                  "1789270138595210240"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 181,
+              "ms": 2.528608,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270138849061344",
+                  "1789270138850700288",
+                  "1789270138850756736",
+                  "1789270138851249152",
+                  "1789270138851285696",
+                  "1789270138851682944"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 196,
+              "ms": 2.604928,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270139096359936",
+                  "1789270139098085408",
+                  "1789270139098142752",
+                  "1789270139098627072",
+                  "1789270139098663872",
+                  "1789270139099059008"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 211,
+              "ms": 2.576384,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270139345080832",
+                  "1789270139345474560",
+                  "1789270139345527840",
+                  "1789270139347313184",
+                  "1789270139347356672",
+                  "1789270139347753984"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 226,
+              "ms": 2.62416,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270139601823808",
+                  "1789270139603569664",
+                  "1789270139603631136",
+                  "1789270139604112384",
+                  "1789270139604148608",
+                  "1789270139604545664"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 241,
+              "ms": 2.625376,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270139854464000",
+                  "1789270139856210944",
+                  "1789270139856272096",
+                  "1789270139856754944",
+                  "1789270139856792096",
+                  "1789270139857187680"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 256,
+              "ms": 2.710848,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270140108026912",
+                  "1789270140109845536",
+                  "1789270140109923328",
+                  "1789270140110416896",
+                  "1789270140110457856",
+                  "1789270140110856512"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 271,
+              "ms": 2.671488,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270140361219072",
+                  "1789270140363009024",
+                  "1789270140363070496",
+                  "1789270140363555776",
+                  "1789270140363593760",
+                  "1789270140363990016"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 286,
+              "ms": 2.671872,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270140617943840",
+                  "1789270140619725408",
+                  "1789270140619787296",
+                  "1789270140620278176",
+                  "1789270140620316928",
+                  "1789270140620716352"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            }
+          ],
+          "reference": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": true,
+            "completedSamples": 10,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "Render and compute pass timestamps; copies, uploads and clears outside passes are excluded"
+          },
+          "routine": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": true,
+            "completedSamples": 10,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "Render and compute pass timestamps; copies, uploads and clears outside passes are excluded"
+          },
+          "adapter": {
+            "vendor": "nvidia",
+            "architecture": "turing",
+            "device": "",
+            "description": ""
+          },
+          "performanceMode": "routine",
+          "playback": "paused",
+          "timeSeconds": 0,
+          "clockEpoch": 0,
+          "frameId": "300",
+          "sdkVersion": "0.2.0",
+          "controlSchemaHash": "297bc0bf1131f8a46dcb56f87631f45c0f0d7a66f583d9605ff2b06c795dd3a2",
+          "controls": {
+            "spikeHeight": 0.85,
+            "noiseScale": 8,
+            "sharpness": 2,
+            "motionSpeed": 0.28,
+            "roughness": 0.38
+          },
+          "controlSequence": 0
+        }
+      },
+      {
+        "pair": 1,
+        "mode": "baseline",
+        "readyMs": 489.40000000596046,
+        "elapsedMs": 5537.20000000298,
+        "data": {
+          "type": "diagnostic-finalize",
+          "instanceId": "07d91a4b-4682-4125-be44-93722843224a",
+          "generation": 1,
+          "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+          "requestId": "fd2d6123-c6b2-417a-ad7c-bbec53241e67",
+          "raw": [
+            {
+              "timer": "reference",
+              "frame": 16,
+              "ms": 0.251616,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270141597218848",
+                  "1789270141597335712",
+                  "1789270141597357056",
+                  "1789270141597436928",
+                  "1789270141597625344",
+                  "1789270141597680224"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 46,
+              "ms": 0.251136,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270142103314528",
+                  "1789270142103432192",
+                  "1789270142103454368",
+                  "1789270142103532544",
+                  "1789270142103696384",
+                  "1789270142103751680"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 76,
+              "ms": 0.251424,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270142610084128",
+                  "1789270142610201504",
+                  "1789270142610219904",
+                  "1789270142610298944",
+                  "1789270142610486272",
+                  "1789270142610541280"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 106,
+              "ms": 0.251424,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270143114336928",
+                  "1789270143114453504",
+                  "1789270143114472448",
+                  "1789270143114552320",
+                  "1789270143114619904",
+                  "1789270143114674880"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 136,
+              "ms": 0.252736,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270143618271424",
+                  "1789270143618388992",
+                  "1789270143618421760",
+                  "1789270143618501632",
+                  "1789270143618638848",
+                  "1789270143618694144"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 166,
+              "ms": 2.33984,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270144124709888",
+                  "1789270144125028544",
+                  "1789270144125076192",
+                  "1789270144126687776",
+                  "1789270144126714880",
+                  "1789270144127124480"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 196,
+              "ms": 2.418912,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270144632620032",
+                  "1789270144634155840",
+                  "1789270144634209312",
+                  "1789270144634700800",
+                  "1789270144634741312",
+                  "1789270144635132928"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 226,
+              "ms": 2.438272,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270145140001280",
+                  "1789270145141564416",
+                  "1789270145141619744",
+                  "1789270145142105088",
+                  "1789270145142138976",
+                  "1789270145142528768"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 256,
+              "ms": 2.484352,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270145645738848",
+                  "1789270145646095360",
+                  "1789270145646146592",
+                  "1789270145647873024",
+                  "1789270145647911200",
+                  "1789270145648312608"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 286,
+              "ms": 2.541504,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270146154596896",
+                  "1789270146156266496",
+                  "1789270146156323552",
+                  "1789270146156802240",
+                  "1789270146156839936",
+                  "1789270146157233152"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            }
+          ],
+          "reference": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": true,
+            "completedSamples": 10,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "Render and compute pass timestamps; copies, uploads and clears outside passes are excluded"
+          },
+          "routine": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": false,
+            "completedSamples": 0,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "GPU timing disabled in baseline mode"
+          },
+          "adapter": {
+            "vendor": "nvidia",
+            "architecture": "turing",
+            "device": "",
+            "description": ""
+          },
+          "performanceMode": "baseline",
+          "playback": "paused",
+          "timeSeconds": 0,
+          "clockEpoch": 0,
+          "frameId": "300",
+          "sdkVersion": "0.2.0",
+          "controlSchemaHash": "297bc0bf1131f8a46dcb56f87631f45c0f0d7a66f583d9605ff2b06c795dd3a2",
+          "controls": {
+            "spikeHeight": 0.85,
+            "noiseScale": 8,
+            "sharpness": 2,
+            "motionSpeed": 0.28,
+            "roughness": 0.38
+          },
+          "controlSequence": 0
+        }
+      },
+      {
+        "pair": 2,
+        "mode": "baseline",
+        "readyMs": 549.5,
+        "elapsedMs": 5575.9000000059605,
+        "data": {
+          "type": "diagnostic-finalize",
+          "instanceId": "44ebb10f-af3c-4a8b-a0d4-bdd6496d11ab",
+          "generation": 1,
+          "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+          "requestId": "22180860-a1cf-476a-bb2b-767ae8e746de",
+          "raw": [
+            {
+              "timer": "reference",
+              "frame": 16,
+              "ms": 0.249344,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270147191182336",
+                  "1789270147191299072",
+                  "1789270147191320992",
+                  "1789270147191399424",
+                  "1789270147191472224",
+                  "1789270147191526400"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 46,
+              "ms": 0.253056,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270147696014336",
+                  "1789270147696132704",
+                  "1789270147696151552",
+                  "1789270147696231424",
+                  "1789270147696376768",
+                  "1789270147696431584"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 76,
+              "ms": 0.254368,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270148197147648",
+                  "1789270148197267968",
+                  "1789270148197286912",
+                  "1789270148197366592",
+                  "1789270148197467136",
+                  "1789270148197521504"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 106,
+              "ms": 0.252128,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270148700777472",
+                  "1789270148700896256",
+                  "1789270148700929024",
+                  "1789270148701008608",
+                  "1789270148701207040",
+                  "1789270148701260800"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 136,
+              "ms": 2.363264,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270149207888928",
+                  "1789270149208214528",
+                  "1789270149208259584",
+                  "1789270149209883552",
+                  "1789270149209910272",
+                  "1789270149210323968"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 166,
+              "ms": 2.447776,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270149712343136",
+                  "1789270149713914880",
+                  "1789270149713968128",
+                  "1789270149714453248",
+                  "1789270149714488352",
+                  "1789270149714879264"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 196,
+              "ms": 2.478496,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270150216078368",
+                  "1789270150217671392",
+                  "1789270150217724960",
+                  "1789270150218217472",
+                  "1789270150218253056",
+                  "1789270150218646016"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 226,
+              "ms": 2.535456,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270150720095040",
+                  "1789270150720477696",
+                  "1789270150720541728",
+                  "1789270150722298880",
+                  "1789270150722335360",
+                  "1789270150722731008"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 256,
+              "ms": 2.587296,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270151227898880",
+                  "1789270151229608576",
+                  "1789270151229667520",
+                  "1789270151230149664",
+                  "1789270151230186304",
+                  "1789270151230581760"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 286,
+              "ms": 2.635232,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270151731893248",
+                  "1789270151733646080",
+                  "1789270151733705760",
+                  "1789270151734191104",
+                  "1789270151734229536",
+                  "1789270151734626592"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            }
+          ],
+          "reference": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": true,
+            "completedSamples": 10,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "Render and compute pass timestamps; copies, uploads and clears outside passes are excluded"
+          },
+          "routine": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": false,
+            "completedSamples": 0,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "GPU timing disabled in baseline mode"
+          },
+          "adapter": {
+            "vendor": "nvidia",
+            "architecture": "turing",
+            "device": "",
+            "description": ""
+          },
+          "performanceMode": "baseline",
+          "playback": "paused",
+          "timeSeconds": 0,
+          "clockEpoch": 0,
+          "frameId": "300",
+          "sdkVersion": "0.2.0",
+          "controlSchemaHash": "297bc0bf1131f8a46dcb56f87631f45c0f0d7a66f583d9605ff2b06c795dd3a2",
+          "controls": {
+            "spikeHeight": 0.85,
+            "noiseScale": 8,
+            "sharpness": 2,
+            "motionSpeed": 0.28,
+            "roughness": 0.38
+          },
+          "controlSequence": 0
+        }
+      },
+      {
+        "pair": 2,
+        "mode": "routine",
+        "readyMs": 591.3999999910593,
+        "elapsedMs": 5653.29999999702,
+        "data": {
+          "type": "diagnostic-finalize",
+          "instanceId": "dbe24906-97f7-4db3-afdf-837531967e63",
+          "generation": 1,
+          "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+          "requestId": "da4d1103-28e8-4639-a750-5e3b4663dfe1",
+          "raw": [
+            {
+              "timer": "routine",
+              "frame": 1,
+              "ms": 0.25408,
+              "complete": false,
+              "raw": {
+                "timestampsNs": [
+                  "1789270152541352320",
+                  "1789270152541475840",
+                  "1789270152555834368",
+                  "1789270152555913728",
+                  "1789270152563057664",
+                  "1789270152563108864"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 16,
+              "ms": 0.251488,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270152814631008",
+                  "1789270152814748416",
+                  "1789270152814767104",
+                  "1789270152814846976",
+                  "1789270152815085632",
+                  "1789270152815139840"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 31,
+              "ms": 0.252256,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270153070512224",
+                  "1789270153070629888",
+                  "1789270153070650048",
+                  "1789270153070729344",
+                  "1789270153070844928",
+                  "1789270153070900224"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 46,
+              "ms": 0.25104,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270153326148320",
+                  "1789270153326265056",
+                  "1789270153326283776",
+                  "1789270153326363264",
+                  "1789270153326685152",
+                  "1789270153326739968"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 61,
+              "ms": 0.250528,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270153574200320",
+                  "1789270153574317056",
+                  "1789270153574349824",
+                  "1789270153574429472",
+                  "1789270153575055488",
+                  "1789270153575109632"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 76,
+              "ms": 0.24928,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270153826114528",
+                  "1789270153826231296",
+                  "1789270153826251584",
+                  "1789270153826330848",
+                  "1789270153826345984",
+                  "1789270153826399232"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 91,
+              "ms": 0.25232,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270154082124800",
+                  "1789270154082243040",
+                  "1789270154082302016",
+                  "1789270154082380800",
+                  "1789270154082544640",
+                  "1789270154082599936"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 106,
+              "ms": 0.2536,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270154339732480",
+                  "1789270154339851264",
+                  "1789270154339883552",
+                  "1789270154339963072",
+                  "1789270154340199424",
+                  "1789270154340254720"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 121,
+              "ms": 0.251424,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270154590585856",
+                  "1789270154590702592",
+                  "1789270154590733312",
+                  "1789270154590813056",
+                  "1789270154590915584",
+                  "1789270154590970528"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 136,
+              "ms": 0.25328,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270154841453568",
+                  "1789270154841571680",
+                  "1789270154841590784",
+                  "1789270154841670656",
+                  "1789270154841877504",
+                  "1789270154841932800"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 151,
+              "ms": 2.44736,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270155096216576",
+                  "1789270155096564736",
+                  "1789270155096613920",
+                  "1789270155098307616",
+                  "1789270155098338304",
+                  "1789270155098743808"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 166,
+              "ms": 2.420864,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270155357143424",
+                  "1789270155357486080",
+                  "1789270155357533184",
+                  "1789270155359200256",
+                  "1789270155359228928",
+                  "1789270155359640064"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 181,
+              "ms": 2.421312,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270155611067392",
+                  "1789270155611402816",
+                  "1789270155611450368",
+                  "1789270155613128896",
+                  "1789270155613160448",
+                  "1789270155613567808"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 196,
+              "ms": 2.475616,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270155862555520",
+                  "1789270155864152352",
+                  "1789270155864208416",
+                  "1789270155864693344",
+                  "1789270155864727776",
+                  "1789270155865121632"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 211,
+              "ms": 2.502432,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270156114867232",
+                  "1789270156116489216",
+                  "1789270156116545600",
+                  "1789270156117033120",
+                  "1789270156117068800",
+                  "1789270156117461728"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 226,
+              "ms": 2.54608,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270156367153312",
+                  "1789270156367538752",
+                  "1789270156367592480",
+                  "1789270156369355168",
+                  "1789270156369392000",
+                  "1789270156369789952"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 241,
+              "ms": 2.509504,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270156626084896",
+                  "1789270156626457568",
+                  "1789270156626512064",
+                  "1789270156628251584",
+                  "1789270156628290560",
+                  "1789270156628687872"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 256,
+              "ms": 2.602176,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270156879811616",
+                  "1789270156881526944",
+                  "1789270156881584768",
+                  "1789270156882075840",
+                  "1789270156882124896",
+                  "1789270156882520672"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 271,
+              "ms": 2.593984,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270157132858368",
+                  "1789270157134566176",
+                  "1789270157134625728",
+                  "1789270157135116480",
+                  "1789270157135156064",
+                  "1789270157135551488"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 286,
+              "ms": 2.63856,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270157388404928",
+                  "1789270157390156800",
+                  "1789270157390218272",
+                  "1789270157390707296",
+                  "1789270157390744224",
+                  "1789270157391141888"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            }
+          ],
+          "reference": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": true,
+            "completedSamples": 10,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "Render and compute pass timestamps; copies, uploads and clears outside passes are excluded"
+          },
+          "routine": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": true,
+            "completedSamples": 10,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "Render and compute pass timestamps; copies, uploads and clears outside passes are excluded"
+          },
+          "adapter": {
+            "vendor": "nvidia",
+            "architecture": "turing",
+            "device": "",
+            "description": ""
+          },
+          "performanceMode": "routine",
+          "playback": "paused",
+          "timeSeconds": 0,
+          "clockEpoch": 0,
+          "frameId": "300",
+          "sdkVersion": "0.2.0",
+          "controlSchemaHash": "297bc0bf1131f8a46dcb56f87631f45c0f0d7a66f583d9605ff2b06c795dd3a2",
+          "controls": {
+            "spikeHeight": 0.85,
+            "noiseScale": 8,
+            "sharpness": 2,
+            "motionSpeed": 0.28,
+            "roughness": 0.38
+          },
+          "controlSequence": 0
+        }
+      },
+      {
+        "pair": 3,
+        "mode": "routine",
+        "readyMs": 479.40000000596046,
+        "elapsedMs": 5520.0999999940395,
+        "data": {
+          "type": "diagnostic-finalize",
+          "instanceId": "66cd3c3f-0169-45b6-aa4b-fea6e8391e96",
+          "generation": 1,
+          "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+          "requestId": "62e3ed8c-62f8-4406-9c9c-f566fc537cd5",
+          "raw": [
+            {
+              "timer": "routine",
+              "frame": 1,
+              "ms": 0.25712,
+              "complete": false,
+              "raw": {
+                "timestampsNs": [
+                  "1789270158092305312",
+                  "1789270158092431808",
+                  "1789270158101074944",
+                  "1789270158101154496",
+                  "1789270158107302912",
+                  "1789270158107353984"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 16,
+              "ms": 0.25376,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270158355397632",
+                  "1789270158355517952",
+                  "1789270158355536896",
+                  "1789270158355616480",
+                  "1789270158355663264",
+                  "1789270158355717120"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 31,
+              "ms": 0.251008,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270158605607936",
+                  "1789270158605724672",
+                  "1789270158605744800",
+                  "1789270158605824000",
+                  "1789270158605926720",
+                  "1789270158605981792"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 46,
+              "ms": 0.253216,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270158858431488",
+                  "1789270158858549664",
+                  "1789270158858617792",
+                  "1789270158858697536",
+                  "1789270158858935296",
+                  "1789270158858990592"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 61,
+              "ms": 0.251584,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270159110766848",
+                  "1789270159110883872",
+                  "1789270159110906752",
+                  "1789270159110986016",
+                  "1789270159111179264",
+                  "1789270159111234560"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 76,
+              "ms": 0.252032,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270159361502208",
+                  "1789270159361620032",
+                  "1789270159361639296",
+                  "1789270159361718432",
+                  "1789270159361934336",
+                  "1789270159361989408"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 91,
+              "ms": 0.251424,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270159621538816",
+                  "1789270159621656576",
+                  "1789270159621676032",
+                  "1789270159621755648",
+                  "1789270159621884128",
+                  "1789270159621938176"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 106,
+              "ms": 0.250304,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270159875984384",
+                  "1789270159876101120",
+                  "1789270159876121408",
+                  "1789270159876200704",
+                  "1789270159876239360",
+                  "1789270159876293632"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 121,
+              "ms": 0.251488,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270160124979456",
+                  "1789270160125096832",
+                  "1789270160125116448",
+                  "1789270160125195264",
+                  "1789270160125369344",
+                  "1789270160125424640"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 136,
+              "ms": 0.250752,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270160374428224",
+                  "1789270160374545408",
+                  "1789270160374565440",
+                  "1789270160374643712",
+                  "1789270160374823936",
+                  "1789270160374879232"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 151,
+              "ms": 0.251456,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270160629019648",
+                  "1789270160629137408",
+                  "1789270160629160032",
+                  "1789270160629238784",
+                  "1789270160629523456",
+                  "1789270160629578400"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 166,
+              "ms": 0.253088,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270160882625536",
+                  "1789270160882743456",
+                  "1789270160882779136",
+                  "1789270160882859008",
+                  "1789270160883041280",
+                  "1789270160883096576"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 181,
+              "ms": 2.503008,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270161138923904",
+                  "1789270161140540416",
+                  "1789270161140593696",
+                  "1789270161141082560",
+                  "1789270161141115584",
+                  "1789270161141513216"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 196,
+              "ms": 2.478048,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270161393259520",
+                  "1789270161393619968",
+                  "1789270161393669152",
+                  "1789270161395379200",
+                  "1789270161395416064",
+                  "1789270161395823616"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 211,
+              "ms": 2.518432,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270161647944736",
+                  "1789270161649578560",
+                  "1789270161649634304",
+                  "1789270161650123040",
+                  "1789270161650162080",
+                  "1789270161650557952"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 226,
+              "ms": 2.567872,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270161905054752",
+                  "1789270161906729728",
+                  "1789270161906786496",
+                  "1789270161907282944",
+                  "1789270161907328000",
+                  "1789270161907724448"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 241,
+              "ms": 2.592992,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270162157003776",
+                  "1789270162158711808",
+                  "1789270162158770976",
+                  "1789270162159262720",
+                  "1789270162159299584",
+                  "1789270162159692800"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 256,
+              "ms": 2.622336,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270162408123168",
+                  "1789270162408530240",
+                  "1789270162408587840",
+                  "1789270162410402816",
+                  "1789270162410440800",
+                  "1789270162410841088"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 271,
+              "ms": 2.640512,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270162661494944",
+                  "1789270162663248896",
+                  "1789270162663310368",
+                  "1789270162663803136",
+                  "1789270162663842240",
+                  "1789270162664236032"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 286,
+              "ms": 2.609696,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270162912926752",
+                  "1789270162914661376",
+                  "1789270162914724128",
+                  "1789270162915205568",
+                  "1789270162915246688",
+                  "1789270162915640320"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            }
+          ],
+          "reference": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": true,
+            "completedSamples": 10,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "Render and compute pass timestamps; copies, uploads and clears outside passes are excluded"
+          },
+          "routine": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": true,
+            "completedSamples": 10,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "Render and compute pass timestamps; copies, uploads and clears outside passes are excluded"
+          },
+          "adapter": {
+            "vendor": "nvidia",
+            "architecture": "turing",
+            "device": "",
+            "description": ""
+          },
+          "performanceMode": "routine",
+          "playback": "paused",
+          "timeSeconds": 0,
+          "clockEpoch": 0,
+          "frameId": "300",
+          "sdkVersion": "0.2.0",
+          "controlSchemaHash": "297bc0bf1131f8a46dcb56f87631f45c0f0d7a66f583d9605ff2b06c795dd3a2",
+          "controls": {
+            "spikeHeight": 0.85,
+            "noiseScale": 8,
+            "sharpness": 2,
+            "motionSpeed": 0.28,
+            "roughness": 0.38
+          },
+          "controlSequence": 0
+        }
+      },
+      {
+        "pair": 3,
+        "mode": "baseline",
+        "readyMs": 486,
+        "elapsedMs": 5544.20000000298,
+        "data": {
+          "type": "diagnostic-finalize",
+          "instanceId": "7246fa24-6278-4823-aa84-c18b2a3031f1",
+          "generation": 1,
+          "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+          "requestId": "bf74c51d-8b40-41e3-9637-aa4062429e0e",
+          "raw": [
+            {
+              "timer": "reference",
+              "frame": 16,
+              "ms": 0.252384,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270163884045312",
+                  "1789270163884163424",
+                  "1789270163884182528",
+                  "1789270163884261728",
+                  "1789270163884301312",
+                  "1789270163884356384"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 46,
+              "ms": 0.251904,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270164394384384",
+                  "1789270164394501120",
+                  "1789270164394531840",
+                  "1789270164394611712",
+                  "1789270164394843136",
+                  "1789270164394898432"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 76,
+              "ms": 0.250368,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270164908591872",
+                  "1789270164908708864",
+                  "1789270164908729344",
+                  "1789270164908809056",
+                  "1789270164909013600",
+                  "1789270164909067264"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 106,
+              "ms": 0.249376,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270165416092480",
+                  "1789270165416209408",
+                  "1789270165416229216",
+                  "1789270165416307712",
+                  "1789270165416536384",
+                  "1789270165416590336"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 136,
+              "ms": 0.251296,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270165919693152",
+                  "1789270165919810560",
+                  "1789270165919830880",
+                  "1789270165919910176",
+                  "1789270165920029536",
+                  "1789270165920084128"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 166,
+              "ms": 2.453984,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270166426882304",
+                  "1789270166427240672",
+                  "1789270166427292480",
+                  "1789270166428984224",
+                  "1789270166429012576",
+                  "1789270166429416448"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 196,
+              "ms": 2.535392,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270166938481664",
+                  "1789270166940144640",
+                  "1789270166940202016",
+                  "1789270166940681216",
+                  "1789270166940718080",
+                  "1789270166941111296"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 226,
+              "ms": 2.609728,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270167449465536",
+                  "1789270167451202208",
+                  "1789270167451261568",
+                  "1789270167451741216",
+                  "1789270167451779904",
+                  "1789270167452173312"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 256,
+              "ms": 2.60736,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270167948142592",
+                  "1789270167948546752",
+                  "1789270167948602208",
+                  "1789270167950404608",
+                  "1789270167950441344",
+                  "1789270167950842144"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 286,
+              "ms": 2.669632,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270168454721792",
+                  "1789270168456507872",
+                  "1789270168456571936",
+                  "1789270168457056704",
+                  "1789270168457098112",
+                  "1789270168457496896"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            }
+          ],
+          "reference": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": true,
+            "completedSamples": 10,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "Render and compute pass timestamps; copies, uploads and clears outside passes are excluded"
+          },
+          "routine": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": false,
+            "completedSamples": 0,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "GPU timing disabled in baseline mode"
+          },
+          "adapter": {
+            "vendor": "nvidia",
+            "architecture": "turing",
+            "device": "",
+            "description": ""
+          },
+          "performanceMode": "baseline",
+          "playback": "paused",
+          "timeSeconds": 0,
+          "clockEpoch": 0,
+          "frameId": "300",
+          "sdkVersion": "0.2.0",
+          "controlSchemaHash": "297bc0bf1131f8a46dcb56f87631f45c0f0d7a66f583d9605ff2b06c795dd3a2",
+          "controls": {
+            "spikeHeight": 0.85,
+            "noiseScale": 8,
+            "sharpness": 2,
+            "motionSpeed": 0.28,
+            "roughness": 0.38
+          },
+          "controlSequence": 0
+        }
+      },
+      {
+        "pair": 4,
+        "mode": "baseline",
+        "readyMs": 502.29999999701977,
+        "elapsedMs": 5527.399999991059,
+        "data": {
+          "type": "diagnostic-finalize",
+          "instanceId": "4f253c73-3d0f-4d16-bce4-336533951bc0",
+          "generation": 1,
+          "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+          "requestId": "78d3976f-86b8-45d1-9506-166fae2140f6",
+          "raw": [
+            {
+              "timer": "reference",
+              "frame": 16,
+              "ms": 0.253376,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270169447894016",
+                  "1789270169448012512",
+                  "1789270169448031232",
+                  "1789270169448111008",
+                  "1789270169448369088",
+                  "1789270169448424192"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 46,
+              "ms": 0.249312,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270169955213952",
+                  "1789270169955330720",
+                  "1789270169955350560",
+                  "1789270169955429376",
+                  "1789270169955668512",
+                  "1789270169955722240"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 76,
+              "ms": 0.251936,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270170460421120",
+                  "1789270170460539904",
+                  "1789270170460559904",
+                  "1789270170460638208",
+                  "1789270170460664832",
+                  "1789270170460719680"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 106,
+              "ms": 0.252352,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270170968064576",
+                  "1789270170968183808",
+                  "1789270170968220576",
+                  "1789270170968300064",
+                  "1789270170968439424",
+                  "1789270170968493056"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 136,
+              "ms": 0.252384,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270171474512896",
+                  "1789270171474630688",
+                  "1789270171474648064",
+                  "1789270171474727936",
+                  "1789270171474840576",
+                  "1789270171474895296"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 166,
+              "ms": 2.478464,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270171979757888",
+                  "1789270171980155904",
+                  "1789270171980213280",
+                  "1789270171980636928",
+                  "1789270171980676128",
+                  "1789270171982332928"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 196,
+              "ms": 2.363392,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270172482836992",
+                  "1789270172484313664",
+                  "1789270172484364480",
+                  "1789270172484856832",
+                  "1789270172484891648",
+                  "1789270172485286016"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 226,
+              "ms": 2.444736,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270172980894112",
+                  "1789270172982461312",
+                  "1789270172982515712",
+                  "1789270172983000064",
+                  "1789270172983034912",
+                  "1789270172983428096"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 256,
+              "ms": 2.479648,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270173483223648",
+                  "1789270173484823456",
+                  "1789270173484878848",
+                  "1789270173485366272",
+                  "1789270173485401088",
+                  "1789270173485793504"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 286,
+              "ms": 2.50064,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270173985700640",
+                  "1789270173987320480",
+                  "1789270173987375392",
+                  "1789270173987863008",
+                  "1789270173987894304",
+                  "1789270173988287488"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            }
+          ],
+          "reference": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": true,
+            "completedSamples": 10,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "Render and compute pass timestamps; copies, uploads and clears outside passes are excluded"
+          },
+          "routine": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": false,
+            "completedSamples": 0,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "GPU timing disabled in baseline mode"
+          },
+          "adapter": {
+            "vendor": "nvidia",
+            "architecture": "turing",
+            "device": "",
+            "description": ""
+          },
+          "performanceMode": "baseline",
+          "playback": "paused",
+          "timeSeconds": 0,
+          "clockEpoch": 0,
+          "frameId": "300",
+          "sdkVersion": "0.2.0",
+          "controlSchemaHash": "297bc0bf1131f8a46dcb56f87631f45c0f0d7a66f583d9605ff2b06c795dd3a2",
+          "controls": {
+            "spikeHeight": 0.85,
+            "noiseScale": 8,
+            "sharpness": 2,
+            "motionSpeed": 0.28,
+            "roughness": 0.38
+          },
+          "controlSequence": 0
+        }
+      },
+      {
+        "pair": 4,
+        "mode": "routine",
+        "readyMs": 516.7000000029802,
+        "elapsedMs": 5579.79999999702,
+        "data": {
+          "type": "diagnostic-finalize",
+          "instanceId": "f61b2b7a-a3a1-427c-96c3-3a9ca885af92",
+          "generation": 1,
+          "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+          "requestId": "1235880a-1b4a-43f3-b7bc-55a096ba68e0",
+          "raw": [
+            {
+              "timer": "routine",
+              "frame": 1,
+              "ms": 0.256768,
+              "complete": false,
+              "raw": {
+                "timestampsNs": [
+                  "1789270174729064480",
+                  "1789270174729188352",
+                  "1789270174737611776",
+                  "1789270174737693696",
+                  "1789270174743642592",
+                  "1789270174743693568"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 16,
+              "ms": 0.25104,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270174996464640",
+                  "1789270174996581376",
+                  "1789270174996599808",
+                  "1789270174996679360",
+                  "1789270174996732576",
+                  "1789270174996787328"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 31,
+              "ms": 0.251776,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270175250383264",
+                  "1789270175250500608",
+                  "1789270175250518816",
+                  "1789270175250597952",
+                  "1789270175250760704",
+                  "1789270175250816000"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 46,
+              "ms": 0.252352,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270175504570944",
+                  "1789270175504688128",
+                  "1789270175504706560",
+                  "1789270175504786432",
+                  "1789270175504989184",
+                  "1789270175505044480"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 61,
+              "ms": 0.25152,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270175758566400",
+                  "1789270175758683136",
+                  "1789270175758703616",
+                  "1789270175758783104",
+                  "1789270175759041536",
+                  "1789270175759096832"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 76,
+              "ms": 0.252,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270176017865728",
+                  "1789270176017983552",
+                  "1789270176018004928",
+                  "1789270176018084256",
+                  "1789270176018307776",
+                  "1789270176018362624"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 91,
+              "ms": 0.250624,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270176270582176",
+                  "1789270176270699456",
+                  "1789270176270719296",
+                  "1789270176270797824",
+                  "1789270176271057888",
+                  "1789270176271112704"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 106,
+              "ms": 0.25152,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270176526730240",
+                  "1789270176526846976",
+                  "1789270176526865408",
+                  "1789270176526945280",
+                  "1789270176527170176",
+                  "1789270176527225088"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 121,
+              "ms": 0.249216,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270176779504352",
+                  "1789270176779621376",
+                  "1789270176779641216",
+                  "1789270176779719680",
+                  "1789270176779733536",
+                  "1789270176779787264"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 136,
+              "ms": 2.474752,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270177033622528",
+                  "1789270177033984800",
+                  "1789270177034037280",
+                  "1789270177035743360",
+                  "1789270177035778176",
+                  "1789270177036184576"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 151,
+              "ms": 2.362944,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270177291025440",
+                  "1789270177292506112",
+                  "1789270177292555296",
+                  "1789270177293046112",
+                  "1789270177293079264",
+                  "1789270177293470720"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 166,
+              "ms": 2.385984,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270177543908064",
+                  "1789270177545413696",
+                  "1789270177545466272",
+                  "1789270177545951360",
+                  "1789270177545980928",
+                  "1789270177546376192"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 181,
+              "ms": 2.456672,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270177795789472",
+                  "1789270177797364224",
+                  "1789270177797420064",
+                  "1789270177797911424",
+                  "1789270177797946272",
+                  "1789270177798336832"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 196,
+              "ms": 2.444896,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270178048056320",
+                  "1789270178049632704",
+                  "1789270178049688352",
+                  "1789270178050165664",
+                  "1789270178050198528",
+                  "1789270178050589728"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 211,
+              "ms": 2.457504,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270178298698304",
+                  "1789270178299053056",
+                  "1789270178299106304",
+                  "1789270178300805312",
+                  "1789270178300844256",
+                  "1789270178301248000"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 226,
+              "ms": 2.501632,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270178555472896",
+                  "1789270178555844928",
+                  "1789270178555898784",
+                  "1789270178557629440",
+                  "1789270178557665888",
+                  "1789270178558064832"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 241,
+              "ms": 2.509152,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270178806389760",
+                  "1789270178808017920",
+                  "1789270178808075296",
+                  "1789270178808564736",
+                  "1789270178808599168",
+                  "1789270178808990720"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 256,
+              "ms": 2.558272,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270179063514144",
+                  "1789270179065186976",
+                  "1789270179065258272",
+                  "1789270179065747872",
+                  "1789270179065786400",
+                  "1789270179066182240"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "routine",
+              "frame": 271,
+              "ms": 2.58624,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270179314367488",
+                  "1789270179316073376",
+                  "1789270179316132768",
+                  "1789270179316617408",
+                  "1789270179316658304",
+                  "1789270179317054016"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            },
+            {
+              "timer": "reference",
+              "frame": 286,
+              "ms": 2.599136,
+              "complete": true,
+              "raw": {
+                "timestampsNs": [
+                  "1789270179570581952",
+                  "1789270179572294656",
+                  "1789270179572353536",
+                  "1789270179572843520",
+                  "1789270179572880384",
+                  "1789270179573276832"
+                ],
+                "passCount": 3,
+                "submittedBuffers": 3
+              }
+            }
+          ],
+          "reference": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": true,
+            "completedSamples": 10,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "Render and compute pass timestamps; copies, uploads and clears outside passes are excluded"
+          },
+          "routine": {
+            "timestampQuerySupported": true,
+            "timestampQueryEnabled": true,
+            "completedSamples": 10,
+            "failedSamples": 0,
+            "droppedSamples": 0,
+            "pendingSamples": 0,
+            "reason": "Render and compute pass timestamps; copies, uploads and clears outside passes are excluded"
+          },
+          "adapter": {
+            "vendor": "nvidia",
+            "architecture": "turing",
+            "device": "",
+            "description": ""
+          },
+          "performanceMode": "routine",
+          "playback": "paused",
+          "timeSeconds": 0,
+          "clockEpoch": 0,
+          "frameId": "300",
+          "sdkVersion": "0.2.0",
+          "controlSchemaHash": "297bc0bf1131f8a46dcb56f87631f45c0f0d7a66f583d9605ff2b06c795dd3a2",
+          "controls": {
+            "spikeHeight": 0.85,
+            "noiseScale": 8,
+            "sharpness": 2,
+            "motionSpeed": 0.28,
+            "roughness": 0.38
+          },
+          "controlSequence": 0
+        }
+      }
+    ],
+    "elapsedMs": 56019.60000000894
+  },
+  "analysis": {
+    "metric": "render/compute pass perturbation on reference frames",
+    "validity": "diagnostic",
+    "issues": [],
+    "legs": [
+      {
+        "pair": 0,
+        "mode": "baseline",
+        "samples": 8,
+        "meanMs": 1.709956,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 0,
+        "mode": "routine",
+        "samples": 8,
+        "meanMs": 1.7116879999999999,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 1,
+        "mode": "routine",
+        "samples": 8,
+        "meanMs": 2.0086399999999998,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 1,
+        "mode": "baseline",
+        "samples": 8,
+        "meanMs": 1.6223079999999999,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 2,
+        "mode": "baseline",
+        "samples": 8,
+        "meanMs": 1.944252,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 2,
+        "mode": "routine",
+        "samples": 8,
+        "meanMs": 1.679932,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 3,
+        "mode": "routine",
+        "samples": 8,
+        "meanMs": 1.4105159999999999,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 3,
+        "mode": "baseline",
+        "samples": 8,
+        "meanMs": 1.703392,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 4,
+        "mode": "baseline",
+        "samples": 8,
+        "meanMs": 1.6279440000000003,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 4,
+        "mode": "routine",
+        "samples": 8,
+        "meanMs": 1.933524,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      }
+    ],
+    "pairs": [
+      {
+        "pair": 0,
+        "ratio": 1.0010128915597827,
+        "percent": 0.10128915597826804,
+        "quantizationPercentBounds": [
+          -37.31031033125204,
+          59.85722314200221
+        ]
+      },
+      {
+        "pair": 1,
+        "ratio": 1.23813727109772,
+        "percent": 23.81372710977201,
+        "quantizationPercentBounds": [
+          -19.85091718084232,
+          95.41710465937454
+        ]
+      },
+      {
+        "pair": 2,
+        "ratio": 0.864050544888214,
+        "percent": -13.594945511178603,
+        "quantizationPercentBounds": [
+          -44.952572612758765,
+          33.662145817376235
+        ]
+      },
+      {
+        "pair": 3,
+        "ratio": 0.8280630647554995,
+        "percent": -17.193693524450048,
+        "quantizationPercentBounds": [
+          -51.47876951723928,
+          37.67096939647803
+        ]
+      },
+      {
+        "pair": 4,
+        "ratio": 1.1877091595288287,
+        "percent": 18.770915952882874,
+        "quantizationPercentBounds": [
+          -23.79089235884344,
+          88.4415029059031
+        ]
+      }
+    ],
+    "meanPairedPercent": 2.3794586366009005,
+    "pairedBootstrap95Percent": [
+      -12.295197783055807,
+      17.054115056257608
+    ],
+    "systematicQuantizationPercentBounds": [
+      -35.47669240018717,
+      63.009789184226825
+    ],
+    "quantizationAssumption": "Prior observed65536ns quantum treated as endpoint uncertainty; sum bound2*quantum per pass. Null upper bound means unbounded. Bootstrap does not remove this systematic bound.",
+    "totalGpuOverheadGate": "unavailable",
+    "reason": "Reference frames exclude real routine query frames; pass sums omit uploads/copies/query resolve/readback. This is not direct collector GPU overhead or total visual GPU cost."
+  },
+  "errors": [],
+  "appClosed": true,
+  "job": {
+    "exitCode": 0,
+    "timeout": false,
+    "cancelled": false,
+    "forcedStop": false,
+    "cleanupComplete": true,
+    "endUtc": "2026-09-13T03:29:45.347621Z",
+    "endTicks": "701822905808"
+  }
+}

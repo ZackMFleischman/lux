@@ -1,0 +1,50 @@
+{
+  "ok": true,
+  "runId": "eff1cc1b-f3d4-4a3a-84b9-698f94ff0d47",
+  "scope": "Direct GPU query/resolve/copy cost on a controlled30-frame batch",
+  "batchEffectsMs": [
+    0.008687999999999807,
+    0.007360000000000255,
+    0.0032800000000001717,
+    0.02856000000000014,
+    0.0034719999999999196,
+    0.005663999999999891,
+    0.0037919999999997955,
+    0.0032319999999996796
+  ],
+  "meanDeltaMs": 0.008005999999999958,
+  "amortizedDeltaPerFrameMs": 0.0002668666666666653,
+  "meanBaselineBatchMs": 2.43302,
+  "meanRoutineBatchMs": 2.441026,
+  "deltaPercentOfBaseline": 0.3290560702336996,
+  "expanded95PercentOfBaseline": [
+    -16.405367589504273,
+    17.063479729971675
+  ],
+  "percentDenominator": "Observed baseline mean held fixed; same conditional assumptions as delta interval",
+  "statistical95IntervalMs": [
+    0.0008541254738430974,
+    0.015157874526156818
+  ],
+  "expanded95IntervalMs": [
+    -0.3991458745261569,
+    0.4151578745261568
+  ],
+  "amortizedExpanded95IntervalMs": [
+    -0.01330486248420523,
+    0.013838595817538562
+  ],
+  "uncertainty": {
+    "method": "Student t across8 ABBA block effects; descriptive conditional interval",
+    "observedEndpointLatticeNs": "32",
+    "assumedEndpointErrorEnvelopeNs": 100000,
+    "deltaEnvelopeMs": 0.4,
+    "calibrated": false,
+    "source": "https://developer.chrome.com/blog/new-in-webgpu-121"
+  },
+  "conclusion": "Inconclusive: sign and magnitude not resolved above noise/envelope",
+  "fullStudioOverheadAcceptance": "unavailable",
+  "cpuHookCostMeasured": false,
+  "activeGpuBusyTimeMeasured": false,
+  "quantizationDisabled": false
+}

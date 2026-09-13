@@ -102,3 +102,23 @@ bootstrap interval against the unchanged <2% gate. Observed timestamp steps of
 0.065536 ms are much larger than 2% of the current small workload's roughly
 0.262 ms pass cost. More samples alone do not establish measurement accuracy;
 GPU overhead remains inconclusive until the reference has adequate resolution.
+
+### 12 September automated overhead checkpoint
+
+Both bounded, independently reviewed hardware diagnostics have now run. The
+direct query/resolve/copy batch test observed +0.008006 ms per 30-frame batch
+(+0.3291% of its controlled baseline). Five sphere pass pairs were too noisy
+to resolve a small effect. Raw samples, uncertainty assumptions and confirmed
+process cleanup are recorded in [GPU overhead evidence](../../evidence/tracer-0.1/gpu-overhead/README.md).
+These tests need no user QA. Collection is complete; full Studio <2% acceptance
+remains unverified because coverage and measurement accuracy are still limited.
+
+The preceding native pixel-correspondence run
+`04c15dba-5627-4841-a939-bf6c67786c0d` also passed: all eight distinct control
+values matched decoded image markers, 246 native observations joined 246 host
+opportunities with no missing ordinals, and supervised cleanup passed. Independent
+review decoded all 118 valid marker samples, including initial value zero.
+Artifacts: `.worktrees/pixel-correlation-probe/artifacts/pixel-correlation-probe/`;
+inspection SHA-256 `2d86f81d033ca5890fbb36adf4ccbb9224e0dccc38db8fa1cae9bb40f217019c`.
+This intrusive eight-change fixture is a correspondence diagnostic, not the
+600-change latency run or an actual Resolume check.
