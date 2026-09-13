@@ -85,7 +85,7 @@ test('failed preview validation prevents export and releases the session lock', 
 test('failed open preserves document controls through save and applies them when repaired', async () => {
   const w = createSourceWorkspace(source()), saved: any[] = [];
   let invalid = true, intensity = 0.2;
-  const session = createAuthoringSession(w, { submit: async (_source, options) => { if (invalid) throw Error('broken source'); intensity = options!.savedControls!.values.intensity!; },
+  const session = createAuthoringSession(w, { submit: async (_source, options) => { if (invalid) throw Error('broken source'); const controls=options!.savedControls!;assert.ok('values' in controls);intensity = controls.values.intensity!; },
     save: async request => { saved.push(request); return { token: 'opened', name: 'broken.lux-scene' }; },
     getControls: () => ({ intensity }),
     open: async () => ({ token: 'opened', name: 'broken.lux-scene', document: { format: 'lux-scene', version: 1,

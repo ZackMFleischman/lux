@@ -12,15 +12,16 @@ const call = createStudioConnection(selectedSession);
 const text = value => ({ content: [{ type: 'text', text: JSON.stringify(value) }] });
 async function runningStudio() {
   try { const status = await call('status'); return { connected: true, studioSession: status.studioSession, capabilities: status.capabilities ?? null,
-    compatible: status.capabilities?.codeDeclaredParameters === true,
-    advice: status.capabilities?.codeDeclaredParameters ? undefined : 'Running Studio predates this adapter; restart from the matching checkout before using SDK 0.2.' }; }
+    compatible: status.capabilities?.codeDeclaredParameters === true && status.capabilities?.supportedSdkVersions?.includes('0.4.0'),
+    advice: status.capabilities?.codeDeclaredParameters && status.capabilities?.supportedSdkVersions?.includes('0.4.0') ? undefined : 'Running Studio predates this adapter; restart from the matching checkout before using SDK 0.4 composition.' }; }
   catch (error) { return { connected: false, compatible: false,
     selectedSession: { profile: selectedSession.profile, workspace: selectedSession.workspace },
     advice: `Use the same Studio profile and checkout; reconnect the adapter after replacing Studio. ${error.message}` }; }
 }
 server.registerTool('lux.studio.discover', { description: 'Read the exact visual SDK, example and standalone Lux capabilities. Start Lux Studio separately.', inputSchema: {} }, async () => text({ ...await discoverVisualSdk(), scope: 'standalone-studio', tools: ['read', 'build', 'capture', 'status', 'parameters', 'playback', 'restart'], resolume: false,
   runningStudio: await runningStudio(),
-  parameters: { kinds: ['number'], maxCount: 32, declaredInCode: true, requiredGuard: 'expectedControlSchemaHash from current runtime status', implicitControls: false },
+  parameters: { kinds: ['number'], maxCount: 32, declaredInCode: true, requiredGuard: 'expectedControlSchemaHash from current runtime status', implicitControls: false,
+    composition: 'SDK 0.4 image-chain-v1 exposes selected leaf controls as independent public aliases; values remain owned by stable node identity.' },
   sourceDocuments: { versions: [1, 2], replacement: 'complete source; preserve sourceVersion and assets when editing v2',
     assetPlayback: true, assetExport: true, assetFormats: ['image/bmp', 'image/png', 'image/jpeg'], decodedImages: 'context.images: top-down sRGB straight-alpha RGBA' , assetDimension: assetLimits.dimension, assetCount: assetLimits.count,
     assetFileBytes: assetLimits.imageBytes, assetTotalBytes: assetLimits.totalBytes,

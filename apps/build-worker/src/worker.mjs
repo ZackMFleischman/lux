@@ -16,6 +16,8 @@ import { extractControlDeclarations } from './parameter-declarations.mjs';
 import { canonicalControlSchemaJson } from '../../../packages/runtime-contracts/src/parameters.mjs';
 import {extractComponentDeclaration} from './component-declarations.mjs';
 import {canonicalComponentMetadataJson} from '../../../packages/runtime-contracts/src/components.mjs';
+import {extractCompositionDeclaration} from './composition-declarations.mjs';
+import {canonicalImageCompositionJson} from '../../../packages/runtime-contracts/src/composition-profile.mjs';
 import { assetDependencyPaths } from './asset-dependencies.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -29,7 +31,7 @@ function diagnostic(error, file) {
 async function main() {
   const { source: raw, dependencyRoot } = await readBoundedJson(process.argv[2], limits.requestBytes);
   const source = validateSource(raw), dependencyHashes = {}, selectedSdk = sdkSourceFile(source.sdkVersion);
-  let controls, component;
+  let controls, component, composition;const asts={};
   for (const [name, version] of Object.entries(pinned)) {
     const bytes = await readFile(join(dependencyRoot, name, 'package.json'));
     if (JSON.parse(bytes).version !== version) throw violation(`Install pinned ${name}@${version}`, 'SERVICE_UNAVAILABLE');
@@ -40,7 +42,7 @@ async function main() {
     let ast;
     try { ast = parse(text, { sourceType: 'module', plugins: ['typescript'], errorRecovery: false }); }
     catch (error) { return { ok: false, code: 'COMPILE_FAILED', diagnostics: [diagnostic(error, path)] }; }
-    try {
+    asts[path]=ast;try {
       if (ast.comments.some(c => /<reference\b|@ts-(?:ignore|nocheck|expect-error)/i.test(c.value))) throw violation('Compiler references and diagnostic-suppression directives are prohibited');
       const stack = [ast.program];
       while (stack.length) {
@@ -62,6 +64,7 @@ async function main() {
       }
       if (path === source.entry) {
         if (source.sdkVersion === '0.3.0') { component=extractComponentDeclaration(ast); controls=component.controls; }
+        else if(source.sdkVersion==='0.4.0') { /* extracted after every module has been parsed */ }
         else if (source.sdkVersion !== '0.1.0') { controls = extractControlDeclarations(ast); }
         else {
         const imported = ast.program.body.flatMap(n => n.type === 'ImportDeclaration' && n.source.value === '@lux/visual-sdk' ? n.specifiers.filter(s => s.type === 'ImportSpecifier' && s.imported.name === 'defineVisual').map(s => s.local.name) : []);
@@ -71,6 +74,7 @@ async function main() {
       }
     } catch (error) { return { ok: false, code: error.code, diagnostics: [diagnostic(error, path)] }; }
   }
+  if(source.sdkVersion==='0.4.0'){try{composition=extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash:sha});controls=composition.publicControls;}catch(error){return {ok:false,code:error.code||'COMPILE_FAILED',diagnostics:[diagnostic(error,source.entry)]};}}
   for (const [path, text] of Object.entries(source.files)) {
     await mkdir(dirname(join(workspace, 'source', path)), { recursive: true });
     await writeFile(join(workspace, 'source', path), text);
@@ -86,8 +90,9 @@ async function main() {
     // module. No repo-relative path escapes into generated artifact imports.
     await writeFile(join(workspace, 'types/parameters.d.ts'), await readFile(join(root, 'packages/runtime-contracts/src/parameters.d.mts')));
   }
-  if (component) await writeFile(join(workspace,'types/components.d.ts'), (await readFile(join(root,'packages/runtime-contracts/src/components.d.mts'),'utf8')).replaceAll('./parameters.mjs','./parameters.js'));
-  await writeFile(join(workspace, '__lux_check.ts'), `import visual from './source/${source.entry}';\nimport type { ${component?'ComponentDefinition':'VisualDefinition'} } from '@lux/visual-sdk';\nconst checked: ${component?'ComponentDefinition':'VisualDefinition'} = visual;\nexport { checked };\n`);
+  if (component||composition) await writeFile(join(workspace,'types/components.d.ts'), (await readFile(join(root,'packages/runtime-contracts/src/components.d.mts'),'utf8')).replaceAll('./parameters.mjs','./parameters.js'));
+  const definitionType=composition?'CompositionDefinition':component?'ComponentDefinition':'VisualDefinition';
+  await writeFile(join(workspace, '__lux_check.ts'), `import visual from './source/${source.entry}';\nimport type { ${definitionType} } from '@lux/visual-sdk';\nconst checked: ${definitionType} = visual;\nexport { checked };\n`);
   const zod = JSON.parse(await readFile(join(dependencyRoot, 'zod/package.json'), 'utf8'));
   const config = { compilerOptions: { target: 'ES2023', module: 'ESNext', moduleResolution: 'Bundler', strict: true,
     types: [], lib: ['ES2023', 'DOM'], skipLibCheck: true, noEmitOnError: true, sourceMap: true, inlineSources: true,
@@ -120,10 +125,12 @@ async function main() {
   modules['__lux/sdk.js'] = await readFile(join(workspace, 'out/types/sdk.js'), 'utf8');
   sourceMaps['__lux/sdk.js.map'] = await readFile(join(workspace, 'out/types/sdk.js.map'), 'utf8');
   if (source.sdkVersion !== '0.1.0') modules['__lux/parameters.js'] = await readFile(join(root, 'packages/runtime-contracts/src/parameters.mjs'), 'utf8');
-  if(component) modules['__lux/components.js']=(await readFile(join(root,'packages/runtime-contracts/src/components.mjs'),'utf8')).replaceAll('./parameters.mjs','./parameters.js');
+  if(component||composition) modules['__lux/components.js']=(await readFile(join(root,'packages/runtime-contracts/src/components.mjs'),'utf8')).replaceAll('./parameters.mjs','./parameters.js');
   const dependencies = {
-    ...(component ? Object.fromEntries(['components.mjs','components.d.mts','component-profile.mjs'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
-    ...(component ? {'compiler/component-declarations.mjs':join(root,'apps/build-worker/src/component-declarations.mjs')} : {}),
+    ...((component||composition) ? Object.fromEntries(['components.mjs','components.d.mts','component-profile.mjs'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
+    ...((component||composition) ? {'compiler/component-declarations.mjs':join(root,'apps/build-worker/src/component-declarations.mjs')} : {}),
+    ...(composition ? Object.fromEntries(['composition-profile.mjs','composition-profile.d.mts'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
+    ...(composition ? {'compiler/composition-declarations.mjs':join(root,'apps/build-worker/src/composition-declarations.mjs')} : {}),
     ...await assetDependencyPaths(root),
     'compiler/worker.mjs': fileURLToPath(import.meta.url),
     'compiler/source-policy.mjs': join(root, 'apps/build-worker/src/source-policy.mjs'),
@@ -156,7 +163,7 @@ async function main() {
   const assetFields = version === 1 ? {} : { artifactVersion:version, ...await deriveAssets(source.assets ?? {},sha) };
   const parameterFields = version >= 3 ? {controls,controlSchemaHash:sha(canonicalControlSchemaJson(controls))} : {};
   const artifact = artifactBody({ sourceHash: sha(JSON.stringify(source)), entry: source.entry.replace(/\.ts$/, '.js'), modules, sourceMaps,
-    sdkVersion: source.sdkVersion, compilerVersion: pinned.typescript, dependencyHashes, ...assetFields, ...parameterFields, ...(component?{executionModel:'single-image-source-v1',component,componentMetadataHash:sha(canonicalComponentMetadataJson(component))}:{}) });
+    sdkVersion: source.sdkVersion, compilerVersion: pinned.typescript, dependencyHashes, ...assetFields, ...parameterFields, ...(component?{executionModel:'single-image-source-v1',component,componentMetadataHash:sha(canonicalComponentMetadataJson(component))}:{}),...(composition?{executionModel:'image-chain-v1',composition,compositionHash:sha(canonicalImageCompositionJson(composition))}:{}) });
   const result = { ok: true, artifact: { ...artifact, bundleHash: sha(JSON.stringify(artifact)) }, diagnostics: [] };
   assertResultBudgets(result);
   return result;

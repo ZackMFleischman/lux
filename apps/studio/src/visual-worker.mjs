@@ -5,8 +5,12 @@ import { createInitializationProbe } from './initialization-probe.mjs';
 import { RuntimeClock } from '../../../packages/runtime/src/clock.ts';
 import { SeededRandom } from '../../../packages/runtime/src/seed.ts';
 import {createSingleImageVisual,componentDisposer,captureComponentInstance} from '../../../packages/runtime/src/components/single-image.ts';
+import {createImageCompositionVisual} from '../../../packages/runtime/src/components/image-chain.ts';
+import {validateNestedGraph} from '../../../packages/runtime/src/graph/nested-validate.ts';
+import {prepareGraphRuntimePlan} from '../../../packages/runtime/src/graph/runtime-plan.ts';
 import { prepareAuthoredModule } from './authored-worker-assets.mjs';
 import { prepareWorkerControlState } from './controls/worker-control-state.mjs';
+import {prepareWorkerCompositionState} from './controls/worker-composition-state.mjs';
 import { createFrameCollector } from '../../../packages/performance/live.mjs';
 import { createGpuPassTimer } from '../../../packages/performance/gpu-pass.mjs';
 import { collectionMode } from '../../../packages/performance/collection-mode.mjs';
@@ -15,7 +19,7 @@ const createURL=URL.createObjectURL.bind(URL),revokeURL=URL.revokeObjectURL.bind
 const now=performance.now.bind(performance);
 const post=postMessage.bind(globalThis);
 let identity, renderer, device, visual, clock, random, settings, outputTarget, presentation;
-let initializationProbe, material, componentBridge, authoredCleanup, cleanupPromise, activeOperation;
+let initializationProbe, material, componentBridge, compositionBridge, authoredCleanup, cleanupPromise, activeOperation;
 let authoredDisposalAttempted=false,terminalError;
 let controlState, frame = 0, tick = 0, lastTime = 0;
 let drawStarted=0,scheduleEpoch=0;
@@ -73,7 +77,7 @@ async function draw(requestId, type = 'frame') {
   const asynchronous=profiling&&renderResult != null && typeof renderResult.then === 'function';
   await renderResult;
   requireRunning();
-  if(componentBridge) presentation.render(renderer);
+  if(componentBridge||compositionBridge) presentation.render(renderer);
   const renderEnd=profiling?now():0;
   await device.queue.onSubmittedWorkDone();
   requireRunning();
@@ -104,7 +108,7 @@ async function initialize(message) {
   if (!settings || settings.width !== 1920 || settings.height !== 1080 || settings.fps !== 60 ||
       !Number.isInteger(settings.seed) || settings.seed < 0 || settings.seed > 0xffffffff) throw Error('Unsupported output settings');
   const prepared=await prepareAuthoredModule(message);
-  controlState=await prepareWorkerControlState(message,prepared.admission);
+  controlState=prepared.admission.kind==='composition'?await prepareWorkerCompositionState(message,prepared.admission):await prepareWorkerControlState(message,prepared.admission);
   clock = new RuntimeClock(() => performance.now(), 'paused'); random = new SeededRandom(settings.seed);
   /*! lux-worker-liveness-v2: heartbeat starts before authored import/create. */
   let workerHeartbeat=0;
@@ -144,7 +148,13 @@ async function initialize(message) {
   }
   const context={ settings: freeze({ ...settings }), assets, images,
     random: () => random.next(), reportError: value => { throw new RuntimeError(String(value)); } };
-  if(prepared.admission.kind==='component'){
+  if(prepared.admission.kind==='composition'){
+    const profile=prepared.admission.composition,targets=new WeakMap(),settlements=new Set(),descriptor={width:settings.width,height:settings.height};let staged,settlementFailure;
+    const resources=freeze({async produce(output){const call=staged;staged=undefined;if(!call)throw new RuntimeError('Missing staged component render');const target=new module.RenderTarget(descriptor.width,descriptor.height);target.texture.colorSpace=module.SRGBColorSpace;targets.set(output,target);renderer.setRenderTarget(target);try{await renderer.render(call.scene,call.camera);}finally{renderer.setRenderTarget(null);}},release(image){const target=targets.get(image);if(!target)throw new RuntimeError('Missing component image allocation');targets.delete(image);const settled=device.queue.onSubmittedWorkDone().then(()=>target.dispose());settlements.add(settled);settled.then(()=>settlements.delete(settled),error=>{settlementFailure??=error;settlements.delete(settled);});},capture(){}});
+    const backend=freeze({resources,stage(scene,camera){if(staged)throw new RuntimeError('Component render already staged');staged={scene,camera};},texture(image){const target=targets.get(image);if(!target)throw new RuntimeError('Missing component input image');return target.texture;},async present(image){const target=targets.get(image);if(!target)throw new RuntimeError('Missing final component image');const copyMaterial=new module.MeshBasicNodeMaterial();copyMaterial.fragmentNode=module.sampleTexture(target.texture);const copy=new module.QuadMesh(copyMaterial);renderer.setRenderTarget(outputTarget);try{copy.render(renderer);}finally{renderer.setRenderTarget(null);copyMaterial.dispose();}},async drain(){while(settlements.size)await Promise.allSettled([...settlements]);if(settlementFailure)throw settlementFailure;}});
+    const plan=prepareGraphRuntimePlan(validateNestedGraph(profile.graph,profile.definitions));
+    compositionBridge=await createImageCompositionVisual({plan,definitions:create,context:freeze(context),backend});visual=compositionBridge;authoredCleanup=()=>compositionBridge.dispose();
+  }else if(prepared.admission.kind==='component'){
     const instance=await create(freeze(context));
     authoredCleanup=componentDisposer(instance);
     const captured=captureComponentInstance(instance);

@@ -2,6 +2,7 @@ import {verifyLinked} from '../../../apps/build-worker/src/artifact-identity.mjs
 import {verifyDerivedAssets,createReadonlyAssetMap,createReadonlyImageMap} from '../../../packages/assets/src/index.mjs';
 import {validateSingleImageProfile} from '../../../packages/runtime-contracts/src/component-profile.mjs';
 import {snapshotRecord} from '../../../apps/build-worker/src/source-policy.mjs';
+import {normalizeImageCompositionProfile} from '../../../packages/runtime-contracts/src/composition-profile.mjs';
 
 // This module is loaded in the pristine worker realm. All admission and private
 // store construction finish before invoking the trusted submitted-code importer.
@@ -24,12 +25,15 @@ export async function prepareAuthoredModule(message) {
     assets=createReadonlyAssetMap(sourceAssets);
     images=createReadonlyImageMap(sourceAssets);
     moduleSource=linked.code;
-    if(linked.linkedVersion===4){
+    if(linked.linkedVersion===5){
+      const composition=normalizeImageCompositionProfile(linked.composition);
+      admission=freeze({kind:'composition',sdkVersion:linked.sdkVersion,executionModel:linked.executionModel,composition,compositionHash:linked.compositionHash,controls:linked.controls,controlSchemaHash:linked.controlSchemaHash});
+    }else if(linked.linkedVersion===4){
       const component=validateSingleImageProfile(linked.component);
       admission=freeze({kind:'component',sdkVersion:linked.sdkVersion,executionModel:linked.executionModel,component,componentMetadataHash:linked.componentMetadataHash,controls:linked.controls,controlSchemaHash:linked.controlSchemaHash});
     }else admission=freeze({kind:'visual',sdkVersion:linked.linkedVersion===3?'0.2.0':'0.1.0'});
   } else {
-    if(message.sdkVersion==='0.3.0')throw Error('Components require verified linked envelope');
+    if(message.sdkVersion==='0.3.0'||message.sdkVersion==='0.4.0')throw Error('Components require verified linked envelope');
     // Existing v1 installed/render-host readers send only moduleSource. Never
     // accept an asset-bearing message through this compatibility branch.
     if(['assets','linkedVersion','artifactVersion','sourceVersion','assetSetHash'].some(key=>Object.hasOwn(message,key))) throw Error('Assets require a verified linked envelope');

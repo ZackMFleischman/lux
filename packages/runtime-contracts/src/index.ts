@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const SDK_VERSION = '0.1.0' as const;
-export const sourceSdkVersionSchema = z.enum(['0.1.0', '0.2.0', '0.3.0']);
+export const sourceSdkVersionSchema = z.enum(['0.1.0', '0.2.0', '0.3.0', '0.4.0']);
 export const hashSchema = z.string().regex(/^[a-f0-9]{64}$/);
 export const runtimeKeySchema = z.object({ instanceId: z.string().uuid(), generation: z.number().int().nonnegative().safe() }).strict();
 export type RuntimeKey = z.infer<typeof runtimeKeySchema>;
@@ -76,7 +76,11 @@ export const componentCompiledArtifactSchema = parameterCompiledArtifactSchema.e
   artifactVersion:z.literal(4),sdkVersion:z.literal('0.3.0'),executionModel:z.literal('single-image-source-v1'),
   component:componentMetadataDtoSchema,componentMetadataHash:hashSchema,
 }).strict();
-export const compiledArtifactSchema = z.union([legacyCompiledArtifactSchema,assetCompiledArtifactSchema,parameterCompiledArtifactSchema,componentCompiledArtifactSchema]);
+export const compositionCompiledArtifactSchema = parameterCompiledArtifactSchema.extend({
+  artifactVersion:z.literal(5),sdkVersion:z.literal('0.4.0'),executionModel:z.literal('image-chain-v1'),
+  composition:z.unknown(),compositionHash:hashSchema,
+}).strict();
+export const compiledArtifactSchema = z.union([legacyCompiledArtifactSchema,assetCompiledArtifactSchema,parameterCompiledArtifactSchema,componentCompiledArtifactSchema,compositionCompiledArtifactSchema]);
 export type CompiledArtifact = z.infer<typeof compiledArtifactSchema>;
 // A compiled artifact has not run a candidate smoke test and is not a ValidatedBundle.
 export const compileFailureCodeSchema = z.enum(['SOURCE_BOUNDARY_VIOLATION', 'COMPILE_FAILED', 'QUOTA_EXCEEDED', 'TIMEOUT', 'SERVICE_UNAVAILABLE']);

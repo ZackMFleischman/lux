@@ -16,13 +16,14 @@ export type RuntimeView = RuntimeKey & Readonly<{
   clockEpoch: number; frameId: string | null; controlMigration?: readonly ControlMigration[];
   output: Readonly<Pick<OutputSettings, 'width' | 'height'>>;
   fault: Readonly<{ code: string; message: string }> | null;
-}> & (RuntimeControlState & Readonly<{sdkVersion:'0.2.0';intensity?:never}> |
+}> & (RuntimeControlState & Readonly<{sdkVersion:'0.2.0'|'0.4.0';intensity?:never}> |
   Partial<RuntimeControlState> & Readonly<{sdkVersion?:'0.1.0';intensity:number}>);
 export function getRuntimeControlState(runtime:RuntimeView):RuntimeControlState {
   const schema=normalizeControlSchema(runtime.controlSchema??LEGACY_CONTROL_SCHEMA);
   return Object.freeze({sdkVersion:runtime.sdkVersion??'0.1.0',controlSchema:schema,
     controlSchemaHash:runtime.controlSchemaHash??LEGACY_CONTROL_SCHEMA_HASH,
-    controls:validateControlSnapshot(schema,runtime.controls??{intensity:runtime.intensity}),controlSequence:runtime.controlSequence??0});
+    controls:validateControlSnapshot(schema,runtime.controls??{intensity:runtime.intensity}),controlSequence:runtime.controlSequence??0,
+    ...(runtime.sdkVersion==='0.4.0'&&runtime.nodeControls?{nodeControls:runtime.nodeControls}:{})});
 }
 export type StudioSnapshot = Readonly<{
   connection: 'disconnected' | 'connecting' | 'connected'; message: string | null;
@@ -74,10 +75,10 @@ export class StudioController {
     const target = this.target();
     const state=getRuntimeControlState(target), patch=validateControlPatch(state.controlSchema,values);
     const pending=this.latestParameters?.input;
-    if(pending && (pending.instanceId!==target.instanceId || pending.expectedGeneration!==target.generation || pending.expectedRevisionId!==target.revisionId || pending.expectedControlSchemaHash!==(target.sdkVersion==='0.2.0'?state.controlSchemaHash:undefined))) throw Error('Runtime target changed while parameters were queued');
+    if(pending && (pending.instanceId!==target.instanceId || pending.expectedGeneration!==target.generation || pending.expectedRevisionId!==target.revisionId || pending.expectedControlSchemaHash!==(state.sdkVersion!=='0.1.0'?state.controlSchemaHash:undefined))) throw Error('Runtime target changed while parameters were queued');
     this.latestParameters = { name: 'lux.parameters.set', input: {
       requestId: this.requestId(), instanceId: target.instanceId, expectedGeneration: target.generation,
-      expectedRevisionId: target.revisionId,...(target.sdkVersion==='0.2.0'?{expectedControlSchemaHash:state.controlSchemaHash}:{}),
+      expectedRevisionId: target.revisionId,...(state.sdkVersion!=='0.1.0'?{expectedControlSchemaHash:state.controlSchemaHash}:{}),
       values: {...pending?.values,...patch}, mode: 'live',
     } };
     return this.startParameterDrain();

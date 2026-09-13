@@ -1,5 +1,6 @@
 import {normalizeComponentDeclaration} from '../../../packages/runtime-contracts/src/components.mjs';
 import {validateSingleImageProfile} from '../../../packages/runtime-contracts/src/component-profile.mjs';
+import {validateImageChainComponentProfile} from '../../../packages/runtime-contracts/src/composition-profile.mjs';
 function fail(node,message){throw Object.assign(Error(message),{code:'COMPILE_FAILED',loc:node?.loc?.start??{line:1,column:0}});}
 function unwrap(node){while(node&&['TSAsExpression','TSSatisfiesExpression','TSTypeAssertion','ParenthesizedExpression'].includes(node.type))node=node.expression;return node;}
 function rows(node){
@@ -21,7 +22,7 @@ function literal(node){
  }
  fail(node,'Metadata requires literals; no references, calls or expressions');
 }
-export function extractComponentDeclaration(ast){
+export function extractComponentDeclaration(ast,profile='single-image-source-v1'){
  const program=ast.program??ast;
  const aliases=program.body.flatMap(n=>n.type==='ImportDeclaration'&&n.importKind!=='type'&&n.source.value==='@lux/visual-sdk'?n.specifiers.filter(s=>s.type==='ImportSpecifier'&&s.importKind!=='type'&&(s.imported.name??s.imported.value)==='defineComponent').map(s=>s.local.name):[]);
  const exported=program.body.find(n=>n.type==='ExportDefaultDeclaration'),call=unwrap(exported?.declaration);
@@ -29,5 +30,5 @@ export function extractComponentDeclaration(ast){
  const outer=rows(call.arguments[0]);
  if(outer.size!==2||!outer.has('metadata')||!outer.has('create')||outer.get('metadata').type!=='ObjectProperty')fail(call,'Component requires only literal metadata and create');
  const node=outer.get('metadata').value;
- try{return validateSingleImageProfile(normalizeComponentDeclaration(literal(node)));}catch(error){if(error.code==='COMPILE_FAILED')throw error;fail(node,error.message);}
+ try{const metadata=normalizeComponentDeclaration(literal(node));return profile==='image-chain-v1'?validateImageChainComponentProfile(metadata):validateSingleImageProfile(metadata);}catch(error){if(error.code==='COMPILE_FAILED')throw error;fail(node,error.message);}
 }

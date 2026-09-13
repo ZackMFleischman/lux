@@ -1,12 +1,20 @@
 # Visual programming in Lux
 
-This reference describes the checked SDK 0.2.0 (with legacy 0.1 support) / Three.js 0.186.0 implementation. When capabilities change, use discovery from the adapter paired with the running Studio build plus actual tool results. Discovery describes checkout files and separately reports `runningStudio.capabilities`; check `compatible` before using SDK 0.2; see [connection](studio-tools.md).
+This reference describes checked SDK 0.2.0 visuals, SDK 0.4.0 image composition, legacy 0.1 support, and Three.js 0.186.0. Use discovery from the adapter paired with the running Studio build plus actual tool results. Discovery describes checkout files and separately reports `runningStudio.capabilities`; check compatibility for the selected SDK; see [connection](studio-tools.md).
 
 ## Source and lifecycle
 
 A source bundle contains `sdkVersion`, an `entry` such as `visual.ts`, and a `files` record mapping relative `.ts` paths to source text. v2 adds `sourceVersion: 2` and `assets`; preserve those fields on edits. Helpers are normal submitted modules, for example `import { palette } from './lib/palette.ts'`. The compiler accepts at most 32 files and 1 MiB aggregate UTF-8 code. Use simple ASCII path segments, forward slashes, explicit `.ts` extensions, and no case-only collisions.
 
 The entry must directly `export default defineVisual({...})`, importing `defineVisual` from `@lux/visual-sdk`. SDK 0.2 requires `{ controls, create }`. `controls` is a static literal map of 0–32 numeric descriptors: `{ type: 'number', label, default, min, max, step?, unit? }`. Use camelCase IDs. No computed metadata, spreads, functions or imported declarations. `frame.controls` is typed from those IDs. Empty `{}` means no controls; do not invent Intensity. The source bundle must set `sdkVersion: '0.2.0'`. Legacy 0.1 sources retain `{ create }` and their compatibility intensity field. Discovery's contract and parameter types describe exact bounds.
+
+## Linear image composition
+
+SDK 0.4 uses `defineComponent` in leaf modules and `defineComposition` in the entry. Component metadata statically declares image ports, numeric controls, descriptions, and lifecycle. The component owns its Three objects; `evaluate(inputs, context)` returns `{ image: await context.render(scene, camera) }`. An effect reads `inputs.image.texture` and renders its own output. Lux owns intermediate render targets and releases them only after downstream GPU work settles.
+
+The entry statically lists `definitions`, stable UUID `nodes`, `edges`, one `output`, and selected `expose` rows. Each exposed ID is a public Studio control alias for exactly one `{nodeId, controlId}` target. For example, two nodes using the same `kaleidoscope` definition can expose `segmentsA` and `segmentsB`; changing one does not mutate the other. Node identity persists values across save/reopen and declaration reorder. A changed definition identity or rebound alias does not transfer a saved value to another instance.
+
+The admitted `image-chain-v1` profile is deliberately narrow: 1–8 nodes, one linear path, one final image, no branches, delays, graph inputs, arbitrary subtrees, or graph editor. Keep SDK 0.2 for a single visual. Source metadata is extracted without executing authored code, and runtime still imports only the exact sealed linked artifact.
 
 | Hook | Responsibility |
 | --- | --- |

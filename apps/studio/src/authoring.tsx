@@ -35,6 +35,10 @@ export function AuthoringApp() {
       const runtime = client.getSnapshot().authoring;
       if (!runtime) return null;
       const state = getRuntimeControlState(runtime);
+      if(state.sdkVersion==='0.4.0'){
+        if(!state.nodeControls)throw Error('Composition controls are unavailable');
+        return {sourceHash:runtime.revisionId,nodes:state.nodeControls.nodes};
+      }
       return { sourceHash: runtime.revisionId, schema: state.controlSchema, schemaHash: state.controlSchemaHash, values: state.controls };
     },
   }), [workspace]);
