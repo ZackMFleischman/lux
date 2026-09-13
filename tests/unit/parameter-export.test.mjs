@@ -69,7 +69,7 @@ test('parameter release pins complete mapping and self-contained validators, wit
  const runtime=path.join(root,'runtime');
  for(const name of [...packageIO.requiredRuntimeFiles,...registration.supervisorFiles]){
   const target=path.join(runtime,name);fs.mkdirSync(path.dirname(target),{recursive:true});
-  fs.writeFileSync(target,name==='electron/version'?'44.3.0':runtimeCapability.parameterCapabilities[name]??'fixture');
+  fs.writeFileSync(target,name==='electron/version'?'44.3.0':[runtimeCapability.parameterCapabilities[name]??'fixture',runtimeCapability.workerLivenessCapabilities[name]??''].join('\n'));
  }
  for(const name of ['package.cjs','install.cjs','register.cjs','runtime-capability.cjs'])fs.copyFileSync(new URL('../../packages/export/src/'+name,import.meta.url),path.join(runtime,name));
  for(const name of ['transport-release.cjs','parameter-mapping.cjs','runtime-validation.cjs']){

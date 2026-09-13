@@ -1,5 +1,6 @@
 const installed = (globalThis as any).luxInstalledContext;
 const parameterProtocol='lux-parameter-render-host-v1';
+/*! lux-main-worker-liveness-v2: independent worker counter in installed health v2. */
 if (installed && installed.protocol !== 'lux-installed-render-host-v2') throw Error('Installed render-host protocol mismatch');
 if (!installed && (!process.env.LUX_EXPERIMENT_RUN_ID || process.env.LUX_EXPERIMENT_MODE !== 'hardware')) {
   throw Error('Reviewed experiment supervisor required');

@@ -18,7 +18,7 @@ function fixture(t) {
   const runtime = path.join(root, 'input'); fs.mkdirSync(runtime);
   for (const name of packageIO.requiredRuntimeFiles) {
     const target = path.join(runtime, name); fs.mkdirSync(path.dirname(target), { recursive: true });
-    fs.writeFileSync(target, name === 'electron/version' ? '44.3.0' : runtimeCapability.capabilities[name] ?? 'fixture:' + name);
+    fs.writeFileSync(target, name === 'electron/version' ? '44.3.0' : [runtimeCapability.capabilities[name] ?? 'fixture:' + name,runtimeCapability.workerLivenessCapabilities[name]??''].join('\n'));
   }
   for (const name of ['package.cjs', 'install.cjs', 'register.cjs', 'runtime-capability.cjs']) fs.copyFileSync(new URL('../../packages/export/src/' + name, import.meta.url), path.join(runtime, name));
   fs.copyFileSync(new URL('../../tools/gpu-spike/transport-release.cjs', import.meta.url), path.join(runtime, 'transport-release.cjs'));
@@ -29,6 +29,42 @@ function fixture(t) {
   const options = { name: 'Tunnel', transportPath, runtimeDirectory: runtime, electronVersion: '44.3.0', outputDirectory: path.join(root, 'exports'), intensity: 0.17 };
   return { root, runtime, options, build: overrides => packageIO.createPackage({ ...options, ...overrides }), installRoot: path.join(process.env.LOCALAPPDATA, 'Lux', 'Installed') };
 }
+test('package creation rejects each stale emitted liveness component before staging a new export',t=>{
+ const f=fixture(t);
+ for(const [relative,marker] of Object.entries(runtimeCapability.workerLivenessCapabilities)){
+  const filename=path.join(f.runtime,relative),current=fs.readFileSync(filename,'utf8');
+  fs.writeFileSync(filename,current.replace(marker,'old heartbeat implementation'));
+  assert.throws(()=>f.build(),/Rebuild.*liveness-v2/);
+  assert.equal(fs.existsSync(f.options.outputDirectory),false,'stale emissions fail before creating a package stage');
+  fs.writeFileSync(filename,current);
+ }
+ assert.ok(f.build().runtimeId);
+});
+
+test('immutable legacy runtime inventory remains valid without new export emission markers',t=>{
+ const f=fixture(t);
+ for(const relative of registration.supervisorFiles){const filename=path.join(f.runtime,relative);fs.mkdirSync(path.dirname(filename),{recursive:true});fs.writeFileSync(filename,'legacy fixture');}
+ const created=f.build(),runtime=path.join(created.path,'runtime');
+ const manifest=JSON.parse(fs.readFileSync(path.join(runtime,'runtime.json')));
+ const {runtimeId,...body}=manifest;
+ for(const [relative,marker] of Object.entries(runtimeCapability.workerLivenessCapabilities)){
+  const filename=path.join(runtime,relative),bytes=Buffer.from(fs.readFileSync(filename,'utf8').replace(marker,'old heartbeat implementation'));
+  fs.writeFileSync(filename,bytes);
+  Object.assign(body.files.find(entry=>entry.path===relative),{bytes:bytes.length,sha256:hash(bytes)});
+ }
+ // Reconstruct an older immutable closure, with its own valid content identity.
+ const legacyId=hash(JSON.stringify(body,null,2)+'\n');
+ fs.writeFileSync(path.join(runtime,'runtime.json'),JSON.stringify({...body,runtimeId:legacyId},null,2)+'\n');
+ assert.equal(packageIO.validateRuntime(runtime,legacyId).runtimeId,legacyId);
+ assert.doesNotThrow(()=>runtimeCapability.assertRuntimeCapabilities(runtime));
+ assert.throws(()=>runtimeCapability.assertWorkerLivenessCapabilities(runtime),/liveness-v2/);
+ const releasePath=path.join(created.path,'release/release.json'),{releaseId,...release}=JSON.parse(fs.readFileSync(releasePath));
+ release.runtimeId=legacyId;
+ fs.writeFileSync(releasePath,JSON.stringify({...release,releaseId:hash(JSON.stringify(release,null,2)+'\n')},null,2)+'\n');
+ assert.equal(packageIO.validatePackage(created.path).runtime.runtimeId,legacyId);
+ assert.equal(packageIO.installPackage(created.path,f.installRoot).runtimeId,legacyId);
+});
+
 test('release identity is repeatable and pins name, control default, visual and complete runtime bytes', t => {
   const f = fixture(t), first = f.build(), repeated = f.build();
   assert.equal(first.releaseId, repeated.releaseId);

@@ -62,6 +62,7 @@ async function initialize(message) {
       !Number.isInteger(settings.seed) || settings.seed < 0 || settings.seed > 0xffffffff) throw Error('Unsupported output settings');
   controlState=await prepareWorkerControlState(message);
   clock = new RuntimeClock(() => performance.now(), 'paused'); random = new SeededRandom(settings.seed);
+  /*! lux-worker-liveness-v2: heartbeat starts before authored import/create. */
   let workerHeartbeat=0;
   const beat=()=>send('heartbeat', { frameId: String(frame),workerHeartbeat:++workerHeartbeat });
   heartbeat = setInterval(beat, 250);
