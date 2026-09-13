@@ -36,6 +36,7 @@ test('250ms supervisor polling force-stops a silent worker by the first tick aft
  let current=0;const stops=[];const registry=new InstanceRegistry({runtimeId,start:async()=>({exited:false,failure:now=>health.failure(now),stop:async options=>stops.push({at:current,force:options?.force})})});
  await registry.reconcile([request],0);
  for(current=250;current<=1500;current+=250){health.observe(status(current,{workerHeartbeat:1}),current);await registry.reconcile([request],current);}
+ await registry.entries.get(request.instanceId).stopping;
  assert.deepEqual(stops,[{at:1500,force:true}]);assert.equal(registry.entries.get(request.instanceId).producer,null);
 });
 test('external startup deadline expires despite a responsive main that never publishes a first frame', () => {
@@ -78,7 +79,10 @@ test('expiry stops only its Job and disposes the second failed producer before s
     starts.push(value.instanceId); return { exited: false, failure: () => value.instanceId === bad ? 'startup deadline' : null,
       stop: async options => { stops.push({ id: value.instanceId, force: options?.force }); } };
   } });
-  for (const now of [0, 1, 500, 1001, 1002, 3002, 3003, 10000]) await registry.reconcile([request(bad), request(good)], now);
+  for (const now of [0, 1, 500, 1001, 1002, 3002, 3003, 10000]) {
+    await registry.reconcile([request(bad), request(good)], now);
+    await registry.entries.get(bad).stopping;
+  }
   assert.equal(starts.filter(id => id === bad).length, 2); assert.equal(starts.filter(id => id === good).length, 1);
   assert.deepEqual(stops, Array.from({ length: 2 }, () => ({ id: bad, force: true })));
   assert.equal(registry.entries.get(bad).producer, null); assert.match(registry.errors.get(bad), /startup/);

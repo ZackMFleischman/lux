@@ -74,9 +74,21 @@ const registry = new InstanceRegistry({runtimeId, start: async request => {
     },
   };
 }});
-async function close() {
-  if (closing) return; closing = true; clearInterval(timer);
-  await registry.close(); fs.rmSync(ready, {force:true}); process.exit(0);
+function close() {
+  if (closing) return closing;
+  clearInterval(timer);
+  closing = (async () => {
+    for (;;) {
+      try { await registry.close(); break; }
+      catch (error) {
+        // Keep the supervisor and its Job handles alive until exit is confirmed.
+        try { fs.writeFileSync(path.join(directory, 'supervisor.error'), String(error.stack || error)); } catch {}
+        await delay(250);
+      }
+    }
+    fs.rmSync(ready, {force:true}); process.exit(0);
+  })();
+  return closing;
 }
 async function tick() {
   if (ticking || closing) return; ticking = true;
@@ -100,7 +112,7 @@ async function tick() {
     }
     await registry.reconcile(requests, performance.now());
     for (const [instanceId, error] of registry.errors) fs.writeFileSync(path.join(directory, instanceId + '.error'), error);
-    if (registry.entries.size) idleSince = Date.now();
+    if (registry.entries.size || registry.draining.size) idleSince = Date.now();
     else if (Date.now() - idleSince >= 30000) await close();
   } catch (error) { try {fs.writeFileSync(path.join(directory, 'supervisor.error'), String(error.stack || error));}finally {await close();} }
   finally { ticking = false; }

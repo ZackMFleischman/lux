@@ -7,7 +7,7 @@ test('a host lease removed during directory scan is normal cleanup, while other 
   const runtime = path.join(root, 'runtimes', runtimeId), directory = path.join(root, 'instances', runtimeId);
   const writes = new Map(); let reconciled;
   class Registry {
-    entries = new Map(); errors = new Map();
+    entries = new Map(); errors = new Map(); draining = new Map();
     async reconcile(requests) { reconciled = requests; }
   }
   const context = { __dirname: path.join(runtime, 'apps/installed-runtime/src'), performance: { now: () => 0 },

@@ -40,11 +40,11 @@ test('healthy generations retain fault history, renew retry eligibility after 30
  let starts=0;const producers=[];
  const registry=new InstanceRegistry({runtimeId,start:async()=>{starts++;const producer={exited:false,stop:async()=>{}};producers.push(producer);return producer;}});
  const lease=request('1'.repeat(32));await registry.reconcile([lease],0);
- producers[0].exited=true;await registry.reconcile([lease],100);await registry.reconcile([lease],350);assert.equal(starts,2);
- producers[1].exited=true;await registry.reconcile([lease],30099);await registry.reconcile([lease],40000);assert.equal(starts,2,'second fault less than 30s suppresses despite successful restart');
+ producers[0].exited=true;await registry.reconcile([lease],100);await registry.entries.get(lease.instanceId).stopping;await registry.reconcile([lease],350);assert.equal(starts,2);
+ producers[1].exited=true;await registry.reconcile([lease],30099);await registry.entries.get(lease.instanceId).stopping;await registry.reconcile([lease],40000);assert.equal(starts,2,'second fault less than 30s suppresses despite successful restart');
  await registry.reconcile([],40001);await Promise.resolve();await registry.reconcile([lease],40002);assert.equal(starts,3,'deliberate removal/re-attach resets the instance policy');
- producers[2].exited=true;await registry.reconcile([lease],40100);await registry.reconcile([lease],40350);assert.equal(starts,4);
- producers[3].exited=true;await registry.reconcile([lease],70100);await registry.reconcile([lease],70350);assert.equal(starts,5,'fault at exactly 30s permits a fresh automatic retry');
+ producers[2].exited=true;await registry.reconcile([lease],40100);await registry.entries.get(lease.instanceId).stopping;await registry.reconcile([lease],40350);assert.equal(starts,4);
+ producers[3].exited=true;await registry.reconcile([lease],70100);await registry.entries.get(lease.instanceId).stopping;await registry.reconcile([lease],70350);assert.equal(starts,5,'fault at exactly 30s permits a fresh automatic retry');
  await registry.close();
 });
 test('invalid and backward clocks cannot bypass suppressed recovery',async()=>{

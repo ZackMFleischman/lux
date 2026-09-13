@@ -56,12 +56,26 @@ class InstanceRegistry {
   retire(key, entry) {
     this.entries.delete(key); this.errors.delete(key);
     if (!entry.producer) return;
-    // A three-second graceful drain must not stall sibling watchdog polling.
-    // Retain ownership/capacity until cleanup ends, including during close().
-    const drain = Promise.resolve().then(() => entry.producer.stop()).catch(error => {
-      this.errors.set(key, 'Installed producer cleanup failed: ' + String(error.message || error));
-    }).finally(() => { this.draining.delete(key); });
-    this.draining.set(key, drain);
+    this.draining.set(key, entry);
+    this.stopEntry(key,entry);
+  }
+  stopEntry(key,entry) {
+    if(entry.stopping)return entry.stopping;
+    const producer=entry.producer;
+    if(!producer)return Promise.resolve();
+    // One cleanup owner across fault, removal and close. Keep the producer and
+    // capacity reservation until its stop confirms exit, including on rejection.
+    const stopping=Promise.resolve().then(()=>producer.stop(entry.faulted?{force:true}:undefined)).then(()=>{
+      entry.producer=null;entry.stopping=null;
+      if(this.draining.get(key)===entry)this.draining.delete(key);
+    },error=>{
+      entry.stopping=null;
+      this.errors.set(key,'Installed producer cleanup failed: '+String(error.message||error));
+      throw error;
+    });
+    entry.stopping=stopping;
+    void stopping.catch(()=>{}); // Polling observes the error; close awaits it.
+    return stopping;
   }
   fault(key,entry,message,now) {
     const retry=entry.lastFaultAt===null||now-entry.lastFaultAt>=30000;
@@ -74,6 +88,7 @@ class InstanceRegistry {
     this.lastNow=now;
     const wanted = new Map();
     for (const raw of requests) { const value = validateRequest(raw, this.runtimeId); wanted.set(value.instanceId, value); }
+    for(const [key,entry] of this.draining)if(!entry.stopping)this.stopEntry(key,entry);
     for (const [key, entry] of this.entries) if (!wanted.has(key)) this.retire(key, entry);
     for (const [key, value] of wanted) {
       if (this.closed) break;
@@ -84,15 +99,17 @@ class InstanceRegistry {
       }
       if (!entry) {
         if (this.entries.size + this.draining.size >= this.limit) { this.errors.set(key, 'Installed runtime capacity reached (16 instances maximum)'); continue; }
-        entry = {request: value, attempts: 0, retryAt: 0, lastFaultAt:null, producer: null}; this.entries.set(key, entry);
+        entry = {request: value, attempts: 0, retryAt: 0, lastFaultAt:null, producer: null,stopping:null,faulted:false}; this.entries.set(key, entry);
       }
+      if(entry.stopping)continue;
       if (entry.producer) {
+        if(entry.faulted){this.stopEntry(key,entry);continue;}
         const failure = entry.producer.exited ? 'Installed producer exited' : entry.producer.failure?.(now);
         if (!failure) continue;
         // A known hung/failed producer cannot drain reliably. Retire only its Job,
         // even when automatic retry is suppressed, before admitting a replacement.
-        await entry.producer.stop({force:true}); entry.producer = null;
         this.fault(key,entry,failure,now);
+        entry.faulted=true;this.stopEntry(key,entry);
         continue;
       }
       if (now < entry.retryAt) continue;
@@ -100,7 +117,7 @@ class InstanceRegistry {
       let starting;
       try {
         starting = Promise.resolve(this.start(value, now)); this.starting.add(starting);
-        entry.producer = await starting; this.errors.delete(key);
+        entry.producer = await starting;entry.faulted=false;this.errors.delete(key);
       }
       catch (error) { this.fault(key,entry,String(error.message || error),now); }
       finally { if (starting) this.starting.delete(starting); }
@@ -110,7 +127,7 @@ class InstanceRegistry {
     this.closed = true;
     await Promise.allSettled(this.starting);
     for (const [key, entry] of this.entries) this.retire(key, entry);
-    await Promise.all(this.draining.values());
+    await Promise.all([...this.draining].map(([key,entry])=>this.stopEntry(key,entry)));
   }
 }
 module.exports = {InstanceRegistry, ProducerHealth, validateRequest, sameInstalledPath};
