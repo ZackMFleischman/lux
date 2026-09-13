@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore
 import { Alert, Button, Chip, CssBaseline, Paper, ThemeProvider, IconButton, Tooltip, Menu, MenuItem } from '@mui/material';
 import { studioTheme } from './theme.ts';
 import { ParameterInspector, parameterOwner } from './controls/ParameterInspector.tsx';
+import type { ControlEdits } from './controls/ParameterInspector.tsx';
 import { Preview } from './preview.tsx';
 import { StudioController } from './service-client.ts';
 import type { ReactNode } from 'react';
@@ -23,6 +24,7 @@ function MetricView({ label, metric, nowMs }: { label: string; metric: Metric | 
   return <div className="metric"><span>{label}</span><strong>{text.value}</strong><small>{text.detail}</small></div>;
 }
 export type StudioProps = {
+  controlEdits?: ControlEdits;
   client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; appError?: string;
 };
 export function StudioApp(props: StudioProps) {
@@ -33,7 +35,7 @@ function controlOwner(snapshot: StudioSnapshot): string | null {
   return snapshot.connection === 'connected' && runtime?.authority === 'studio'
     ? parameterOwner(runtime) : null;
 }
-function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel, appCommands, fileMenu, appError }: StudioProps) {
+function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel, appCommands, fileMenu, appError, controlEdits }: StudioProps) {
   const [toolsHost, setToolsHost] = useState<HTMLElement | null>(null);
   const [transportMenu, setTransportMenu] = useState<HTMLElement | null>(null);
   const subscribe = useCallback((listener: () => void) => client.subscribe(listener), [client]);
@@ -116,8 +118,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
       </Paper>;
   const inspectorPane = <Paper component="aside" square className="inspector" aria-label="Scene controls and status">
         <section><div className="section-heading"><h2>Controls</h2><Chip label="LIVE" /></div>
-          <p className="section-description">Authoring values only. Host controls stay independent.</p>
-          <ParameterInspector runtime={runtime} available={!!available} client={client} controller={controller} onError={setError} />
+          <ParameterInspector runtime={runtime} available={!!available} client={client} controller={controller} onError={setError} edits={controlEdits} />
         </section>
         <section><h2>Performance</h2><MetricView label="Visual delivery" metric={snapshot.visualFps} nowMs={nowMs ?? clock} /><MetricView label="UI cadence" metric={snapshot.uiFps} nowMs={nowMs ?? clock} />
           <p className="hint">Delivery and interface cadence are measured separately.</p></section>

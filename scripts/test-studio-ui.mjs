@@ -79,7 +79,7 @@ try {
   await slider.focus();
   await page.keyboard.press('Home');
   for (let i = 0; i < 8; i++) await page.keyboard.press('ArrowRight');
-  await page.getByText('Applied value: 0.08', { exact: true }).waitFor();
+  await page.locator('[data-control-id="intensity"][data-applied-value="0.08"]').waitFor();
   assert.deepEqual(await page.locator('.preview-surface').boundingBox(), before);
   assert.deepEqual(await page.evaluate(() => window.__qaDisabled), []);
   report.checks.push('Paused intensity changes preserve layout and transport state');
@@ -96,7 +96,7 @@ try {
   await page.mouse.move(sliderBounds.x + sliderBounds.width * 0.9, sliderBounds.y + sliderBounds.height / 2, { steps: 40 });
   await page.mouse.up();
   const draggedValue = Number(await slider.inputValue());
-  await page.getByText(`Applied value: ${draggedValue.toFixed(2)}`, { exact: true }).waitFor();
+  await page.locator(`[data-control-id="intensity"][data-applied-value="${draggedValue}"]`).waitFor();
   const draggedValues = await page.evaluate(() => { window.__qaSliderObserver.disconnect(); return window.__qaSliderValues; });
   assert.ok(draggedValues.length > 10, 'Exercise continuous pointer changes, not one final jump');
   assert.ok(draggedValues.every((value, index) => index === 0 || value >= draggedValues[index - 1]), 'Earlier confirmations must not pull a rightward drag backwards');
@@ -104,7 +104,7 @@ try {
   report.checks.push('Real continuous slider drag stays monotonic while runtime acknowledgements arrive');
   await slider.focus(); await page.keyboard.press('Home');
   for (let i = 0; i < 8; i++) await page.keyboard.press('ArrowRight');
-  await page.getByText('Applied value: 0.08', { exact: true }).waitFor();
+  await page.locator('[data-control-id="intensity"][data-applied-value="0.08"]').waitFor();
   await page.screenshot({ path: join(output, 'workspace.png') });
   for (let i = 0; i < 2; i++) {
     await page.getByRole('button', { name: 'Fullscreen', exact: true }).click();
@@ -163,7 +163,7 @@ try {
   report.checks.push('Ctrl/Cmd+S builds the full source; file navigation stays compact and scene title is passive');
   await slider.focus(); await page.keyboard.press('Home');
   for (let i = 0; i < 8; i++) await page.keyboard.press('ArrowRight');
-  await page.getByText('Applied value: 0.08', { exact: true }).waitFor();
+  await page.locator('[data-control-id="intensity"][data-applied-value="0.08"]').waitFor();
   // Save and reopen the actual edited scene through the File commands. Only
   // native picker responses are supplied; source/control serialization is real.
   const savedScenePath = join(output, 'creative-workflow.lux-scene');
@@ -174,15 +174,16 @@ try {
   assert.equal(savedScene.source.files['lib/qa-helper.ts'], 'export const amount: number = 0.42;');
   assert.equal(savedScene.controls.intensity, 0.08);
   await helper.fill('export const amount: number = 0.99;');
-  page.on('dialog', dialog => dialog.type() === 'confirm' ? dialog.accept() : dialog.dismiss());
+  page.on('dialog', () => report.errors.push('Unexpected native JavaScript dialog'));
   await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, savedScenePath);
   await page.locator('.file-tools summary').click();
   await page.getByRole('button', { name: 'Open', exact: true }).click();
+  await page.getByRole('button', { name: 'Discard and open', exact: true }).click();
   await page.waitForFunction(() => document.querySelector('.build-status')?.textContent === 'Preview current'
     && [...document.querySelectorAll('button')].some(button => button.textContent === 'Build' && !button.disabled));
   await page.getByRole('button', { name: 'Open lib/qa-helper.ts', exact: true }).click();
   assert.equal(await helper.innerText(), 'export const amount: number = 0.42;');
-  await page.getByText('Applied value: 0.08', { exact: true }).waitFor();
+  await page.locator('[data-control-id="intensity"][data-applied-value="0.08"]').waitFor();
   report.checks.push('File Save and Open round trip the actual edited helper and controls after an intervening draft edit');
   // Supply only the native folder-picker response. The renderer, trusted IPC,
   // child compiler and real package writer all run normally.

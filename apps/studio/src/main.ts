@@ -11,6 +11,7 @@ import { SceneFileStore } from '../../../packages/core/src/scene-file.ts';
 import { createAgentBridge } from './agent-bridge.ts';
 import { observeFullscreen } from './fullscreen.ts';
 import { createExportService, runExportChild } from './export-process.ts';
+import { createCloseConfirmation } from './close-confirmation.ts';
 
 // This process owns presentation windows only. It never creates a render service,
 // starts an authoring instance, or terminates a host-owned process.
@@ -25,7 +26,8 @@ let mainWindow: BrowserWindow | null = null;
 let closing = false;
 let compiling = false;
 const files = new SceneFileStore();
-let dirty = false, closeConfirmed = false;
+let dirty = false;
+const closeConfirmation = createCloseConfirmation(() => randomBytes(16).toString('hex'), id => mainWindow?.webContents.send('studio:close-request', id));
 const agentRequests = new Map<string, { resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
 const workspace = resolve(__dirname, '../../..');
 const exportShutdown = new AbortController();
@@ -112,6 +114,12 @@ app.whenReady().then(async () => {
     if (action === 'compile') return compile(value);
     if (action === 'smoke-enabled') return process.env.LUX_STUDIO_SMOKE === '1';
     if (action === 'dirty') { if (typeof value !== 'boolean') throw Error('Invalid dirty state'); dirty = value; return; }
+    if (action === 'close-confirmation') {
+      const answer = value as { id?: unknown; discard?: unknown };
+      if (typeof answer?.id !== 'string' || typeof answer.discard !== 'boolean') throw Error('Invalid close confirmation');
+      if (closeConfirmation.reply(answer.id, answer.discard)) setTimeout(() => mainWindow?.close(), 0);
+      return;
+    }
     if (action === 'open') {
       const result = await dialog.showOpenDialog(mainWindow!, { properties: ['openFile'], filters: [{ name: 'Lux visual', extensions: ['lux-scene'] }] });
       if (result.canceled || !result.filePaths[0]) return null;
@@ -171,13 +179,9 @@ app.whenReady().then(async () => {
   await writeFile(join(app.getPath('userData'), 'agent-endpoint.json'), JSON.stringify({ url: bridge.url, token: bridge.token, pid: process.pid }));
   app.once('will-quit', () => { bridge.close(); for (const pending of agentRequests.values()) { clearTimeout(pending.timer); pending.reject(Error('Studio closed')); } agentRequests.clear(); });
   mainWindow.on('close', event => {
-    if (!dirty || closeConfirmed || process.env.LUX_STUDIO_SMOKE === '1') return;
-    event.preventDefault();
-    void dialog.showMessageBox(mainWindow!, { type: 'question', message: 'Close without saving your changes?', buttons: ['Keep editing', 'Discard changes'], defaultId: 0, cancelId: 0 }).then(result => {
-      if (result.response === 1) { closeConfirmed = true; mainWindow?.close(); }
-    });
+    if (process.env.LUX_STUDIO_SMOKE !== '1' && !closeConfirmation.allowClose(dirty)) { event.preventDefault(); return; }
+    closing = true; coordinator.dock();
   });
-  mainWindow.on('close', () => { closing = true; coordinator.dock(); });
   if (process.env.LUX_STUDIO_SMOKE === '1') setTimeout(() => { console.error('Studio smoke timeout'); app.exit(3); }, 90000);
   if (process.env.LUX_STUDIO_MCP_TEST === '1') setTimeout(() => { console.error('Studio MCP test timeout'); app.exit(3); }, 120000);
   mainWindow.webContents.on('console-message', details => console.log('Studio:', details.message));

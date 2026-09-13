@@ -43,6 +43,9 @@ try {
   await page.getByText('View', { exact: true }).click();
   assert.equal(await page.getByRole('slider').count(), 5);
   assert.equal(await page.getByRole('slider', { name: 'Intensity' }).count(), 0);
+  const rows = await page.locator('.parameter-row').evaluateAll(elements => elements.map(element => element.getBoundingClientRect().height));
+  assert.ok(rows.every(height => height <= 54), 'Each parameter fits a compact row');
+  report.controlHeights = rows;
   report.checks.push('Five code-defined sphere controls, no invented Intensity, matching running-app discovery');
   const target = () => ({ instanceId: runtime.instanceId, expectedGeneration: runtime.generation, expectedRevisionId: runtime.revisionId, expectedControlSchemaHash: runtime.controlSchemaHash });
   const zero = await call('parameters', { ...target(), values: { spikeHeight: 0, noiseScale: 2 } });
@@ -50,7 +53,7 @@ try {
   const smooth = await capture('smooth');
   const height = page.getByRole('spinbutton', { name: 'Spike height value', exact: true });
   await height.fill('1.8'); await height.press('Enter');
-  await page.getByText('Applied value: 1.80', { exact: true }).waitFor();
+  await page.locator('[data-control-id="spikeHeight"][data-applied-value="1.8"]').waitFor();
   const spiky = await capture('spiky');
   assert.equal(spiky.metadata.controls.spikeHeight, 1.8); assert.notEqual(smooth.bytes, spiky.bytes);
   const noise = await call('parameters', { ...target(), values: { noiseScale: 8, sharpness: 2 } });
@@ -61,18 +64,28 @@ try {
   for (const args of [{ ...target(), values: { absent: 1 } }, { ...target(), expectedControlSchemaHash: 'f'.repeat(64), values: { spikeHeight: 1 } }, { ...target(), values: { roughness: 0.2, spikeHeight: 99 } }]) assert.equal((await raw('parameters', args)).isError, true);
   assert.equal((await call('status')).authoring.controls.roughness, 0.38);
   await page.getByRole('button', { name: 'Reset Spike height to default' }).click();
-  await page.getByText('Applied value: 0.85', { exact: true }).waitFor();
+  await page.locator('[data-control-id="spikeHeight"][data-applied-value="0.85"]').waitFor();
   const savePath = join(folder, 'sphere.lux-scene');
   await app.evaluate(({ dialog }, path) => { dialog.showSaveDialog = async () => ({ canceled: false, filePath: path }); }, savePath);
   await page.locator('.file-tools > summary').click(); await page.getByRole('button', { name: 'Save', exact: true }).click();
   await page.waitForFunction(() => !document.querySelector('[aria-label="Unsaved changes"]'));
   const saved = JSON.parse(await readFile(savePath, 'utf8'));
   assert.equal(saved.version, 3); assert.equal(saved.controls.values.noiseScale, 8); assert.equal(saved.controls.values.spikeHeight, 0.85);
+  await height.fill('1.1');
+  await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].close());
+  await page.getByRole('dialog', { name: 'Discard unsaved changes?' }).waitFor();
+  await page.getByRole('button', { name: 'Keep editing' }).click();
+  assert.equal(page.isClosed(), false, 'Unsubmitted numeric input must protect close');
+  await page.locator('[data-control-id="spikeHeight"][data-applied-value="1.1"]').waitFor();
   await call('parameters', { ...target(), values: { spikeHeight: 0.2 } });
   await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, savePath);
-  page.on('dialog', dialog => dialog.accept());
+  page.on('dialog', () => report.errors.push('Unexpected native JavaScript dialog'));
   await page.locator('.file-tools > summary').click(); await page.getByRole('button', { name: 'Open', exact: true }).click();
-  await page.getByText('Applied value: 0.85', { exact: true }).waitFor();
+  await page.getByRole('button', { name: 'Keep editing', exact: true }).click();
+  assert.equal((await call('status')).authoring.controls.spikeHeight, 0.2);
+  await page.locator('.file-tools > summary').click(); await page.getByRole('button', { name: 'Open', exact: true }).click();
+  await page.getByRole('button', { name: 'Discard and open', exact: true }).click();
+  await page.locator('[data-control-id="spikeHeight"][data-applied-value="0.85"]').waitFor();
   runtime = (await call('status')).authoring;
   assert.equal(runtime.controls.noiseScale, 8);
   const reopened = await capture('reopened'); assert.deepEqual(reopened.metadata.controls, saved.controls.values);
@@ -93,8 +106,15 @@ try {
   assert.equal(legacy.status.authoring.sdkVersion, '0.1.0');
   assert.equal(await page.getByRole('slider', { name: 'Intensity', exact: true }).count(), 1);
   report.checks.push('Failed code retains accepted values; empty schema works; legacy source remains compatible');
+  await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].close());
+  await page.getByRole('dialog', { name: 'Discard unsaved changes?' }).waitFor();
+  await page.getByRole('button', { name: 'Keep editing' }).click();
+  assert.equal(page.isClosed(), false);
+  await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].close());
+  await Promise.all([page.waitForEvent('close'), page.getByRole('button', { name: 'Discard and close' }).click()]);
+  report.checks.push('In-app Open/Close confirmations cancel safely and discard explicitly without native modal dialogs');
   assert.deepEqual(report.errors, []);
   report.ok = true;
 } catch (error) { report.error = String(error.stack ?? error); console.error(error); process.exitCode = 1; }
-finally { await client?.close(); await app?.close(); await writeFile(join(folder, 'result.json'), JSON.stringify(report, null, 2)); }
+finally { await client?.close(); if (app) { await app.evaluate(({ app }) => app.exit(0)).catch(() => {}); await app.close().catch(() => {}); } await writeFile(join(folder, 'result.json'), JSON.stringify(report, null, 2)); }
 console.log(JSON.stringify(report));

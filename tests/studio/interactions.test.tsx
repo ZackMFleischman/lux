@@ -14,8 +14,29 @@ const { render, screen, cleanup, waitFor, fireEvent, act } = await import('@test
 const { userEvent } = await import('@testing-library/user-event');
 const { StudioApp } = await import('../../apps/studio/src/renderer.tsx');
 const { createDisconnectedClient } = await import('../../apps/studio/src/service-client.ts');
+const { useDiscardConfirmation } = await import('../../apps/studio/src/Confirmation.tsx');
 afterEach(() => cleanup());
 after(() => dom.window.close());
+
+test('RTL: discard confirmation is an accessible in-app dialog with safe cancel, Escape and explicit approval', async () => {
+  const answers: boolean[] = [];
+  function Fixture() { const confirmation = useDiscardConfirmation(); return <>{confirmation.dialog}<button onClick={() => void confirmation.confirm('open').then(answer => answers.push(answer))}>Choose another scene</button></>; }
+  const user = userEvent.setup({ document }); render(<Fixture />);
+  await user.click(screen.getByRole('button', { name: 'Choose another scene' }));
+  assert.ok(screen.getByRole('dialog', { name: 'Discard unsaved changes?' }));
+  await user.click(screen.getByRole('button', { name: 'Keep editing' }));
+  assert.deepEqual(answers, [false]);
+  await act(async () => { await new Promise(resolve => setTimeout(resolve, 250)); });
+  assert.equal(screen.queryByRole('dialog'), null);
+  await user.click(screen.getByRole('button', { name: 'Choose another scene' }));
+  await user.keyboard('{Escape}');
+  assert.deepEqual(answers, [false, false]);
+  await act(async () => { await new Promise(resolve => setTimeout(resolve, 250)); });
+  assert.equal(screen.queryByRole('dialog'), null);
+  await user.click(screen.getByRole('button', { name: 'Choose another scene' }));
+  await user.click(screen.getByRole('button', { name: 'Discard and open' }));
+  assert.deepEqual(answers, [false, false, true]);
+});
 
 test('RTL: code-defined controls expose independent values, numeric entry and defaults without Intensity', async () => {
   const fixture = service();
@@ -42,6 +63,28 @@ test('RTL: an empty authored schema has no invented control', () => {
   render(<StudioApp client={fixture.client} nowMs={1000} />);
   assert.equal(screen.queryByRole('slider'), null);
   assert.ok(screen.getByText('This visual defines no live controls.'));
+});
+
+test('RTL: typing and pending control writes mark unsaved intent before acknowledgement', async () => {
+  const fixture = service(); let dirty = 0; const writes: Promise<unknown>[] = [];
+  let complete!: () => void;
+  fixture.client.invoke = () => new Promise(resolve => { complete = () => resolve({}); });
+  render(<StudioApp client={fixture.client} nowMs={1000} controlEdits={{ changed: () => { dirty++; }, track: write => { writes.push(write); } }} />);
+  fireEvent.change(screen.getByRole('spinbutton', { name: 'Intensity value' }), { target: { value: '0.7' } });
+  assert.equal(dirty, 1, 'unsubmitted visible input must protect close');
+  fireEvent.keyDown(screen.getByRole('spinbutton', { name: 'Intensity value' }), { key: 'Enter' });
+  assert.equal(dirty, 2); assert.equal(writes.length, 1, 'save can await the actual write');
+  await act(async () => { complete(); await Promise.all(writes); });
+});
+
+test('RTL: merely focusing numeric input cannot overwrite a later agent parameter change', async () => {
+  const fixture = service(); render(<StudioApp client={fixture.client} nowMs={1000} />);
+  const input = screen.getByRole('spinbutton', { name: 'Intensity value' }) as HTMLInputElement;
+  fireEvent.focus(input);
+  await act(async () => fixture.publish({ intensity: 0.2 }));
+  assert.equal(input.value, '0.2');
+  fireEvent.blur(input);
+  assert.equal(fixture.calls.length, 0);
 });
 
 function service() {
@@ -93,7 +136,7 @@ test('RTL: playback and intensity invoke guarded shared operations and wait for 
   const write = fixture.calls[1];
   assert.equal(write?.name, 'lux.parameters.set');
   if (write?.name === 'lux.parameters.set') assert.deepEqual(write.input.values, { intensity: 0.8 });
-  assert.ok(screen.getByText('Applied value: 0.50'));
+  assert.equal(document.querySelector('[data-control-id="intensity"]')?.getAttribute('data-applied-value'), '0.5');
   await act(async () => fixture.update());
   await user.click(screen.getByRole('button', { name: 'Pause' }));
   await waitFor(() => assert.equal(fixture.calls.length, 3));
@@ -170,7 +213,7 @@ test('RTL: delayed applied values never pull a slider away from the latest input
   assert.equal(slider.value, '0.8');
   assert.equal(fixture.calls.length, 1, 'controller coalesces pending writes');
   await act(async () => pending.shift()!());
-  assert.ok(screen.getByText('Applied value: 0.60'));
+  assert.equal(document.querySelector('[data-control-id="intensity"]')?.getAttribute('data-applied-value'), '0.6');
   assert.equal(slider.value, '0.8', 'old acknowledgement must not overwrite newer input');
   assert.equal(fixture.calls.length, 2);
   fireEvent.change(slider, { target: { value: '0.9' } });
@@ -178,7 +221,7 @@ test('RTL: delayed applied values never pull a slider away from the latest input
   assert.equal(slider.value, '0.9');
   await act(async () => pending.shift()!());
   assert.equal(slider.value, '0.9');
-  assert.ok(screen.getByText('Applied value: 0.90'));
+  assert.equal(document.querySelector('[data-control-id="intensity"]')?.getAttribute('data-applied-value'), '0.9');
   await act(async () => fixture.publish({ intensity: 0.25 }));
   assert.equal(slider.value, '0.25', 'external changes still apply after local input settles');
 });

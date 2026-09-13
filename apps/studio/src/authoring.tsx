@@ -16,9 +16,11 @@ import type { SourceDiagnostic } from './source/diagnostics.ts';
 import { ExportDialog } from './ExportDialog.tsx';
 import './export-client.ts';
 import { studioCapabilities } from './capabilities.ts';
+import { useDiscardConfirmation } from './Confirmation.tsx';
 const client = new StandaloneClient(window.luxAuthoring, { codeDeclaredParameters: true });
 const agentStatus = () => ({ ...client.getSnapshot(), capabilities: studioCapabilities });
 export function AuthoringApp() {
+  const confirmation = useDiscardConfirmation();
   const windows = useMemo(() => window.luxStudioWindows ? { ...window.luxStudioWindows,
     popout: undefined } : undefined, []);
   const [error, setError] = useState('');
@@ -36,6 +38,12 @@ export function AuthoringApp() {
       return { sourceHash: runtime.revisionId, schema: state.controlSchema, schemaHash: state.controlSchemaHash, values: state.controls };
     },
   }), [workspace]);
+  const pendingControlWrites = useRef(new Set<Promise<unknown>>());
+  const controlEdits = useMemo(() => ({ changed: () => session.controlsChanged(), track: (write: Promise<unknown>) => {
+    pendingControlWrites.current.add(write);
+    void write.then(() => pendingControlWrites.current.delete(write), () => pendingControlWrites.current.delete(write));
+  } }), [session]);
+  async function finishControlWrites() { while (pendingControlWrites.current.size) await Promise.all([...pendingControlWrites.current]); }
   const draft = useSyncExternalStore(workspace.subscribe, workspace.getSnapshot);
   const io = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const busy = io.busy || draft.busy, dirty = draft.dirty || io.controlsDirty;
@@ -44,6 +52,7 @@ export function AuthoringApp() {
     if (reason instanceof SourceCompileError) setDiagnostics(diagnosticsForSource(reason.diagnostics, submittedSource, draftVersion, workspace.getSnapshot()));
   }
   useEffect(() => window.luxAuthoring.onAgentCommand(async command => {
+    if (confirmation.isPending() && !['read', 'status', 'capture'].includes(command.method)) throw Error('Studio is waiting for a user confirmation');
     if (['parameters', 'playback', 'restart'].includes(command.method)) return dispatchRuntimeCommand(client, command.method, command.params);
     if (command.method === 'status') return agentStatus();
     if (command.method === 'read') return { ...session.read(), status: agentStatus() };
@@ -56,10 +65,14 @@ export function AuthoringApp() {
     const source = command.params.source as SourceBundle;
     setError('');
     try {
+      if (pendingControlWrites.current.size) await finishControlWrites();
       await session.build(source, command.params?.expectedDraftVersion);
       return { draftVersion: workspace.getSnapshot().version, status: agentStatus() };
     } catch (reason) { reportError(reason, command.params?.expectedDraftVersion, source); throw reason; }
   }), [session, workspace]);
+  useEffect(() => window.luxConfirmation?.onCloseRequest(id => {
+    void confirmation.confirm('close').then(discard => window.luxConfirmation!.reply(id, discard)).catch(reason => setError(String(reason)));
+  }), [confirmation.confirm]);
   useEffect(() => { void window.luxAuthoring.dirty(dirty); }, [dirty]);
   useEffect(() => {
     const signature = () => { const runtime = client.getSnapshot().authoring; return runtime ? JSON.stringify(getRuntimeControlState(runtime).controls) : null; };
@@ -93,20 +106,20 @@ export function AuthoringApp() {
     }
   }).catch(reason => setError(String(reason))); }, [session, workspace]);
   async function build() { if (composing.current || session.getSnapshot().busy || workspace.getSnapshot().busy) return; setError(''); const current = session.read();
-    try { await session.build(current.source, current.draftVersion); setDiagnostics([]); } catch (reason) { reportError(reason, current.draftVersion, current.source); } }
+    try { if (pendingControlWrites.current.size) await finishControlWrites(); await session.build(current.source, current.draftVersion); setDiagnostics([]); } catch (reason) { reportError(reason, current.draftVersion, current.source); } }
   async function save(saveAs = false) {
     if (composing.current || session.getSnapshot().busy || workspace.getSnapshot().busy) return;
     setError('');
-    try { await session.save(saveAs); } catch (reason) { setError(String(reason)); }
+    try { if (pendingControlWrites.current.size) await finishControlWrites(); await session.save(saveAs); } catch (reason) { setError(String(reason)); }
   }
   async function open() {
-    if (dirty && !window.confirm('Discard unsaved changes and open another visual?')) return;
+    if (dirty && !await confirmation.confirm('open')) return;
     setError('');
     try { await session.open(); setDiagnostics([]); } catch (reason) { const current = workspace.getSnapshot(); reportError(reason, current.version, current.source); }
   }
   const fileMenu = <details className="file-tools" onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }}><summary>File</summary><div className="file-tools-content" onClick={event => { if ((event.target as Element).closest('button')) event.currentTarget.closest('details')!.open = false; }}>
       <Button disabled={busy} onClick={() => void open()}>Open</Button><Button disabled={busy} title="Save scene (Ctrl/Cmd+Shift+S in source)" onClick={() => void save()}>Save</Button><Button disabled={busy} onClick={() => void save(true)}>Save as</Button>
-      <ExportDialog disabled={busy || composing.current} defaultName={io.name} create={name => session.exportSource(name)} />
+      <ExportDialog disabled={busy || composing.current} defaultName={io.name} create={async name => { if (pendingControlWrites.current.size) await finishControlWrites(); return session.exportSource(name); }} />
     </div></details>;
   const commands = <>
     <span className="document-name" title={io.name}><span className="document-label">Scene</span><span className="document-title">{io.name}</span>{dirty && <span aria-label="Unsaved changes"> *</span>}</span>
@@ -114,7 +127,8 @@ export function AuthoringApp() {
     <span className="build-status" role="status">{draft.runningMatchesDraft ? 'Preview current' : draft.hasRunningSource ? 'Preview shows previous source' : 'Not built'}</span>
   </>;
   return <ThemeProvider theme={studioTheme}><div className="authoring-shell">
-    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} appCommands={commands} appError={error}
+    {confirmation.dialog}
+    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} appCommands={commands} appError={error} controlEdits={controlEdits}
       sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onApply={() => void build()} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnostics={diagnostics} />} />
   </div></ThemeProvider>;
 }

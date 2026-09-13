@@ -16,6 +16,14 @@ const api: StudioWindowClient = {
 contextBridge.exposeInMainWorld('luxStudioWindows', Object.freeze(api));
 const exportApi: StudioExportClient = { create: request => ipcRenderer.invoke('studio:export', request) };
 contextBridge.exposeInMainWorld('luxExport', Object.freeze(exportApi));
+contextBridge.exposeInMainWorld('luxConfirmation', Object.freeze({
+  onCloseRequest: (listener: (id: string) => void) => {
+    const callback = (_event: Electron.IpcRendererEvent, id: string) => listener(id);
+    ipcRenderer.on('studio:close-request', callback);
+    return () => ipcRenderer.removeListener('studio:close-request', callback);
+  },
+  reply: (id: string, discard: boolean) => ipcRenderer.invoke('studio:authoring', 'close-confirmation', { id, discard }),
+}));
 contextBridge.exposeInMainWorld('luxAuthoring', Object.freeze({
   example: () => ipcRenderer.invoke('studio:authoring', 'example'),
   compile: (source: unknown) => ipcRenderer.invoke('studio:authoring', 'compile', source),
