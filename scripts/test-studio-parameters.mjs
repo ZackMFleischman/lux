@@ -15,7 +15,7 @@ const report = { ok: false, checks: [], errors: [] };
 try {
   app = await _electron.launch({ executablePath: createRequire(import.meta.url)('electron'), args: [join(root, 'apps/studio/dist/main.cjs')], cwd: root, env, timeout: 30000 });
   const page = await app.firstWindow(); page.setDefaultTimeout(15000);
-  page.on('pageerror', error => report.errors.push(error.message));
+  page.on('pageerror', error => report.errors.push(error.stack ?? error.message));
   await page.getByRole('button', { name: 'Build', exact: true }).waitFor();
   const ownedPid = await app.evaluate(() => process.pid);
   let endpoint;

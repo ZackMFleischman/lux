@@ -12,12 +12,13 @@ Updated: 12 September 2026. **Tracer is not complete.** Scope is fixed; filesyst
 | Image import and export | In progress | Import, replace and remove images and package original bytes for shows. | Studio workflow passed; isolated installed-package playback remains. |
 | Runtime performance monitoring | In progress | Measure CPU work, GPU passes and frame delivery without blocking playback. | Bounded collectors and GPU queries integrated; verify real hardware coverage and overhead. |
 | Basic monitoring status | Done | Show actual measurements in a small, collapsed Studio section. | Real CPU/GPU measurements reach Studio and the agent API. Incomplete GPU coverage is labeled; budget validation remains below. |
+| Playback UI stability | In progress | Keep editing and controls responsive while the preview renders. | Faster frame scheduling exposed excessive React updates in stable Studio. A focused fix and regression test are underway. |
 | Host and control timing | In progress | Measure startup, host frames and how quickly controls reach visible output. | Timing records integrated; review fixes and actual measurements remain. Worker-to-host frame matching is still unproven. |
 | Performance acceptance | In progress | Compare repeatable measured runs with the required speed budgets. | Collect and evaluate hardware results; unsupported or incomplete measurements cannot pass. |
 | Standalone Resolume checks | In progress | Exported sources work with Lux closed and without the development checkout. | Older exports passed fast startup and independent instances; new parameter/image packages need isolated-host checks. |
 | Failure recovery | In progress | Broken visuals recover without trapping Lux or Resolume. | Retry and review fixes are integrated. Verify actual process shutdown, recovered playback and current host values. |
 
-Current integration: `codex/parameter-integration`. Completed UI fixes include compact 46 px property rows, collapsed diagnostics sections, and in-app discard confirmations. Final combined validation is underway before updating the stable tracer checkout.
+Stable checkout: `codex/tracer-0.1`, updated through `60297e1`. Compact 46 px property rows, collapsed diagnostics and in-app discard confirmations are committed. Native build passes 13 checks; isolated package installation, supervisor startup and idle shutdown passed. Final rendering checks exposed the UI stability item above.
 
 Next after tracer: filesystem-first projects with real TypeScript files and Git. Architecture and planning are done; implementation has not started. See [architecture](docs/design/filesystem-projects.md), [plan](docs/implementation/filesystem-projects-plan.md), and [review](docs/reviews/filesystem-projects-review.md).
 
