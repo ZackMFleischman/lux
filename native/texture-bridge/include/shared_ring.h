@@ -46,6 +46,29 @@ inline void publishHostControl(SharedRing& r,float value) {
 }
 inline bool transition(SharedSlot& slot,LONG from,LONG to) {return InterlockedCompareExchange(&slot.state,to,from)==from;}
 inline bool retire(SharedRing& r,FrameKey k) {if(k.slot>=3||r.generation!=k.generation||r.outputGeneration!=k.outputGeneration||r.slots[k.slot].frame!=k.frame)return false;return transition(r.slots[k.slot],Reading,Free);}
+// The caller already owns selected in Reading and holds its admission through
+// local-copy completion. Reclaim only other completed, obsolete source images.
+inline bool retireObsoleteReadySources(SharedRing& r,FrameKey selected) {
+ if(!beginRead(r))return true; // Shutdown won admission; leave all ownership intact.
+ struct Admission {SharedRing& ring;bool release=true;~Admission(){if(release)endRead(ring);}} admission{r};
+ if(selected.slot>=3||!selected.frame||r.generation!=selected.generation||r.outputGeneration!=selected.outputGeneration||
+    InterlockedCompareExchange(&r.slots[selected.slot].state,Reading,Reading)!=Reading||r.slots[selected.slot].frame!=selected.frame)return false;
+ for(uint32_t i=0;i<3;++i){
+  if(i==selected.slot||!transition(r.slots[i],Ready,Reading))continue;
+  // Read metadata only after exclusive ownership: another reader/producer may
+  // have retired and republished the slot since any earlier Ready observation.
+  const FrameKey candidate{selected.generation,selected.outputGeneration,r.slots[i].frame,i};
+  if(candidate.frame&&candidate.frame<selected.frame){
+   if(retire(r,candidate))continue;
+   // A violated epoch/key invariant is fatal, never permission to free a slot.
+   // Restore Ready if still owned; otherwise retain admission for containment.
+   if(!transition(r.slots[i],Reading,Ready))admission.release=false;
+   return false;
+  }
+  if(!transition(r.slots[i],Reading,Ready)){admission.release=false;return false;}
+ }
+ return true;
+}
 inline std::wstring userSid() {
  HANDLE token=nullptr;if(!OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY,&token))throw std::runtime_error("OpenProcessToken");DWORD count=0;GetTokenInformation(token,TokenUser,nullptr,0,&count);std::string bytes(count,'\0');if(!GetTokenInformation(token,TokenUser,bytes.data(),count,&count)){CloseHandle(token);throw std::runtime_error("TokenUser");}CloseHandle(token);LPWSTR sid=nullptr;if(!ConvertSidToStringSidW(reinterpret_cast<TOKEN_USER*>(bytes.data())->User.Sid,&sid))throw std::runtime_error("SID conversion");std::wstring result(sid);LocalFree(sid);return result;
 }
