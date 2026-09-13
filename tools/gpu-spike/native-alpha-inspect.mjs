@@ -6,9 +6,11 @@ const matches=(actual,expected)=>Array.isArray(actual)&&actual.length===4&&actua
 /** A fixture image/control check only; does not certify Resolume, frame
  * correspondence, physical stop, GPU cleanup or performance acceptance. */
 export function inspectNativeAlpha({pixels,experiment,probe,captureMtimeMs}) {
-  if(experiment?.outcome!=='success'||experiment.cleanupComplete!==true)throw Error('Supervised cleanup did not succeed');
-  const start=Date.parse(experiment.start?.utc),end=Date.parse(experiment.end?.utc);
-  if(!Number.isFinite(start)||!Number.isFinite(end)||end<start||end-start>30000||!Number.isFinite(captureMtimeMs)||captureMtimeMs<start||captureMtimeMs>end)throw Error('Capture is stale or outside the bounded experiment window');
+  if(experiment?.outcome!=='success'||experiment.cleanupComplete!==true||experiment.result?.cleanupComplete!==true||experiment.result.exitCode!==0||experiment.result.timeout!==false||experiment.result.cancelled!==false||!Number.isInteger(experiment.timeoutMs)||experiment.timeoutMs<1000||experiment.timeoutMs>30000)throw Error('Supervised cleanup/deadline did not succeed');
+  // Manifest start includes review hashing/preflight; freshness starts at the
+  // actual supervised child, whose execution budget is recorded separately.
+  const start=Date.parse(experiment.child?.startUtc),end=Date.parse(experiment.result.endUtc);
+  if(!Number.isFinite(start)||!Number.isFinite(end)||end<start||!Number.isFinite(captureMtimeMs)||captureMtimeMs<start||captureMtimeMs>end)throw Error('Capture is stale or outside the bounded experiment window');
   if(!probe||probe.runId!==experiment.id||probe.ok!==true||probe.deinstantiated!==true||probe.deinitialized!==true||probe.parameterIndex!==0||probe.normalizedValue!==0||!Number.isFinite(probe.elapsedMs)||probe.elapsedMs<0||probe.elapsedMs>10000||!matches(probe.white,WHITE))throw Error('Invalid alpha/control probe evidence');
   if(!(pixels instanceof Uint8Array)||pixels.byteLength!==WIDTH*HEIGHT*4)throw Error('Invalid native capture size');
   const samples=[.25,.75].flatMap(y=>[.25,.75].map(x=>{const at=((HEIGHT-1-Math.floor(y*HEIGHT))*WIDTH+Math.floor(x*WIDTH))*4;return [...pixels.subarray(at,at+4)];}));
