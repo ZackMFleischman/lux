@@ -45,3 +45,40 @@ The context-only trace isolated creation failure ERROR_INVALID_OPERATION (4317 c
 The production handoff helper is CPU-tested for creation failure, exceptions after resource preparation, thread-launch failure, successful ownership transfer, and duplicate-start refusal. The unused context is deleted on pre-launch failure; deletion failure retains ownership under the existing unsupported-unload policy. These tests and compilation do not establish hardware compatibility or fix the earlier system freeze.
 
 The worker's transferred context is also protected during path/stream construction: allocation exceptions release the still-unused context and finish the worker, while deletion failure retains it. Empty optional storage and the other owners constructed before the GPU try block are compile-checked as nothrow default-constructible. CPU injection covers allocation and non-standard exceptions at this early boundary.
+
+## Receiver stop and final diagnostics (R1)
+
+The production `ReceiverRun.h` boundary classifies a failed D3D query as failure
+even when stop is requested, and preserves a completed query as complete. For a
+pending query, a requested stop takes precedence over the poll deadline and exits
+the body through a dedicated internal marker. A real query failure or deadline
+still emits its precise failure reason. Cancellation skips retirement, admission
+release, NV locking and publication after that pending copy; it does not clear
+the ownership ledger. Pending or failed cleanup retains ownership until an actual
+Complete result permits the established retirement/admission/unregister/release
+order. Driver calls and quarantine remain subject to the unload limitations above.
+
+Normal return, cancellation and body exceptions now reach one final diagnostic
+attempt before `activation.end()` and the unchanged GPU cleanup. Failure and
+finalization callbacks are contained independently, so a throwing diagnostic does
+not skip that cleanup handoff. Opportunity counters, the 100,000-record cap and
+loss accounting are unchanged. Attributed opportunity draining and the summary
+require a current-run successful `activation.begin()` return. A retained old ID,
+or an ID assigned by a begin that then throws, cannot authorize attributed rows;
+initialization instead attempts an unattributed `host-telemetry-unavailable` row.
+
+Failure rows use the production bounded formatter: at most 1024 reason bytes,
+escaped quotes/backslashes, deterministic `\u00XX` escapes for control and
+non-ASCII bytes, and a visible `...[truncated]` suffix when the scan limit is
+reached. This is bounded byte rendering, not Unicode-preserving conversion.
+Diagnostic I/O or allocation failures may leave missing or truncated rows. There
+is no retry of partial output and no claim that one attempt guarantees a valid
+summary. Summaries precede resource cleanup and cannot prove GPU completion.
+
+`receiver_run_cpu` tests the production decision matrix, cancellation continuation,
+known/unknown failures, callback failures and ordering, current-run attribution,
+and bounded failure escaping through a real failing ostream. Extended ledger
+tests preserve pending/failed ownership after stop and the existing GL negatives.
+These CPU checks and DLL compilation provide source-level evidence only. Actual
+host behavior, physical stop timing, frame freshness and clean-machine acceptance
+remain separate work; prior incomplete timing spans and failure rows remain invalid.

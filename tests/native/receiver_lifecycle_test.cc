@@ -1,4 +1,5 @@
 #include "ReceiverLifecycle.h"
+#include "ReceiverRun.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -25,6 +26,12 @@ int main(){
  CHECK(pending.cleanup(copy)==lux::Completion::Pending);
  CHECK(copy.calls==std::vector<std::string>{"poll-copy"});
  CHECK(pending.lease&&pending.admission&&pending.registered);
+ // Cancellation and failed cleanup preserve all copy ownership until Complete.
+ CHECK(lux::classifyCopyPoll(lux::Completion::Pending,true,true)==lux::CopyPollAction::Stop);
+ copy.copy=lux::Completion::Failed;copy.calls.clear();
+ CHECK(pending.cleanup(copy)==lux::Completion::Failed);
+ CHECK(copy.calls==std::vector<std::string>{"poll-copy"});
+ CHECK(pending.copyPending&&pending.lease&&pending.admission&&pending.registered);
  copy.copy=lux::Completion::Complete;copy.calls.clear();
  CHECK(pending.cleanup(copy)==lux::Completion::Complete);
  CHECK(copy.calls==std::vector<std::string>({"poll-copy","retire","end-admission","unregister","release"}));

@@ -3,6 +3,7 @@
 #include "ContextDiagnostic.h"
 #include "ContextHandoff.h"
 #include "ReceiverPoll.h"
+#include "ReceiverRun.h"
 #include <dxgi1_2.h>
 #include <wrl/client.h>
 #include <fstream>
@@ -146,7 +147,15 @@ void FrameReceiver::run(HGLRC shared) {
   }
  };
  auto detach=[&]{drainImports();if(ring){UnmapViewOfFile(ring);ring=nullptr;}if(mapping){CloseHandle(mapping);mapping=nullptr;}};
- try {
+ bool beginSucceeded=false;
+  uint64_t opportunityRecords=0,traceCapped=0;
+  auto drainOpportunities=[&]{if(!beginSucceeded)return;HostOpportunity item;while(opportunities.pop(item)){
+   if(opportunityRecords++>=100000){++traceCapped;continue;}
+   log<<"{\"kind\":\"host-opportunity\",\"instanceId\":\""<<activation.instanceId()<<"\",\"sequence\":"<<item.sequence<<",\"at\":\""<<item.at<<"\",\"present\":"<<(item.present?"true":"false")<<",\"generation\":"<<item.generation<<",\"frameId\":\""<<item.frame<<"\",\"copyCompletedQpc\":\""<<item.completedQpc<<"\",\"correlation\":\""<<(item.provenance.status?"producer-claim-unverified":"unavailable")<<"\"";
+   if(item.provenance.status){const auto& p=item.provenance;log<<",\"workerFrameId\":\""<<p.workerFrame<<"\",\"controlSequence\":\""<<p.controlSequence<<"\",\"producerReceivedQpc\":\""<<p.receivedQpc<<"\",\"revisionId\":\""<<std::string(p.revisionHash.data(),64)<<"\",\"schemaHash\":\""<<std::string(p.schemaHash.data(),64)<<"\",\"normalized\":[";for(uint32_t i=0;i<p.count;++i){if(i)log<<',';log<<p.normalized[i];}log<<']';}
+   log<<"}\n";
+  }};
+ runReceiverBody([&] {
   // The worker creates, uses and destroys its own drawable/DC. The host's DC is
   // consulted only in start for format/context creation; never made current here.
   windowClass=L"LuxTR02Drawable-"+std::to_wstring(GetCurrentThreadId())+L"-"+std::to_wstring(reinterpret_cast<uintptr_t>(this));
@@ -174,16 +183,9 @@ void FrameReceiver::run(HGLRC shared) {
   require(SUCCEEDED(base.As(&device)),"D3D11.1");interop=open(device.Get());require(interop!=nullptr,"wglDXOpenDeviceNV failed: adapter/context compatibility unproved");
   log<<"{\"kind\":\"adapter\",\"luidLow\":"<<description.AdapterLuid.LowPart<<",\"luidHigh\":"<<description.AdapterLuid.HighPart<<"}"<<std::endl;
   glGenFramebuffers(1,&readFbo);glGenFramebuffers(1,&drawFbo);require(readFbo&&drawFbo,"worker framebuffer allocation failed");
-  activation.begin();
+  activation.begin();beginSucceeded=true;
   log<<std::setprecision(std::numeric_limits<float>::max_digits10);
   LARGE_INTEGER frequency;QueryPerformanceFrequency(&frequency);log<<"{\"kind\":\"native-clock\",\"domain\":\"qpc\",\"frequency\":\""<<frequency.QuadPart<<"\"}"<<std::endl;
-  uint64_t opportunityRecords=0,traceCapped=0;
-  auto drainOpportunities=[&]{HostOpportunity item;while(opportunities.pop(item)){
-   if(opportunityRecords++>=100000){++traceCapped;continue;}
-   log<<"{\"kind\":\"host-opportunity\",\"instanceId\":\""<<activation.instanceId()<<"\",\"sequence\":"<<item.sequence<<",\"at\":\""<<item.at<<"\",\"present\":"<<(item.present?"true":"false")<<",\"generation\":"<<item.generation<<",\"frameId\":\""<<item.frame<<"\",\"copyCompletedQpc\":\""<<item.completedQpc<<"\",\"correlation\":\""<<(item.provenance.status?"producer-claim-unverified":"unavailable")<<"\"";
-   if(item.provenance.status){const auto& p=item.provenance;log<<",\"workerFrameId\":\""<<p.workerFrame<<"\",\"controlSequence\":\""<<p.controlSequence<<"\",\"producerReceivedQpc\":\""<<p.receivedQpc<<"\",\"revisionId\":\""<<std::string(p.revisionHash.data(),64)<<"\",\"schemaHash\":\""<<std::string(p.schemaHash.data(),64)<<"\",\"normalized\":[";for(uint32_t i=0;i<p.count;++i){if(i)log<<',';log<<p.normalized[i];}log<<']';}
-   log<<"}\n";
-  }};
   std::wstring connected;ReceiverPoll discovery,counters;int pending=-1,sourceSlot=-1;
   lifecycle.started();
   while(!lifecycle.stopRequested()) {
@@ -239,7 +241,15 @@ void FrameReceiver::run(HGLRC shared) {
       imported.ownership.copyPending=true;
       context->CopyResource(imported.local.Get(),imported.texture.Get());context->End(imported.query.Get());context->Flush();
       const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(2);
-      for(;;){auto result=pollCopy(imported);require(result!=Completion::Failed,"local D3D copy query failure");if(result==Completion::Complete)break;require(!lifecycle.stopRequested()&&std::chrono::steady_clock::now()<deadline,"local D3D copy deadline");std::this_thread::sleep_for(std::chrono::milliseconds(1));}
+      for(;;){
+       const auto result=pollCopy(imported);
+       const auto action=classifyCopyPoll(result,lifecycle.stopRequested(),std::chrono::steady_clock::now()>=deadline);
+       require(action!=CopyPollAction::Failed,"local D3D copy query failure");
+       if(action==CopyPollAction::Complete)break;
+       if(action==CopyPollAction::Stop)throw ReceiverStopRequested{};
+       require(action!=CopyPollAction::Deadline,"local D3D copy deadline");
+       std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      }
       imported.ownership.copyPending=false;require(retire(*ring,imported.key),"source retirement key mismatch");imported.ownership.lease=false;endRead(*ring);imported.ownership.admission=false;
       // Driver synchronization stays on the worker; it is not assumed bounded.
       require(lock(interop,1,&imported.object)!=FALSE,"NV lock failed");imported.ownership.locked=true;
@@ -253,9 +263,13 @@ void FrameReceiver::run(HGLRC shared) {
    }
    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
+ },[&](const char* reason){writeReceiverFailure(log,reason);},[&]{
+  finalizeReceiverDiagnostics(beginSucceeded,[&]{
   drainOpportunities();log<<"{\"kind\":\"host-telemetry-summary\",\"instanceId\":\""<<activation.instanceId()<<"\",\"lostRecords\":"<<opportunities.lost.load()+traceCapped<<",\"recorded\":"<<std::min<uint64_t>(opportunityRecords,100000)<<"}"<<std::endl;
- }catch(const std::exception& error){log<<"{\"kind\":\"failure\",\"reason\":\""<<error.what()<<"\"}"<<std::endl;}
- catch(...){log<<"{\"kind\":\"failure\",\"reason\":\"unknown worker exception\"}"<<std::endl;}
+  },[&]{
+   log<<"{\"kind\":\"host-telemetry-unavailable\",\"reason\":\"activation initialization incomplete\"}"<<std::endl;
+  });
+ });
  activation.end();
  detach(); // always before closing interop or releasing its D3D device
  if(interop&&!close(interop)){unsupportedUnload();for(;;)std::this_thread::sleep_for(std::chrono::seconds(1));}
