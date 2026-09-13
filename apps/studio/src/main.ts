@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, clipboard } from 'electron';
 import { join, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { randomBytes } from 'node:crypto';
@@ -14,6 +14,8 @@ import { observeFullscreen } from './fullscreen.ts';
 import { createExportService, runExportChild } from './export-process.ts';
 import { createCloseConfirmation } from './close-confirmation.ts';
 import { resolveStudioSession } from '../../../scripts/studio-session.mjs';
+import { ComponentLibraryStore } from '../../../packages/core/src/component-library-store.ts';
+import type { SourceBundle } from '../../../packages/runtime-contracts/src/index.ts';
 
 // This process owns presentation windows only. It never creates a render service,
 // starts an authoring instance, or terminates a host-owned process.
@@ -34,6 +36,11 @@ let mainWindow: BrowserWindow | null = null;
 let closing = false;
 let compiling = false;
 const files = new SceneFileStore();
+const library = new ComponentLibraryStore(join(studioProfile.directory,'component-library.json'),{validateCandidate:async source=>{
+  const result=await compile({...source,sdkVersion:'0.3.0'} as SourceBundle) as {ok?:boolean;linked?:{linkedVersion?:number};diagnostics?:readonly {message?:string}[]};
+  if(!result.ok)throw Error(result.diagnostics?.map(item=>item.message).filter(Boolean).join('; ')||'Library component candidate did not compile');
+  if(result.linked?.linkedVersion!==4)throw Error('Library component candidate did not produce a component build');
+}});
 let dirty = false;
 const closeConfirmation = createCloseConfirmation(() => randomBytes(16).toString('hex'), id => mainWindow?.webContents.send('studio:close-request', id));
 const agentRequests = new Map<string, { resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
@@ -114,6 +121,19 @@ app.whenReady().then(async () => {
   ipcMain.handle('studio:export', (event, request: unknown) => {
     if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted export sender');
     return exportService.create(request);
+  });
+  ipcMain.handle('studio:library',async(event,action:unknown,value:unknown)=>{
+    if(!trusted(event)||BrowserWindow.fromWebContents(event.sender)!==mainWindow)throw Error('Untrusted library sender');
+    if(action==='list')return library.list();
+    if(action==='read')return library.read(value as string);
+    if(action==='create')return library.create(value as Parameters<ComponentLibraryStore['create']>[0]);
+    if(action==='update')return library.update(value as Parameters<ComponentLibraryStore['update']>[0]);
+    if(action==='copy-request'){
+      const component=await library.read(value as string);
+      const request=`Read the current Lux scene with lux.studio.read. Read library component ${component.name} (${component.id}) with lux.library.read. Add one linked instance under a unique library/<name> mount path. Preserve the existing scene source and libraryLinks. Submit the complete source with lux.studio.build and include the component ID and mountPath in libraryLinks. Then confirm the actual preview.`;
+      clipboard.writeText(request);return request;
+    }
+    throw Error('Unsupported library operation');
   });
   ipcMain.handle('studio:authoring', async (event, action: unknown, value: unknown) => {
     if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted authoring sender');

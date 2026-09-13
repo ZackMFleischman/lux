@@ -64,18 +64,22 @@ Read live tool schemas if available; these are the checked adapter's contracts. 
 | --- | --- |
 | `discover` | `{}` → adapter-checkout SDK source, example, shared types, imports, declared capabilities. No running-app handshake; can succeed with Studio closed. |
 | `read` | `{}` → `{ source, draftVersion, ..., status }`. Complete source; don't truncate assets/files when storing it for an edit. |
-| `build` | `{ expectedDraftVersion, source }` → `{ draftVersion, status }` after compile/candidate promotion. This is a complete replacement. |
+| `build` | `{ expectedDraftVersion, source, libraryLinks?: [{ componentId, mountPath }] }` → `{ draftVersion, status }` after resolving linked component source and candidate promotion. This is a complete replacement. Preserve current links from `read.libraryLinks` unless the requested edit changes them. |
 | `status` | `{}` → snapshot containing `authoring`, which is null before a working runtime exists. |
 | `capture` | `{}` → PNG image block plus JSON metadata. Captures the current completed frame; it does not advance paused playback. |
 | `playback` | `{ instanceId, expectedGeneration, action: 'play' | 'pause' | 'reset' }` → `{ applied, status }`. Reset preserves playing/paused state. |
 | `parameters` | `{ instanceId, expectedGeneration, expectedRevisionId, expectedControlSchemaHash, values: { spikeHeight: 0.5 }, mode: 'live' }` → `{ applied, status }`. Use actual runtime `controlSchema` IDs/ranges and `controlSchemaHash`; the patch can change several keys atomically. Unknown keys and stale schemas are rejected. |
 | `restart` | `{ instanceId, expectedGeneration }` → replacement runtime status; source and controls retained. Use for recovery when needed, not every edit. |
 
+Discovery can also expose local tools with the `lux.library.` prefix. `list {}` returns stable IDs, names, descriptions, and revisions. `read { id }` returns the complete current SDK 0.4 component source. The first connected path accepts zero-input image-source components. `create { name, description, source }` validates and builds the candidate before creating revision 1. `update { id, expectedRevision, name, description, source }` validates a complete replacement and rejects a stale expected revision. An invalid candidate or revision conflict leaves the prior library revision active.
+
+The Library panel is read-only for source. It lists profile-owned local entries, opens their source files, and can copy an agent request. Copying does not message an agent or insert source. A linked scene stores the last resolved revision and mounted source as an explicit fallback. Reopen resolves the latest library revision; if it fails to build, Studio keeps the saved working preview and reports the fallback. A running scene reports newer revisions and waits for Apply update. Fork copies the mounted source into the scene and unlinks that component.
+
 Obtain `instanceId`, `generation`, `revisionId`, and `playback` from `status.authoring` (or a tool response's `status.authoring`). Map `generation` to `expectedGeneration` and `revisionId` to `expectedRevisionId`; do not invent them. Restart replaces the generation, so refresh guards afterward. For rejected stale guards, reread state and reconsider the action instead of forcing it against an unrelated runtime.
 
 For source edits, `structuredClone(current.source)` is a useful starting point. Modify only the intended entries in `.files`; preserve the remaining bundle. A complete-source build is atomic and version guarded. Typing through Playwright or streaming characters into the user's editor has different concurrency behavior and is not the creation path; token-by-token edit visualization is not exposed by the checked MCP API.
 
-Current tools do not expose scene Save/Open, export, resolution changes or audio inputs. Numeric visual-defined controls are available; color/Boolean/enum controls are not yet supported. Do not claim a tool result performed those actions. Inspect updated discovery for newer capabilities before concluding they remain unavailable.
+Current tools do not expose scene Save/Open, export, resolution changes or audio inputs. The library tools do not directly save a scene. Numeric visual-defined controls are available; color/Boolean/enum controls are not yet supported. Do not claim a tool result performed those actions. Inspect updated discovery for newer capabilities before concluding they remain unavailable.
 
 ## Editor and scene commands
 

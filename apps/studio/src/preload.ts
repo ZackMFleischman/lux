@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import type { StudioWindowClient, WindowState } from './window-client.ts';
 import type { StudioExportClient } from './export-client.ts';
+import type { ComponentLibraryClient } from './library-client.ts';
 
 const api: StudioWindowClient = {
   getState: () => ipcRenderer.invoke('studio:window', 'state'),
@@ -42,3 +43,11 @@ contextBridge.exposeInMainWorld('luxAuthoring', Object.freeze({
     return () => ipcRenderer.removeListener('studio:agent-command', callback);
   },
 }));
+const libraryApi:ComponentLibraryClient={
+  list:()=>ipcRenderer.invoke('studio:library','list'),
+  read:id=>ipcRenderer.invoke('studio:library','read',id),
+  create:input=>ipcRenderer.invoke('studio:library','create',input),
+  update:input=>ipcRenderer.invoke('studio:library','update',input),
+  copyRequest:id=>ipcRenderer.invoke('studio:library','copy-request',id),
+};
+contextBridge.exposeInMainWorld('luxLibrary',Object.freeze(libraryApi));
