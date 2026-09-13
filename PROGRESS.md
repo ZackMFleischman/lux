@@ -1,19 +1,28 @@
-# Remaining work to finish the tracer
+# Tracer progress
 
-Updated: 12 September 2026. **Tracer is not complete.** Studio testing is now authorized. The coordinator runs graphics checks one at a time; other agents continue isolated CPU work.
+Updated: 12 September 2026. **Tracer is not complete.**
 
-| Remaining task | What it means | Current progress |
-| --- | --- | --- |
-| Code-defined properties | Each visual defines its own sliders and settings. Intensity is just one possible property. Studio and AI use the same definitions. | **SDK and compiler independently verified:** 54 checks pass, including named/empty properties and legacy compatibility. Runtime integration is underway; Inspector follows. Required for tracer completion. |
-| Save and export those properties | Keep property values when reopening a scene or restarting it. Exported sources expose the visual's properties in Resolume. | **Native foundation independently verified:** coherent multi-property snapshots, cross-process delivery and interrupted-writer handling pass CPU tests. Scene persistence is the next parallel slice; full export integration follows. Existing exports must keep working. |
-| Editor usability | Ctrl+S applies code to preview. Keep scene save explicit, make the scene title distinct from menus, and keep file navigation compact at every width. | **Passed actual Studio QA:** Ctrl+S, scene save/reopen, passive title and compact file list. Persistent shortcut hints removed; all 99 CPU/DOM/editor checks pass. |
-| Smooth slider dragging | Keep the slider under your pointer while earlier changes finish applying. Still show actual applied values separately. | **Passed actual Studio QA:** 40-step drag stayed monotonic while runtime confirmations arrived; stale-owner regression checks also pass. |
-| Preview uses available space | Remove unnecessary padding and let the image fill the pane as far as its aspect ratio allows, without stretching or cropping. | **Passed actual Studio QA:** preview fills the available pane; aspect fit and preview-only fullscreen remain correct. |
-| Image browsing and preview | See image assets alongside source files, use them in a visual, and retain them through preview restart and scene save/reopen. | **Passed actual Studio QA:** six image regions match expected GPU pixels; image-only changes, restart, failed-build retention and save/reopen pass. BMP foundation; PNG/JPEG still below. |
-| PNG, JPEG and transparency | Load common image formats with correct colors and transparent edges. Reject malformed or excessively large images. | **PNG decoder reviewed and tested:** allocation-race correction verified. JPEG is under independent review; malformed-file corrections are underway. Application integration and transparency rendering checks remain. |
-| Image import and export | Import, replace and remove images in Studio. Include every required image in an export so it works independently. | **Pending:** browser and source preservation foundations exist; import controls and installed image playback remain. |
-| Standalone Resolume checks | Run two different exported visuals with Lux closed and the development checkout unavailable. Reopen a saved composition and retain each source's values. | **Partly verified:** startup around one second and independent copies passed manual QA. Different-source and offline/package-isolation checks remain. |
-| Failure recovery | Broken or stalled visuals stop cleanly; recovery uses current settings and does not freeze Studio or Resolume. | **Partly verified:** automated lifecycle checks pass. Retry policy and actual process/GPU stop-and-recovery measurements remain. |
-| Performance and final sign-off | Measure real playback smoothness and control response, then record every required check as passed, failed or unavailable. | **Foundation complete:** measurement design and offline evaluator tested. Runtime measurement collection and final hardware acceptance remain. |
+**Scope is fixed for tracer:** finish the requirements below. Filesystem projects, full profiler UI and optional polish are deferred.
 
-After relevant features land, update and reinstall the repo-shipped visual-creation skill. The latest BMP-preview and shortcut instructions are validated, reinstalled and verified identical. Studio testing is authorized; graphics tests run one at a time. Compact status-bar consolidation is queued with the Inspector density polish, after required property and asset work.
+**Done** means the whole task is implemented, integrated into Lux, and tested. Passing tests for one part does not make the whole task done.
+
+| Task | Status | What it means | What remains |
+| --- | --- | --- | --- |
+| Code-defined properties | In progress | Each visual defines its own controls; Intensity is just one possible property. | Inspector, numeric inputs and generic AI controls are integrated in the test checkout; CPU regressions running, live Studio validation next (coordinator). |
+| Save and export properties | In progress | Preserve values when reopening scenes and expose the visual's controls in Resolume. | Scene save wiring is integrated in the test checkout; native/export agent is finishing offline control mapping and host tests. |
+| PNG, JPEG and transparency | In progress | Use common images with correct colors and transparent edges. | PNG/JPEG admission tests pass; assets agent is connecting decoded images to preview and verifying transparency. |
+| Image import and export | In progress | Import, replace and remove images; include them in standalone exports. | Assets agent is implementing import controls; native/export agent owns exported image playback. |
+| Runtime performance monitoring | In progress | Measure frame delivery and visual CPU/GPU cost without stalling playback. | Performance agent is implementing bounded live measurements and explicit unsupported-metric reporting. |
+| Host and control timing | In progress | Measure Resolume startup, frame delivery and how quickly control changes appear. | Replace partial counters/manual observations with complete timing records and measured runs. |
+| Basic monitoring status | In progress | Show real measurements in Studio and make them available to agents. | Performance agent is connecting measured status and a compact view; no full profiler UI in this checkpoint. |
+| Performance acceptance | In progress | Run repeatable workloads and check whether performance meets the required budgets. | Collect real hardware results and evaluate them. The result-checking code is implemented. |
+| Standalone Resolume checks | In progress | Run different exported visuals with Lux closed and no development checkout available. | Finish different-source and package-isolation checks. Fast startup and independent copies already passed. |
+| Failure recovery | In progress | Recover from broken or stalled visuals without freezing Lux or Resolume. | Finish retry behavior and measure actual process shutdown, GPU cleanup and recovery. |
+
+Completed Studio fixes: Ctrl+S/editor navigation, smooth sliders, larger preview/fullscreen, shortcut-hint removal, and basic BMP image preview/restart/save/reopen.
+
+Next after tracer: filesystem-first projects with real TypeScript files, normal coding environments and Git. **Architecture and implementation planning: Done. Implementation: Not started.** See the [architecture](docs/design/filesystem-projects.md), [plan](docs/implementation/filesystem-projects-plan.md), and [completed review](docs/reviews/filesystem-projects-review.md).
+
+Performance details: [design](docs/design/performance-monitoring.md) and [implementation checkpoint](docs/implementation/performance-checkpoint.md). Basic monitoring and measured acceptance are required for the tracer; per-component breakdowns and the full profiler panel come later.
+
+Compact Inspector/status-bar polish is queued after the required property and asset work. Keep the repo-shipped visual-creation skill updated and reinstalled as features land. Run graphics tests one at a time.
