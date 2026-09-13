@@ -29,6 +29,29 @@ let count = 0, dropped = 0, failed = false, finishing = false, webgpuReady = fal
 let pollTimer, controlTimer, endTimer;
 let healthTimer, healthSequence = 0, workerHeartbeat = 0, completedFrames = 0, backpressureFrames = 0;
 let stopProducer=()=>{};
+let hangProbeWritten=false;
+// lux-installed-hang-probe-v1: reviewed diagnostic only; no authored path or payload.
+function persistHangProbe(message) {
+  if(process.env.LUX_STANDALONE_HANG_CONTROL!=='1'||message!=='LUX_QA_INSTALLED_HANG_ENTERED'||hangProbeWritten)return;
+  hangProbeWritten=true;
+  const runId=process.env.LUX_EXPERIMENT_RUN_ID,directory=process.env.LUX_EXPERIMENT_DIRECTORY;
+  const budget=Number(process.env.LUX_EXPERIMENT_TIMEOUT_MS);
+  if(!installed||process.env.LUX_EXPERIMENT_MODE!=='hardware'||!runId||!/^[a-f0-9-]{36}$/.test(runId)||
+    !directory||!path.isAbsolute(directory)||path.basename(directory)!==runId||!Number.isInteger(budget)||budget<1000||budget>30000||
+    !/^[a-f0-9]{32}$/.test(installed.attemptId)||!visualReady||completedFrames<1||workerHeartbeat<1)throw Error('Invalid installed hang probe identity/readiness');
+  for(let cursor=path.resolve(directory);;cursor=path.dirname(cursor)){
+    if(fs.lstatSync(cursor).isSymbolicLink())throw Error('Redirected hang probe directory');
+    if(cursor===path.dirname(cursor))break;
+  }
+  const instanceId=path.basename(installed.requestPath,'.json');
+  if(!/^[a-f0-9]{32}$/.test(instanceId)||!Number.isSafeInteger(installed.hostPid)||installed.hostPid<1||!release||!/^[a-f0-9]{64}$/.test(release.sourceHash))throw Error('Invalid installed hang probe owner');
+  const filename=path.join(directory,'installed-hang-entered.json');
+  if(fs.existsSync(filename))throw Error('Hang evidence already exists');
+  const record={kind:'hang-entered',runId,instanceId,attemptId:installed.attemptId,revisionId:release.sourceHash,hostPid:installed.hostPid,
+    clock:bridge.clock(),ready:true,workerHeartbeat,completedFrames};
+  fs.writeFileSync(filename+'.tmp',JSON.stringify(record)+'\n',{flag:'wx'});
+  fs.renameSync(filename+'.tmp',filename);
+}
 function publishHealth() {
   if (!installed || finishing) return;
   const state = {version:2, attemptId:installed.attemptId, sequence:++healthSequence,workerHeartbeat,
@@ -73,6 +96,7 @@ app.whenReady().then(async () => {
   record({ kind: 'bounds', bounds: win.getContentBounds() });
   win.webContents.on('console-message', (details, _level, legacyMessage) => {
     const message = details.message ?? legacyMessage;
+    try{persistHangProbe(message);}catch(error){failure(error);}
     if(typeof message==='string'&&message.includes('runtime-heartbeat')){
       try{const data=JSON.parse(message);if(data.kind==='runtime-heartbeat'){
         if(typeof data.frameId!=='string'||!/^\d{1,20}$/.test(data.frameId)||!Number.isSafeInteger(data.workerHeartbeat)||data.workerHeartbeat<=workerHeartbeat)return;

@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <filesystem>
 #include "standalone_alpha.h"
 extern "C" __declspec(dllexport) DWORD NvOptimusEnablement=1;
 int main(int argc,char** argv) {
@@ -23,17 +24,34 @@ int main(int argc,char** argv) {
   const char* alphaText=std::getenv("LUX_STANDALONE_ALPHA_CONTROL");
   const bool alpha=alphaText&&std::strcmp(alphaText,"1")==0;
   if(alphaText&&!alpha){std::cerr<<"Invalid alpha probe option\n";return 2;}
-  if(alpha){
+  const char* hangText=std::getenv("LUX_STANDALONE_HANG_CONTROL");
+  const bool hang=hangText&&std::strcmp(hangText,"1")==0;
+  if((hangText&&!hang)||(hang&&alpha)){std::cerr<<"Invalid hang probe option\n";return 2;}
+  std::string hangMarker;
+  LARGE_INTEGER frequency{};QueryPerformanceFrequency(&frequency);
+  if(alpha||hang){
     const char* outerText=std::getenv("LUX_EXPERIMENT_TIMEOUT_MS");char* outerEnd=nullptr;
     const long outer=outerText?std::strtol(outerText,&outerEnd,10):0;
     if(duration>10000||outer<1000||outer>30000||!outerEnd||*outerEnd||std::strlen(runId)>128||std::strspn(runId,"0123456789abcdefABCDEF-")!=std::strlen(runId)){
       std::cerr<<"Alpha probe requires <=10 s work / <=30 s supervised budget and a safe run identity\n";return 2;
     }
   }
+  if(hang){
+    const char* directory=std::getenv("LUX_EXPERIMENT_DIRECTORY");
+    const std::filesystem::path folder=directory?directory:"";
+    if(!folder.is_absolute()||folder.filename().string()!=runId||frequency.QuadPart<=0){std::cerr<<"Invalid hang experiment directory/clock\n";return 2;}
+    for(auto cursor=folder;;cursor=cursor.parent_path()){
+      const auto attributes=GetFileAttributesW(cursor.c_str());
+      if(attributes==INVALID_FILE_ATTRIBUTES||!(attributes&FILE_ATTRIBUTE_DIRECTORY)||(attributes&FILE_ATTRIBUTE_REPARSE_POINT)){std::cerr<<"Redirected/missing hang experiment directory\n";return 2;}
+      if(cursor==cursor.parent_path())break;
+    }
+    hangMarker=(folder/"installed-hang-entered.json").string();
+    if(GetFileAttributesA(hangMarker.c_str())!=INVALID_FILE_ATTRIBUTES){std::cerr<<"Hang marker already exists\n";return 2;}
+  }
   if(argc==2&&std::strcmp(argv[1],"--validate-options")==0){std::cout<<"options valid, no graphics initialized\n";return 0;}
   if(argc<2){std::cerr<<"DLL path required\n";return 2;}
-  const std::string capturePath=argc>2?argv[2]:"standalone.rgba",probePath=capturePath+".alpha.json";
-  if(alpha&&(argc<3||GetFileAttributesA(capturePath.c_str())!=INVALID_FILE_ATTRIBUTES||GetFileAttributesA(probePath.c_str())!=INVALID_FILE_ATTRIBUTES)){
+  const std::string capturePath=argc>2?argv[2]:"standalone.rgba",probePath=capturePath+(hang?".hang.json":".alpha.json");
+  if((alpha||hang)&&(argc<3||GetFileAttributesA(capturePath.c_str())!=INVALID_FILE_ATTRIBUTES||GetFileAttributesA(probePath.c_str())!=INVALID_FILE_ATTRIBUTES)){
     std::cerr<<"Alpha probe requires fresh explicit capture/evidence paths\n";return 2;
   }
   WNDCLASSW wc{};wc.style=CS_OWNDC;wc.lpfnWndProc=DefWindowProcW;wc.hInstance=GetModuleHandle(nullptr);wc.lpszClassName=L"LuxStandaloneGL";RegisterClassW(&wc);
@@ -51,13 +69,34 @@ int main(int argc,char** argv) {
   ProcessOpenGLStruct process{0,nullptr,fbo};uint64_t count=0;auto start=std::chrono::steady_clock::now();
   auto elapsed=[&](){return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-start).count();};
   int result=0;bool whiteSeen=false,setAccepted=false,transparentSeen=false;
+  bool hangReady=false,armAccepted=false,disarmSubmitted=false;
+  uint64_t readyAt=0,triggerAt=0,disarmAt=0,callbacksAfterMarker=0;
+  auto qpc=[](){LARGE_INTEGER at{};QueryPerformanceCounter(&at);return uint64_t(at.QuadPart);};
+  auto setArm=[&](float normalized){SetParameterStruct parameter{};parameter.ParameterNumber=0;
+    std::memcpy(&parameter.NewParameterValue.UIntValue,&normalized,sizeof(normalized));FFMixed input{};input.PointerValue=&parameter;
+    return main(FF_SET_PARAMETER,input,instance).UIntValue==FF_SUCCESS;};
   lux::probe::Quartet whitePixels{};
   auto bindRead=[&](){glBindFramebuffer(GL_FRAMEBUFFER,fbo);glReadBuffer(GL_COLOR_ATTACHMENT0);};
   auto quarters=[&](){lux::probe::Quartet samples{};bindRead();unsigned row=0;for(int y:{270,810})for(int x:{480,1440})glReadPixels(x,1079-y,1,1,GL_RGBA,GL_UNSIGNED_BYTE,samples[row++].data());return samples;};
-  if(alpha){glDisable(GL_BLEND);glDisable(GL_FRAMEBUFFER_SRGB);bindRead();if(glCheckFramebufferStatus(GL_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE||glGetError()!=GL_NO_ERROR)result=9;}
-  while(!result&&elapsed()<duration) {
-    if(alpha){glDisable(GL_BLEND);glDisable(GL_FRAMEBUFFER_SRGB);glBindFramebuffer(GL_FRAMEBUFFER,fbo);}
+  if(alpha||hang){glDisable(GL_BLEND);glDisable(GL_FRAMEBUFFER_SRGB);bindRead();if(glCheckFramebufferStatus(GL_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE||glGetError()!=GL_NO_ERROR)result=9;}
+  while(!result&&elapsed()<(hang?duration-25:duration)) {
+    if(alpha||hang){glDisable(GL_BLEND);glDisable(GL_FRAMEBUFFER_SRGB);glBindFramebuffer(GL_FRAMEBUFFER,fbo);}
     value.PointerValue=&process;if(main(FF_PROCESS_OPENGL,value,instance).UIntValue!=FF_SUCCESS){result=6;break;}++count;
+    if(hang){
+      if(disarmSubmitted)++callbacksAfterMarker;
+      if(!hangReady){
+        unsigned char pixel[4]{};bindRead();glReadPixels(960,540,1,1,GL_RGBA,GL_UNSIGNED_BYTE,pixel);
+        if(glGetError()!=GL_NO_ERROR){result=9;break;}
+        if(pixel[0]>=250&&pixel[1]<=5&&pixel[2]>=250&&pixel[3]>=250){
+          hangReady=true;readyAt=qpc();
+          if(elapsed()>6500){result=12;break;}
+          triggerAt=qpc();armAccepted=setArm(1.0f);if(!armAccepted){result=12;break;}
+        }
+      }else if(armAccepted&&!disarmSubmitted&&GetFileAttributesA(hangMarker.c_str())!=INVALID_FILE_ATTRIBUTES){
+        // This is only a host control submission. The blocked worker cannot acknowledge it.
+        disarmAt=qpc();disarmSubmitted=setArm(0.0f);if(!disarmSubmitted){result=12;break;}
+      }
+    }
     if(alpha){
       const auto samples=quarters();if(glGetError()!=GL_NO_ERROR){result=9;break;}
       if(!whiteSeen&&lux::probe::matches(samples,lux::probe::white)){whiteSeen=true;whitePixels=samples;std::cout<<"alpha white observed\n";}
@@ -73,16 +112,21 @@ int main(int argc,char** argv) {
     std::this_thread::sleep_for(std::chrono::milliseconds(16));
   }
   if(alpha&&(!whiteSeen||!setAccepted||!transparentSeen)&&!result){std::cerr<<"Alpha control/pixel deadline exceeded\n";result=10;}
+  if(hang&&(!hangReady||!armAccepted||!disarmSubmitted||!callbacksAfterMarker)&&!result){std::cerr<<"Hang readiness/marker/disarm deadline exceeded\n";result=12;}
   // One diagnostic capture only. Not transport or performance evidence.
-  if(!result){
+  if(!result&&!hang){
     std::vector<unsigned char> pixels(1920*1080*4);if(alpha)bindRead();glReadPixels(0,0,1920,1080,GL_RGBA,GL_UNSIGNED_BYTE,pixels.data());
     if(alpha&&glGetError()!=GL_NO_ERROR)result=9;
     if(alpha){lux::probe::Quartet samples{};unsigned row=0;for(int y:{270,810})for(int x:{480,1440})std::memcpy(samples[row++].data(),pixels.data()+((1079-y)*1920+x)*4,4);if(!lux::probe::matches(samples,lux::probe::transparent))result=10;}
     if(!result){std::ofstream file(capturePath,std::ios::binary);file.write(reinterpret_cast<char*>(pixels.data()),pixels.size());file.close();if(!file)result=11;}
     std::cout<<"callbacks "<<count<<" centerRGBA ";for(int i=0;i<4;++i)std::cout<<int(pixels[(540*1920+960)*4+i])<<" ";std::cout<<"\n";
   }
-  const auto workElapsed=elapsed();if(alpha&&workElapsed>10000&&!result)result=10;
+  const auto workElapsed=elapsed();if((alpha||hang)&&workElapsed>10000&&!result)result=10;
   auto evidence=[&](bool deinstantiated,bool deinitialized){
+    if(hang){
+      std::ofstream file(probePath);file<<"{\"runId\":\""<<runId<<"\",\"ok\":"<<(!result&&deinstantiated&&deinitialized?"true":"false")<<",\"hostPid\":"<<GetCurrentProcessId()<<",\"deinstantiated\":"<<(deinstantiated?"true":"false")<<",\"deinitialized\":"<<(deinitialized?"true":"false")<<",\"elapsedMs\":"<<workElapsed<<",\"ready\":"<<(hangReady?"true":"false")<<",\"armAccepted\":"<<(armAccepted?"true":"false")<<",\"disarmSubmitted\":"<<(disarmSubmitted?"true":"false")<<",\"callbacksAfterMarker\":"<<callbacksAfterMarker<<",\"clock\":{\"domain\":\"qpc\",\"frequency\":\""<<frequency.QuadPart<<"\"},\"readyAt\":\""<<readyAt<<"\",\"triggerAt\":\""<<triggerAt<<"\",\"disarmAt\":\""<<disarmAt<<"\"}\n";
+      file.close();if(!file&&!result)result=11;return;
+    }
     if(!alpha)return;
     std::ofstream file(probePath);file<<"{\"runId\":\""<<runId<<"\",\"ok\":"<<(!result&&deinstantiated&&deinitialized?"true":"false")<<",\"deinstantiated\":"<<(deinstantiated?"true":"false")<<",\"deinitialized\":"<<(deinitialized?"true":"false")<<",\"parameterIndex\":0,\"normalizedValue\":0,\"elapsedMs\":"<<workElapsed<<",\"white\":[";
     for(unsigned row=0;row<4;++row){if(row)file<<',';file<<'[';for(unsigned c=0;c<4;++c){if(c)file<<',';file<<unsigned(whitePixels[row][c]);}file<<']';}file<<"]}\n";file.close();if(!file&&!result)result=11;

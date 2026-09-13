@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import path from 'node:path';import os from 'node:os';import {spawnSync} from 'node:child_process';import {randomUUID} from 'node:crypto';
+test('native hang option validates the reviewed bounds and private marker before any graphics initialization',t=>{
+ const parent=fs.mkdtempSync(path.join(os.tmpdir(),'lux-stop-options-')),runId=randomUUID(),directory=path.join(parent,runId);fs.mkdirSync(directory);t.after(()=>fs.rmSync(parent,{recursive:true,force:true}));
+ const env={...process.env};for(const name of Object.keys(env))if(name.startsWith('LUX_'))delete env[name];
+ Object.assign(env,{LUX_EXPERIMENT_RUN_ID:runId,LUX_EXPERIMENT_MODE:'hardware',LUX_EXPERIMENT_DIRECTORY:directory,LUX_EXPERIMENT_TIMEOUT_MS:'30000',LUX_STANDALONE_DURATION_MS:'10000',LUX_STANDALONE_HANG_CONTROL:'1'});
+ const check=patch=>spawnSync(path.resolve('native/build/Release/lux_standalone_host.exe'),['--validate-options'],{env:{...env,...patch},encoding:'utf8',windowsHide:true,timeout:3000});
+ const valid=check({});assert.equal(valid.status,0,valid.stderr);assert.match(valid.stdout,/no graphics initialized/);
+ for(const patch of [{LUX_STANDALONE_DURATION_MS:'10001'},{LUX_EXPERIMENT_TIMEOUT_MS:'30001'},{LUX_EXPERIMENT_MODE:'cpu'},{LUX_STANDALONE_ALPHA_CONTROL:'1'},{LUX_EXPERIMENT_DIRECTORY:parent}])assert.equal(check(patch).status,2);
+ fs.writeFileSync(path.join(directory,'installed-hang-entered.json'),'stale');assert.equal(check({}).status,2);
+});
