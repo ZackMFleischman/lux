@@ -15,6 +15,8 @@ test('native hang option validates the reviewed bounds and private marker before
  assert.equal(plainCheck({LUX_STANDALONE_DURATION_MS:'30000'}).status,0,'ordinary diagnostic limit is unchanged');
  assert.equal(plainCheck({LUX_STANDALONE_ALPHA_CONTROL:'1',LUX_STANDALONE_DURATION_MS:'10000'}).status,0);
  assert.equal(plainCheck({LUX_STANDALONE_ALPHA_CONTROL:'1',LUX_STANDALONE_DURATION_MS:'10001'}).status,2);
+ assert.equal(plainCheck({LUX_STANDALONE_PIXEL_CONTROL:'1',LUX_STANDALONE_DURATION_MS:'15000'}).status,0);
+ for(const patch of [{LUX_STANDALONE_PIXEL_CONTROL:'0'},{LUX_STANDALONE_PIXEL_CONTROL:'1',LUX_STANDALONE_DURATION_MS:'15001'},{LUX_STANDALONE_PIXEL_CONTROL:'1',LUX_EXPERIMENT_TIMEOUT_MS:'30001'},{LUX_STANDALONE_PIXEL_CONTROL:'1',LUX_STANDALONE_ALPHA_CONTROL:'1'},{LUX_STANDALONE_PIXEL_CONTROL:'1',LUX_STANDALONE_HANG_CONTROL:'1'}])assert.equal(plainCheck(patch).status,2);
  for(const patch of [{LUX_STANDALONE_DURATION_MS:'10001'},{LUX_EXPERIMENT_TIMEOUT_MS:'30001'},{LUX_EXPERIMENT_MODE:'cpu'},{LUX_STANDALONE_ALPHA_CONTROL:'1'},{LUX_EXPERIMENT_DIRECTORY:parent}])assert.equal(check(patch).status,2);
  fs.writeFileSync(path.join(directory,'installed-hang-entered.json'),'stale');assert.equal(check({}).status,2);
 });
