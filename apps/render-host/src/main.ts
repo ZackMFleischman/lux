@@ -30,6 +30,7 @@ let pollTimer, controlTimer, endTimer;
 let healthTimer, healthSequence = 0, workerHeartbeat = 0, completedFrames = 0, backpressureFrames = 0;
 let stopProducer=()=>{};
 let hangProbeWritten=false;
+let initHangProbeWritten=false;
 // lux-installed-hang-probe-v1: reviewed diagnostic only; no authored path or payload.
 function persistHangProbe(message) {
   if(process.env.LUX_STANDALONE_HANG_CONTROL!=='1'||message!=='LUX_QA_INSTALLED_HANG_ENTERED'||hangProbeWritten)return;
@@ -51,6 +52,29 @@ function persistHangProbe(message) {
     clock:bridge.clock(),ready:true,workerHeartbeat,completedFrames};
   fs.writeFileSync(filename+'.tmp',JSON.stringify(record)+'\n',{flag:'wx'});
   fs.renameSync(filename+'.tmp',filename);
+}
+// lux-installed-init-hang-probe-v1: inert unless this separate reviewed probe is enabled.
+function persistInitHangProbe(message) {
+  if(process.env.LUX_STANDALONE_INIT_HANG!=='1'||message!=='LUX_QA_INSTALLED_INIT_HANG_ENTERED'||initHangProbeWritten)return;
+  initHangProbeWritten=true;
+  // Observe entry before validation/file I/O; the measured interval includes persistence overhead.
+  const clock=bridge.clock();
+  const runId=process.env.LUX_EXPERIMENT_RUN_ID,directory=process.env.LUX_EXPERIMENT_DIRECTORY;
+  const budget=Number(process.env.LUX_EXPERIMENT_TIMEOUT_MS);
+  if(!installed||process.env.LUX_EXPERIMENT_MODE!=='hardware'||!runId||!/^[a-f0-9-]{36}$/.test(runId)||
+    !directory||!path.isAbsolute(directory)||path.basename(directory)!==runId||!Number.isInteger(budget)||budget<1000||budget>30000||
+    !/^[a-f0-9]{32}$/.test(installed.attemptId)||visualReady||completedFrames!==0||workerHeartbeat<1)throw Error('Invalid initialization hang probe identity/readiness');
+  for(let cursor=path.resolve(directory);;cursor=path.dirname(cursor)){
+    if(fs.lstatSync(cursor).isSymbolicLink())throw Error('Redirected initialization hang probe directory');
+    if(cursor===path.dirname(cursor))break;
+  }
+  const instanceId=path.basename(installed.requestPath,'.json');
+  if(!/^[a-f0-9]{32}$/.test(instanceId)||!Number.isSafeInteger(installed.hostPid)||installed.hostPid<1||!release||!/^[a-f0-9]{64}$/.test(release.sourceHash))throw Error('Invalid initialization hang probe owner');
+  const filename=path.join(directory,'installed-init-hang-entered-'+installed.attemptId+'.json');
+  if(fs.existsSync(filename))throw Error('Initialization hang evidence already exists');
+  const record={kind:'init-hang-entered',stage:'create',runId,instanceId,attemptId:installed.attemptId,revisionId:release.sourceHash,hostPid:installed.hostPid,
+    clock,ready:false,workerHeartbeat,completedFrames};
+  fs.writeFileSync(filename+'.tmp',JSON.stringify(record)+'\n',{flag:'wx'});fs.renameSync(filename+'.tmp',filename);
 }
 function publishHealth() {
   if (!installed || finishing) return;
@@ -104,7 +128,7 @@ app.whenReady().then(async () => {
   record({ kind: 'bounds', bounds: win.getContentBounds() });
   win.webContents.on('console-message', (details, _level, legacyMessage) => {
     const message = details.message ?? legacyMessage;
-    try{persistHangProbe(message);}catch(error){failure(error);}
+    try{persistHangProbe(message);persistInitHangProbe(message);}catch(error){failure(error);}
     if(typeof message==='string'&&message.includes('runtime-heartbeat')){
       try{const data=JSON.parse(message);if(data.kind==='runtime-heartbeat'){
         if(typeof data.frameId!=='string'||!/^\d{1,20}$/.test(data.frameId)||!Number.isSafeInteger(data.workerHeartbeat)||data.workerHeartbeat<=workerHeartbeat)return;

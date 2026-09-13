@@ -1,0 +1,14 @@
+import fs from 'node:fs';import path from 'node:path';import {pathToFileURL} from 'node:url';
+const out=import.meta.dirname,c=JSON.parse(fs.readFileSync(path.join(out,'configuration.json')));
+if(!process.argv[2])throw Error('Reviewed authorization JSON required');
+const reviewFile=path.resolve(process.argv[2]),review=JSON.parse(fs.readFileSync(reviewFile));
+if(review.executable!==c.host||JSON.stringify(review.args)!==JSON.stringify([c.registered.dllPath,c.final]))throw Error('Review changed target');
+for(const file of [c.final,c.hostLog,path.join(out,'last-experiment.json')])if(fs.existsSync(file))throw Error('Refusing reused evidence');
+for(const key of Object.keys(process.env))if(key.startsWith('LUX_')||['NODE_OPTIONS','NODE_PATH','ELECTRON_RUN_AS_NODE'].includes(key))delete process.env[key];
+process.env.LOCALAPPDATA=c.local;process.env.APPDATA=path.join(out,'roaming');
+process.env.PATH=[path.join(process.env.SystemRoot,'System32'),path.join(process.env.SystemRoot,'System32/WindowsPowerShell/v1.0')].join(path.delimiter);
+process.env.LUX_STANDALONE_DURATION_MS='10000';process.env.LUX_STANDALONE_INIT_HANG='1';process.env.LUX_HOST_LOG=c.hostLog;
+fs.mkdirSync(process.env.APPDATA,{recursive:true});
+const {runExperiment,experimentSummary}=await import(pathToFileURL(path.join(c.root,'scripts/experiment-runner.mjs')));
+const result=await runExperiment({mode:'hardware',reviewFile,timeoutMs:30000,output:path.join(out,'experiments')});
+fs.writeFileSync(path.join(out,'last-experiment.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(experimentSummary(result),null,2));process.exitCode=result.outcome==='success'?0:1;
