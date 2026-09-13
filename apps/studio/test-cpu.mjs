@@ -13,6 +13,7 @@ for (const args of [
     join(directory, 'dist/view.test.cjs'), join(directory, 'dist/interactions.test.mjs')],
   ['--test', '--test-isolation=none', join(directory, 'dist/source-editor.test.mjs')],
   ['--experimental-vm-modules', '--test', join(tests, 'visual-worker.test.mjs')],
+  ['--test','--test-isolation=none',join(root,'tests/performance/live.test.mjs'),join(root,'tests/performance/recovery.test.ts')],
 ]) {
   const result = spawnSync(process.execPath, args, { cwd: root, stdio: 'inherit', windowsHide: true, timeout: 60000 });
   if (result.error) throw result.error;
