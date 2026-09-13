@@ -8,13 +8,13 @@ import { canonicalControlSchemaJson, normalizeControlDeclarations } from '../../
 const schema=normalizeControlDeclarations({height:{type:'number',label:'Height',default:1,min:0,max:4},speed:{type:'number',label:'Speed',default:0.5,min:0,max:2}});
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const bundle=(await build({entryPoints:[fileURLToPath(new URL('../../apps/studio/src/visual-worker.mjs',import.meta.url))],bundle:true,write:false,format:'esm',platform:'browser',logLevel:'silent'})).outputFiles[0].text;
-async function fixture(controls=schema,declared=controls,mutation='',sdkVersion='0.2.0') {
-  const messages=[],frames=[];let created=0,imports=0;
-  const context=vm.createContext({TextEncoder,Uint8Array,Uint8ClampedArray,ArrayBuffer,Blob,crypto:webcrypto,performance:{now:()=>0},onmessage:null,
-    postMessage:message=>messages.push(structuredClone(message)),setTimeout:()=>1,clearTimeout(){},setInterval:()=>1,clearInterval(){},close(){},
+async function fixture(controls=schema,declared=controls,mutation='',sdkVersion='0.2.0',timed=false) {
+  const messages=[],frames=[],intervals=new Map();let created=0,imports=0,now=0;
+  const context=vm.createContext({TextEncoder,Uint8Array,Uint8ClampedArray,ArrayBuffer,Blob,crypto:webcrypto,performance:{now:()=>now},onmessage:null,
+    postMessage:message=>messages.push(structuredClone(message)),setTimeout:()=>1,clearTimeout(){},setInterval:(callback,ms)=>{intervals.set(ms,callback);return ms;},clearInterval:id=>intervals.delete(id),close(){},
     URL:{createObjectURL:()=> 'memory:visual',revokeObjectURL(){}},
-    navigator:{gpu:{requestAdapter:async()=>({requestDevice:async()=>({lost:new Promise(()=>{}),queue:{onSubmittedWorkDone:async()=>{}},destroy(){}})})}},
-    recordCreate:()=>created++,recordFrame:frame=>frames.push(structuredClone(frame)),
+    navigator:{gpu:{requestAdapter:async()=>({features:new Set(['timestamp-query']),requestDevice:async()=>({lost:new Promise(()=>{}),queue:{onSubmittedWorkDone:async()=>{if(timed)now+=17;}},destroy(){}})})}},
+    recordCreate:()=>created++,recordFrame:frame=>{frames.push(structuredClone(frame));if(timed)now+=3;},advanceClock:ms=>{now+=ms;},
     ImageData:class{},OffscreenCanvas:class{getContext(){return {putImageData(){}}}async convertToBlob(){return new Blob(['png']);}},
   });
   vm.runInContext('const parseForHarness=JSON.parse; globalThis.deliver=raw=>onmessage({data:parseForHarness(raw)});',context);
@@ -22,7 +22,7 @@ async function fixture(controls=schema,declared=controls,mutation='',sdkVersion=
     export class WebGPURenderer {backend={isWebGPUBackend:true};setSize(){}async init(){}setRenderTarget(){}render(){}dispose(){}async readRenderTargetPixelsAsync(){return new Uint8Array(4);}}
     export class RenderTarget{texture={};dispose(){}} export const SRGBColorSpace='srgb';
     export class MeshBasicNodeMaterial {dispose(){}} export class QuadMesh {constructor(material){this.material=material;}render(){}} export const sampleTexture=()=>({});
-    export default {sdkVersion:${JSON.stringify(sdkVersion)},controls:${typeof declared==='string'?declared:JSON.stringify(declared)},async create(){recordCreate();return {update(frame){recordFrame(frame)},render(){},reset(){},dispose(){}}}};`;
+    export default {sdkVersion:${JSON.stringify(sdkVersion)},controls:${typeof declared==='string'?declared:JSON.stringify(declared)},async create(){recordCreate();return {update(frame){recordFrame(frame)},${timed?'async render(){advanceClock(7);await Promise.resolve();advanceClock(11);}':'render(){}'},reset(){},dispose(){}}}};`;
   const module=new vm.SourceTextModule(bundle,{context,importModuleDynamically:async()=>{
     imports++;const visual=new vm.SourceTextModule(visualCode,{context});await visual.link(()=>{throw Error('Unexpected import')});await visual.evaluate();return visual;
   }});
@@ -30,8 +30,20 @@ async function fixture(controls=schema,declared=controls,mutation='',sdkVersion=
   const identity={instanceId:'instance',generation:1,revisionId:'revision'};
   const initial={type:'init',requestId:'init',...identity,moduleSource:'fixture',canvas:{},settings:{width:1920,height:1080,fps:60,seed:0},sdkVersion,controlSchema:controls,controlSchemaHash:hash(canonicalControlSchemaJson(controls)),controls:Object.fromEntries(controls.map(row=>[row.id,row.default])),playing:false};
   async function send(message){const before=messages.length;context.deliver(JSON.stringify({...identity,...message}));for(let i=0;i<200 && messages.length===before;i++)await new Promise(resolve=>setImmediate(resolve));assert.ok(messages.length>before,'worker must respond');return messages.at(-1);}
-  return {send,initial,messages,frames,created:()=>created,imports:()=>imports};
+  return {send,initial,messages,frames,created:()=>created,imports:()=>imports,telemetry(){now=500;intervals.get(500)?.();return messages.at(-1);},intervals};
 }
+
+test('actual worker reports separate CPU calls, asynchronous render wait, queue wait and honest GPU capability',async()=>{
+  const f=await fixture(schema,schema,'','0.2.0',true);await f.send(f.initial);
+  const message=f.telemetry();assert.equal(message.type,'performance');
+  assert.equal(message.summary.update.p95,3);assert.equal(message.summary.renderCall.p95,7);
+  assert.equal(message.summary.renderAwait.p95,11);assert.equal(message.summary.queueWait.p95,17);
+  assert.equal(message.summary.cpuCall.p95,10);assert.equal(message.summary.cpuCall.validity,'incomplete');
+  assert.equal(message.summary.gpu.timestampQuerySupported,true);assert.equal(message.summary.gpu.timestampQueryEnabled,false);
+  assert.equal(message.summary.gpu.availability,'unsupported');assert.equal('p95' in message.summary.gpu,false);
+  await f.send({type:'controls',controlSequence:1,values:{height:99,speed:1},controlSchemaHash:f.initial.controlSchemaHash});
+  assert.equal(f.intervals.has(500),false,'fault releases collector interval');
+});
 test('actual worker applies complete initial/live controls and captures exact metadata; reset preserves values',async()=>{
   const f=await fixture();const ready=await f.send({...f.initial,controls:{height:3,speed:1}});
   assert.equal(ready.type,'ready',JSON.stringify(ready));assert.deepEqual(ready.controls,{height:3,speed:1});assert.equal('intensity' in ready,false);

@@ -4,23 +4,34 @@ import { RuntimeClock } from '../../../packages/runtime/src/clock.ts';
 import { SeededRandom } from '../../../packages/runtime/src/seed.ts';
 import { loadAuthoredModule } from './authored-worker-assets.mjs';
 import { prepareWorkerControlState } from './controls/worker-control-state.mjs';
+import { createFrameCollector } from '../../../packages/performance/live.mjs';
 const freeze=Object.freeze;
+const now=performance.now.bind(performance);
+const post=postMessage.bind(globalThis);
 let identity, renderer, device, visual, clock, random, settings, outputTarget, presentation;
 let controlState, frame = 0, tick = 0, lastTime = 0;
-let stopped = false, timer, heartbeat, chain = Promise.resolve();
-const send = (type, extra = {}) => postMessage({ type, ...identity, ...extra });
+let stopped = false, timer, heartbeat, telemetryTimer, collector, gpuCapability, chain = Promise.resolve();
+const send = (type, extra = {}) => post({ type, ...identity, ...extra });
 function state() { return { ...clock.snapshot(), frameId: String(frame),...controlState.state() }; }
 function failure(error, requestId) {
-  stopped = true; clearTimeout(timer); clearInterval(heartbeat);
+  stopped = true; clearTimeout(timer); clearInterval(heartbeat); clearInterval(telemetryTimer);
   send('failure', { requestId, code: 'RUNTIME_FAILED', message: String(error?.message || error).slice(0, 2000) });
 }
 async function draw(requestId, type = 'frame') {
   const time = clock.snapshot();
+  const updateStart=now();
   visual.update(freeze({ tick: tick++, timeSeconds: time.timeSeconds,
     deltaSeconds: Math.max(0, time.timeSeconds - lastTime), controls: controlState.values(), events: freeze([]) }));
-  await visual.render(freeze({ width: settings.width, height: settings.height, colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }));
+  const updateEnd=now();
+  const renderResult=visual.render(freeze({ width: settings.width, height: settings.height, colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }));
+  const renderCallEnd=now();
+  const asynchronous=renderResult != null && typeof renderResult.then === 'function';
+  await renderResult;
+  const renderEnd=now();
   await device.queue.onSubmittedWorkDone();
+  const completed=now();
   lastTime = time.timeSeconds; frame++;
+  collector.record(completed,frame,updateEnd-updateStart,renderCallEnd-updateEnd,completed-renderEnd,asynchronous,renderEnd-renderCallEnd);
   send(type, { requestId, ...state(), timeSeconds: time.timeSeconds });
 }
 function schedule() {
@@ -44,6 +55,7 @@ async function initialize(message) {
   if (!navigator.gpu) throw Error('WebGPU is unavailable');
   const adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
   if (!adapter) throw Error('No WebGPU adapter available');
+  gpuCapability=freeze({timestampQuerySupported:typeof adapter.features?.has === 'function' ? adapter.features.has('timestamp-query') : null,timestampQueryEnabled:false});
   device = await adapter.requestDevice();
   device.lost.then(info => { if (!stopped) failure(Error(`WebGPU device lost: ${info.message}`)); });
   renderer = new module.WebGPURenderer({ canvas: message.canvas, device, alpha: true, antialias: false });
@@ -61,6 +73,8 @@ async function initialize(message) {
       renderer.setRenderTarget(null); presentation.render(renderer);
     } }) }));
   for (const name of ['update', 'render', 'reset', 'dispose']) if (typeof visual?.[name] !== 'function') throw Error(`Visual missing ${name}`);
+  collector=createFrameCollector({startMs:now()});
+  telemetryTimer=setInterval(()=>{if (!stopped) send('performance',{summary:collector.summary(now(),gpuCapability)});},500);
   if (message.playing) clock.play();
   await draw(message.requestId, 'ready');
   schedule();
@@ -93,7 +107,7 @@ onmessage = event => {
         postMessage({ type: 'capture', ...identity, requestId: message.requestId, metadata, bytes }, [bytes]);
       } catch (error) { send('capture-error', { requestId: message.requestId, message: String(error.message) }); }
     } else if (message.type === 'dispose') {
-      stopped = true; clearTimeout(timer); clearInterval(heartbeat); await visual.dispose(); outputTarget.dispose(); presentation.material.dispose(); renderer.dispose(); device.destroy(); close();
+      stopped = true; clearTimeout(timer); clearInterval(heartbeat); clearInterval(telemetryTimer); await visual.dispose(); outputTarget.dispose(); presentation.material.dispose(); renderer.dispose(); device.destroy(); close();
     }
   }).catch(error => failure(error, message?.requestId));
 };
