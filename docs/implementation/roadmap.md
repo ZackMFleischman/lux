@@ -8,8 +8,8 @@ concurrently in isolated Git worktrees, with regular integration back to main.
 Codex task `01a09967-d0ac-75d2-bea3-ccda2980ed32` authorizes Conductor onboarding,
 overall orchestration, and advancing workstreams 3 and 4 alongside the existing
 filesystem/component work. The user delegates routine decisions while asleep.
-The existing agent retains execution coordination for workstreams 1 and 2;
-the overall orchestrator arbitrates shared interfaces, integrations and graphics.
+The user's later direction makes the root task the sole coordinator for all four
+workstreams, including shared interfaces, integrations and graphics.
 See [Conductor onboarding](../conductor-onboarding.md) and the
 [orchestration checkpoint](../conductor-orchestration.md).
 This records scope and coordination, not completed
@@ -24,6 +24,15 @@ technical dependencies and the existing acceptance requirements still apply.
 | 4. Reliability | Frame delivery, recovery and diagnostics, GPU/resource accounting, performance validation, actual-host coverage and isolated installed distribution. | Continue the [post-tracer reliability work](tracer-preview-closeout.md), including preserved experiment review. Keep these activities in one coordinated workstream; incomplete numerical gates remain explicit and do not block unrelated creative development. |
 
 ### Preparation and integration rules
+
+**Delivery correction, 13 September 2026:** usable features are the checkpoints.
+The user identified too much internal work without a working feature. Follow
+the delivery rules in `../../AGENTS.md` and the next demonstrations in
+[the orchestration checkpoint](../conductor-orchestration.md). Each new internal
+task must explain why that demonstration needs it now. An old plan's next slice
+is not an automatic dispatch order. Reuse completed work, connect one concrete
+case, and defer extensions that do not help that case. Keep the existing safety
+and independent review requirements. Report actual feature use, not ticket totals.
 
 - Prepare separate scoped plans and testable delivery slices for the four
   workstreams. Refresh the existing filesystem plan against integrated main;

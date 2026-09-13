@@ -23,6 +23,40 @@ All four roadmap workstreams are authorized; later slices still require their
 documented prerequisites and review. Preserve active ownership, serialize main
 integrations and graphics/Studio/Resolume tests, and do not start a second team.
 
+## Deliver usable features
+
+The user set this direction on 13 September 2026 after reviewing excessive
+internal work. Apply it before every plan, worker dispatch and status report.
+
+- Keep one next usable milestone per workstream. State the user action, expected
+  visible result and a short demonstration in its parent ticket. Read the current
+  targets in `docs/conductor-orchestration.md` before dispatch.
+- Each child ticket must name that milestone and explain why it needs this work
+  now. For internal code, state the connection to the actual application and why
+  existing code cannot support the demonstration. Otherwise defer the task.
+- Prefer connecting and demonstrating existing code before adding another helper
+  system. A plan, parser, ledger or test suite is not a usable feature.
+- After each accepted slice, check the shortest remaining path to the demonstration.
+  Do not automatically dispatch the next slice of an old plan. Keep only work
+  needed for this path active; do not fill agent capacity with speculative work.
+- Start with one concrete case. Add general frameworks, formats, version changes,
+  replay systems and broad compatibility only when the milestone needs them.
+- Keep plans short and proportional to risk. Reuse existing contracts. Put detail
+  in a linked reference when it is needed for correctness. Do not add another
+  planning or review layer unless an existing policy or a specific unresolved risk
+  requires it. Keep required independent review and data/resource protection.
+- Test changed behavior and relevant regressions. CPU tests do not prove a working
+  UI, device, GPU or installed host. Preserve real demonstration evidence and any
+  remaining limits; never weaken a safety boundary to make a demo pass.
+- Report features as usable, implemented but not connected, or planned. For a
+  usable feature, cite the actual demonstration. Describe blockers and the next
+  user-visible result. Do not use ticket counts or test totals as feature progress.
+- Use short STE-style sentences in tickets and handoffs. Separate technical
+  references from the main copy. Preserve historical evidence and exact contracts.
+
+These rules change execution priority, not the authorized four-workstream scope.
+They do not authorize bypassing native-input provenance or policy-stopped work.
+
 ## Visual-creation skill
 
 `skills/lux-visual-creation/` is the source of truth for the shipped Codex skill. When changing author-facing SDK features, published parameters, supported assets, source-bundle rules, or Studio MCP tools, update the relevant skill instructions/examples in the same work and validate them against the implementation. Describe available behavior separately from planned behavior. Pair the adapter with the running Studio's checkout: discovery describes the adapter and is not a version handshake with an older open application.

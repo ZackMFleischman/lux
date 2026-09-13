@@ -2,7 +2,35 @@
 
 The user designated this task as the sole coordinator on 13 September 2026. All four roadmap workstreams are authorized. The coordinator can make routine implementation, review and integration decisions. The phone portal works. Leave its service running.
 
-## Ownership and current delivery
+## Next usable milestones
+
+The user corrected the delivery workflow on 13 September 2026. Internal progress
+had outpaced usable features. The rules in `../AGENTS.md` now govern dispatch.
+Keep these targets in the four parent tickets. They are next outcomes, not claims
+of completed features or permission to bypass their prerequisites.
+
+| Workstream | Next user action and demonstration | Defer until needed |
+| --- | --- | --- |
+| Filesystem, LUX-2 | Edit one scene's TypeScript file, apply it in Lux, and see the change. Show the file diff. Reject an invalid edit while keeping the last working preview and the user's files. | Toolchain upgrades and downgrades, broad version support, and extra proposal systems. Resolve the native file-access blocker before claiming the real file workflow works. |
+| Components, LUX-3 | Compose two existing components in a real preview. Change one instance's control and show that the other instance keeps its value. Use the smallest supported authoring path; a full graph editor is not required for this first demonstration. | Library discovery, grouping, broad graph UI and further reusable frameworks unless this example needs them. |
+| Inputs, LUX-4 | Map one MIDI knob to one declared visual control and show the response in Studio. Check that manual control still works after disconnect. If hardware is unavailable, label the device demonstration blocked; a synthetic signal is development evidence only. | Recording, transcript extensions, replay and macros unless the first live mapping needs them. |
+| Reliability, LUX-5 | Restart one failed installed visual and show a fresh image with its last control value. Preserve the existing stop and recovery targets and verify actual process cleanup. | Broader benchmark and diagnostic frameworks that do not help this case. Native provenance and physical-test gates still apply. |
+
+Before another delivery launch, reconcile unavailable hosts and map retained code
+to the shortest path for these demonstrations. LUX-81 and LUX-84 contain submitted
+code; inspect and review useful code without automatically extending their old
+plans. LUX-85 is a recording plan, not a reason to implement recording next.
+LUX-87 is deferred pending a concrete need from the filesystem demonstration.
+Preserve submitted commits, old decisions and original evidence.
+
+For each selected child, record four short items: user result, why this task is
+needed now, demonstration or connection point, and excluded extensions. Use the
+existing ticket and checkpoint fields. Do not create a separate reporting system.
+After each accepted slice, update feature status and reassess the remaining path.
+Report usable, implemented but not connected, or planned, with any blocker stated
+separately. A successful CPU test does not establish a real user demonstration.
+
+## Ownership and historical delivery snapshot
 
 Conductor project: `34723eb7-f57d-45c3-8831-adcb2bbfe485` (LUX). Coordinator identity: `77de5ef7-a72d-43f2-8d3b-8dabbaef06f1`; live session: `27df4cd0-6ac6-41b1-b1ae-41af49240d64`; run: `345554f0-0896-4ea2-8fb4-942317f65fda`. The current registry and actual native host observations are authoritative; source checkpoints are historical snapshots.
 
