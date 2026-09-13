@@ -73,3 +73,5 @@ Current tools do not expose scene Save/Open, export, resolution changes or audio
 ## Editor and scene commands
 
 In the Source editor, Ctrl/Cmd+S builds and applies the complete edited source bundle to preview; it does not save a single file or the scene to disk. Ctrl/Cmd+Shift+S saves the scene. File Save and Save as remain explicit scene commands. Ctrl/Cmd+F opens editor search; shortcut hints are not permanently displayed. MCP `build` still performs the same complete-source replacement and is the supported agent edit path.
+
+The Source panel's Import images, selected-image Replace and Remove commands change the draft; Build explicitly applies it. PNG/JPEG/BMP source assets also work in an offline Resolume export when the running app reports `assetExport: true`. File Export packages the scene's original image bytes and required runtime for offline playback. This is a UI workflow, not a new MCP export tool; creating a package does not install/register it or prove its behavior in Resolume. See [image assets](image-assets.md) before editing asset records.

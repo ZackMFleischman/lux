@@ -17,6 +17,8 @@ Call `discover`, then `read`. Discovery supplies the adapter checkout's SDK cont
 
 Read [visual programming](references/visual-programming.md) before the first implementation. For procedural displacement, read [noise and meaningful parameters](references/noise-and-parameters.md); its [sphere template](assets/noise-sphere.ts) illustrates a CPU-compiled starting point, not a visually approved finished design.
 
+For PNG, JPEG or BMP images, read [image assets](references/image-assets.md). Check the running app's `capabilities.imageFormats` and `assetExport`, not just the adapter's advertised formats. Use `context.images` for admitted decoded pixels; preserve original asset bytes in complete-source edits. The [image plane example](assets/image-plane.ts) shows texture setup and disposal.
+
 - Preserve existing files and assets unless the requested change removes them. Build replaces the **entire bundle**, not one file or a patch. Preserve `sourceVersion` and `assets` on v2 documents.
 - Submit with the `expectedDraftVersion` from the read you based the edit on. If a user or another agent has edited meanwhile, reread and merge the intended change into the latest source. Do not replay the old bundle with a newly fetched version number.
 - Parameters belong to each visual's code. Use the discovered declaration/control schema; Intensity is not a required global semantic. SDK 0.2 declares numeric `controls` directly in `defineVisual`; use the actual runtime schema/hash for guarded MCP patches. Legacy 0.1 retains its compatibility Intensity. If an old running app cannot use 0.2, report the mismatch. Continue the useful visual work without changing the SDK.
