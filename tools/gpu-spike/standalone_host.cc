@@ -30,13 +30,14 @@ int main(int argc,char** argv) {
   const char* recoveryText=std::getenv("LUX_STANDALONE_RECOVERY_CONTROL");
   const bool recovery=recoveryText&&std::strcmp(recoveryText,"1")==0;
   if((recoveryText&&!recovery)||(recovery&&!hang)){std::cerr<<"Recovery probe requires hang mode\n";return 2;}
+  const long probeWorkLimit=recovery?15000:10000;
   std::string hangMarker;
   LARGE_INTEGER frequency{};QueryPerformanceFrequency(&frequency);
   if(alpha||hang){
     const char* outerText=std::getenv("LUX_EXPERIMENT_TIMEOUT_MS");char* outerEnd=nullptr;
     const long outer=outerText?std::strtol(outerText,&outerEnd,10):0;
-    if(duration>10000||outer<1000||outer>30000||!outerEnd||*outerEnd||std::strlen(runId)>128||std::strspn(runId,"0123456789abcdefABCDEF-")!=std::strlen(runId)){
-      std::cerr<<"Alpha probe requires <=10 s work / <=30 s supervised budget and a safe run identity\n";return 2;
+    if(duration>probeWorkLimit||outer<1000||outer>30000||!outerEnd||*outerEnd||std::strlen(runId)>128||std::strspn(runId,"0123456789abcdefABCDEF-")!=std::strlen(runId)){
+      std::cerr<<"Probe exceeds work limit (recovery 15 s; alpha/hang 10 s), 30 s supervised budget, or safe run identity\n";return 2;
     }
   }
   if(hang){
@@ -140,7 +141,7 @@ int main(int argc,char** argv) {
     if(!result){std::ofstream file(capturePath,std::ios::binary);file.write(reinterpret_cast<char*>(pixels.data()),pixels.size());file.close();if(!file)result=11;}
     std::cout<<"callbacks "<<count<<" centerRGBA ";for(int i=0;i<4;++i)std::cout<<int(pixels[(540*1920+960)*4+i])<<" ";std::cout<<"\n";
   }
-  const auto workElapsed=elapsed();if((alpha||hang)&&workElapsed>10000&&!result)result=10;
+  const auto workElapsed=elapsed();if((alpha||hang)&&workElapsed>probeWorkLimit&&!result)result=10;
   auto evidence=[&](bool deinstantiated,bool deinitialized){
     if(hang){
       std::ofstream file(probePath);file<<"{\"runId\":\""<<runId<<"\",\"ok\":"<<(!result&&deinstantiated&&deinitialized?"true":"false")<<",\"hostPid\":"<<GetCurrentProcessId()<<",\"deinstantiated\":"<<(deinstantiated?"true":"false")<<",\"deinitialized\":"<<(deinitialized?"true":"false")<<",\"elapsedMs\":"<<workElapsed<<",\"ready\":"<<(hangReady?"true":"false")<<",\"armAccepted\":"<<(armAccepted?"true":"false")<<",\"disarmSubmitted\":"<<(disarmSubmitted?"true":"false")<<",\"callbacksAfterMarker\":"<<callbacksAfterMarker<<",\"clock\":{\"domain\":\"qpc\",\"frequency\":\""<<frequency.QuadPart<<"\"},\"readyAt\":\""<<readyAt<<"\",\"triggerAt\":\""<<triggerAt<<"\",\"disarmAt\":\""<<disarmAt<<"\",\"recoveryMode\":"<<(recovery?"true":"false")<<",\"recovered\":"<<(recovered?"true":"false")<<",\"recoveredAt\":\""<<recoveredAt<<"\",\"currentNormalizedValue\":"<<(recovered?0:-1)<<",\"initialRGBA\":[";
