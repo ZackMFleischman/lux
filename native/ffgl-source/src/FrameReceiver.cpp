@@ -223,6 +223,7 @@ void FrameReceiver::run(HGLRC shared) {
      else {
       auto& source=ring->slots[newest];auto& imported=imports[newest];auto& output=outputs[outputIndex];
       imported.ownership.admission=true;imported.ownership.lease=true;imported.key={ring->generation,ring->outputGeneration,source.frame,uint32_t(newest)};
+      require(retireObsoleteReadySources(*ring,imported.key),"obsolete source ownership mismatch");
       const auto provenance=source.provenance;
       require(validFrameProvenanceV4(provenance,controlSchema,controlCount),"Invalid producer frame provenance");
       output.provenance=provenance;output.completedQpc=source.completeQpc;

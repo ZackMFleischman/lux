@@ -82,3 +82,28 @@ tests preserve pending/failed ownership after stop and the existing GL negatives
 These CPU checks and DLL compilation provide source-level evidence only. Actual
 host behavior, physical stop timing, frame freshness and clean-machine acceptance
 remain separate work; prior incomplete timing spans and failure rows remain invalid.
+
+## Obsolete source publications (R2a)
+
+After recording the selected source's exact key, lease and read admission, the
+receiver calls `retireObsoleteReadySources`. The helper takes a separate temporary
+admission and claims each other Ready slot into Reading before inspecting its
+frame. It retires only nonzero older frames through the existing key-checked
+operation. Equal, newer and zero frames return to Ready; the selected lease,
+other readers and in-progress producers remain untouched. Publication ordering
+remains non-wrapping within the existing generation convention.
+
+Closing or saturated admission skips reclamation without changing ownership.
+An invalid selected key fails with temporary admission balanced. Invariant
+failure never forces a slot Free; failed ownership restoration retains temporary
+admission for containment. The receiver sends failure through its unchanged R1
+finalization and cleanup. Its selected lease and original admission still require
+actual copy completion before release; reclaiming a completed Ready publication
+cannot establish completion of that selected copy.
+
+`source_slot_retirement_cpu` covers repeated reclamation/reuse, two admitted
+readers, producer ownership, retained publications, invalid selection, admission
+refusal and immediate producer reuse. Existing receiver lifecycle checks preserve
+Pending/Failed copy ownership until Complete. These CPU checks and DLL compilation
+provide ownership evidence only; physical completion, freshness, timing and
+performance remain separate R2b and hardware work.
