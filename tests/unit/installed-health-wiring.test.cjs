@@ -2,6 +2,30 @@ const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path'), vm = require('node:vm');
 const {stripTypeScriptTypes} = require('node:module');
 const registry = require('../../apps/installed-runtime/src/registry.cjs');
+
+test('lifecycle telemetry failure cannot prevent native stop or reopen a released process key',async()=>{
+ for(const failAt of ['stop-requested','process-exit-observed','clock','all']){
+  const runtimeId='a'.repeat(64),local=path.resolve('fixture/local'),root=path.join(local,'Lux/Installed'),runtime=path.join(root,'runtimes',runtimeId);
+  let start,stopCalls=0,active=false,failed=false;const records=[],warnings=[];
+  class Registry{entries=new Map();errors=new Map();constructor(options){start=options.start;}async reconcile(){}}
+  const context={__dirname:path.join(runtime,'apps/installed-runtime/src'),performance:{now:()=>0},setInterval(){return 1;},clearInterval(){},setTimeout,
+   process:{argv:['node','supervisor','--lux-runtime-id',runtimeId],env:{LOCALAPPDATA:local},on(){},exit(){assert.fail('Unexpected exit');},stderr:{write:value=>warnings.push(value)}},
+   require(name){
+    if(name==='node:path'||name==='node:crypto')return require(name);
+    if(name==='node:fs')return {mkdirSync(){},writeFileSync(){},rmSync(){},readdirSync:()=>[],appendFileSync(_file,bytes){const record=JSON.parse(bytes);if(failAt==='all'||record.kind===failAt&&!failed){failed=true;throw Error('Disk full');}records.push(record);}};
+    if(name==='./registry.cjs')return {InstanceRegistry:Registry,ProducerHealth:class{},sameInstalledPath:(a,b)=>a===b};
+    if(name.endsWith('.node'))return {lockSupervisor:()=>true,clock(){if(failAt==='clock'&&!failed){failed=true;throw Error('Clock unavailable');}return {domain:'qpc',at:'1',frequency:'10000000'};},installedStart(){active=true;return 1;},installedRunning(){assert.equal(active,true,'erased native key must never be read');return true;},installedStop(){assert.equal(active,true);active=false;stopCalls++;return {stopped:true,activeProcesses:0,observedExitAt:'2'};}};
+    if(name.endsWith('package.cjs'))return {validateRuntime(){},validateRelease:()=>({runtimeId,sourceHash:'c'.repeat(64),releaseId:'d'.repeat(64)}),noLinks:value=>value};
+    throw Error('Unexpected dependency: '+name);
+   }};
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../../apps/installed-runtime/src/supervisor.cjs'),'utf8'),context);
+  const producer=await start({releaseId:'d'.repeat(64),instanceId:'b'.repeat(32)});
+  await producer.stop({force:true});await producer.stop({force:true});assert.equal(producer.exited,true);assert.equal(stopCalls,1);assert.equal(failed,true);
+  assert.equal(warnings.length,1);assert.equal(JSON.parse(warnings[0]).incomplete,true);
+  if(failAt==='all')assert.equal(records.length,0);
+  else if(failAt!=='process-exit-observed'){assert.equal(records.at(-1).incomplete,true);assert.equal(records.at(-1).lostRecords,1);}
+ }
+});
 test('each attempt gets its own health/profile channel but watches the original host lease', () => {
   const runtimeId = 'a'.repeat(64), instanceId = 'b'.repeat(32), directory = path.resolve('fixture/Installed');
   const runtime = path.join(directory, 'runtimes', runtimeId), instances = path.join(directory, 'instances', runtimeId);

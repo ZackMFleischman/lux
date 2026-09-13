@@ -10,6 +10,17 @@ struct FrameProvenanceV4 {
  std::array<char,64> revisionHash{};ControlSchemaHashV4 schemaHash{};
  uint32_t count=0;std::array<float,32> normalized{};
 };
+// Validate the private copy while the slot is owned, before metadata can enter
+// host output state or control a log loop. Only status 1 is a producer claim.
+inline bool validFrameProvenanceV4(const FrameProvenanceV4& value,const ControlSchemaHashV4& schema,uint32_t count) noexcept {
+ if(value.status>1||value.reserved||value.count>HostControlsLimitV4||count>HostControlsLimitV4||!host_controls_v4_detail::validSchema(schema))return false;
+ if(value.status==0){
+  if(value.workerFrame||value.controlSequence||value.receivedQpc||value.count)return false;
+  for(char c:value.revisionHash)if(c)return false;for(char c:value.schemaHash)if(c)return false;
+ }else if(!value.workerFrame||!value.receivedQpc||value.controlSequence>9007199254740991ULL||value.count!=count||value.schemaHash!=schema||!host_controls_v4_detail::validSchema(value.revisionHash))return false;
+ for(size_t i=0;i<value.normalized.size();++i){const auto v=value.normalized[i];if(!host_controls_v4_detail::validValue(v)||(v==0&&std::signbit(v))||(i>=value.count&&v!=0))return false;}
+ return true;
+}
 struct HostOpportunity {
  uint64_t sequence=0,at=0,generation=0,frame=0,completedQpc=0;
  bool present=false;FrameProvenanceV4 provenance;
