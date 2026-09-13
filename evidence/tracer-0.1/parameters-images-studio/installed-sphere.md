@@ -62,3 +62,38 @@ the new **Lux Spike Sphere** source in
 FFGL identity is `TH01`, with all five saved normalized defaults in its sidecar.
 Existing releases remain installed. This step did not start Resolume or activate
 the source; actual host gestures/persistence remain pending.
+
+## Actual native rendering
+
+Reviewed run `08dadd7d-ff77-4090-a1f7-6b7f063dfdd1` activated this exact package
+in the normal native diagnostic host with a fresh private profile. No control
+gestures or failure injection were enabled. The 10 s work/30 s outer limits and
+231 recorded input hashes were independently checked before launch.
+
+The fixture returned a fresh 1920×1080 RGBA capture, reported 339 final callbacks,
+exited 0 and confirmed outer cleanup. Its last periodic counter reported 332
+callbacks and 107 consumed frames; that sample is not the final total. Total supervised
+operation was 15,480.3433 ms. The inspector found nontransparent/nonconstant
+output with no native failure record. Root viewed the converted PNG and observed
+the expected purple spiky sphere on a dark background. Final process inventory
+contained no Studio, Resolume or installed renderer process.
+
+Artifacts: `C:/Users/zFlei/repos/lux/.worktrees/multicontrol-package/artifacts/sphere-native-render/`.
+Inspection SHA-256:
+`47d892f17ccdbf6e56c053e968052cdbef13fccfb09f3b45a699fd9f292ef4a8`.
+This validates functional installed native output, not actual Resolume gestures,
+composition persistence, GPU resource accounting or performance budgets. The
+user explicitly deferred the separate five-control Resolume check.
+
+Independent raw-log review found no faults or retries. Release source/linked/schema
+identities and all five initial values match the package's float32-normalized
+FFGL mapping. Producer summary reports `closed: true`, `failed: false`; receiver
+opportunity sequence is contiguous with zero reported loss. Child QPC duration
+was 11,511 ms; first present output was observed 5,670 ms after child start.
+These are short-run startup observations, not quantitative acceptance. The
+attempt has a normal stop request but no independent exit record; outer Job
+cleanup and root's subsequent no-process check establish the stated cleanup.
+
+Raw review: `artifacts/sphere-native-render/actual-log-review.json` in the worktree
+above. PNG SHA-256: `ea3a671dbeb1b9b8206d872963637e1b90f5f0ddf30e8f702ea7030bda10188d`;
+raw RGBA SHA-256: `923862fa05de0c3547cd8be965cf74e9baa5b0f88b9574e53d9800bdf8f0528b`.
