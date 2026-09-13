@@ -67,3 +67,16 @@ Tasks 3 and 4 can overlap after shared interfaces agree; instrumentation must la
 Implement the missing standalone MCP control adapters and their regression tests. Do not begin CodeMirror, Dockview, graph UI, or the activity log as part of that patch. Keep user playback intent: building a revision does not implicitly authorize starting a paused scene; the agent explicitly requests play when its task calls for animation.
 
 Update this order from integrated evidence, not an agent's unverified progress message. No application was launched and no native branch was changed to prepare this addendum.
+
+## Current implementation reconciliation — 13 September 2026 UTC
+
+The earlier missing-MCP-adapter "Immediate next implementation task" and the
+opening SDK parameter blocker describe historical gaps. Generic guarded MCP
+controls/playback/restart, SDK 0.2 code-declared properties, scene persistence,
+the source/docking UI and bounded PNG/JPEG authoring are integrated. Do not
+schedule those implementations again from the older sequencing text. Refer to
+the [current export scope](tracer-export-scope.md#current-sdk-02-requirement-addendum--13-september-2026-utc)
+and its linked executed evidence when distinguishing remaining tracer validation
+from completed functionality. Existing creative-feedback priorities and the
+filesystem-first checkpoint after tracer retain their placement; this update
+creates no new workstream or acceptance gate.
