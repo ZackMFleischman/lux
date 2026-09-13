@@ -102,3 +102,56 @@ recovery observation window, retaining the 30 s outer Job and all production
 deadlines. This is not a change to any performance acceptance gate.
 
 Artifacts: `C:/Users/zFlei/repos/lux/.worktrees/installed-recovery-probe/artifacts/installed-recovery-probe/`.
+
+## Verified automatic recovery with current controls
+
+The independently reviewed recovery-only observation adjustment `3f72c26`
+(integrated as `c0f5f05`) permits up to 15 s native work while retaining the 30 s
+outer Job and 2 s physical-stop requirement. Production behavior is unchanged.
+Six root-run inspector/options tests passed, including over-limit rejection.
+
+Fresh run **`4b766584-a481-4abf-9f73-d4d22da3bb23`** used the same immutable
+release/runtime as the failed run, a fresh private profile, and reviewed host
+SHA-256 `faa93f4c267dd78b48304e691d4e2df6c0541c7c8b1f22b4ef192683fb2fab70`.
+All 171 recorded input hashes were independently reverified before launch.
+The prior failed run remains unchanged.
+
+Root ran the strict recovery inspector successfully: initial native RGBA was
+`[255,0,255,255]`; after the hang, exactly one distinct retry produced native
+RGBA `[0,255,255,255]`. The FFGL getter returned normalized zero, representing
+concrete `arm: -1`. The hung worker itself did not acknowledge that change.
+
+| Endpoint | QPC ticks (10,000,000 Hz) |
+| --- | --- |
+| Host arm trigger | `681497347247` |
+| Durable hang entry | `681497853826` |
+| Host disarm submission | `681497980835` |
+| Original Job confirmed exited | `681510914520` |
+| Observed recovered cyan | `681537040325` |
+
+The conservative trigger-to-physical-exit bound is **1,356.7273 ms**. Cyan was
+observed **3,969.3078 ms** after the trigger. This is automatic recovery of the
+pinned binary-color fixture, not measurement of the first accepted frame or the
+explicit-restart five-second gate. Both root process exit and zero active Job
+descendants were recorded for the failed attempt. Native deinstantiation and
+deinitialization, outer Job cleanup and final no-process inventory passed.
+
+The successful run used **9,126 ms** native work and **13,045.097 ms** total
+supervised time, exited 0, and did not reach the extended observation ceiling.
+Instance `0000000000000be00000009ea8e96084`; failed attempt
+`d02ba34c59c9092cc0f5a02e361c6993`; retry
+`6aea7f0d755c798915259240af272e15`.
+
+Artifacts: `C:/Users/zFlei/repos/lux/.worktrees/installed-recovery-probe/artifacts/installed-recovery-probe-15s/`.
+Inspection SHA-256:
+`81b564aee5ce79e315b2ce6ed64d48f697b4e11eae22b3e4dbd89a2718274eda`.
+Actual Resolume fault behavior, initialization hangs, explicit-restart timing,
+host latency certification and GPU-resource accounting remain separate gaps.
+
+Independent raw-evidence review reproduced the result and found no producer or
+receiver failure records. The retry reported concrete `arm: -1`, 12 paints and
+`failed: false`. The child duration was 10,524.5969 ms; the 13,045.097 ms above
+includes supervisor preflight/operation overhead. The retry has a normal stop
+request after cyan but no separate per-attempt exit-observation row; final
+process ownership cleanup is established by the outer Job, not an invented
+retry exit record. This is not GPU-resource accounting.
