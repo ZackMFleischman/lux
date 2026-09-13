@@ -37,6 +37,11 @@ export function inspectCadence({experiment,probe,host,lifecycle,expected}){
  check(Array.isArray(lifecycle)&&lifecycle.length>0&&lifecycle.length<=10&&lifecycle.every(x=>['restart-trigger','stop-requested','process-exit-observed'].includes(x.kind)&&x.instanceId===instanceId&&x.revisionId===expected.revisionId&&x.releaseId===expected.releaseId&&x.incomplete===false&&x.lostRecords===0&&x.clock?.domain==='qpc'&&tick(x.clock.frequency)===f),'Invalid source lifecycle');
  const starts=lifecycle.filter(x=>x.kind==='restart-trigger');check(starts.length===1&&/^[a-f0-9]{32}$/.test(starts[0].attemptId)&&tick(starts[0].clock.at)>=childStart&&tick(starts[0].clock.at)<end&&lifecycle.every(x=>x.attemptId===starts[0].attemptId),'Unexpected producer attempt');
  for(const o of ops)if(o.present)check(tick(o.at)>=tick(starts[0].clock.at)&&tick(o.copyCompletedQpc)>=tick(starts[0].clock.at),'Selected frame predates producer start');
- for(const row of lifecycle){const clockAt=tick(row.clock.at);check(clockAt>=childStart&&clockAt<=childEnd,'Lifecycle outside supervisor envelope');if(row.kind==='restart-trigger')continue;const at=tick(row.kind==='process-exit-observed'?row.observedExitAt:row.clock.at);check(at>=end&&at<=childEnd&&row.force!==true,'Fault/cleanup during observation');if(row.kind==='process-exit-observed')check(row.stopped===true&&row.activeProcesses===0,'Exit unconfirmed');}
+ for(const row of lifecycle){
+  const exit=row.kind==='process-exit-observed',at=tick(exit?row.observedExitAt:row.clock.at);
+  check(at>=childStart&&at<=childEnd,'Lifecycle outside supervisor envelope');if(row.kind==='restart-trigger')continue;
+  check(at>=end&&row.force!==true,'Fault/cleanup during observation');
+  if(exit){const requested=tick(row.requestedAt);check(requested>=end&&requested<=at&&row.stopped===true&&row.activeProcesses===0,'Exit unconfirmed/order mismatch');}
+ }
  return {ok:true,scope:'10 s cold-start native fixture cadence and elapsed callback diagnostic',instanceId,...expected,expectedSlots:600,opportunities:calls,missedSlots:missed,rateHz:calls/10,noFrame,selectedTransport:selected,heldTransport:held,callbackMs:quantiles(spans),latenessMs:quantiles(lateness),window:{start:probe.start,end:probe.end,coverageEnd:probe.coverageEnd,overshootMs:ms(coverageEnd-end)},freshImageMeasured:false,performanceAcceptance:false,actualResolumeTested:false,callbackTiming:'QPC elapsed including descheduling and driver time; not exclusive CPU execution'};
 }
