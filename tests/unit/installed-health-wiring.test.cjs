@@ -15,11 +15,14 @@ test('lifecycle telemetry failure cannot prevent native stop or reopen a release
     if(name==='node:fs')return {mkdirSync(){},writeFileSync(){},rmSync(){},readdirSync:()=>[],appendFileSync(_file,bytes){const record=JSON.parse(bytes);if(failAt==='all'||record.kind===failAt&&!failed){failed=true;throw Error('Disk full');}records.push(record);}};
     if(name==='./registry.cjs')return {InstanceRegistry:Registry,ProducerHealth:class{},sameInstalledPath:(a,b)=>a===b};
     if(name.endsWith('.node'))return {lockSupervisor:()=>true,clock(){if(failAt==='clock'&&!failed){failed=true;throw Error('Clock unavailable');}return {domain:'qpc',at:'1',frequency:'10000000'};},installedStart(){active=true;return 1;},installedRunning(){assert.equal(active,true,'erased native key must never be read');return true;},installedStop(){assert.equal(active,true);active=false;stopCalls++;return {stopped:true,activeProcesses:0,observedExitAt:'2'};}};
-    if(name.endsWith('package.cjs'))return {validateRuntime(){},validateRelease:()=>({runtimeId,sourceHash:'c'.repeat(64),releaseId:'d'.repeat(64)}),noLinks:value=>value};
+    if(name.endsWith('package.cjs'))return {validateRuntime(){},validateRelease:()=>({version:1,runtimeId,sourceHash:'c'.repeat(64),releaseId:'d'.repeat(64)}),noLinks:value=>value};
     throw Error('Unexpected dependency: '+name);
    }};
   vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../../apps/installed-runtime/src/supervisor.cjs'),'utf8'),context);
-  const producer=await start({releaseId:'d'.repeat(64),instanceId:'b'.repeat(32)});
+  let bound;
+  const producer=await start({version:1,runtimeId,releaseId:'d'.repeat(64),instanceId:'b'.repeat(32),hostPid:42},0,
+   Object.freeze({generation:1,bindValidated(sourceHash,attemptId){assert.equal(sourceHash,'c'.repeat(64));assert.match(attemptId,/^[a-f0-9]{32}$/);assert.equal(bound,undefined);bound=attemptId;}}));
+  assert.ok(bound);
   await producer.stop({force:true});await producer.stop({force:true});assert.equal(producer.exited,true);assert.equal(stopCalls,1);assert.equal(failed,true);
   assert.equal(warnings.length,1);assert.equal(JSON.parse(warnings[0]).incomplete,true);
   if(failAt==='all')assert.equal(records.length,0);

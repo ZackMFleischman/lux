@@ -4,6 +4,14 @@
 const fs = require('node:fs'), path = require('node:path');
 const {randomBytes} = require('node:crypto');
 const {InstanceRegistry, ProducerHealth, validateRequest, sameInstalledPath} = require('./registry.cjs');
+function diagnostic(value) {
+  if(typeof value==='string' && value)return value.slice(0,512);
+  try {
+    if(typeof Error.isError==='function'?Error.isError(value):value instanceof Error){const message=Object.getOwnPropertyDescriptor(value,'message');
+      if(message && typeof message.value==='string' && message.value)return message.value.slice(0,512);}
+  }catch{}
+  return 'Installed supervisor operation failed';
+}
 const runtimeDirectory = path.resolve(__dirname, '../../..');
 const runtimeId = process.argv[process.argv.indexOf('--lux-runtime-id') + 1];
 if (!/^[a-f0-9]{64}$/.test(runtimeId) || path.basename(runtimeDirectory) !== runtimeId) throw Error('Installed runtime identity/path mismatch');
@@ -17,13 +25,22 @@ const {validateRuntime, validateRelease, noLinks} = require(path.join(runtimeDir
 const ready = path.join(directory, 'supervisor.ready');
 // Validate the immutable distribution once on cold start, never per loaded copy.
 try { validateRuntime(runtimeDirectory, runtimeId); }
-catch (error) { fs.writeFileSync(path.join(directory, 'supervisor.error'), String(error.stack || error)); process.exit(2); }
+catch (error) { fs.writeFileSync(path.join(directory, 'supervisor.error'), diagnostic(error)); process.exit(2); }
 let closing = false, ticking = false, idleSince = Date.now();
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-const registry = new InstanceRegistry({runtimeId, start: async request => {
+const registry = new InstanceRegistry({runtimeId,
+ restart:{supervisorEpoch:randomBytes(16).toString('hex'),now:()=>performance.now(),nonce:()=>randomBytes(16).toString('hex')},
+ start: async (request, _admittedAt, attemptContext) => {
   const release = validateRelease(path.join(root, 'releases', request.releaseId), request.releaseId);
-  if (release.runtimeId !== runtimeId) throw Error('Source release requires a different installed runtime');
+  if (release.runtimeId !== runtimeId || release.runtimeId!==request.runtimeId || release.releaseId!==request.releaseId)
+    throw Error('Installed release identity mismatch');
+  if(release.version===2){
+    const {sourceIdentity}=require(path.join(runtimeDirectory,'register.cjs'));
+    const digest=require('node:crypto').createHash('sha256').update(sourceIdentity(release).sidecar).digest('hex');
+    if(request.version!==2 || request.descriptorHash!==digest)throw Error('Installed native parameter descriptor mismatch');
+  }else if(release.version!==1 || request.version!==1)throw Error('Installed legacy descriptor version mismatch');
   const attemptId = randomBytes(16).toString('hex');
+  attemptContext.bindValidated(release.sourceHash,attemptId);
   const attempts = noLinks(path.join(directory, request.instanceId + '.attempts'));
   fs.mkdirSync(attempts, {recursive:true});
   const requestPath = noLinks(path.join(attempts, attemptId + '.json'));
@@ -39,19 +56,22 @@ const registry = new InstanceRegistry({runtimeId, start: async request => {
   const stopPath = path.join(directory, request.instanceId + '.stop');
   fs.rmSync(stopPath, {force:true});
   const health = new ProducerHealth({attemptId, startedAt:performance.now()});
-  let key;
-  try { trace(()=>({kind:'restart-trigger',clock:bridge.clock()}));key = bridge.installedStart(path.join(runtimeDirectory, 'electron/electron.exe'), path.join(__dirname, 'instance.cjs'), requestPath); }
-  catch (error) { fs.rmSync(requestPath, {force:true}); throw error; }
-  let closed = false;
-  return {
-    get exited() { return closed || !bridge.installedRunning(key); },
+  let key,closed=false,quarantined=false;
+  const unconfirmed=()=>Object.assign(Error('INSTALLED_START_EXIT_UNCONFIRMED'),{code:'INSTALLED_START_EXIT_UNCONFIRMED'});
+  // Build the JS cleanup owner before launch. A bridge exception supplies neither
+  // confirmed root/descendant exit nor a recoverable key: keep its reservation.
+  const producer={
+    get initialFailure(){return quarantined?'INSTALLED_START_EXIT_UNCONFIRMED':null;},
+    get exited() { return quarantined ? false : closed || !bridge.installedRunning(key); },
     failure(now) {
+      if(quarantined)return 'INSTALLED_START_EXIT_UNCONFIRMED';
       try {
         if (fs.statSync(noLinks(healthPath)).size <= 512) health.observe(JSON.parse(fs.readFileSync(healthPath, 'utf8')), now);
       } catch { /* Missing/partial/malformed status never renews health. */ }
       return health.failure(now);
     },
     async stop({force = false} = {}) {
+      if(quarantined)throw unconfirmed();
       if (closed) return;
       trace(()=>({kind:'stop-requested',force,clock:bridge.clock()}));
       try {
@@ -62,9 +82,13 @@ const registry = new InstanceRegistry({runtimeId, start: async request => {
         }
       } catch { /* A failed drain signal still closes this producer's Job. */
       } finally {
-        const deadline=performance.now()+2000;let stopped;
-        do {stopped=bridge.installedStop(key);if(stopped.stopped)break;await delay(10);}while(performance.now()<deadline);
-        if(!stopped.stopped)throw Error('Installed Job exit remains unconfirmed; ownership retained');
+        let deadline,stopped;
+        try {deadline=performance.now()+2000;}catch{/* A broken clock cannot skip the native cleanup attempt. */}
+        for(;;){
+          stopped=bridge.installedStop(key);if(stopped.stopped)break;
+          if(deadline===undefined || performance.now()>=deadline)throw Error('Installed Job exit remains unconfirmed; ownership retained');
+          await delay(10);
+        }
         closed = true;
         trace(()=>({kind:'process-exit-observed',...stopped}));
         for (const filename of [path.join(directory, request.instanceId + '.rendezvous'), requestPath, healthPath, healthPath + '.tmp']) {
@@ -73,6 +97,11 @@ const registry = new InstanceRegistry({runtimeId, start: async request => {
       }
     },
   };
+  const executable=path.join(runtimeDirectory,'electron/electron.exe'),entrypoint=path.join(__dirname,'instance.cjs');
+  trace(()=>({kind:'restart-trigger',clock:bridge.clock()}));
+  try {key=bridge.installedStart(executable,entrypoint,requestPath);}
+  catch {quarantined=true;}
+  return producer;
 }});
 function close() {
   if (closing) return closing;
@@ -82,7 +111,7 @@ function close() {
       try { await registry.close(); break; }
       catch (error) {
         // Keep the supervisor and its Job handles alive until exit is confirmed.
-        try { fs.writeFileSync(path.join(directory, 'supervisor.error'), String(error.stack || error)); } catch {}
+        try { fs.writeFileSync(path.join(directory, 'supervisor.error'), diagnostic(error)); } catch {}
         await delay(250);
       }
     }
@@ -107,14 +136,16 @@ async function tick() {
       } catch (error) {
         // The host may remove its lease after readdir but before stat/read.
         // Absence is normal removal; preserve diagnostics for every other fault.
-        if (error.code !== 'ENOENT') fs.writeFileSync(path.join(directory, name + '.error'), String(error.message || error));
+        let missing=false;
+        try {missing=Object.getOwnPropertyDescriptor(error,'code')?.value==='ENOENT';}catch{}
+        if (!missing) fs.writeFileSync(path.join(directory, name + '.error'), diagnostic(error));
       }
     }
     await registry.reconcile(requests, performance.now());
     for (const [instanceId, error] of registry.errors) fs.writeFileSync(path.join(directory, instanceId + '.error'), error);
     if (registry.entries.size || registry.draining.size) idleSince = Date.now();
     else if (Date.now() - idleSince >= 30000) await close();
-  } catch (error) { try {fs.writeFileSync(path.join(directory, 'supervisor.error'), String(error.stack || error));}finally {await close();} }
+  } catch (error) { try {fs.writeFileSync(path.join(directory, 'supervisor.error'), diagnostic(error));}finally {await close();} }
   finally { ticking = false; }
 }
 const timer = setInterval(() => void tick(), 250);
