@@ -20,7 +20,7 @@ export async function exportResolume({ scenePath, name, outputDirectory, root = 
   const prepared=preparedPath?null:await prepareTransportScene(scenePath,path.join(outputDirectory,'.prepared'));
   const transportPath = preparedPath||prepared.path;
   savedControls=prepared?.savedControls??savedControls;if(savedControls?.intensity!==undefined)intensity=savedControls.intensity;
-  runtimeCapability.assertRuntimeCapabilities(root,{parameters:transportIO.readTransportRelease(transportPath).linked.linkedVersion===3});
+  runtimeCapability.assertRuntimeCapabilities(root,{parameters:transportIO.readTransportRelease(transportPath).linked.linkedVersion===3,workerLiveness:true});
   const staging = fs.mkdtempSync(path.join(outputDirectory, '.runtime-'));
   try {
     // Resolve the dependency manager junction once, then copy regular runtime files.

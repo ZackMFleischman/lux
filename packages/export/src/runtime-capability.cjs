@@ -13,15 +13,26 @@ const parameterCapabilities=Object.freeze({
  'native/build/Release/lux_texture_bridge.node':'lux-installed-producer-protocol-v2-ring-v4',
  'apps/render-host/src/main.cjs':'lux-parameter-render-host-v1',
 });
-function assertRuntimeCapabilities(root,{parameters=false}={}) {
-  for (const [relative, marker] of Object.entries(parameters?parameterCapabilities:capabilities)) {
+const workerLivenessCapabilities=Object.freeze({
+ 'apps/render-host/src/main.cjs':'lux-main-worker-liveness-v2',
+ 'apps/render-host/src/compiled-worker.js':'lux-worker-liveness-v2',
+});
+function assertMarkers(root,markers) {
+  for (const [relative, marker] of Object.entries(markers)) {
     const filename = path.join(root, relative);
     if (!fs.existsSync(filename) || !fs.statSync(filename).isFile() || fs.statSync(filename).size > 32 * 1024 * 1024 || !fs.readFileSync(filename).includes(Buffer.from(marker)))
       throw Error('Rebuild the installed runtime before export/registration: ' + relative + ' lacks ' + marker);
   }
+}
+// Current export guard only: previously immutable packages retain their pinned
+// protocol and continue to validate/register against the original capabilities.
+function assertWorkerLivenessCapabilities(root){assertMarkers(root,workerLivenessCapabilities);}
+function assertRuntimeCapabilities(root,{parameters=false,workerLiveness=false}={}) {
+  assertMarkers(root,parameters?parameterCapabilities:capabilities);
+  if(workerLiveness)assertWorkerLivenessCapabilities(root);
   for (const name of ['supervisor', 'registry', 'instance']) {
     const filename = path.join(root, 'apps/installed-runtime/src', name + '.cjs');
     if (!fs.existsSync(filename) || !fs.statSync(filename).isFile()) throw Error('Rebuild the installed runtime: missing ' + name);
   }
 }
-module.exports = {assertRuntimeCapabilities, capabilities,parameterCapabilities};
+module.exports = {assertRuntimeCapabilities,assertWorkerLivenessCapabilities, capabilities,parameterCapabilities,workerLivenessCapabilities};
