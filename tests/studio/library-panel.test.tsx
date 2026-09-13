@@ -34,7 +34,7 @@ test('a missing library entry keeps its linked fork action short and reachable',
  const missing='99999999-9999-4999-8999-999999999999',actions:string[]=[];const component={id,revision:1,name:'Shared Violet',description:'A reusable violet image.',updatedAt:'2026-09-13T20:00:00.000Z',source};
  const client={list:async()=>[],read:async()=>component,copyRequest:async()=>'request',create:async()=>component,update:async()=>component};
  render(<LibraryPanel client={client} links={[{componentId:missing,mountPath:'library/missing',resolvedRevision:3,files:['library/missing/component.ts']}]} updates={[]} fallbacks={[]} onApplyUpdates={async()=>{}} onFork={value=>actions.push(value)} onError={reason=>assert.fail(String(reason))}/>);
- fireEvent.click(await screen.findByRole('button',{name:'Fork',exact:true}));assert.deepEqual(actions,[missing]);assert.ok(screen.getByText(`${missing} · revision 3`));
+ fireEvent.click(await screen.findByRole('button',{name:/^Fork$/}));assert.deepEqual(actions,[missing]);assert.ok(screen.getByText(`${missing} · revision 3`));
 });
 test('refresh advances the selected summary and readable source together',async()=>{
  let current={id,revision:1,name:'Shared Violet',description:'A reusable violet image.',updatedAt:'2026-09-13T20:00:00.000Z',source};
@@ -65,9 +65,10 @@ test('a late inspection response cannot replace the user’s newer selection',as
  assert.ok(screen.getByText('beta source'));assert.equal(screen.queryByText('alpha source'),null);assert.equal(screen.getByRole('button',{name:/Beta/}).getAttribute('aria-pressed'),'true');
 });
 test('a committed library mutation remains successful while a busy scene refresh retries',async()=>{
- let revision=0,refreshes=0;const errors:unknown[]=[];
- const create=()=>completeLibraryMutation(async()=>({revision:++revision}),async()=>{if(refreshes++===0)throw Error('Studio is busy');},reason=>errors.push(reason),async()=>{});
- assert.deepEqual(await create(),{revision:1});await waitFor(()=>assert.equal(refreshes,2));assert.deepEqual(errors,[]);
- const update=(expected:number)=>completeLibraryMutation(async()=>{if(expected!==revision)throw Error('revision conflict');return {revision:++revision};},async()=>{},reason=>errors.push(reason));
- assert.deepEqual(await update(1),{revision:2});await assert.rejects(update(1),/revision conflict/);assert.deepEqual(errors,[]);
+ let revision=0,refreshes=0,refreshError:unknown;
+ const onRefreshError=(reason:unknown)=>{refreshError=reason;};
+ const create=()=>completeLibraryMutation(async()=>({revision:++revision}),async()=>{if(refreshes++===0)throw Error('Studio is busy');},onRefreshError,async()=>{});
+ assert.deepEqual(await create(),{revision:1});await waitFor(()=>assert.equal(refreshes,2));assert.equal(refreshError,undefined);
+ const update=(expected:number)=>completeLibraryMutation(async()=>{if(expected!==revision)throw Error('revision conflict');return {revision:++revision};},async()=>{},onRefreshError);
+ assert.deepEqual(await update(1),{revision:2});await assert.rejects(update(1),/revision conflict/);assert.equal(refreshError,undefined);
 });
