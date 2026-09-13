@@ -31,6 +31,7 @@ let healthTimer, healthSequence = 0, workerHeartbeat = 0, completedFrames = 0, b
 let stopProducer=()=>{};
 let hangProbeWritten=false;
 let initHangProbeWritten=false;
+let initHangProbeArmed=false;
 // lux-installed-hang-probe-v1: reviewed diagnostic only; no authored path or payload.
 function persistHangProbe(message) {
   if(process.env.LUX_STANDALONE_HANG_CONTROL!=='1'||message!=='LUX_QA_INSTALLED_HANG_ENTERED'||hangProbeWritten)return;
@@ -54,9 +55,11 @@ function persistHangProbe(message) {
   fs.renameSync(filename+'.tmp',filename);
 }
 // lux-installed-init-hang-probe-v1: inert unless this separate reviewed probe is enabled.
-function persistInitHangProbe(message) {
-  if(process.env.LUX_STANDALONE_INIT_HANG!=='1'||message!=='LUX_QA_INSTALLED_INIT_HANG_ENTERED'||initHangProbeWritten)return;
-  initHangProbeWritten=true;
+function persistInitHangProbe(message, phase='entered') {
+  if(process.env.LUX_STANDALONE_INIT_HANG!=='1'||message!=='LUX_QA_INSTALLED_INIT_HANG_ENTERED'||
+    (phase==='entered'?initHangProbeWritten:initHangProbeArmed))return;
+  if(phase!=='entered'&&phase!=='armed')throw Error('Invalid probe phase');
+  if(phase==='entered')initHangProbeWritten=true;else initHangProbeArmed=true;
   // Observe entry before validation/file I/O; the measured interval includes persistence overhead.
   const clock=bridge.clock();
   const runId=process.env.LUX_EXPERIMENT_RUN_ID,directory=process.env.LUX_EXPERIMENT_DIRECTORY;
@@ -70,11 +73,12 @@ function persistInitHangProbe(message) {
   }
   const instanceId=path.basename(installed.requestPath,'.json');
   if(!/^[a-f0-9]{32}$/.test(instanceId)||!Number.isSafeInteger(installed.hostPid)||installed.hostPid<1||!release||!/^[a-f0-9]{64}$/.test(release.sourceHash))throw Error('Invalid initialization hang probe owner');
-  const filename=path.join(directory,'installed-init-hang-entered-'+installed.attemptId+'.json');
+  const filename=path.join(directory,'installed-init-hang-'+phase+'-'+installed.attemptId+'.json');
   if(fs.existsSync(filename))throw Error('Initialization hang evidence already exists');
-  const record={kind:'init-hang-entered',stage:'create',runId,instanceId,attemptId:installed.attemptId,revisionId:release.sourceHash,hostPid:installed.hostPid,
+  const record={kind:'init-hang-'+phase,stage:phase==='entered'?'create':'before-create',runId,instanceId,attemptId:installed.attemptId,revisionId:release.sourceHash,hostPid:installed.hostPid,
     clock,ready:false,workerHeartbeat,completedFrames};
   fs.writeFileSync(filename+'.tmp',JSON.stringify(record)+'\n',{flag:'wx'});fs.renameSync(filename+'.tmp',filename);
+  return record;
 }
 function publishHealth() {
   if (!installed || finishing) return;
@@ -129,6 +133,12 @@ app.whenReady().then(async () => {
   win.webContents.on('console-message', (details, _level, legacyMessage) => {
     const message = details.message ?? legacyMessage;
     try{persistHangProbe(message);persistInitHangProbe(message);}catch(error){failure(error);}
+    if(process.env.LUX_STANDALONE_INIT_HANG==='1'&&typeof message==='string'&&message.includes('init-probe-ready')){
+      try{const ready=JSON.parse(message);if(ready.kind==='init-probe-ready'&&ready.attemptId===installed?.attemptId&&ready.revisionId===release?.sourceHash){
+        const armed=persistInitHangProbe('LUX_QA_INSTALLED_INIT_HANG_ENTERED','armed');
+        if(armed)win.webContents.executeJavaScript('window.goInitProbe('+JSON.stringify(ready.attemptId)+','+JSON.stringify(ready.revisionId)+')').then(sent=>{if(sent!==true)failure('Initialization GO rejected');}).catch(failure);
+      }}catch(error){failure(error);}
+    }
     if(typeof message==='string'&&message.includes('runtime-heartbeat')){
       try{const data=JSON.parse(message);if(data.kind==='runtime-heartbeat'){
         if(typeof data.frameId!=='string'||!/^\d{1,20}$/.test(data.frameId)||!Number.isSafeInteger(data.workerHeartbeat)||data.workerHeartbeat<=workerHeartbeat)return;
@@ -189,7 +199,8 @@ app.whenReady().then(async () => {
   };
   const startup = release ? new HostStartup({revisionId:release.sourceHash,
     ...(generic?{schema:release.linked.controls,schemaHash:release.linked.controlSchemaHash}:{}),
-    init:value=>executeDraw('window.startVisual(' + JSON.stringify(release) + ',' + JSON.stringify(value) + ','+controlledFrames+')'),
+    init:value=>executeDraw('window.startVisual(' + JSON.stringify(release) + ',' + JSON.stringify(value) + ','+controlledFrames+
+      (process.env.LUX_STANDALONE_INIT_HANG==='1'?','+JSON.stringify(installed?.attemptId):'')+')'),
     update:value=>executeDraw((generic?'window.setParameters(':'window.setIntensity(') + JSON.stringify(value) + ')'),
     observe:value=>record({kind:'host-control',value}), stopped:()=>session.stopping||finishing,
     promote:(initial,value)=>{

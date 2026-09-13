@@ -41,6 +41,18 @@ async function fixture(controls=schema,declared=controls,mutation='',sdkVersion=
   return {send,post,initial,messages,frames,requested,allocations,scheduled,timers,flush,async fireTimer(late=0){const [id,timer]=timers.entries().next().value;timers.delete(id);now=Math.max(now,timer.at)+late;timer.fn();await flush();},created:()=>created,imports:()=>imports,telemetry(){now=500;intervals.get(500)?.();return messages.at(-1);},intervals};
 }
 
+test('opt-in initialization gate waits before create and accepts only one exact owner GO outside its pending init chain',async()=>{
+ const f=await fixture(),initProbeId='b'.repeat(32);
+ const armed=await f.send({...f.initial,initProbeId});assert.equal(armed.type,'init-probe-ready');assert.equal(f.created(),0);
+ for(const patch of [{instanceId:'old'},{generation:2},{revisionId:'old'},{initProbeId:'old'}])f.post({type:'init-probe-go',initProbeId,...patch});
+ await f.flush();assert.equal(f.created(),0);assert.ok(f.intervals.has(250));
+ f.post({type:'init-probe-go',initProbeId});
+ for(let i=0;i<30&&!f.messages.some(r=>r.type==='ready');i++)await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(f.created(),1);assert.ok(f.messages.some(r=>r.type==='ready'));
+ f.post({type:'init-probe-go',initProbeId});await f.flush();assert.equal(f.created(),1);
+ const normal=await fixture();assert.equal((await normal.send(normal.initial)).type,'ready');assert.equal(normal.messages.some(r=>r.type==='init-probe-ready'),false);
+});
+
 test('worker announces liveness before top-level/create and heartbeats continue through healthy async initialization',async()=>{
  for(const stage of ['top-level','create']){
   const f=await fixture(schema,schema,stage==='top-level'?'await new Promise(()=>{});':'','0.2.0',false,false,0,stage==='create');f.post(f.initial);

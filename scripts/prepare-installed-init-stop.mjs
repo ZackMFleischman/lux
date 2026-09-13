@@ -22,13 +22,13 @@ finally{if(previous===undefined)delete process.env.LOCALAPPDATA;else process.env
 const commit=execFileSync('git',['-c',`safe.directory=${root.replaceAll('\\','/')}`,'rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim();
 const c={root,out,host,...exported,...installed,local,installRoot,registered,sourceHash,scenePath,final:path.join(out,'final.rgba'),hostLog:path.join(out,'receiver.jsonl'),workMs:10000,timeoutMs:30000,
  expected:{releaseId:exported.releaseId,revisionId:sourceHash},sourceCommit:commit,
- limits:['First pre-ready create-entry marker to independent stopped/zero-active-processes Job exit <=2seconds. Main-observed entry is not exact worker onset.',
+ limits:['Persisted main QPC before GO permits create to independent stopped/zero-active-processes Job exit <=2seconds: conservative bound includes dispatch/persistence delay; entered marker confirms create reached.',
  'Normal10-second native draw loop after instantiate, unchanged30-second outer bound. No rendered image expected. Automatic retry policy unchanged.',
  'No actual Resolume, recovery image, full GPU resource cleanup or performance acceptance.']};
 fs.writeFileSync(path.join(out,'configuration.json'),JSON.stringify(c,null,2)+'\n');
 function files(dir){packageIO.noLinks(dir);return fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?files(path.join(dir,e.name)):[path.join(dir,e.name)]);}
 const inputs=[...files(exported.path),...files(installed.runtimePath),...files(installed.releasePath),registered.dllPath,registered.sidecarPath,host,process.execPath,scenePath,fixturePath,
- ...['scripts/prepare-installed-init-stop.mjs','scripts/installed-init-stop/launch.mjs','scripts/installed-init-stop/inspect.mjs','apps/render-host/src/main.ts','tools/gpu-spike/native-init-stop-inspect.mjs','scripts/experiment-runner.mjs','scripts/experiment-job.ps1','scripts/experiment-job.cs'].map(n=>path.join(root,n)),
+ ...['scripts/prepare-installed-init-stop.mjs','scripts/installed-init-stop/launch.mjs','scripts/installed-init-stop/inspect.mjs','apps/render-host/src/main.ts','apps/render-host/src/compiled-output.html','apps/studio/src/visual-worker.mjs','apps/studio/src/initialization-probe.mjs','tools/gpu-spike/native-init-stop-inspect.mjs','scripts/experiment-runner.mjs','scripts/experiment-job.ps1','scripts/experiment-job.cs'].map(n=>path.join(root,n)),
  ...['launch.mjs','inspect.mjs','configuration.json'].map(n=>path.join(out,n)),path.resolve(path.dirname(host),'../../../tools/gpu-spike/standalone_host.cc')];
 const records=[...new Set(inputs)].map(digest),binary=r=>/\.(exe|dll|node|pak|bin|asar|dat)$/i.test(r.path);
 const review={schema:1,preparedUtc:new Date().toISOString(),authorized:false,reviewer:null,expiresUtc:null,hostClosedConfirmed:false,

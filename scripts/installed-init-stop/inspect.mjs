@@ -8,14 +8,15 @@ try{
  const markerFiles=fs.readdirSync(experiment.directory).filter(n=>/^installed-init-hang-entered-[a-f0-9]{32}\.json$/.test(n)).map(n=>path.join(experiment.directory,n));
  assert.ok(markerFiles.length>=1&&markerFiles.length<=2,'Expected bounded original/retry marker count');
  const markers=markerFiles.map(read).sort((a,b)=>BigInt(a.clock.at)<BigInt(b.clock.at)?-1:1),marker=markers[0];
+ const armedFile=path.join(experiment.directory,'installed-init-hang-armed-'+marker.attemptId+'.json'),armed=read(armedFile);
  const lifecycleFile=path.join(c.installRoot,'instances',c.runtimeId,marker.instanceId+'.attempts',marker.attemptId+'.lifecycle.jsonl');
  const lifecycle=fs.readFileSync(lifecycleFile,'utf8').trim().split(/\r?\n/).filter(Boolean).map(line=>JSON.parse(line));
- const result=inspectNativeInitStop({experiment,marker,lifecycle,expected:c.expected});
+ const result=inspectNativeInitStop({experiment,armed,marker,lifecycle,expected:c.expected});
  const receiver=fs.readFileSync(c.hostLog,'utf8').trim().split(/\r?\n/).filter(Boolean).map(line=>JSON.parse(line));
  assert.ok(!receiver.some(row=>['failure','bounded-unload-unsupported'].includes(row.kind)),'Native receiver failure');
  const opportunities=receiver.filter(r=>r.kind==='host-opportunity');
  assert.ok(opportunities.some(row=>BigInt(row.at)>BigInt(result.observedExitAt)),'No native callback after confirmed first-attempt stop');
  report={...report,...result,experimentId:experiment.id,markerCount:markers.length,firstAttemptOnly:true,callbacksAfterFirstStop:opportunities.filter(r=>BigInt(r.at)>BigInt(result.observedExitAt)).length,
-  hashes:[...markerFiles,lifecycleFile,c.hostLog,path.join(out,'last-experiment.json')].map(digest),scope:'Initialization hang physical stop from main-observed entry; retry may be cut short by normal host exit. No recovered image or exact worker onset claim.'};
+  hashes:[armedFile,...markerFiles,lifecycleFile,c.hostLog,path.join(out,'last-experiment.json')].map(digest),scope:'Conservative initialization hang physical stop from persisted pre-GO origin; retry may be cut short by normal host exit. No recovered image or exact worker onset claim.'};
 }catch(error){report.error=String(error.stack??error);process.exitCode=1;}
 fs.writeFileSync(path.join(out,'inspection.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report,null,2));
