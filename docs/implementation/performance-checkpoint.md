@@ -81,3 +81,24 @@ collection calibration and paired overhead, startup categories and physical
 stop/recovery acceptance remain open. Preserve missing or unverified measurements
 as unavailable; do not infer a pass from functional screenshots, short intervals,
 synthetic evaluator results or unverified frame-correspondence fields.
+
+### Follow-up coverage and overhead audit
+
+The current pass collector cannot certify full GPU-frame cost: pinned Three also
+submits uniform writes, uploads and copies outside render/compute passes. Next,
+record bounded per-frame excluded-operation counts, submission/pass identities
+and query loss, and provide explicit baseline/routine collection modes. Routine
+GPU sampling should follow the design's initial one-frame-in-30 policy.
+
+A bounded native GPU trace may cross-check these exclusions, but must demonstrate
+frame attribution and copy-engine coverage before contributing acceptance data.
+An empty-pass timestamp bracket can include idle submission gaps; a marker placed
+after queue completion also includes a CPU round trip. Neither proves GPU work.
+
+Paired overhead validation needs identical source/seed/settings and an independent
+GPU measurement in both baseline and routine modes. Keep watchdogs and correctness
+counters enabled, alternate five pairs, publish each pair and the run-level 95%
+bootstrap interval against the unchanged <2% gate. Observed timestamp steps of
+0.065536 ms are much larger than 2% of the current small workload's roughly
+0.262 ms pass cost. More samples alone do not establish measurement accuracy;
+GPU overhead remains inconclusive until the reference has adequate resolution.
