@@ -12,7 +12,7 @@
     "transport:prepare": "node scripts/transport-prepare.mjs",
     "transport:play": "node scripts/transport-play.mjs",
     "export:resolume": "node scripts/export-resolume.mjs",
-    "test:export": "node --test tests/unit/export-package.test.mjs tests/unit/export-electron-fs.test.mjs tests/unit/install-flow.test.cjs tests/unit/runtime-capability.test.cjs",
+    "test:export": "node --test tests/unit/export-package.test.mjs tests/unit/export-electron-fs.test.mjs tests/unit/install-flow.test.cjs tests/unit/runtime-capability.test.cjs tests/unit/parameter-export.test.mjs",
     "test:installed:cpu": "node --test tests/unit/installed-registry.test.cjs tests/unit/installed-health.test.cjs tests/unit/installed-health-wiring.test.cjs tests/unit/installed-drain.test.cjs tests/unit/installed-scan.test.cjs",
     "test:installed:package": "node scripts/test-installed-package.mjs",
     "preflight": "node scripts/preflight.mjs",

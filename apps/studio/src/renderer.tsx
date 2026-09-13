@@ -3,6 +3,7 @@ import { Alert, Button, Chip, CssBaseline, Paper, ThemeProvider, IconButton, Too
 import { studioTheme } from './theme.ts';
 import { ParameterInspector, parameterOwner } from './controls/ParameterInspector.tsx';
 import type { ControlEdits } from './controls/ParameterInspector.tsx';
+import { PerformanceStatus } from './performance/PerformanceStatus.tsx';
 import { Preview } from './preview.tsx';
 import { StudioController } from './service-client.ts';
 import type { ReactNode } from 'react';
@@ -120,10 +121,10 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
         <section><div className="section-heading"><h2>Controls</h2><Chip label="LIVE" /></div>
           <ParameterInspector runtime={runtime} available={!!available} client={client} controller={controller} onError={setError} edits={controlEdits} />
         </section>
-        <section><h2>Performance</h2><MetricView label="Visual delivery" metric={snapshot.visualFps} nowMs={nowMs ?? clock} /><MetricView label="UI cadence" metric={snapshot.uiFps} nowMs={nowMs ?? clock} />
-          <p className="hint">Delivery and interface cadence are measured separately.</p></section>
-        <section><h2>Runtime</h2><dl className="identity"><dt>Authoring revision</dt><dd>{runtime?.revisionId ?? 'Unavailable'}</dd><dt>Instance</dt><dd>{runtime?.instanceId ?? 'Unavailable'}</dd><dt>Generation / clock epoch</dt><dd>{runtime ? `${runtime.generation} / ${runtime.clockEpoch}` : 'Unavailable'}</dd><dt>Completed frame</dt><dd>{runtime?.frameId ?? 'Unavailable'}</dd></dl></section>
-        <section><div className="section-heading"><h2>Host output</h2><Chip label="SEPARATE" /></div><p className="host-revision">{snapshot.host?.revisionId ?? 'No host status available'}</p><p className="hint">Authoring changes do not update a pinned host revision.</p></section>
+        <section><details><summary>Performance</summary><PerformanceStatus performance={snapshot.performance} /><MetricView label="Visual delivery" metric={snapshot.visualFps} nowMs={nowMs ?? clock} /><MetricView label="UI cadence" metric={snapshot.uiFps} nowMs={nowMs ?? clock} />
+          <p className="hint">Delivery and interface cadence are measured separately.</p></details></section>
+        <section><details><summary>Runtime</summary><dl className="identity"><dt>Authoring revision</dt><dd>{runtime?.revisionId ?? 'Unavailable'}</dd><dt>Instance</dt><dd>{runtime?.instanceId ?? 'Unavailable'}</dd><dt>Generation / clock epoch</dt><dd>{runtime ? `${runtime.generation} / ${runtime.clockEpoch}` : 'Unavailable'}</dd><dt>Completed frame</dt><dd>{runtime?.frameId ?? 'Unavailable'}</dd></dl></details></section>
+        <section><details><summary>Host output</summary><p className="host-revision">{snapshot.host?.revisionId ?? 'No host status available'}</p><p className="hint">Authoring changes do not update a pinned host revision.</p></details></section>
       </Paper>;
   const jobsPane = <section className="diagnostics" aria-label="Jobs and diagnostics"><div className="section-heading"><h2>Jobs & diagnostics</h2><span className="subtle">{snapshot.jobs.length} reported</span></div>
       {runtime?.fault && <p className="error" role="alert"><strong>{runtime.fault.code}</strong> · {runtime.fault.message}</p>}

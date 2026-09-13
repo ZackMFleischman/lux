@@ -10,7 +10,7 @@ import transportIO from '../tools/gpu-spike/transport-release.cjs';
 
 const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 /** Authoring-only entry point. Runtime consumers use the pinned package bytes. */
-export async function exportResolume({ scenePath, name, outputDirectory, root = defaultRoot, preparedPath, intensity = 0.5,savedControls,
+export async function exportResolume({ scenePath, name, outputDirectory, root = defaultRoot, preparedPath, intensity = 0.5,savedControls = undefined,
   nativeRuntimeDirectory = path.join(process.env.SystemRoot || 'C:/Windows', 'System32') }) {
   if (typeof name !== 'string' || !name.trim() || name.length > 80 || /[\x00-\x1f]/.test(name)) throw Error('A source name of 1–80 characters without control characters is required');
   outputDirectory = path.resolve(outputDirectory || path.join(root, 'artifacts/exports'));

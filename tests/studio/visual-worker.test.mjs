@@ -14,7 +14,7 @@ async function fixture(controls=schema,declared=controls,mutation='',sdkVersion=
   const device={lost:new Promise(()=>{}),features:new Set(gpuTimed?['timestamp-query']:[]),pushErrorScope(){},popErrorScope:async()=>null,queue:{onSubmittedWorkDone:async()=>{if(timed)now+=17;},submit(){}},destroy(){},
     createQuerySet(){return {destroy(){}};},createBuffer(){return {mapAsync:async()=>{},getMappedRange:()=>new BigUint64Array([100n,1000100n]).buffer,unmap(){},destroy(){}};},
     createCommandEncoder(){return {beginRenderPass:()=>({end(){}}),beginComputePass:()=>({end(){}}),resolveQuerySet(){},copyBufferToBuffer(){},finish:()=>({})};}};
-  const context=vm.createContext({TextEncoder,Uint8Array,Uint8ClampedArray,ArrayBuffer,Blob,crypto:webcrypto,performance:{now:()=>now},onmessage:null,
+  const context=vm.createContext({TextEncoder,TextDecoder,Uint8Array,Uint8ClampedArray,ArrayBuffer,Blob,crypto:webcrypto,performance:{now:()=>now},onmessage:null,
     postMessage:message=>messages.push(structuredClone(message)),setTimeout:(fn,ms)=>{scheduled.push(ms);return 1;},clearTimeout(){},setInterval:(callback,ms)=>{intervals.set(ms,callback);return ms;},clearInterval:id=>intervals.delete(id),close(){},
     URL:{createObjectURL:()=> 'memory:visual',revokeObjectURL(){}},
     navigator:{gpu:{requestAdapter:async()=>({features:new Set(['timestamp-query']),requestDevice:async options=>{requested.push(options);return device;}})}},
