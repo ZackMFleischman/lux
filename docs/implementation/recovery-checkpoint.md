@@ -113,3 +113,19 @@ playing/control preservation, second-fault suppression, unchanged source, and an
 explicit paused restart with checked reference pixels and capture metadata.
 This upgrades functional Studio recovery evidence; installed recovery and the
 physical stop/GPU-cleanup/host-consumption budgets remain unverified.
+
+### Installed liveness and isolated cleanup integration
+
+Integration `c280365` replaces the historical 2.5 s main-heartbeat policy with
+independent 1.25 s main/worker liveness deadlines. A sequenced worker heartbeat
+starts before authored import/create, while responsive asynchronous initialization
+retains the 15 s first-frame cap. Main activity and backpressure cannot renew a
+silent worker. Supervisor polling remains 250 ms; frame/output policy remains 4 s.
+
+Failure cleanup is pending per instance, allowing healthy siblings to be polled.
+Removal and close share the stop promise, retain capacity/ownership on rejection,
+and retry cleanup before exiting. New exports check matching generated main,
+worker and HTML-relay capability markers; already immutable old packages retain
+their original validation rules. Independent review and the integrated 47-test
+installed/export suite passed. None of these CPU results proves actual process
+exit within two seconds or GPU-resource release; those physical checks remain open.

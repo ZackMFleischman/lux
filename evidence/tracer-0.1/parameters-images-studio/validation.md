@@ -29,3 +29,24 @@ Still required: installed image/control playback, host alpha composition, comple
 Stable `b0a844f` passed the complete parameter harness with zero page errors, including 24 monitor toggles over sustained playing output. The final short interval observed 58.3 worker fps with zero lost/invalid records; this is functional evidence, not a 60 Hz host acceptance run. All five property rows remained 46 CSS pixels. Three coalescing/urgency/lifecycle unit tests and Studio typecheck passed. The original integrated run and the final stable run use separate artifact directories; latest stable output is `.worktrees/tracer/artifacts/studio-parameters/result.json`.
 
 The [installed native image check](installed-image.md) additionally verifies the packaged PNG output and supervised cleanup. Actual Resolume and full performance/recovery gates remain open.
+
+## Sampled monitoring integration
+
+Integration `f1ba953` (runtime/UI code also at `c280365`) passed the full real
+Studio parameter harness after merging worker liveness and sampling changes.
+The report has zero page errors, five 46 CSS-pixel control rows, and successful
+numeric/MCP changes, save/open/restart and repeated monitor interactions during
+playback. Visual inspection shows the expected purple spiky sphere and compact
+Inspector. Studio CPU suite and Studio typecheck passed. A new receiver regression
+first reproduced acceptance of an impossible GPU sample population, then passed
+with a one-in-30 bound; independent phase/invalid-record review approved it.
+
+The final observed interval contained 29 completed frames, one eligible GPU
+sample and no lost/invalid records. GPU pass coverage remains incomplete because
+copies/uploads/clears are excluded. This is functional sampling evidence, not
+paired overhead or performance-budget acceptance. Baseline behavior has CPU
+test coverage; a real baseline/routine hardware comparison remains outstanding.
+
+Report: `artifacts/studio-parameters/result.json` in the integration checkout,
+SHA-256 `11f3efee26a715f4e60e2f69daeea4dc4c11e0a80d38d5d63fa8bf8df6b35c74`.
+The integrated installed/export suite additionally passed 47 CPU tests.
