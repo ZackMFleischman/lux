@@ -172,6 +172,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     } catch (error) { this.stop(candidate, String(error)); canvas.remove(); throw error; }
   }
   private stop(runtime: Running, message: string) {
+    if(runtime===this.running){this.cancelAutomaticRetry();runtime.autoRetry=false;}
     if (runtime.terminal) return;
     runtime.terminal = true;
     clearInterval(runtime.watchdog); clearTimeout(runtime.activationTimer); runtime.worker.onmessage = null; runtime.worker.onerror = null;
@@ -181,8 +182,9 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private fault(runtime: Running, message: string) {
     if (runtime !== this.running || runtime.terminal) return;
     const at=performance.now(),last=runtime.retryPolicy.lastFaultAt;
-    runtime.autoRetry=last===null||at-last>=30000;runtime.retryPolicy.lastFaultAt=at;
+    const retry=last===null||at-last>=30000;runtime.retryPolicy.lastFaultAt=at;
     this.stop(runtime, message);
+    runtime.autoRetry=retry;
     runtime.performance.fail();
     if (this.snapshot.authoring) this.publish({ message:runtime.autoRetry?'Preview failed. One automatic restart is queued.':'Preview failed twice within 30 seconds. Restart explicitly to retry.',performance:runtime.performance.snapshot,authoring: { ...this.snapshot.authoring, playback: 'failed', fault: { code: 'RUNTIME_FAILED', message } } });
     this.scheduleAutomaticRetry();

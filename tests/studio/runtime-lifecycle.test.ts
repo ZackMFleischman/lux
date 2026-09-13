@@ -207,3 +207,7 @@ test('a fault during source compilation defers recovery; rejected replacement re
  assert.equal(WorkerFixture.all.length,1);release();await f.flush();WorkerFixture.all.at(-1)!.reply({type:'failure',message:'candidate rejected'});await replacement;
  await f.advance(250);assert.equal(WorkerFixture.all.length,3);const retry=WorkerFixture.all.at(-1)!;assert.equal(retry.init.linked.code,'accepted');retry.reply({type:'ready'});await f.flush();assert.equal(f.client.getSnapshot().authoring!.playback,'paused');
 });
+test('retiring an already faulted owner cancels its queued automatic retry',async t=>{
+ const f=fixture(t),worker=await f.start();worker.reply({type:'failure',message:'failed'});onlyQueuedRetry(f.scheduled);
+ (f.client as any).stop((f.client as any).running,'owner retired');await f.advance(1000);assert.equal(WorkerFixture.all.length,1);assert.equal(f.scheduled.size,0);
+});
