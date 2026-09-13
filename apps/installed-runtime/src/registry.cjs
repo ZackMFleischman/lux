@@ -43,7 +43,7 @@ class InstanceRegistry {
   constructor({runtimeId, start, limit = 16}) {
     if (!id.test(runtimeId)) throw Error('Invalid installed runtime identity');
     Object.assign(this, {runtimeId, start, limit}); this.entries = new Map(); this.errors = new Map();
-    this.draining = new Map(); this.starting = new Set(); this.closed = false;
+    this.draining = new Map(); this.starting = new Set(); this.closed = false;this.lastNow=0;
   }
   retire(key, entry) {
     this.entries.delete(key); this.errors.delete(key);
@@ -55,8 +55,15 @@ class InstanceRegistry {
     }).finally(() => { this.draining.delete(key); });
     this.draining.set(key, drain);
   }
+  fault(key,entry,message,now) {
+    const retry=entry.lastFaultAt===null||now-entry.lastFaultAt>=30000;
+    entry.lastFaultAt=now;entry.retryAt=retry?now+250:Infinity;
+    this.errors.set(key,retry?message:message+'; second fault within 30 seconds. Remove and re-add this source to retry.');
+  }
   async reconcile(requests, now) {
     if (this.closed) return;
+    if(!Number.isFinite(now)||now<this.lastNow)throw Error('Registry clock must be monotonic');
+    this.lastNow=now;
     const wanted = new Map();
     for (const raw of requests) { const value = validateRequest(raw, this.runtimeId); wanted.set(value.instanceId, value); }
     for (const [key, entry] of this.entries) if (!wanted.has(key)) this.retire(key, entry);
@@ -69,25 +76,25 @@ class InstanceRegistry {
       }
       if (!entry) {
         if (this.entries.size + this.draining.size >= this.limit) { this.errors.set(key, 'Installed runtime capacity reached (16 instances maximum)'); continue; }
-        entry = {request: value, attempts: 0, retryAt: 0, producer: null}; this.entries.set(key, entry);
+        entry = {request: value, attempts: 0, retryAt: 0, lastFaultAt:null, producer: null}; this.entries.set(key, entry);
       }
       if (entry.producer) {
         const failure = entry.producer.exited ? 'Installed producer exited' : entry.producer.failure?.(now);
         if (!failure) continue;
         // A known hung/failed producer cannot drain reliably. Retire only its Job,
-        // even on the final attempt, before applying the existing retry budget.
+        // even when automatic retry is suppressed, before admitting a replacement.
         await entry.producer.stop({force:true}); entry.producer = null;
-        this.errors.set(key, failure); entry.retryAt = now + 1000 * entry.attempts;
+        this.fault(key,entry,failure,now);
         continue;
       }
-      if (entry.attempts >= 3 || now < entry.retryAt) continue;
-      entry.attempts++; entry.retryAt = now + 1000 * entry.attempts;
+      if (now < entry.retryAt) continue;
+      entry.attempts++;
       let starting;
       try {
         starting = Promise.resolve(this.start(value, now)); this.starting.add(starting);
         entry.producer = await starting; this.errors.delete(key);
       }
-      catch (error) { this.errors.set(key, String(error.message || error)); }
+      catch (error) { this.fault(key,entry,String(error.message || error),now); }
       finally { if (starting) this.starting.delete(starting); }
     }
   }
