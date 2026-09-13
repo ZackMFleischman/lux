@@ -1,5 +1,48 @@
 # Milestone implementation roadmap
 
+## Current direction: four parallel workstreams
+
+User direction, 13 September 2026 UTC: prepare these four workstreams to run
+concurrently in isolated Git worktrees, with regular integration back to main.
+**Workstreams 1 and 2 are now authorized to start, with the primary agent
+coordinating and implementation delegated to other agents. Workstreams 3 and 4
+remain paused.** This records scope and coordination, not completed
+implementation plans. It supersedes earlier priority ordering where it conflicts;
+technical dependencies and the existing acceptance requirements still apply.
+
+| Workstream | Scope | Dependencies and coordination |
+| --- | --- | --- |
+| 1. Filesystem projects and Git | Ordinary TypeScript project files, offline editor tooling, scenes/shared code, conflict-aware apply and Git workflows. | Use the reviewed [project architecture](../design/filesystem-projects.md) and [implementation plan](filesystem-projects-plan.md). Establish project identity, persistence and operation contracts before dependent consumers integrate. |
+| 2. Components, graph and library | Reusable creative components, typed graph composition, per-instance controls, effect stacks, grouping and library discovery/reuse. | Prepare a focused plan from the component expectations below. Coordinate scene/component identity, dependency pins and persistence with workstream 1; build on existing declared controls. Independent component/runtime work can progress before project integration. |
+| 3. Creative controls and inputs | Audio/MIDI reactivity, modulation, named looks and macros for experimentation without repeated source edits. | Prepare a focused plan spanning the relevant 0.3/4 requirements. Agree parameter targets, control authority, event/clock semantics and saved mappings with workstreams 1 and 2, and coordinate runtime changes with workstream 4. Host modulation and Studio input providers remain distinct contracts. |
+| 4. Reliability | Frame delivery, recovery and diagnostics, GPU/resource accounting, performance validation, actual-host coverage and isolated installed distribution. | Continue the [post-tracer reliability work](tracer-preview-closeout.md), including preserved experiment review. Keep these activities in one coordinated workstream; incomplete numerical gates remain explicit and do not block unrelated creative development. |
+
+### Preparation and integration rules
+
+- Prepare separate scoped plans and testable delivery slices for the four
+  workstreams. Refresh the existing filesystem plan against integrated main;
+  its baseline notes predate tracer closeout. Resolve shared interfaces and
+  first deliverables before implementation starts.
+- At execution time, use a separate worktree and `codex/` branch for each
+  workstream. Coordinate ownership of shared Studio entry points, project and
+  parameter contracts, runtime interfaces, MCP registration and test runners;
+  avoid competing implementations of the same contract.
+- Merge small, coherent, reviewed and tested slices back to main regularly,
+  rather than waiting for a whole workstream to finish. Serialize integrations,
+  validate affected combined behavior, then bring the other worktrees forward
+  to the integrated main before their next dependent slice. Regular merges are
+  authorized for the active execution phase of workstreams 1 and 2.
+- Run CPU development/tests and reviews in parallel. Serialize graphics,
+  Studio and Resolume test sessions so evidence and runtime ownership remain
+  attributable. Preserve existing experiment artifacts.
+- Synchronize and reinstall the shipped visual-creation skill with relevant
+  SDK, asset or MCP changes, as required by repository maintenance instructions.
+- Broader Studio iteration/inspection is not a fifth active workstream.
+  Include UI needed to use the selected features in their owning workstream;
+  retain unrelated inspection, embedded chat and general polish for later.
+
+## Earlier roadmap context
+
 **Creative feedback addendum, 12 September 2026:** promote visual-declared live parameters to the next authoring capability alongside assets, before broader polish. A visual's code declares its parameters; `intensity` is just one possible visual-specific property, never a required global parameter. Derive Inspector controls and generic MCP parameter validation/application from that declaration, with persistence/export compatibility. The noisy sphere brief needs independent displacement, frequency, sharpness, animation and material controls. Track delivery and validation in [current priorities](current-priorities.md). The repo-shipped visual-creation skill must be updated and reinstalled whenever relevant SDK, asset or MCP features change; see the repository maintenance instructions.
 
 This is the full-product coverage map. Only [tracer 0.1](tracer-0.1.md) is decomposed into execution tasks now. Later milestones require a focused implementation plan against the contracts below before coding; this avoids freezing speculative file-level details before GPU feasibility is established. Source acceptance procedures remain linked from [requirements](../requirements.md).
@@ -66,11 +109,85 @@ Run a focused design/UI/UX audit now alongside the remaining tracer work and use
 | 0.3 | Explicit fixed-step simulation/overload policy, one event control, native audio modulation/MIDI knob/repeated notes, ordered event transport with generations. | Seeded particle fixture, 20 events/sec for 10 seconds, exact delivered-event count/order, host MIDI-delivery observation, latency/restore gates, stale events discarded. |
 | 1a (first after tracer) | Filesystem-based projects with real TypeScript files, pinned SDK/editor types, explicit batch apply and MCP project/path discovery; Git-aware status/reconciliation and normal Git editing (see [architecture](../design/filesystem-projects.md) and [plan](filesystem-projects-plan.md)); import existing tracer scenes. | Agent edits entry/helper on disk, obtains useful types and per-file Git diffs, then applies/captures successfully. Incomplete edits and dirty Studio conflicts retain data and working preview; Git checkout/reopen reconciles correctly. |
 | 1 | Atomic project transactions, accepted revision journal, undo/redo/checkpoints, source/assets/runtime pins, autosave, durable conflict handling, project archive foundation. | Restart/reopen without AI/dev server; crash between multi-file writes cannot create a half-project; invalid/hanging edit retains working data; conflicting clients cannot overwrite; one AI request is one undo action. |
-| 2 | Declared graph registry and typed ports, branch/shared dependency scheduling, groups, meaningful 3D systems, inspector, effect stack/amount/bypass, control publishing, initial compact library. | Corrected Particles→Glow→Composite with Background→Composite then ColorGrade; bypass restores particles without doubling; saved graph round trip; type errors rejected; shared work counted once; manual graph edit survives next AI edit. |
+| 2 | Declared graph registry and typed ports, branch/shared dependency scheduling, groups, meaningful 3D systems, inspector, effect stack/amount/bypass, control publishing, initial compact library. Component reuse is the default authoring path; shared declarations drive node controls, AI discovery and runtime behavior. See the component authoring expectations below. | Corrected Particles→Glow→Composite with Background→Composite then ColorGrade; bypass restores particles without doubling; saved graph round trip; type errors rejected; shared work counted once; manual graph and inspector edits survive the next AI edit. Also verify library reuse, live controls, independent node values and explicit legacy decomposition as described below. |
 | 3 | Output/diagnostic target selection, region/aspect controls, live and controlled sequences, repeatable input playback, measurements and separate inspection/edit scopes. | Three frames at relative 0/500/1000 ms with actual provenance; region validation; frame limits; real intermediate simulation steps; host instance untouched; component scope rejects unrelated edits; supported diagnostics explain rendered behavior. |
 | 4 | Complete dockable studio and layout presets; embedded chat; named looks/macros; studio audio/MIDI, meters/mapping; generated assets; complete preview quality/time/settings controls. | Ultrawide/laptop restore, node inspector lock, graph/preview selection independence, popout return/fullscreen/monitor removal, signal-to-control visibility, external/embedded operation parity, create/import/revise transparent sprite, two looks without dual continuous renders. |
 | 5 | Harden the export path already delivered in tracer: polished installer/distribution and renderer management, explicit update/migration, complete later asset/look/control/input coverage and sustained benchmarks. | Repeat offline installed lifecycle across the full feature set; host audio/MIDI and generated sprite offline; five workload categories; 60-minute resource soak; diagnostic overhead; orientation/color/alpha and final budgets. |
 | 6 | Export reusable FFGL effects: one incoming Resolume image, Lux processing and a returned GPU image. Add an input-image authoring/preview contract, effect packaging and published controls; reuse installed runtime management without Studio. | Apply one exported distortion to both a video clip and a live source. Verify input/output frame association, measured added latency, GPU-only steady-state transfer, orientation/color/alpha, bypass, resize, independent effect copies, saved composition cold reopen, and responsive failure/recovery. |
+
+## Component authoring and runtime control (milestone 2)
+
+**Direction clarified 12 September 2026:** reusable Components become the normal
+unit of authoring when the graph and initial library arrive. Three.js/TSL may
+implement a Component internally. A Node is a placed instance of that definition,
+with its own stable identity, control values and runtime state. The graph and
+inspectors expose this declared structure; drawing nodes around opaque scene code
+does not itself create reusable parts or live controls.
+
+This elaborates [project model](../design/project-model.md),
+[AI authoring](../design/ai-authoring.md), [runtime](../design/runtime.md) and
+[Studio](../design/studio.md). The focused milestone-2 plan must carry these
+expectations into their contracts and implementation. Milestone boundaries stay
+unchanged: tracer retains its minimal visual API and fixed control schema; full
+docking, input mapping and library presentation remain in milestone 4.
+
+- **Meaningful creative units.** Start with a handful of understandable building
+  blocks such as particle systems, deformation, materials, lighting rigs and
+  effects. Graph Components can expose a compact interface with deeper internal
+  nodes available when needed. Code Components expose their declared controls;
+  their implementation is not automatically an editable internal graph. Avoid
+  requiring a node for every Three.js operation. Node boundaries need not create
+  separate GPU passes; shared 3D work still follows the scheduler contracts.
+- **One declared interface.** Each Component declares typed inputs/outputs,
+  capabilities, lifecycle and meaningful creative controls with stable IDs,
+  types, defaults, ranges where applicable, units and descriptions. Use the same
+  declarations for library/AI discovery, inspector controls, validation and
+  eligibility for explicit host-control publishing. The serialized graph owns
+  wiring and instance values; UI and AI use the same revision-checked operations.
+- **Reuse before custom implementation.** AI authoring searches and inspects the
+  library, configures/connects suitable existing Components, and composes them
+  into reusable graph Components where useful. Write project-local custom code
+  for capabilities the available Components do not reasonably cover, with the
+  same declared interface. Support this order through searchable metadata,
+  examples and graph-editing tools as well as authoring instructions. Preserve
+  existing node identities and manual edits. Structural validation can enforce
+  declared interfaces and valid references; it cannot reliably detect every
+  semantic duplication hidden in arbitrary code.
+- **Controls that affect the running visual.** Exposed controls must be consumed
+  by the implementation. Declare whether a change applies live, rebuilds
+  resources, recompiles or resets simulation, and surface that behavior in the
+  inspector. Ordinary artistic adjustments should update the running instance
+  without source replacement or unnecessary resets. For example, spike height,
+  sharpness, rotation speed and material roughness should be considered for
+  independent controls instead of remaining source constants behind one intensity
+  macro. Expensive structural settings may have different update semantics.
+- **Deliberate library growth.** Useful project-local Components or graph groups
+  can be explicitly published after interface/lifecycle validation and a working
+  example. Do not publish every generated experiment automatically. Library uses
+  pin versions and content hashes; instances have independent values/state, and
+  scoped customization follows the existing local-override rules. Publishing a
+  new version does not silently update existing scenes or installed releases.
+- **Gradual migration.** Existing tracer visuals remain usable as one custom
+  Component with their declared external controls. Deliberately extract useful
+  parts and expose additional parameters when revisiting a visual. Do not promise
+  automatic arbitrary-code-to-graph conversion or require all old visuals to be
+  decomposed before milestone 2 can ship.
+
+In addition to the existing graph acceptance fixture, milestone 2 must demonstrate:
+
+1. An AI-created visual reuses suitable library Components and adds a custom
+   Component only for an identified missing capability. Record the library
+   references and verify that the saved composition exposes those instances.
+2. An inspector adjustment visibly changes a declared live parameter without
+   source recompilation or simulation reset; a structural/reset parameter follows
+   its separately declared behavior. A later scoped AI edit and save/reopen
+   preserve the manual control values and unrelated graph wiring.
+3. Two instances of the same Component retain independent values and simulation
+   state where applicable. Publishing a newer library version leaves the scene's
+   pinned version unchanged.
+4. A legacy visual works as one custom node, followed by explicit extraction of
+   one useful part into a reusable Component with working inspector controls.
+   Verify the intended output is retained; wrapping alone is not decomposition.
 
 ## Complete requirement routing
 
