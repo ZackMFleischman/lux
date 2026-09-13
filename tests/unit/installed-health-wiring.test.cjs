@@ -52,9 +52,9 @@ test('each attempt gets its own health/profile channel but watches the original 
   assert.throws(() => run('3'.repeat(32), true), /path mismatch/);
 });
 test('producer main publishes bounded health while Electron loadFile remains pending, without claiming readiness', async () => {
-  const intervals = [], files = new Map(), pendingLoad = new Promise(() => {});
+  const intervals = [], files = new Map(), handlers=new Map(), pendingLoad = new Promise(() => {});
   class FakeWindow {
-    constructor() { this.webContents = { on() {}, setFrameRate() {} }; }
+    constructor() { this.webContents = { on(name,handler) {handlers.set(name,handler);}, setFrameRate() {} }; }
     setContentSize() {} getContentBounds() { return {}; } loadFile() { return pendingLoad; }
   }
   const app = { commandLine: { appendSwitch() {} }, setPath() {}, whenReady: () => Promise.resolve(), getGPUInfo: () => assert.fail('must still be awaiting loadFile') };
@@ -79,4 +79,24 @@ test('producer main publishes bounded health while Electron loadFile remains pen
   assert.equal(sample.frameId, '0'); assert.equal(sample.completedFrames, 0); assert.ok(Buffer.byteLength(files.get('health.status')) < 512);
   intervals.find(timer => timer.ms === 250).callback();
   assert.equal(JSON.parse(files.get('health.status')).sequence, 2); assert.equal(JSON.parse(files.get('health.status')).ready, false);
+  assert.equal(sample.version,2);assert.equal(sample.workerHeartbeat,0);
+  const beat=value=>handlers.get('console-message')({message:JSON.stringify({kind:'runtime-heartbeat',frameId:'0',workerHeartbeat:value})});
+  beat(1);let received=JSON.parse(files.get('health.status'));assert.equal(received.workerHeartbeat,1);assert.equal(received.sequence,3);assert.equal(received.ready,false);
+  for(const value of [1,0,-1,1.5,null,Number.MAX_SAFE_INTEGER+1])beat(value);
+  assert.equal(JSON.parse(files.get('health.status')).sequence,3,'replayed/invalid worker messages cannot renew health');
+  intervals.find(timer=>timer.ms===250).callback();received=JSON.parse(files.get('health.status'));assert.equal(received.sequence,4);assert.equal(received.workerHeartbeat,1,'main health must preserve the last actual worker counter');
+  beat(2);assert.equal(JSON.parse(files.get('health.status')).workerHeartbeat,2);
+});
+
+test('installed page forwards pre-ready heartbeat only for its own worker instance, generation and revision',async()=>{
+ let worker;const logs=[];
+ class Worker{constructor(){worker=this;}postMessage(message){this.init=message;}}
+ const canvas={cloneNode(){return {transferControlToOffscreen:()=>({})};},replaceWith(){}};
+ const context={window:{},Worker,document:{querySelector:()=>canvas},crypto:{randomUUID:require('node:crypto').randomUUID},setTimeout:()=>1,clearTimeout(){},console:{log:value=>logs.push(JSON.parse(value)),error(){}}};
+ const html=fs.readFileSync(path.join(__dirname,'../../apps/render-host/src/compiled-output.html'),'utf8');vm.runInNewContext(html.match(/<script type="module">([\s\S]*)<\/script>/)[1],context);
+ const ready=context.window.startVisual({sourceHash:'revision',linked:{},settings:{}},.5);
+ const heartbeat={type:'heartbeat',instanceId:worker.init.instanceId,generation:worker.init.generation,revisionId:'revision',frameId:'0',workerHeartbeat:1};
+ for(const patch of [{instanceId:'other'},{generation:2},{revisionId:'other'}])worker.onmessage({data:{...heartbeat,...patch}});
+ assert.equal(logs.length,0);worker.onmessage({data:heartbeat});assert.deepEqual(logs,[{kind:'runtime-heartbeat',frameId:'0',workerHeartbeat:1}]);
+ worker.onmessage({data:{...worker.init,type:'ready'}});await ready;
 });

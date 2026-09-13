@@ -8,7 +8,7 @@ test('slow removal keeps healthy sibling polling and close awaits its outstandin
   const stopped=[],health=new ProducerHealth({attemptId,startedAt:0});let sequence=0;
   const registry=new InstanceRegistry({runtimeId,start:async value=>({exited:false,
     failure:now=>{
-      health.observe({version:1,attemptId,sequence:++sequence,ready:true,frameId:String(sequence),completedFrames:sequence,backpressureFrames:0},now);
+      health.observe({version:2,attemptId,sequence:++sequence,workerHeartbeat:sequence,ready:true,frameId:String(sequence),completedFrames:sequence,backpressureFrames:0},now);
       return health.failure(now);
     },stop:async()=>{stopped.push(value.instanceId);if(value.instanceId===removed)await drain;}})});
   try {

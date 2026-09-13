@@ -9,31 +9,39 @@ function validateRequest(value, runtimeId) {
 }
 // All time values are the supervisor's monotonic clock, never child wall time.
 class ProducerHealth {
-  constructor({attemptId, startedAt, startupMs = 15000, heartbeatMs = 2500, frameMs = 4000}) {
+  constructor({attemptId, startedAt, startupMs = 15000, heartbeatMs = 1250, workerMs = 1250, frameMs = 4000}) {
     if (!instance.test(attemptId) || !Number.isFinite(startedAt)) throw Error('Invalid producer health identity');
-    Object.assign(this, {attemptId, startedAt, startupMs, heartbeatMs, frameMs});
+    Object.assign(this, {attemptId, startedAt, startupMs, heartbeatMs, workerMs, frameMs});
     this.sequence = 0; this.frame = 0n; this.completedFrames = 0; this.backpressureFrames = 0; this.ready = false;
     this.heartbeatAt = startedAt; this.frameAt = startedAt; this.outputAt = startedAt;
+    this.workerHeartbeat=0;this.workerAt=null;
   }
   observe(value, now) {
-    if (this.failure(now) || !value || value.version !== 1 || value.attemptId !== this.attemptId ||
+    if (this.failure(now) || !value || value.version !== 2 || value.attemptId !== this.attemptId ||
         !Number.isSafeInteger(value.sequence) || value.sequence <= this.sequence || typeof value.ready !== 'boolean' ||
+        !Number.isSafeInteger(value.workerHeartbeat)||value.workerHeartbeat<this.workerHeartbeat||value.workerHeartbeat<0||
         typeof value.frameId !== 'string' || !/^\d{1,20}$/.test(value.frameId) ||
         !Number.isSafeInteger(value.completedFrames) || value.completedFrames < this.completedFrames ||
         !Number.isSafeInteger(value.backpressureFrames) || value.backpressureFrames < this.backpressureFrames ||
-        Object.keys(value).sort().join() !== 'attemptId,backpressureFrames,completedFrames,frameId,ready,sequence,version') return false;
+        Object.keys(value).sort().join() !== 'attemptId,backpressureFrames,completedFrames,frameId,ready,sequence,version,workerHeartbeat') return false;
     const frame = BigInt(value.frameId);
-    if (frame < this.frame || (this.ready && !value.ready) || (value.ready && (frame === 0n || value.completedFrames === 0))) return false;
+    if (frame < this.frame || (this.ready && !value.ready) || (value.ready && (frame === 0n || value.completedFrames === 0 || value.workerHeartbeat===0))) return false;
     if (!this.ready && value.ready) { this.ready = true; this.frameAt = now; this.outputAt = now; }
     if (frame > this.frame) this.frameAt = now;
     if (value.completedFrames > this.completedFrames || value.backpressureFrames > this.backpressureFrames) this.outputAt = now;
     this.frame = frame; this.completedFrames = value.completedFrames; this.backpressureFrames = value.backpressureFrames;
+    if(value.workerHeartbeat>this.workerHeartbeat)this.workerAt=now;
+    this.workerHeartbeat=value.workerHeartbeat;
     this.sequence = value.sequence; this.heartbeatAt = now;
     return true;
   }
   failure(now) {
+    // Startup may spend 15s loading Electron/awaiting healthy async initialization.
+    // Once each event loop reports, its independent liveness deadline is armed
+    // even before ready. Fresh main/file writes never renew worker liveness.
+    if (this.sequence>0 && now - this.heartbeatAt >= this.heartbeatMs) return 'Producer main heartbeat expired';
+    if (this.workerAt!==null && now-this.workerAt>=this.workerMs)return 'Visual worker heartbeat expired';
     if (!this.ready) return now - this.startedAt >= this.startupMs ? 'Installed producer startup deadline exceeded' : null;
-    if (now - this.heartbeatAt >= this.heartbeatMs) return 'Producer main heartbeat expired';
     if (now - this.frameAt >= this.frameMs) return 'Visual frame progress expired';
     if (now - this.outputAt >= this.frameMs) return 'Published output progress expired';
     return null;
