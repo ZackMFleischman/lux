@@ -1,4 +1,5 @@
 import { encodeCapturedTarget } from './capture-png.mjs';
+import { createInitializationProbe } from './initialization-probe.mjs';
 // Generated modules run only in this dedicated browser worker. No Node or
 // desktop bridge is exposed here. The parent owns termination and promotion.
 import { RuntimeClock } from '../../../packages/runtime/src/clock.ts';
@@ -12,6 +13,7 @@ const freeze=Object.freeze;
 const now=performance.now.bind(performance);
 const post=postMessage.bind(globalThis);
 let identity, renderer, device, visual, clock, random, settings, outputTarget, presentation;
+let initializationProbe;
 let controlState, frame = 0, tick = 0, lastTime = 0;
 let drawStarted=0,scheduleEpoch=0;
 let performanceMode='routine';
@@ -19,6 +21,7 @@ let stopped = false, externallyDriven=false, timer, heartbeat, telemetryTimer, c
 const send = (type, extra = {}) => post({ type, ...identity, ...extra });
 function state() { return { ...clock.snapshot(), frameId: String(frame),...controlState.state() }; }
 function failure(error, requestId) {
+  initializationProbe?.cancel();initializationProbe=undefined;
   stopped = true; clearTimeout(timer); clearInterval(heartbeat); clearInterval(telemetryTimer);
   gpuTimer?.dispose();
   send('failure', { requestId, code: 'RUNTIME_FAILED', message: String(error?.message || error).slice(0, 2000) });
@@ -95,6 +98,11 @@ async function initialize(message) {
   const material = new module.MeshBasicNodeMaterial();
   material.fragmentNode = module.sampleTexture(outputTarget.texture);
   presentation = new module.QuadMesh(material);
+  if (typeof message.initProbeId === 'string' && /^[a-f0-9]{32}$/.test(message.initProbeId)) {
+    initializationProbe=createInitializationProbe({...identity,initProbeId:message.initProbeId},post);
+    await initializationProbe.wait;
+    initializationProbe=undefined;
+  }
   visual = await create(freeze({ settings: freeze({ ...settings }), assets, images,
     random: () => random.next(), reportError: value => { throw Error(String(value)); },
     renderer: freeze({ render: (scene, camera) => {
@@ -110,6 +118,8 @@ async function initialize(message) {
 }
 onmessage = event => {
   const message = event.data;
+  // GO must bypass the initialization promise queued on chain.
+  if (message?.type === 'init-probe-go') { if (!stopped) initializationProbe?.accept(message); return; }
   chain = chain.then(async () => {
     if (!identity && message?.type === 'init') return initialize(message);
     if (stopped || !identity || message.instanceId !== identity.instanceId || message.generation !== identity.generation) return;

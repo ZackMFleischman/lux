@@ -15,11 +15,19 @@ function request(message, transfer = []) {
     worker.postMessage({...message,requestId}, transfer);
   });
 }
-window.startVisual = async (release, values, externallyDriven = false) => {
+window.startVisual = async (release, values, externallyDriven = false, initProbeId) => {
   if (worker) throw Error('Visual already initialized');
   worker = new Worker('./compiled-worker.js', {type:'module'});
   identity = {instanceId:crypto.randomUUID(),generation:1,revisionId:release.sourceHash};
+  let probeReady=false,probeSent=false;
+  if(typeof initProbeId==='string'&&/^[a-f0-9]{32}$/.test(initProbeId))window.goInitProbe=(attempt,revision)=>{
+    if (!probeReady || probeSent || attempt!==initProbeId || revision!==identity.revisionId) return false;
+    probeSent=true;worker.postMessage({type:'init-probe-go',...identity,initProbeId});return true;
+  };
   worker.onmessage = ({data}) => {
+    if(data.type==='init-probe-ready'&&typeof initProbeId==='string'&&data.initProbeId===initProbeId&&data.instanceId===identity.instanceId&&data.generation===identity.generation&&data.revisionId===identity.revisionId&&!probeReady){
+      probeReady=true;console.log(JSON.stringify({kind:'init-probe-ready',attemptId:initProbeId,revisionId:identity.revisionId}));return;
+    }
     if (data.type === 'heartbeat' && data.instanceId===identity.instanceId && data.generation===identity.generation && data.revisionId===identity.revisionId) console.log(JSON.stringify({kind:'runtime-heartbeat',frameId:data.frameId,workerHeartbeat:data.workerHeartbeat}));
     if (data.type === 'failure') console.error(JSON.stringify({kind:'failure',reason:data.message}));
     if (data.type === 'ready' || data.type === 'status') console.log(JSON.stringify({kind:'runtime-frame',...data}));
@@ -40,7 +48,7 @@ window.startVisual = async (release, values, externallyDriven = false) => {
   identity.controlSchemaHash=generic?release.linked.controlSchemaHash:undefined;
   return request({type:'init',...identity,linked:release.linked,settings:release.settings,
     sdkVersion:generic?'0.2.0':'0.1.0',controlSchema:generic?release.linked.controls:undefined,
-    canvas,controls:generic?values:{intensity:values},playing:true,externallyDriven},[canvas]);
+    canvas,controls:generic?values:{intensity:values},playing:true,externallyDriven,...(initProbeId===undefined?{}:{initProbeId})},[canvas]);
 };
 window.drawVisual = () => request({type:'frame',...identity});
 window.setIntensity = value => request({type:'controls',...identity,controlSequence:++sequence,values:{intensity:value}});
