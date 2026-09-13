@@ -10,7 +10,7 @@ The entry must directly `export default defineVisual({...})`, importing `defineV
 
 ## Linear image composition
 
-SDK 0.4 uses `defineComponent` in leaf modules and `defineComposition` in the entry. Component metadata statically declares image ports, numeric controls, descriptions, and lifecycle. The component owns its Three objects; `evaluate(inputs, context)` returns `{ image: await context.render(scene, camera) }`. An effect reads `inputs.image.texture` and renders its own output. Lux owns intermediate render targets and releases them only after downstream GPU work settles.
+SDK 0.4 uses `defineComponent` in leaf modules and `defineComposition` in the entry. Component metadata statically declares image ports, numeric controls, descriptions, and lifecycle. A component instance implements `update(frame)`, `evaluate(inputs, evaluation)`, `reset(seed)`, and `dispose()`. Its evaluation returns `{ image: await evaluation.render(scene, camera) }`; an effect reads `inputs.image.texture` and renders its own output. Lux owns intermediate render targets and releases them only after downstream GPU work settles.
 
 The entry statically lists `definitions`, stable UUID `nodes`, `edges`, one `output`, and selected `expose` rows. Each exposed ID is a public Studio control alias for exactly one `{nodeId, controlId}` target. For example, two nodes using the same `kaleidoscope` definition can expose `segmentsA` and `segmentsB`; changing one does not mutate the other. Node identity persists values across save/reopen and declaration reorder. A changed definition identity or rebound alias does not transfer a saved value to another instance.
 
@@ -18,11 +18,13 @@ The admitted `image-chain-v1` profile is deliberately narrow: 1–8 nodes, one l
 
 | Hook | Responsibility |
 | --- | --- |
-| `async create(context)` | Allocate scene, camera, geometry, materials, uniforms and per-instance state; return the four hooks below. |
-| `update(frame)` | Change transforms and uniform values from `timeSeconds`, `deltaSeconds`, and `controls`. Runs even for a paused parameter change. |
-| `render(target)` | Return `context.renderer.render(scene, camera, target)`. Lux owns the renderer, output target, frame scheduling and GPU lifecycle. |
-| `reset(seed)` | Reset visual-owned mutable simulation state. Lux resets its clock and seeded random generator before calling this hook. |
-| `dispose()` | Dispose owned geometries, materials and textures, including replaced resources; release subscriptions if used. Removing a mesh alone does not free its GPU resources. |
+| SDK 0.2 `async create(context)` | Allocate a visual's scene, camera, geometry, materials, uniforms and state; return `update`, `render`, `reset`, and `dispose`. |
+| SDK 0.2 `update(frame)` | Change transforms and uniform values from `timeSeconds`, `deltaSeconds`, and `controls`. Runs even for a paused parameter change. |
+| SDK 0.2 `render(target)` | Return `context.renderer.render(scene, camera, target)`. Lux owns the renderer, output target, frame scheduling and GPU lifecycle. |
+| SDK 0.4 `update(frame)` | Update component-owned transforms and uniforms before evaluation. |
+| SDK 0.4 `evaluate(inputs, evaluation)` | Return output values; for this profile return `{ image: await evaluation.render(scene, camera) }`. |
+| SDK 0.2/0.4 `reset(seed)` | Reset visual- or component-owned mutable simulation state. Lux resets its clock and seeded random generator before calling this hook. |
+| SDK 0.2/0.4 `dispose()` | Dispose owned geometries, materials and textures, including replaced resources; release subscriptions if used. Removing a mesh alone does not free its GPU resources. |
 
 For continuous motion, derive angles and noise offsets from `frame.timeSeconds`. It follows Lux playback/reset. Use `deltaSeconds` for a simulation that genuinely needs integration; reset its accumulated state. Avoid a separate animation loop, browser wall time, or TSL's automatic timer for playback-sensitive movement. Feed a `uniform` from Lux time instead.
 

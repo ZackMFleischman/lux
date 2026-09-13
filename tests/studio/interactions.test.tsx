@@ -77,6 +77,19 @@ test('RTL: code-defined controls expose independent values, numeric entry and de
   assert.deepEqual((fixture.calls[1] as any).input.values, { spikeHeight: 1 });
 });
 
+test('RTL: duplicate component labels show and announce their public aliases', () => {
+  const fixture = service();
+  fixture.publish({ sdkVersion: '0.4.0', intensity: undefined, controlSchema: [
+    { id: 'segmentsA', type: 'number' as const, label: 'Segments', min: 2, max: 16, default: 6, changeCost: 'live' as const },
+    { id: 'segmentsB', type: 'number' as const, label: 'Segments', min: 2, max: 16, default: 6, changeCost: 'live' as const },
+  ], controlSchemaHash: 'c'.repeat(64), controls: { segmentsA: 6, segmentsB: 6 }, controlSequence: 0 });
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+  assert.ok(screen.getByText('Segments (segmentsA)'));
+  assert.ok(screen.getByText('Segments (segmentsB)'));
+  assert.ok(screen.getByRole('slider', { name: 'Segments (segmentsA)' }));
+  assert.ok(screen.getByRole('spinbutton', { name: 'Segments (segmentsB) value' }));
+});
+
 test('RTL: an empty authored schema has no invented control', () => {
   const fixture = service();
   fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [], controlSchemaHash: 'b'.repeat(64), controls: {}, controlSequence: 0 });
