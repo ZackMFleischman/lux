@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "paths": { "@lux/visual-sdk": ["./packages/visual-sdk/src/sdk-v2.ts"] }
+  },
+  "files": ["packages/visual-sdk/examples/parameters.ts"],
+  "include": [],
+  "exclude": []
+}
