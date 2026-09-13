@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { prepareTransportScene } from './transport-prepare.mjs';
 import { exportResolume } from './export-resolume.mjs';
 import packageIO from '../packages/export/src/package.cjs';
@@ -14,7 +15,14 @@ const [sceneArgument, outputArgument, runtimeArgument] = process.argv.slice(2);
 if (!sceneArgument || !outputArgument) throw Error('Usage: node scripts/prepare-sphere-host-qa.mjs <sphere.lux-scene> <new-artifact-directory> [reviewed-runtime-checkout]');
 const scenePath = path.resolve(sceneArgument), out = path.resolve(outputArgument);
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+function checkoutProvenance(root) {
+  const git = args => execFileSync('git', ['-c', `safe.directory=${root.replaceAll('\\', '/')}`, ...args], { cwd: root, encoding: 'utf8' }).trim();
+  return { root, commit: git(['rev-parse', 'HEAD']), trackedDirty: git(['status', '--porcelain', '--untracked-files=no']) !== '' };
+}
 packageIO.noLinks(scenePath); packageIO.noLinks(out);
+const reportPath = path.join(out, 'preparation.json');
+if (!runtimeArgument && fs.existsSync(reportPath) && JSON.parse(fs.readFileSync(reportPath, 'utf8')).package)
+  throw Error('Refusing source-only preparation over a completed package report; choose a new artifact directory');
 fs.mkdirSync(out, { recursive: true });
 const original = fs.readFileSync(scenePath), scene = JSON.parse(original);
 assert.equal(scene.version, 3);
@@ -39,12 +47,13 @@ const effects = {
 };
 const parameters = scene.controls.schema.map((row, index) => ({ index, ...row, saved: scene.controls.values[row.id],
   normalizedSaved: Math.fround((scene.controls.values[row.id] - row.min) / (row.max - row.min)), expectedEffect: effects[row.id] }));
-const report = { format: 'lux-sphere-host-qa', version: 1, preparedWithSourceCommit: 'f7d61249ec29eea12a51357777ba4967a5051fa9',
+const report = { format: 'lux-sphere-host-qa', version: 1, compilerCheckout: checkoutProvenance(path.resolve(import.meta.dirname, '..')),
   originalScenePath: scenePath, scenePath: copy, sceneSha256: digest(original), sourceHash: prepared.sourceHash,
   schemaHash: scene.controls.schemaHash, linkedHash: prepared.linkedHash, transportPath: prepared.path,
   settings: scene.settings, parameters, hostTested: false, gpuTested: false, userPluginDirectoryModified: false };
 if (runtimeArgument) {
   const runtimeRoot = path.resolve(runtimeArgument);
+  const runtimeCheckout = checkoutProvenance(runtimeRoot);
   const result = await exportResolume({ scenePath: copy, name: 'Lux Spike Sphere', root: runtimeRoot,
     outputDirectory: path.join(out, 'packages'), preparedPath: prepared.path, savedControls: prepared.savedControls });
   const verified = packageIO.validatePackage(result.path);
@@ -64,7 +73,8 @@ if (runtimeArgument) {
     else process.env.LOCALAPPDATA = previousLocal;
   }
   assert.equal(registered.sidecar.split('\n')[6], '5');
-  Object.assign(report, { package: result, runtimeRoot, runtimeFiles: verified.runtime.files.length, installed, registration: registered,
+  Object.assign(report, { package: result, runtimeRoot, runtimeCheckout, runtimeFiles: verified.runtime.files.length, installed, registration: registered,
+    provenanceNote: 'Checkout commits identify inspected inputs, not reproducible native-build proof. The package runtime manifest inventories the exact emitted bytes.',
     runtimeInventorySha256: digest(fs.readFileSync(path.join(result.path, 'runtime', 'runtime.json'))),
     registeredDllSha256: digest(fs.readFileSync(registered.dllPath)) });
 }
