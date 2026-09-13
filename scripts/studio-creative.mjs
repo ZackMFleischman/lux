@@ -4,7 +4,7 @@ import { mkdir, readFile, writeFile, realpath, readdir, lstat, rmdir } from 'nod
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { canonicalWorkspace, createStudioConnection, resolveStudioSession, studioAppData } from './studio-session.mjs';
-import { installedElectron } from './studio-electron.mjs';
+import { ensureElectron } from './studio-electron.mjs';
 
 function git(root, args) {
   return execFileSync('git', ['-c', 'core.excludesFile=', '-c', 'core.fsmonitor=false', '-c', `safe.directory=${root.replaceAll('\\', '/')}`, ...args],
@@ -107,8 +107,7 @@ async function start(source, prepareOnly) {
       }
     }
     await verifyCreativeDependencies(record.checkout);
-    // Resolve without loading electron/index.js, which can download a missing binary.
-    installedElectron(record.checkout);
+    ensureElectron(record.checkout);
     const buildRecordPath = join(directory, 'build.json'), dist = join(record.checkout, 'apps', 'studio', 'dist');
     const built = await readJson(buildRecordPath);
     if (built) {

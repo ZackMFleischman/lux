@@ -17,7 +17,9 @@ node scripts/studio-creative.mjs --prepare
 
 This reserves `.worktrees/lux-creative` at the current committed HEAD on first use and records the checkout and commit under the `creative` Studio profile. Later starts keep that version. Read the returned paths rather than assuming the current development worktree is the creative runtime. The command neither upgrades an existing reservation nor changes its source. A missing or changed reservation is a concrete startup problem; preserve it rather than resetting it.
 
-The pinned checkout needs its own dependencies from its frozen lockfile and the approved pinned Electron executable. Follow the project's setup instructions if these are missing. Do not link development `node_modules`, substitute another worktree's native binaries, or bypass an existing installation/provenance stop. Explain the missing prerequisite if setup is blocked.
+On first use, if the reserved checkout has no local dependencies, run `pnpm install --frozen-lockfile` **in that returned checkout**, using the project's pinned Node and pnpm. This is part of starting Lux, not a separate permission question. Keep its own `node_modules`; do not link development dependencies. Do not reinstall dependencies in an already prepared or running creative session.
+
+Normal creative startup installs a missing pinned Electron runtime with the official checksum-verifying installer and shared download cache. No global Electron install is needed. `pnpm studio:setup` prepares or repairs the runtime explicitly; `pnpm studio:check` checks it without downloads. Run these in the reserved checkout. For an older reservation without those commands, use its documented `node node_modules/electron/install.js` setup without changing its pinned source. Preserve any concrete installation/provenance stop; do not substitute retained unverified binaries. An installer/network failure must be reported as a failed start, not readiness.
 
 Run from the same source repository:
 

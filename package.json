@@ -27,6 +27,8 @@
     "test:acceptance": "node scripts/unavailable.mjs TR-07 measured-host-acceptance",
     "studio": "node apps/studio/build.mjs && node scripts/studio.mjs",
     "studio:creative": "node scripts/studio-creative.mjs",
+    "studio:setup": "node scripts/studio-electron.mjs",
+    "studio:check": "node scripts/studio-electron.mjs --check",
     "studio:mcp": "node scripts/studio-mcp.mjs",
     "test:studio:cpu": "node apps/studio/test-cpu.mjs",
     "test:studio:smoke": "node apps/studio/build.mjs && node scripts/studio.mjs --smoke",

@@ -39,6 +39,7 @@ test('creative dependency check rejects parent fallback without executing packag
   await verifyCreativeDependencies(checkout);
   assert.throws(() => installedElectron(checkout), /not installed/i);
   await mkdir(join(electron, 'dist'));
+  await writeFile(join(electron, 'dist', 'version'), '44.3.0');
   await writeFile(join(electron, 'dist', 'fixture.exe'), 'inert fixture, never executed');
   await writeFile(join(electron, 'path.txt'), 'fixture.exe');
   assert.equal(installedElectron(checkout), join(electron, 'dist', 'fixture.exe'));

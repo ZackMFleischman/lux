@@ -9,7 +9,8 @@ Current reference: Windows x64, Node 24.12.0, pnpm 10.33.0, Visual Studio Build 
 
 ```powershell
 pnpm install --frozen-lockfile
-node node_modules/electron/install.js
+pnpm studio:setup
+pnpm studio:check
 pnpm typecheck
 pnpm test:unit
 pnpm build
@@ -18,6 +19,10 @@ pnpm test:mcp -- --profile-fixture
 pnpm preflight
 ```
 
-The Electron install is explicit; preflight never downloads it implicitly. Preflight records actual observations and exits nonzero while hardware integration requirements are unavailable. That is expected before the GPU experiment passes, not a passing hardware test. Later-task commands similarly report their missing prerequisite rather than silently passing.
+`pnpm studio:setup` installs or repairs the exact Electron version pinned in this checkout using Electron's official installer and checksum verification. It reuses Electron's shared download cache (`%LOCALAPPDATA%/electron/Cache` on Windows); no global Electron installation is needed. Each checkout keeps its own dependencies and runtime. See [Electron installation](https://www.electronjs.org/docs/latest/tutorial/installation).
+
+Normal `pnpm studio` and `pnpm studio:creative` launches also prepare a missing runtime before opening Studio. First-use creative startup needs `pnpm install --frozen-lockfile` in the reserved checkout returned by `node scripts/studio-creative.mjs --prepare`; `/start-lux` handles this setup. Existing creative reservations stay pinned. Setup never upgrades the pin or falls back to repairing another checkout's dependencies.
+
+`pnpm studio:check`, preflight, and automated tests never download Electron. Run `pnpm studio:setup` before live tests. A failed download reports its error and stops startup; rerun setup after restoring network access. Preflight records actual observations and exits nonzero while hardware integration requirements are unavailable. That is expected before the GPU experiment passes, not a passing hardware test.
 
 The MCP fixture is test-only. It proves protocol negotiation and PNG delivery, not visual generation or live playback. Native smoke verifies the C++ toolchain and monotonic clock, not GPU transport. Preserve these distinctions in test reports.
