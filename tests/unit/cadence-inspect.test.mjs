@@ -25,6 +25,13 @@ test('supervisor QPC envelope and producer-start provenance cannot be shifted or
   const x=fixture();mutate(x);assert.throws(()=>inspectCadence(x));
  }
 });
+test('completed lifecycle uses the actual native exit timestamp fields, without clock.at',()=>{
+ const x=fixture(),base=x.lifecycle[0];
+ x.lifecycle.push({...base,kind:'stop-requested',force:false,clock:{domain:'qpc',frequency:'6000',at:'61200'}},
+  {...base,kind:'process-exit-observed',force:false,clock:{domain:'qpc',frequency:'6000'},requestedAt:'61201',observedExitAt:'61800',stopped:true,activeProcesses:0});
+ assert.equal(inspectCadence(x).ok,true);
+ for(const patch of [{observedExitAt:'61200'},{observedExitAt:'62001'},{requestedAt:'60999'}]){const broken=structuredClone(x);Object.assign(broken.lifecycle.at(-1),patch);assert.throws(()=>inspectCadence(broken));}
+});
 test('incomplete windows, fake joins, missing slots, timer failures and loss fail closed',()=>{
  for(const mutate of [x=>x.probe.end='60999',x=>x.probe.coverageEnd='60999',x=>x.probe.slots.pop(),x=>x.probe.slots[1].slot=0,x=>x.probe.slots[1].due='1101',x=>x.probe.slots[1].before='999',x=>x.host[1].at='1003',x=>x.host.splice(2,1),x=>x.host.at(-1).lostRecords=1,x=>x.probe.ok=false,x=>x.probe.slots[0].success=false,x=>x.probe.clock.frequency='6001',x=>x.experiment.timeoutMs=30001,x=>x.experiment.cleanupComplete=false,x=>x.lifecycle[0].revisionId='e'.repeat(64)]){
   const x=fixture();mutate(x);assert.throws(()=>inspectCadence(x));
