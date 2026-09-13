@@ -1,6 +1,6 @@
 # Deterministic input timing, smoothing and replay
 
-Planning revision 1 for LUX-17. Baseline main `aca4d38c69c71ef2e6f0b71b171163e8fe836ee0` includes independently accepted I01 source `fab83026c7baadb845bb6617c355dc6c6df421db`. Root coordinator is the planner; this document requires a fresh independent critique before any implementation dispatch. It introduces no runtime, device, Studio, SDK or saved-project capability.
+Planning revision 2 for LUX-17. Baseline main `aca4d38c69c71ef2e6f0b71b171163e8fe836ee0` includes independently accepted I01 source `fab83026c7baadb845bb6617c355dc6c6df421db`. Root coordinator is the planner; this document requires a fresh independent critique before any implementation dispatch. It introduces no runtime, device, Studio, SDK or saved-project capability. Revision 1 at `22a20ade78b2523338b0a225d27890f28782a33b` is preserved; revision 2 addresses the independent numeric-edge finding and requires exact recheck.
 
 The governing scope is [I02 in the creative inputs plan](creative-inputs-plan.md). Current code consists only of `packages/inputs/src/mapping.mjs` and its declarations. It validates a complete base snapshot, applies macros before modulation, handles explicit host-owned targets, clamps once and returns detached frozen traces. Its two functions are stateless version 1. Range shaping and combination currently live inside `evaluateNumericMappings`; they must have one implementation when timed evaluation is added. `packages/runtime/src/clock.ts` and `seed.ts` remain their owners' code and are not edited here.
 
@@ -82,14 +82,20 @@ For an enabled resolved binding on a target without host ownership, compute the 
 
 ```js
 // previous exists only for the same plan key, epoch, binding and source generation.
-const alpha = tauMs === 0 ? 1 : -Math.expm1(-deltaMs / tauMs);
-const smoothed = !previous || tauMs === 0
-  ? shaped
-  : previous.value + (shaped - previous.value) * alpha;
-// Check every subtraction/product/sum for finite values before combining.
+let smoothed;
+if (!previous || tauMs === 0) smoothed = shaped;
+else if (deltaMs === 0) smoothed = previous.value;
+else {
+  const ratio = requireFinite(deltaMs / tauMs);
+  const alpha = requireFinite(-Math.expm1(-ratio));
+  const difference = requireFinite(shaped - previous.value);
+  const adjustment = requireFinite(difference * alpha);
+  smoothed = requireFinite(previous.value + adjustment);
+}
+// requireFinite uses the existing bounded INVALID_INPUT_MAPPING error policy.
 ```
 
-First valid sample initializes to the shaped contribution, even at zero delta. Existing state with zero delta retains its prior value unless tau is zero. A generation change clears that binding's history and initializes from the new sample. This is explicit reset behavior; timeline admission, not this evaluator, determines which generation is current. Disabled, unresolved-source and host-owned bindings produce no new state entry, so re-enabling/reconnecting/releasing host authority starts clean. They retain their existing status and null shaped/smoothed/mapped fields. Host-owned targets still bypass even overflowing competing Studio arithmetic.
+First valid sample initializes to the shaped contribution, even at zero delta. Existing state with zero delta retains its prior value unless tau is zero; this short circuit occurs before ratio or difference arithmetic, after valid shaping. A tiny positive tau is legal plan data, but an existing-state positive-delta evaluation whose ratio overflows deliberately fails atomically rather than accepting `expm1(-Infinity)` as implicit saturation. This follows I01's distinction between finite admitted operands and finite evaluated intermediates. First-sample/tau0/zero-delta branches never calculate unused ratios or differences. Tests include `tauMs=Number.MIN_VALUE, deltaMs=60000` with existing state (bounded error), tau0 (instant shaped value), and delta0 with finite opposite extreme previous/shaped values (exact retention without subtraction). A generation change clears that binding's history and initializes from the new sample. This is explicit reset behavior; timeline admission, not this evaluator, determines which generation is current. Disabled, unresolved-source and host-owned bindings produce no new state entry, so re-enabling/reconnecting/releasing host authority starts clean. They retain their existing status and null shaped/smoothed/mapped fields. Host-owned targets still bypass even overflowing competing Studio arithmetic.
 
 Combine the smoothed contribution using the same replace/add/multiply helper and phase order as I01, then perform the same single final clamp. A timed applied trace has `shaped` equal to the pre-smoothing contribution, `smoothed` equal to the actual contribution, and inherited `mapped` equal to `smoothed`. Its before/after values show target accumulation. I01 trace fields and version remain unchanged. Return deeply frozen detached results/state; no Map, Set or typed-array storage is exposed. Invalid arithmetic rejects the entire result and leaves the previous state intact. A caller can construct its own valid numeric state; this library does not confer authority or provenance on it.
 
