@@ -11,6 +11,7 @@ for (const args of [
   ['--test', '--test-isolation=none', ...(await readdir(tests)).filter(name => name.endsWith('.test.ts')).map(name => join(tests, name)),
     join(tests, 'source-admission.test.mjs'), join(tests, 'source-admission-browser.test.mjs'),
     join(tests, 'image-preview.test.mjs'),
+    join(tests, 'capture-alpha.test.mjs'),
     join(directory, 'dist/view.test.cjs'), join(directory, 'dist/interactions.test.mjs')],
   ['--test', '--test-isolation=none', join(directory, 'dist/source-editor.test.mjs')],
   ['--experimental-vm-modules', '--test', join(tests, 'visual-worker.test.mjs')],
