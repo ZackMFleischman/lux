@@ -30,6 +30,31 @@ contexts. Use capacity for concrete independent delivery and review. Do not fill
 slots with speculative work. When an immutable run has an obsolete limit,
 checkpoint and stop it before starting its successor at the actual host limit.
 
+### Model and context selection
+
+Choose the model and reasoning effort for each fresh delegation. Do not inherit
+Astra high by default. Use these starting points, adjusted for the actual risk:
+
+- GPT-5.6 Luna, low: routine inspection, documentation and mechanical checks.
+- GPT-5.6 Terra, medium: bounded coding, bug fixes and focused code review.
+- GPT-5.6 Sol, medium or high: broader debugging, cross-module changes and reviews
+  with substantial uncertainty.
+- GPT-6 Astra, high: difficult architecture, subtle concurrency or ownership
+  problems, or work where a lighter attempt left a material gap.
+
+Use only models and efforts available through the selected host tool. Put the
+choice and a short reason in the handoff. For native subagents, pass explicit
+`model` and `reasoning_effort` with `fork_turns: "none"` and a focused assignment.
+Supply the needed scope, source references, ownership and startup corrections.
+Do not copy the full conversation by default.
+
+Escalate when findings, failed attempts or unresolved risk justify it. Review
+depth follows the change's risk, not merely its size. Keep independent review,
+required checks and data protection at every tier. Avoid repeated reads, large
+tool output and extra agents when a small local action is sufficient. The workflow
+observer must assess model choice, context size and avoidable rework in its normal
+report process. Record short reasons in existing evidence; add no routing system.
+
 ## Deliver usable features
 
 The user set this direction on 13 September 2026 after reviewing excessive
