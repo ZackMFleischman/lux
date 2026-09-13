@@ -158,8 +158,37 @@ function editorError(code:Code|'PROJECT_INVALID', message:string, location?:stri
     ...(expected===undefined?{}:{expected:expected.slice(0,240)}),...(actual===undefined?{}:{actual:actual.slice(0,240)})});
 }
 function captureJson(input:unknown):unknown {
-  try { return snapshotJsonData(input); }
-  catch(error) { return editorError(/limit exceeded/.test((error as Error).message)?'QUOTA_EXCEEDED':'TOOLCHAIN_INVALID',(error as Error).message); }
+  // Keep caller reflection failures separate from the snapshot helper's own
+  // diagnostics. Never inspect a thrown caller value, even with descriptors:
+  // that value may itself be a Proxy with executable reflection traps.
+  const callerFailure=Object.create(null),wrapped=new WeakMap<object,object>();
+  const reflect=<T>(read:()=>T):T=>{try{return read();}catch{throw callerFailure;}};
+  const wrap=(value:unknown):unknown=>{
+    if(!value || typeof value!=='object')return value;
+    const existing=wrapped.get(value);if(existing)return existing;
+    const isArray=reflect(()=>Array.isArray(value));
+    // Empty extensible targets let frozen caller data retain its values without
+    // violating Proxy invariants when child objects are wrapped lazily.
+    const proxy=new Proxy(isArray?[]:{},{
+      getPrototypeOf:()=>reflect(()=>Object.getPrototypeOf(value)),
+      ownKeys:()=>reflect(()=>Reflect.ownKeys(value)),
+      getOwnPropertyDescriptor:(_target,key)=>{
+        const descriptor=reflect(()=>Object.getOwnPropertyDescriptor(value,key));
+        if(!descriptor)return undefined;
+        return Object.hasOwn(descriptor,'value')
+          ? {value:wrap(descriptor.value),enumerable:descriptor.enumerable,configurable:!(isArray && key==='length'),writable:true}
+          : {...descriptor,configurable:true};
+      },
+    });
+    wrapped.set(value,proxy);return proxy;
+  };
+  try { return snapshotJsonData(wrap(input)); }
+  catch(error) {
+    if(error===callerFailure)return editorError('TOOLCHAIN_INVALID','Unable to capture own JSON data');
+    // All caller reflection above is guarded; only internal snapshot errors
+    // reach this branch, with ordinary, bounded data messages.
+    return editorError(/limit exceeded/.test((error as Error).message)?'QUOTA_EXCEEDED':'TOOLCHAIN_INVALID',(error as Error).message);
+  }
 }
 const intrinsicByteKind = Object.getOwnPropertyDescriptor(arrayPrototype,Symbol.toStringTag)!.get!;
 function editorByteLength(input:unknown):number {
@@ -260,7 +289,19 @@ export async function createProjectEditorPlan(metadata:ProjectMetadata,pack:Veri
   }
   let admitted:ProjectMetadata;
   try {admitted=await admitProjectMetadata(documents,selection);}
-  catch(error){return editorError(/limit exceeded|quota exceeded/.test((error as Error).message)?'QUOTA_EXCEEDED':/Missing SDK toolchain variant/.test((error as Error).message)?'TOOLCHAIN_UNAVAILABLE':'PROJECT_INVALID',(error as Error).message);}
+  catch(error){
+    if((error as Error).message==='Missing SDK toolchain variant') {
+      // Admission has checked all document shapes and reached closure checking.
+      // Use only the detached capture to attach a bounded affected definition;
+      // this diagnostic does not admit or publish the rejected metadata.
+      const captured=capturedMetadata as ProjectMetadata;
+      const missing=(sdk:string,location:string)=>{if(!Object.hasOwn(selection.sdkVariants,sdk))editorError('TOOLCHAIN_UNAVAILABLE',`Missing SDK toolchain variant sdkVariants/${sdk}`,location,sdk);};
+      for(const id of Object.keys(captured.components).sort(lexical))missing(captured.components[id]!.sdkVersion,`${captured.project.components[id]}/component.json`);
+      for(const id of Object.keys(captured.packages).sort(lexical))for(const name of Object.keys(captured.packages[id]!.exports).sort(lexical))missing(captured.packages[id]!.exports[name]!.sdkVersion,`libraries/${captured.lock.packages[id]!.contentHash}/package.json/exports/${name}`);
+      return editorError('TOOLCHAIN_UNAVAILABLE','Missing SDK toolchain variant','sdkVariants');
+    }
+    return editorError(/limit exceeded|quota exceeded/.test((error as Error).message)?'QUOTA_EXCEEDED':'PROJECT_INVALID',(error as Error).message);
+  }
   type Node = {ref:ComponentRef;definition:CodeExport;prefix:string;configPath:string};
   let count=Object.keys(admitted.components).length;
   for(const pkg of Object.values(admitted.packages))count+=Object.keys(pkg.exports).length;

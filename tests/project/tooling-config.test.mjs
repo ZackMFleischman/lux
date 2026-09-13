@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { posix } from 'node:path';
 import { createProjectEditorPlan, compareProjectEditorFiles, editorLimits, verifyDeclarationPack } from '../../packages/core/src/project/tooling.ts';
 import { admitProjectMetadata } from '../../packages/core/src/project/contracts.ts';
+import { snapshotJsonData } from '../../packages/core/src/project/bounded-json.ts';
 import { model, inputFor, ids, local, fixtureText, bytes, hash, pinFor, canonical } from './resolver-fixtures.ts';
 
 const key = ref => ref.kind === 'local' ? `local:${ref.componentId}` : `package:${ref.packageId}:${ref.exportId}`;
@@ -96,6 +97,89 @@ test('selection supports a nonempty SDK subset while every definition must remai
   assert.equal((await createProjectEditorPlan(f.metadata,clone,f.selection)).planHash,plan.planHash);
   const mixed=await fixture();delete mixed.selection.sdkVariants['0.1.0'];mixed.metadata.lock.toolchain=structuredClone(mixed.selection);
   await assert.rejects(create(mixed),{code:'TOOLCHAIN_UNAVAILABLE'});
+});
+
+test('missing SDK diagnostics identify the exact variant and affected local or package definition',async()=>{
+  for(const packageOnly of [false,true])for(const sdk of ['0.1.0','0.2.0']) {
+    const m=mixedModel();
+    if(packageOnly){m.project.components={};m.components=[];m.project.scenes={};m.scenes=[];}
+    const f=await fixture(m);delete f.selection.sdkVariants[sdk];f.metadata.lock.toolchain=structuredClone(f.selection);
+    const path=packageOnly?`libraries/${f.metadata.lock.packages['demo/mixed'].contentHash}/package.json/exports/${sdk==='0.1.0'?'old':'modern'}`:`components/${sdk==='0.1.0'?'b':'a'}/component.json`;
+    await assert.rejects(create(f),error=>{
+      assert.equal(error.code,'TOOLCHAIN_UNAVAILABLE');assert.equal(error.path,path);assert.equal(error.expected,sdk);
+      assert.ok(error.message.includes(`sdkVariants/${sdk}`));return true;
+    });
+  }
+});
+
+test('JSON capture normalizes caller exceptions without getters, coercion or thrown Proxy traps',async()=>{
+  for(const input of ['metadata','selection','manifest'])for(const operation of ['getPrototypeOf','ownKeys','getOwnPropertyDescriptor']) {
+    let calls=0;
+    const get=()=>{calls++;throw Error('Exception property executed');};
+    const hostile=Object.defineProperties({}, {message:{get},toString:{get},[Symbol.toPrimitive]:{get}});
+    const proxied=new Proxy({}, {get,getPrototypeOf:get,ownKeys:get,getOwnPropertyDescriptor:get});
+    const revoked=Proxy.revocable({},{});revoked.revoke();
+    for(const thrown of [null,undefined,false,17,1n,Symbol('error'),'limit exceeded',{}, {message:'Metadata nesting limit exceeded'},new Error('Metadata nesting limit exceeded'),hostile,proxied,revoked.proxy]) {
+      const f=await fixture(),target=input==='metadata'?f.metadata:input==='selection'?f.selection:f.pack.manifest;
+      const proxy=new Proxy(target,{[operation](){throw thrown;}});
+      if(input==='metadata')f.metadata=proxy;else if(input==='selection')f.selection=proxy;else f.pack={...f.pack,manifest:proxy};
+      await assert.rejects(create(f),error=>{assert.equal(error.code,'TOOLCHAIN_INVALID');assert.ok(error.message.length<=240);return true;});
+      assert.equal(calls,0,`${input}/${operation} must not inspect the thrown value`);
+    }
+  }
+});
+
+test('JSON capture retains genuine internal quota diagnostics at every capture callsite',async()=>{
+  for(const input of ['metadata','selection','manifest'])for(const quota of ['string','key','depth','nodes','document']) {
+    const f=await fixture();let overflow;
+    if(quota==='string')overflow='x'.repeat(65537);
+    if(quota==='key')overflow={['x'.repeat(241)]:0};
+    if(quota==='depth'){overflow={};let node=overflow;for(let i=0;i<32;i++)node=node.next={};}
+    if(quota==='nodes')overflow=Array(65536).fill(0);
+    if(quota==='document')overflow=Array(17).fill('x'.repeat(65536));
+    if(input==='metadata')f.metadata=overflow;else if(input==='selection')f.selection=overflow;else f.pack={...f.pack,manifest:overflow};
+    await assert.rejects(create(f),error=>{assert.equal(error.code,'QUOTA_EXCEEDED');assert.match(error.message,/Metadata .*limit exceeded/);return true;});
+  }
+});
+
+test('guarded JSON capture preserves frozen data, shared references and caller reflection order',async()=>{
+  const f=await fixture(),expected=await create(f);
+  f.metadata.components[ids.B].assets=f.metadata.components[ids.A].assets;
+  const freeze=value=>{if(value && typeof value==='object' && !Object.isFrozen(value)){Object.values(value).forEach(freeze);Object.freeze(value);}return value;};
+  freeze(f.metadata);freeze(f.selection);freeze(f.pack.manifest);
+  assert.equal((await create(f)).planHash,expected.planHash);
+  for(const input of ['metadata','selection','manifest'])for(const nested of [false,true]) {
+    const f=await fixture(),events=[];
+    const root=input==='metadata'?f.metadata:input==='selection'?f.selection:structuredClone(f.pack.manifest);
+    const property=input==='metadata'?'components':input==='selection'?'sdkVariants':'files';
+    const target=nested?root[property]:root;
+    const proxy=new Proxy(target,{
+      getPrototypeOf(target){events.push('prototype');return Reflect.getPrototypeOf(target);},
+      ownKeys(target){events.push('keys');return Reflect.ownKeys(target);},
+      getOwnPropertyDescriptor(target,key){events.push(`descriptor:${String(key)}`);return Reflect.getOwnPropertyDescriptor(target,key);},
+    });
+    const value=nested?{...root,[property]:proxy}:proxy;
+    snapshotJsonData(value);const expectedEvents=events.splice(0);
+    if(input==='metadata')f.metadata=value;else if(input==='selection')f.selection=value;else f.pack={...f.pack,manifest:value};
+    assert.equal((await create(f)).planHash,expected.planHash);assert.deepEqual(events,expectedEvents);
+  }
+});
+
+test('guarded JSON capture retains malformed nested shape and cycle rejection at every callsite',async()=>{
+  for(const input of ['metadata','selection','manifest'])for(const shape of ['cycle','sparse','arrayPrototype','objectPrototype','symbol','hidden','accessor','revoked']) {
+    const f=await fixture();let calls=0,value={};
+    if(shape==='cycle')value.child=value;
+    if(shape==='sparse')value=[,0];
+    if(shape==='arrayPrototype')value=Object.setPrototypeOf([],null);
+    if(shape==='objectPrototype')value=Object.create({inherited:true});
+    if(shape==='symbol')value[Symbol('hidden')]=0;
+    if(shape==='hidden')Object.defineProperty(value,'hidden',{value:0});
+    if(shape==='accessor')Object.defineProperty(value,'accessor',{enumerable:true,get(){calls++;throw Error('Getter ran');}});
+    if(shape==='revoked'){const revocable=Proxy.revocable({},{});revocable.revoke();value=revocable.proxy;}
+    const root={nested:value};
+    if(input==='metadata')f.metadata=root;else if(input==='selection')f.selection=root;else f.pack={...f.pack,manifest:root};
+    await assert.rejects(create(f),{code:shape==='cycle'?'QUOTA_EXCEEDED':'TOOLCHAIN_INVALID'});assert.equal(calls,0);
+  }
 });
 test('comparison preserves raw custom bytes and issues deterministic complete replacement proposals',async()=>{
   const plan=await create(await fixture()),observed=Object.fromEntries(plan.files.map(f=>[f.path,f.bytes.slice()]));
