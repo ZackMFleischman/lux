@@ -1,8 +1,22 @@
 # Four-workstream orchestration checkpoint
 
-The user designated this task as the sole coordinator on 13 September 2026. All four roadmap workstreams are authorized. The coordinator can make routine implementation, review and integration decisions. The phone portal works. Leave its service running.
+The user designated task `01a09baf-3806-7eb0-8bed-48b8b7f771cf` as the sole coordinator on 13 September 2026. All four roadmap workstreams are authorized. The coordinator can make routine implementation, review and integration decisions. The phone portal works. Leave its service running.
+
+Use up to the current host limit for future coordination. The current host permits
+eight total contexts, including root. The user explicitly replaced the historical
+five-context cap. Count all delivery, review, observer and unresolved launches.
+Keep one active run and serialize shared integration and graphics tests. Do not
+fill available slots with speculative work. The existing dispatch checkpoint and
+tracker record the transition from the old immutable profile to its successor.
 
 ## Next usable milestones
+
+The user's latest priority is QA and iteration on the normal creative workflow
+before additive features. Exercise start, create/edit, build, inspect, controls,
+save/reopen and invalid-edit preservation. MIDI ticket LUX-91 is paused for user
+design discussion. Select fixes from observed workflow problems. The four targets
+below remain authorized later milestones. LUX-89 startup isolation is in progress
+in a separate user task and must integrate serially with this coordinator.
 
 The user corrected the delivery workflow on 13 September 2026. Internal progress
 had outpaced usable features. The rules in `../AGENTS.md` now govern dispatch.
@@ -32,7 +46,13 @@ separately. A successful CPU test does not establish a real user demonstration.
 
 ## Ownership and historical delivery snapshot
 
-Conductor project: `34723eb7-f57d-45c3-8831-adcb2bbfe485` (LUX). Coordinator identity: `77de5ef7-a72d-43f2-8d3b-8dabbaef06f1`; live session: `27df4cd0-6ac6-41b1-b1ae-41af49240d64`; run: `345554f0-0896-4ea2-8fb4-942317f65fda`. The current registry and actual native host observations are authoritative; source checkpoints are historical snapshots.
+Conductor project: `34723eb7-f57d-45c3-8831-adcb2bbfe485` (LUX). Coordinator identity: `f261ab71-d5b4-469c-be0e-0a8632744ea6`; session: `307e0575-8e27-433b-8979-7007af80c79e`; successor run: `8629b873-e6c5-4068-a7ff-aa5937871032`. The former run `345554f0-0896-4ea2-8fb4-942317f65fda` stopped at revision 466 before the successor started. Its coordinator and child sessions are stopped and their evidence is preserved. The current registry and actual native host observations are authoritative.
+
+The fresh LUX-84 review rejected source `27dc4b9d05ede6d86c14ba1f7c053b2970fe22b6`.
+An asynchronous registry failure can omit the supervisor cleanup retry handoff.
+The source remains unchanged and is not integrated. See
+`.worktrees/_coordination/transfer-01a09baf-restart-review/review.md` for the actual
+supervisor CPU reproduction. This is a retained defect, not installed recovery QA.
 
 Every Lux ticket has an assignee. Root owns the four epics and integration tickets. Each new delivery leaf is assigned before launch; its fresh worker claims only that ticket in its recorded worktree. Reviewers use distinct identities and preserve source/plan evidence. The unassigned-ticket query returned an empty, non-truncated result during this checkpoint.
 
@@ -43,13 +63,13 @@ Every Lux ticket has an assignee. Root owns the four epics and integration ticke
 | Creative controls and inputs, LUX-4 | Mapping, live timeline and scripted fixture foundations are integrated. The cursor reentry defect is fixed. LUX-65 integrated the accepted cursor at `0725c7d6fed9969d1f43a46852049e6218c3ce1e`. | LUX-67 is in independent plan review at `4efc3929d5a42cd4ea43da2c4271964a8907fd35`. It defines a separate live transcript format and importer. Recording adapters, devices and runtime capture remain later work. |
 | Reliability, LUX-5 | R1, R2a, R2b-a, receiver comparison plan and input inventory are integrated. LUX-69 integrated the reviewed installed recovery plan at `9e7c9413843dc3fb8def7b5d81c7cc15fc7b640e`. | LUX-70 is in independent source review at `d0f01ec588b2a0b997bbb766ba1c4674d0003880`. It adds an internal restart-intent ledger. Production wiring, native authentication and physical recovery checks remain later work. LUX-59 still blocks receiver package preparation because input provenance is unresolved. |
 
-This table is a status snapshot. Read the tracker and `docs/conductor-onboarding/current-dispatch-checkpoint.json` before the next dispatch. A same-task follow-up checks the run every 15 minutes. It does not replace the live agent and claim checks.
+This table is a historical status snapshot. Read the tracker and `docs/conductor-onboarding/current-dispatch-checkpoint.json` before the next dispatch. The former coordinator's follow-up is paused. Do not restart its automation.
 
 Use Simplified Technical English where it helps in new or updated tickets, plans and handoffs. Write short sentences. Use one clear action per sentence and consistent technical terms. Put IDs, hashes, paths and evidence in separate fields. Preserve exact API names, error codes and acceptance requirements. Do not rewrite historical evidence or claim formal STE compliance.
 
 The LUX-57 correction handoff omitted the CLI `--commit` option. Its submission summary and evidence both identify the full source commit shown above. Its separate `submitted_commit` field is empty. The fresh reviewer must verify the original handoff, actual source and current specification, then record the exact commit in the ordinary structured decision. Preserve the missing field as a handoff defect. Do not change the old record, revive the worker session or infer acceptance from CLI permissiveness.
 
-The former task **Identify parallel Lux workstreams** (`01a0993a-0e08-7ec2-9455-b85075bf2b1c`) and its transferred children stopped their sessions and released claims. Preserve `.worktrees/_coordination/final-coordinator-handoff.md`; do not resume that coordinator or its stopped sessions. The immutable active run profile retains the historical two-coordinator wording, superseded by the explicit user direction above. Its current limit is five contexts including root and the required workflow improver. Do not silently change that profile or infer extra capacity from old external reservations.
+The former task **Identify parallel Lux workstreams** (`01a0993a-0e08-7ec2-9455-b85075bf2b1c`) and its transferred children stopped their sessions and released claims. Preserve `.worktrees/_coordination/final-coordinator-handoff.md`; do not resume that coordinator or its stopped sessions. The former run profile retains historical two-coordinator wording and a five-context limit. Both are superseded by the explicit user direction above. Preserve that profile as history; do not infer extra capacity from old external reservations.
 
 ## Validation and remaining boundaries
 

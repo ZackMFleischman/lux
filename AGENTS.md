@@ -23,10 +23,24 @@ All four roadmap workstreams are authorized; later slices still require their
 documented prerequisites and review. Preserve active ownership, serialize main
 integrations and graphics/Studio/Resolume tests, and do not start a second team.
 
+Use up to the current host's available agent limit. Do not impose a lower fixed
+project limit. The user replaced the historical five-context cap on 13 September
+2026. Count the coordinator, observers, reviewers, workers and starting or unknown
+contexts. Use capacity for concrete independent delivery and review. Do not fill
+slots with speculative work. When an immutable run has an obsolete limit,
+checkpoint and stop it before starting its successor at the actual host limit.
+
 ## Deliver usable features
 
 The user set this direction on 13 September 2026 after reviewing excessive
 internal work. Apply it before every plan, worker dispatch and status report.
+
+Current priority: QA and iterate on the normal creative workflow before additive
+features. Start Lux, create or edit a visual, build and inspect it, adjust controls,
+save and reopen it, and verify that an invalid edit preserves the last working
+preview and user files. Use observed problems to select fixes. MIDI work is paused
+until the user discusses and approves its design. The four workstreams remain
+authorized, but their later features do not take priority over this QA loop.
 
 - Keep one next usable milestone per workstream. State the user action, expected
   visible result and a short demonstration in its parent ticket. Read the current
