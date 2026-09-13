@@ -56,7 +56,7 @@ function ParameterRow({ definition, displayLabel, applied, owner, available, cli
   const label = <label className="parameter-name" htmlFor={`parameter-${definition.id}`} {...(definition.description ? { tabIndex: 0 } : { title: `${displayLabel}${definition.unit ? ` (${definition.unit})` : ''}` })}>{displayLabel}{definition.unit && <small> {definition.unit}</small>}</label>;
   return <div className="parameter-row" data-control-id={definition.id} data-applied-value={applied}>
     <div className="parameter-heading">
-      {definition.description ? <Tooltip title={definition.description} placement="top-start" disableInteractive slotProps={{ tooltip: { className: 'control-description-tooltip' } }}>{label}</Tooltip> : label}
+      {definition.description ? <Tooltip title={definition.description} placement="left-start" disableInteractive slotProps={{ tooltip: { className: 'control-description-tooltip' } }}>{label}</Tooltip> : label}
       <TextField id={`parameter-${definition.id}`} className="parameter-number" size="small" type="number" value={text} disabled={!available}
         slotProps={{ htmlInput: { 'aria-label': `${displayLabel} value`, min: definition.min, max: definition.max, step: definition.step ?? 'any' } }}
         onChange={event => { editing.current = true; setText(event.target.value); edits?.changed(); }}

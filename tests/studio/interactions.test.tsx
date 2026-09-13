@@ -88,7 +88,7 @@ test('RTL: control descriptions appear on hover and keyboard focus without creat
   const described = screen.getByText('Source sampling radius');
   fireEvent.mouseOver(described);
   const tooltip = await screen.findByRole('tooltip', { name: /Expands the area sampled/ });
-  assert.equal(tooltip.closest('[data-popper-placement]')?.getAttribute('data-popper-placement'), 'top-start');
+  assert.equal(tooltip.closest('[data-popper-placement]')?.getAttribute('data-popper-placement'), 'left-start');
   fireEvent.change(screen.getByRole('slider', { name: 'Source sampling radius' }), { target: { value: '2' } });
   await waitFor(() => assert.deepEqual((fixture.calls[0] as any).input.values, { samplingRadius: 2 }));
   fireEvent.mouseOut(described);
