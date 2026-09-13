@@ -32,8 +32,8 @@ server.registerTool('lux.studio.build', { description: 'Compile and preview repl
   inputSchema: sourceBuildInputSchema.shape }, async input => text(await call('build', input)));
 server.registerTool('lux.library.list',{description:'List local shared components with stable IDs, names, descriptions, and current revisions.',inputSchema:{}},async()=>text(await call('library.list')));
 server.registerTool('lux.library.read',{description:'Read one local shared component and its complete current source bundle.',inputSchema:libraryReadInputSchema.shape},async input=>text(await call('library.read',input)));
-server.registerTool('lux.library.create',{description:'Validate and build a component candidate, then create one stable local library entry at revision 1.',inputSchema:libraryCreateInputSchema.shape},async input=>text(await call('library.create',input)));
-server.registerTool('lux.library.update',{description:'Validate and build a complete replacement, then update one local library entry only when expectedRevision matches.',inputSchema:libraryUpdateInputSchema.shape},async input=>text(await call('library.update',input)));
+server.registerTool('lux.library.create',{description:'Validate and build a zero-input image-source component candidate, then create one stable local library entry at revision 1.',inputSchema:libraryCreateInputSchema.shape},async input=>text(await call('library.create',input)));
+server.registerTool('lux.library.update',{description:'Validate and build a complete zero-input image-source replacement, then update one local library entry only when expectedRevision matches.',inputSchema:libraryUpdateInputSchema.shape},async input=>text(await call('library.update',input)));
 server.registerTool('lux.studio.capture', { description: 'Return an actual 1920x1080 PNG from Lux with its frame, controls and revision metadata.', inputSchema: {} }, async () => {
   const result = await call('capture'); return { content: [{ type: 'image', mimeType: 'image/png', data: result.base64 }, { type: 'text', text: JSON.stringify(result.metadata) }] };
 });

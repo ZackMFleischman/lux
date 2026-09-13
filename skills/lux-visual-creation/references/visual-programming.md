@@ -16,7 +16,7 @@ The entry statically lists `definitions`, stable UUID `nodes`, `edges`, one `out
 
 ## Shared components
 
-The local Library stores complete SDK 0.4 component bundles under stable IDs. Use `lux.library.list` and `lux.library.read` to inspect names, descriptions, revisions, and readable source before composing with an entry. Link through `lux.studio.build.libraryLinks` using `{ componentId, mountPath }`; import the component through files mounted below that path. Two scene instances of the same linked component keep independent node UUIDs and controls.
+The local Library stores complete SDK 0.4 component bundles under stable IDs. The first connected create/update path accepts zero-input image-source components. Use `lux.library.list` and `lux.library.read` to inspect names, descriptions, revisions, and readable source before composing with an entry. Link through `lux.studio.build.libraryLinks` using `{ componentId, mountPath }`; import the component through files mounted below that path. Two scene instances of the same linked component keep independent node UUIDs and controls.
 
 Create and update are full-source operations. `lux.library.update` requires the current `expectedRevision`. Studio validates and builds the candidate before activation, so a stale revision or invalid source cannot replace the working library entry. Linked scenes store the resolved revision and mounted source. They resolve the latest revision on load or rebuild, offer Apply update while running, and fall back visibly to the saved source if the latest candidate cannot run. Forking retains those files in the scene and removes the link. The current Library is profile-local and has no remote publication or automatic source insertion.
 

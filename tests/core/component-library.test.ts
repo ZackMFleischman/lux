@@ -82,3 +82,11 @@ test('missing library data retains the saved mounted fallback and reports it exp
   assert.deepEqual(checked.source, linked.source);
   assert.deepEqual(checked.fallbacks, [{ componentId: first.id, resolvedRevision: 1, message: 'Library component is missing' }]);
 });
+
+test('checking an empty library link set does not require an SDK 0.4 scene', async () => {
+  const legacy = { sdkVersion: '0.1.0' as const, entry: 'visual.ts', files: { 'visual.ts': 'export default 1;' } };
+  const checked = await checkLibraryLinks(legacy, [], async () => { throw Error('must not read'); });
+  assert.deepEqual(checked.source, legacy);
+  assert.deepEqual(checked.updates, []);
+  assert.deepEqual(checked.fallbacks, []);
+});

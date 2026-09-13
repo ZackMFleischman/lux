@@ -98,7 +98,7 @@ export function forkLibraryComponent(scene: SourceBundle, linksValue: readonly S
   return Object.freeze({ source: admitted, links: Object.freeze(links.filter(link => link.componentId !== id)) });
 }
 export async function checkLibraryLinks(scene: SourceBundle, linksValue: readonly SceneLibraryLink[], read: (id: string) => Promise<LibraryComponent>) {
-  const admitted = validateLibrarySource(scene), links = validateSceneLibraryLinks(linksValue);
+  const admitted = structuredClone(validateSource(scene) as SourceBundle), links = validateSceneLibraryLinks(linksValue);
   const updates: Array<{ componentId: string; name: string; resolvedRevision: number; availableRevision: number }> = [];
   const fallbacks: Array<{ componentId: string; resolvedRevision: number; message: string }> = [];
   for (const link of links) {
