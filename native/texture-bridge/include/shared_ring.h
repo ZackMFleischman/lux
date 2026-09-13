@@ -5,17 +5,20 @@
 #include <stdexcept>
 #include <cstdint>
 #include <cmath>
+#include <algorithm>
+#include "host_control_snapshot_v4.h"
 namespace lux {
 constexpr LONG Free=0, Writing=1, Ready=2, Reading=3;
 struct FrameKey { uint64_t generation, outputGeneration, frame; uint32_t slot; };
 struct alignas(64) SharedSlot { volatile LONG state=Free; uint32_t width=0,height=0,format=0; uint64_t frame=0,completeQpc=0; wchar_t textureName[160]{}; };
-constexpr uint32_t RingVersion=3;
+constexpr uint32_t RingVersion=4;
+inline const ControlSchemaHashV4 LegacyControlSchema=[] {ControlSchemaHashV4 value{};const char* text="2f686a688523e2aa6e5368cd286974b87b324cfa4c67507563658b25cadd5a87";std::copy_n(text,64,value.begin());return value;}();
 // Admission and closing must share one atomic word. A separate alive check cannot
 // exclude a receiver that observed alive immediately before producer shutdown.
 constexpr LONG RingClosing=0x40000000;
-// Quiet NaN is an uninitialized snapshot, never an Intensity default. One LONG
-// publishes this scalar atomically; a fresh ring must wait for its own host.
-struct SharedRing { uint32_t version=RingVersion,pid=0; uint64_t generation=0,outputGeneration=1; LUID adapter{}; volatile LONG admissions=0; volatile LONG controlBits=0x7fc00000; SharedSlot slots[3]; };
+// Ring v4 carries one locked full host snapshot, including an initialized empty
+// schema. Legacy scalar helpers below adapt one explicit legacy descriptor.
+struct SharedRing { uint32_t version=RingVersion,pid=0; uint64_t generation=0,outputGeneration=1; LUID adapter{}; volatile LONG admissions=0; HostControlsV4 controls; SharedSlot slots[3]; };
 inline bool beginRead(SharedRing& r) {
  LONG observed=InterlockedCompareExchange(&r.admissions,0,0);
  for(;;) {
@@ -32,13 +35,13 @@ inline bool closeAdmission(SharedRing& r) {
 }
 inline bool isClosing(SharedRing& r) {return (InterlockedCompareExchange(&r.admissions,0,0)&RingClosing)!=0;}
 inline bool readHostControl(SharedRing& r,float& value) {
- const LONG bits=InterlockedCompareExchange(&r.controlBits,0,0);
- memcpy(&value,&bits,sizeof(value));
- return !isClosing(r)&&std::isfinite(value)&&value>=0&&value<=1;
+ HostControlSnapshotV4 snapshot;
+ if(isClosing(r)||tryReadHostControlsV4(r.controls,LegacyControlSchema,1,snapshot)!=HostControlStatusV4::Ok)return false;
+ value=snapshot.values[0];return true;
 }
 inline void publishHostControl(SharedRing& r,float value) {
  if(!std::isfinite(value)||value<0||value>1||isClosing(r))return;
- LONG bits;memcpy(&bits,&value,sizeof(bits));InterlockedExchange(&r.controlBits,bits);
+ uint64_t sequence;tryPublishHostControlsV4(r.controls,LegacyControlSchema,std::span<const float>(&value,1),sequence);
 }
 inline bool transition(SharedSlot& slot,LONG from,LONG to) {return InterlockedCompareExchange(&slot.state,to,from)==from;}
 inline bool retire(SharedRing& r,FrameKey k) {if(k.slot>=3||r.generation!=k.generation||r.outputGeneration!=k.outputGeneration||r.slots[k.slot].frame!=k.frame)return false;return transition(r.slots[k.slot],Reading,Free);}

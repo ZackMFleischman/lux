@@ -5,6 +5,7 @@
 #include <cmath>
 using namespace ffglex;
 extern "C" __declspec(dllexport) const char LuxInstalledSourceProtocol[]="lux-installed-source-protocol-v1";
+extern "C" __declspec(dllexport) const char LuxInstalledParameterProtocol[]="lux-installed-source-protocol-v2-ring-v4";
 namespace {
 struct Descriptor {
  std::optional<lux::InstalledSource> source;std::string error;
@@ -17,11 +18,13 @@ class LuxSource : public CFFGLPlugin {
   FFGLShader shader;
   FFGLScreenQuad quad;
   lux::FrameReceiver receiver;
-  std::atomic<float> intensity{0.65f};
   GLint imageLocation=-1,availableLocation=-1;
   bool initialized=false;
  public:
-  LuxSource(){SetMinInputs(0);SetMaxInputs(0);receiver.configureInstalled(descriptor.source);if(descriptor.source){intensity=0.5f;receiver.setIntensity(0.5f);}SetParamInfof(0,"Intensity",FF_TYPE_STANDARD);}
+  LuxSource(){SetMinInputs(0);SetMaxInputs(0);receiver.configureInstalled(descriptor.source);
+   if(descriptor.source&&descriptor.source->version==2){for(unsigned i=0;i<descriptor.source->controls.size();++i)SetParamInfof(i,descriptor.source->controls[i].label.c_str(),FF_TYPE_STANDARD);}
+   else SetParamInfof(0,"Intensity",FF_TYPE_STANDARD);
+  }
   FFResult InitGL(const FFGLViewportStruct* viewport) override {
     if(!descriptor.error.empty()){OutputDebugStringA(descriptor.error.c_str());return FF_FAIL;}
     if(initialized)return FF_SUCCESS;
@@ -59,9 +62,8 @@ void main(){color=available!=0?texture(image,vec2(uv.x,1.0-uv.y)):vec4(0);}
   }
   FFResult DeInitGL() override {receiver.stop();shader.FreeGLResources();quad.Release();initialized=false;return FF_SUCCESS;}
   FFResult SetFloatParameter(unsigned int index,float value) override {
-    if(index||!std::isfinite(value))return FF_FAIL;
-    intensity=std::clamp(value,0.0f,1.0f);receiver.setIntensity(intensity);return FF_SUCCESS;
+    return receiver.setParameter(index,value)?FF_SUCCESS:FF_FAIL;
   }
-  float GetFloatParameter(unsigned int) override{return intensity;}
+  float GetFloatParameter(unsigned int index) override{return receiver.parameter(index);}
 };
 static CFFGLPluginInfo info(PluginFactory<LuxSource>,descriptor.source?descriptor.source->pluginId.c_str():"LX02",descriptor.source?descriptor.source->name.c_str():"Lux TR02 Probe",2,1,0,2,FF_SOURCE,"Lux source runtime","Lux");

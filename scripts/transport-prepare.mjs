@@ -5,11 +5,10 @@ import { SceneFileStore } from '../packages/core/src/scene-file.ts';
 import { compileVisual } from '../apps/build-worker/src/compile.mjs';
 import { linkRuntime } from '../apps/build-worker/src/link-runtime.mjs';
 import releaseIO from '../tools/gpu-spike/transport-release.cjs';
-import { assertLegacyPlaybackSource } from '../apps/studio/src/source/asset-playback.ts';
+import { reconcileControlValues } from '../packages/runtime-contracts/src/parameters.mjs';
 
 export async function prepareTransportScene(filename, directory = 'artifacts/transport') {
   const { document } = await new SceneFileStore().open(filename);
-  assertLegacyPlaybackSource(document.source);
   const { settings } = document;
   if (settings.width !== 1920 || settings.height !== 1080 || settings.fps !== 60) throw Error('Transport currently requires 1920×1080 at 60 fps');
   const dependencyRoot = await realpath(fileURLToPath(new URL('../node_modules', import.meta.url)));
@@ -23,7 +22,8 @@ export async function prepareTransportScene(filename, directory = 'artifacts/tra
   try { await writeFile(output, bytes, { flag: 'wx' }); }
   catch (error) { if (error.code !== 'EEXIST') throw error; }
   releaseIO.readTransportRelease(output);
-  return { path: output, sourceHash: release.sourceHash, linkedHash: linked.linkedHash, settings };
+  const savedControls=linked.linkedVersion===3?reconcileControlValues(document.controls.schema,document.controls.values,linked.controls).values:document.controls;
+  return { path: output, sourceHash: release.sourceHash, linkedHash: linked.linkedHash, settings,savedControls };
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   if (!process.argv[2]) { console.error('Usage: pnpm transport:prepare <saved.lux-scene> [output-directory]'); process.exitCode = 2; }

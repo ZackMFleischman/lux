@@ -2,9 +2,9 @@
 const id = /^[a-f0-9]{64}$/, instance = /^[a-f0-9]{32}$/;
 const sameInstalledPath = (a, b) => require('node:path').win32.resolve(a).toLowerCase() === require('node:path').win32.resolve(b).toLowerCase();
 function validateRequest(value, runtimeId) {
-  if (!value || value.version !== 1 || !id.test(value.runtimeId) || value.runtimeId !== runtimeId || !id.test(value.releaseId) ||
+  if (!value || ![1,2].includes(value.version) || !id.test(value.runtimeId) || value.runtimeId !== runtimeId || !id.test(value.releaseId) ||
       !instance.test(value.instanceId) || !Number.isSafeInteger(value.hostPid) || value.hostPid < 1 ||
-      Object.keys(value).sort().join() !== 'hostPid,instanceId,releaseId,runtimeId,version') throw Error('Invalid installed instance request');
+      (value.version===2&&!id.test(value.descriptorHash))||Object.keys(value).sort().join() !== (value.version===2?'descriptorHash,hostPid,instanceId,releaseId,runtimeId,version':'hostPid,instanceId,releaseId,runtimeId,version')) throw Error('Invalid installed instance request');
   return value;
 }
 // All time values are the supervisor's monotonic clock, never child wall time.
@@ -64,7 +64,7 @@ class InstanceRegistry {
       if (this.closed) break;
       if (this.draining.has(key)) continue;
       let entry = this.entries.get(key);
-      if (entry && (entry.request.releaseId !== value.releaseId || entry.request.hostPid !== value.hostPid)) {
+      if (entry && (entry.request.releaseId !== value.releaseId || entry.request.hostPid !== value.hostPid || entry.request.descriptorHash!==value.descriptorHash)) {
         this.errors.set(key, 'Instance identity cannot change while attached'); continue;
       }
       if (!entry) {

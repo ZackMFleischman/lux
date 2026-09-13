@@ -1,4 +1,5 @@
 const installed = (globalThis as any).luxInstalledContext;
+const parameterProtocol='lux-parameter-render-host-v1';
 if (installed && installed.protocol !== 'lux-installed-render-host-v2') throw Error('Installed render-host protocol mismatch');
 if (!installed && (!process.env.LUX_EXPERIMENT_RUN_ID || process.env.LUX_EXPERIMENT_MODE !== 'hardware')) {
   throw Error('Reviewed experiment supervisor required');
@@ -100,14 +101,17 @@ app.whenReady().then(async () => {
   win.webContents.setFrameRate(60);
   await win.loadFile(path.join(__dirname, release ? 'compiled-output.html' : 'output.html'));
   record({ kind: 'gpu', info: await app.getGPUInfo('complete') });
+  const generic=release?.linked.linkedVersion===3;
+  if(generic)bridge.configureControls(release.linked.controlSchemaHash,release.linked.controls.length);
   if (installed) bridge.advertise(installed.rendezvous); else bridge.advertise();
   let lastHostControl: number | undefined;
   const startup = release ? new HostStartup({revisionId:release.sourceHash,
-    init:value=>win.webContents.executeJavaScript('window.startVisual(' + JSON.stringify(release) + ',' + value + ')'),
-    update:value=>win.webContents.executeJavaScript('window.setIntensity(' + value + ')'),
+    ...(generic?{schema:release.linked.controls,schemaHash:release.linked.controlSchemaHash}:{}),
+    init:value=>win.webContents.executeJavaScript('window.startVisual(' + JSON.stringify(release) + ',' + JSON.stringify(value) + ')'),
+    update:value=>win.webContents.executeJavaScript((generic?'window.setParameters(':'window.setIntensity(') + JSON.stringify(value) + ')'),
     observe:value=>record({kind:'host-control',value}), stopped:()=>session.stopping||finishing,
     promote:(initial,value)=>{
-      record({kind:'initial-frame',intensity:value,sourceHash:release.sourceHash,frameId:initial.frameId,controlSequence:initial.controlSequence});
+      record({kind:'initial-frame',controls:initial.controls,controlSchemaHash:initial.controlSchemaHash,sourceHash:release.sourceHash,frameId:initial.frameId,controlSequence:initial.controlSequence});
       visualReady=true;webgpuReady=true;progress.observe(initial.frameId,performance.now());win.webContents.startPainting();
       if(!playback&&!process.env.LUX_RESOLUME_PID)win.webContents.executeJavaScript('window.captureVisual()').then(capture=>{
         fs.writeFileSync(path.join(output,'worker.png'),Buffer.from(capture.bytes));record({kind:'capture',...capture.metadata});

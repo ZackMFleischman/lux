@@ -46,7 +46,7 @@ test('agent bridge round-trips complete Unicode source and rejects oversized rea
     assert.equal((await fetch(bridge.url, { method: 'POST', headers, body: malformed })).status, 400);
   } finally { bridge.close(); }
 });
-test('compile accepts v2 admission while export entry points still reject before producing legacy payloads', async () => {
+test('asset export reaches validation and invalid source never publishes a transport', async () => {
   const compiled = spawnSync(process.execPath, ['scripts/studio-compile.mjs'], { input: JSON.stringify(source), encoding: 'utf8', windowsHide: true, timeout: 10000 });
   assert.equal(compiled.status, 0, compiled.stderr);
   const result = JSON.parse(compiled.stdout); assert.equal(result.ok, false);
@@ -56,10 +56,10 @@ test('compile accepts v2 admission while export entry points still reject before
     const document = createSceneDocument(source, { width: 1920, height: 1080, fps: 60, seed: 0 }, { intensity: 0.5 });
     const path = join(directory, 'scene.lux-scene'), output = join(directory, 'output');
     await new SceneFileStore().saveAs(path, document);
-    await assert.rejects(prepareTransportScene(path, output), /Asset export is not available/);
+    await assert.rejects(prepareTransportScene(path, output), /Entry must export default/);
     await assert.rejects(access(output));
     await assert.rejects(exportSceneDocument({ name: 'Image', document, outputDirectory: directory }, {
-      prepare: async () => assert.fail('unsupported assets must not reach preparation'), exporter: async () => assert.fail('must not publish'),
-    }), /Asset export is not available/);
+      prepare: async () => {throw Error('invalid asset scene source');}, exporter: async () => assert.fail('must not publish'),
+    }), /invalid asset scene source/);
   } finally { await rm(directory, { recursive: true, force: true }); }
 });
