@@ -1,8 +1,8 @@
 const requireFact=(value,message)=>{if(!value)throw Error(message);};
 const ticks=value=>{if(typeof value!=='string'||!/^(0|[1-9][0-9]{0,19})$/.test(value)||BigInt(value)>0xffffffffffffffffn)throw Error('Invalid QPC ticks');return BigInt(value);};
 const id=value=>typeof value==='string'&&/^[a-f0-9]{32}$/.test(value);
-/** Independent main-observed create entry to confirmed producer Job exit. The
- * console delivery timestamp is not exact worker hang onset. No rendered frame
+/** Conservative pre-GO origin to confirmed producer Job exit. The separate
+ * console marker confirms entry but is not the timing origin. No rendered frame
  * or recovery image is expected from this deliberately pre-ready fixture. */
 export function inspectNativeInitStop({experiment,armed,marker,lifecycle,expected}){
  requireFact(experiment?.outcome==='success'&&experiment.cleanupComplete===true&&experiment.result?.cleanupComplete===true&&experiment.result.exitCode===0&&experiment.result.timeout===false&&experiment.result.cancelled===false,'Supervised completion/cleanup failed');

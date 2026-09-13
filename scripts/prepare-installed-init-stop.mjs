@@ -13,6 +13,7 @@ const source=validateSource({sdkVersion:'0.2.0',entry:'visual.ts',files:{'visual
 const scene={format:'lux-scene',version:3,source,settings:{width:1920,height:1080,fps:60,seed:0},controls:{sourceHash,schema:[],schemaHash:hash(canonicalControlSchemaJson([])),values:{}}};
 const scenePath=path.join(out,'scene.lux-scene');fs.writeFileSync(scenePath,JSON.stringify(scene,null,2)+'\n',{flag:'wx'});
 assert.ok(fs.readFileSync(path.join(root,'apps/render-host/src/main.cjs'),'utf8').includes('lux-installed-init-hang-probe-v1'),'Emit the reviewed diagnostic main before export');
+for(const [name,token] of [['main.cjs',"'armed'"],['compiled-output.html','window.goInitProbe'],['compiled-worker.js','init-probe-go']])assert.ok(fs.readFileSync(path.join(root,'apps/render-host/src',name),'utf8').includes(token),'Missing emitted handshake: '+name);
 const exported=await exportResolume({scenePath,name:'Lux Init Stop QA',outputDirectory:path.join(out,'packages'),root});
 const verified=packageIO.validatePackage(exported.path);assert.equal(verified.release.sourceHash,sourceHash);assert.deepEqual(verified.release.controls,[]);assert.deepEqual(verified.release.savedControls,{});
 const local=path.join(out,'profile/local'),installRoot=path.join(local,'Lux/Installed'),installed=packageIO.installPackage(exported.path,installRoot);
@@ -32,6 +33,6 @@ const inputs=[...files(exported.path),...files(installed.runtimePath),...files(i
  ...['launch.mjs','inspect.mjs','configuration.json'].map(n=>path.join(out,n)),path.resolve(path.dirname(host),'../../../tools/gpu-spike/standalone_host.cc')];
 const records=[...new Set(inputs)].map(digest),binary=r=>/\.(exe|dll|node|pak|bin|asar|dat)$/i.test(r.path);
 const review={schema:1,preparedUtc:new Date().toISOString(),authorized:false,reviewer:null,expiresUtc:null,hostClosedConfirmed:false,
- hypothesis:'Pinned create-loop fixture emits a pre-ready entry marker; independent supervisor force-stops that producer Job within2seconds while native callbacks continue.',
+ hypothesis:'Persisted pre-GO QPC conservatively precedes the pinned create-loop; entered marker confirms execution, and independent supervisor force-stops that producer Job within2seconds of pre-GO while native callbacks continue.',
  executable:host,args:[registered.dllPath,c.final],sources:records.filter(r=>!binary(r)),binaries:records.filter(binary),limits:c.limits};
 fs.writeFileSync(path.join(out,'review-request.json'),JSON.stringify(review,null,2)+'\n');console.log(JSON.stringify({review:path.join(out,'review-request.json'),...exported,sourceHash,sources:review.sources.length,binaries:review.binaries.length},null,2));
