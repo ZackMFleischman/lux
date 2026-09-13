@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { normalizeControlDeclarations, canonicalControlSchemaJson } from '../../packages/runtime-contracts/src/parameters.mjs';
+import {validateControlSnapshot} from '../../packages/runtime-contracts/src/parameters.mjs';
+import mapping from '../../tools/gpu-spike/parameter-mapping.cjs';
 import registration from '../../packages/export/src/register.cjs';
 import startup from '../../tools/gpu-spike/host-startup.cjs';
 import fs from 'node:fs';
@@ -25,6 +27,23 @@ test('v2 installed descriptor preserves ordered mapping, adapted unique labels a
   assert.notEqual(rows[0].split('\t')[1],rows[1].split('\t')[1]);
   assert.equal(Number(rows[0].split('\t')[2]),0.75);
   assert.equal(Number(rows[1].split('\t')[2]),0.5);
+});
+test('normalized endpoints preserve exact decimal bounds and wide finite ranges',async()=>{
+ const schema=normalizeControlDeclarations({gain:{type:'number',label:'Gain',min:-2,max:0.1,default:0},wide:{type:'number',label:'Wide',min:-1e307,max:1e307,default:0}});
+ const expected=hash(canonicalControlSchemaJson(schema));
+ for(const u of [0,0.5,1]){
+  const values=mapping.mapHostSnapshot(schema,expected,{initialized:true,count:2,schemaHash:expected,sequence:'1',values:[u,u]});
+  assert.doesNotThrow(()=>validateControlSnapshot(schema,values));if(u===1)assert.equal(values.gain,0.1);
+ }
+ assert.equal(mapping.parameterMapping(schema,{gain:0.1,wide:0},expected)[1].initial,0.5);
+ let promoted;
+ const host=new startup.HostStartup({revisionId:'decimal',schema,schemaHash:expected,
+  init:async values=>{validateControlSnapshot(schema,values);return {type:'ready',revisionId:'decimal',frameId:'1',controls:values,controlSchemaHash:expected};},
+  update:async values=>validateControlSnapshot(schema,values),observe:()=>{},promote:(_frame,values)=>promoted=values,stopped:()=>false});
+ await host.apply({initialized:true,count:2,schemaHash:expected,sequence:'1',values:[1,0.5]});
+ assert.equal(promoted.gain,0.1);
+ await host.apply({initialized:true,count:2,schemaHash:expected,sequence:'2',values:[0,0]});
+ await host.apply({initialized:true,count:2,schemaHash:expected,sequence:'3',values:[1,1]});
 });
 
 test('host startup maps an atomic normalized tuple and verifies first-frame full values',async()=>{

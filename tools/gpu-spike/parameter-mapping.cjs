@@ -21,7 +21,10 @@ function mapHostSnapshot(schema,expectedHash,snapshot){
  if(snapshot.count!==schema.length||!Array.isArray(snapshot.values)||snapshot.values.length!==schema.length||
   typeof snapshot.sequence!=='string'||!(/^[1-9][0-9]{0,19}$/).test(snapshot.sequence)||BigInt(snapshot.sequence)>0xffffffffffffffffn)throw Error('Invalid host snapshot');
  const values={};
- schema.forEach((row,index)=>{const value=snapshot.values[index];if(!Number.isFinite(value)||value<0||value>1)throw Error('Invalid normalized host value');values[row.id]=row.min+value*(row.max-row.min);});
+ schema.forEach((row,index)=>{const value=snapshot.values[index];if(!Number.isFinite(value)||value<0||value>1)throw Error('Invalid normalized host value');
+  // Preserve declared endpoints exactly; intermediate floating point rounding must stay in range.
+  values[row.id]=value===0?row.min:value===1?row.max:Math.min(row.max,Math.max(row.min,row.min+value*(row.max-row.min)));
+ });
  return values;
 }
 module.exports={parameterMapping,mapHostSnapshot,schemaHash,policy};
