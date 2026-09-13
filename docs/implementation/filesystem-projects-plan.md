@@ -10,23 +10,23 @@
 
 **Spec:** [Filesystem project architecture](../design/filesystem-projects.md). Its schemas and transaction semantics are authoritative for this plan. [Review record](../reviews/filesystem-projects-review.md) must have no unresolved blocking findings before implementation begins.
 
-**Planning status:** all three independent reviews and correction rechecks passed; see the review record. Implementation has not begun.
+**Planning status:** all three independent reviews and correction rechecks passed; see the review record. Preimplementation baseline refreshed against `409c2d7e2ec83871cc88e04798bee8d9f42406e6` on 13 September 2026 UTC in `codex/filesystem-projects`. Task 1a's pure metadata foundation is implemented and awaiting independent implementation review; Slice 1 remains in progress. The tracer preview closeout supersedes the former tracer-completion prerequisite; outstanding show-readiness measurements retain their deferred status.
 
 ## Scope and baseline
 
 This is the first project-workflow checkpoint after the tracer. It does not reopen tracer completion or imply project storage already exists. The first deliverable supports multiple scenes, each referencing a single code component, project-local shared definitions and exact vendored dependencies; graph composition and library publishing UI remain later work. Preserve a standalone `.lux-scene` interchange path.
 
-At planning time, active integration is `codex/tracer-0.1`, with isolated parameter and codec work ahead of it. Before coding, identify the final integrated commits and refresh this inventory:
+The execution baseline is the integrated tracer preview at `409c2d7` (see [closeout](tracer-preview-closeout.md)). Named numeric parameters, v3 saved-control provenance, BMP/PNG/JPEG admission and the admission worker are present. Directory project services remain unimplemented. This inventory describes current implementation rather than the earlier pending integration branches:
 
 | Existing path | Current responsibility | Integration rule |
 | --- | --- | --- |
-| `packages/core/src/scene-document.ts`, `scene-file.ts` | Portable bundled scene schemas and conflict-checked disk save | Keep compatibility; add directory project services beside these, not by reinterpreting old scene versions. Integrate the pending v3 control provenance work first. |
+| `packages/core/src/scene-document.ts`, `scene-file.ts` | Portable v1/v2/v3 scene schemas, `SavedControlSnapshot` verification and conflict-checked disk save | Keep compatibility; add directory project services beside these, not by reinterpreting old scene versions. Reuse `verifySavedControlSnapshot` and preserve older valid source provenance. |
 | `apps/studio/src/source/workspace.ts`, `authoring-session.ts` | Whole-source draft, saved/running distinction, editor selection and save/build coordination | Add a project-backed adapter; preserve the standalone adapter and per-file CodeMirror history. |
 | `apps/studio/src/source/CodeEditor.tsx`, `SourcePanel.tsx` | Text editing and file/asset views | Project file paths identify buffers; UI layout is not document ownership. |
 | `apps/studio/src/main.ts`, `preload.ts`, `agent-bridge.ts` | Privileged I/O, trusted IPC and local agent bridge | Move new filesystem operations behind focused project handlers; do not put filesystem authority in the renderer. |
-| `apps/studio/src/standalone-client.ts`, `controls/` | Candidate activation, generic properties and runtime snapshots in the parameter integration branch | Adapt the candidate lifecycle for prepare/activate/abort; do not implement a second rendering path. |
+| `apps/studio/src/standalone-client.ts`, `controls/` | Integrated candidate activation, generic numeric properties, migration and runtime snapshots | Adapt the candidate lifecycle for prepare/activate/abort; those are not yet separately exposed project ports. Do not implement a second rendering path. |
 | `apps/build-worker/src/source-policy.mjs`, `compile.mjs`, `link-runtime.mjs`, `artifact-identity.mjs` | Bounded source admission, contained compiler, linker and sealed artifacts | Resolver emits a normal accepted SourceBundle; disk paths and project tsconfig cannot expand imports. Preserve SDK 0.1/0.2 and asset versions. |
-| `packages/assets/src/`, pending admission worker | Original-byte and codec validation | Reuse off-UI admission; do not decode unchanged assets during typing or watcher events. |
+| `packages/assets/src/`, `apps/studio/src/source/admission*.mjs` | Original-byte BMP/PNG/JPEG validation and dedicated worker admission | Reuse the integrated codec/media/path contract and existing image quotas. The architecture's earlier BMP-only baseline prose is historical; do not narrow delivered format support. Reuse off-UI admission; do not decode unchanged assets during typing or watcher events. |
 | `scripts/studio-mcp.mjs`, `packages/visual-sdk/src/discovery.mjs` | Source/control operations and checkout SDK discovery | Add negotiated project capability and locations without breaking standalone tools. |
 | `packages/export/src/`, `scripts/studio-export.mjs` | Immutable exported closure | Export accepted scene closure only; never enumerate mutable project files at host startup. |
 
@@ -95,10 +95,14 @@ Use separate worktrees for independent slices. Freeze contracts after slice 1. F
 
 **Deliverable:** strict schemas matching the architecture and fixtures for two scenes sharing one component, a unique component, nested helpers, one pinned library dependency, assets and named controls.
 
-- [ ] Write negative fixtures: duplicate IDs, stale references, unsupported versions, duplicate/case-colliding paths, extra fields, bad pins, missing dependency closure malformed schema hashes/control caches, legacy-v1 versus empty-assets-v2 distinction, and mixed-SDK imports. Valid prior-source control provenance is not itself an error.
-- [ ] Implement bounded raw duplicate-key-aware JSON parsing before object/schema validation; include literal duplicate-key, deep nesting, oversized string and invalid UTF-8 fixtures. Implement and export the exact manifest/session/candidate contracts, quotas and deterministic hash-body format. Use explicit versioned identity bodies rather than arbitrary JSON property order.
-- [ ] Test that display renames preserve IDs, reference changes alter the relevant content identity, and invalid metadata cannot invoke submitted code.
-- [ ] Run `node --test tests/project/contracts.test.ts`; review schema examples against the architecture and commit.
+**Initial execution checkpoint (Task 1a):** pure metadata admission, neutral UUID brands, bounded raw JSON parsing, exact package metadata and executable fixtures are implemented; see the [metadata v1 addendum](../design/filesystem-project-metadata-v1.md) for the concrete parser, package, identity and admission policy. Focused CPU tests and repository typecheck are the acceptance evidence for this checkpoint; independent implementation review remains required. No project service is implemented and the whole slice remains incomplete. Specify and review the architecture's currently prose-only auxiliary DTOs (buffer/location/reference-index/diff/job state, internal candidate and resolved accepted scene) before their first consuming task; export no permissive placeholders. Freeze metadata contracts after review before resolver/tooling consumers, and freeze the remaining wire/store contracts before their corresponding consumers begin.
+
+- [x] Write metadata negative fixtures: duplicate IDs, stale references, unsupported versions, duplicate/case-colliding paths, extra fields, bad pins, missing dependency closure, malformed schema hashes/control caches, legacy-v1 versus empty-assets-v2 distinction, and mixed-SDK references. Valid prior-source control provenance is not itself an error. Source import resolution tests remain Slice 3.
+- [x] Implement bounded raw duplicate-key-aware JSON parsing before object/schema validation, exact metadata schemas, available metadata quotas and versioned metadata/inventory/package identity bodies. Include literal/escaped duplicate keys, nesting, node/key/string/byte boundaries and invalid UTF-8 fixtures.
+- [ ] Specify, review and implement remaining session/candidate/wire/store contracts and identity bodies before their consumers.
+- [x] Test that display renames preserve IDs, reference changes alter relevant content identity, and own-data admission does not execute submitted getters/iterators. Raw JSON is the primary boundary; arbitrary Proxy immunity is not claimed.
+- [x] Run focused metadata tests and repository typecheck; provide `scripts/test-project-cpu.mjs` for executable inventory now. Package runner integration remains Slice 11.
+- [ ] Complete independent implementation review and all remaining Slice 1 contracts before claiming interface freeze.
 
 ## Slice 2: safe filesystem capabilities and complete inventory
 
