@@ -21,3 +21,11 @@ Run `node apps/studio/build.mjs`, then each separately:
 Both passed without page errors. Reports and screenshots are local generated artifacts under `.worktrees/parameter-integration/artifacts/studio-parameters/` and `artifacts/studio-common-images/`; the harness recreates them. Studio CPU/DOM/worker/performance runner and Studio typecheck passed; export/install/registry suite passed 40 tests. Native build passed before the subsequent telemetry review fixes, whose rebuilt check is recorded separately.
 
 Still required: installed image/control playback, host alpha composition, complete performance/overhead measurements, and physical failure/recovery acceptance. The implementation must not turn missing or unverified evidence into a pass.
+
+## Stable-checkout follow-up
+
+`60297e1` removes an extra full-frame delay after drawing. Real stable Studio then reproduced React maximum-update-depth errors twice: per-frame synchronous external-store notifications overwhelmed pending UI work. `2f4a511` caches and coalesces frame/metric observations at the React boundary (100 ms), preserving immediate control/playback/owner/fault/job updates and unchanged raw agent/capture state.
+
+Stable `b0a844f` passed the complete parameter harness with zero page errors, including 24 monitor toggles over sustained playing output. The final short interval observed 58.3 worker fps with zero lost/invalid records; this is functional evidence, not a 60 Hz host acceptance run. All five property rows remained 46 CSS pixels. Three coalescing/urgency/lifecycle unit tests and Studio typecheck passed. The original integrated run and the final stable run use separate artifact directories; latest stable output is `.worktrees/tracer/artifacts/studio-parameters/result.json`.
+
+The [installed native image check](installed-image.md) additionally verifies the packaged PNG output and supervised cleanup. Actual Resolume and full performance/recovery gates remain open.
