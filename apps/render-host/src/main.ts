@@ -57,7 +57,15 @@ function publishHealth() {
   const state = {version:2, attemptId:installed.attemptId, sequence:++healthSequence,workerHeartbeat,
     ready:visualReady && completedFrames > 0, frameId:progress.frame.toString(), completedFrames, backpressureFrames};
   const temporary = installed.healthPath + '.tmp';
-  fs.writeFileSync(temporary, JSON.stringify(state)); fs.renameSync(temporary, installed.healthPath);
+  fs.writeFileSync(temporary, JSON.stringify(state));
+  try { fs.renameSync(temporary, installed.healthPath); }
+  catch (error) {
+    // A Windows reader may briefly hold the destination open. Keep the last
+    // published sample; the next heartbeat retries with current counters.
+    // Replayed samples cannot renew the supervisor's existing deadlines.
+    if (['EPERM', 'EACCES', 'EBUSY'].includes(error?.code)) return false;
+    throw error;
+  }
 }
 // Start reporting before Electron startup awaits. The supervisor owns the
 // deadline if this main event loop or a native driver call stops responding.
