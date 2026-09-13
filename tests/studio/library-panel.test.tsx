@@ -30,6 +30,12 @@ test('library panel offers explicit apply and fork actions with visible fallback
  fireEvent.click(screen.getByRole('button',{name:'Apply update'}));fireEvent.click(screen.getByRole('button',{name:'Fork Shared Violet'}));
  await waitFor(()=>assert.deepEqual(actions,['apply',`fork:${id}`]));
 });
+test('a missing library entry keeps its linked fork action short and reachable',async()=>{
+ const missing='99999999-9999-4999-8999-999999999999',actions:string[]=[];const component={id,revision:1,name:'Shared Violet',description:'A reusable violet image.',updatedAt:'2026-09-13T20:00:00.000Z',source};
+ const client={list:async()=>[],read:async()=>component,copyRequest:async()=>'request',create:async()=>component,update:async()=>component};
+ render(<LibraryPanel client={client} links={[{componentId:missing,mountPath:'library/missing',resolvedRevision:3,files:['library/missing/component.ts']}]} updates={[]} fallbacks={[]} onApplyUpdates={async()=>{}} onFork={value=>actions.push(value)} onError={reason=>assert.fail(String(reason))}/>);
+ fireEvent.click(await screen.findByRole('button',{name:'Fork',exact:true}));assert.deepEqual(actions,[missing]);assert.ok(screen.getByText(`${missing} · revision 3`));
+});
 test('refresh advances the selected summary and readable source together',async()=>{
  let current={id,revision:1,name:'Shared Violet',description:'A reusable violet image.',updatedAt:'2026-09-13T20:00:00.000Z',source};
  const client={list:async()=>[current],read:async()=>current,copyRequest:async()=>'request',create:async()=>current,update:async()=>current};

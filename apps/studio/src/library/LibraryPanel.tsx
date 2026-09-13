@@ -26,7 +26,7 @@ export function LibraryPanel({client,links,updates,fallbacks,refreshKey=0,onAppl
     <div className="library-files" role="navigation" aria-label="Component source files">{Object.keys(selected.source.files).map(path=><Button key={path} aria-pressed={file===path} onClick={()=>setFile(path)}>{path}</Button>)}</div>
     <pre tabIndex={0} aria-label={`${file} source`}><code>{selected.source.files[file]}</code></pre></>:<p className="hint">Select a component to read its source.</p>}
   </div></div>
-  {links.length>0&&<section className="library-links"><h3>Linked in this scene</h3>{links.map(link=><div key={link.componentId}><span>{names.get(link.componentId)??link.componentId} · revision {link.resolvedRevision}</span><Button onClick={()=>onFork(link.componentId)}>Fork {names.get(link.componentId)??link.componentId}</Button></div>)}</section>}
+  {links.length>0&&<section className="library-links"><h3>Linked in this scene</h3>{links.map(link=>{const name=names.get(link.componentId);return <div key={link.componentId}><span>{name??link.componentId} · revision {link.resolvedRevision}</span><Button onClick={()=>onFork(link.componentId)}>Fork{name?` ${name}`:''}</Button></div>;})}</section>}
   {message&&<p role="status">{message}</p>}
  </section>;
 }
