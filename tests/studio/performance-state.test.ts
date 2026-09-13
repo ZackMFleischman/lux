@@ -5,6 +5,21 @@ import { createFrameCollector } from '../../packages/performance/live.mjs';
 const owner={instanceId:'instance',generation:1,revisionId:'revision'};
 function sample(){const c=createFrameCollector({startMs:0});c.record(20,1,2,3,4,false);return c.summary(500);}
 
+test('routine receiver rejects populations impossible under one-in-thirty sampling',()=>{
+ const collector=createFrameCollector({startMs:0});
+ for(let frame=1;frame<=60;frame++){collector.record(frame,frame,1,2,3,false);collector.recordGpu(frame,1,true);}
+ const valid=collector.summary(500,{timestampQuerySupported:true,timestampQueryEnabled:true});
+ assert.equal(valid.gpu.expectedCount,2);
+ assert.equal(new PerformanceReceiver(owner,0).receive(valid,10),true);
+ for(const expectedCount of [3,60]){
+  const forged={...valid,gpu:{...valid.gpu,sampleCount:expectedCount,expectedCount,missingCount:0}};
+  assert.equal(new PerformanceReceiver(owner,0).receive(forged,10),false);
+ }
+ // A summary may begin on any sampling phase, including just before frame 31.
+ const phased=createFrameCollector({startMs:0});phased.record(20,30,1,2,3,false);phased.record(21,31,1,2,3,false);phased.recordGpu(31,1,true);
+ assert.equal(new PerformanceReceiver(owner,0).receive(phased.summary(500,{timestampQuerySupported:true,timestampQueryEnabled:true}),10),true);
+});
+
 test('receiver accepts explicit baseline and sampled routine summaries without accepting false full coverage',()=>{
  const baseline=createFrameCollector({startMs:0,mode:'baseline'});baseline.record(20,1);
  const r=new PerformanceReceiver(owner,0);assert.equal(r.receive(baseline.summary(500,{timestampQuerySupported:true}),10),true);

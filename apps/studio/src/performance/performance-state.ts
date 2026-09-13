@@ -1,5 +1,5 @@
 import type { FrameSummary, LiveMetric } from '../../../../packages/performance/live.mjs';
-import { GPU_SAMPLING_POLICY } from '../../../../packages/performance/collection-mode.mjs';
+import { GPU_SAMPLE_EVERY, GPU_SAMPLING_POLICY } from '../../../../packages/performance/collection-mode.mjs';
 export type PerformanceOwner=Readonly<{instanceId:string;generation:number;revisionId:string}>;
 export type PerformanceSnapshot=Readonly<{
  owner:PerformanceOwner;status:'pending'|'live'|'stale'|'failed';observedAtMs:number|null;worker:FrameSummary|null;
@@ -46,6 +46,9 @@ function summary(raw:any):FrameSummary {
  if(gpu.timestampQueryEnabled?gpu.timestampQuerySupported!==true||gpu.availability==='unsupported':gpu.availability!=='unsupported'||gpu.sampleCount!==0||gpu.validity!=='incomplete')throw Error('Invalid GPU coverage');
  if(gpu.sampleCount>raw.retainedRecords)throw Error('Invalid GPU samples');
  if(gpu.expectedCount>result.produced.expectedCount||gpu.validity==='complete'||gpu.samplingPolicy!==(raw.mode==='baseline'?'none':GPU_SAMPLING_POLICY))throw Error('Invalid GPU coverage count');
+ // This receiver consumes consecutive completed worker frames. An interval can
+ // start on any phase, but cannot contain more than ceil(N/30) eligible frames.
+ if(raw.mode==='routine'&&gpu.expectedCount>Math.ceil(result.produced.expectedCount/GPU_SAMPLE_EVERY))throw Error('Invalid GPU sampling population');
  if(raw.mode==='baseline'&&(gpu.timestampQueryEnabled||gpu.expectedCount!==0||gpu.failedSamples!==0||gpu.droppedSamples!==0||gpu.pendingSamples!==0))throw Error('Invalid baseline GPU timing');
  result.gpu=Object.freeze({...metric(gpu,'ms'),timestampQuerySupported:gpu.timestampQuerySupported,timestampQueryEnabled:gpu.timestampQueryEnabled,failedSamples:gpu.failedSamples,droppedSamples:gpu.droppedSamples,pendingSamples:gpu.pendingSamples});
  return Object.freeze(result);
