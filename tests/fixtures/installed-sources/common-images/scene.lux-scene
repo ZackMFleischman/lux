@@ -20,7 +20,7 @@
     "width": 1920,
     "height": 1080,
     "fps": 60,
-    "seed": 42
+    "seed": 0
   },
   "controls": {
     "intensity": 0.5
