@@ -2,6 +2,19 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGpuPassTimer } from '../../packages/performance/gpu-pass.mjs';
 
+test('offset reference probing preserves the unchanged real routine query schedule',async()=>{
+ const f=fixture(),reference=[],routine=[];
+ const ref=createGpuPassTimer(f.device,(frame)=>{reference.push(frame+15);return true;});
+ const normal=createGpuPassTimer(f.device,(frame)=>{routine.push(frame);return true;});
+ for(let frame=1;frame<=61;frame++){
+  if(frame>=16)ref.begin(frame-15);normal.begin(frame);const encoder=f.device.createCommandEncoder();encoder.beginRenderPass({}).end();f.device.queue.submit([encoder.finish()]);
+  normal.end();ref.end();await f.flush();
+ }
+ assert.deepEqual(routine,[1,31,61]);assert.deepEqual(reference,[16,46]);
+ assert.equal(ref.status().failedSamples,0);assert.equal(normal.status().failedSamples,0);
+ normal.dispose();ref.dispose();
+});
+
 test('baseline leaves GPU APIs untouched and allocates no query resources',()=>{
  const f=fixture(),encoder=f.device.createCommandEncoder,submit=f.device.queue.submit;
  const timer=createGpuPassTimer(f.device,()=>assert.fail('No baseline GPU samples'),{mode:'baseline'});
