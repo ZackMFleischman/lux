@@ -91,3 +91,7 @@ target_include_directories(lux_frame_telemetry_test PRIVATE texture-bridge/inclu
 target_compile_features(lux_frame_telemetry_test PRIVATE cxx_std_20)
 target_compile_options(lux_frame_telemetry_test PRIVATE /UNDEBUG)
 add_test(NAME frame_telemetry_cpu COMMAND lux_frame_telemetry_test)
+add_executable(lux_pixel_marker_test tests/pixel_marker_test.cc)
+target_compile_features(lux_pixel_marker_test PRIVATE cxx_std_20)
+target_compile_options(lux_pixel_marker_test PRIVATE /UNDEBUG)
+add_test(NAME pixel_marker_cpu COMMAND lux_pixel_marker_test)

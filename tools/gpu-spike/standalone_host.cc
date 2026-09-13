@@ -11,6 +11,7 @@
 #include <string>
 #include <filesystem>
 #include "standalone_alpha.h"
+#include "pixel-marker.h"
 extern "C" __declspec(dllexport) DWORD NvOptimusEnablement=1;
 int main(int argc,char** argv) {
   // Refuse unsupervised launches before creating a window or touching the driver.
@@ -30,10 +31,13 @@ int main(int argc,char** argv) {
   const char* recoveryText=std::getenv("LUX_STANDALONE_RECOVERY_CONTROL");
   const bool recovery=recoveryText&&std::strcmp(recoveryText,"1")==0;
   if((recoveryText&&!recovery)||(recovery&&!hang)){std::cerr<<"Recovery probe requires hang mode\n";return 2;}
-  const long probeWorkLimit=recovery?15000:10000;
+  const char* pixelText=std::getenv("LUX_STANDALONE_PIXEL_CONTROL");
+  const bool pixelProbe=pixelText&&std::strcmp(pixelText,"1")==0;
+  if((pixelText&&!pixelProbe)||(pixelProbe&&(alpha||hang||recovery))){std::cerr<<"Invalid pixel probe mode\n";return 2;}
+  const long probeWorkLimit=(recovery||pixelProbe)?15000:10000;
   std::string hangMarker;
   LARGE_INTEGER frequency{};QueryPerformanceFrequency(&frequency);
-  if(alpha||hang){
+  if(alpha||hang||pixelProbe){
     const char* outerText=std::getenv("LUX_EXPERIMENT_TIMEOUT_MS");char* outerEnd=nullptr;
     const long outer=outerText?std::strtol(outerText,&outerEnd,10):0;
     if(duration>probeWorkLimit||outer<1000||outer>30000||!outerEnd||*outerEnd||std::strlen(runId)>128||std::strspn(runId,"0123456789abcdefABCDEF-")!=std::strlen(runId)){
@@ -54,8 +58,8 @@ int main(int argc,char** argv) {
   }
   if(argc==2&&std::strcmp(argv[1],"--validate-options")==0){std::cout<<"options valid, no graphics initialized\n";return 0;}
   if(argc<2){std::cerr<<"DLL path required\n";return 2;}
-  const std::string capturePath=argc>2?argv[2]:"standalone.rgba",probePath=capturePath+(hang?".hang.json":".alpha.json");
-  if((alpha||hang)&&(argc<3||GetFileAttributesA(capturePath.c_str())!=INVALID_FILE_ATTRIBUTES||GetFileAttributesA(probePath.c_str())!=INVALID_FILE_ATTRIBUTES)){
+  const std::string capturePath=argc>2?argv[2]:"standalone.rgba",probePath=capturePath+(pixelProbe?".pixels.json":hang?".hang.json":".alpha.json");
+  if((alpha||hang||pixelProbe)&&(argc<3||GetFileAttributesA(capturePath.c_str())!=INVALID_FILE_ATTRIBUTES||GetFileAttributesA(probePath.c_str())!=INVALID_FILE_ATTRIBUTES)){
     std::cerr<<"Alpha probe requires fresh explicit capture/evidence paths\n";return 2;
   }
   WNDCLASSW wc{};wc.style=CS_OWNDC;wc.lpfnWndProc=DefWindowProcW;wc.hInstance=GetModuleHandle(nullptr);wc.lpszClassName=L"LuxStandaloneGL";RegisterClassW(&wc);
@@ -77,6 +81,11 @@ int main(int argc,char** argv) {
   uint64_t readyAt=0,triggerAt=0,disarmAt=0,callbacksAfterMarker=0;
   bool recovered=false;uint64_t recoveredAt=0;float currentNormalizedValue=-1;
   unsigned char initialRGBA[4]{},recoveredRGBA[4]{};
+  struct PixelSample{uint64_t sequence,before,after,readStart,readEnd;lux::probe::MarkerPixels rgba;};
+  struct PixelControl{unsigned step;uint64_t due,before,after;bool accepted;};
+  std::vector<PixelSample> pixelSamples;std::vector<PixelControl> pixelControls;
+  if(pixelProbe){pixelSamples.reserve(1024);pixelControls.reserve(8);}
+  bool pixelReady=false,pixelComplete=false;uint64_t pixelSchedule=0,pixelLost=0;
   auto qpc=[](){LARGE_INTEGER at{};QueryPerformanceCounter(&at);return uint64_t(at.QuadPart);};
   auto setArm=[&](float normalized){SetParameterStruct parameter{};parameter.ParameterNumber=0;
     std::memcpy(&parameter.NewParameterValue.UIntValue,&normalized,sizeof(normalized));FFMixed input{};input.PointerValue=&parameter;
@@ -84,10 +93,25 @@ int main(int argc,char** argv) {
   lux::probe::Quartet whitePixels{};
   auto bindRead=[&](){glBindFramebuffer(GL_FRAMEBUFFER,fbo);glReadBuffer(GL_COLOR_ATTACHMENT0);};
   auto quarters=[&](){lux::probe::Quartet samples{};bindRead();unsigned row=0;for(int y:{270,810})for(int x:{480,1440})glReadPixels(x,1079-y,1,1,GL_RGBA,GL_UNSIGNED_BYTE,samples[row++].data());return samples;};
-  if(alpha||hang){glDisable(GL_BLEND);glDisable(GL_FRAMEBUFFER_SRGB);bindRead();if(glCheckFramebufferStatus(GL_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE||glGetError()!=GL_NO_ERROR)result=9;}
-  while(!result&&elapsed()<(hang?duration-25:duration)) {
-    if(alpha||hang){glDisable(GL_BLEND);glDisable(GL_FRAMEBUFFER_SRGB);glBindFramebuffer(GL_FRAMEBUFFER,fbo);}
+  if(alpha||hang||pixelProbe){glDisable(GL_BLEND);glDisable(GL_FRAMEBUFFER_SRGB);bindRead();if(glCheckFramebufferStatus(GL_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE||glGetError()!=GL_NO_ERROR)result=9;}
+  while(!result&&elapsed()<((hang||pixelProbe)?duration-25:duration)) {
+    if(alpha||hang||pixelProbe){glDisable(GL_BLEND);glDisable(GL_FRAMEBUFFER_SRGB);glBindFramebuffer(GL_FRAMEBUFFER,fbo);}
+    const auto callbackBefore=pixelProbe?qpc():0;
     value.PointerValue=&process;if(main(FF_PROCESS_OPENGL,value,instance).UIntValue!=FF_SUCCESS){result=6;break;}++count;
+    if(pixelProbe){
+      PixelSample sample{};sample.sequence=count;sample.before=callbackBefore;sample.after=qpc();
+      if(pixelSamples.size()==1024){++pixelLost;result=13;break;}
+      std::array<unsigned char,1920*4> strip{};bindRead();sample.readStart=qpc();glReadPixels(0,540,1920,1,GL_RGBA,GL_UNSIGNED_BYTE,strip.data());sample.readEnd=qpc();
+      if(glGetError()!=GL_NO_ERROR){result=9;break;}
+      for(unsigned i=0;i<32;++i)std::memcpy(sample.rgba[i].data(),strip.data()+(i*60+30)*4,4);
+      pixelSamples.push_back(sample);lux::probe::PixelMarker marker;
+      const bool decoded=lux::probe::decodeMarker(sample.rgba,marker);
+      if(!pixelReady&&decoded){if(marker.step!=0){result=13;break;}pixelReady=true;pixelSchedule=qpc();}
+      if(pixelReady&&pixelControls.size()<8){const auto due=pixelSchedule+pixelControls.size()*uint64_t(frequency.QuadPart)/2;
+        if(qpc()>=due){PixelControl control{};control.step=unsigned(pixelControls.size()+1);control.due=due;control.before=qpc();control.accepted=setArm(float(control.step)/8.0f);control.after=qpc();pixelControls.push_back(control);if(!control.accepted){result=13;break;}}
+      }
+      if(decoded&&marker.step==8&&pixelControls.size()==8){pixelComplete=true;break;}
+    }
     if(hang){
       if(disarmSubmitted)++callbacksAfterMarker;
       if(!hangReady){
@@ -133,16 +157,22 @@ int main(int argc,char** argv) {
   if(alpha&&(!whiteSeen||!setAccepted||!transparentSeen)&&!result){std::cerr<<"Alpha control/pixel deadline exceeded\n";result=10;}
   if(hang&&(!hangReady||!armAccepted||!disarmSubmitted||!callbacksAfterMarker)&&!result){std::cerr<<"Hang readiness/marker/disarm deadline exceeded\n";result=12;}
   if(recovery&&!recovered&&!result){std::cerr<<"Recovered cyan image deadline exceeded\n";result=12;}
+  if(pixelProbe&&(!pixelReady||!pixelComplete||pixelControls.size()!=8)&&!result){std::cerr<<"Pixel correlation deadline exceeded\n";result=13;}
   // One diagnostic capture only. Not transport or performance evidence.
-  if(!result&&!hang){
+  if(!result&&!hang&&!pixelProbe){
     std::vector<unsigned char> pixels(1920*1080*4);if(alpha)bindRead();glReadPixels(0,0,1920,1080,GL_RGBA,GL_UNSIGNED_BYTE,pixels.data());
     if(alpha&&glGetError()!=GL_NO_ERROR)result=9;
     if(alpha){lux::probe::Quartet samples{};unsigned row=0;for(int y:{270,810})for(int x:{480,1440})std::memcpy(samples[row++].data(),pixels.data()+((1079-y)*1920+x)*4,4);if(!lux::probe::matches(samples,lux::probe::transparent))result=10;}
     if(!result){std::ofstream file(capturePath,std::ios::binary);file.write(reinterpret_cast<char*>(pixels.data()),pixels.size());file.close();if(!file)result=11;}
     std::cout<<"callbacks "<<count<<" centerRGBA ";for(int i=0;i<4;++i)std::cout<<int(pixels[(540*1920+960)*4+i])<<" ";std::cout<<"\n";
   }
-  const auto workElapsed=elapsed();if((alpha||hang)&&workElapsed>probeWorkLimit&&!result)result=10;
+  const auto workElapsed=elapsed();if((alpha||hang||pixelProbe)&&workElapsed>probeWorkLimit&&!result)result=10;
   auto evidence=[&](bool deinstantiated,bool deinitialized){
+    if(pixelProbe){
+      std::ofstream file(probePath);file<<"{\"mode\":\"pixel-correlation-v1\",\"runId\":\""<<runId<<"\",\"hostPid\":"<<GetCurrentProcessId()<<",\"ok\":"<<(!result&&deinstantiated&&deinitialized?"true":"false")<<",\"deinstantiated\":"<<(deinstantiated?"true":"false")<<",\"deinitialized\":"<<(deinitialized?"true":"false")<<",\"elapsedMs\":"<<workElapsed<<",\"lostRecords\":"<<pixelLost<<",\"clock\":{\"domain\":\"qpc\",\"frequency\":\""<<frequency.QuadPart<<"\"},\"controls\":[";
+      for(size_t i=0;i<pixelControls.size();++i){if(i)file<<',';const auto& c=pixelControls[i];file<<"{\"step\":"<<c.step<<",\"due\":\""<<c.due<<"\",\"before\":\""<<c.before<<"\",\"after\":\""<<c.after<<"\",\"accepted\":"<<(c.accepted?"true":"false")<<'}';}file<<"],\"samples\":[";
+      for(size_t i=0;i<pixelSamples.size();++i){if(i)file<<',';const auto& s=pixelSamples[i];file<<"{\"sequence\":"<<s.sequence<<",\"before\":\""<<s.before<<"\",\"after\":\""<<s.after<<"\",\"readStart\":\""<<s.readStart<<"\",\"readEnd\":\""<<s.readEnd<<"\",\"rgba\":[";for(unsigned j=0;j<32;++j){if(j)file<<',';file<<'[';for(unsigned c=0;c<4;++c){if(c)file<<',';file<<unsigned(s.rgba[j][c]);}file<<']';}file<<"]}";}file<<"]}\n";file.close();if(!file&&!result)result=11;return;
+    }
     if(hang){
       std::ofstream file(probePath);file<<"{\"runId\":\""<<runId<<"\",\"ok\":"<<(!result&&deinstantiated&&deinitialized?"true":"false")<<",\"hostPid\":"<<GetCurrentProcessId()<<",\"deinstantiated\":"<<(deinstantiated?"true":"false")<<",\"deinitialized\":"<<(deinitialized?"true":"false")<<",\"elapsedMs\":"<<workElapsed<<",\"ready\":"<<(hangReady?"true":"false")<<",\"armAccepted\":"<<(armAccepted?"true":"false")<<",\"disarmSubmitted\":"<<(disarmSubmitted?"true":"false")<<",\"callbacksAfterMarker\":"<<callbacksAfterMarker<<",\"clock\":{\"domain\":\"qpc\",\"frequency\":\""<<frequency.QuadPart<<"\"},\"readyAt\":\""<<readyAt<<"\",\"triggerAt\":\""<<triggerAt<<"\",\"disarmAt\":\""<<disarmAt<<"\",\"recoveryMode\":"<<(recovery?"true":"false")<<",\"recovered\":"<<(recovered?"true":"false")<<",\"recoveredAt\":\""<<recoveredAt<<"\",\"currentNormalizedValue\":"<<(recovered?0:-1)<<",\"initialRGBA\":[";
       for(unsigned c=0;c<4;++c){if(c)file<<',';file<<unsigned(initialRGBA[c]);}file<<"],\"recoveredRGBA\":[";
