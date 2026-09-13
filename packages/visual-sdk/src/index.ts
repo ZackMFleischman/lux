@@ -12,6 +12,7 @@ export interface FrameContext {
 export interface VisualContext {
   readonly settings: Readonly<OutputSettings>;
   readonly assets: ReadonlyMap<string, Readonly<Uint8Array>>;
+  readonly images: ReadonlyMap<string, Readonly<{ width: number; height: number; colorSpace: 'srgb'; alphaMode: 'straight'; data: Uint8Array }>>;
   random(): number;
   reportError(message: string): void;
   readonly renderer: { render(scene: unknown, camera: unknown, target: OutputTarget): void | Promise<void> };
