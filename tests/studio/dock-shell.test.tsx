@@ -91,7 +91,15 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   assert.equal(screen.queryByRole('button', { name: 'Play' }), null);
   await act(async () => { fireEvent.keyDown(window, { key: 'Escape' }); });
   assert.ok(canvas.closest('.studio-dock-grid'));
-  await click('Maximize'); await click('Restore workspace');
+  await click('Maximize');
+  await click('Show Inspector');
+  const maximizedIntensity = screen.getByRole('slider', { name: 'Intensity' });
+  await click('Hide Inspector');
+  assert.equal(maximizedIntensity.closest('.studio-expanded-pane'), null);
+  await click('Show Inspector');
+  assert.equal(screen.getByRole('slider', { name: 'Intensity' }), maximizedIntensity);
+  assert.equal(maximizedIntensity.closest('.studio-expanded-pane')?.hasAttribute('hidden'), false);
+  await click('Restore workspace');
   await act(async () => { snapshot = { ...snapshot, authoring: { ...runtime, frameId: '11' } }; for (const listener of listeners) listener(); });
   await click('Open Inspector');
   assert.ok(screen.getByText('11'));

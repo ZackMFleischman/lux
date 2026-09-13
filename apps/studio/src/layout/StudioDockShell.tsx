@@ -16,7 +16,7 @@ const storage: LayoutStorage = {
 };
 /** The portals own real panes above Dockview mounts. Reparenting their host preserves
  * the same canvas, editor/undo, subscriptions and React state even through closure. */
-export function StudioDockShell({ compact, toolsHost, ...content }: { compact: boolean; toolsHost?: HTMLElement | null } & Record<Kind, ReactNode>) {
+export function StudioDockShell({ compact, showInspector, toolsHost, ...content }: { compact: boolean; showInspector: boolean; toolsHost?: HTMLElement | null } & Record<Kind, ReactNode>) {
   const [mode] = useState<'desktop' | 'laptop'>(() => window.innerWidth < 1100 ? 'laptop' : 'desktop');
   const [name, setName] = useState('Default'), [message, setMessage] = useState('');
   const [panel, setPanel] = useState<Kind>('source'), [reference, setReference] = useState<Kind>('preview');
@@ -41,6 +41,10 @@ export function StudioDockShell({ compact, toolsHost, ...content }: { compact: b
     const destination = compact ? expanded.current : slots.current.preview;
     if (destination) destination.append(hosts.preview); else hosts.preview.remove();
   }, [compact, hosts]);
+  useLayoutEffect(() => {
+    const destination = compact && showInspector ? expanded.current : slots.current.inspector;
+    if (destination) destination.append(hosts.inspector); else hosts.inspector.remove();
+  }, [compact, hosts, showInspector]);
   function action(run: (value: LuxDockviewAdapter) => void) {
     try { if (!adapter.current) throw Error('Layout is loading'); run(adapter.current); }
     catch (reason) { setMessage(String(reason)); }
@@ -67,7 +71,7 @@ export function StudioDockShell({ compact, toolsHost, ...content }: { compact: b
 
     <div className="studio-dock-grid" hidden={compact}><LuxDockLayout registry={registry} panels={panels} storage={storage} nonce={nonce} mode={mode}
       onReady={(value, result) => { adapter.current = value; if (result.reason && result.reason !== 'No saved personal layout') setMessage(result.reason); }} /></div>
-    <div className="studio-expanded-pane" hidden={!compact} ref={expanded} />
+    <div className={`studio-expanded-pane ${showInspector ? 'studio-expanded-with-inspector' : ''}`} hidden={!compact} ref={expanded} />
     {kinds.map(kind => createPortal(content[kind], hosts[kind], kind))}
   </div>;
 }
