@@ -211,3 +211,11 @@ test('retiring an already faulted owner cancels its queued automatic retry',asyn
  const f=fixture(t),worker=await f.start();worker.reply({type:'failure',message:'failed'});onlyQueuedRetry(f.scheduled);
  (f.client as any).stop((f.client as any).running,'owner retired');await f.advance(1000);assert.equal(WorkerFixture.all.length,1);assert.equal(f.scheduled.size,0);
 });
+for(const playback of ['playing','paused'] as const)test(`automatic recovery preserves acknowledged ${playback} state without replaying pending transport`,async t=>{
+ const f=fixture(t),worker=await f.start();worker.reply({playback});
+ const state=f.client.getSnapshot().authoring!;
+ const pending=assert.rejects(f.client.invoke({name:'lux.playback',input:{requestId:'pending-transport',instanceId:state.instanceId,expectedGeneration:state.generation,action:playback==='playing'?'pause':'play'}}),/failed/);
+ worker.reply({type:'failure',message:'failed'});await pending;await f.advance(250);
+ const retry=WorkerFixture.all.at(-1)!;assert.equal(retry.init.playing,playback==='playing');
+ retry.reply({type:'ready',playback});await f.flush();assert.equal(f.client.getSnapshot().authoring!.playback,playback);
+});
