@@ -44,3 +44,18 @@ capture identity/timing and failed cleanup. The native matcher was also compiled
 and CPU-tested independently. Actual Resolume composition, JPEG rendering in the
 host, multiple live controls, updated-runtime recovery, complete GPU cleanup and
 performance gates remain separate.
+
+## Prepared actual Resolume check
+
+After the native probe, the unchanged package was installed with its packaged
+headless installer into `C:/Users/zFlei/AppData/Local/Lux/Installed` and registered
+as **Lux Image Tracer** (FFGL ID `51ZR`) in
+`C:/Users/zFlei/Documents/Resolume Avenue/Extra Effects`. Installation exited 0;
+existing named releases/plugins were preserved. Resolume was closed. This is
+installation evidence, not actual Resolume playback acceptance.
+
+Native desktop UI automation is unavailable in this session; the user was asked
+for a short manual check: load above a solid-color lower layer, change Backdrop
+from 1 to 0, inspect transparent/partial/opaque regions, save and reopen the
+composition with Studio absent. Package-only dependency checks and this reopen
+must not be described as a physically absent-checkout test.
