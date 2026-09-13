@@ -2,20 +2,23 @@
 // desktop bridge is exposed here. The parent owns termination and promotion.
 import { RuntimeClock } from '../../../packages/runtime/src/clock.ts';
 import { SeededRandom } from '../../../packages/runtime/src/seed.ts';
+import { loadAuthoredModule } from './authored-worker-assets.mjs';
+import { prepareWorkerControlState } from './controls/worker-control-state.mjs';
+const freeze=Object.freeze;
 let identity, renderer, device, visual, clock, random, settings, outputTarget, presentation;
-let controls = { intensity: 0.5 }, sequence = 0, frame = 0, tick = 0, lastTime = 0;
+let controlState, frame = 0, tick = 0, lastTime = 0;
 let stopped = false, timer, heartbeat, chain = Promise.resolve();
 const send = (type, extra = {}) => postMessage({ type, ...identity, ...extra });
-function state() { return { ...clock.snapshot(), frameId: String(frame), controlSequence: sequence, intensity: controls.intensity }; }
+function state() { return { ...clock.snapshot(), frameId: String(frame),...controlState.state() }; }
 function failure(error, requestId) {
   stopped = true; clearTimeout(timer); clearInterval(heartbeat);
   send('failure', { requestId, code: 'RUNTIME_FAILED', message: String(error?.message || error).slice(0, 2000) });
 }
 async function draw(requestId, type = 'frame') {
   const time = clock.snapshot();
-  visual.update(Object.freeze({ tick: tick++, timeSeconds: time.timeSeconds,
-    deltaSeconds: Math.max(0, time.timeSeconds - lastTime), controls: Object.freeze({ ...controls }), events: Object.freeze([]) }));
-  await visual.render(Object.freeze({ width: settings.width, height: settings.height, colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }));
+  visual.update(freeze({ tick: tick++, timeSeconds: time.timeSeconds,
+    deltaSeconds: Math.max(0, time.timeSeconds - lastTime), controls: controlState.values(), events: freeze([]) }));
+  await visual.render(freeze({ width: settings.width, height: settings.height, colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }));
   await device.queue.onSubmittedWorkDone();
   lastTime = time.timeSeconds; frame++;
   send(type, { requestId, ...state(), timeSeconds: time.timeSeconds });
@@ -30,15 +33,14 @@ async function initialize(message) {
   settings = message.settings;
   if (!settings || settings.width !== 1920 || settings.height !== 1080 || settings.fps !== 60 ||
       !Number.isInteger(settings.seed) || settings.seed < 0 || settings.seed > 0xffffffff) throw Error('Unsupported output settings');
-  if (typeof message.moduleSource !== 'string' || message.moduleSource.length > 16777216) throw Error('Invalid linked module');
-  if (!Number.isFinite(message.controls?.intensity) || message.controls.intensity < 0 || message.controls.intensity > 1) throw Error('Invalid intensity');
-  controls = { intensity: message.controls.intensity };
+  controlState=await prepareWorkerControlState(message);
   clock = new RuntimeClock(() => performance.now(), 'paused'); random = new SeededRandom(settings.seed);
   heartbeat = setInterval(() => send('heartbeat', { frameId: String(frame) }), 250);
-  const url = URL.createObjectURL(new Blob([message.moduleSource], { type: 'text/javascript' }));
-  let module;
-  try { module = await import(url); } finally { URL.revokeObjectURL(url); }
-  if (module.default?.sdkVersion !== '0.1.0' || typeof module.default.create !== 'function') throw Error('Invalid visual definition');
+  const {module,assets} = await loadAuthoredModule(message, async moduleSource => {
+    const url = URL.createObjectURL(new Blob([moduleSource], { type: 'text/javascript' }));
+    try { return await import(url); } finally { URL.revokeObjectURL(url); }
+  });
+  const create=controlState.checkDefinition(module);
   if (!navigator.gpu) throw Error('WebGPU is unavailable');
   const adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
   if (!adapter) throw Error('No WebGPU adapter available');
@@ -52,9 +54,9 @@ async function initialize(message) {
   const material = new module.MeshBasicNodeMaterial();
   material.fragmentNode = module.sampleTexture(outputTarget.texture);
   presentation = new module.QuadMesh(material);
-  visual = await module.default.create(Object.freeze({ settings: Object.freeze({ ...settings }), assets: new Map(),
+  visual = await create(freeze({ settings: freeze({ ...settings }), assets,
     random: () => random.next(), reportError: value => { throw Error(String(value)); },
-    renderer: Object.freeze({ render: (scene, camera) => {
+    renderer: freeze({ render: (scene, camera) => {
       renderer.setRenderTarget(outputTarget); renderer.render(scene, camera);
       renderer.setRenderTarget(null); presentation.render(renderer);
     } }) }));
@@ -69,9 +71,7 @@ onmessage = event => {
     if (!identity && message?.type === 'init') return initialize(message);
     if (stopped || !identity || message.instanceId !== identity.instanceId || message.generation !== identity.generation) return;
     if (message.type === 'controls') {
-      if (!Number.isSafeInteger(message.controlSequence) || message.controlSequence <= sequence ||
-          !Number.isFinite(message.values?.intensity) || message.values.intensity < 0 || message.values.intensity > 1) throw Error('Invalid control snapshot');
-      controls = { intensity: message.values.intensity }; sequence = message.controlSequence;
+      controlState.apply(message.values,message.controlSequence,message.controlSchemaHash);
       await draw(message.requestId, 'status'); schedule();
     } else if (message.type === 'playback') {
       if (!['play', 'pause', 'reset'].includes(message.action)) throw Error('Invalid playback command');

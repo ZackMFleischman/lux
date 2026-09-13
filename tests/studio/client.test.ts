@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createDisconnectedClient, StudioController } from '../../apps/studio/src/service-client.ts';
 import type { StudioClient, StudioSnapshot, StudioOperation } from '../../apps/studio/src/service-client.ts';
+import { normalizeControlDeclarations } from '../../packages/runtime-contracts/src/parameters.mjs';
 
 const connected = (): StudioSnapshot => ({
   connection: 'connected', message: null, receivedAtMs: 1000,
@@ -88,4 +89,19 @@ test('a value queued at acknowledgement is not erased by drain cleanup', async (
   const last = new Promise<void>(resolve => queueMicrotask(() => queueMicrotask(() => { void controller.setIntensity(0.9).then(() => resolve()); })));
   await Promise.all([first, last]);
   assert.equal(operations.length, 2);
+});
+
+test('generic parameter coalescing preserves different keys and original schema guards', async()=>{
+  const controlSchema=normalizeControlDeclarations({height:{type:'number',label:'Height',default:1,min:0,max:4},speed:{type:'number',label:'Speed',default:0.5,min:0,max:2}});
+  const snapshot:StudioSnapshot={...connected(),authoring:{...connected().authoring!,sdkVersion:'0.2.0',controlSchema,controlSchemaHash:'a'.repeat(64),controls:{height:1,speed:0.5},controlSequence:0,intensity:undefined}};
+  const operations:StudioOperation[]=[], complete:Array<()=>void>=[];
+  const client:StudioClient={getSnapshot:()=>snapshot,subscribe:()=>()=>{},invoke:operation=>{operations.push(operation);return new Promise(resolve=>complete.push(()=>resolve({})));}};
+  const controller=new StudioController(client);
+  const writes=[controller.setParameters({height:2}),controller.setParameters({height:3}),controller.setParameters({speed:1.5})];
+  assert.equal(operations.length,1); complete.shift()!(); await new Promise(resolve=>setImmediate(resolve));
+  const last=operations[1]!; assert.equal(last.name,'lux.parameters.set');
+  if(last.name==='lux.parameters.set') {assert.deepEqual(last.input.values,{height:3,speed:1.5});assert.equal(last.input.expectedControlSchemaHash,'a'.repeat(64));}
+  complete.shift()!(); await Promise.all(writes);
+  await assert.rejects(controller.setParameters({intensity:0.5}),/unknown/i);
+  assert.deepEqual(snapshot.authoring!.controls,{height:1,speed:0.5});
 });

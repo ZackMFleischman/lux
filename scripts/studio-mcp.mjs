@@ -19,7 +19,7 @@ async function call(method, params = {}) {
 const text = value => ({ content: [{ type: 'text', text: JSON.stringify(value) }] });
 server.registerTool('lux.studio.discover', { description: 'Read the exact visual SDK, example and standalone Lux capabilities. Start Lux Studio separately.', inputSchema: {} }, async () => text({ ...await discoverVisualSdk(), scope: 'standalone-studio', tools: ['read', 'build', 'capture', 'status', 'parameters', 'playback', 'restart'], resolume: false,
   sourceDocuments: { versions: [1, 2], replacement: 'complete source; preserve sourceVersion and assets when editing v2',
-    assetPlayback: false, assetFormat: 'image/bmp: 24-bit uncompressed, opaque', assetDimension: assetLimits.dimension, assetCount: assetLimits.count,
+    assetPlayback: true, assetExport: false, assetFormat: 'image/bmp: 24-bit uncompressed, opaque', assetDimension: assetLimits.dimension, assetCount: assetLimits.count,
     assetFileBytes: assetLimits.imageBytes, assetTotalBytes: assetLimits.totalBytes,
     sourceV2JsonBytes: 6291456, requestBytes: 8388608, readToolResultBytes: 16777216 } }));
 server.registerTool('lux.studio.read', { description: 'Read complete source and draft version before changing it. Preserve sourceVersion and all assets when editing v2. The complete escaped tool result is limited to 16 MiB.', inputSchema: {} }, async () => sourceReadResult(await call('read')));

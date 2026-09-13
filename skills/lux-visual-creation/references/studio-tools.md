@@ -69,3 +69,7 @@ Obtain `instanceId`, `generation`, `revisionId`, and `playback` from `status.aut
 For source edits, `structuredClone(current.source)` is a useful starting point. Modify only the intended entries in `.files`; preserve the remaining bundle. A complete-source build is atomic and version guarded. Typing through Playwright or streaming characters into the user's editor has different concurrency behavior and is not the creation path; token-by-token edit visualization is not exposed by the checked MCP API.
 
 Current tools do not expose scene Save/Open, export, resolution changes, audio inputs, or arbitrary visual-defined controls. Do not claim a tool result performed those actions. Inspect updated discovery for newer capabilities before concluding they remain unavailable.
+
+## Editor and scene commands
+
+In the Source editor, Ctrl/Cmd+S builds and applies the complete edited source bundle to preview; it does not save a single file or the scene to disk. Ctrl/Cmd+Shift+S saves the scene. File Save and Save as remain explicit scene commands. Ctrl/Cmd+F opens editor search; shortcut hints are not permanently displayed. MCP `build` still performs the same complete-source replacement and is the supported agent edit path.

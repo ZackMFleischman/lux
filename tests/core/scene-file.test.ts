@@ -6,7 +6,49 @@ import { join } from 'node:path';
 import { SceneFileStore, createSceneDocument } from '../../packages/core/src/scene-file.ts';
 import {validateSceneDocument} from '../../packages/core/src/scene-document.ts';
 import { sourceBundleSchema } from '../../packages/runtime-contracts/src/index.ts';
+import { createHash } from 'node:crypto';
+import { canonicalControlSchemaJson, normalizeControlDeclarations } from '../../packages/runtime-contracts/src/parameters.mjs';
 const document = { format: 'lux-scene', version: 1, source: { sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': '// 🌈 unfinished draft' } }, settings: { width: 1920, height: 1080, fps: 60, seed: 0 }, controls: { intensity: 0.8 } };
+
+test('scene v3 preserves empty and named caches with accepted-source provenance and assets', async () => {
+  const folder = await mkdtemp(join(tmpdir(), 'lux-parameters-scene-'));
+  try {
+    for (const schema of [[], normalizeControlDeclarations({ height: { type:'number', label:'Height', min:0, max:2, default:1 } })]) {
+      const values:Record<string,number>=schema.length ? {height:1.7} : {};
+      const controls = { sourceHash:'a'.repeat(64), schema, schemaHash:createHash('sha256').update(canonicalControlSchemaJson(schema)).digest('hex'), values };
+      for (const source of [{...document.source,sdkVersion:'0.2.0' as const}, {...document.source,sdkVersion:'0.2.0' as const,sourceVersion:2 as const,assets:{}}]) {
+        const next = {...document,version:3,source,controls}, path = join(folder,'parameters.lux-scene');
+        assert.deepEqual(createSceneDocument(source,document.settings,controls),next);
+        await new SceneFileStore().saveAs(path,next);
+        assert.deepEqual((await new SceneFileStore().open(path)).document,next);
+      }
+    }
+  } finally { await rm(folder,{recursive:true,force:true}); }
+});
+
+test('scene v3 rejects malformed caches and schema hashes before replacing files', async () => {
+  const folder = await mkdtemp(join(tmpdir(), 'lux-parameters-invalid-'));
+  try {
+    const schema=normalizeControlDeclarations({height:{type:'number',label:'Height',min:0,max:2,default:1}});
+    const controls={sourceHash:'a'.repeat(64),schema,schemaHash:createHash('sha256').update(canonicalControlSchemaJson(schema)).digest('hex'),values:{height:1.5}};
+    const next={...document,version:3,source:{...document.source,sdkVersion:'0.2.0'},controls};
+    const path=join(folder,'parameters.lux-scene'),store=new SceneFileStore();
+    await store.saveAs(path,next); const before=await readFile(path);
+    for(const bad of [
+      {...next,version:1}, {...next,source:document.source},
+      ...[{...controls,schemaHash:'b'.repeat(64)},{...controls,sourceHash:'no'}, {...controls,values:{}},
+        {...controls,values:{height:3}},{...controls,values:{height:1,other:0}}, {...controls,values:Object.create({height:1})},
+        {...controls,schema:[Object.create(schema[0]!)]}, Object.defineProperty({...controls},'values',{get(){throw Error('getter invoked');}})
+      ].map(controls=>({...next,controls})),
+    ]) {
+      await assert.rejects(store.saveAs(path,bad)); assert.deepEqual(await readFile(path),before);
+    }
+    await writeFile(path,JSON.stringify({...next,controls:{...controls,schemaHash:'b'.repeat(64)}}));
+    await assert.rejects(store.open(path),/schema hash/i);
+    await writeFile(path,' '.repeat(7340032)+JSON.stringify(next));
+    await assert.rejects(store.open(path),/7 MiB/);
+  } finally { await rm(folder,{recursive:true,force:true}); }
+});
 
 test('scene v2 preserves image bytes and rejects version pairs before replacing files', async () => {
   const folder = await mkdtemp(join(tmpdir(),'lux-assets-scene-'));
@@ -59,6 +101,7 @@ test('failed replacement keeps old file and permits a later successful save', as
     await assert.rejects(store.save(opened.token, { ...document, controls: { intensity: 0.2 } }), /replacement failure/);
     assert.deepEqual(JSON.parse(await readFile(path, 'utf8')), document);
     const final = await new SceneFileStore().saveAs(path, { ...document, controls: { intensity: 0.2 } });
+    assert.equal(final.document.version,1);
     assert.equal(final.document.controls.intensity, 0.2);
   } finally { await rm(folder, { recursive: true, force: true }); }
 });

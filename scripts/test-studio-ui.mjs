@@ -46,6 +46,13 @@ try {
   assert.equal(await page.getByRole('button', { name: 'Pop out', exact: true }).count(), 0, 'unsupported popout is not an actionable control');
   report.compactGeometry = { appBar, transport };
   report.checks.push('Compact application and transport bars; unsupported popout action hidden');
+  const previewArea = await page.locator('.preview-area').boundingBox();
+  const previewSurface = await page.locator('.preview-surface').boundingBox();
+  assert.ok(previewArea && previewSurface);
+  assert.ok(Math.abs(previewArea.width - previewSurface.width) < 1 && Math.abs(previewArea.height - previewSurface.height) < 1,
+    'Preview uses the full available area without a padded inner box');
+  report.previewGeometry = { previewArea, previewSurface };
+  report.checks.push('Preview fills the available pane and retains aspect-ratio containment');
   await page.evaluate(() => {
     window.__qaCanvas = document.querySelector('.preview-surface canvas');
     window.__qaDisabled = [];
@@ -76,6 +83,28 @@ try {
   assert.deepEqual(await page.locator('.preview-surface').boundingBox(), before);
   assert.deepEqual(await page.evaluate(() => window.__qaDisabled), []);
   report.checks.push('Paused intensity changes preserve layout and transport state');
+  await page.evaluate(() => {
+    window.__qaSliderValues = [];
+    const slider = document.querySelector('input[type="range"]');
+    window.__qaSliderObserver = new MutationObserver(() => window.__qaSliderValues.push(Number(slider.getAttribute('aria-valuenow'))));
+    window.__qaSliderObserver.observe(slider, { attributes: true, attributeFilter: ['aria-valuenow'] });
+  });
+  const sliderBounds = await page.locator('.MuiSlider-root').boundingBox();
+  assert.ok(sliderBounds);
+  await page.mouse.move(sliderBounds.x + sliderBounds.width * 0.1, sliderBounds.y + sliderBounds.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(sliderBounds.x + sliderBounds.width * 0.9, sliderBounds.y + sliderBounds.height / 2, { steps: 40 });
+  await page.mouse.up();
+  const draggedValue = Number(await slider.inputValue());
+  await page.getByText(`Applied value: ${draggedValue.toFixed(2)}`, { exact: true }).waitFor();
+  const draggedValues = await page.evaluate(() => { window.__qaSliderObserver.disconnect(); return window.__qaSliderValues; });
+  assert.ok(draggedValues.length > 10, 'Exercise continuous pointer changes, not one final jump');
+  assert.ok(draggedValues.every((value, index) => index === 0 || value >= draggedValues[index - 1]), 'Earlier confirmations must not pull a rightward drag backwards');
+  report.sliderDrag = { samples: draggedValues.length, first: draggedValues[0], last: draggedValues.at(-1) };
+  report.checks.push('Real continuous slider drag stays monotonic while runtime acknowledgements arrive');
+  await slider.focus(); await page.keyboard.press('Home');
+  for (let i = 0; i < 8; i++) await page.keyboard.press('ArrowRight');
+  await page.getByText('Applied value: 0.08', { exact: true }).waitFor();
   await page.screenshot({ path: join(output, 'workspace.png') });
   for (let i = 0; i < 2; i++) {
     await page.getByRole('button', { name: 'Fullscreen', exact: true }).click();
@@ -125,13 +154,22 @@ try {
   assert.equal(await page.evaluate(() => window.__qaCanvas === document.querySelector('.preview-surface canvas')), true);
   await page.screenshot({ path: join(output, 'source-editor.png') });
   report.checks.push('Real CodeMirror syntax colors under CSP; helper draft and undo survive tabs and close/reopen without replacing preview');
+  const files = await page.locator('.source-files').boundingBox(), editing = await page.locator('.source-editing').boundingBox();
+  assert.ok(files && editing && files.y + files.height <= editing.y + 1, 'File navigation stays above the editor');
+  await helper.press('ControlOrMeta+s');
+  await page.getByText('Preview current', { exact: true }).waitFor();
+  assert.equal(await helper.innerText(), 'export const amount: number = 0.42;');
+  assert.equal(await page.locator('.document-name [role="button"], .document-name button, .document-name summary').count(), 0);
+  report.checks.push('Ctrl/Cmd+S builds the full source; file navigation stays compact and scene title is passive');
+  await slider.focus(); await page.keyboard.press('Home');
+  for (let i = 0; i < 8; i++) await page.keyboard.press('ArrowRight');
+  await page.getByText('Applied value: 0.08', { exact: true }).waitFor();
   // Save and reopen the actual edited scene through the File commands. Only
   // native picker responses are supplied; source/control serialization is real.
   const savedScenePath = join(output, 'creative-workflow.lux-scene');
   await app.evaluate(({ dialog }, path) => { dialog.showSaveDialog = async () => ({ canceled: false, filePath: path }); }, savedScenePath);
-  await page.locator('.file-tools summary').click();
-  await page.getByRole('button', { name: 'Save', exact: true }).click();
-  await page.waitForFunction(() => document.querySelector('.document-name')?.textContent === 'creative-workflow.lux-scene');
+  await helper.press('ControlOrMeta+Shift+s');
+  await page.waitForFunction(() => document.querySelector('.document-title')?.textContent === 'creative-workflow.lux-scene');
   const savedScene = JSON.parse(await readFile(savedScenePath, 'utf8'));
   assert.equal(savedScene.source.files['lib/qa-helper.ts'], 'export const amount: number = 0.42;');
   assert.equal(savedScene.controls.intensity, 0.08);

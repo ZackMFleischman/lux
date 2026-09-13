@@ -2,9 +2,12 @@
 
 ## Current creative-session follow-ups
 
-- [ ] C22 — NEXT AUTHORING CAPABILITY, alongside assets: code-declared per-visual live parameters. No globally required Intensity; derive Inspector and generic MCP operations from the visual declaration. Cover validation, runtime changes, persistence and export compatibility. The user's noisy sphere brief is the motivating acceptance case. Prioritize ahead of broader polish.
+- [ ] C22 — IN PROGRESS: visual_parameters_design is mapping the actual SDK/compiler/runtime/scene/host interfaces into an implementation contract in an isolated worktree. Code declares each visual's parameters; no globally required Intensity. Inspector and generic MCP operations consume that declaration. Cover validation, runtime changes, persistence and export compatibility. The user's noisy sphere brief is the motivating acceptance case.
 - [x] C23 — DONE: repo-shipped `lux-visual-creation` Codex skill (428b2de/6b7afb0), independent workflow review and corrected adapter/build guidance, CPU-compiled noise example, repeatable installer (11428ce; eight CPU tests passed), and personal installation. Installed files match the repo; Skill Creator validation passed. See [maintenance and validation](visual-creation-skill.md). Update and reinstall alongside future author-facing features. Fixed Intensity and asset limitations remain explicit; this does not close C22 or validate the template's GPU appearance.
 - User's working Studio remains available for creative use. This skill/documentation checkpoint does not launch Studio or run live MCP/graphics tests.
+
+- [ ] C24 — IN PROGRESS (BOUNDED USABILITY): editor_apply_polish implements Ctrl+S to apply the source bundle to preview, keeps explicit scene save, distinguishes the passive scene title from File/View menus, and keeps file navigation compact even in a wide editor. Isolated CPU/RTL validation first; no reload of the user's open Studio.
+- Asset delivery update: C16 preview/restart and browser implementations have completed independent review in separate worktrees (2df7baf and96cec76). Coordinator is combining them for CPU validation. C21 PNG/JPEG/alpha design is complete (a6ed354); image_codec_delivery now implements the bounded codec slice in isolation. This supersedes the older in-progress ownership entries below; no PNG/JPEG playback or GPU alpha validation is claimed yet.
 
 Started 2026-09-12 after the successful guided Resolume QA. This is the active tracker; [overnight progress](overnight-progress.md) preserves the preceding work and manual observations. Integration: `.worktrees/tracer`, branch `codex/tracer-0.1`, starting commit `26fc023`.
 
@@ -108,9 +111,11 @@ Implement a browser-compatible pure module under packages/assets for the approve
 
 User clarification: assets should be visible in Studio alongside source files. The first asset workflow includes a compact asset list with thumbnail, filename, dimensions and size; selection opens an image preview, and import/replace/remove manage the underlying document. Assets are ordinary pane content and do not become TypeScript editor tabs. This precedes full offline export acceptance rather than waiting behind it.
 
-## C19: inspector density polish — QUEUED NEAR-TERM
+## C19: inspector and status-bar density polish — QUEUED NEAR-TERM
 
 User feedback: properties should dominate the Inspector. Performance, Runtime and Host output become independently collapsible, collapsed by default, and compact when expanded. Implement as a small follow-up alongside assets, with keyboard/narrow-pane and stable-update checks. See compact-studio-audit.md and roadmap.md; no implementation claimed.
+
+User feedback, 12 September: keep the footer height compact and consolidate routine Jobs/Diagnostics summaries into a VS Code-style status bar. Show build activity, problem counts and connection/runtime health only when useful; clicking an item opens the corresponding detail view. Jobs and Diagnostics remain available as ordinary dockable panes, but should not occupy default workspace space simply to repeat idle status. Preserve stable dimensions during updates, accessible labels and keyboard access; errors remain discoverable. Implement this with the Inspector density pass after required parameters and image workflow work. Persistent editor shortcut hints are an immediate small removal; keyboard commands remain available.
 
 C11 closeout: native tests ran serially and closed owned Electron windows; process inspection showed no Electron/Avenue/Arena. Coordinator inspected desktop/laptop screenshots and independently reviewed the separate editor implementation against admission, composition and undo tests. The12-line handler fixes Chromium selected-text formatting without changing CSP. MCP restart request-to-ready sample241ms is not physical-stop/host-consumed recovery evidence. New test export remains uninstalled.
 
@@ -123,3 +128,7 @@ Integration checkpoint: C14/C15 and fixture compilation are committed; integrate
 At the user's request, launched the working tracer Studio (window PID2276, launcher27288) and verified its window responding. Freeze tracer implementation/build outputs and compile/MCP scripts while this session is in use. Automated Studio/native tests are paused until the user closes Studio and clears testing. Isolated-worktree CPU/design work may continue.
 
 C16 preview2df7baf and browser96cec76 are independently reviewed, but remain unintegrated pending native validation. PNG/JPEG and alpha remain required before the complete asset workflow is ready. The open build supports the existing procedural creation/preview/MCP/save/export path. User can begin with Build and Play; no full tracer completion is claimed.
+
+## Studio validation resumed — 12 September
+
+User ended the creative session and authorized Studio tests. Actual UI QA passed shortcut/scene-save behavior, compact files, passive title, smooth slider dragging and full-area preview/fullscreen. Actual asset QA passed GPU pixel orientation/colors, image-only source identity changes, restart, failed-build retention and scene save/reopen. These verify the bounded BMP foundation; PNG/JPEG/alpha and exported image playback remain separate outstanding gates.
