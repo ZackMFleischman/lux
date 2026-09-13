@@ -55,6 +55,33 @@ tool output and extra agents when a small local action is sufficient. The workfl
 observer must assess model choice, context size and avoidable rework in its normal
 report process. Record short reasons in existing evidence; add no routing system.
 
+### Continuous workflow fixes
+
+The workflow observer sends actionable findings to a dedicated workflow-fix
+agent. That agent maintains a prioritized queue in the existing tracker and
+implements one ready fix at a time. Workflow improvements are a meta process;
+do not defer them to product milestones. Keep blocked items visible and take
+the next ready fix. Preserve independent review and verify later effectiveness.
+
+Reusable rules belong in Conductor's canonical skills and normal installation
+path. Keep project- and role-specific scope local. Ship reviewed fixes when ready,
+with explicit coordination for affected agents or shared installations. The
+coordinator still owns host capacity and conflicting integrations/resources.
+Do not create a second worker pool, speculative work or a background daemon.
+
+### UI review evidence
+
+For UI changes, capture the affected area in the actual running application.
+Include enough context to assess the layout. Add before/after views and relevant
+screen sizes when they help explain the change. Record the tested source and
+setup with the images. Do not use mockups as evidence of implemented behavior.
+
+Independent review includes a design, UX and UI pass on these screenshots and
+relevant interactions. Check hierarchy, spacing, readability, keyboard access and
+responsive behavior where affected. Resolve actionable findings before merging.
+Show relevant screenshots in user-facing change reports, with short captions and
+remaining limits. Keep the user's active creative session protected during QA.
+
 ## Deliver usable features
 
 The user set this direction on 13 September 2026 after reviewing excessive
