@@ -9,6 +9,7 @@
 #include <sstream>
 #include <optional>
 #include <type_traits>
+#include <limits>
 
 using Microsoft::WRL::ComPtr;
 namespace lux {
@@ -174,12 +175,13 @@ void FrameReceiver::run(HGLRC shared) {
   log<<"{\"kind\":\"adapter\",\"luidLow\":"<<description.AdapterLuid.LowPart<<",\"luidHigh\":"<<description.AdapterLuid.HighPart<<"}"<<std::endl;
   glGenFramebuffers(1,&readFbo);glGenFramebuffers(1,&drawFbo);require(readFbo&&drawFbo,"worker framebuffer allocation failed");
   activation.begin();
+  log<<std::setprecision(std::numeric_limits<float>::max_digits10);
   LARGE_INTEGER frequency;QueryPerformanceFrequency(&frequency);log<<"{\"kind\":\"native-clock\",\"domain\":\"qpc\",\"frequency\":\""<<frequency.QuadPart<<"\"}"<<std::endl;
   uint64_t opportunityRecords=0,traceCapped=0;
   auto drainOpportunities=[&]{HostOpportunity item;while(opportunities.pop(item)){
    if(opportunityRecords++>=100000){++traceCapped;continue;}
-   log<<"{\"kind\":\"host-opportunity\",\"sequence\":"<<item.sequence<<",\"at\":\""<<item.at<<"\",\"present\":"<<(item.present?"true":"false")<<",\"generation\":"<<item.generation<<",\"frameId\":\""<<item.frame<<"\",\"copyCompletedQpc\":\""<<item.completedQpc<<"\",\"correlation\":\""<<(item.provenance.status?"producer-claim-unverified":"unavailable")<<"\"";
-   if(item.provenance.status){const auto& p=item.provenance;log<<",\"workerFrameId\":\""<<p.workerFrame<<"\",\"controlSequence\":\""<<p.controlSequence<<"\",\"revisionId\":\""<<std::string(p.revisionHash.data(),64)<<"\",\"schemaHash\":\""<<std::string(p.schemaHash.data(),64)<<"\",\"normalized\":[";for(uint32_t i=0;i<p.count;++i){if(i)log<<',';log<<p.normalized[i];}log<<']';}
+   log<<"{\"kind\":\"host-opportunity\",\"instanceId\":\""<<activation.instanceId()<<"\",\"sequence\":"<<item.sequence<<",\"at\":\""<<item.at<<"\",\"present\":"<<(item.present?"true":"false")<<",\"generation\":"<<item.generation<<",\"frameId\":\""<<item.frame<<"\",\"copyCompletedQpc\":\""<<item.completedQpc<<"\",\"correlation\":\""<<(item.provenance.status?"producer-claim-unverified":"unavailable")<<"\"";
+   if(item.provenance.status){const auto& p=item.provenance;log<<",\"workerFrameId\":\""<<p.workerFrame<<"\",\"controlSequence\":\""<<p.controlSequence<<"\",\"producerReceivedQpc\":\""<<p.receivedQpc<<"\",\"revisionId\":\""<<std::string(p.revisionHash.data(),64)<<"\",\"schemaHash\":\""<<std::string(p.schemaHash.data(),64)<<"\",\"normalized\":[";for(uint32_t i=0;i<p.count;++i){if(i)log<<',';log<<p.normalized[i];}log<<']';}
    log<<"}\n";
   }};
   std::wstring connected;ReceiverPoll discovery,counters;int pending=-1,sourceSlot=-1;
@@ -249,7 +251,7 @@ void FrameReceiver::run(HGLRC shared) {
    }
    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
-  drainOpportunities();log<<"{\"kind\":\"host-telemetry-summary\",\"lostRecords\":"<<opportunities.lost.load()+traceCapped<<",\"recorded\":"<<std::min<uint64_t>(opportunityRecords,100000)<<"}"<<std::endl;
+  drainOpportunities();log<<"{\"kind\":\"host-telemetry-summary\",\"instanceId\":\""<<activation.instanceId()<<"\",\"lostRecords\":"<<opportunities.lost.load()+traceCapped<<",\"recorded\":"<<std::min<uint64_t>(opportunityRecords,100000)<<"}"<<std::endl;
  }catch(const std::exception& error){log<<"{\"kind\":\"failure\",\"reason\":\""<<error.what()<<"\"}"<<std::endl;}
  catch(...){log<<"{\"kind\":\"failure\",\"reason\":\"unknown worker exception\"}"<<std::endl;}
  activation.end();

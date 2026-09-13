@@ -22,11 +22,11 @@ const requiredRuntimeFiles = [
   'apps/render-host/src/main.cjs', 'apps/render-host/src/compiled-output.html',
   'apps/render-host/src/compiled-worker.js', 'native/build/Release/lux_texture_bridge.node',
   'native/build/Release/LuxTracerTR02.dll', 'tools/gpu-spike/producer-session.cjs',
-  'tools/gpu-spike/transport-release.cjs', 'tools/gpu-spike/host-startup.cjs', 'tools/gpu-spike/frame-progress.cjs', 'tools/gpu-spike/parameter-mapping.cjs', 'tools/gpu-spike/runtime-validation.cjs',
+  'tools/gpu-spike/transport-release.cjs', 'tools/gpu-spike/host-startup.cjs', 'tools/gpu-spike/frame-progress.cjs', 'tools/gpu-spike/frame-gate.cjs', 'tools/gpu-spike/parameter-mapping.cjs', 'tools/gpu-spike/runtime-validation.cjs',
   ...nativeRuntimeFiles.map(name => 'native/build/Release/' + name),
   ...electronRuntimeFiles.filter(name => !['electron.exe', 'version'].includes(name)).map(name => 'electron/' + name),
 ];
-const parameterRuntimeFiles=['parameter-mapping.cjs','runtime-validation.cjs','tools/gpu-spike/parameter-mapping.cjs','tools/gpu-spike/runtime-validation.cjs'];
+const parameterRuntimeFiles=['parameter-mapping.cjs','runtime-validation.cjs','tools/gpu-spike/parameter-mapping.cjs','tools/gpu-spike/runtime-validation.cjs','tools/gpu-spike/frame-gate.cjs'];
 function safeRelative(value) {
   if (typeof value !== 'string' || value.length > 240 || !value.length || value.includes('\\')) throw Error('Unsafe package path');
   for (const part of value.split('/')) {

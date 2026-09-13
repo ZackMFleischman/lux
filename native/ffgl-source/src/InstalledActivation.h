@@ -63,10 +63,11 @@ class InstalledActivation {
 public:
  void configure(std::optional<InstalledSource> value){source=std::move(value);}
  bool installed()const{return source.has_value();}
+ const std::string& instanceId()const{return instance;}
  std::wstring rendezvous()const{return source?(directory/(instance+".rendezvous")).wstring():rendezvousPath();}
  void begin(){
-  if(!source)return;
   LARGE_INTEGER counter;QueryPerformanceCounter(&counter);instance=installedInstanceName(GetCurrentProcessId(),counter.QuadPart);
+  if(!source)return;
   directory=installedRoot()/L"instances"/source->runtimeId;std::filesystem::create_directories(directory);
   request=directory/(instance+".json");ready=directory/L"supervisor.ready";
   std::ofstream file(request,std::ios::binary|std::ios::trunc);file<<"{\"version\":"<<source->version<<",\"runtimeId\":\""<<source->runtimeId<<"\",\"releaseId\":\""<<source->releaseId<<"\",\"instanceId\":\""<<instance<<"\",\"hostPid\":"<<GetCurrentProcessId();if(source->version==2)file<<",\"descriptorHash\":\""<<source->descriptorHash<<"\"";file<<"}";file.close();if(!file)throw std::runtime_error("Cannot request installed Lux source");

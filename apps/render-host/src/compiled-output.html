@@ -14,7 +14,7 @@ function request(message, transfer = []) {
     worker.postMessage({...message,requestId}, transfer);
   });
 }
-window.startVisual = async (release, values) => {
+window.startVisual = async (release, values, externallyDriven = false) => {
   if (worker) throw Error('Visual already initialized');
   worker = new Worker('./compiled-worker.js', {type:'module'});
   identity = {instanceId:crypto.randomUUID(),generation:1,revisionId:release.sourceHash};
@@ -39,8 +39,9 @@ window.startVisual = async (release, values) => {
   identity.controlSchemaHash=generic?release.linked.controlSchemaHash:undefined;
   return request({type:'init',...identity,linked:release.linked,settings:release.settings,
     sdkVersion:generic?'0.2.0':'0.1.0',controlSchema:generic?release.linked.controls:undefined,
-    canvas,controls:generic?values:{intensity:values},playing:true},[canvas]);
+    canvas,controls:generic?values:{intensity:values},playing:true,externallyDriven},[canvas]);
 };
+window.drawVisual = () => request({type:'frame',...identity});
 window.setIntensity = value => request({type:'controls',...identity,controlSequence:++sequence,values:{intensity:value}});
 window.setParameters = values => request({type:'controls',...identity,controlSequence:++sequence,values});
 window.captureVisual = async () => {

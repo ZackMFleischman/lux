@@ -13,6 +13,9 @@ const { HostStartup } = require('../../../tools/gpu-spike/host-startup.cjs');
 const { FrameProgress } = require('../../../tools/gpu-spike/frame-progress.cjs');
 const progress = new FrameProgress();
 const release = process.env.LUX_TRANSPORT_BUNDLE ? readTransportRelease(process.env.LUX_TRANSPORT_BUNDLE) : null;
+const controlledFrames=process.env.LUX_CONTROLLED_FRAMES==='1';
+if(controlledFrames&&release?.linked.linkedVersion!==3)throw Error('Controlled frame diagnostics require a parameter release');
+const frameGate=controlledFrames?new (require('../../../tools/gpu-spike/frame-gate.cjs').ControlledFrameGate)({revisionId:release.sourceHash,schemaHash:release.linked.controlSchemaHash,count:release.linked.controls.length}):null;
 const playback = process.env.LUX_TRANSPORT_PLAYBACK === '1';
 if(playback&&(!release||!process.env.LUX_TRANSPORT_STOP))throw Error('Playback requires a compiled release and supervised stop signal');
 const bridge = require(path.resolve(__dirname, '../../../native/build/Release/lux_texture_bridge.node'));
@@ -84,8 +87,11 @@ app.whenReady().then(async () => {
   win.webContents.on('paint', event => {
     if (!event.texture) { failure('paint without shared texture'); return; }
     if (release && !visualReady) { event.texture.release(); return; }
+    const claim=frameGate?.consumePaint();
+    if(frameGate&&!claim){event.texture.release();return;}
+    if(frameGate)win.webContents.stopPainting();
     try {
-      const result = session.submit(event.texture);
+      const result = session.submit(event.texture,claim??undefined);
       // A host that has stopped drawing can fill the receiver ring without a
       // failed visual. Only confirmed backpressure with no pending copy counts.
       if (result.drop === 'no-free-slot' && session.held.size === 0 && session.uncertain.size === 0) backpressureFrames++;
@@ -105,10 +111,22 @@ app.whenReady().then(async () => {
   if(generic)bridge.configureControls(release.linked.controlSchemaHash,release.linked.controls.length);
   if (installed) bridge.advertise(installed.rendezvous); else bridge.advertise();
   let lastHostControl: number | undefined;
+  let normalized=[];
+  const executeDraw=async (script:string)=>{
+    if(!frameGate)return win.webContents.executeJavaScript(script);
+    if(!frameGate.begin())throw Error('Controlled draw already pending');
+    win.webContents.stopPainting();
+    const pinned=[...normalized];
+    const result=await win.webContents.executeJavaScript(script);
+    frameGate.acknowledge(result,pinned);
+    record({kind:'worker-frame-claim',clock:bridge.clock(),...result,normalized:pinned,correlation:'producer-claim-unverified'});
+    win.webContents.startPainting();win.webContents.invalidate();
+    return result;
+  };
   const startup = release ? new HostStartup({revisionId:release.sourceHash,
     ...(generic?{schema:release.linked.controls,schemaHash:release.linked.controlSchemaHash}:{}),
-    init:value=>win.webContents.executeJavaScript('window.startVisual(' + JSON.stringify(release) + ',' + JSON.stringify(value) + ')'),
-    update:value=>win.webContents.executeJavaScript((generic?'window.setParameters(':'window.setIntensity(') + JSON.stringify(value) + ')'),
+    init:value=>executeDraw('window.startVisual(' + JSON.stringify(release) + ',' + JSON.stringify(value) + ','+controlledFrames+')'),
+    update:value=>executeDraw((generic?'window.setParameters(':'window.setIntensity(') + JSON.stringify(value) + ')'),
     observe:value=>record({kind:'host-control',value}), stopped:()=>session.stopping||finishing,
     promote:(initial,value)=>{
       record({kind:'initial-frame',controls:initial.controls,controlSchemaHash:initial.controlSchemaHash,sourceHash:release.sourceHash,frameId:initial.frameId,controlSequence:initial.controlSequence});
@@ -119,18 +137,23 @@ app.whenReady().then(async () => {
     }}) : null;
   let applyingControl = false;
   controlTimer = setInterval(async () => {
-    if (applyingControl || session.stopping) return;
+    if (applyingControl || session.stopping || frameGate?.busy) return;
     applyingControl = true;
     try {
       const value = bridge.control();
-      if (startup) { await startup.apply(value); return; }
+      if (startup) {
+        if(frameGate&&value!==null){normalized=[...value.values];record({kind:'producer-control-received',clock:bridge.clock(),hostSequence:value.sequence,schemaHash:value.schemaHash,normalized});}
+        await startup.apply(value);
+        if(frameGate&&startup.ready&&!frameGate.busy)await executeDraw('window.drawVisual()');
+        return;
+      }
       if (value === null) return;
       if (value !== lastHostControl) { record({ kind: 'host-control', value }); lastHostControl = value; }
       await win.webContents.executeJavaScript('window.setIntensity(' + value + ')');
     }
     catch (error) { failure(error); }
     finally { applyingControl = false; }
-  }, 50);
+  }, controlledFrames?16:50);
   stopProducer = () => {
     if(session.stopping||finishing)return;
     session.stop(); win.webContents.stopPainting();
