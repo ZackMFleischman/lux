@@ -78,6 +78,23 @@ test('RTL: code-defined controls expose independent values, numeric entry and de
   assert.deepEqual((fixture.calls[1] as any).input.values, { spikeHeight: 1 });
 });
 
+test('RTL: control descriptions appear on hover and keyboard focus without creating empty help', async () => {
+  const fixture = service();
+  fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [
+    { id: 'samplingRadius', type: 'number' as const, label: 'Source sampling radius', description: 'Expands the area sampled from the source image before mirroring.', min: 0, max: 4, default: 1, changeCost: 'live' as const },
+    { id: 'spiralTwist', type: 'number' as const, label: 'Spiral twist', min: -4, max: 4, default: 0, changeCost: 'live' as const },
+  ], controlSchemaHash: 'd'.repeat(64), controls: { samplingRadius: 1, spiralTwist: 0 }, controlSequence: 0 });
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+  const described = screen.getByText('Source sampling radius');
+  fireEvent.mouseOver(described);
+  assert.ok(await screen.findByRole('tooltip', { name: /Expands the area sampled/ }));
+  fireEvent.mouseOut(described);
+  fireEvent.focus(described);
+  assert.ok(await screen.findByRole('tooltip', { name: /Expands the area sampled/ }));
+  assert.equal(document.querySelectorAll('[role="tooltip"]').length, 1);
+  assert.equal(screen.getByText('Spiral twist').getAttribute('tabindex'), null);
+});
+
 test('RTL: duplicate component labels show and announce their public aliases', () => {
   const fixture = service();
   fixture.publish({ sdkVersion: '0.4.0', intensity: undefined, controlSchema: [

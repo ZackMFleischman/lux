@@ -8,5 +8,6 @@ const options={dependencyRoot:process.env.LUX_COMPILER_DEPENDENCIES||resolve('no
 test('Studio prismatic fixture compiles and links a three-stage image chain with independent instance controls',async()=>{
   const compiled=await compileVisual({source:prismaticCompositionSource()},options);assert.equal(compiled.ok,true,JSON.stringify(compiled.diagnostics));
   assert.equal(compiled.artifact.artifactVersion,5);assert.deepEqual(compiled.artifact.controls.map(row=>row.id),['ballIntensity','segmentsA','segmentsB']);
+  assert.deepEqual(compiled.artifact.controls.map(row=>row.description),['Controls the height of the animated spikes.','Sets the number of independently mirrored wedges.','Sets the number of independently mirrored wedges.']);
   const linked=await linkRuntime(compiled.artifact,options);assert.equal(linked.linkedVersion,5);assert.equal(linked.composition.nodes.length,3);
 });
