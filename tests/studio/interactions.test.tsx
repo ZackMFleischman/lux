@@ -10,7 +10,7 @@ for (const name of ['window', 'document', 'navigator', 'HTMLElement', 'Element',
   Object.defineProperty(globalThis, name, { configurable: true, value: dom.window[name] });
 }
 Object.defineProperty(globalThis, 'IS_REACT_ACT_ENVIRONMENT', { configurable: true, writable: true, value: true });
-const { render, screen, cleanup, waitFor, fireEvent, act } = await import('@testing-library/react');
+const { render, screen, cleanup, waitFor, fireEvent, act, within } = await import('@testing-library/react');
 const { userEvent } = await import('@testing-library/user-event');
 const { StudioApp } = await import('../../apps/studio/src/renderer.tsx');
 const { createDisconnectedClient } = await import('../../apps/studio/src/service-client.ts');
@@ -20,7 +20,7 @@ after(() => dom.window.close());
 
 test('RTL: frame bursts leave Performance responsive and applied controls publish immediately', async context => {
   context.mock.timers.enable({ apis: ['setTimeout'] });
-  const fixture = service();
+  try { const fixture = service();
   render(<StudioApp client={fixture.client} nowMs={1000} />);
   const initialFrame = fixture.client.getSnapshot().authoring!.frameId!;
   await act(async () => {
@@ -36,6 +36,7 @@ test('RTL: frame bursts leave Performance responsive and applied controls publis
   await act(async () => { fixture.publish({ frameId: '160' }); fixture.publish({ intensity: 0.8 }); });
   assert.equal((screen.getByRole('slider', { name: 'Intensity' }) as HTMLInputElement).value, '0.8');
   assert.ok(screen.getByText('160'));
+  } finally { context.mock.timers.reset(); }
 });
 
 test('RTL: discard confirmation is an accessible in-app dialog with safe cancel, Escape and explicit approval', async () => {
@@ -67,7 +68,7 @@ test('RTL: code-defined controls expose independent values, numeric entry and de
   fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: schema, controlSchemaHash: 'a'.repeat(64), controls: { spikeHeight: 2, noiseScale: 7 }, controlSequence: 0 });
   render(<StudioApp client={fixture.client} nowMs={1000} />);
   assert.equal(screen.queryByRole('slider', { name: 'Intensity' }), null);
-  assert.equal(screen.getAllByRole('slider').length, 2);
+  assert.equal(within(document.querySelector('.inspector')!).getAllByRole('slider').length, 2);
   fireEvent.change(screen.getByRole('spinbutton', { name: 'Noise scale value' }), { target: { value: '12' } });
   fireEvent.keyDown(screen.getByRole('spinbutton', { name: 'Noise scale value' }), { key: 'Enter' });
   await waitFor(() => assert.equal(fixture.calls.length, 1));
@@ -94,7 +95,7 @@ test('RTL: an empty authored schema has no invented control', () => {
   const fixture = service();
   fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [], controlSchemaHash: 'b'.repeat(64), controls: {}, controlSequence: 0 });
   render(<StudioApp client={fixture.client} nowMs={1000} />);
-  assert.equal(screen.queryByRole('slider'), null);
+  assert.equal(within(document.querySelector('.inspector')!).queryByRole('slider'), null);
   assert.ok(screen.getByText('This visual defines no live controls.'));
 });
 
