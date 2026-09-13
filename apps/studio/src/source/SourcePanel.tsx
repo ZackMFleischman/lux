@@ -15,6 +15,7 @@ export function SourcePanel({ workspace, readOnly, onApply, onSave, onCompositio
 }) {
   const snapshot = useSyncExternalStore(workspace.subscribe, workspace.getSnapshot);
   const [adding, setAdding] = useState(false);
+  const [filesCollapsed, setFilesCollapsed] = useState(false);
   const [assetSelection, setAssetSelection] = useState<{ path: string; documentKey: number } | null>(null);
   const assets = sourceAssets(snapshot.source);
   const assetPath = assetSelection?.documentKey === snapshot.documentKey && Object.hasOwn(assets, assetSelection.path) ? assetSelection.path : null;
@@ -41,7 +42,9 @@ export function SourcePanel({ workspace, readOnly, onApply, onSave, onCompositio
       if (event.shiftKey) onSave(); else onApply();
     }
   }}>
-    <div className="source-columns"><div className="source-files">
+    <div className="source-columns"><div className="source-navigation-toggle">
+      <Tooltip title={filesCollapsed ? 'Expand source files and assets' : 'Collapse source files and assets'}><IconButton aria-label={filesCollapsed ? 'Expand source files and assets' : 'Collapse source files and assets'} aria-controls="source-files-and-assets" aria-expanded={!filesCollapsed} onClick={() => setFilesCollapsed(value => !value)}>{filesCollapsed ? '›' : '‹'}</IconButton></Tooltip>
+      </div><div id="source-files-and-assets" className="source-files" hidden={filesCollapsed}>
       <div className="source-files-heading"><span>Files</span><Tooltip title="New file"><IconButton ref={addButton} aria-label="New file" disabled={locked} onClick={() => setAdding(true)}>+</IconButton></Tooltip></div>
       <nav aria-label="Source files">{Object.keys(snapshot.source.files).map(path => <Button key={path} title={path} aria-label={`Open ${path}`} aria-current={!assetPath && snapshot.selectedFile === path ? 'page' : undefined}
         onClick={() => openCode(path)}><span className="file-path">{path}</span>{path === snapshot.source.entry && <span className="file-marker">Entry</span>}{snapshot.dirtyFiles.includes(path) && <span aria-label="Unsaved">*</span>}</Button>)}</nav>

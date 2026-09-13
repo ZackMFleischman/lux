@@ -9,8 +9,9 @@ export function parameterOwner(runtime: RuntimeView | null): string | null {
   return runtime?.authority === 'studio'
     ? JSON.stringify([runtime.instanceId, runtime.generation, runtime.revisionId, runtime.controlSchemaHash]) : null;
 }
-function ParameterRow({ definition, applied, owner, available, client, controller, onError, edits }: {
+function ParameterRow({ definition, displayLabel, applied, owner, available, client, controller, onError, edits }: {
   definition: NumberControlDefinition; applied: number; owner: string | null; available: boolean;
+  displayLabel: string;
   client: StudioClient; controller: StudioController; onError: (error: string | null) => void;
   edits?: ControlEdits;
 }) {
@@ -48,20 +49,20 @@ function ParameterRow({ definition, applied, owner, available, client, controlle
     editing.current = false;
     const next = text.trim() === '' ? NaN : Number(text);
     if (!Number.isFinite(next) || next < definition.min || next > definition.max) {
-      setText(String(value)); onError(`${definition.label} must be between ${definition.min} and ${definition.max}.`); return;
+      setText(String(value)); onError(`${displayLabel} must be between ${definition.min} and ${definition.max}.`); return;
     }
     if (next !== value) void change(next);
   }
   return <div className="parameter-row" data-control-id={definition.id} data-applied-value={applied}>
     <div className="parameter-heading">
-      <label className="parameter-name" htmlFor={`parameter-${definition.id}`} title={`${definition.label}${definition.unit ? ` (${definition.unit})` : ''}`}>{definition.label}{definition.unit && <small> {definition.unit}</small>}</label>
+      <label className="parameter-name" htmlFor={`parameter-${definition.id}`} title={`${displayLabel}${definition.unit ? ` (${definition.unit})` : ''}`}>{displayLabel}{definition.unit && <small> {definition.unit}</small>}</label>
       <TextField id={`parameter-${definition.id}`} className="parameter-number" size="small" type="number" value={text} disabled={!available}
-        slotProps={{ htmlInput: { 'aria-label': `${definition.label} value`, min: definition.min, max: definition.max, step: definition.step ?? 'any' } }}
+        slotProps={{ htmlInput: { 'aria-label': `${displayLabel} value`, min: definition.min, max: definition.max, step: definition.step ?? 'any' } }}
         onChange={event => { editing.current = true; setText(event.target.value); edits?.changed(); }}
         onBlur={commitText} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); commitText(); } if (event.key === 'Escape') { event.stopPropagation(); editing.current = false; setText(String(value)); } }} />
-      <Tooltip title="Reset to default"><span><IconButton size="small" disabled={!available} aria-label={`Reset ${definition.label} to default`} onClick={() => void change(definition.default)}>↺</IconButton></span></Tooltip>
+      <Tooltip title="Reset to default"><span><IconButton size="small" disabled={!available} aria-label={`Reset ${displayLabel} to default`} onClick={() => void change(definition.default)}>↺</IconButton></span></Tooltip>
     </div>
-    <Slider size="small" aria-label={definition.label} min={definition.min} max={definition.max}
+    <Slider size="small" aria-label={displayLabel} min={definition.min} max={definition.max}
       step={definition.step ?? (definition.max - definition.min) / 100} value={value} disabled={!available}
       onChange={(_event, next) => { if (typeof next === 'number') void change(next); }} />
   </div>;
@@ -73,8 +74,11 @@ export function ParameterInspector({ runtime, available, client, controller, onE
 }) {
   if (!runtime) return <p className="hint">Build a visual to see its controls.</p>;
   const state = getRuntimeControlState(runtime), owner = parameterOwner(runtime);
+  const labelCounts = new Map<string, number>();
+  for (const definition of state.controlSchema) labelCounts.set(definition.label, (labelCounts.get(definition.label) ?? 0) + 1);
+  const displayLabel = (definition: NumberControlDefinition) => labelCounts.get(definition.label)! > 1 ? `${definition.id} · ${definition.label}` : definition.label;
   return <>{state.controlSchema.length === 0 && <p className="hint">This visual defines no live controls.</p>}
-    {state.controlSchema.map(definition => <ParameterRow key={`${owner}:${definition.id}`} definition={definition}
+    {state.controlSchema.map(definition => <ParameterRow key={`${owner}:${definition.id}`} definition={definition} displayLabel={displayLabel(definition)}
       applied={state.controls[definition.id]!} owner={owner} available={available} client={client} controller={controller} onError={onError} edits={edits} />)}
     {!!runtime.controlMigration?.length && <details><summary>Controls updated</summary>{runtime.controlMigration.map(change => <p key={change.id}>{change.id}: {change.reason.replaceAll('-', ' ')}</p>)}</details>}
   </>;

@@ -234,6 +234,19 @@ test('keyboard asset activation and source tabs keep navigation accessible', asy
   assert.equal(screen.queryByRole('img', { name: /Image preview:/ }), null);
 });
 
+test('collapsing source navigation preserves the active asset and code draft', async () => {
+  const w = createSourceWorkspace(imageSource()); render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => {}} />);
+  await act(async () => { view().dispatch({ changes: { from: 0, insert: '// retained draft\n' } }); });
+  await click(screen.getByRole('button', { name: 'View assets/red.bmp' }));
+  await click(screen.getByRole('button', { name: 'Collapse source files and assets' }));
+  assert.ok(screen.getByRole('region', { name: 'Asset preview' }));
+  assert.equal((document.querySelector('.source-files') as HTMLElement).hidden, true);
+  await click(screen.getByRole('button', { name: 'Expand source files and assets' }));
+  await click(screen.getByRole('button', { name: 'Open main.ts' }));
+  assert.match(view().state.doc.toString(), /retained draft/);
+  assert.equal(w.getSnapshot().source.files['main.ts'], '// retained draft\nexport const main = 1');
+});
+
 test('source shortcuts apply all drafts with Ctrl/Cmd+S and save the scene only with Shift', async () => {
   const w = fixture(); const commands: string[] = [];
   const ui = render(<SourcePanel workspace={w} readOnly={false} onApply={() => { commands.push('apply'); }} onSave={() => { commands.push('save'); }} />);
