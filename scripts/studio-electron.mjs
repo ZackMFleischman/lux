@@ -68,7 +68,10 @@ export function ensureElectron(workspace) {
     // Runtime setup is for this host and the official pinned distribution.
     // Keep Electron's standard shared cache (or electron_config_cache) and proxy settings.
     for (const key of Object.keys(env)) {
-      if (/^(electron_(mirror|nightly_mirror|custom_dir|custom_filename|override_dist_path|install_platform|install_arch|use_remote_checksums)|npm_config_(platform|arch|electron_use_remote_checksums))$/i.test(key)) delete env[key];
+      // @electron/get accepts direct, npm config, and package config aliases,
+      // including both camelCase and snake_case spellings.
+      const normalized = key.toLowerCase().replaceAll('_', '');
+      if (/^(?:(?:npmconfig|npmpackageconfig)?electron(?:mirror|nightlymirror|customdir|customfilename|customversion|overridedistpath|installplatform|installarch|useremotechecksums)|npmconfig(?:platform|arch))$/.test(normalized)) delete env[key];
     }
     console.error(`Preparing Electron ${pkg.version} for ${process.platform}-${process.arch} (shared download cache)...`);
     try { execFileSync(process.execPath, [join(pkg.root, 'install.js')], { cwd: workspace, env, stdio: 'inherit', windowsHide: true }); }

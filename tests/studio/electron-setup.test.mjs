@@ -71,3 +71,24 @@ test('setup refuses concurrent mutation and parent dependency fallback', t => {
   writeFileSync(join(child, 'package.json'), readFileSync(join(workspace, 'package.json')));
   assert.throws(() => runtime.ensureElectron(child), /local|checkout/i);
 });
+
+test('installer uses official pinned sources despite inherited npm mirror/version overrides', t => {
+  const { workspace, root } = fixture(t);
+  const overrides = ['ELECTRON_CUSTOM_VERSION', 'npm_config_electron_mirror',
+    'NPM_CONFIG_ELECTRON_CUSTOM_DIR', 'npm_config_electron_customfilename',
+    'npm_package_config_electron_customVersion', 'npm_package_config_electron_nightly_mirror'];
+  const keys = [...overrides, 'electron_config_cache'];
+  const saved = keys.map(key => [key, process.env[key]]);
+  t.after(() => { for (const [key, value] of saved) { if (value === undefined) delete process.env[key]; else process.env[key] = value; } });
+  for (const key of overrides) process.env[key] = 'must-not-reach-installer';
+  process.env.electron_config_cache = join(workspace, 'shared-cache');
+  writeFileSync(join(root, 'install.js'), `
+    const fs = require('node:fs'), path = require('node:path');
+    fs.writeFileSync(path.join(__dirname, 'env.json'), JSON.stringify(process.env));
+    process.exit(0);
+  `);
+  assert.throws(() => runtime.ensureElectron(workspace), /not installed/);
+  const env = JSON.parse(readFileSync(join(root, 'env.json'), 'utf8'));
+  for (const key of overrides) assert.equal(env[key], undefined, key);
+  assert.equal(env.electron_config_cache, process.env.electron_config_cache);
+});
