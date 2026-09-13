@@ -13,7 +13,7 @@ for (let alpha = 1; alpha < 256; alpha++) for (let byte = 0; byte < 256; byte++)
 }
 
 export function encodeCapturedTarget(pixels, width, height) {
-  if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1 || width > 1920 || height > 1080 ||
+  if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1 || width > 3840 || height > 2160 ||
       !(pixels instanceof Uint8Array) || pixels.byteLength !== width * height * 4) throw Error('Invalid capture target readback');
   const data = new Uint8Array(pixels.length);
   for (let at = 0; at < pixels.length; at += 4) {

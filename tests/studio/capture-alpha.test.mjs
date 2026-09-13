@@ -27,3 +27,8 @@ test('capture rejects inconsistent or oversized readback before encoding', () =>
   assert.throws(() => encodeCapturedTarget(new Uint8Array(4), 1920, 1080), /readback/);
   assert.throws(() => encodeCapturedTarget(new Uint8Array(4), 1, 1081), /readback/);
 });
+
+test('Studio preview capture accepts a non-default render size', () => {
+  const pixels = new Uint8Array(1280 * 720 * 4); pixels[3] = 255;
+  assert.ok(encodeCapturedTarget(pixels, 1280, 720).byteLength > 0);
+});

@@ -105,7 +105,7 @@ async function initialize(message) {
   externallyDriven=message.externallyDriven===true;
   performanceMode=collectionMode(message.performanceMode);
   settings = message.settings;
-  if (!settings || settings.width !== 1920 || settings.height !== 1080 || settings.fps !== 60 ||
+  if (!settings || !Number.isInteger(settings.width) || !Number.isInteger(settings.height) || settings.width < 1 || settings.width > 3840 || settings.height < 1 || settings.height > 2160 || settings.fps !== 60 ||
       !Number.isInteger(settings.seed) || settings.seed < 0 || settings.seed > 0xffffffff) throw Error('Unsupported output settings');
   const prepared=await prepareAuthoredModule(message);
   controlState=prepared.admission.kind==='composition'?await prepareWorkerCompositionState(message,prepared.admission):await prepareWorkerControlState(message,prepared.admission);

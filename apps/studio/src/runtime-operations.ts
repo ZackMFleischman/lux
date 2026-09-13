@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { outputSettingsSchema } from '../../../packages/runtime-contracts/src/index.ts';
 import { snapshotRecord } from '../../build-worker/src/source-policy.mjs';
 import type { StudioClient } from './service-client.ts';
 
@@ -8,7 +7,7 @@ const valuesSchema=z.record(z.number().finite()).refine(values=>Object.keys(valu
 export const parameterInputSchema = z.object({ ...target, expectedRevisionId: z.string().min(1), expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/).optional(),values:valuesSchema, mode: z.literal('live').default('live') }).strict();
 export const playbackInputSchema = z.object({ ...target, action: z.enum(['play', 'pause', 'reset']) }).strict();
 export const restartInputSchema = z.object(target).strict();
-export const previewResizeInputSchema = z.object({ ...target, width: outputSettingsSchema.shape.width, height: outputSettingsSchema.shape.height }).strict();
+export const previewResizeInputSchema = z.object({ ...target, width: z.number().int().min(1).max(3840), height: z.number().int().min(1).max(2160) }).strict();
 const requestId = z.string().min(1).max(100);
 export const studioOperationSchema = z.discriminatedUnion('name', [
   z.object({ name: z.literal('lux.parameters.set'), input: parameterInputSchema.extend({ requestId }) }).strict(),

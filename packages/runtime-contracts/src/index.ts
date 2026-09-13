@@ -6,7 +6,7 @@ export const hashSchema = z.string().regex(/^[a-f0-9]{64}$/);
 export const runtimeKeySchema = z.object({ instanceId: z.string().uuid(), generation: z.number().int().nonnegative().safe() }).strict();
 export type RuntimeKey = z.infer<typeof runtimeKeySchema>;
 export const outputSettingsSchema = z.object({
-  width: z.number().int().min(1).max(3840), height: z.number().int().min(1).max(2160),
+  width: z.number().int().min(1).max(1920), height: z.number().int().min(1).max(1080),
   fps: z.number().finite().positive().max(240), seed: z.number().int().min(0).max(0xffffffff),
 }).strict();
 export type OutputSettings = z.infer<typeof outputSettingsSchema>;

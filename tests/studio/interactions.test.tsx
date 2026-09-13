@@ -34,7 +34,7 @@ test('RTL: frame bursts leave Performance responsive and applied controls publis
   await act(async () => context.mock.timers.tick(100));
   assert.ok(screen.getByText('159'));
   await act(async () => { fixture.publish({ frameId: '160' }); fixture.publish({ intensity: 0.8 }); });
-  assert.equal((screen.getByRole('slider') as HTMLInputElement).value, '0.8');
+  assert.equal((screen.getByRole('slider', { name: 'Intensity' }) as HTMLInputElement).value, '0.8');
   assert.ok(screen.getByText('160'));
 });
 
@@ -164,7 +164,7 @@ test('RTL: playback and intensity invoke guarded shared operations and wait for 
   assert.equal(fixture.calls[0]?.name, 'lux.playback');
   assert.equal(fixture.calls[0]?.input.expectedGeneration, 2);
   assert.equal(screen.queryByRole('button', { name: 'Pause' }), null);
-  fireEvent.change(screen.getByRole('slider'), { target: { value: '0.8' } });
+  fireEvent.change(screen.getByRole('slider', { name: 'Intensity' }), { target: { value: '0.8' } });
   await waitFor(() => assert.equal(fixture.calls.length, 2));
   const write = fixture.calls[1];
   assert.equal(write?.name, 'lux.parameters.set');
@@ -198,7 +198,7 @@ test('RTL: pending playback preserves button styling and ignores duplicate trans
   };
   render(<StudioApp client={fixture.client} nowMs={1000} />);
   await user.click(screen.getByRole('button', { name: 'Play' }));
-  fireEvent.change(screen.getByRole('slider'), { target: { value: '0.8' } });
+  fireEvent.change(screen.getByRole('slider', { name: 'Intensity' }), { target: { value: '0.8' } });
   await waitFor(() => assert.equal(fixture.calls.length, 2));
   assert.equal(document.querySelector('.playback-state')?.textContent, 'paused');
   await act(async () => finishIntensity());
@@ -220,7 +220,7 @@ test('RTL: intensity writes do not disable transport or insert a success alert',
   const fixture = service(); let finish!: () => void;
   fixture.client.invoke = operation => { fixture.calls.push(operation); return new Promise(resolve => { finish = () => resolve({}); }); };
   render(<StudioApp client={fixture.client} nowMs={1000} />);
-  fireEvent.change(screen.getByRole('slider'), { target: { value: '0.8' } });
+  fireEvent.change(screen.getByRole('slider', { name: 'Intensity' }), { target: { value: '0.8' } });
   await waitFor(() => assert.equal(fixture.calls.length, 1));
   for (const name of ['Play', 'Reset', 'More playback actions']) assert.equal((screen.getByRole('button', { name }) as HTMLButtonElement).disabled, false);
   assert.equal(screen.queryByText('Sending request…'), null);
@@ -240,7 +240,7 @@ test('RTL: delayed applied values never pull a slider away from the latest input
     }));
   };
   render(<StudioApp client={fixture.client} nowMs={1000} />);
-  const slider = screen.getByRole('slider') as HTMLInputElement;
+  const slider = screen.getByRole('slider', { name: 'Intensity' }) as HTMLInputElement;
   fireEvent.change(slider, { target: { value: '0.6' } });
   fireEvent.change(slider, { target: { value: '0.8' } });
   assert.equal(slider.value, '0.8');
@@ -264,14 +264,14 @@ test('RTL: rejected slider input restores confirmed value and replacement ignore
   let reject!: (reason: Error) => void;
   fixture.client.invoke = operation => { fixture.calls.push(operation); return new Promise((_resolve, fail) => { reject = fail; }); };
   render(<StudioApp client={fixture.client} nowMs={1000} />);
-  let slider = screen.getByRole('slider') as HTMLInputElement;
+  let slider = screen.getByRole('slider', { name: 'Intensity' }) as HTMLInputElement;
   fireEvent.change(slider, { target: { value: '0.8' } });
   await act(async () => reject(Error('Parameter rejected')));
   assert.equal(slider.value, '0.5');
   assert.match(screen.getByRole('alert').textContent ?? '', /Parameter rejected/);
   fireEvent.change(slider, { target: { value: '0.9' } });
   await act(async () => fixture.publish({ revisionId: 'new-revision', intensity: 0.2 }));
-  slider = screen.getByRole('slider') as HTMLInputElement;
+  slider = screen.getByRole('slider', { name: 'Intensity' }) as HTMLInputElement;
   assert.equal(slider.value, '0.2');
   await act(async () => reject(Error('Old revision rejected')));
   assert.equal(slider.value, '0.2');
@@ -289,10 +289,10 @@ test('RTL: a replaced runtime has an independent input queue while old writes ar
     }, reject }));
   };
   render(<StudioApp client={fixture.client} nowMs={1000} />);
-  let slider = screen.getByRole('slider') as HTMLInputElement;
+  let slider = screen.getByRole('slider', { name: 'Intensity' }) as HTMLInputElement;
   fireEvent.change(slider, { target: { value: '0.8' } });
   await act(async () => fixture.publish({ revisionId: 'new-revision', intensity: 0.2 }));
-  slider = screen.getByRole('slider') as HTMLInputElement;
+  slider = screen.getByRole('slider', { name: 'Intensity' }) as HTMLInputElement;
   fireEvent.change(slider, { target: { value: '0.4' } });
   assert.equal(fixture.calls.length, 2, 'new runtime input cannot queue behind the obsolete target');
   await act(async () => pending[1]!.resolve());
