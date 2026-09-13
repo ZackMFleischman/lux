@@ -53,3 +53,21 @@ Resolume fault behavior, callback latency budgets, the first recovered image wit
 current controls, explicit-restart-to-image timing or GPU-resource accounting.
 Those remain distinct checks. No missing endpoint is replaced with a banner,
 termination request, worker-ready response or process-exit assumption.
+
+## Recovery follow-up: Windows status-file contention
+
+Review of the same run found that automatic retry attempt
+`3ba825995402e93d7daf66450810a249` failed before painting: at
+`2026-09-13T02:23:15.237Z`, its trace reports `EPERM` while renaming the temporary
+health-status file over the published status. Its final summary reports
+`paint: 0`, `failed: true`. This does not invalidate the measured physical stop,
+but it explains why that run cannot establish recovered output.
+
+Fix `9aef18c`, integrated as `ef83f4f`, tolerates only transient rename
+`EPERM`/`EACCES`/`EBUSY`: it leaves the last published sample intact and lets the
+next heartbeat attempt publication with current counters. It does not sleep,
+extend deadlines or let stale samples renew liveness. Temporary-file write
+errors and other rename errors remain fatal. Independent review approved the
+change; root reran all 16 health/publication/wiring tests successfully. The new
+regression failed before the fix (two uncaught `EPERM` failures), as verified by
+the implementation agent. A fresh native recovery run remains required.
