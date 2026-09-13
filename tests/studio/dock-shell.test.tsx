@@ -31,7 +31,8 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
     fullscreen: async (fullscreen: boolean) => notify({ detached: false, fullscreen }), dock: async () => {}, popout: async () => {} };
   const workspace = createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'main.ts', files: { 'main.ts': 'export const value = 1' } });
   const ui = render(<StudioApp client={client} presentation={presentation} windows={windows} nowMs={1000}
-    sourcePanel={<SourcePanel workspace={workspace} readOnly={false} onApply={() => {}} onSave={() => {}} />} />);
+    sourcePanel={<SourcePanel workspace={workspace} readOnly={false} onApply={() => {}} onSave={() => {}} />}
+    libraryPanel={<section aria-label="Library fixture">Library fixture</section>} />);
   await waitFor(() => assert.equal(attaches, 1));
   const editorNode = document.querySelector('.cm-editor') as HTMLElement;
   const editor = EditorView.findFromDOM(editorNode)!;
@@ -60,8 +61,9 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
     assert.ok(tab, `Expected dock tab ${title}`);
     const group = tab.closest('.dv-groupview'); assert.ok(group); return group;
   };
-  assert.equal(document.querySelectorAll('.studio-dock-grid .dv-groupview').length, 3);
+  assert.equal(document.querySelectorAll('.studio-dock-grid .dv-groupview').length, 4);
   assert.equal(groupFor('Source'), groupFor('Preview'));
+  assert.notEqual(groupFor('Library'), groupFor('Preview'));
   await act(async () => { editor.dispatch({ changes: { from: 0, insert: '// saved layout draft\n' } }); });
   fireEvent.change(screen.getByLabelText('Layout name'), { target: { value: 'Authoring tabs' } });
   await click('Save layout');
@@ -75,8 +77,9 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   fireEvent.change(screen.getByLabelText('Layout name'), { target: { value: 'Authoring tabs' } });
   await click('Restore layout');
   assert.ok(screen.getByText('Restored layout: Authoring tabs'));
-  assert.equal(document.querySelectorAll('.studio-dock-grid .dv-groupview').length, 3);
+  assert.equal(document.querySelectorAll('.studio-dock-grid .dv-groupview').length, 4);
   assert.equal(groupFor('Source'), groupFor('Preview'));
+  assert.notEqual(groupFor('Library'), groupFor('Preview'));
   assert.equal(document.querySelector('.preview-surface canvas'), canvas);
   assert.equal(document.querySelector('.cm-editor'), editorNode);
   assert.equal(EditorView.findFromDOM(editorNode), editor);
@@ -106,7 +109,7 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   await click('Open Preview');
   assert.equal(document.querySelector('.cm-editor'), editorNode);
   assert.equal(attaches, 1); assert.equal(detaches, 0); assert.equal(subscriptions, 1);
-  for (const kind of ['preview', 'source', 'inspector', 'jobs']) {
+  for (const kind of ['preview', 'source', 'library', 'inspector', 'jobs']) {
     fireEvent.change(screen.getByLabelText('Move panel'), { target: { value: kind } });
     await click('Close selected panel');
   }
