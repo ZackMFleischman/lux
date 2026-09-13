@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFile,writeFile,mkdtemp,cp,mkdir,rm} from 'node:fs/promises';
+import {readFile,writeFile,mkdtemp,cp,mkdir,rm,symlink} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {resolve,join,dirname} from 'node:path';
 import {pathToFileURL} from 'node:url';
@@ -19,7 +19,7 @@ test('contained v2 compiler/linker retains assets and pixel-only changes change 
   const artifact=compiled.artifact;
   assert.equal(artifact.artifactVersion,2);assert.equal(artifact.assets['assets/red.bmp'].data,image);
   assert.equal(artifact.assets['assets/red.bmp'].sha256,hash(Buffer.from(image,'base64')));
-  for(const key of ['assets/index.mjs','compiler/artifact-identity.mjs','compiler/bounded-json.mjs']) assert.equal(artifact.dependencyHashes[key].length,64);
+  for(const key of ['assets/index.mjs','assets/png.mjs','assets/jpeg.mjs','codec/jpeg-js/lib/decoder.js','compiler/artifact-identity.mjs','compiler/bounded-json.mjs']) assert.equal(artifact.dependencyHashes[key]?.length,64,`missing ${key}`);
   const linked=await linkRuntime(artifact,{dependencyRoot});assert.equal(linked.linkedVersion,2);
   assert.deepEqual(linked.assets,artifact.assets);assert.equal(linked.assetSetHash,artifact.assetSetHash);assert(!linked.code.includes(image));
   const changed=structuredClone(source),bytes=Buffer.from(image,'base64');bytes[54]=123;changed.assets['assets/red.bmp'].data=bytes.toString('base64');
@@ -38,6 +38,7 @@ test('contained v2 compiler/linker retains assets and pixel-only changes change 
   // asset helper bytes there; never mutate this checkout or node_modules.
   const scratch=await mkdtemp(join(tmpdir(),'lux-helper-identity-'));
   try {
+    await symlink(dependencyRoot,join(scratch,'node_modules'),'junction');
     for(const path of ['apps/build-worker/src','packages/assets/src','packages/visual-sdk/src','packages/runtime-contracts/src','scripts/experiment-job.ps1','scripts/experiment-job.cs']) {
       await mkdir(dirname(join(scratch,path)),{recursive:true});await cp(resolve(path),join(scratch,path),{recursive:true});
     }

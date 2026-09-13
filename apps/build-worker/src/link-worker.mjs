@@ -9,6 +9,7 @@ import { violation, limits } from './source-policy.mjs';
 import { verifyArtifact, linkedBody } from './artifact-identity.mjs';
 import { readBoundedJson } from './bounded-json.mjs';
 import { sdkSourceFile } from './sdk-selection.mjs';
+import { assetDependencyPaths } from './asset-dependencies.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -28,6 +29,7 @@ async function link() {
   if (artifact.artifactVersion===3 && !Object.hasOwn(artifact.modules, '__lux/parameters.js')) fail('Missing SDK parameter policy module');
   const { default: getExePath } = await import(pathToFileURL(join(dependencyRoot, 'typescript/lib/getExePath.js')).href);
   const known = {
+    ...await assetDependencyPaths(root),
     'typescript/package.json': join(dependencyRoot, 'typescript/package.json'),
     '@babel/parser/package.json': join(dependencyRoot, '@babel/parser/package.json'),
     'three/package.json': join(dependencyRoot, 'three/package.json'),
