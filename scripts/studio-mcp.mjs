@@ -30,7 +30,7 @@ server.registerTool('lux.studio.read', { description: 'Read complete source and 
 server.registerTool('lux.studio.status', { description: 'Read actual standalone preview status.', inputSchema: {} }, async () => text(await call('status')));
 server.registerTool('lux.studio.build', { description: 'Compile and preview replacement source. Read first; expectedDraftVersion prevents overwriting intervening edits. Failed builds retain the working preview.',
   inputSchema: sourceBuildInputSchema.shape }, async input => text(await call('build', input)));
-server.registerTool('lux.studio.capture', { description: 'Return an actual 1920x1080 PNG from Lux with its frame, controls and revision metadata.', inputSchema: {} }, async () => {
+server.registerTool('lux.studio.capture', { description: 'Return an actual PNG at the current Preview render size, with frame, controls and revision metadata. MCP does not change Preview resolution.', inputSchema: {} }, async () => {
   const result = await call('capture'); return { content: [{ type: 'image', mimeType: 'image/png', data: result.base64 }, { type: 'text', text: JSON.stringify(result.metadata) }] };
 });
 for (const [method, schema, description] of [
