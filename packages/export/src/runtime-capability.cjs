@@ -16,6 +16,7 @@ const parameterCapabilities=Object.freeze({
 const workerLivenessCapabilities=Object.freeze({
  'apps/render-host/src/main.cjs':'lux-main-worker-liveness-v2',
  'apps/render-host/src/compiled-worker.js':'lux-worker-liveness-v2',
+ 'apps/render-host/src/compiled-output.html':'lux-relay-worker-liveness-v2',
 });
 function assertMarkers(root,markers) {
   for (const [relative, marker] of Object.entries(markers)) {
