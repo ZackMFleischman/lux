@@ -16,7 +16,7 @@ Updated: 12 September 2026. **Tracer is not complete.** Scope is fixed; filesyst
 | Host and control timing | In progress | Measure startup, host frames and how quickly controls reach visible output. | Timing records integrated; review fixes and actual measurements remain. Worker-to-host frame matching is still unproven. |
 | Performance acceptance | In progress | Compare repeatable measured runs with the required speed budgets. | Collect and evaluate hardware results; unsupported or incomplete measurements cannot pass. |
 | Standalone Resolume checks | In progress | Exported sources work with Lux closed and without the development checkout. | New image package passed a private native-host test (first output 4.4 s). Actual Resolume controls, independent sources and composition reopen still need verification. |
-| Failure recovery | In progress | Broken visuals recover without trapping Lux or Resolume. | Retry and review fixes are integrated. Verify actual process shutdown, recovered playback and current host values. |
+| Failure recovery | In progress | Broken visuals recover without trapping Lux or Resolume. | Real Studio error/hang recovery, retry suppression and recovered pixels passed. Installed execution-loop timeout review is underway; physical stop/GPU cleanup and host-value recovery remain. |
 
 Stable checkout: `codex/tracer-0.1`, validated through `b0a844f`. Compact 46 px property rows, collapsed diagnostics, in-app confirmations and the playback UI fix are committed and tested. Native build passes 13 checks; private installation, native image playback and supervised cleanup passed. Remaining work is host interaction, performance acceptance and physical recovery validation.
 

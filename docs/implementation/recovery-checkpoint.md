@@ -104,3 +104,12 @@ remains unavailable. The required **2 s injected-JavaScript physical stop** and
 controls**, host responsiveness, GPU teardown and real Resolume failure recovery
 remain unverified. Do not substitute a terminate request, worker-ready response,
 successful clean shutdown or startup timing for those endpoints.
+
+### Subsequent real Studio fault injection
+
+The [real Studio recovery check](../../evidence/tracer-0.1/parameters-images-studio/studio-recovery.md)
+now covers throwing and unresponsive generated JavaScript, one automatic retry,
+playing/control preservation, second-fault suppression, unchanged source, and an
+explicit paused restart with checked reference pixels and capture metadata.
+This upgrades functional Studio recovery evidence; installed recovery and the
+physical stop/GPU-cleanup/host-consumption budgets remain unverified.
