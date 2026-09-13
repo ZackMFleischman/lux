@@ -1,1 +1,1 @@
-{"extends":"./tsconfig.base.json","compilerOptions":{"outDir":"dist","rootDir":"packages","declaration":true,"rewriteRelativeImportExtensions":true},"include":["packages/**/*.ts"]}
+{"extends":"./tsconfig.base.json","compilerOptions":{"outDir":"dist","rootDir":"packages","declaration":true,"rewriteRelativeImportExtensions":true},"include":["packages/**/*.ts"],"exclude":["packages/visual-sdk/examples/parameters.ts"]}

@@ -1,1 +1,1 @@
-{"extends":"./tsconfig.base.json","compilerOptions":{"allowImportingTsExtensions":true,"allowJs":true,"noEmit":true},"include":["packages/**/*.ts","tests/**/*.ts"]}
+{"extends":"./tsconfig.base.json","compilerOptions":{"allowImportingTsExtensions":true,"allowJs":true,"noEmit":true},"include":["packages/**/*.ts","tests/**/*.ts"],"exclude":["packages/visual-sdk/examples/parameters.ts"]}
