@@ -14,6 +14,7 @@ import { readBoundedJson } from './bounded-json.mjs';
 import { sdkSourceFile, sourceArtifactVersion } from './sdk-selection.mjs';
 import { extractControlDeclarations } from './parameter-declarations.mjs';
 import { canonicalControlSchemaJson } from '../../../packages/runtime-contracts/src/parameters.mjs';
+import { assetDependencyPaths } from './asset-dependencies.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const workspace = process.cwd();
@@ -116,6 +117,7 @@ async function main() {
   sourceMaps['__lux/sdk.js.map'] = await readFile(join(workspace, 'out/types/sdk.js.map'), 'utf8');
   if (source.sdkVersion === '0.2.0') modules['__lux/parameters.js'] = await readFile(join(root, 'packages/runtime-contracts/src/parameters.mjs'), 'utf8');
   const dependencies = {
+    ...await assetDependencyPaths(root),
     'compiler/worker.mjs': fileURLToPath(import.meta.url),
     'compiler/source-policy.mjs': join(root, 'apps/build-worker/src/source-policy.mjs'),
     'compiler/result-budget.mjs': join(root, 'apps/build-worker/src/result-budget.mjs'),

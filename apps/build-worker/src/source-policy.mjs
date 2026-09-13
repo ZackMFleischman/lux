@@ -1,15 +1,26 @@
-import { validateSourceAssets } from '../../../packages/assets/src/index.mjs';
+import { validateSourceAssets, snapshotSourceAssetRecords } from '../../../packages/assets/src/index.mjs';
 import { sdkSourceFile } from './sdk-selection.mjs';
 export const limits = Object.freeze({ sourceBytes: 1048576, files: 32, diagnosticBytes: 131072, compileMs: 30000, outputBytes: 4194304, sourceJsonBytes: 6291456, requestBytes: 8388608 });
 export function violation(message, code = 'SOURCE_BOUNDARY_VIOLATION') { return Object.assign(new Error(message), { code }); }
 export function validateSource(source) {
+  const envelope = validateSourceEnvelope(source);
+  if (envelope.sourceVersion === 2) {
+    try { envelope.assets = validateSourceAssets(envelope.assets); }
+    catch(error) { throw Object.assign(violation(error.message,error.code === 'QUOTA_EXCEEDED' ? error.code : 'SOURCE_BOUNDARY_VIOLATION'), error.path ? {path:error.path} : {}); }
+  }
+  return envelope;
+}
+
+// Explicitly untrusted envelope: suitable before worker dispatch or for files
+// derived from an internally owned admitted source, never full admission itself.
+export function validateSourceEnvelope(source) {
   if (source && typeof source === 'object' && 'sourceVersion' in source) {
     const raw = snapshotRecord(source, ['sourceVersion','sdkVersion','entry','files','assets']);
     if (raw.sourceVersion !== 2) throw violation('Unsupported source version');
     const files = snapshotRecord(raw.files);
     const legacy = validateLegacySource({sdkVersion:raw.sdkVersion,entry:raw.entry,files});
     let assets;
-    try { assets = validateSourceAssets(raw.assets); }
+    try { assets = snapshotSourceAssetRecords(raw.assets); }
     catch(error) { throw Object.assign(violation(error.message,error.code === 'QUOTA_EXCEEDED' ? error.code : 'SOURCE_BOUNDARY_VIOLATION'), error.path ? {path:error.path} : {}); }
     const canonical = {sourceVersion:2,sdkVersion:legacy.sdkVersion,entry:legacy.entry,files:Object.fromEntries(Object.keys(files).sort().map(key=>[key,files[key]])),assets};
     if (new TextEncoder().encode(JSON.stringify(canonical)).byteLength > limits.sourceJsonBytes) throw violation('Source v2 compact JSON exceeds 6 MiB','QUOTA_EXCEEDED');

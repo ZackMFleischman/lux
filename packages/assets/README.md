@@ -1,12 +1,12 @@
-# Bounded image asset foundation
+# Bounded image assets
 
-This module implements the approved BMP and asset-record policy in
-`docs/implementation/required-assets.md`. It does not enable source v2, populate
-production runtime contexts, or demonstrate scene/export playback. No dependency,
-SDK, source-contract, compiler, runtime, UI or package-manifest changes are included.
+This module admits BMP plus the bounded PNG/JPEG subsets documented in `PNG.md`
+and `JPEG.md`. Source envelopes preserve original bytes. Studio workers expose
+both original assets and predecoded images; actual GPU/installed-host acceptance
+is recorded separately from these CPU guarantees.
 
 Import `packages/assets/src/index.mjs`; TypeScript resolves `index.d.mts`.
-The module has no imports or platform image codecs and can be bundled for a browser.
+The module uses pinned pure JavaScript codecs and can be bundled for a browser.
 
 ## Admission and decoding
 
@@ -26,13 +26,14 @@ The module has no imports or platform image codecs and can be bundled for a brow
   later property reads or Proxy `get` substitutions cannot change admitted bytes
   or metadata.
 
-Source descriptors are exactly `{mediaType:"image/bmp",encoding:"base64",data}`.
+Source descriptors are exactly `{mediaType,encoding:"base64",data}`, where
+mediaType is `image/bmp`, `image/png`, or `image/jpeg`. Logical paths use matching
+lowercase `.bmp`, `.png`, `.jpg` or `.jpeg` extensions.
 An empty record is valid. Paths are logical IDs; these APIs confer no filesystem
 or URL authority. Errors have `code` equal to `ASSET_BOUNDARY_VIOLATION` or
 `QUOTA_EXCEEDED`; asset-specific errors also carry `path`. Outer source, scene,
 request, artifact and transport JSON byte limits remain the integrating caller's
-responsibility. The aggregate RGBA guard is retained even though the stricter
-current BMP file-byte budget already bounds its maximum reachable allocation.
+responsibility. Original and decoded aggregate budgets apply across all formats.
 
 ## Derived metadata and identity
 
@@ -78,6 +79,15 @@ its identities, call `verifyDerivedAssets`, then construct
 `createReadonlyAssetMap(verified.sourceAssets)`. Legacy candidates can construct
 `createReadonlyAssetMap({})`. This module does not verify artifact/linked identities.
 
+Construct `createReadonlyImageMap(verified.sourceAssets)` in that same pristine
+phase for `context.images`. Values contain `{width,height,colorSpace:'srgb',
+alphaMode:'straight',data}` with top-down RGBA8 and fresh caller-owned pixel copies.
+JPEG orientation changes derived dimensions/pixels without changing originals;
+PNG retains hidden RGB under zero alpha. A private weak cache reuses decoded data
+only for immutable asset records minted by this module; received hashes/JSON cannot
+mint cache authority. Studio PNG/JPEG previews and imports decode in dedicated,
+deadline-bounded workers rather than during ordinary editor renders.
+
 The frozen null-prototype facade implements `size`, `has`, `get`, `keys`, `values`,
 `entries`, `[Symbol.iterator]`, and `forEach`. It has no mutators or native Map
 brand. `get` and every value-producing iteration return fresh caller-owned byte
@@ -93,15 +103,15 @@ private bytes. Custom iterators use captured operations too. This confines asset
 storage under later intrinsic replacement; it is not a general JavaScript sandbox.
 Admission and hashing run in the trusted phase, not after submitted code executes.
 
-## Next integration stage
+## Integration boundaries
 
-Keep legacy source/hash normalization unchanged. Add discriminated v2 contracts
-only when workspace, compiler/linker, worker, and export paths can retain assets.
-Include this helper in both dependency pinning allowlists and emitted runtime
-inventory; importing it alone does not pin its bytes. Ensure shipped worker and
+Legacy source/hash normalization remains unchanged. The compiler and linker
+inventory the asset helpers and actual installed codec package implementations.
+Ensure shipped worker and
 transport-reader bundles contain it without runtime checkout imports. Charge
 base64 to every exact serialized outer budget, and verify metadata/set hashes at
-each decoded trust boundary. None of that pipeline wiring is part of this module.
+each decoded trust boundary. Installed-host integration and GPU alpha evidence
+remain required release checks.
 
 Run CPU coverage with `node --test --test-isolation=none tests/assets/assets.test.mjs`;
 run declaration/SDK compatibility with `node node_modules/typescript/bin/tsc --noEmit`.

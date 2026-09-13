@@ -36,7 +36,7 @@ async function initialize(message) {
   controlState=await prepareWorkerControlState(message);
   clock = new RuntimeClock(() => performance.now(), 'paused'); random = new SeededRandom(settings.seed);
   heartbeat = setInterval(() => send('heartbeat', { frameId: String(frame) }), 250);
-  const {module,assets} = await loadAuthoredModule(message, async moduleSource => {
+  const {module,assets,images} = await loadAuthoredModule(message, async moduleSource => {
     const url = URL.createObjectURL(new Blob([moduleSource], { type: 'text/javascript' }));
     try { return await import(url); } finally { URL.revokeObjectURL(url); }
   });
@@ -54,7 +54,7 @@ async function initialize(message) {
   const material = new module.MeshBasicNodeMaterial();
   material.fragmentNode = module.sampleTexture(outputTarget.texture);
   presentation = new module.QuadMesh(material);
-  visual = await create(freeze({ settings: freeze({ ...settings }), assets,
+  visual = await create(freeze({ settings: freeze({ ...settings }), assets, images,
     random: () => random.next(), reportError: value => { throw Error(String(value)); },
     renderer: freeze({ render: (scene, camera) => {
       renderer.setRenderTarget(outputTarget); renderer.render(scene, camera);

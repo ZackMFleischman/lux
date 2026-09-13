@@ -4,6 +4,18 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  fast-png>fflate: 0.8.2
+  fast-png>iobuffer: 6.0.1
+
+patchedDependencies:
+  fast-png@8.0.0:
+    hash: c7792735a387ac9ed4e877892e94b5cbe19e23efb66b8eae4607ab59671cf54d
+    path: patches/fast-png@8.0.0.patch
+  jpeg-js@0.4.4:
+    hash: 9f104444e6d781245877562d247768cc15dca273e2a4bb238ae46bbf73146a69
+    path: patches/jpeg-js@0.4.4.patch
+
 importers:
 
   .:
@@ -41,6 +53,21 @@ importers:
       dockview-react:
         specifier: 7.0.4
         version: 7.0.4(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      fast-png:
+        specifier: 8.0.0
+        version: 8.0.0(patch_hash=c7792735a387ac9ed4e877892e94b5cbe19e23efb66b8eae4607ab59671cf54d)
+      fflate:
+        specifier: 0.8.2
+        version: 0.8.2
+      iobuffer:
+        specifier: 6.0.1
+        version: 6.0.1
+      jpeg-js:
+        specifier: 0.4.4
+        version: 0.4.4(patch_hash=9f104444e6d781245877562d247768cc15dca273e2a4bb238ae46bbf73146a69)
+      pako:
+        specifier: 2.1.0
+        version: 2.1.0
       three:
         specifier: 0.186.0
         version: 0.186.0
@@ -1064,8 +1091,14 @@ packages:
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
 
+  fast-png@8.0.0:
+    resolution: {integrity: sha512-gCysNasJ8KEMgfdYIKd/wTDo6ENK1PWT0RJO7O+0pgmuHPw2O6tA1WvdxFRJoLf9V8yFYpG0FA1YgI8X97OhJA==}
+
   fast-uri@3.1.7:
     resolution: {integrity: sha512-dOvZVzjdZdz7phd9v6jCbwxrBW3fK6n8Rc0CtdmM4bumzMnxywBYhuph6J819RRw/ku+rLbelwfMunktuzVVHg==}
+
+  fflate@0.8.2:
+    resolution: {integrity: sha512-cPJU47OaAoCbg0pBvzsgpTPhmhqI5eJjh/JIu8tPj5q+T7iLvW/JAYUqmE7KOB4R1ZyEhzBaIQpQpardBF5z8A==}
 
   fflate@0.8.3:
     resolution: {integrity: sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==}
@@ -1149,6 +1182,9 @@ packages:
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
 
+  iobuffer@6.0.1:
+    resolution: {integrity: sha512-SZWYkWNfjIXIBYSDpXDYIgshqtbOPsi4lviawAEceR1Kqk+sHDlcQjWrzNQsii80AyBY0q5c8HCTNjqo74ul+Q==}
+
   ip-address@10.7.0:
     resolution: {integrity: sha512-BGFsyJd5mpXp3rK6jIdADLNgpJUK1jnjzvYF8lK+VyDab9JAmqN0YOKDdP17HlgKb2+ehPgDc8EtnRLbGCAMhA==}
     engines: {node: '>= 12'}
@@ -1175,6 +1211,9 @@ packages:
 
   jose@6.2.12:
     resolution: {integrity: sha512-9NiFmJEex0sy2Dk58j2UGBSHgUs2ypF9eZSu4L6vjOX3Dp96Sw1F3uL+H+D1sx02jZZdzUT0HgvCy59CuvXcWw==}
+
+  jpeg-js@0.4.4:
+    resolution: {integrity: sha512-WZzeDOEtTOBK4Mdsar0IqEU5sMr3vSV2RqkAIzUEV2BHnUfKGyswWFPFwK5EeDo93K3FohSHbLAjj0s1Wzd+dg==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -1263,6 +1302,9 @@ packages:
 
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
+
+  pako@2.1.0:
+    resolution: {integrity: sha512-w+eufiZ1WuJYgPXbV/PO3NCMEc3xqylkKHzp8bxp1uW4qaSNQUkwmLLEc3kKsfz8lpV1F8Ht3U1Cm+9Srog2ug==}
 
   parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
@@ -2425,7 +2467,14 @@ snapshots:
 
   fast-deep-equal@3.1.3: {}
 
+  fast-png@8.0.0(patch_hash=c7792735a387ac9ed4e877892e94b5cbe19e23efb66b8eae4607ab59671cf54d):
+    dependencies:
+      fflate: 0.8.2
+      iobuffer: 6.0.1
+
   fast-uri@3.1.7: {}
+
+  fflate@0.8.2: {}
 
   fflate@0.8.3: {}
 
@@ -2523,6 +2572,8 @@ snapshots:
 
   inherits@2.0.4: {}
 
+  iobuffer@6.0.1: {}
+
   ip-address@10.7.0: {}
 
   ipaddr.js@1.9.1: {}
@@ -2540,6 +2591,8 @@ snapshots:
   isexe@2.0.0: {}
 
   jose@6.2.12: {}
+
+  jpeg-js@0.4.4(patch_hash=9f104444e6d781245877562d247768cc15dca273e2a4bb238ae46bbf73146a69): {}
 
   js-tokens@4.0.0: {}
 
@@ -2621,6 +2674,8 @@ snapshots:
   once@1.4.0:
     dependencies:
       wrappy: 1.0.2
+
+  pako@2.1.0: {}
 
   parent-module@1.0.1:
     dependencies:

@@ -38,12 +38,14 @@ test('worker prepares verified isolated bytes before importing the submitted mod
   const linked=await payload(); let imported='';
   const prepared=await loadAuthoredModule({linked},async code=>{imported=code;return {default:'visual'};});
   assert.equal(imported,linked.code);assert.deepEqual(prepared.module,{default:'visual'});
+  assert.deepEqual([...prepared.images.get('assets/red.bmp')!.data],[255,0,0,255]);
   assert.equal(hash(prepared.assets.get('assets/red.bmp')!),hash(Buffer.from(data,'base64')));
   (prepared.assets.get('assets/red.bmp') as Uint8Array).fill(0);
   assert.equal(hash(prepared.assets.get('assets/red.bmp')!),hash(Buffer.from(data,'base64')));
   assert.equal((prepared.assets as any).set,undefined);
   const missing=await loadAuthoredModule({moduleSource:'legacy'},async()=>({default:'legacy'}));
   assert.equal(missing.assets.size,0);assert(Object.isFrozen(missing.assets));assert.equal((missing.assets as any).set,undefined);
+  assert.equal(missing.images.size,0);
 });
 test('bad linked hashes, altered assets and ambiguous legacy messages fail before import',async()=>{
   const linked=await payload();
@@ -84,6 +86,7 @@ test('actual worker exposes verified assets during create and missing keys fail 
   const makeCode=(sdkVersion:string,controls:unknown)=>`export default {sdkVersion:${JSON.stringify(sdkVersion)},controls:${JSON.stringify(controls)},async create(context){
     const bytes=context.assets.get('assets/red.bmp');if(!bytes)throw Error('Missing required asset: assets/red.bmp');
     if(bytes[0]!==66||bytes[1]!==77||context.assets.set||!Object.isFrozen(context.assets))throw Error('Invalid asset context');
+    const image=context.images.get('assets/red.bmp');if(!image||image.colorSpace!=='srgb'||image.alphaMode!=='straight'||image.data[0]!==255||image.data[3]!==255)throw Error('Invalid decoded image context');
     bytes[0]=0;if(context.assets.get('assets/red.bmp')[0]!==66)throw Error('Shared private storage');
     return {update(){},render(){},reset(){},dispose(){}};
   }};

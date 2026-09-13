@@ -22,6 +22,10 @@ await build({ ...common, entryPoints: [join(directory, 'src/entry.tsx')], outfil
   platform: 'browser', format: 'esm', target: 'chrome140', jsx: 'automatic' });
 await build({ ...common, entryPoints: [join(directory, 'src/visual-worker.mjs')], outfile: join(dist, 'visual-worker.js'),
   platform: 'browser', format: 'esm', target: 'chrome140' });
+await build({ ...common, entryPoints: [join(directory, 'src/source/admission-worker.mjs')], outfile: join(dist, 'source-admission-worker.js'),
+  platform: 'browser', format: 'esm', target: 'chrome140' });
+await build({ ...common, entryPoints: [join(directory, 'src/source/image-preview-worker.mjs')], outfile: join(dist, 'image-preview-worker.js'),
+  platform: 'browser', format: 'esm', target: 'chrome140' });
 await copyFile(join(directory, 'src/index.html'), join(dist, 'index.html'));
 if (process.argv.includes('--tests')) await build({ ...common,
   entryPoints: [join(root, 'tests/studio/view.test.tsx')], outfile: join(dist, 'view.test.cjs'),

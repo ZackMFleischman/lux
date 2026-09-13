@@ -1,0 +1,65 @@
+diff --git a/lib/decoder.js b/lib/decoder.js
+index 1982481806e5fe29bd38cb008297f35731ade20b..d3604090441d9c7300558287bf6eb2b452555fe3 100644
+--- a/lib/decoder.js
++++ b/lib/decoder.js
+@@ -157,9 +157,11 @@ var JpegImage = (function jpegImage() {
+           if (r < 15)
+             break;
+           k += 16;
++          if (!opts.tolerantDecoding && k > 64) throw new Error("AC run exceeds block");
+           continue;
+         }
+         k += r;
++        if (!opts.tolerantDecoding && k >= 64) throw new Error("AC coefficient exceeds block");
+         var z = dctZigZag[k];
+         zz[z] = receiveAndExtend(s);
+         k++;
+@@ -189,9 +191,11 @@ var JpegImage = (function jpegImage() {
+             break;
+           }
+           k += 16;
++          if (!opts.tolerantDecoding && k > spectralEnd + 1) throw new Error("AC run exceeds spectral band");
+           continue;
+         }
+         k += r;
++        if (!opts.tolerantDecoding && k > spectralEnd) throw new Error("AC coefficient exceeds spectral band");
+         var z = dctZigZag[k];
+         zz[z] = receiveAndExtend(s) * (1 << successive);
+         k++;
+@@ -247,6 +251,9 @@ var JpegImage = (function jpegImage() {
+         }
+         k++;
+       }
++      if (!opts.tolerantDecoding && successiveACState !== 0 && successiveACState !== 4) {
++        throw new Error("unfinished AC refinement run at block boundary");
++      }
+       if (successiveACState === 4) {
+         eobrun--;
+         if (eobrun === 0)
+@@ -305,6 +312,7 @@ var JpegImage = (function jpegImage() {
+         for (n = 0; n < resetInterval; n++) {
+           decodeBlock(component, decodeFn, mcu);
+           mcu++;
++          if (mcu === mcuExpected) break;
+         }
+       } else {
+         for (n = 0; n < resetInterval; n++) {
+@@ -325,7 +333,17 @@ var JpegImage = (function jpegImage() {
+         }
+       }
+ 
+-      if (mcu === mcuExpected) {
++      // Lux strict-admission patch: entropy boundaries use one-fill padding
++      // and may not hide additional bytes before the next marker.
++      if (!opts.tolerantDecoding) {
++        if (eobrun > 0) throw new Error("EOB run exceeds scan or restart boundary");
++        var paddingMask = (1 << bitsCount) - 1;
++        if ((bitsData & paddingMask) !== paddingMask || data[offset] !== 0xFF || data[offset + 1] === 0x00) {
++          throw new Error("invalid entropy padding or unused entropy bytes");
++        }
++        while (data[offset] === 0xFF && data[offset + 1] === 0xFF) offset++;
++      }
++      if (mcu === mcuExpected && opts.tolerantDecoding) {
+         // Skip trailing bytes at the end of the scan - until we reach the next marker
+         do {
+           if (data[offset] === 0xFF) {
