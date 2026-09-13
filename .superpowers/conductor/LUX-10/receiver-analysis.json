@@ -1,0 +1,387 @@
+{
+  "executor": "/root/reliability_plan",
+  "analysisOnly": true,
+  "acceptance": false,
+  "results": [
+    {
+      "branch": "receiver-worker-timing",
+      "dir": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\receiver-worker-timing\\artifacts\\receiver-timing-baseline",
+      "preparedCommit": "6e3f7649d1fe0bedce501ce223a946eefd8c04e8",
+      "experimentId": "9ed6224f-ab31-46bb-a3a0-e93530356f68",
+      "manifestCommit": null,
+      "child": {
+        "pid": 27684,
+        "startUtc": "2026-09-13T04:39:14.6546767Z",
+        "startTicks": "743515741638",
+        "frequency": 10000000
+      },
+      "result": {
+        "exitCode": 0,
+        "timeout": false,
+        "cancelled": false,
+        "forcedStop": false,
+        "cleanupComplete": true,
+        "endUtc": "2026-09-13T04:39:27.6574190Z",
+        "endTicks": "743645776799"
+      },
+      "releaseId": "f1542487d8bf1e4313c655f4b1a8442fd0ed771413fb940c7f1bf27f737120d9",
+      "runtimeId": "edca0cd159422128fea2a2f3f4a44c29cbb0134adbcca42d6565dcd43d4141af",
+      "expected": {
+        "releaseId": "f1542487d8bf1e4313c655f4b1a8442fd0ed771413fb940c7f1bf27f737120d9",
+        "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab"
+      },
+      "strictCadence": {
+        "ok": false,
+        "reason": "Lost host records"
+      },
+      "strictTiming": {
+        "ok": false,
+        "reason": "Timing evidence incomplete"
+      },
+      "hostSummary": [],
+      "failures": [
+        {
+          "kind": "failure",
+          "reason": "local D3D copy deadline"
+        }
+      ],
+      "timingSummary": {
+        "kind": "receiver-worker-timing-summary",
+        "instanceId": "0000000000006c24000000ad1df05c75",
+        "domain": "qpc",
+        "frequency": "10000000",
+        "metric": "worker CPU elapsed including queue/poll/wake delays, not GPU duration",
+        "capacity": 32768,
+        "recorded": 1168,
+        "attempted": 1168,
+        "lostRecords": 0,
+        "clockFailures": 0,
+        "incompleteSpans": 1,
+        "allocationFailed": false,
+        "aborted": true,
+        "valid": false
+      },
+      "partialDiagnostic": {
+        "joined": 600,
+        "slots": 600,
+        "selectedTransport": 143,
+        "heldTransport": 209,
+        "noFrame": 248,
+        "maxBetweenSelectedTransportMs": 83.7097,
+        "callbackMs": {
+          "count": 600,
+          "median": 0.0933,
+          "p95": 0.2875,
+          "max": 15.5518
+        },
+        "completeSpanMs": {
+          "outer-sleep": {
+            "count": 457,
+            "median": 15.5283,
+            "p95": 16.1066,
+            "max": 16.6532
+          },
+          "local-copy-poll-sleep": {
+            "count": 179,
+            "median": 15.26,
+            "p95": 15.8165,
+            "max": 16.1996
+          },
+          "copy-submit-to-query-done": {
+            "count": 177,
+            "median": 15.3563,
+            "p95": 15.941,
+            "max": 45.3915
+          },
+          "nv-lock": {
+            "count": 177,
+            "median": 0.2269,
+            "p95": 0.6316,
+            "max": 1.5418
+          },
+          "gl-fence-to-ready": {
+            "count": 177,
+            "median": 15.5292,
+            "p95": 16.5814,
+            "max": 33.7727
+          }
+        }
+      },
+      "incomplete": [
+        {
+          "kind": "receiver-worker-timing",
+          "instanceId": "0000000000006c24000000ad1df05c75",
+          "sequence": 1168,
+          "stage": "copy-submit-to-query-done",
+          "start": "743639087345",
+          "end": "743639093751",
+          "generation": 743565802160,
+          "outputGeneration": 1,
+          "frameId": "179",
+          "boundFrame": true,
+          "complete": false
+        }
+      ],
+      "lifecycle": [
+        {
+          "instanceId": "0000000000006c24000000ad1df05c75",
+          "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+          "releaseId": "f1542487d8bf1e4313c655f4b1a8442fd0ed771413fb940c7f1bf27f737120d9",
+          "attemptId": "59b5e4447ddbb1ab794b965a97679843",
+          "kind": "restart-trigger",
+          "clock": {
+            "domain": "qpc",
+            "frequency": "10000000",
+            "at": "743555331030"
+          },
+          "incomplete": false,
+          "lostRecords": 0
+        },
+        {
+          "instanceId": "0000000000006c24000000ad1df05c75",
+          "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+          "releaseId": "f1542487d8bf1e4313c655f4b1a8442fd0ed771413fb940c7f1bf27f737120d9",
+          "attemptId": "59b5e4447ddbb1ab794b965a97679843",
+          "kind": "stop-requested",
+          "force": false,
+          "clock": {
+            "domain": "qpc",
+            "frequency": "10000000",
+            "at": "743641771191"
+          },
+          "incomplete": false,
+          "lostRecords": 0
+        }
+      ],
+      "hashes": [
+        {
+          "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\receiver-worker-timing\\artifacts\\receiver-timing-baseline\\configuration.json",
+          "sha256": "1aecacc497da519a76577d4b603794d92fd49b09911c24778e9b4763677a7723"
+        },
+        {
+          "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\receiver-worker-timing\\artifacts\\receiver-timing-baseline\\last-experiment.json",
+          "sha256": "9176b4aefea3ed34d45e2d68528f6a092dbf18618462335b35bee8b7a2ca2ad1"
+        },
+        {
+          "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\receiver-worker-timing\\artifacts\\receiver-timing-baseline\\cadence.cadence.json",
+          "sha256": "ece891a64ce3673fc245495670b9caf59f17d2990a9a1dbbd10d881a29ac31cb"
+        },
+        {
+          "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\receiver-worker-timing\\artifacts\\receiver-timing-baseline\\receiver.jsonl",
+          "sha256": "17cd77b00d0c2e8b7338a5e4073a698a6e3e36287339278eb235fb21de088da7"
+        },
+        {
+          "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\receiver-worker-timing\\artifacts\\receiver-timing-baseline\\profile\\local\\Lux\\Installed\\instances\\edca0cd159422128fea2a2f3f4a44c29cbb0134adbcca42d6565dcd43d4141af\\0000000000006c24000000ad1df05c75.attempts\\59b5e4447ddbb1ab794b965a97679843.lifecycle.jsonl",
+          "sha256": "28cabf7b76dda9ca1239990d04161499bbea0bf5ecf82ea8d2c2a2e88a558525"
+        }
+      ]
+    },
+    {
+      "branch": "receiver-timing-treatment",
+      "dir": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\receiver-timing-treatment\\artifacts\\receiver-timing-treatment",
+      "preparedCommit": "24afa99e32af81ed2466a386574b43234b20f1a7",
+      "experimentId": "f6ee6d77-1079-459a-9ece-a69f103c3108",
+      "manifestCommit": null,
+      "child": {
+        "pid": 22432,
+        "startUtc": "2026-09-13T04:45:12.5619177Z",
+        "startTicks": "747094801829",
+        "frequency": 10000000
+      },
+      "result": {
+        "exitCode": 0,
+        "timeout": false,
+        "cancelled": false,
+        "forcedStop": false,
+        "cleanupComplete": true,
+        "endUtc": "2026-09-13T04:45:23.8081389Z",
+        "endTicks": "747207263346"
+      },
+      "releaseId": "92354e1d788f87e0991cd8fe648ccba6c1cf3c4d5cad1fe1a90ebebd8dddd16b",
+      "runtimeId": "ea3de4f2f961c69f32bf12406c64a407c52b8a33f9eee6204b9418ae705ed5b8",
+      "expected": {
+        "releaseId": "92354e1d788f87e0991cd8fe648ccba6c1cf3c4d5cad1fe1a90ebebd8dddd16b",
+        "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab"
+      },
+      "strictCadence": {
+        "ok": true,
+        "scope": "10 s cold-start native fixture cadence and elapsed callback diagnostic",
+        "instanceId": "00000000000057a0000000adf2a0458f",
+        "releaseId": "92354e1d788f87e0991cd8fe648ccba6c1cf3c4d5cad1fe1a90ebebd8dddd16b",
+        "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+        "expectedSlots": 600,
+        "opportunities": 600,
+        "missedSlots": 0,
+        "rateHz": 60,
+        "noFrame": 260,
+        "selectedTransport": 170,
+        "heldTransport": 170,
+        "callbackMs": {
+          "p50": 0.1072,
+          "p95": 0.3056,
+          "p99": 1.3483,
+          "max": 7.2606
+        },
+        "latenessMs": {
+          "p50": 0.293,
+          "p95": 0.5519,
+          "p99": 1.3095,
+          "max": 6.2593
+        },
+        "window": {
+          "start": "747105862904",
+          "end": "747205862904",
+          "coverageEnd": "747205866481",
+          "overshootMs": 0.3577
+        },
+        "freshImageMeasured": false,
+        "performanceAcceptance": false,
+        "actualResolumeTested": false,
+        "callbackTiming": "QPC elapsed including descheduling and driver time; not exclusive CPU execution"
+      },
+      "strictTiming": {
+        "ok": false,
+        "reason": "Timing evidence incomplete"
+      },
+      "hostSummary": [
+        {
+          "kind": "host-telemetry-summary",
+          "instanceId": "00000000000057a0000000adf2a0458f",
+          "lostRecords": 0,
+          "recorded": 600
+        }
+      ],
+      "failures": [],
+      "timingSummary": {
+        "kind": "receiver-worker-timing-summary",
+        "instanceId": "00000000000057a0000000adf2a0458f",
+        "domain": "qpc",
+        "frequency": "10000000",
+        "metric": "worker CPU elapsed including queue/poll/wake delays, not GPU duration",
+        "capacity": 32768,
+        "recorded": 1156,
+        "attempted": 1156,
+        "lostRecords": 0,
+        "clockFailures": 0,
+        "incompleteSpans": 1,
+        "allocationFailed": false,
+        "aborted": false,
+        "valid": false
+      },
+      "partialDiagnostic": {
+        "joined": 600,
+        "slots": 600,
+        "selectedTransport": 170,
+        "heldTransport": 170,
+        "noFrame": 260,
+        "maxBetweenSelectedTransportMs": 66.5369,
+        "callbackMs": {
+          "count": 600,
+          "median": 0.1072,
+          "p95": 0.3056,
+          "max": 7.2606
+        },
+        "completeSpanMs": {
+          "outer-sleep": {
+            "count": 472,
+            "median": 15.4559,
+            "p95": 16.103,
+            "max": 16.6092
+          },
+          "local-copy-poll-sleep": {
+            "count": 171,
+            "median": 15.3054,
+            "p95": 15.8463,
+            "max": 16.3014
+          },
+          "copy-submit-to-query-done": {
+            "count": 171,
+            "median": 15.4091,
+            "p95": 16.013,
+            "max": 16.3908
+          },
+          "nv-lock": {
+            "count": 171,
+            "median": 0.2283,
+            "p95": 0.3864,
+            "max": 0.9289
+          },
+          "gl-fence-to-ready": {
+            "count": 170,
+            "median": 15.5808,
+            "p95": 16.1376,
+            "max": 16.5923
+          }
+        }
+      },
+      "incomplete": [
+        {
+          "kind": "receiver-worker-timing",
+          "instanceId": "00000000000057a0000000adf2a0458f",
+          "sequence": 1156,
+          "stage": "gl-fence-to-ready",
+          "start": "747205739418",
+          "end": "747205893644",
+          "generation": 747135284613,
+          "outputGeneration": 1,
+          "frameId": "322",
+          "boundFrame": true,
+          "complete": false
+        }
+      ],
+      "lifecycle": [
+        {
+          "instanceId": "00000000000057a0000000adf2a0458f",
+          "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+          "releaseId": "92354e1d788f87e0991cd8fe648ccba6c1cf3c4d5cad1fe1a90ebebd8dddd16b",
+          "attemptId": "fe280825283f131f3bf6172e4bddb727",
+          "kind": "restart-trigger",
+          "clock": {
+            "domain": "qpc",
+            "frequency": "10000000",
+            "at": "747124216783"
+          },
+          "incomplete": false,
+          "lostRecords": 0
+        },
+        {
+          "instanceId": "00000000000057a0000000adf2a0458f",
+          "revisionId": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+          "releaseId": "92354e1d788f87e0991cd8fe648ccba6c1cf3c4d5cad1fe1a90ebebd8dddd16b",
+          "attemptId": "fe280825283f131f3bf6172e4bddb727",
+          "kind": "stop-requested",
+          "force": false,
+          "clock": {
+            "domain": "qpc",
+            "frequency": "10000000",
+            "at": "747206557752"
+          },
+          "incomplete": false,
+          "lostRecords": 0
+        }
+      ],
+      "hashes": [
+        {
+          "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\receiver-timing-treatment\\artifacts\\receiver-timing-treatment\\configuration.json",
+          "sha256": "8d992d652967e7a1c0f5145e338654344bbae43d4b34062f47272b227c6b52e9"
+        },
+        {
+          "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\receiver-timing-treatment\\artifacts\\receiver-timing-treatment\\last-experiment.json",
+          "sha256": "63e36b6bd670e4b29144655152b5a93a883a5f17727647f2db07f33151a48aeb"
+        },
+        {
+          "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\receiver-timing-treatment\\artifacts\\receiver-timing-treatment\\cadence.cadence.json",
+          "sha256": "2f3baaefcc26e28c93522676f6fee2cb38efa80490bb6d2d10e6f423c1d12e72"
+        },
+        {
+          "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\receiver-timing-treatment\\artifacts\\receiver-timing-treatment\\receiver.jsonl",
+          "sha256": "5538d59def8bba325a6ffec865e91981f3a4ed399715cbd7a9a7f813092081ea"
+        },
+        {
+          "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\receiver-timing-treatment\\artifacts\\receiver-timing-treatment\\profile\\local\\Lux\\Installed\\instances\\ea3de4f2f961c69f32bf12406c64a407c52b8a33f9eee6204b9418ae705ed5b8\\00000000000057a0000000adf2a0458f.attempts\\fe280825283f131f3bf6172e4bddb727.lifecycle.jsonl",
+          "sha256": "2d27c362415eaac46c6c822a07a295124f8217664ab75f52a13c924c2417b8a0"
+        }
+      ]
+    }
+  ]
+}

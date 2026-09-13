@@ -1,0 +1,1 @@
+Verified 10 retained raw hashes, all Markdown plan file links outside code fences, and analysis JavaScript syntax. Initial link checker mistook a C++ lambda for Markdown; excluding fenced code corrected the checker.
