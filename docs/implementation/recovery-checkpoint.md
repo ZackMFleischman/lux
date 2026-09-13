@@ -129,3 +129,14 @@ worker and HTML-relay capability markers; already immutable old packages retain
 their original validation rules. Independent review and the integrated 47-test
 installed/export suite passed. None of these CPU results proves actual process
 exit within two seconds or GPU-resource release; those physical checks remain open.
+
+### Subsequent physical-stop hardware result
+
+The [installed stop probe](../../evidence/tracer-0.1/parameters-images-studio/installed-stop.md)
+now establishes a conservative 1,522.2192 ms host-trigger-to-confirmed-Job-exit
+bound for one generated update-loop hang. A durable marker confirms hang entry;
+the native endpoint requires a signaled root process and zero active descendants.
+Native callbacks continued and normal fixture teardown/outer cleanup succeeded.
+This supersedes the blanket unavailable physical-stop statement for this tested
+case only. Initialization hangs, actual Resolume faults, recovered-image timing
+with current controls and GPU-resource accounting retain their stated gaps.
