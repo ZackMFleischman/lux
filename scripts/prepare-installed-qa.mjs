@@ -26,7 +26,7 @@ assert.notEqual(releases[0].releaseId, releases[1].releaseId);
 assert.equal(releases[0].runtimeId, releases[1].runtimeId, 'both exports must pin the same runtime');
 const report = { format: 'lux-installed-qa-fixtures', version: 1, preparationPassed: true,
   hostTested: false, gpuTested: false, requiredAssetCovered: false,
-  assetGap: 'Current source admission permits TypeScript modules only; asset import/bytes/resolution is not wired through the saved scene and release.',
+  assetGap: 'These triangle/ring fixtures contain TypeScript dependencies but no images; use the separate required-image and PNG/JPEG checks for asset coverage.',
   releases };
 await writeFile(join(outputDirectory, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify(report, null, 2));

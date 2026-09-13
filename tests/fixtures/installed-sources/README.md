@@ -46,3 +46,18 @@ checks decoder agreement, missing-asset failure, material/texture ownership and
 disposal using CPU renderer substitutes. Independent review approved this bounded
 fixture. Real compiler/link, native six-region capture, restart, export and offline
 installed playback remain separate gates; the fixture is not yet a working export.
+
+## Current checkpoint — 13 September 2026 UTC
+
+The asset-gap sections above describe earlier checkpoints. Source v2 now admits
+bounded BMP, PNG and JPEG originals, and immutable exports include their bytes.
+The runtime exposes decoded top-down, straight-alpha sRGB pixels through
+`context.images`. The triangle/ring pair still does not exercise image assets.
+
+Real Studio PNG/JPEG workflow and the installed PNG source's native RGBA,
+Resolume transparency and composition reopen checks have passed. See
+[image evidence](../../../evidence/tracer-0.1/parameters-images-studio/installed-alpha.md).
+The separate SDK 0.2 sphere package has five code-defined controls and is installed
+for host QA; this does not upgrade the legacy triangle/ring parameter contract.
+See [sphere evidence](../../../evidence/tracer-0.1/parameters-images-studio/installed-sphere.md)
+and the current [progress table](../../../PROGRESS.md) for remaining host gates.
