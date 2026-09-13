@@ -30,3 +30,18 @@ independent acceptance at revision5 for integrated mainf95f397; its validator
 session stopped. This makes LUX-7/8 eligible for the existing coordinator's fresh
 workers. Current live run state must be read from Conductor rather than the initial
 starting checkpoint above.
+
+## Sole coordinator checkpoint — 13 September 2026
+
+The user's latest direction supersedes the earlier two-coordinator arrangement: task `01a09967-d0ac-75d2-bea3-ccda2980ed32` is the sole coordinator of all four workstreams. The former coordinator and its C02/resolver children reported completed host states, released claims and stopped sessions; the full handoff is retained at `.worktrees/_coordination/final-coordinator-handoff.md`. Do not resume those stopped sessions. The existing immutable run profile records the historical delegation arrangement; its four-workstream delivery scope continues under this explicit user supersession, without changing the acknowledged profile string.
+
+All Lux tickets now use assignees. Root owns the four epics and blocked/prerequisite coordination. Fresh implementation tickets are assigned before launch; reviewers keep independent identities and recorded decisions. Assignee changes wait for active claims to be released through normal submission or handoff. Current tracker revisions and native host observations remain authoritative.
+
+| Workstream | Current delivery path |
+| --- | --- |
+| Filesystem projects | LUX-12 pure resolver plan independently accepted at `037fec859f81e121b934fa7eb74035bc6857a731`; prepare one R3a implementation worker. LUX-7 remains blocked at its recorded host safety stop, with partial evidence preserved. |
+| Components | LUX-8 fresh worker `lux-components-c02-01a09967` continues the preserved uncommitted C02 patch in `component-projects`; actual tests, exact commit and independent review are required before integration. |
+| Creative controls and inputs | LUX-13 I01 mapping source `fab83026c7baadb845bb6617c355dc6c6df421db` submitted with 31 focused tests and declaration audit; fresh independent code review underway. Later input slices retain their individual preparation gates. |
+| Reliability | LUX-10 plan independently accepted at `6221e4b0734446606df460a87ca8f66ea72cd279`; LUX-14 receiver diagnostics assigned to `lux-receiver-diagnostics-01a09967`. Isolated source-only FFGL prerequisite prepared and hash-verified; no hardware acceptance inferred. |
+
+Main integration stays serial and requires focused validation at the exact resulting source. No graphics/Studio/Resolume slot is granted by this checkpoint. Reviews rotate into available delivery capacity; no additional workflow projects are authorized. The user confirmed phone portal access works and explicitly requested no further portal attention; leave its existing service running.
