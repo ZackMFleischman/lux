@@ -1,5 +1,7 @@
 import { z } from 'zod';
-import { hashSchema, outputSettingsSchema, sourceSdkVersionSchema } from '../../../runtime-contracts/src/index.ts';
+// Persisted v1 capabilities deliberately exclude internal compiler profiles.
+const projectV1SdkVersionSchema = z.enum(['0.1.0', '0.2.0']);
+import { hashSchema, outputSettingsSchema } from '../../../runtime-contracts/src/index.ts';
 import { projectIdSchema, sceneIdSchema, componentIdSchema, assetIdSchema } from '../../../runtime-contracts/src/identities.ts';
 import { validateSavedControlSnapshot, verifySavedControlSnapshot, sceneHash } from '../scene-document.ts';
 import type { SavedControlSnapshot } from '../scene-document.ts';
@@ -26,7 +28,7 @@ const pins = z.record(packageId, pin).superRefine((value, context) => {
 });
 const ref = z.discriminatedUnion('kind', [z.object({ kind: z.literal('local'), componentId: componentIdSchema }).strict(), z.object({ kind: z.literal('package'), packageId, exportId }).strict()]);
 const sourceFields = {
-  kind: z.literal('code'), sdkVersion: sourceSdkVersionSchema, sourceVersion: z.union([z.literal(1), z.literal(2)]), entry: modulePath,
+  kind: z.literal('code'), sdkVersion: projectV1SdkVersionSchema, sourceVersion: z.union([z.literal(1), z.literal(2)]), entry: modulePath,
   files: z.array(modulePath).min(1).max(projectLimits.closureFiles), references: z.array(ref), assets: z.record(assetPath, assetIdSchema),
 };
 function checkDefinition(value: { entry: string; files: string[]; sourceVersion: number; assets: Record<string, string>; references: z.infer<typeof ref>[] }) {
@@ -68,7 +70,7 @@ const assetRecords = z.record(uuidKey, asset).superRefine(value => {
 });
 const assets = z.object({ schemaVersion: z.literal(1), assets: assetRecords }).strict();
 const toolchain = z.object({
-  sdkVariants: z.record(z.string().refine(value => sourceSdkVersionSchema.safeParse(value).success), z.object({ declarationEntry: path, contractHash: hashSchema }).strict()),
+  sdkVariants: z.record(z.string().refine(value => projectV1SdkVersionSchema.safeParse(value).success), z.object({ declarationEntry: path, contractHash: hashSchema }).strict()),
   typescriptVersion: exactVersion, threeVersion: exactVersion, threeTypesVersion: exactVersion, declarationPackHash: hashSchema, runtimeBuildHash: hashSchema,
 }).strict().superRefine(value => {
   if (!Object.keys(value.sdkVariants).length) throw Error('Toolchain must declare a supported SDK');

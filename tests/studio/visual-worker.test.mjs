@@ -9,10 +9,10 @@ import { decode } from 'fast-png';
 const schema=normalizeControlDeclarations({height:{type:'number',label:'Height',default:1,min:0,max:4},speed:{type:'number',label:'Speed',default:0.5,min:0,max:2}});
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const bundle=(await build({entryPoints:[fileURLToPath(new URL('../../apps/studio/src/visual-worker.mjs',import.meta.url))],bundle:true,write:false,format:'esm',platform:'browser',logLevel:'silent'})).outputFiles[0].text;
-async function fixture(controls=schema,declared=controls,mutation='',sdkVersion='0.2.0',timed=false,gpuTimed=false,workMs=0,waitCreate=false) {
-  const messages=[],frames=[],intervals=new Map(),scheduled=[],timers=new Map();let created=0,imports=0,now=0,nextTimer=0;
+async function fixture(controls=schema,declared=controls,mutation='',sdkVersion='0.2.0',timed=false,gpuTimed=false,workMs=0,waitCreate=false,lifecycle={}) {
+  const events=[],messages=[],frames=[],intervals=new Map(),scheduled=[],timers=new Map();let created=0,imports=0,now=0,nextTimer=0;
   const requested=[],allocations={query:0,buffer:0,duration:0,clock:0};
-  const device={lost:new Promise(()=>{}),features:new Set(gpuTimed?['timestamp-query']:[]),pushErrorScope(){},popErrorScope:async()=>null,queue:{onSubmittedWorkDone:async()=>{now+=timed?17:workMs;},submit(){}},destroy(){},
+  const device={lost:new Promise(()=>{}),features:new Set(gpuTimed?['timestamp-query']:[]),pushErrorScope(){},popErrorScope:async()=>null,queue:{onSubmittedWorkDone:async()=>{now+=timed?17:workMs;},submit(){}},destroy(){events.push(['device-dispose']);},
     createQuerySet(){allocations.query++;return {destroy(){}};},createBuffer(){allocations.buffer++;return {mapAsync:async()=>{},getMappedRange:()=>new BigUint64Array([100n,1000100n]).buffer,unmap(){},destroy(){}};},
     createCommandEncoder(){return {beginRenderPass:()=>({end(){}}),beginComputePass:()=>({end(){}}),resolveQuerySet(){},copyBufferToBuffer(){},finish:()=>({})};}};
   const context=vm.createContext({TextEncoder,TextDecoder,Uint8Array,Uint8ClampedArray,ArrayBuffer,Blob,crypto:webcrypto,Float64Array:class extends Float64Array{constructor(...args){super(...args);allocations.duration++;}},performance:{now:()=>{allocations.clock++;return now;}},onmessage:null,
@@ -20,15 +20,17 @@ async function fixture(controls=schema,declared=controls,mutation='',sdkVersion=
     URL:{createObjectURL:()=> 'memory:visual',revokeObjectURL(){}},
     navigator:{gpu:{requestAdapter:async()=>({features:new Set(['timestamp-query']),requestDevice:async options=>{requested.push(options);return device;}})}},
     gpuDraw(){const e=device.createCommandEncoder();e.beginRenderPass({}).end();device.queue.submit([e.finish()]);},
-    recordCreate:()=>created++,recordFrame:frame=>{frames.push(structuredClone(frame));if(timed)now+=3;},advanceClock:ms=>{now+=ms;},
+    recordLifecycle:(...event)=>events.push(event),recordCreate:()=>created++,recordFrame:frame=>{frames.push(structuredClone(frame));if(timed)now+=3;},advanceClock:ms=>{now+=ms;},
     ImageData:class{},OffscreenCanvas:class{getContext(){return {putImageData(){}}}async convertToBlob(){return new Blob(['png']);}},
   });
   vm.runInContext('const parseForHarness=JSON.parse; globalThis.deliver=raw=>onmessage({data:parseForHarness(raw)});',context);
+  const methods=[`update(frame){recordFrame(frame)}`,gpuTimed?'render(){gpuDraw();}':timed?'async render(){advanceClock(7);await Promise.resolve();advanceClock(11);}':'render(){}','reset(){}',`dispose(){recordLifecycle('authored-dispose',this===instance);${lifecycle.throwDispose?"throw Error('legacy dispose failed');":''}}`];
+  const instanceCode=lifecycle.classInstance?`new (class {${methods.join(' ')}})()`:`{${methods.join(',')}}`;
   const visualCode=`${mutation}
-    export class WebGPURenderer {backend={isWebGPUBackend:true};setSize(){}async init(){}setRenderTarget(){}render(){}dispose(){}async readRenderTargetPixelsAsync(){const pixels=new Uint8Array(1920*1080*4);pixels.set([188,0,0,128]);return pixels;}}
-    export class RenderTarget{texture={};dispose(){}} export const SRGBColorSpace='srgb';
-    export class MeshBasicNodeMaterial {dispose(){}} export class QuadMesh {constructor(material){this.material=material;}render(){}} export const sampleTexture=()=>({});
-    export default {sdkVersion:${JSON.stringify(sdkVersion)},controls:${typeof declared==='string'?declared:JSON.stringify(declared)},async create(){recordCreate();${waitCreate?'await new Promise(()=>{});':''}return {update(frame){recordFrame(frame)},${gpuTimed?'render(){gpuDraw();}':timed?'async render(){advanceClock(7);await Promise.resolve();advanceClock(11);}':'render(){}'},reset(){},dispose(){}}}};`;
+    export class WebGPURenderer {backend={isWebGPUBackend:true};setSize(){}async init(){}setRenderTarget(){}render(){}dispose(){recordLifecycle('renderer-dispose');}async readRenderTargetPixelsAsync(){const pixels=new Uint8Array(1920*1080*4);pixels.set([188,0,0,128]);return pixels;}}
+    export class RenderTarget{texture={};dispose(){recordLifecycle('target-dispose');}} export const SRGBColorSpace='srgb';
+    export class MeshBasicNodeMaterial {dispose(){recordLifecycle('material-dispose');}} export class QuadMesh {constructor(material){this.material=material;}render(){}} export const sampleTexture=()=>({});
+    export default {sdkVersion:${JSON.stringify(sdkVersion)},controls:${typeof declared==='string'?declared:JSON.stringify(declared)},async create(){recordCreate();${waitCreate?'await new Promise(()=>{});':''}const instance=${instanceCode};return instance;}};`;
   const module=new vm.SourceTextModule(bundle,{context,importModuleDynamically:async()=>{
     imports++;assert.equal(messages[0]?.type,'heartbeat','worker must announce liveness before authored module import');assert.equal(messages[0].workerHeartbeat,1);const visual=new vm.SourceTextModule(visualCode,{context});await visual.link(()=>{throw Error('Unexpected import')});await visual.evaluate();return visual;
   }});
@@ -38,8 +40,28 @@ async function fixture(controls=schema,declared=controls,mutation='',sdkVersion=
   const post=message=>context.deliver(JSON.stringify({...identity,...message}));
   async function send(message){const before=messages.length;post(message);const response=()=>messages.slice(before).find(row=>row.type!=='heartbeat');for(let i=0;i<200&&!response();i++)await new Promise(resolve=>setImmediate(resolve));assert.ok(response(),'worker must respond');return response();}
   const flush=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};
-  return {send,post,initial,messages,frames,requested,allocations,scheduled,timers,flush,async fireTimer(late=0){const [id,timer]=timers.entries().next().value;timers.delete(id);now=Math.max(now,timer.at)+late;timer.fn();await flush();},created:()=>created,imports:()=>imports,telemetry(){now=500;intervals.get(500)?.();return messages.at(-1);},intervals};
+  return {send,post,initial,events,messages,frames,requested,allocations,scheduled,timers,flush,async fireTimer(late=0){const [id,timer]=timers.entries().next().value;timers.delete(id);now=Math.max(now,timer.at)+late;timer.fn();await flush();},created:()=>created,imports:()=>imports,telemetry(){now=500;intervals.get(500)?.();return messages.at(-1);},intervals};
 }
+
+test('legacy class prototype dispose retains its receiver and runs once across repeated disposal',async()=>{
+ for(const sdkVersion of ['0.1.0','0.2.0']){
+  const f=await fixture(schema,schema,'',sdkVersion,false,false,0,false,{classInstance:true});
+  assert.equal((await f.send(f.initial)).type,'ready');
+  f.post({type:'dispose'});await f.flush();f.post({type:'dispose'});await f.flush();
+  assert.deepEqual(f.events.filter(([event])=>event==='authored-dispose'),[['authored-dispose',true]]);
+  for(const event of ['target-dispose','material-dispose','renderer-dispose','device-dispose'])assert.equal(f.events.filter(([name])=>name===event).length,1,event);
+ }
+});
+
+test('throwing legacy prototype dispose reports diagnostics and still releases owned resources once',async()=>{
+ const f=await fixture(schema,schema,'','0.2.0',false,false,0,false,{classInstance:true,throwDispose:true});
+ assert.equal((await f.send(f.initial)).type,'ready');
+ f.post({type:'dispose'});await f.flush();f.post({type:'dispose'});await f.flush();
+ assert.deepEqual(f.events.filter(([event])=>event==='authored-dispose'),[['authored-dispose',true]]);
+ for(const event of ['target-dispose','material-dispose','renderer-dispose','device-dispose'])assert.equal(f.events.filter(([name])=>name===event).length,1,event);
+ const cleanup=f.messages.filter(message=>message.type==='cleanup');assert.equal(cleanup.length,1);assert.equal(cleanup[0].complete,true);
+ assert.deepEqual(cleanup[0].diagnostics,['authored: legacy dispose failed']);
+});
 
 test('opt-in initialization gate waits before create and accepts only one exact owner GO outside its pending init chain',async()=>{
  const f=await fixture(),initProbeId='b'.repeat(32);

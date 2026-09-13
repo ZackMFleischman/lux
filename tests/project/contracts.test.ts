@@ -2,6 +2,41 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { parseMetadataJson, metadataLimits, validateMetadata, admitProjectMetadata, hashMetadata, hashInventory, hashPackage } from '../../packages/core/src/project/contracts.ts';
 import { fixture, documents, ids, h, hash, toolchain, legacyControls } from './fixtures.ts';
+import {sourceBundleSchema,sourceSdkVersionSchema} from '../../packages/runtime-contracts/src/index.ts';
+import {componentFileSchema,codeExportSchema,dependencyLockSchema} from '../../packages/core/src/project/contracts.ts';
+import type {ComponentFile,CodeExport} from '../../packages/core/src/project/contracts.ts';
+import type {SourceBundle} from '../../packages/runtime-contracts/src/index.ts';
+type Equal<A,B>=(<T>()=>T extends A?1:2) extends (<T>()=>T extends B?1:2)?true:false;
+const projectComponentSdkExact:Equal<ComponentFile['sdkVersion'],'0.1.0'|'0.2.0'>=true;
+const projectExportSdkExact:Equal<CodeExport['sdkVersion'],'0.1.0'|'0.2.0'>=true;
+const internalSdkExact:Equal<SourceBundle['sdkVersion'],'0.1.0'|'0.2.0'|'0.3.0'>=true;
+void [projectComponentSdkExact,projectExportSdkExact,internalSdkExact];
+
+test('internal SDK 0.3 never widens persisted project-v1 source or toolchain capabilities', async()=>{
+  assert.equal(sourceSdkVersionSchema.safeParse('0.3.0').success,true);
+  assert.equal(sourceBundleSchema.safeParse({sdkVersion:'0.3.0',entry:'main.ts',files:{'main.ts':''}}).success,true);
+  const f=fixture();
+  for(const sourceVersion of [1,2]) {
+    assert.equal(componentFileSchema.safeParse({...f.components[0],sourceVersion,sdkVersion:'0.3.0'}).success,false);
+    assert.equal(codeExportSchema.safeParse({...f.pkg.exports.noise,sourceVersion,sdkVersion:'0.3.0'}).success,false);
+  }
+  const extra={...f.lock.toolchain,sdkVariants:{...f.lock.toolchain.sdkVariants,'0.3.0':{declarationEntry:'sdk/components.d.ts',contractHash:h}}};
+  assert.equal(dependencyLockSchema.safeParse({...f.lock,toolchain:extra}).success,false);
+  await assert.rejects(admitProjectMetadata(documents(),extra));
+  const disk=documents();disk['dependencies.lock.json']=new TextEncoder().encode(JSON.stringify({...f.lock,toolchain:extra}));
+  await assert.rejects(admitProjectMetadata(disk,extra));
+  assert.equal(dependencyLockSchema.safeParse({...f.lock,toolchain:{...extra,sdkVariants:{'0.3.0':extra.sdkVariants['0.3.0']}}}).success,false);
+  const unused=documents();unused['scenes/c/scene.json']=new TextEncoder().encode(JSON.stringify({...f.scenes[2],implementation:{kind:'local',componentId:ids.shared}}));
+  unused['components/unique/component.json']=new TextEncoder().encode(JSON.stringify({...f.components[2],sdkVersion:'0.3.0'}));
+  await assert.rejects(admitProjectMetadata(unused,toolchain));
+  for(const sdkVersion of ['0.1.0','0.2.0'])for(const sourceVersion of [1,2]){
+    const component={...f.components[1],assets:{},sdkVersion,sourceVersion};
+    assert.equal(componentFileSchema.safeParse(component).success,true);
+    assert.equal(codeExportSchema.safeParse({...f.pkg.exports.noise,sdkVersion,sourceVersion}).success,true);
+  }
+  for(const sdkRange of ['0.3.0','0.1.0 || 0.3.0'])assert.throws(()=>validateMetadata('package',{...f.pkg,sdkRange}));
+  assert.throws(()=>validateMetadata('package',{...f.pkg,exports:{noise:{...f.pkg.exports.noise,sdkVersion:'0.3.0'}}}));
+});
 
 const bytes = (text: string) => new TextEncoder().encode(text);
 test('admits all three scenes, shared references, exact package and original asset metadata', async () => {

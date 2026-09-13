@@ -14,6 +14,7 @@ function readTransportRelease(filename) {
       !Number.isInteger(settings.seed) || settings.seed < 0 || settings.seed > 0xffffffff ||
       typeof linked?.code !== 'string' || typeof linked.sourceMap !== 'string' ||
       !/^[a-f0-9]{64}$/.test(linked.bundleHash)) throw Error('Invalid transport release');
+  if(Object.hasOwn(linked,'linkedVersion')&&linked.linkedVersion!==2&&linked.linkedVersion!==3)throw Error('Unsupported installed linked profile');
   let body = { code: linked.code, sourceMap: linked.sourceMap, bundleHash: linked.bundleHash, linker: linked.linker };
   if(linked.linkedVersion!==undefined){
     const {policy,schemaHash}=require('./parameter-mapping.cjs'),validation=policy();body=validation.linkedBody(linked);

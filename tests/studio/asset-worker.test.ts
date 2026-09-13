@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {deriveAssets} from '../../packages/assets/src/index.mjs';
 import {linkedBody} from '../../apps/build-worker/src/artifact-identity.mjs';
-import {loadAuthoredModule} from '../../apps/studio/src/authored-worker-assets.mjs';
+import {loadAuthoredModule,prepareAuthoredModule} from '../../apps/studio/src/authored-worker-assets.mjs';
 import {canonicalControlSchemaJson,normalizeControlDeclarations} from '../../packages/runtime-contracts/src/parameters.mjs';
 const hash=(bytes:Uint8Array|string)=>createHash('sha256').update(bytes).digest('hex');
 const data='Qk06AAAAAAAAADYAAAAoAAAAAQAAAAEAAAABABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AA==';
@@ -12,6 +12,15 @@ async function payload() {
   const body=linkedBody({linkedVersion:2,code:'export default 1;',sourceMap:'{}',bundleHash:'a'.repeat(64),linker:{version:'0.28.2',implementationHash:'b'.repeat(64),apiHash:'c'.repeat(64),binaryHash:'d'.repeat(64)},...assets});
   return {...body,linkedHash:hash(JSON.stringify(body))};
 }
+test('two-phase loader keeps exact verified bytes private and its importer runs once',async()=>{
+ const linked=await payload(),message={linked};let imports=0;
+ const prepared=await prepareAuthoredModule(message);assert.equal(imports,0);assert.equal(prepared.admission.kind,'visual');
+ message.linked={...linked,code:'replaced after verification'};
+ const loaded=await prepared.import(async code=>{imports++;assert.equal(code,'export default 1;');return code;});
+ assert.equal(loaded.module,'export default 1;');assert.equal(imports,1);
+ await assert.rejects(prepared.import(async()=>{imports++;}));assert.equal(imports,1);
+ await assert.rejects(prepareAuthoredModule({sdkVersion:'0.3.0',moduleSource:'unverified'}));
+});
 
 test('v3 parameters retain verified private asset bytes before import and reject invalid identities',async()=>{
   const original=await payload();

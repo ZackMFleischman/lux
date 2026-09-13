@@ -133,6 +133,7 @@ function createPackage({ name, transportPath, runtimeDirectory, electronVersion,
   const relative = path.relative(path.resolve(runtimeDirectory), path.resolve(outputDirectory));
   if (relative === '' || (!path.isAbsolute(relative) && relative !== '..' && !relative.startsWith('..' + path.sep))) throw Error('Export output must be outside the runtime input tree');
   const visual = readTransportRelease(transportPath);
+  if(Object.hasOwn(visual.linked,'linkedVersion')&&![2,3].includes(visual.linked.linkedVersion))throw Error('Unsupported export linked profile');
   require('./runtime-capability.cjs').assertWorkerLivenessCapabilities(runtimeDirectory);
   fs.mkdirSync(outputDirectory, { recursive: true });
   const stage = fs.mkdtempSync(path.join(outputDirectory, '.export-'));

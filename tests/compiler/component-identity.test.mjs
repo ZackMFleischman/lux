@@ -1,0 +1,30 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {artifactBody,linkedBody,verifyArtifact,verifyLinked} from '../../apps/build-worker/src/artifact-identity.mjs';
+import {normalizeComponentDeclaration,canonicalComponentMetadataJson} from '../../packages/runtime-contracts/src/components.mjs';
+import {canonicalControlSchemaJson} from '../../packages/runtime-contracts/src/parameters.mjs';
+import {deriveAssets} from '../../packages/assets/src/index.mjs';
+import {compiledArtifactSchema} from '../../packages/runtime-contracts/src/index.ts';
+import {declaration} from './component-fixture.mjs';
+const hash=x=>createHash('sha256').update(x).digest('hex'),component=normalizeComponentDeclaration(declaration),assets=await deriveAssets({},hash);
+const fields={sdkVersion:'0.3.0',executionModel:'single-image-source-v1',component,componentMetadataHash:hash(canonicalComponentMetadataJson(component)),controls:component.controls,controlSchemaHash:hash(canonicalControlSchemaJson(component.controls))};
+const base={artifactVersion:4,sourceHash:'a'.repeat(64),entry:'main.js',modules:{'main.js':''},sourceMaps:{},compilerVersion:'7.0.2',dependencyHashes:{},...assets,...fields};
+const linker={version:'0.28.2',implementationHash:'b'.repeat(64),apiHash:'c'.repeat(64),binaryHash:'d'.repeat(64)};
+test('strict v4 identity seals SDK, execution model, normalized metadata and control projection',async()=>{
+ const body=artifactBody(base),artifact={...body,bundleHash:hash(JSON.stringify(body))};
+ assert.equal(compiledArtifactSchema.safeParse(artifact).success,true);await verifyArtifact(artifact,hash);
+ assert.equal(compiledArtifactSchema.safeParse({...artifact,component:{...component,unexpected:true}}).success,false);
+ assert.equal(compiledArtifactSchema.safeParse({...artifact,component:{...component,outputs:{image:{...component.outputs.image,type:{kind:'image',colorSpace:'linear-srgb',alphaMode:'straight'}}}}}).success,false);
+ const b=linkedBody({linkedVersion:4,code:'export default {};',sourceMap:'',bundleHash:artifact.bundleHash,linker,...assets,...fields}),linked={...b,linkedHash:hash(JSON.stringify(b))};await verifyLinked(linked,hash,artifact);
+ for(const patch of [{artifactVersion:3},{sdkVersion:'0.2.0'},{executionModel:'graph'},{extra:1},{componentMetadataHash:'0'.repeat(64)},{component:{...component,label:'Changed'}},{controls:[]}])await assert.rejects(verifyArtifact({...artifact,...patch},hash));
+ for(const patch of [{linkedVersion:3},{sdkVersion:'0.2.0'},{executionModel:'graph'},{extra:1},{componentMetadataHash:'0'.repeat(64)},{controls:[]}])await assert.rejects(verifyLinked({...linked,...patch},hash));
+ const changed={...component,label:'Changed'},changedBody=linkedBody({...linked,component:changed,componentMetadataHash:hash(canonicalComponentMetadataJson(changed))});const rehashed={...changedBody,linkedHash:hash(JSON.stringify(changedBody))};await verifyLinked(rehashed,hash);await assert.rejects(verifyLinked(rehashed,hash,artifact),/identity/);
+});
+test('fixed legacy identity bodies keep their exact original field order and bytes',()=>{
+ const legacy={sourceHash:'a'.repeat(64),entry:'main.js',modules:{'z.js':'z','a.js':'a'},sourceMaps:{},sdkVersion:'0.1.0',compilerVersion:'7.0.2',dependencyHashes:{}};
+ assert.equal(JSON.stringify(artifactBody(legacy)),JSON.stringify(legacy));
+ const v2={...legacy,modules:{'a.js':'a','z.js':'z'},artifactVersion:2,...assets};assert.equal(JSON.stringify(artifactBody(v2)),JSON.stringify(v2));
+ const b={code:'x',sourceMap:'',bundleHash:'a'.repeat(64),linker};assert.equal(JSON.stringify(linkedBody(b)),JSON.stringify(b));
+ assert.throws(()=>linkedBody({...b,...fields}));
+});
