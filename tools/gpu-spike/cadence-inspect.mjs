@@ -7,6 +7,8 @@ export function inspectCadence({experiment,probe,host,lifecycle,expected}){
  check(expected&&/^[a-f0-9]{64}$/.test(expected.releaseId)&&/^[a-f0-9]{64}$/.test(expected.revisionId),'Missing immutable source identity');
  const f=tick(probe.clock?.frequency),start=tick(probe.start),end=tick(probe.end),coverageEnd=tick(probe.coverageEnd);
  check(probe.clock?.domain==='qpc'&&f>=60n&&f<=1000000000n&&end-start===10n*f&&coverageEnd>=end,'Invalid full 10 s window');
+ const childStart=tick(experiment.child.startTicks),childEnd=tick(experiment.result.endTicks);
+ check(Number.isSafeInteger(experiment.child.frequency)&&BigInt(experiment.child.frequency)===f&&childStart<=start&&coverageEnd<=childEnd,'Supervisor QPC envelope mismatch');
  check(Array.isArray(probe.slots)&&probe.slots.length===600&&Array.isArray(host)&&host.length<=10000,'Invalid bounded records');
  const ops=host.filter(x=>x.kind==='host-opportunity'),clocks=host.filter(x=>x.kind==='native-clock'),summaries=host.filter(x=>x.kind==='host-telemetry-summary');
  check(clocks.length===1&&clocks[0].domain==='qpc'&&tick(clocks[0].frequency)===f,'Host clock mismatch');
@@ -33,7 +35,8 @@ export function inspectCadence({experiment,probe,host,lifecycle,expected}){
  }
  check(calls===ops.length&&calls+missed===600&&calls>0,'Incomplete callback/slot coverage');
  check(Array.isArray(lifecycle)&&lifecycle.length>0&&lifecycle.length<=10&&lifecycle.every(x=>['restart-trigger','stop-requested','process-exit-observed'].includes(x.kind)&&x.instanceId===instanceId&&x.revisionId===expected.revisionId&&x.releaseId===expected.releaseId&&x.incomplete===false&&x.lostRecords===0&&x.clock?.domain==='qpc'&&tick(x.clock.frequency)===f),'Invalid source lifecycle');
- const starts=lifecycle.filter(x=>x.kind==='restart-trigger');check(starts.length===1&&/^[a-f0-9]{32}$/.test(starts[0].attemptId)&&tick(starts[0].clock.at)<end&&lifecycle.every(x=>x.attemptId===starts[0].attemptId),'Unexpected producer attempt');
- for(const row of lifecycle){if(row.kind==='restart-trigger')continue;check(tick(row.kind==='process-exit-observed'?row.observedExitAt:row.clock.at)>=end&&row.force!==true,'Fault/cleanup during observation');if(row.kind==='process-exit-observed')check(row.stopped===true&&row.activeProcesses===0,'Exit unconfirmed');}
+ const starts=lifecycle.filter(x=>x.kind==='restart-trigger');check(starts.length===1&&/^[a-f0-9]{32}$/.test(starts[0].attemptId)&&tick(starts[0].clock.at)>=childStart&&tick(starts[0].clock.at)<end&&lifecycle.every(x=>x.attemptId===starts[0].attemptId),'Unexpected producer attempt');
+ for(const o of ops)if(o.present)check(tick(o.at)>=tick(starts[0].clock.at)&&tick(o.copyCompletedQpc)>=tick(starts[0].clock.at),'Selected frame predates producer start');
+ for(const row of lifecycle){const clockAt=tick(row.clock.at);check(clockAt>=childStart&&clockAt<=childEnd,'Lifecycle outside supervisor envelope');if(row.kind==='restart-trigger')continue;const at=tick(row.kind==='process-exit-observed'?row.observedExitAt:row.clock.at);check(at>=end&&at<=childEnd&&row.force!==true,'Fault/cleanup during observation');if(row.kind==='process-exit-observed')check(row.stopped===true&&row.activeProcesses===0,'Exit unconfirmed');}
  return {ok:true,scope:'10 s cold-start native fixture cadence and elapsed callback diagnostic',instanceId,...expected,expectedSlots:600,opportunities:calls,missedSlots:missed,rateHz:calls/10,noFrame,selectedTransport:selected,heldTransport:held,callbackMs:quantiles(spans),latenessMs:quantiles(lateness),window:{start:probe.start,end:probe.end,coverageEnd:probe.coverageEnd,overshootMs:ms(coverageEnd-end)},freshImageMeasured:false,performanceAcceptance:false,actualResolumeTested:false,callbackTiming:'QPC elapsed including descheduling and driver time; not exclusive CPU execution'};
 }

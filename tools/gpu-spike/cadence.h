@@ -21,8 +21,9 @@ template<class Now,class Wait,class Call> bool runCadence(Cadence& c,uint64_t fr
   if(!waitUntil(c.slots[next].due))return false;
   const auto at=now();if(at>=c.end){while(next<600)c.slots[next++].missed=true;break;}
   while(next+1<600&&c.slots[next+1].due<=at)c.slots[next++].missed=true;
-  auto& s=c.slots[next++];s.sequence=++c.calls;s.before=now();
-  if(s.before>=c.end)return false; // Scheduling interruption cannot become a hidden out-of-window call.
+  // One admission sample selects the slot and starts its elapsed callback bracket.
+  // Resampling here could relabel an obsolete slot after a scheduling interruption.
+  auto& s=c.slots[next++];s.sequence=++c.calls;s.before=at;
   s.success=call();s.after=now();if(!s.success||s.after<s.before)return false;
  }
  if(!waitUntil(c.end))return false;c.coverageEnd=now();return c.coverageEnd>=c.end;
