@@ -40,7 +40,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private accepted: { linked: LinkedEnvelope; revisionId: string; state:RuntimeControlState } | null = null;
   private busy = false;
   private automaticRetry:ReturnType<typeof setTimeout>|undefined;
-  private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; expectedControlSequence?:number; expectedControls?:ControlValues; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
+  private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; playback?:boolean; expectedControlSequence?:number; expectedControls?:ControlValues; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
   private api: AuthoringApi;
   private codeDeclaredParameters:boolean;
   private readonly performanceMode:CollectionMode;
@@ -53,6 +53,10 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     const supportedSdkVersion=source.sdkVersion;
     if(source.sdkVersion==='0.2.0'&&!this.codeDeclaredParameters)throw Error('Code-declared parameters are not enabled in this Studio UI yet');
     if (this.busy) throw Error('A visual build is already running');
+    // A replacement must not snapshot playback before an admitted command settles.
+    if ([...this.pending.values()].some(wait => wait.runtime === this.running && wait.playback)) {
+      throw Error('Wait for the playback command to complete, then build again.');
+    }
     this.cancelAutomaticRetry();
     this.busy = true;
     const jobId = crypto.randomUUID();
@@ -242,7 +246,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     } else message = { type: 'playback', action: operation.input.action };
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => this.fault(runtime, 'Runtime command timed out'), 5000);
-      this.pending.set(input.requestId, { runtime, kind: 'command', resolve, reject, timer,
+      this.pending.set(input.requestId, { runtime, kind: 'command', playback: message.type === 'playback', resolve, reject, timer,
         ...(message.type === 'controls' ? { expectedControlSequence: message.controlSequence, expectedControls: message.values } : {}) });
       try { runtime.worker.postMessage({ ...message, requestId: input.requestId, instanceId: runtime.instanceId, generation: runtime.generation }); }
       catch (error) { this.fault(runtime, String(error)); }

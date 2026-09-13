@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { StandaloneClient } from '../../apps/studio/src/standalone-client.ts';
+import { StudioController } from '../../apps/studio/src/service-client.ts';
 import { createFrameCollector } from '../../packages/performance/live.mjs';
 
 class WorkerFixture {
@@ -36,6 +37,80 @@ function fixture(t: any, linked: any = {code:'accepted'}, performanceMode:'basel
   const operation = (requestId: string) => { const state = client.getSnapshot().authoring!; return { name: 'lux.playback' as const, input: { requestId, instanceId: state.instanceId, expectedGeneration: state.generation, action: 'play' as const } }; };
   return { client, api,start, flush, advance, scheduled, operation, compiles: () => compiles };
 }
+
+test('Build rejects a pending Pause before compilation and retry preserves the acknowledged pause', async t => {
+  const f = fixture(t), old = await f.start(), controller = new StudioController(f.client);
+  old.reply({ playback: 'playing' });
+  const before = f.client.getSnapshot();
+  const pause = controller.playback('pause'), request = old.messages.at(-1);
+  const blockedBuild = f.client.submit(source).catch(error => error);
+  await f.flush();
+  assert.equal(f.compiles(), 1, 'Build must not compile while Pause is pending');
+  assert.match(String(await blockedBuild), /playback command.*complete/i);
+  assert.equal(f.client.getSnapshot(), before);
+  assert.equal(old.terminated, false);
+  old.reply({ requestId: request.requestId, playback: 'paused' });
+  await pause;
+  const build = f.client.submit(source); await f.flush();
+  const candidate = WorkerFixture.all.at(-1)!;
+  assert.equal(candidate.init.playing, false);
+  candidate.reply({ type: 'ready' }); await build;
+  assert.equal(f.client.getSnapshot().authoring!.playback, 'paused');
+  assert.equal(old.terminated, true);
+});
+
+test('Pause is rejected during both compilation and candidate startup; the new owner can pause', async t => {
+  const f = fixture(t), old = await f.start(), controller = new StudioController(f.client);
+  old.reply({ playback: 'playing' });
+  const compile = f.api.compile; let release!: () => void;
+  f.api.compile = async () => { await new Promise<void>(resolve => { release = resolve; }); return compile(); };
+  const build = f.client.submit(source);
+  await assert.rejects(controller.playback('pause'), /visual build is already running/);
+  release(); await f.flush();
+  const candidate = WorkerFixture.all.at(-1)!;
+  assert.equal(candidate.init.playing, true);
+  await assert.rejects(controller.playback('pause'), /visual build is already running/);
+  assert.equal(old.messages.filter(message => message.type === 'playback').length, 0);
+  candidate.reply({ type: 'ready', playback: 'playing' }); await build;
+  const pause = controller.playback('pause');
+  candidate.reply({ requestId: candidate.messages.at(-1).requestId, playback: 'paused' }); await pause;
+  assert.equal(f.client.getSnapshot().authoring!.playback, 'paused');
+});
+
+test('failed candidate preserves the paused preview after a pending Pause blocks the first Build', async t => {
+  const f = fixture(t), old = await f.start(), controller = new StudioController(f.client);
+  old.reply({ playback: 'playing' });
+  const pause = controller.playback('pause'), request = old.messages.at(-1);
+  const blockedBuild = f.client.submit(source).catch(error => error); await f.flush();
+  assert.equal(f.compiles(), 1);
+  assert.match(String(await blockedBuild), /playback command.*complete/i);
+  old.reply({ requestId: request.requestId, playback: 'paused' }); await pause;
+  const paused = f.client.getSnapshot().authoring;
+  const failed = assert.rejects(f.client.submit(source), /candidate rejected/); await f.flush();
+  const candidate = WorkerFixture.all.at(-1)!;
+  candidate.reply({ type: 'failure', message: 'candidate rejected' }); await failed;
+  assert.equal(f.client.getSnapshot().authoring, paused);
+  assert.equal(old.terminated, false);
+  assert.equal(candidate.terminated, true);
+});
+
+for (const failure of ['worker failure', 'timeout'] as const) test(`a rejected Pause from ${failure} does not leave Build blocked`, async t => {
+  const f = fixture(t), old = await f.start(), controller = new StudioController(f.client);
+  const pause = assert.rejects(controller.playback('pause'), /command failed|timed out/);
+  const blockedBuild = f.client.submit(source).catch(error => error); await f.flush();
+  assert.equal(f.compiles(), 1);
+  assert.match(String(await blockedBuild), /playback command.*complete/i);
+  if (failure === 'worker failure') old.reply({ type: 'failure', message: 'command failed' });
+  else {
+    for (let i = 0; i < 19; i++) { await f.advance(250); old.reply({ type: 'heartbeat' }); }
+    await f.advance(250);
+  }
+  await pause;
+  assert.equal(old.terminated, true);
+  await f.start();
+  assert.equal(f.compiles(), 2);
+  assert.equal(f.client.getSnapshot().authoring!.playback, 'paused');
+});
 test('baseline selection reaches initial and restarted workers without changing watchdog termination',async t=>{
  const f=fixture(t,{code:'accepted'},'baseline'),worker=await f.start();assert.equal(worker.init.performanceMode,'baseline');
  await f.advance(1250);assert.equal(worker.terminated,true);assert.equal(f.client.getSnapshot().authoring!.playback,'failed');
