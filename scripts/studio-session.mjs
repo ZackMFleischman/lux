@@ -54,19 +54,35 @@ function validateEndpoint(endpoint, session) {
 
 /** One adapter stays bound to one process lifetime, even if its endpoint is replaced. */
 export function createStudioConnection(session, { timeoutMs = 75000 } = {}) {
-  let bound;
-  return async (method, params = {}) => {
-    const endpoint = validateEndpoint(JSON.parse(await readFile(session.endpointPath, 'utf8')), session);
-    if (bound && ['sessionId', 'pid', 'url', 'token'].some(key => bound[key] !== endpoint[key])) {
-      throw Error('Studio instance changed. Reconnect the adapter to explicitly select the replacement.');
-    }
-    bound ??= Object.freeze(endpoint);
-    // Use the bound credentials, not a second lookup that could select another app.
-    const response = await fetch(bound.url, { method: 'POST',
-      headers: { authorization: `Bearer ${bound.token}`, 'content-type': 'application/json' },
+  let bound, connecting;
+  const readEndpoint = async () => validateEndpoint(JSON.parse(await readFile(session.endpointPath, 'utf8')), session);
+  const request = async (endpoint, method, params = {}) => {
+    const response = await fetch(endpoint.url, { method: 'POST',
+      headers: { authorization: `Bearer ${endpoint.token}`, 'content-type': 'application/json' },
       body: JSON.stringify({ id: randomUUID(), method, params }), signal: AbortSignal.timeout(timeoutMs) });
     const result = await response.json();
     if (!response.ok || !result.ok) throw Error(result.error || `Studio request failed (${response.status})`);
     return result.result;
+  };
+  return async (method, params = {}) => {
+    if (!bound) {
+      // Only a successful read-only handshake selects an instance. Concurrent
+      // first calls share it; a startup failure can retry a newly published file.
+      connecting ??= (async () => {
+        const endpoint = await readEndpoint();
+        const status = await request(endpoint, 'status');
+        if (['profile', 'workspace', 'sessionId', 'pid'].some(key => status?.studioSession?.[key] !== endpoint[key])) {
+          throw Error('Studio endpoint does not match the responding instance');
+        }
+        bound = Object.freeze(endpoint);
+      })().finally(() => { connecting = undefined; });
+      await connecting;
+    }
+    const endpoint = await readEndpoint();
+    if (['sessionId', 'pid', 'url', 'token'].some(key => bound[key] !== endpoint[key])) {
+      throw Error('Studio instance changed. Reconnect the adapter to explicitly select the replacement.');
+    }
+    // Bind before mutation. A lost mutation response must not enable retargeting.
+    return request(bound, method, params);
   };
 }

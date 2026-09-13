@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import { _electron as electron } from 'playwright';
-import { createRequire } from 'node:module';
-const require = createRequire(import.meta.url);
-const env = { ...process.env, LUX_NODE_EXECUTABLE: process.execPath };
-delete env.ELECTRON_RUN_AS_NODE;
-const app = await electron.launch({ executablePath: require('electron'), args: ['apps/studio/dist/main.cjs'], cwd: process.cwd(), env, chromiumSandbox: true });
+import { join, resolve } from 'node:path';
+import { studioTestEnvironment } from './studio-session.mjs';
+import { installedElectron } from './studio-electron.mjs';
+const root = resolve(import.meta.dirname, '..');
+const env = { ...studioTestEnvironment(), LUX_NODE_EXECUTABLE: process.execPath };
+const app = await electron.launch({ executablePath: installedElectron(root), args: [join(root, 'apps/studio/dist/main.cjs')], cwd: root, env, chromiumSandbox: true });
 try {
   const page = await app.firstWindow();
   const violations = [];

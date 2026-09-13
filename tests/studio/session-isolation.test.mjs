@@ -40,7 +40,7 @@ test('normal checkouts, creative, and every test run have separate profiles', as
   assert.throws(() => resolveStudioSession({ workspace: a, appData, env: { LUX_STUDIO_PROFILE: 'creative', LUX_STUDIO_MCP_TEST: '1' } }), /test profile/i);
 });
 
-async function endpoint(t, session, label) {
+async function endpoint(t, session, label, { dropBuild = false } = {}) {
   const calls = [];
   const identity = { profile: session.profile, workspace: session.workspace, sessionId: randomUUID(), pid: process.pid };
   const token = randomUUID();
@@ -48,6 +48,7 @@ async function endpoint(t, session, label) {
     assert.equal(req.headers.authorization, `Bearer ${token}`);
     let body = ''; for await (const chunk of req) body += chunk;
     const command = JSON.parse(body); calls.push(command.method);
+    if (dropBuild && command.method === 'build') { req.socket.destroy(); return; }
     res.setHeader('content-type', 'application/json');
     res.end(JSON.stringify({ ok: true, result: { label, studioSession: identity } }));
   });
@@ -90,6 +91,32 @@ test('rejects mismatched checkout and legacy or invalid endpoint before sending 
     await assert.rejects(createStudioConnection(session)('build', {}), /endpoint|checkout/i);
   }
   assert.deepEqual(live.calls, []);
+});
+
+test('failed startup discovery can connect after a stale endpoint is replaced', async t => {
+  const { a, appData } = await fixture(t);
+  const session = resolveStudioSession({ workspace: a, appData, env: {} });
+  const stale = await endpoint(t, session, 'stale');
+  await writeFile(session.endpointPath, JSON.stringify({ ...stale.record, url: 'http://127.0.0.1:1/' }));
+  const call = createStudioConnection(session);
+  await assert.rejects(call('status'));
+  const live = await endpoint(t, session, 'ready');
+  assert.equal((await call('status')).label, 'ready');
+  const count = live.calls.length;
+  await writeFile(session.endpointPath, JSON.stringify({ ...live.record, sessionId: randomUUID() }));
+  await assert.rejects(call('build', {}), /changed/i);
+  assert.equal(live.calls.length, count);
+});
+
+test('an uncertain mutation keeps the selected instance bound', async t => {
+  const { a, appData } = await fixture(t);
+  const session = resolveStudioSession({ workspace: a, appData, env: {} });
+  await endpoint(t, session, 'original', { dropBuild: true });
+  const call = createStudioConnection(session);
+  await assert.rejects(call('build', {}));
+  const replacement = await endpoint(t, session, 'replacement');
+  await assert.rejects(call('build', {}), /changed/i);
+  assert.deepEqual(replacement.calls, [], 'Uncertain build must not be retried on a new process');
 });
 
 test('actual Windows stdio adapter selects its test profile and refuses a replacement', { skip: process.platform !== 'win32' }, async t => {
