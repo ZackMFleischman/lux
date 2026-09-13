@@ -29,8 +29,9 @@ class FrameReceiver {
   uint64_t frame()const{return lastFrame;}
   std::atomic<uint64_t> callbacks{0},consumed{0};
  private:
-  struct Output {std::atomic<int> state{Free};GLuint texture=0;GLsync fence=nullptr;bool unfenced=false;uint32_t width=0,height=0;uint64_t frame=0,generation=0;};
+  struct Output {std::atomic<int> state{Free};GLuint texture=0;GLsync fence=nullptr;bool unfenced=false;uint32_t width=0,height=0;uint64_t frame=0,generation=0,completedQpc=0;FrameProvenanceV4 provenance;};
   std::array<Output,3> outputs;
+  OpportunityQueue<> opportunities;
   HostControlsV4 desired;ControlSchemaHashV4 controlSchema=LegacyControlSchema;uint32_t controlCount=1;
   std::array<std::atomic<float>,32> parameterValues{};
   WorkerLifecycle lifecycle;

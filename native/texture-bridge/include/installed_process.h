@@ -6,7 +6,7 @@
 #include <string>
 #include <stdexcept>
 namespace lux {
-struct InstalledProcess{HANDLE job=nullptr,process=nullptr;};
+struct InstalledProcess{HANDLE job=nullptr,process=nullptr;uint64_t stopRequested=0;};
 inline std::map<uint32_t,InstalledProcess> installedProcesses;
 inline uint32_t installedProcessSequence=0;
 inline std::wstring napiWide(napi_env env,napi_value value){size_t size=0;if(napi_get_value_string_utf16(env,value,nullptr,0,&size)!=napi_ok||!size||size>32760)throw std::runtime_error("Invalid installed process argument");std::vector<char16_t> bytes(size+1);napi_get_value_string_utf16(env,value,bytes.data(),bytes.size(),&size);return std::wstring(reinterpret_cast<wchar_t*>(bytes.data()),size);}
@@ -34,5 +34,17 @@ inline napi_value installedStart(napi_env env,napi_callback_info info){
 }
 inline uint32_t installedKey(napi_env env,napi_callback_info info){size_t argc=1;napi_value value;uint32_t key=0;napi_get_cb_info(env,info,&argc,&value,nullptr,nullptr);if(argc!=1||napi_get_value_uint32(env,value,&key)!=napi_ok||!installedProcesses.count(key))throw std::runtime_error("Unknown installed producer");return key;}
 inline napi_value installedRunning(napi_env env,napi_callback_info info){try{const auto key=installedKey(env,info);napi_value result;napi_get_boolean(env,WaitForSingleObject(installedProcesses.at(key).process,0)==WAIT_TIMEOUT,&result);return result;}catch(const std::exception& error){napi_throw_error(env,nullptr,error.what());return nullptr;}}
-inline napi_value installedStop(napi_env env,napi_callback_info info){try{const auto key=installedKey(env,info);auto value=installedProcesses.at(key);TerminateJobObject(value.job,0);CloseHandle(value.process);CloseHandle(value.job);installedProcesses.erase(key);napi_value result;napi_get_undefined(env,&result);return result;}catch(const std::exception& error){napi_throw_error(env,nullptr,error.what());return nullptr;}}
+inline napi_value qpcText(napi_env env,uint64_t ticks){napi_value value;const auto text=std::to_string(ticks);napi_create_string_utf8(env,text.c_str(),text.size(),&value);return value;}
+inline napi_value installedClock(napi_env env,napi_callback_info){LARGE_INTEGER at,frequency;QueryPerformanceCounter(&at);QueryPerformanceFrequency(&frequency);napi_value result,domain;napi_create_object(env,&result);napi_create_string_utf8(env,"qpc",3,&domain);napi_set_named_property(env,result,"domain",domain);napi_set_named_property(env,result,"frequency",qpcText(env,frequency.QuadPart));napi_set_named_property(env,result,"at",qpcText(env,at.QuadPart));return result;}
+inline napi_value installedStop(napi_env env,napi_callback_info info){try{
+ const auto key=installedKey(env,info);auto& value=installedProcesses.at(key);LARGE_INTEGER at,frequency;QueryPerformanceCounter(&at);QueryPerformanceFrequency(&frequency);
+ if(!value.stopRequested){if(!TerminateJobObject(value.job,0))throw std::runtime_error("Installed Job termination failed; ownership retained");value.stopRequested=at.QuadPart;}
+ JOBOBJECT_BASIC_ACCOUNTING_INFORMATION accounting{};if(!QueryInformationJobObject(value.job,JobObjectBasicAccountingInformation,&accounting,sizeof(accounting),nullptr))throw std::runtime_error("Installed Job observation failed; ownership retained");
+ const auto wait=WaitForSingleObject(value.process,0);if(wait!=WAIT_OBJECT_0&&wait!=WAIT_TIMEOUT)throw std::runtime_error("Installed process exit observation failed; ownership retained");
+ const bool stopped=wait==WAIT_OBJECT_0&&accounting.ActiveProcesses==0;QueryPerformanceCounter(&at);
+ napi_value result,flag,count,clock,domain;napi_create_object(env,&result);napi_get_boolean(env,stopped,&flag);napi_set_named_property(env,result,"stopped",flag);napi_create_uint32(env,accounting.ActiveProcesses,&count);napi_set_named_property(env,result,"activeProcesses",count);
+ napi_set_named_property(env,result,"requestedAt",qpcText(env,value.stopRequested));if(stopped)napi_set_named_property(env,result,"observedExitAt",qpcText(env,at.QuadPart));else{napi_value nullValue;napi_get_null(env,&nullValue);napi_set_named_property(env,result,"observedExitAt",nullValue);}
+ napi_create_object(env,&clock);napi_create_string_utf8(env,"qpc",3,&domain);napi_set_named_property(env,clock,"domain",domain);napi_set_named_property(env,clock,"frequency",qpcText(env,frequency.QuadPart));napi_set_named_property(env,result,"clock",clock);
+ if(stopped){CloseHandle(value.process);CloseHandle(value.job);installedProcesses.erase(key);}return result;
+ }catch(const std::exception& error){napi_throw_error(env,nullptr,error.what());return nullptr;}}
 }

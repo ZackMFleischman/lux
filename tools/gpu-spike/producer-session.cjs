@@ -7,11 +7,11 @@ class ProducerSession {
     this.stopping = false;
     this.closed = false;
   }
-  submit(texture) {
+  submit(texture,provenance) {
     if (this.stopping) { texture.release(); return { drop: 'stopping' }; }
     let result;
     try {
-      result = JSON.parse(this.bridge.submit(texture.textureInfo.handle.ntHandle));
+      result = JSON.parse(provenance===undefined?this.bridge.submit(texture.textureInfo.handle.ntHandle):this.bridge.submit(texture.textureInfo.handle.ntHandle,provenance));
       const accepted = result && Number.isSafeInteger(result.id) && result.id > 0 && result.drop === undefined;
       const rejected = result && result.id === undefined && typeof result.drop === 'string';
       if (!accepted && !rejected) throw Error('invalid native submission response');
