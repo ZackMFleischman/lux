@@ -119,6 +119,10 @@ test('CLI check exits nonzero on drift and CODEX_HOME controls the default insta
   assert.equal(cli().status, 0);
   assert.equal(await readFile(join(codexHome, 'skills', 'lux-visual-creation', 'SKILL.md'), 'utf8'), '# Lux visual\n');
   assert.equal(cli('--check').status, 0);
+  assert.equal(cli('--skill', 'start-lux').status, 0);
+  assert.equal(cli('--skill', 'start-lux', '--check').status, 0);
+  assert.equal(await readFile(join(codexHome, 'skills', 'start-lux', 'SKILL.md'), 'utf8'), '# Lux visual\n');
+  assert.notEqual(cli('--skill', '../unrelated').status, 0);
   assert.equal(await readFile(join(neighbor, 'SKILL.md'), 'utf8'), 'keep neighboring skill');
   assert.equal(cli('--destination', f.destination).status, 0);
   assert.equal(await readFile(join(f.destination, 'SKILL.md'), 'utf8'), '# Lux visual\n');

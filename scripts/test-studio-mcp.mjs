@@ -1,27 +1,29 @@
+import { studioTestEnvironment, resolveStudioSession } from './studio-session.mjs';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-import { createRequire } from 'node:module';
+import { installedElectron } from './studio-electron.mjs';
 import { spawn } from 'node:child_process';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import { once } from 'node:events';
 import assert from 'node:assert/strict';
 const root = resolve(import.meta.dirname, '..');
-const env = { ...process.env, LUX_NODE_EXECUTABLE: process.execPath, LUX_STUDIO_MCP_TEST: '1' };
+const env = { ...studioTestEnvironment(), LUX_NODE_EXECUTABLE: process.execPath };
+const testSession = resolveStudioSession({ workspace: root, env });
 delete env.ELECTRON_RUN_AS_NODE; delete env.LUX_STUDIO_SMOKE;
-const app = spawn(createRequire(import.meta.url)('electron'), [join(root, 'apps/studio/dist/main.cjs')], { cwd: root, env, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+const app = spawn(installedElectron(root), [join(root, 'apps/studio/dist/main.cjs')], { cwd: root, env, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
 let logs = ''; app.stdout.on('data', chunk => { if (logs.length < 16000) logs += chunk; }); app.stderr.on('data', chunk => { if (logs.length < 16000) logs += chunk; });
 const exited = once(app, 'exit');
 let endpoint, client;
 const folder = join(root, 'artifacts/studio-mcp'); await mkdir(folder, { recursive: true });
 try {
   for (let i = 0; i < 80; i++) {
-    try { const value = JSON.parse(await readFile(join(process.env.APPDATA, 'Lux/Studio/agent-endpoint.json'), 'utf8')); if (value.pid === app.pid) { endpoint = value; break; } } catch {}
+    try { const value = JSON.parse(await readFile(testSession.endpointPath, 'utf8')); if (value.pid === app.pid) { endpoint = value; break; } } catch {}
     await new Promise(resolve => setTimeout(resolve, 250));
   }
   assert.ok(endpoint, 'This test must connect only to its own Studio process');
   client = new Client({ name: 'lux-standalone-integration-test', version: '0.1.0' });
-  await client.connect(new StdioClientTransport({ command: process.execPath, args: [join(root, 'scripts/studio-mcp.mjs')], cwd: root }));
+  await client.connect(new StdioClientTransport({ command: process.execPath, args: [join(root, 'scripts/studio-mcp.mjs')], cwd: root, env }));
   const call = async (name, args = {}) => {
     const result = await client.callTool({ name, arguments: args }, undefined, { timeout: 75000 });
     assert.equal(result.isError, undefined, JSON.stringify(result)); return result;

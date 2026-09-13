@@ -3,8 +3,7 @@ import { homedir } from 'node:os';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const skillName = 'lux-visual-creation';
-const defaultSource = fileURLToPath(new URL(`../skills/${skillName}`, import.meta.url));
+const skillNames = ['lux-visual-creation', 'start-lux'];
 
 async function inspect(path) {
   try { return await lstat(path); }
@@ -50,8 +49,10 @@ function contains(parent, child) {
 /** Destination is the skill directory itself, not the parent skills folder.
  * Extras are deliberately never deleted: review/move them before reinstalling.
  */
-export async function installVisualSkill({ source = defaultSource,
-  destination = join(process.env.CODEX_HOME || join(homedir(), '.codex'), 'skills', skillName), check = false } = {}) {
+export async function installVisualSkill({ skill = 'lux-visual-creation',
+  source = fileURLToPath(new URL(`../skills/${skill}`, import.meta.url)),
+  destination = join(process.env.CODEX_HOME || join(homedir(), '.codex'), 'skills', skill), check = false } = {}) {
+  if (!skillNames.includes(skill)) throw Error('Unknown Lux skill');
   source = resolve(source); destination = resolve(destination);
   await rejectLinkedPath(source); await rejectLinkedPath(destination);
   if (contains(source, destination) || contains(destination, source)) throw Error('Source and destination must not overlap');
@@ -88,11 +89,11 @@ async function main(args) {
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === '--check') options.check = true;
-    else if (arg === '--source' || arg === '--destination') {
+    else if (arg === '--source' || arg === '--destination' || arg === '--skill') {
       if (!args[i + 1] || args[i + 1].startsWith('--')) throw Error(`Missing value for ${arg}`);
       options[arg.slice(2)] = args[++i];
     } else if (arg === '--help') {
-      console.log('Usage: node scripts/install-visual-skill.mjs [--check] [--source DIR] [--destination SKILL_DIR]');
+      console.log('Usage: node scripts/install-visual-skill.mjs [--skill lux-visual-creation|start-lux] [--check] [--source DIR] [--destination SKILL_DIR]');
       return;
     } else throw Error(`Unknown argument: ${arg}`);
   }

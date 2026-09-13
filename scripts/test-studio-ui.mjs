@@ -1,6 +1,7 @@
+import { studioTestEnvironment, resolveStudioSession } from './studio-session.mjs';
 import assert from 'node:assert/strict';
 import { _electron } from 'playwright';
-import { createRequire } from 'node:module';
+import { installedElectron } from './studio-electron.mjs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,12 +10,13 @@ import packageIO from '../packages/export/src/package.cjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const output = join(root, 'artifacts/studio-ui');
 await mkdir(output, { recursive: true });
-const env = { ...process.env, LUX_NODE_EXECUTABLE: process.execPath, LUX_STUDIO_MCP_TEST: '1' };
+const env = { ...studioTestEnvironment(), LUX_NODE_EXECUTABLE: process.execPath };
+const testSession = resolveStudioSession({ workspace: root, env });
 delete env.ELECTRON_RUN_AS_NODE;
 let app, page;
 const report = { ok: false, checks: [], errors: [] };
 try {
-  app = await _electron.launch({ executablePath: createRequire(import.meta.url)('electron'),
+  app = await _electron.launch({ executablePath: installedElectron(root),
     args: [join(root, 'apps/studio/dist/main.cjs')], cwd: root, env, timeout: 30000,
     chromiumSandbox: true });
   page = await app.firstWindow();

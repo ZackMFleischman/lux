@@ -11,6 +11,8 @@ Turn the user's visual brief into working Lux source, inspect the actual preview
 
 Prefer available `lux.studio.*` MCP tools. Otherwise read [connection and tools](references/studio-tools.md) for the local stdio adapter. Use the existing Studio session; ordinary visual creation does not call for launching extra Studio instances, running integration tests, modifying infrastructure, or installing/exporting to Resolume.
 
+For startup, reuse **start-lux**. It reserves a creative checkout/build at a recorded commit and selects the `creative` profile. Use configured MCP tools only when discovery confirms the intended profile and checkout. Ordinary development launches use per-worktree profiles; tests use unique `test-*` profiles. Never select a test instance for creative work. Retain the live `studioSession.sessionId`; temporary adapters use `LUX_STUDIO_SESSION_ID` to guard that selection. Follow [connection and tools](references/studio-tools.md) when an explicitly selected adapter is needed.
+
 Call `discover`, then `read`. Discovery supplies the adapter checkout's SDK contract, example, allowed imports, versions, and declared capabilities; `runningStudio` separately reports the running app's capabilities and compatibility. Require compatibility for SDK 0.2. Use the adapter from the checkout/build that launched the current Studio when known, and verify actual `read`, `status`, and operation results. Read returns the **complete source bundle**, draft version, and current preview status. A newer adapter can describe features absent from an already-open build; investigate that mismatch rather than trusting either this skill's snapshot or discovery alone. Do not print connection credentials.
 
 ## Create and revise

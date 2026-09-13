@@ -1,9 +1,10 @@
+import { studioTestEnvironment, resolveStudioSession } from './studio-session.mjs';
 // Scheduled GPU integration test. Build Studio first; this script owns its app.
 import assert from 'node:assert/strict';
 import { _electron } from 'playwright';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-import { createRequire } from 'node:module';
+import { installedElectron } from './studio-electron.mjs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { decode, encode } from 'fast-png';
@@ -19,7 +20,8 @@ const changedPng = Buffer.from(encode({ width: 2, height: 2, channels: 4,
 const originalPixels = [[255,0,0,128], [0,255,0,255], [0,0,255,0], [255,255,255,64]];
 const revisedPixels = [[0,0,255,128], ...originalPixels.slice(1)];
 const report = { ok: false, checks: [], captures: [], errors: [] };
-const env = { ...process.env, LUX_NODE_EXECUTABLE: process.execPath, LUX_STUDIO_MCP_TEST: '1' };
+const env = { ...studioTestEnvironment(), LUX_NODE_EXECUTABLE: process.execPath };
+const testSession = resolveStudioSession({ workspace: root, env });
 delete env.ELECTRON_RUN_AS_NODE; delete env.LUX_STUDIO_SMOKE;
 await mkdir(output, { recursive: true });
 let app, client, page;
@@ -41,7 +43,7 @@ function scene(assets, imagePath = 'assets/alpha.png') {
   return { ...fixture.source, sdkVersion: '0.2.0', files: { [fixture.source.entry]: text }, assets };
 }
 try {
-  app = await _electron.launch({ executablePath: createRequire(import.meta.url)('electron'),
+  app = await _electron.launch({ executablePath: installedElectron(root),
     args: [join(root, 'apps/studio/dist/main.cjs')], cwd: root, env, timeout: 30000, chromiumSandbox: true });
   page = await app.firstWindow(); page.setDefaultTimeout(15000);
   page.on('pageerror', error => report.errors.push(error.message));
@@ -49,12 +51,12 @@ try {
   const pid = await app.evaluate(() => process.pid);
   let endpoint;
   for (let attempt = 0; attempt < 100; attempt++) {
-    try { endpoint = JSON.parse(await readFile(join(process.env.APPDATA, 'Lux/Studio/agent-endpoint.json'), 'utf8')); } catch {}
+    try { endpoint = JSON.parse(await readFile(testSession.endpointPath, 'utf8')); } catch {}
     if (endpoint?.pid === pid) break; await delay();
   }
   assert.equal(endpoint?.pid, pid, 'Connect only to the Studio process owned by this test');
   client = new Client({ name: 'lux-common-images-qa', version: '1.0.0' });
-  await client.connect(new StdioClientTransport({ command: process.execPath, args: [join(root, 'scripts/studio-mcp.mjs')], cwd: root }));
+  await client.connect(new StdioClientTransport({ command: process.execPath, args: [join(root, 'scripts/studio-mcp.mjs')], cwd: root, env }));
   const raw = (name, args = {}) => client.callTool({ name: `lux.studio.${name}`, arguments: args }, undefined, { timeout: 75000 });
   const call = async (name, args) => { const result = await raw(name, args); assert.equal(result.isError, undefined, JSON.stringify(result)); return parse(result); };
   async function until(predicate, label) {

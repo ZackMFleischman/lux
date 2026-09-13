@@ -64,3 +64,23 @@ They do not authorize bypassing native-input provenance or policy-stopped work.
 After any skill update, reinstall it from this checkout with `node scripts/install-visual-skill.mjs`, then run `node scripts/install-visual-skill.mjs --check`. Do not edit only the personal installed copy. If installation is unavailable on the current host, report that remaining step explicitly rather than claiming delivery is complete.
 
 Visual parameters belong to each visual's code. `intensity` is an optional concrete visual parameter, not a global built-in contract. The current tracer's fixed Intensity control is temporary implementation debt, not the intended SDK design.
+
+## Creative session isolation
+
+Use `start-lux` / `pnpm studio:creative` for user creative work. Its reserved
+`.worktrees/lux-creative` checkout and build stay at the recorded commit until an
+explicit user-requested upgrade. Do not edit, rebuild, update dependencies in,
+test against, prune, or terminate that creative checkout or instance during
+development. Keep saved creative scenes outside test artifact directories.
+
+Ordinary Studio and MCP launches select a profile derived from their checkout.
+Explicit profiles must match in Studio and its adapter; creative uses `creative`.
+Every automated Studio launch must use `studioTestEnvironment()` and pass that
+same environment to its MCP adapter. Never reuse the creative profile or the
+legacy shared endpoint for a test. Only close the process owned by that test.
+Concurrent profiles still share the GPU, so coordinate graphics load and retain
+all native-input provenance requirements.
+
+Both `skills/lux-visual-creation/` and `skills/start-lux/` ship from this repository.
+After changes, install/check the first with `node scripts/install-visual-skill.mjs`
+and `--check`; install/check the second with the additional `--skill start-lux`.

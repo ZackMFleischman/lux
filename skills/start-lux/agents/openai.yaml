@@ -1,0 +1,4 @@
+interface:
+  display_name: "Start Lux"
+  short_description: "Open an isolated Lux Studio creative session"
+  default_prompt: "Use $start-lux to open a stable creative Lux Studio, connect through MCP, and load $lux-visual-creation."

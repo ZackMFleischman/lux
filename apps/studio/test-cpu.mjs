@@ -12,6 +12,8 @@ for (const args of [
     join(tests, 'source-admission.test.mjs'), join(tests, 'source-admission-browser.test.mjs'),
     join(tests, 'image-preview.test.mjs'),
     join(tests, 'capture-alpha.test.mjs'),
+    join(tests, 'session-isolation.test.mjs'),
+    join(tests, 'creative-checkout.test.mjs'),
     join(directory, 'dist/view.test.cjs'), join(directory, 'dist/interactions.test.mjs')],
   ['--test', '--test-isolation=none', join(directory, 'dist/source-editor.test.mjs')],
   ['--experimental-vm-modules', '--test', join(tests, 'visual-worker.test.mjs'), join(tests, 'component-worker.test.mjs')],
