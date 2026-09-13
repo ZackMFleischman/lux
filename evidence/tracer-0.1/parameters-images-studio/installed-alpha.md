@@ -59,3 +59,20 @@ for a short manual check: load above a solid-color lower layer, change Backdrop
 from 1 to 0, inspect transparent/partial/opaque regions, save and reopen the
 composition with Studio absent. Package-only dependency checks and this reopen
 must not be described as a physically absent-checkout test.
+
+## Actual Resolume manual result
+
+The user loaded Lux Image Tracer, confirmed its initial white-background image
+and Backdrop control, then set Backdrop to 0 above a colored lower layer. They
+confirmed the lower-left region exposed the layer unchanged, upper-left blended
+blue, lower-right blended white, and upper-right remained opaque green.
+
+The user saved the test composition and closed Resolume. Root observed a remaining
+installed Electron process finish normal shutdown, then independently confirmed
+no Resolume or matching Lux/Electron processes remained. Without opening Studio,
+the user reopened the composition and confirmed correct image/transparency and
+Backdrop restoration. They reported startup was quick; no exact duration was
+measured. This passes manual PNG composition and saved-value process-cold reopen
+for release 2545b762. Network and checkout availability were not changed, and
+this observation does not establish their absence, multiple declared controls,
+JPEG host pixels, current health-v2 fault recovery or quantitative speed budgets.
