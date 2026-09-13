@@ -14,6 +14,11 @@ const attemptId = path.basename(requestPath, '.json');
 if (!/^[a-f0-9]{32}$/.test(attemptId) || !sameInstalledPath(requestPath, path.join(directory, request.instanceId + '.attempts', attemptId + '.json'))) throw Error('Installed instance path mismatch');
 const release = validateRelease(path.join(root, 'releases', request.releaseId), request.releaseId);
 if (release.runtimeId !== runtimeId) throw Error('Installed release runtime mismatch');
+if(release.version===2){
+ const {sourceIdentity}=require(path.join(runtimeDirectory,'register.cjs'));
+ const digest=require('node:crypto').createHash('sha256').update(sourceIdentity(release).sidecar).digest('hex');
+ if(request.version!==2||request.descriptorHash!==digest)throw Error('Installed native parameter descriptor mismatch');
+}else if(request.version!==1)throw Error('Installed legacy descriptor version mismatch');
 globalThis.luxInstalledContext = {
   protocol:'lux-installed-render-host-v2',
   requestPath:path.join(directory, request.instanceId + '.json'), hostPid:request.hostPid, supervisorReady:path.join(directory, 'supervisor.ready'),

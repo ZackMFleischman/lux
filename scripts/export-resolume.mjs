@@ -6,19 +6,21 @@ import { SceneFileStore } from '../packages/core/src/scene-file.ts';
 import packageIO from '../packages/export/src/package.cjs';
 import registration from '../packages/export/src/register.cjs';
 import runtimeCapability from '../packages/export/src/runtime-capability.cjs';
+import transportIO from '../tools/gpu-spike/transport-release.cjs';
 
 const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 /** Authoring-only entry point. Runtime consumers use the pinned package bytes. */
-export async function exportResolume({ scenePath, name, outputDirectory, root = defaultRoot, preparedPath, intensity = 0.5,
+export async function exportResolume({ scenePath, name, outputDirectory, root = defaultRoot, preparedPath, intensity = 0.5,savedControls,
   nativeRuntimeDirectory = path.join(process.env.SystemRoot || 'C:/Windows', 'System32') }) {
   if (typeof name !== 'string' || !name.trim() || name.length > 80 || /[\x00-\x1f]/.test(name)) throw Error('A source name of 1–80 characters without control characters is required');
   outputDirectory = path.resolve(outputDirectory || path.join(root, 'artifacts/exports'));
   packageIO.noLinks(outputDirectory);
   fs.mkdirSync(outputDirectory, { recursive: true });
-  if (!preparedPath) intensity = (await new SceneFileStore().open(scenePath)).document.controls.intensity;
   // Invalid drafts and stale native payloads fail before copying the pinned runtime.
-  const transportPath = preparedPath || (await prepareTransportScene(scenePath, path.join(outputDirectory, '.prepared'))).path;
-  runtimeCapability.assertRuntimeCapabilities(root);
+  const prepared=preparedPath?null:await prepareTransportScene(scenePath,path.join(outputDirectory,'.prepared'));
+  const transportPath = preparedPath||prepared.path;
+  savedControls=prepared?.savedControls??savedControls;if(savedControls?.intensity!==undefined)intensity=savedControls.intensity;
+  runtimeCapability.assertRuntimeCapabilities(root,{parameters:transportIO.readTransportRelease(transportPath).linked.linkedVersion===3});
   const staging = fs.mkdtempSync(path.join(outputDirectory, '.runtime-'));
   try {
     // Resolve the dependency manager junction once, then copy regular runtime files.
@@ -28,7 +30,7 @@ export async function exportResolume({ scenePath, name, outputDirectory, root = 
     for (const relative of packageIO.requiredRuntimeFiles.filter(value => !value.startsWith('electron/'))) {
       const source = ['package.cjs', 'install.cjs', 'install-gui.cjs', 'install-flow.cjs', 'register.cjs', 'runtime-capability.cjs'].includes(relative)
         ? path.join(root, 'packages/export/src', relative)
-        : relative === 'transport-release.cjs' ? path.join(root, 'tools/gpu-spike', relative)
+        : ['transport-release.cjs','parameter-mapping.cjs','runtime-validation.cjs'].includes(relative) ? path.join(root, 'tools/gpu-spike', relative)
         : packageIO.nativeRuntimeFiles.includes(path.basename(relative)) ? path.join(nativeRuntimeDirectory, path.basename(relative)) : path.join(root, relative);
       packageIO.noLinks(source);
       const destination = path.join(staging, relative);
@@ -42,7 +44,7 @@ export async function exportResolume({ scenePath, name, outputDirectory, root = 
       fs.mkdirSync(path.dirname(destination), { recursive: true });
       fs.copyFileSync(source, destination, fs.constants.COPYFILE_EXCL);
     }
-    return packageIO.createPackage({ name: name.trim(), transportPath, runtimeDirectory: staging, electronVersion, outputDirectory, intensity });
+    return packageIO.createPackage({ name: name.trim(), transportPath, runtimeDirectory: staging, electronVersion, outputDirectory, intensity,savedControls });
   } finally { packageIO.removeStage(outputDirectory, staging); }
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {

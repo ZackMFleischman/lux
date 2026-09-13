@@ -4,6 +4,12 @@ import { createHash } from 'node:crypto';
 import { normalizeControlDeclarations, canonicalControlSchemaJson } from '../../packages/runtime-contracts/src/parameters.mjs';
 import registration from '../../packages/export/src/register.cjs';
 import startup from '../../tools/gpu-spike/host-startup.cjs';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import packageIO from '../../packages/export/src/package.cjs';
+import runtimeCapability from '../../packages/export/src/runtime-capability.cjs';
+import {validateRequest} from '../../apps/installed-runtime/src/registry.cjs';
 const hash = value => createHash('sha256').update(value).digest('hex');
 const controls = normalizeControlDeclarations({height:{type:'number',label:'Long identical label A',min:-2,max:2,default:0},speed:{type:'number',label:'Long identical label B',min:10,max:20,default:12}});
 const schemaHash = hash(canonicalControlSchemaJson(controls));
@@ -37,4 +43,29 @@ test('empty initialized snapshot starts while null/uninitialized and wrong schem
  await host.apply(null);assert.equal(count,0);
  await host.apply({initialized:true,count:0,schemaHash:emptyHash,sequence:'1',values:[]});assert.equal(count,1);
  await assert.rejects(host.apply({initialized:true,count:0,schemaHash,sequence:'2',values:[]}),/schema/i);
+});
+
+test('parameter release pins complete mapping and self-contained validators, with original bytes and tamper rejection',t=>{
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'lux-parameter-package-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
+ const runtime=path.join(root,'runtime');
+ for(const name of [...packageIO.requiredRuntimeFiles,...registration.supervisorFiles]){
+  const target=path.join(runtime,name);fs.mkdirSync(path.dirname(target),{recursive:true});
+  fs.writeFileSync(target,name==='electron/version'?'44.3.0':runtimeCapability.parameterCapabilities[name]??'fixture');
+ }
+ for(const name of ['package.cjs','install.cjs','register.cjs','runtime-capability.cjs'])fs.copyFileSync(new URL('../../packages/export/src/'+name,import.meta.url),path.join(runtime,name));
+ for(const name of ['transport-release.cjs','parameter-mapping.cjs','runtime-validation.cjs']){
+  fs.copyFileSync(new URL('../../tools/gpu-spike/'+name,import.meta.url),path.join(runtime,name));
+  fs.copyFileSync(new URL('../../tools/gpu-spike/'+name,import.meta.url),path.join(runtime,'tools/gpu-spike',name));
+ }
+ const linked={linkedVersion:3,code:'export default {};',sourceMap:'',bundleHash:'b'.repeat(64),linker:{version:'0.28.2',implementationHash:'c'.repeat(64),apiHash:'d'.repeat(64),binaryHash:'e'.repeat(64)},assets:{},assetSetHash:hash('[]'),controls,controlSchemaHash:schemaHash};
+ linked.linkedHash=hash(JSON.stringify(linked));
+ const transport={format:'lux-transport',version:1,sourceHash:'a'.repeat(64),settings:{width:1920,height:1080,fps:60,seed:0},linked};
+ const bytes=JSON.stringify(transport),transportPath=path.join(root,hash(bytes)+'.json');fs.writeFileSync(transportPath,bytes);
+ const result=packageIO.createPackage({name:'Parameters',transportPath,runtimeDirectory:runtime,electronVersion:'44.3.0',outputDirectory:path.join(root,'out'),savedControls:{height:1,speed:15}});
+ const loaded=packageIO.validatePackage(result.path);assert.equal(loaded.release.version,2);assert.equal(loaded.runtime.version,2);
+ assert.deepEqual(loaded.release.savedControls,{height:1,speed:15});assert.equal(loaded.release.controlMapping[0].initial,0.75);
+ const descriptor=registration.sourceIdentity(loaded.release).sidecar;
+ assert.equal(validateRequest({version:2,releaseId:result.releaseId,runtimeId:result.runtimeId,instanceId:'a'.repeat(32),hostPid:1,descriptorHash:hash(descriptor)},result.runtimeId).version,2);
+ const releaseFile=path.join(result.path,'release/release.json');loaded.release.controlMapping[0].id='changed';fs.writeFileSync(releaseFile,JSON.stringify(loaded.release));
+ assert.throws(()=>packageIO.validatePackage(result.path),/identity mismatch/);
 });

@@ -9,8 +9,7 @@
 #include <type_traits>
 
 namespace lux {
-// Separate protocol foundation: no active v3 SharedRing reader uses this block.
-// Future ring v4 users must validate the OUTER mapping version/size before
+// Active ring v4 readers validate the OUTER mapping version/size before
 // locating this block; never reinterpret a v3 ring as HostControlsV4. Pair the
 // sequence with its mapping generation: a replacement starts again at one.
 // Windows x64, little-endian IEEE-754 float, MSVC interlocked full barriers.

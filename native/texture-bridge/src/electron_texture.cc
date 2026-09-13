@@ -10,6 +10,7 @@
 #include "installed_process.h"
 using Microsoft::WRL::ComPtr;
 extern "C" __declspec(dllexport) const char LuxInstalledProducerProtocol[]="lux-installed-producer-protocol-v1";
+extern "C" __declspec(dllexport) const char LuxInstalledParameterProducerProtocol[]="lux-installed-producer-protocol-v2-ring-v4";
 namespace {
 struct Slot {
   ComPtr<ID3D11Texture2D> source, owned;
@@ -26,6 +27,7 @@ lux::SharedRing* ring=nullptr;
 std::wstring mappingName;
 HANDLE supervisorMutex=nullptr;
 DXGI_ADAPTER_DESC adapterDesc{};
+lux::ControlSchemaHashV4 expectedSchema=lux::LegacyControlSchema;uint32_t expectedCount=1;bool genericControls=false;
 void check(HRESULT hr) {
   if(FAILED(hr)) { std::ostringstream s;s<<"HRESULT 0x"<<std::hex<<uint32_t(hr);throw std::runtime_error(s.str()); }
 }
@@ -83,8 +85,8 @@ napi_value submit(napi_env env,napi_callback_info info) {
   try {
     initialize();
     if(lux::isClosing(*ring))throw std::runtime_error("producer is closing; submissions rejected");
-    float hostValue;
-    if(!lux::readHostControl(*ring,hostValue))return text(env,"{\"drop\":\"waiting-for-host-control\"}");
+    lux::HostControlSnapshotV4 hostValue;
+    if(lux::tryReadHostControlsV4(ring->controls,expectedSchema,expectedCount,hostValue)!=lux::HostControlStatusV4::Ok)return text(env,"{\"drop\":\"waiting-for-host-control\"}");
     size_t argc=1; napi_value args[1];napi_get_cb_info(env,info,&argc,args,nullptr,nullptr);
     void* bytes=nullptr;size_t length=0;
     if(argc!=1||napi_get_buffer_info(env,args[0],&bytes,&length)!=napi_ok||length!=sizeof(HANDLE))throw std::runtime_error("NT handle must be 8-byte Buffer");
@@ -158,7 +160,21 @@ napi_value lockSupervisor(napi_env env,napi_callback_info info){
   napi_get_boolean(env,acquired,&result);return result;
  }catch(const std::exception& error){napi_throw_error(env,nullptr,error.what());return nullptr;}
 }
-napi_value control(napi_env env,napi_callback_info){float value;napi_value result;if(!ring||!lux::readHostControl(*ring,value)){napi_get_null(env,&result);return result;}napi_create_double(env,value,&result);return result;}
+napi_value configureControls(napi_env env,napi_callback_info info){
+ try{if(ring)throw std::runtime_error("Controls must be configured before advertising");size_t argc=2;napi_value args[2];napi_get_cb_info(env,info,&argc,args,nullptr,nullptr);char hash[65]{};size_t length=0;uint32_t count=33;
+  if(argc!=2||napi_get_value_string_utf8(env,args[0],hash,sizeof(hash),&length)!=napi_ok||length!=64||napi_get_value_uint32(env,args[1],&count)!=napi_ok||count>32)throw std::runtime_error("Invalid expected parameter schema");
+  lux::ControlSchemaHashV4 next;std::copy_n(hash,64,next.begin());if(!lux::host_controls_v4_detail::validSchema(next))throw std::runtime_error("Invalid expected schema hash");expectedSchema=next;expectedCount=count;genericControls=true;napi_value result;napi_get_undefined(env,&result);return result;
+ }catch(const std::exception& error){napi_throw_error(env,nullptr,error.what());return nullptr;}
+}
+napi_value control(napi_env env,napi_callback_info){
+ napi_value result;lux::HostControlSnapshotV4 snapshot;
+ if(!ring||lux::isClosing(*ring)||lux::tryReadHostControlsV4(ring->controls,expectedSchema,expectedCount,snapshot)!=lux::HostControlStatusV4::Ok){napi_get_null(env,&result);return result;}
+ if(!genericControls){napi_create_double(env,snapshot.values[0],&result);return result;}
+ napi_create_object(env,&result);napi_value value;napi_get_boolean(env,true,&value);napi_set_named_property(env,result,"initialized",value);
+ napi_create_uint32(env,snapshot.count,&value);napi_set_named_property(env,result,"count",value);
+ napi_set_named_property(env,result,"schemaHash",text(env,std::string(snapshot.schemaHash.data(),64)));napi_set_named_property(env,result,"sequence",text(env,std::to_string(snapshot.sequence)));
+ napi_value values;napi_create_array_with_length(env,snapshot.count,&values);for(uint32_t i=0;i<snapshot.count;++i){napi_create_double(env,snapshot.values[i],&value);napi_set_element(env,values,i,value);}napi_set_named_property(env,result,"values",values);return result;
+}
 napi_value shutdown(napi_env env,napi_callback_info) {
   if(!ring)return text(env,"{\"closed\":true}");
   // Atomically close admission before examining borrowers. An admitted reader
@@ -173,6 +189,7 @@ napi_value shutdown(napi_env env,napi_callback_info) {
 napi_value module(napi_env env,napi_value exports) {
   napi_property_descriptor properties[]={{"shutdown",nullptr,shutdown,nullptr,nullptr,nullptr,napi_default,nullptr},{"submit",nullptr,submit,nullptr,nullptr,nullptr,napi_default,nullptr},{"poll",nullptr,poll,nullptr,nullptr,nullptr,napi_default,nullptr},{"advertise",nullptr,advertise,nullptr,nullptr,nullptr,napi_default,nullptr},{"control",nullptr,control,nullptr,nullptr,nullptr,napi_default,nullptr}};
   napi_define_properties(env,exports,5,properties);
+  napi_property_descriptor parameterApi={"configureControls",nullptr,configureControls,nullptr,nullptr,nullptr,napi_default,nullptr};napi_define_properties(env,exports,1,&parameterApi);
   napi_property_descriptor supervisor[]={
     {"lockSupervisor",nullptr,lockSupervisor,nullptr,nullptr,nullptr,napi_default,nullptr},
     {"installedStart",nullptr,lux::installedStart,nullptr,nullptr,nullptr,napi_default,nullptr},

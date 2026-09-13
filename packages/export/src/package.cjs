@@ -18,14 +18,15 @@ const electronRuntimeFiles = ['electron.exe', 'version', 'LICENSE', 'LICENSES.ch
   'vk_swiftshader_icd.json', 'vk_swiftshader.dll', 'vulkan-1.dll', 'locales/en-US.pak', 'resources/default_app.asar'];
 const requiredRuntimeFiles = [
   'electron/electron.exe', 'electron/version', 'install.cjs', 'package.cjs', 'register.cjs', 'runtime-capability.cjs', 'transport-release.cjs',
-  'install-gui.cjs', 'install-flow.cjs',
+  'install-gui.cjs', 'install-flow.cjs', 'parameter-mapping.cjs', 'runtime-validation.cjs',
   'apps/render-host/src/main.cjs', 'apps/render-host/src/compiled-output.html',
   'apps/render-host/src/compiled-worker.js', 'native/build/Release/lux_texture_bridge.node',
   'native/build/Release/LuxTracerTR02.dll', 'tools/gpu-spike/producer-session.cjs',
-  'tools/gpu-spike/transport-release.cjs', 'tools/gpu-spike/host-startup.cjs', 'tools/gpu-spike/frame-progress.cjs',
+  'tools/gpu-spike/transport-release.cjs', 'tools/gpu-spike/host-startup.cjs', 'tools/gpu-spike/frame-progress.cjs', 'tools/gpu-spike/parameter-mapping.cjs', 'tools/gpu-spike/runtime-validation.cjs',
   ...nativeRuntimeFiles.map(name => 'native/build/Release/' + name),
   ...electronRuntimeFiles.filter(name => !['electron.exe', 'version'].includes(name)).map(name => 'electron/' + name),
 ];
+const parameterRuntimeFiles=['parameter-mapping.cjs','runtime-validation.cjs','tools/gpu-spike/parameter-mapping.cjs','tools/gpu-spike/runtime-validation.cjs'];
 function safeRelative(value) {
   if (typeof value !== 'string' || value.length > 240 || !value.length || value.includes('\\')) throw Error('Unsafe package path');
   for (const part of value.split('/')) {
@@ -66,7 +67,7 @@ function readJson(filename) {
 function validateRuntime(directory, expectedId) {
   const manifest = readJson(path.join(directory, 'runtime.json'));
   const { runtimeId, ...body } = manifest;
-  if (body.format !== 'lux-runtime' || body.version !== 1 || body.platform !== 'win32-x64' || digest(body) !== assertId(runtimeId) || (expectedId && expectedId !== runtimeId)) throw Error('Runtime manifest identity mismatch');
+  if (body.format !== 'lux-runtime' || ![1,2].includes(body.version) || body.platform !== 'win32-x64' || digest(body) !== assertId(runtimeId) || (expectedId && expectedId !== runtimeId)) throw Error('Runtime manifest identity mismatch');
   if (!/^\d+\.\d+\.\d+$/.test(body.electronVersion) || !Array.isArray(body.files) || body.files.length > 10000) throw Error('Invalid runtime manifest');
   const seen = new Set();
   for (const entry of body.files) {
@@ -76,7 +77,7 @@ function validateRuntime(directory, expectedId) {
     const filename = noLinks(path.join(directory, name));
     if (!fs.statSync(filename).isFile() || fs.statSync(filename).size !== entry.bytes || hash(fs.readFileSync(filename)) !== entry.sha256) throw Error('Runtime file hash mismatch: ' + name);
   }
-  for (const name of requiredRuntimeFiles) if (!seen.has(name.toLowerCase())) throw Error('Missing runtime dependency: ' + name);
+  for (const name of requiredRuntimeFiles.filter(name=>body.version===2||!parameterRuntimeFiles.includes(name))) if (!seen.has(name.toLowerCase())) throw Error('Missing runtime dependency: ' + name);
   if (files(directory).length !== seen.size + 1) throw Error('Unlisted runtime files');
   if (fs.readFileSync(path.join(directory, 'electron/version'), 'utf8').trim() !== body.electronVersion) throw Error('Electron version mismatch');
   return manifest;
@@ -84,13 +85,19 @@ function validateRuntime(directory, expectedId) {
 function validateRelease(directory, expectedId) {
   const manifest = readJson(path.join(directory, 'release.json'));
   const { releaseId, ...body } = manifest;
-  if (body.format !== 'lux-resolume-source' || body.version !== 1 || digest(body) !== assertId(releaseId) || (expectedId && expectedId !== releaseId)) throw Error('Release manifest identity mismatch');
+  if (body.format !== 'lux-resolume-source' || ![1,2].includes(body.version) || digest(body) !== assertId(releaseId) || (expectedId && expectedId !== releaseId)) throw Error('Release manifest identity mismatch');
   if (typeof body.name !== 'string' || !body.name.trim() || body.name.length > 80 || /[\x00-\x1f]/.test(body.name)) throw Error('Invalid source name');
   assertId(body.runtimeId); assertId(body.transportHash);
   const intensity = body.savedControls?.intensity;
-  if (JSON.stringify(body.controls) !== JSON.stringify([intensityControl]) || Object.keys(body.savedControls).join() !== 'intensity') throw Error('Unsupported control schema');
-  if (typeof intensity !== 'number' || !Number.isFinite(intensity) || intensity < 0 || intensity > 1) throw Error('Invalid intensity');
+  if(body.version===1){
+    if (JSON.stringify(body.controls) !== JSON.stringify([intensityControl]) || Object.keys(body.savedControls).join() !== 'intensity') throw Error('Unsupported control schema');
+    if (typeof intensity !== 'number' || !Number.isFinite(intensity) || intensity < 0 || intensity > 1) throw Error('Invalid intensity');
+  }else{
+    const {parameterMapping}=require(fs.existsSync(path.join(__dirname,'parameter-mapping.cjs'))?'./parameter-mapping.cjs':'../../../tools/gpu-spike/parameter-mapping.cjs');
+    if(JSON.stringify(parameterMapping(body.controls,body.savedControls,body.controlSchemaHash))!==JSON.stringify(body.controlMapping))throw Error('Invalid immutable parameter mapping');
+  }
   const visual = readTransportRelease(noLinks(path.join(directory, body.transportHash + '.json')));
+  if(body.version===2 ? visual.linked.linkedVersion!==3||body.controlSchemaHash!==visual.linked.controlSchemaHash||JSON.stringify(body.controls)!==JSON.stringify(visual.linked.controls) : visual.linked.linkedVersion===3)throw Error('Release control schema mismatch');
   if (encode(visual.settings) !== encode(body.settings) || visual.sourceHash !== body.sourceHash || visual.linked.linkedHash !== body.linkedHash) throw Error('Release visual mismatch');
   if (files(directory).join('|') !== [body.transportHash + '.json', 'release.json'].sort().join('|')) throw Error('Unlisted release files');
   return manifest;
@@ -101,6 +108,7 @@ function validatePackage(directory) {
   if (fs.readFileSync(noLinks(path.join(directory, 'install.cmd')), 'utf8') !== installer) throw Error('Installer bootstrap mismatch');
   const release = validateRelease(path.join(directory, 'release'));
   const runtime = validateRuntime(path.join(directory, 'runtime'), release.runtimeId);
+  if(release.version===2&&runtime.version!==2)throw Error('Parameter release requires ring-v4 runtime');
   return { release, runtime };
 }
 function copyTree(source, destination) {
@@ -120,7 +128,7 @@ function removeStage(parent, stage) {
   files(stage); // Reject redirected descendants before recursive removal.
   fs.rmSync(stage, { recursive: true });
 }
-function createPackage({ name, transportPath, runtimeDirectory, electronVersion, outputDirectory, intensity = 0.5 }) {
+function createPackage({ name, transportPath, runtimeDirectory, electronVersion, outputDirectory, intensity = 0.5, savedControls }) {
   noLinks(outputDirectory); noLinks(runtimeDirectory); noLinks(transportPath);
   const relative = path.relative(path.resolve(runtimeDirectory), path.resolve(outputDirectory));
   if (relative === '' || (!path.isAbsolute(relative) && relative !== '..' && !relative.startsWith('..' + path.sep))) throw Error('Export output must be outside the runtime input tree');
@@ -129,13 +137,20 @@ function createPackage({ name, transportPath, runtimeDirectory, electronVersion,
   const stage = fs.mkdtempSync(path.join(outputDirectory, '.export-'));
   // Failed stages are retained for diagnosis, never replace a published package.
   copyTree(runtimeDirectory, path.join(stage, 'runtime'));
-  const body = { format: 'lux-runtime', version: 1, platform: 'win32-x64', electronVersion, files: inventory(path.join(stage, 'runtime')) };
+  const body = { format: 'lux-runtime', version: visual.linked.linkedVersion===3?2:1, platform: 'win32-x64', electronVersion, files: inventory(path.join(stage, 'runtime')) };
   const runtimeId = digest(body);
   fs.writeFileSync(path.join(stage, 'runtime/runtime.json'), encode({ ...body, runtimeId }), { flag: 'wx' });
   const transportHash = hash(fs.readFileSync(transportPath));
   const source = { format: 'lux-resolume-source', version: 1, name, runtimeId, transportHash,
     sourceHash: visual.sourceHash, linkedHash: visual.linked.linkedHash, settings: visual.settings,
     controls: [intensityControl], savedControls: { intensity } };
+  if(visual.linked.linkedVersion===3){
+    const {parameterMapping}=require(fs.existsSync(path.join(__dirname,'parameter-mapping.cjs'))?'./parameter-mapping.cjs':'../../../tools/gpu-spike/parameter-mapping.cjs');
+    source.version=2;source.controls=visual.linked.controls;source.controlSchemaHash=visual.linked.controlSchemaHash;
+    source.savedControls=savedControls??Object.fromEntries(source.controls.map(row=>[row.id,row.default]));
+    source.controlMapping=parameterMapping(source.controls,source.savedControls,source.controlSchemaHash);
+    require('./runtime-capability.cjs').assertRuntimeCapabilities(runtimeDirectory,{parameters:true});
+  }
   const releaseId = digest(source);
   fs.mkdirSync(path.join(stage, 'release'));
   fs.copyFileSync(transportPath, path.join(stage, 'release', transportHash + '.json'));

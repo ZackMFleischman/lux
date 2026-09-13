@@ -14,7 +14,7 @@ function request(message, transfer = []) {
     worker.postMessage({...message,requestId}, transfer);
   });
 }
-window.startVisual = async (release, intensity) => {
+window.startVisual = async (release, values) => {
   if (worker) throw Error('Visual already initialized');
   worker = new Worker('./compiled-worker.js', {type:'module'});
   identity = {instanceId:crypto.randomUUID(),generation:1,revisionId:release.sourceHash};
@@ -35,10 +35,14 @@ window.startVisual = async (release, intensity) => {
   const freshCanvas = previousCanvas.cloneNode();
   previousCanvas.replaceWith(freshCanvas);
   const canvas = freshCanvas.transferControlToOffscreen();
-  return request({type:'init',...identity,moduleSource:release.linked.code,settings:release.settings,
-    canvas,controls:{intensity},playing:true},[canvas]);
+  const generic=release.linked.linkedVersion===3;
+  identity.controlSchemaHash=generic?release.linked.controlSchemaHash:undefined;
+  return request({type:'init',...identity,linked:release.linked,settings:release.settings,
+    sdkVersion:generic?'0.2.0':'0.1.0',controlSchema:generic?release.linked.controls:undefined,
+    canvas,controls:generic?values:{intensity:values},playing:true},[canvas]);
 };
 window.setIntensity = value => request({type:'controls',...identity,controlSequence:++sequence,values:{intensity:value}});
+window.setParameters = values => request({type:'controls',...identity,controlSequence:++sequence,values});
 window.captureVisual = async () => {
   const result = await request({type:'capture',...identity});
   if(result.type !== 'capture') throw Error(result.message || 'Capture failed');

@@ -5,7 +5,15 @@
 #include <fstream>
 #include <optional>
 #include <vector>
+#include <bcrypt.h>
+#pragma comment(lib,"bcrypt.lib")
 namespace lux {
+inline std::string descriptorDigest(const std::string& bytes){
+ std::array<unsigned char,32> digest{};
+ BCRYPT_ALG_HANDLE algorithm=nullptr;if(BCryptOpenAlgorithmProvider(&algorithm,BCRYPT_SHA256_ALGORITHM,nullptr,0)<0)throw std::runtime_error("Descriptor SHA-256 unavailable");
+ auto result=BCryptHash(algorithm,nullptr,0,reinterpret_cast<PUCHAR>(const_cast<char*>(bytes.data())),static_cast<ULONG>(bytes.size()),digest.data(),32);BCryptCloseAlgorithmProvider(algorithm,0);
+ if(result<0)throw std::runtime_error("Descriptor SHA-256 failed");std::ostringstream out;for(auto byte:digest)out<<std::hex<<std::setfill('0')<<std::setw(2)<<unsigned(byte);return out.str();
+}
 // Descriptor reads are bounded and do not load Electron, GPU resources or visual code.
 inline std::optional<InstalledSource> readInstalledSource(const void* address){
  HMODULE module=nullptr;
@@ -17,8 +25,8 @@ inline std::optional<InstalledSource> readInstalledSource(const void* address){
   if(dll.filename()==L"LuxTracerTR02.dll")return {};
   throw std::runtime_error("Lux source descriptor is missing; reinstall this release");
  }
- if(std::filesystem::file_size(descriptor)>512)throw std::runtime_error("Lux descriptor exceeds limit");
- std::ifstream file(descriptor,std::ios::binary);return parseInstalledSource(std::string(std::istreambuf_iterator<char>(file),{}));
+ if(std::filesystem::file_size(descriptor)>8192)throw std::runtime_error("Lux descriptor exceeds limit");
+ std::ifstream file(descriptor,std::ios::binary);std::string bytes(std::istreambuf_iterator<char>(file),{});auto result=parseInstalledSource(bytes);result.descriptorHash=descriptorDigest(bytes);return result;
 }
 inline std::filesystem::path installedRoot(){wchar_t path[32768]{};auto length=GetEnvironmentVariableW(L"LOCALAPPDATA",path,32768);if(!length||length>=32768)throw std::runtime_error("LOCALAPPDATA is unavailable");return std::filesystem::path(path)/L"Lux"/L"Installed";}
 class InstalledActivation {
@@ -61,7 +69,7 @@ public:
   LARGE_INTEGER counter;QueryPerformanceCounter(&counter);instance=installedInstanceName(GetCurrentProcessId(),counter.QuadPart);
   directory=installedRoot()/L"instances"/source->runtimeId;std::filesystem::create_directories(directory);
   request=directory/(instance+".json");ready=directory/L"supervisor.ready";
-  std::ofstream file(request,std::ios::binary|std::ios::trunc);file<<"{\"version\":1,\"runtimeId\":\""<<source->runtimeId<<"\",\"releaseId\":\""<<source->releaseId<<"\",\"instanceId\":\""<<instance<<"\",\"hostPid\":"<<GetCurrentProcessId()<<"}";file.close();if(!file)throw std::runtime_error("Cannot request installed Lux source");
+  std::ofstream file(request,std::ios::binary|std::ios::trunc);file<<"{\"version\":"<<source->version<<",\"runtimeId\":\""<<source->runtimeId<<"\",\"releaseId\":\""<<source->releaseId<<"\",\"instanceId\":\""<<instance<<"\",\"hostPid\":"<<GetCurrentProcessId();if(source->version==2)file<<",\"descriptorHash\":\""<<source->descriptorHash<<"\"";file<<"}";file.close();if(!file)throw std::runtime_error("Cannot request installed Lux source");
   heartbeat();
  }
  void heartbeat(){

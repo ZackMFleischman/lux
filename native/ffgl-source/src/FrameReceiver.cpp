@@ -194,7 +194,12 @@ void FrameReceiver::run(HGLRC shared) {
     }
    }
    if(counters.due(now,true))log<<"{\"kind\":\"counters\",\"callbacks\":"<<callbacks.load()<<",\"consumed\":"<<consumed.load()<<"}"<<std::endl;
-   if(ring)publishHostControl(*ring,intensity.load());
+   if(ring){HostControlSnapshotV4 snapshot;uint64_t sequence;
+    if(tryReadHostControlsV4(desired,controlSchema,controlCount,snapshot)==HostControlStatusV4::Ok){
+     auto status=tryPublishHostControlsV4(ring->controls,controlSchema,std::span<const float>(snapshot.values.data(),snapshot.count),sequence);
+     require(status==HostControlStatusV4::Ok||status==HostControlStatusV4::Busy,"host parameter publication failed");
+    }
+   }
    if(ring&&pending<0){
     int outputIndex=-1;for(int i=0;i<3;++i){int expected=Free;if(outputs[i].state.compare_exchange_strong(expected,Writing)){outputIndex=i;break;}}
     if(outputIndex>=0){
