@@ -62,7 +62,10 @@ async function initialize(message) {
       !Number.isInteger(settings.seed) || settings.seed < 0 || settings.seed > 0xffffffff) throw Error('Unsupported output settings');
   controlState=await prepareWorkerControlState(message);
   clock = new RuntimeClock(() => performance.now(), 'paused'); random = new SeededRandom(settings.seed);
-  heartbeat = setInterval(() => send('heartbeat', { frameId: String(frame) }), 250);
+  let workerHeartbeat=0;
+  const beat=()=>send('heartbeat', { frameId: String(frame),workerHeartbeat:++workerHeartbeat });
+  heartbeat = setInterval(beat, 250);
+  beat(); // Arm external worker liveness before any authored import/create runs.
   const {module,assets,images} = await loadAuthoredModule(message, async moduleSource => {
     const url = URL.createObjectURL(new Blob([moduleSource], { type: 'text/javascript' }));
     try { return await import(url); } finally { URL.revokeObjectURL(url); }

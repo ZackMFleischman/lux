@@ -26,11 +26,11 @@ fs.mkdirSync(output, { recursive: true });
 const records = [], session = new ProducerSession(bridge);
 let count = 0, dropped = 0, failed = false, finishing = false, webgpuReady = false, visualReady = false;
 let pollTimer, controlTimer, endTimer;
-let healthTimer, healthSequence = 0, completedFrames = 0, backpressureFrames = 0;
+let healthTimer, healthSequence = 0, workerHeartbeat = 0, completedFrames = 0, backpressureFrames = 0;
 let stopProducer=()=>{};
 function publishHealth() {
   if (!installed || finishing) return;
-  const state = {version:1, attemptId:installed.attemptId, sequence:++healthSequence,
+  const state = {version:2, attemptId:installed.attemptId, sequence:++healthSequence,workerHeartbeat,
     ready:visualReady && completedFrames > 0, frameId:progress.frame.toString(), completedFrames, backpressureFrames};
   const temporary = installed.healthPath + '.tmp';
   fs.writeFileSync(temporary, JSON.stringify(state)); fs.renameSync(temporary, installed.healthPath);
@@ -73,7 +73,14 @@ app.whenReady().then(async () => {
   win.webContents.on('console-message', (details, _level, legacyMessage) => {
     const message = details.message ?? legacyMessage;
     if(typeof message==='string'&&message.includes('runtime-heartbeat')){
-      try{const data=JSON.parse(message);if(data.kind==='runtime-heartbeat'){progress.observe(data.frameId,performance.now());if(!playback)record(data);return;}}catch{}
+      try{const data=JSON.parse(message);if(data.kind==='runtime-heartbeat'){
+        if(typeof data.frameId!=='string'||!/^\d{1,20}$/.test(data.frameId)||!Number.isSafeInteger(data.workerHeartbeat)||data.workerHeartbeat<=workerHeartbeat)return;
+        workerHeartbeat=data.workerHeartbeat;progress.observe(data.frameId,performance.now());
+        // Forward actual worker progress immediately; periodic main health uses
+        // the same counter and cannot impersonate worker event-loop activity.
+        try{publishHealth();}catch(error){failure(error);}
+        if(!playback)record(data);return;
+      }}catch{}
     }
     record({ kind: 'console', message });
     try {

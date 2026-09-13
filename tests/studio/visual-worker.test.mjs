@@ -9,7 +9,7 @@ import { decode } from 'fast-png';
 const schema=normalizeControlDeclarations({height:{type:'number',label:'Height',default:1,min:0,max:4},speed:{type:'number',label:'Speed',default:0.5,min:0,max:2}});
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const bundle=(await build({entryPoints:[fileURLToPath(new URL('../../apps/studio/src/visual-worker.mjs',import.meta.url))],bundle:true,write:false,format:'esm',platform:'browser',logLevel:'silent'})).outputFiles[0].text;
-async function fixture(controls=schema,declared=controls,mutation='',sdkVersion='0.2.0',timed=false,gpuTimed=false,workMs=0) {
+async function fixture(controls=schema,declared=controls,mutation='',sdkVersion='0.2.0',timed=false,gpuTimed=false,workMs=0,waitCreate=false) {
   const messages=[],frames=[],intervals=new Map(),scheduled=[],timers=new Map();let created=0,imports=0,now=0,nextTimer=0;
   const requested=[];
   const device={lost:new Promise(()=>{}),features:new Set(gpuTimed?['timestamp-query']:[]),pushErrorScope(){},popErrorScope:async()=>null,queue:{onSubmittedWorkDone:async()=>{now+=timed?17:workMs;},submit(){}},destroy(){},
@@ -28,17 +28,27 @@ async function fixture(controls=schema,declared=controls,mutation='',sdkVersion=
     export class WebGPURenderer {backend={isWebGPUBackend:true};setSize(){}async init(){}setRenderTarget(){}render(){}dispose(){}async readRenderTargetPixelsAsync(){const pixels=new Uint8Array(1920*1080*4);pixels.set([188,0,0,128]);return pixels;}}
     export class RenderTarget{texture={};dispose(){}} export const SRGBColorSpace='srgb';
     export class MeshBasicNodeMaterial {dispose(){}} export class QuadMesh {constructor(material){this.material=material;}render(){}} export const sampleTexture=()=>({});
-    export default {sdkVersion:${JSON.stringify(sdkVersion)},controls:${typeof declared==='string'?declared:JSON.stringify(declared)},async create(){recordCreate();return {update(frame){recordFrame(frame)},${gpuTimed?'render(){gpuDraw();}':timed?'async render(){advanceClock(7);await Promise.resolve();advanceClock(11);}':'render(){}'},reset(){},dispose(){}}}};`;
+    export default {sdkVersion:${JSON.stringify(sdkVersion)},controls:${typeof declared==='string'?declared:JSON.stringify(declared)},async create(){recordCreate();${waitCreate?'await new Promise(()=>{});':''}return {update(frame){recordFrame(frame)},${gpuTimed?'render(){gpuDraw();}':timed?'async render(){advanceClock(7);await Promise.resolve();advanceClock(11);}':'render(){}'},reset(){},dispose(){}}}};`;
   const module=new vm.SourceTextModule(bundle,{context,importModuleDynamically:async()=>{
-    imports++;const visual=new vm.SourceTextModule(visualCode,{context});await visual.link(()=>{throw Error('Unexpected import')});await visual.evaluate();return visual;
+    imports++;assert.equal(messages[0]?.type,'heartbeat','worker must announce liveness before authored module import');assert.equal(messages[0].workerHeartbeat,1);const visual=new vm.SourceTextModule(visualCode,{context});await visual.link(()=>{throw Error('Unexpected import')});await visual.evaluate();return visual;
   }});
   await module.link(()=>{throw Error('Unexpected bundled import')});await module.evaluate();
   const identity={instanceId:'instance',generation:1,revisionId:'revision'};
   const initial={type:'init',requestId:'init',...identity,moduleSource:'fixture',canvas:{},settings:{width:1920,height:1080,fps:60,seed:0},sdkVersion,controlSchema:controls,controlSchemaHash:hash(canonicalControlSchemaJson(controls)),controls:Object.fromEntries(controls.map(row=>[row.id,row.default])),playing:false};
-  async function send(message){const before=messages.length;context.deliver(JSON.stringify({...identity,...message}));for(let i=0;i<200 && messages.length===before;i++)await new Promise(resolve=>setImmediate(resolve));assert.ok(messages.length>before,'worker must respond');return messages.at(-1);}
+  const post=message=>context.deliver(JSON.stringify({...identity,...message}));
+  async function send(message){const before=messages.length;post(message);const response=()=>messages.slice(before).find(row=>row.type!=='heartbeat');for(let i=0;i<200&&!response();i++)await new Promise(resolve=>setImmediate(resolve));assert.ok(response(),'worker must respond');return response();}
   const flush=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};
-  return {send,initial,messages,frames,requested,scheduled,timers,flush,async fireTimer(late=0){const [id,timer]=timers.entries().next().value;timers.delete(id);now=Math.max(now,timer.at)+late;timer.fn();await flush();},created:()=>created,imports:()=>imports,telemetry(){now=500;intervals.get(500)?.();return messages.at(-1);},intervals};
+  return {send,post,initial,messages,frames,requested,scheduled,timers,flush,async fireTimer(late=0){const [id,timer]=timers.entries().next().value;timers.delete(id);now=Math.max(now,timer.at)+late;timer.fn();await flush();},created:()=>created,imports:()=>imports,telemetry(){now=500;intervals.get(500)?.();return messages.at(-1);},intervals};
 }
+
+test('worker announces liveness before top-level/create and heartbeats continue through healthy async initialization',async()=>{
+ for(const stage of ['top-level','create']){
+  const f=await fixture(schema,schema,stage==='top-level'?'await new Promise(()=>{});':'','0.2.0',false,false,0,stage==='create');f.post(f.initial);
+  for(let i=0;i<20;i++)await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(f.imports(),1);assert.equal(f.created(),stage==='create'?1:0);assert.equal(f.messages.length,1);assert.equal(f.messages[0].workerHeartbeat,1);assert.equal(f.messages[0].frameId,'0');
+  f.intervals.get(250)();assert.equal(f.messages.at(-1).workerHeartbeat,2);assert.equal(f.messages.at(-1).frameId,'0');assert.equal(f.messages.some(row=>row.type==='ready'),false);
+ }
+});
 
 test('playing cadence subtracts full completed-frame work from its next delay',async()=>{
  const f=await fixture(schema,schema,'','0.2.0',false,false,6);await f.send({...f.initial,playing:true});
