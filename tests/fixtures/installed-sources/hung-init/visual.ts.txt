@@ -1,0 +1,10 @@
+import { defineVisual } from '@lux/visual-sdk';
+
+// Reviewed diagnostic only. Never activate outside its bounded installed Job.
+export default defineVisual({
+  controls: {},
+  async create(_context) {
+    console.log('LUX_QA_INSTALLED_INIT_HANG_ENTERED');
+    while (true) {}
+  },
+});
