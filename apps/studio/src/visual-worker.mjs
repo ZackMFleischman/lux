@@ -12,6 +12,7 @@ const now=performance.now.bind(performance);
 const post=postMessage.bind(globalThis);
 let identity, renderer, device, visual, clock, random, settings, outputTarget, presentation;
 let controlState, frame = 0, tick = 0, lastTime = 0;
+let drawStarted=0,scheduleEpoch=0;
 let stopped = false, externallyDriven=false, timer, heartbeat, telemetryTimer, collector, gpuTimer, gpuCapability, chain = Promise.resolve();
 const send = (type, extra = {}) => post({ type, ...identity, ...extra });
 function state() { return { ...clock.snapshot(), frameId: String(frame),...controlState.state() }; }
@@ -21,6 +22,7 @@ function failure(error, requestId) {
   send('failure', { requestId, code: 'RUNTIME_FAILED', message: String(error?.message || error).slice(0, 2000) });
 }
 async function draw(requestId, type = 'frame') {
+  drawStarted=now();
   const time = clock.snapshot();
   gpuTimer.begin(frame+1);
   const updateStart=now();
@@ -41,8 +43,16 @@ async function draw(requestId, type = 'frame') {
 }
 function schedule() {
   clearTimeout(timer);
+  const epoch=++scheduleEpoch;
   if (stopped || externallyDriven || clock.snapshot().playback !== 'playing') return;
-  timer = setTimeout(() => { chain = chain.then(async () => { if (!stopped) { await draw(); schedule(); } }).catch(failure); }, 1000 / settings.fps);
+  // Start-to-start cadence includes update, async render and queue completion.
+  // Every actual draw rebases the deadline, so slow work/late timers never build
+  // a backlog of missed frames. Keep one asynchronous yield even when overdue.
+  const delay=Math.max(0,drawStarted+1000/settings.fps-now());
+  timer = setTimeout(() => { chain = chain.then(async () => {
+    // clearTimeout cannot retract a callback already queued behind a command.
+    if (!stopped && epoch===scheduleEpoch && clock.snapshot().playback==='playing') { await draw(); schedule(); }
+  }).catch(failure); }, delay);
 }
 async function initialize(message) {
   identity = { instanceId: message.instanceId, generation: message.generation, revisionId: message.revisionId };
