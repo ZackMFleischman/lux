@@ -12,12 +12,24 @@ test('static composition extraction derives canonical controls and distinct same
  assert.deepEqual(profile.publicControlBindings,{ballIntensity:[{nodePath:[ballId],controlId:'intensity',active:true}],segmentsA:[{nodePath:[kaleidoscopeAId],controlId:'segments',active:true}],segmentsB:[{nodePath:[kaleidoscopeBId],controlId:'segments',active:true}]});
  assert.deepEqual(profile.nodes.map(row=>row.nodePath),[[ballId],[kaleidoscopeAId],[kaleidoscopeBId]]);
 });
+test('composition extraction preserves authored exposure order without requiring sorted binding keys',()=>{
+ const source=nestedCompositionSourceBundle(),ordered=` {id:'ballIntensity',nodeId:'${ballId}',controlId:'intensity'},\n {id:'segmentsA',nodeId:'${compositeAId}',controlId:'firstSegments'},\n {id:'segmentsB',nodeId:'${compositeBId}',controlId:'secondSegments'}`,reordered=` {id:'segmentsB',nodeId:'${compositeBId}',controlId:'secondSegments'},\n {id:'ballIntensity',nodeId:'${ballId}',controlId:'intensity'},\n {id:'segmentsA',nodeId:'${compositeAId}',controlId:'firstSegments'}`;
+ source.files['composition.ts']=source.files['composition.ts'].replace(ordered,reordered);
+ const asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})])),profile=extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash});
+ assert.deepEqual(profile.publicControls.map(row=>row.id),['segmentsB','ballIntensity','segmentsA']);
+});
 test('composition extraction rejects duplicate exposure and a non-linear graph',()=>{
  const source=compositionSourceBundle();
  for(const text of [source.files['composition.ts'].replace("{id:'segmentsB'","{id:'segmentsA'"),source.files['composition.ts'].replace(`nodeId:'${kaleidoscopeBId}',portId:'image'},delay:'none'`,`nodeId:'${kaleidoscopeAId}',portId:'image'},delay:'none'`)]){
   const files={...source.files,'composition.ts':text},asts=Object.fromEntries(Object.entries(files).map(([path,value])=>[path,parse(value,{sourceType:'module',plugins:['typescript']})]));
   assert.throws(()=>extractCompositionDeclaration({entry:source.entry,files,asts,hash}),/duplicate|linear|writer|duplicate/i);
  }
+});
+test('composition extraction rejects a zero-input node pruned from the selected image chain',()=>{
+ const source=nestedCompositionSourceBundle(),extraId='99999999-9999-4999-8999-999999999999';
+ source.files['composition.ts']=source.files['composition.ts'].replace(`{id:'${compositeBId}',definition:'composite'}],edges:[`,`{id:'${compositeBId}',definition:'composite'},{id:'${extraId}',definition:'ball'}],edges:[`);
+ const asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));
+ assert.throws(()=>extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash}),/linear|reachable|pruned/i);
 });
 test('static extraction recursively admits reusable compositions and derives canonical leaf paths',()=>{
  const source=nestedCompositionSourceBundle(),asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));
