@@ -186,7 +186,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
             }
             if(message.type==='ready'&&(message.controlSequence!==0||animationSequence!==0||JSON.stringify(applied)!==JSON.stringify(state.controls)||JSON.stringify(controlAnimations)!==JSON.stringify(state.controlAnimations??[])))throw Error('Initial control snapshot mismatch');
           } catch(error) {if(message.type==='ready')fail(String(error));return;}
-          if(ready&&message.controlSequence<candidate.state.controlSequence)return;
+          if(ready&&(message.controlSequence<candidate.state.controlSequence||animationSequence<(candidate.state.animationSequence??0)))return;
           candidate.state={...state,controls:applied,controlSequence:message.controlSequence,
             ...(compositionNodeControls?{nodeControls:compositionNodeControls,effectiveNodeControls,controlAnimations,controlAnimationIssues,animationSequence}:{} )};
           candidate.playback=message.playback;

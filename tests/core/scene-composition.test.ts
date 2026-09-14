@@ -28,3 +28,4 @@ test('scene v5 rejects duplicate links and mounted files outside their mount pat
  assert.throws(()=>createSceneDocument(source,DEFAULT_OUTPUT,controls,[link,link]),/duplicate/i);
  assert.throws(()=>createSceneDocument(source,DEFAULT_OUTPUT,controls,[{...link,files:['other.ts']}]),/mounted/i);
 });
+test('scene animation validation rejects accessors without invoking them',()=>{let invoked=false;const hostile:any={...animations[0]};Object.defineProperty(hostile,'amount',{enumerable:true,get(){invoked=true;return 2;}});assert.throws(()=>createSceneDocument(source,DEFAULT_OUTPUT,controls,[],[hostile]),/animation/i);assert.equal(invoked,false);});

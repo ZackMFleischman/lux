@@ -56,6 +56,8 @@ test('Studio promotes, edits and restarts a composition from canonical leaf snap
   assert.deepEqual(worker.messages.at(-1),{type:'animations',requestId:'animate-a',instanceId:runtime.instanceId,generation:runtime.generation,animationSequence:1,controlAnimations:[binding]});
   worker.reply({requestId:'animate-a',controls:next.values(),nodeControls:next.snapshot(),controlSequence:2,controlAnimations:[binding],animationSequence:1});await animationWrite;
   assert.deepEqual(client.getSnapshot().authoring!.controlAnimations,[binding]);
+  worker.reply({controls:next.values(),nodeControls:next.snapshot(),controlSequence:2,controlAnimations:[],animationSequence:0});
+  assert.deepEqual(client.getSnapshot().authoring!.controlAnimations,[binding],'delayed animation state must not replace the newer binding');
   await assert.rejects(client.submit({...source,files:{...source.files,'composition.ts':'invalid'}} as any),/invalid composition/);
   assert.equal(client.getSnapshot().authoring!.generation,runtime.generation);const before=compiles;
   await client.invoke({name:'lux.runtime.restart',input:{requestId:'restart',instanceId:runtime.instanceId,expectedGeneration:runtime.generation}});
