@@ -8,6 +8,7 @@ import type { SourceDiagnostic } from './diagnostics.ts';
 import { AssetItem, AssetPreview } from './AssetPreview.tsx';
 import { sourceAssets } from './source-equality.ts';
 import { AssetImport } from './AssetImport.tsx';
+import { Disclosure } from '../Disclosure.tsx';
 export function SourcePanel({ workspace, readOnly, onApply, onSave, onCompositionChange, diagnosticTarget, diagnostics = [] }: {
   workspace: SourceWorkspace; readOnly: boolean; onApply(): void; onSave(): void; onCompositionChange?(value: boolean): void;
   diagnosticTarget?: { path: string; offset: number; request: number } | null;
@@ -15,7 +16,6 @@ export function SourcePanel({ workspace, readOnly, onApply, onSave, onCompositio
 }) {
   const snapshot = useSyncExternalStore(workspace.subscribe, workspace.getSnapshot);
   const [adding, setAdding] = useState(false);
-  const [filesCollapsed, setFilesCollapsed] = useState(false);
   const [assetSelection, setAssetSelection] = useState<{ path: string; documentKey: number } | null>(null);
   const assets = sourceAssets(snapshot.source);
   const assetPath = assetSelection?.documentKey === snapshot.documentKey && Object.hasOwn(assets, assetSelection.path) ? assetSelection.path : null;
@@ -42,9 +42,8 @@ export function SourcePanel({ workspace, readOnly, onApply, onSave, onCompositio
       if (event.shiftKey) onSave(); else onApply();
     }
   }}>
-    <div className="source-columns"><div className="source-navigation-toggle">
-      <Tooltip title={filesCollapsed ? 'Expand source files and assets' : 'Collapse source files and assets'}><IconButton aria-label={filesCollapsed ? 'Expand source files and assets' : 'Collapse source files and assets'} aria-controls="source-files-and-assets" aria-expanded={!filesCollapsed} onClick={() => setFilesCollapsed(value => !value)}>{filesCollapsed ? '›' : '‹'}</IconButton></Tooltip>
-      </div><div id="source-files-and-assets" className="source-files" hidden={filesCollapsed}>
+    <div className="source-columns"><Disclosure title="Files and assets" defaultOpen className="source-files-disclosure">
+      <div id="source-files-and-assets" className="source-files">
       <div className="source-files-heading"><span>Files</span><Tooltip title="New file"><IconButton ref={addButton} aria-label="New file" disabled={locked} onClick={() => setAdding(true)}>+</IconButton></Tooltip></div>
       <nav aria-label="Source files">{Object.keys(snapshot.source.files).map(path => <Button key={path} title={path} aria-label={`Open ${path}`} aria-current={!assetPath && snapshot.selectedFile === path ? 'page' : undefined}
         onClick={() => openCode(path)}><span className="file-path">{path}</span>{path === snapshot.source.entry && <span className="file-marker">Entry</span>}{snapshot.dirtyFiles.includes(path) && <span aria-label="Unsaved">*</span>}</Button>)}</nav>
@@ -63,7 +62,7 @@ export function SourcePanel({ workspace, readOnly, onApply, onSave, onCompositio
         <Button type="submit" disabled={locked}>Add file</Button>
       </form>}
       {snapshot.canUndoReplacement && <Button disabled={locked} onClick={() => workspace.undoReplacement()}>Undo source replacement</Button>}
-      </div>
+      </div></Disclosure>
       <div className="source-editing"><Tabs ref={tabs} value={assetPath ? false : snapshot.selectedFile || false} onChange={(_, path: string) => openCode(path)} variant="scrollable" scrollButtons="auto" aria-label="Open source files">
         {snapshot.openFiles.map(path => <Tab key={path} value={path} title={path} label={<span className="file-tab-label"><span className="file-path">{path}{snapshot.dirtyFiles.includes(path) ? ' *' : ''}</span><span role="button" tabIndex={0} aria-label={`Close ${path}`} className="file-tab-close"
           onClick={event => { event.stopPropagation(); closeFile(path); }} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); closeFile(path); } }}>×</span></span>} />)}
