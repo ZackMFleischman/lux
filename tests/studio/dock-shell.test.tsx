@@ -27,9 +27,13 @@ async function openLayouts() {
   await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: 'Layouts…' })); });
 }
 async function closeLayouts() {
-  if (!screen.queryByRole('dialog', { name: 'Workspace layouts' })) return;
-  await pressButton('Done');
-  await waitFor(() => assert.ok(!screen.queryByRole('dialog')));
+  if (screen.queryByRole('dialog', { name: 'Workspace layouts' })) await pressButton('Done');
+  // MUI hides the dialog from accessibility before its exit transition removes
+  // the modal and restores access to the underlying workspace.
+  await waitFor(() => {
+    assert.ok(!document.querySelector('[role="dialog"]'));
+    assert.ok(screen.queryByRole('button', { name: 'View', exact: true }));
+  });
 }
 async function click(name: string) {
   if (name.startsWith('Open ')) {
