@@ -346,3 +346,98 @@ test('View is a compact keyboard menu with recoverable panes and a separate layo
   await waitFor(() => assert.ok(!screen.queryByRole('dialog')));
   ui.unmount();
 });
+
+test('Graph wheel zoom anchors at the pointer and background gestures keep selection clear', async () => {
+  const { GraphPanel } = await import('../../apps/studio/src/GraphPanel.tsx');
+  const { parse } = await import('@babel/parser');
+  const { createHash } = await import('node:crypto');
+  const { extractCompositionDeclaration } = await import('../../apps/build-worker/src/composition-declarations.mjs');
+  const { nestedCompositionSourceBundle } = await import('../compiler/composition-fixture.mjs');
+  const source = nestedCompositionSourceBundle();
+  const asts = Object.fromEntries(Object.entries(source.files).map(([path, text]) => [path, parse(text as string, { sourceType: 'module', plugins: ['typescript'] })]));
+  const composition = extractCompositionDeclaration({ entry: source.entry, files: source.files, asts, hash: (text: string) => createHash('sha256').update(text).digest('hex') });
+  const selections: unknown[] = [];
+  render(<GraphPanel runtime={{ composition } as any} selected={'["selected"]'} onSelect={path => selections.push(path)} />);
+  const viewport = screen.getByLabelText('Graph canvas');
+  viewport.getBoundingClientRect = () => ({ x: 100, y: 50, left: 100, top: 50, right: 700, bottom: 350, width: 600, height: 300, toJSON() {} });
+  let captured: number | null = null;
+  viewport.setPointerCapture = id => { captured = id; };
+  viewport.hasPointerCapture = id => captured === id;
+  viewport.releasePointerCapture = () => { captured = null; };
+  const transform = () => {
+    const values = document.querySelector<HTMLElement>('.graph-content')!.style.transform.match(/-?[\d.]+/g)!.map(Number);
+    return { x: values[0]!, y: values[1]!, zoom: values[2]! };
+  };
+  const before = transform();
+  await act(async () => { viewport.dispatchEvent(new dom.window.WheelEvent('wheel', { deltaY: -120, clientX: 350, clientY: 180, bubbles: true, cancelable: true })); });
+  const after = transform();
+  assert.ok(after.zoom > before.zoom, 'ordinary wheel zooms without Ctrl');
+  assert.ok(Math.abs((250 - before.x) / before.zoom - (250 - after.x) / after.zoom) < 1e-8);
+  assert.ok(Math.abs((130 - before.y) / before.zoom - (130 - after.y) / after.zoom) < 1e-8);
+  assert.deepEqual(selections, []);
+  async function pointer(type: string, x: number, y: number, id = 1) {
+    const event = new dom.window.MouseEvent(type, { clientX: x, clientY: y, button: 0, bubbles: true, cancelable: true });
+    Object.defineProperty(event, 'pointerId', { value: id });
+    await act(async () => { viewport.dispatchEvent(event); });
+  }
+  await pointer('pointerdown', 200, 200);
+  assert.ok(viewport.classList.contains('graph-panning'));
+  await pointer('pointermove', 230, 225, 2);
+  assert.deepEqual(transform(), after, 'another pointer cannot move this gesture');
+  await pointer('pointermove', 230, 225);
+  assert.equal(transform().x, after.x + 30);
+  await pointer('pointerup', 230, 225);
+  fireEvent.click(viewport);
+  assert.deepEqual(selections, [], 'drag and its synthetic click preserve selected node');
+  assert.equal(captured, null);
+  assert.ok(!viewport.classList.contains('graph-panning'));
+  await pointer('pointerdown', 200, 200);
+  await pointer('pointerup', 202, 201);
+  assert.deepEqual(selections, [null], 'short background click selects Scene controls');
+  await pointer('pointerdown', 200, 200);
+  await pointer('pointercancel', 220, 220);
+  assert.ok(!viewport.classList.contains('graph-panning'));
+  assert.deepEqual(selections, [null], 'cancel does not change selection');
+  await pointer('pointerdown', 200, 200);
+  await pointer('lostpointercapture', 200, 200);
+  assert.ok(!viewport.classList.contains('graph-panning'));
+  for (const delta of [-10000, 10000, 10000, 10000]) {
+    const old = transform();
+    const wheelEvent = new dom.window.WheelEvent('wheel', { deltaY: delta, clientX: 600, clientY: 300, bubbles: true, cancelable: true });
+    await act(async () => { viewport.dispatchEvent(wheelEvent); });
+    assert.equal(wheelEvent.defaultPrevented, true, 'graph owns wheel scrolling even at zoom limits');
+    const next = transform();
+    assert.ok(next.zoom >= .2 && next.zoom <= 2);
+    assert.ok(Math.abs((500 - old.x) / old.zoom - (500 - next.x) / next.zoom) < 1e-8);
+    assert.ok(Math.abs((250 - old.y) / old.zoom - (250 - next.y) / next.zoom) < 1e-8);
+  }
+  assert.equal(transform().zoom, .2);
+  await click('Scene controls');
+  assert.deepEqual(selections, [null, null]);
+});
+
+test('Graph connections point from output to input with reversed node declarations', async () => {
+  const { GraphPanel } = await import('../../apps/studio/src/GraphPanel.tsx');
+  const { parse } = await import('@babel/parser');
+  const { createHash } = await import('node:crypto');
+  const { extractCompositionDeclaration } = await import('../../apps/build-worker/src/composition-declarations.mjs');
+  const { nestedCompositionSourceBundle } = await import('../compiler/composition-fixture.mjs');
+  const source = nestedCompositionSourceBundle();
+  const asts = Object.fromEntries(Object.entries(source.files).map(([path, text]) => [path, parse(text as string, { sourceType: 'module', plugins: ['typescript'] })]));
+  const composition = structuredClone(extractCompositionDeclaration({ entry: source.entry, files: source.files, asts, hash: (text: string) => createHash('sha256').update(text).digest('hex') }));
+  assert.ok(composition);
+  const definition = composition.definitions[composition.graph.rootDefinitionHash];
+  assert.ok(definition?.kind === 'graph');
+  const body = definition.body;
+  (body.nodes as Array<typeof body.nodes[number]>).reverse();
+  render(<GraphPanel runtime={{ composition } as any} selected={null} onSelect={() => {}} />);
+  const wires = [...document.querySelectorAll('.graph-connection')];
+  assert.ok(wires.length > 0);
+  for (const [index, wire] of wires.entries()) {
+    const edge = body.edges[index]!;
+    const coordinates = wire.querySelector('path')!.getAttribute('d')!.match(/-?[\d.]+/g)!.map(Number);
+    assert.ok(coordinates[0]! < coordinates[6]!, 'display order follows signal flow even when declarations are reversed');
+    const points = wire.querySelector('polygon')!.getAttribute('points')!.split(' ').map(point => point.split(',').map(Number));
+    assert.equal(Math.sign(points[1]![0]! - points[0]![0]!), 1);
+  }
+});
