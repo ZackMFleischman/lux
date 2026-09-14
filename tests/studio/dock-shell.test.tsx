@@ -32,7 +32,7 @@ async function closeLayouts() {
   // the modal and restores access to the underlying workspace.
   await waitFor(() => {
     assert.ok(!document.querySelector('[role="dialog"]'));
-    assert.ok(screen.queryByRole('button', { name: 'View', exact: true }));
+    assert.ok(screen.queryByRole('button', { name: 'View' }));
   });
 }
 async function click(name: string) {
