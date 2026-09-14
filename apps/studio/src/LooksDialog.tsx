@@ -38,9 +38,13 @@ export function LooksDialog({open, onClose, onClosed, client, onSave, onLoad}: {
   useEffect(() => { if (open) void refresh().catch(reason => setError(String(reason))); }, [open, client]);
   async function run(operation: () => Promise<void>) {
     if (locked.current) return;
+    const origin = document.activeElement as HTMLElement | null;
     locked.current = true; setBusy(true); setError(''); setMessage('');
     try { await operation(); } catch (reason) { setError(reason instanceof Error ? reason.message : String(reason)); }
-    finally { locked.current = false; setBusy(false); }
+    finally {
+      locked.current = false; setBusy(false);
+      requestAnimationFrame(() => { if (origin?.isConnected && origin.getClientRects().length) origin.focus(); });
+    }
   }
   async function save(update: boolean) {
     await run(async () => {
