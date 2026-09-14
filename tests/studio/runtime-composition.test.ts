@@ -24,7 +24,7 @@ test('Studio saves, reopens, edits and restarts nested composition instances whi
   Object.defineProperty(globalThis,'Worker',{value:CompositionWorker,configurable:true});
   Object.defineProperty(globalThis,'document',{value:{createElement:()=>({style:{},transferControlToOffscreen:()=>({}),remove(){}})},configurable:true});
   CompositionWorker.all=[];let compiles=0;
-  const compiler={compile:async(input:any)=>{compiles++;if(input.files['composition.ts']==='invalid')return {ok:false,diagnostics:[{code:'COMPILE_FAILED',message:'invalid composition'}]};return {ok:true,sourceHash:compiled.artifact.sourceHash,linked};}} as any;
+  const compiler={compile:async(input:any)=>{compiles++;if(input.files['composite.ts']==='invalid')return {ok:false,diagnostics:[{code:'COMPILE_FAILED',message:'invalid nested composition'}]};return {ok:true,sourceHash:compiled.artifact.sourceHash,linked};}} as any;
   const client=new StandaloneClient(compiler,{codeDeclaredParameters:true});
   t.after(()=>{const runtime=(client as any).running;if(runtime)(client as any).stop(runtime,'test complete');for(const [key,value]of originals)if(value)Object.defineProperty(globalThis,key,value);else Reflect.deleteProperty(globalThis,key);});
   const saved=createCompositionControlState(linked.composition);saved.apply({ballIntensity:.6,segmentsA:5,segmentsB:11});
@@ -58,7 +58,7 @@ test('Studio saves, reopens, edits and restarts nested composition instances whi
   assert.deepEqual(client.getSnapshot().authoring!.controlAnimations,[binding]);
   worker.reply({controls:next.values(),nodeControls:next.snapshot(),controlSequence:2,controlAnimations:[],animationSequence:0});
   assert.deepEqual(client.getSnapshot().authoring!.controlAnimations,[binding],'delayed animation state must not replace the newer binding');
-  await assert.rejects(client.submit({...source,files:{...source.files,'composition.ts':'invalid'}} as any),/invalid composition/);
+  await assert.rejects(client.submit({...source,files:{...source.files,'composite.ts':'invalid'}} as any),/invalid nested composition/);
   assert.equal(client.getSnapshot().authoring!.generation,runtime.generation);const before=compiles;
   await client.invoke({name:'lux.runtime.restart',input:{requestId:'restart',instanceId:runtime.instanceId,expectedGeneration:runtime.generation}});
   assert.equal(compiles,before);assert.deepEqual(CompositionWorker.all.at(-1)!.init.controls,{ballIntensity:.6,segmentsA:7,segmentsB:11});
