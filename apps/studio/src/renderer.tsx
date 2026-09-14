@@ -36,13 +36,12 @@ export function StudioApp(props: StudioProps) {
 }
 function controlOwner(snapshot: StudioSnapshot): string | null {
   const runtime = snapshot.authoring;
-  const status = studioStatus(snapshot);
   return snapshot.connection === 'connected' && runtime?.authority === 'studio'
     ? parameterOwner(runtime) : null;
 }
 const activeJobStates = new Set(['queued', 'pending', 'running', 'compiling', 'initializing']);
 function sentenceCase(value: string): string { return value ? value[0]!.toUpperCase() + value.slice(1) : value; }
-export function studioStatus(snapshot: StudioSnapshot): { build: string; problems: number; runtime: string } {
+export function studioStatus(snapshot: StudioSnapshot): { build: string; building: boolean; problems: number; runtime: string } {
   const jobs = [...snapshot.jobs];
   const latest = jobs.at(-1), active = jobs.findLast(job => activeJobStates.has(job.state.toLowerCase()));
   const build = active?.summary ?? (latest?.state.toLowerCase() === 'failed' ? 'Build failed'
@@ -51,7 +50,7 @@ export function studioStatus(snapshot: StudioSnapshot): { build: string; problem
   const runtime = snapshot.connection === 'connecting' ? 'Connecting' : snapshot.connection !== 'connected' ? 'Disconnected'
     : snapshot.authoring?.fault || snapshot.authoring?.playback === 'failed' ? 'Failed'
     : snapshot.authoring ? sentenceCase(snapshot.authoring.playback) : 'No runtime';
-  return { build, problems, runtime };
+  return { build, building: !!active, problems, runtime };
 }
 function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel,libraryPanel, appCommands, fileMenu, appError, controlEdits }: StudioProps) {
   const [toolsHost, setToolsHost] = useState<HTMLElement | null>(null);
@@ -191,7 +190,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
     </div>
     {!sourcePanel && !compact && jobsPane}
     <footer className="status-bar" hidden={windowState.fullscreen} aria-label="Studio status">
-      <button type="button" className={`status-item status-build ${status.build === 'Build failed' ? 'status-error' : ''}`} aria-label={`Build status: ${status.build}. Open Jobs and diagnostics`} onClick={openJobs}><span aria-hidden="true">↻</span><span>{status.build}</span></button>
+      <button type="button" className={`status-item status-build ${status.build === 'Build failed' ? 'status-error' : ''}`} aria-busy={status.building} aria-label={`Build status: ${status.build}. Open Jobs and diagnostics`} onClick={openJobs}><span aria-hidden="true" className={status.building ? 'status-spinner' : 'status-build-icon'}>{status.building ? '' : '↻'}</span><span aria-live="polite">{status.build}</span></button>
       <button type="button" className={`status-item ${status.problems ? 'status-error' : ''}`} aria-label={`Problems: ${status.problems}. Open Jobs and diagnostics`} onClick={openJobs}><span aria-hidden="true">!</span><span>{status.problems} {status.problems === 1 ? 'problem' : 'problems'}</span></button>
       <button type="button" className={`status-item status-runtime ${status.runtime === 'Failed' || status.runtime === 'Disconnected' ? 'status-error' : ''}`} aria-label={`Runtime status: ${status.runtime}. Open Jobs and diagnostics`} onClick={openJobs}><span className="status-dot" aria-hidden="true" /><span>{status.runtime}</span></button>
     </footer>

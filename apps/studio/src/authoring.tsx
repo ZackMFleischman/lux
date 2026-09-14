@@ -141,7 +141,9 @@ export function AuthoringApp() {
     </div></details>;
   const commands = <>
     <span className="document-name" title={io.name}><span className="document-label">Scene</span><span className="document-title">{io.name}</span>{dirty && <span aria-label="Unsaved changes"> *</span>}</span>
-    <Button variant="contained" disabled={busy} title="Build preview (Ctrl/Cmd+S in source)" onClick={() => void build()}>Build</Button>
+    <Button variant="contained" disabled={busy} aria-label="Build" aria-busy={busy} title="Build preview (Ctrl/Cmd+S in source)" onClick={() => void build()}>
+      <span className="build-button-icon" aria-hidden="true">{busy && <span className="status-spinner" />}</span>Build
+    </Button>
     <span className="build-status" role="status">{draft.runningMatchesDraft ? 'Preview current' : draft.hasRunningSource ? 'Preview shows previous source' : 'Not built'}</span>
   </>;
   const links=session.read().libraryLinks;
