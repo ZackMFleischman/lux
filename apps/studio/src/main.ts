@@ -15,6 +15,7 @@ import { createExportService, runExportChild } from './export-process.ts';
 import { createCloseConfirmation } from './close-confirmation.ts';
 import { resolveStudioSession } from '../../../scripts/studio-session.mjs';
 import { ComponentLibraryStore } from '../../../packages/core/src/component-library-store.ts';
+import { LookStore } from '../../../packages/core/src/look-store.ts';
 import type { SourceBundle } from '../../../packages/runtime-contracts/src/index.ts';
 
 // This process owns presentation windows only. It never creates a render service,
@@ -134,6 +135,14 @@ app.whenReady().then(async () => {
       clipboard.writeText(request);return request;
     }
     throw Error('Unsupported library operation');
+  });
+  const looks = new LookStore(join(studioProfile.directory, 'looks'));
+  ipcMain.handle('studio:looks', async (event, action: unknown, value: unknown) => {
+    if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted Looks sender');
+    if (action === 'list') return looks.list();
+    if (action === 'read') return looks.read(value as string);
+    if (action === 'save') return looks.save(value as Parameters<LookStore['save']>[0]);
+    throw Error('Unsupported Looks operation');
   });
   ipcMain.handle('studio:authoring', async (event, action: unknown, value: unknown) => {
     if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted authoring sender');

@@ -20,6 +20,8 @@ import { useDiscardConfirmation } from './Confirmation.tsx';
 import { LibraryPanel } from './library/LibraryPanel.tsx';
 import { completeLibraryMutation } from './library/library-mutation.ts';
 import './library-client.ts';
+import './look-client.ts';
+import { LooksDialog } from './LooksDialog.tsx';
 const client = new StandaloneClient(window.luxAuthoring, { codeDeclaredParameters: true });
 const agentStatus = () => ({ ...client.getSnapshot(), capabilities: studioCapabilities });
 export function AuthoringApp() {
@@ -29,6 +31,8 @@ export function AuthoringApp() {
   const [error, setError] = useState('');
   const [diagnostics, setDiagnostics] = useState<SourceDiagnostic[]>([]);
   const [libraryVersion, setLibraryVersion] = useState(0);
+  const [looksOpen, setLooksOpen] = useState(false);
+  const lookOperation = useRef(false);
   const composing = useRef(false);
   const workspace = useMemo(() => createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': '' } }), []);
   const session = useMemo(() => createAuthoringSession(workspace, {
@@ -47,6 +51,10 @@ export function AuthoringApp() {
     },
     getControlAnimations:()=>client.getSnapshot().authoring?.controlAnimations??[],
     readLibraryComponent:id=>window.luxLibrary.read(id),
+    acceptedDocument: () => client.acceptedDocument(),
+    saveLook: request => window.luxLooks.save(request),
+    readLook: id => window.luxLooks.read(id),
+    lookThumbnail: captureLookThumbnail,
   }), [workspace]);
   const pendingControlWrites = useRef(new Set<Promise<unknown>>());
   const controlEdits = useMemo(() => ({ changed: () => session.controlsChanged(), track: (write: Promise<unknown>) => {
@@ -62,6 +70,7 @@ export function AuthoringApp() {
     if (reason instanceof SourceCompileError) setDiagnostics(diagnosticsForSource(reason.diagnostics, submittedSource, draftVersion, workspace.getSnapshot()));
   }
   useEffect(() => window.luxAuthoring.onAgentCommand(async command => {
+    if (lookOperation.current && !['read', 'status'].includes(command.method)) throw Error('Wait for the look operation to finish');
     if (confirmation.isPending() && !['read', 'status', 'capture','library.list','library.read'].includes(command.method)) throw Error('Studio is waiting for a user confirmation');
     if (['parameters', 'playback', 'restart'].includes(command.method)) return dispatchRuntimeCommand(client, command.method, command.params);
     if(command.method==='library.list')return window.luxLibrary.list();
@@ -135,8 +144,47 @@ export function AuthoringApp() {
     setError('');
     try { await session.open(); setDiagnostics([]); } catch (reason) { const current = workspace.getSnapshot(); reportError(reason, current.version, current.source); }
   }
+  async function withLookOperation<T>(operation: () => Promise<T>) {
+    if (lookOperation.current || session.getSnapshot().busy || workspace.getSnapshot().busy) throw Error('Studio is busy');
+    lookOperation.current = true;
+    try { await finishControlWrites(); return await operation(); }
+    finally { lookOperation.current = false; }
+  }
+  async function captureLookThumbnail(documentSnapshot: ReturnType<typeof client.acceptedDocument>) {
+    const runtime = client.getSnapshot().authoring!;
+    const capture = await client.capture();
+    const after = client.getSnapshot().authoring;
+    if (after?.instanceId !== runtime.instanceId || after.generation !== runtime.generation ||
+        capture.metadata.controlSequence !== (runtime.controlSequence ?? 0) ||
+        (capture.metadata.animationSequence ?? 0) !== (runtime.animationSequence ?? 0) ||
+        JSON.stringify(client.acceptedDocument()) !== JSON.stringify(documentSnapshot)) return undefined;
+    const bitmap = await createImageBitmap(new Blob([capture.bytes], {type: 'image/png'}));
+    try {
+      const canvas = document.createElement('canvas');
+      const scale = Math.min(256 / bitmap.width, 144 / bitmap.height);
+      canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+      canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+      canvas.getContext('2d')!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      const data = canvas.toDataURL('image/png');
+      return data.length <= 350000 ? data : undefined;
+    } finally { bitmap.close(); }
+  }
+  async function saveLook(name: string, selected?: {id: string; revision: number}) {
+    return withLookOperation(async () => {
+      const look = await session.saveLook(name, selected);
+      return {look, thumbnail: !!look.thumbnail};
+    });
+  }
+  async function loadLook(id: string) {
+    return withLookOperation(async () => {
+      const current = session.getSnapshot();
+      if ((workspace.getSnapshot().dirty || current.controlsDirty || current.libraryDirty) && !await confirmation.confirm('load-look')) return false;
+      await session.loadLook(id); setDiagnostics([]); setError(''); return true;
+    });
+  }
   const fileMenu = <details className="file-tools" onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }}><summary>File</summary><div className="file-tools-content" onClick={event => { if ((event.target as Element).closest('button')) event.currentTarget.closest('details')!.open = false; }}>
       <Button disabled={busy} onClick={() => void open()}>Open</Button><Button disabled={busy} title="Save scene (Ctrl/Cmd+Shift+S in source)" onClick={() => void save()}>Save</Button><Button disabled={busy} onClick={() => void save(true)}>Save as</Button>
+      <Button disabled={busy} onClick={() => setLooksOpen(true)}>Looks…</Button>
       <ExportDialog disabled={busy || composing.current} defaultName={io.name} create={async name => { if (pendingControlWrites.current.size) await finishControlWrites(); return session.exportSource(name); }} />
     </div></details>;
   const commands = <>
@@ -152,6 +200,7 @@ export function AuthoringApp() {
     onFork={id=>{try{session.forkLibraryComponent(id);}catch(reason){setError(String(reason));}}} onError={reason=>setError(String(reason))}/>;
   return <ThemeProvider theme={studioTheme}><div className="authoring-shell">
     {confirmation.dialog}
+    <LooksDialog open={looksOpen} onClose={() => setLooksOpen(false)} client={window.luxLooks} onSave={saveLook} onLoad={loadLook} />
     <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} appCommands={commands} appError={error} controlEdits={controlEdits} libraryPanel={libraryPanel}
       sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onApply={() => void build()} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnostics={diagnostics} />} />
   </div></ThemeProvider>;

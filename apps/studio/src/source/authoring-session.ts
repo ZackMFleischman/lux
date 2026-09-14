@@ -1,5 +1,6 @@
 import { DEFAULT_OUTPUT, controlValuesSchema } from '../../../../packages/runtime-contracts/src/index.ts';
-import type { SourceBundle, ControlValues } from '../../../../packages/runtime-contracts/src/index.ts';
+import type { SourceBundle, ControlValues, OutputSettings } from '../../../../packages/runtime-contracts/src/index.ts';
+import type { Look, LookSummary, SaveLook } from '../../../../packages/core/src/look-store.ts';
 import type { SceneDocument } from '../../../../packages/core/src/scene-file.ts';
 import { createSceneDocument, verifySceneDocument, verifySavedControlSnapshot, verifySavedNodeControlSnapshot, validateSavedControlSnapshot, validateSavedNodeControlSnapshot, sceneControlSnapshot, sceneSourceHash, sceneHash } from '../../../../packages/core/src/scene-document.ts';
 import type { SavedControlSnapshot, SavedNodeControlSnapshot } from '../../../../packages/core/src/scene-document.ts';
@@ -13,7 +14,11 @@ type SavedControls=SavedControlSnapshot|SavedNodeControlSnapshot;
 
 type SavedFile = { token: string; name: string };
 type Ports = {
-  submit(source: SourceBundle, options?: {savedControls?:SavedControls;savedControlAnimations?:readonly ControlAnimationBinding[]}): Promise<void>;
+  submit(source: SourceBundle, options?: {savedControls?:SavedControls;savedControlAnimations?:readonly ControlAnimationBinding[];output?:OutputSettings}): Promise<void>;
+  acceptedDocument?(): SceneDocument;
+  saveLook?(request: SaveLook): Promise<LookSummary>;
+  readLook?(id: string): Promise<Look>;
+  lookThumbnail?(document: SceneDocument): Promise<string | undefined>;
   save(request: { token?: string; saveAs: boolean; document: SceneDocument }): Promise<SavedFile | null>;
   getControls?(): ControlValues;
   getControlSnapshot?(): SavedControls | null;
@@ -109,6 +114,33 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
     controlsChanged() { if (pendingDocumentControls) return; controlsVersion++; update({ controlsDirty: true }); },
     build(source: SourceBundle, expectedVersion: number,requested?:readonly Readonly<{componentId:string;mountPath:string}>[]) {
       return exclusive(() => buildLinked(source, expectedVersion,requested));
+    },
+    saveLook(name: string, selected?: {id: string; revision: number}) {
+      return exclusive(async () => {
+        if (!ports.acceptedDocument || !ports.saveLook) throw Error('Looks are unavailable');
+        const document = await verifySceneDocument(ports.acceptedDocument());
+        let thumbnail: string | undefined;
+        try { thumbnail = await ports.lookThumbnail?.(document); } catch { /* The accepted snapshot is still usable. */ }
+        return ports.saveLook({name, document, ...(selected ? {id: selected.id, expectedRevision: selected.revision} : {}), ...(thumbnail ? {thumbnail} : {})});
+      });
+    },
+    loadLook(id: string) {
+      return exclusive(async () => {
+        if (!ports.readLook) throw Error('Looks are unavailable');
+        const look = await ports.readLook(id);
+        const document = await verifySceneDocument(look.document);
+        if (document.version === 5 && document.libraryLinks.length) throw Error('This look is not a frozen snapshot');
+        const savedControls = await sceneControlSnapshot(document);
+        const savedControlAnimations = document.version === 4 || document.version === 5 ? document.controlAnimations : [];
+        await workspace.submit(document.source, workspace.getSnapshot().version, source => ports.submit(source, {savedControls, savedControlAnimations, output: document.settings}));
+        token = undefined;
+        libraryLinks = Object.freeze([]);
+        pendingDocumentControls = null;
+        pendingDocumentAnimations = null;
+        workspace.markSaved(workspace.getSnapshot().version);
+        update({name: look.name, controlsDirty: false, libraryDirty: false, libraryUpdates: [], libraryFallbacks: []});
+        return look;
+      });
     },
     exportSource(name: string) {
       return exclusive(async () => {

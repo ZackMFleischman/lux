@@ -214,3 +214,21 @@ test('opening a linked scene tries the latest revision then visibly falls back t
  assert.deepEqual(appliedAnimations,[animations,animations]);
  assert.equal(w.getSnapshot().hasRunningSource,true);
 });
+
+test('Save Look uses accepted bytes after dirty edits and survives thumbnail failure',async()=>{
+ const w=createSourceWorkspace(source()),accepted=createSceneDocument(source(),{...DEFAULT_OUTPUT,width:1280,height:720},{intensity:.75});
+ let saved:any;
+ const session=createAuthoringSession(w,{submit:async()=>{},save:async()=>null,acceptedDocument:()=>accepted,
+  lookThumbnail:async()=>{throw Error('capture failed');},saveLook:async request=>{saved=request;return {id:'look',revision:1,name:request.name,updatedAt:'2026-09-14T00:00:00Z'};}});
+ w.edit('main.ts','invalid draft');const before=w.getSnapshot();
+ await session.saveLook('Accepted');assert.deepEqual(saved.document,accepted);assert.equal(saved.thumbnail,undefined);assert.equal(w.getSnapshot().source.files['main.ts'],'invalid draft');assert.equal(w.getSnapshot().version,before.version);
+});
+test('Load Look commits only after activation and preserves all authoring state on failure',async()=>{
+ const w=createSourceWorkspace(source());let fail=true,options:any;
+ const document=createSceneDocument({...source(),files:{'main.ts':'export const replacement=1'}},{...DEFAULT_OUTPUT,width:1280,height:720},{intensity:.8});
+ const session=createAuthoringSession(w,{submit:async(_source,value)=>{options=value;if(fail)throw Error('activation failed');},save:async()=>null,
+  readLook:async()=>({format:'lux-look',version:1,id:'look',revision:1,name:'Warm',updatedAt:'2026-09-14T00:00:00Z',document})});
+ w.edit('main.ts','my unsaved work');session.controlsChanged();const before=w.getSnapshot(),beforeIO=session.getSnapshot(),beforeRead=session.read();
+ await assert.rejects(session.loadLook('look'),/activation failed/);assert.deepEqual(w.getSnapshot(),before);assert.deepEqual(session.getSnapshot(),beforeIO);assert.deepEqual(session.read(),beforeRead);
+ fail=false;await session.loadLook('look');assert.deepEqual(options.output,document.settings);assert.equal(w.getSnapshot().source.files['main.ts'],'export const replacement=1');assert.equal(w.getSnapshot().dirty,false);assert.equal(session.getSnapshot().controlsDirty,false);assert.equal(session.getSnapshot().name,'Warm');
+});

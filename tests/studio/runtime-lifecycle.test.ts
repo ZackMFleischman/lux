@@ -379,3 +379,18 @@ for(const playback of ['playing','paused'] as const)test(`automatic recovery pre
  const retry=WorkerFixture.all.at(-1)!;assert.equal(retry.init.playing,playback==='playing');
  retry.reply({type:'ready',playback});await f.flush();assert.equal(f.client.getSnapshot().authoring!.playback,playback);
 });
+
+test('Look activation uses saved resolution only after success and snapshots accepted source',async t=>{
+ const f=fixture(t),old=await f.start();
+ const baseline=f.client.acceptedDocument();assert.equal(baseline.settings.width,1920);
+ const output={width:1280,height:720,fps:60,seed:0};
+ const loading=f.client.submit({...source,files:{'visual.ts':'new source'}},{output});await f.flush();
+ assert.throws(()=>f.client.acceptedDocument(),/working preview/);
+ const failed=WorkerFixture.all.at(-1)!;assert.equal(failed.init.settings.width,1280);failed.reply({type:'failure',message:'bad look'});await assert.rejects(loading);
+ assert.deepEqual(f.client.acceptedDocument(),baseline);assert.equal(old.terminated,false);
+ const retry=f.client.submit({...source,files:{'visual.ts':'new source'}},{output});await f.flush();WorkerFixture.all.at(-1)!.reply({type:'ready'});await retry;
+ const accepted=f.client.acceptedDocument();assert.equal(accepted.settings.width,1280);assert.equal(accepted.settings.height,720);assert.equal(accepted.source.files['visual.ts'],'new source');
+ WorkerFixture.all.forEach(worker => worker.terminate()); f.scheduled.clear();
+});
+
+
