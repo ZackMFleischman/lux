@@ -8,20 +8,34 @@ import { uniform, positionLocal, normalLocal, vec3, mx_noise_float } from 'three
 // SDK 0.2: numeric controls are declared below; color remains a source setting.
 export default defineVisual({
   controls: {
-    spikeHeight: { type: 'number', label: 'Spike height', default: 0.85, min: 0, max: 2, step: 0.01 },
-    noiseScale: { type: 'number', label: 'Noise scale', default: 3.4, min: 0.5, max: 12, step: 0.1 },
-    sharpness: { type: 'number', label: 'Sharpness', default: 3.2, min: 0.25, max: 8, step: 0.05 },
-    motionSpeed: { type: 'number', label: 'Motion speed', default: 0.28, min: 0, max: 2, step: 0.01 },
-    roughness: { type: 'number', label: 'Roughness', default: 0.38, min: 0, max: 1, step: 0.01 },
+    spikeHeight: {
+      type: 'number', label: 'Spike height', default: 0.85, min: 0, max: 2, step: 0.01,
+    },
+    noiseScale: {
+      type: 'number', label: 'Noise scale', default: 3.4, min: 0.5, max: 12, step: 0.1,
+    },
+    sharpness: {
+      type: 'number', label: 'Sharpness', default: 3.2, min: 0.25, max: 8, step: 0.05,
+    },
+    motionSpeed: {
+      type: 'number', label: 'Motion speed', default: 0.28, min: 0, max: 2, step: 0.01,
+    },
+    roughness: {
+      type: 'number', label: 'Roughness', default: 0.38, min: 0, max: 1, step: 0.01,
+    },
   },
   async create(context) {
     const time = uniform(0);
-    const spikeHeight = uniform(0.85), noiseScale = uniform(3.4), sharpness = uniform(3.2);
+    const spikeHeight = uniform(0.85);
+    const noiseScale = uniform(3.4);
+    const sharpness = uniform(3.2);
     const drift = vec3(time.mul(0.31), time.mul(0.17), time.mul(0.23));
     const noise = mx_noise_float(positionLocal.mul(noiseScale).add(drift));
     const peaks = noise.mul(0.5).add(0.5).clamp(0, 1).pow(sharpness);
     const material = new MeshStandardNodeMaterial({
-      color: '#8b5cff', roughness: 0.38, metalness: 0.15,
+      color: '#8b5cff',
+      roughness: 0.38,
+      metalness: 0.15,
       flatShading: true,
     });
     material.positionNode = positionLocal.add(
@@ -52,9 +66,16 @@ export default defineVisual({
         sphere.rotation.y = frame.timeSeconds * 0.12;
         sphere.rotation.x = Math.sin(frame.timeSeconds * 0.17) * 0.18;
       },
-      render(target) { return context.renderer.render(scene, camera, target); },
-      reset(_seed) { time.value = 0; },
-      dispose() { geometry.dispose(); material.dispose(); },
+      render(target) {
+        return context.renderer.render(scene, camera, target);
+      },
+      reset(_seed) {
+        time.value = 0;
+      },
+      dispose() {
+        geometry.dispose();
+        material.dispose();
+      },
     };
   },
 });
