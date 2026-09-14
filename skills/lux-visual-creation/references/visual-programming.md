@@ -14,6 +14,14 @@ SDK 0.4 uses `defineComponent` in leaf modules and `defineComposition` in the en
 
 The entry statically lists `definitions`, stable UUID `nodes`, `edges`, one `output`, and selected `expose` rows. Each exposed ID is a public Studio control alias for exactly one `{nodeId, controlId}` target. The alias keeps its component control description, so authors do not duplicate help text in the composition. For example, two nodes using the same `kaleidoscope` definition can expose `segmentsA` and `segmentsB`; changing one does not mutate the other. Stable node identity persists compatible values across save/reopen, declaration reorder, and a linked component revision. Added, removed, unit-changed, and out-of-range controls are reported; incompatible values reset to the new declaration default. A rebound alias does not transfer a saved value to another instance.
 
+### Studio control animation
+
+Studio can attach one compact LFO to a numeric control on the currently selected Graph node. The saved control value remains the base value, while each preview frame evaluates `clamp(base + amount × waveform, min, max)`. Available waveforms are sine, triangle, saw and square. Period accepts finite values from 0.05 through 3600 seconds; amount is a finite nonnegative peak distance in the control's declared units; start phase is a finite fraction from 0 through 1.
+
+The LFO follows the scene clock: pause freezes it, Play resumes it, and scene Reset or **Restart animation** returns it to the configured start phase. Turning it off outputs the base value and retains the frozen oscillator phase for later resume. Editing the base moves the animation center immediately. The Inspector shows clamped extrema and reports when the declared control range limits them.
+
+Scene Save/Open stores the base values and compatible per-instance bindings. Bindings include node, component definition and control schema identity. When a linked component update removes or changes the target incompatibly, Lux keeps the affected binding disabled with a visible issue and never retargets it by list position. Removing the animation deletes the binding. Control animation currently applies only to eligible numeric controls on selected SDK 0.4 Graph nodes; it is not a shared modulation source, graph editor feature or MIDI mapping.
+
 ## Shared components
 
 The local Library stores complete SDK 0.4 component bundles under stable IDs. The first connected create/update path accepts zero-input image-source components. Use `lux.library.list` and `lux.library.read` to inspect names, descriptions, revisions, and readable source before composing with an entry. Link through `lux.studio.build.libraryLinks` using `{ componentId, mountPath }`; import the component through files mounted below that path. Two scene instances of the same linked component keep independent node UUIDs and controls.

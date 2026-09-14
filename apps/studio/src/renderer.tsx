@@ -60,7 +60,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const openPanelRef=useRef<null|((kind:'inspector')=>void)>(null);
   const bindOpenPanel=useCallback((action:null|((kind:'inspector')=>void))=>{openPanelRef.current=action;},[]);
   const [graphSelection,setGraphSelection]=useState<{revision:string;path:NodePath}|null>(null);
-  const selectedNode=graphSelection?.revision===runtime?.revisionId?compositionNodes(runtime).find(node=>nodeKey(node.nodePath)===nodeKey(graphSelection!.path)):undefined;
+  const selectedNodePath=graphSelection&&graphSelection.revision===runtime?.revisionId?graphSelection.path:undefined;
+  const selectedNode=selectedNodePath?compositionNodes(runtime).find(node=>nodeKey(node.nodePath)===nodeKey(selectedNodePath)):undefined;
   function selectGraphNode(path:NodePath|null){setGraphSelection(path&&runtime?{revision:runtime.revisionId,path}:null);openPanelRef.current?.('inspector');}
   const available = snapshot.connection === 'connected' && runtime?.authority === 'studio';
   useEffect(() => {
@@ -144,8 +145,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
       </Paper>;
   const inspectorPane = <Paper component="aside" square className="inspector" aria-label="Scene controls and status">
         <section><details className="controls-section" open><summary className="section-heading"><span className="section-title">Controls</span><Chip label="LIVE" /></summary>
-          <p className="inspector-target">{selectedNode?.label??(runtime?.composition?'Composition controls':'Visual controls')}</p>
-          <ParameterInspector nodePath={selectedNode?.nodePath} runtime={runtime} available={!!available} client={client} controller={controller} onError={setError} edits={controlEdits} />
+          <p className="inspector-target">{selectedNode?.label??(selectedNodePath?'Selected node unavailable':runtime?.composition?'Composition controls':'Visual controls')}</p>
+          <ParameterInspector nodePath={selectedNodePath} runtime={runtime} available={!!available} client={client} controller={controller} onError={setError} edits={controlEdits} />
         </details></section>
         <section><details><summary>Performance</summary><PerformanceStatus performance={snapshot.performance} /><MetricView label="Visual delivery" metric={snapshot.visualFps} nowMs={nowMs ?? clock} /><MetricView label="UI cadence" metric={snapshot.uiFps} nowMs={nowMs ?? clock} />
           <p className="hint">Delivery and interface cadence are measured separately.</p></details></section>

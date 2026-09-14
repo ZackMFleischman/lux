@@ -177,12 +177,16 @@ export class StandaloneClient implements StudioClient, PresentationPort {
               if(!message.effectiveNodeControls)throw Error('Missing effective animation values');
               const effective=createCompositionControlState(linked.composition,message.effectiveNodeControls);
               effectiveNodeControls=Object.freeze({sourceHash:revisionId,nodes:effective.snapshot().nodes});
-              controlAnimations=validateControlAnimationBindings(message.controlAnimations);
+              const parsedAnimations=validateControlAnimationBindings(message.controlAnimations);
+              controlAnimations=JSON.stringify(parsedAnimations)===JSON.stringify(candidate.state.controlAnimations??[])
+                ? candidate.state.controlAnimations??Object.freeze([]):parsedAnimations;
               if(!Array.isArray(message.controlAnimationIssues))throw Error('Invalid animation issues');
-              controlAnimationIssues=Object.freeze(message.controlAnimationIssues.map((issue:any)=>{
+              const parsedIssues=Object.freeze(message.controlAnimationIssues.map((issue:any)=>{
                 if(!issue||!Number.isSafeInteger(issue.index)||issue.index<0||!Array.isArray(issue.nodePath)||issue.nodePath.some((id:unknown)=>typeof id!=='string')||typeof issue.controlId!=='string'||typeof issue.message!=='string')throw Error('Invalid animation issue');
                 return Object.freeze({index:issue.index,nodePath:Object.freeze([...issue.nodePath]),controlId:issue.controlId,message:issue.message});
               }));
+              controlAnimationIssues=JSON.stringify(parsedIssues)===JSON.stringify(candidate.state.controlAnimationIssues??[])
+                ? candidate.state.controlAnimationIssues??Object.freeze([]):parsedIssues;
             }
             if(message.type==='ready'&&(message.controlSequence!==0||animationSequence!==0||JSON.stringify(applied)!==JSON.stringify(state.controls)||JSON.stringify(controlAnimations)!==JSON.stringify(state.controlAnimations??[])))throw Error('Initial control snapshot mismatch');
           } catch(error) {if(message.type==='ready')fail(String(error));return;}

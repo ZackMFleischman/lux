@@ -167,9 +167,9 @@ test('Graph selects an instance, opens Inspector, writes only that node and pres
   const state=createCompositionControlState(composition);
   let runtime:any={instanceId:'graph-instance',generation:1,revisionId:'graph-revision',sceneName:'Graph fixture',authority:'studio',playback:'paused',clockEpoch:0,frameId:'1',output:{width:1280,height:720},fault:null,sdkVersion:'0.4.0',controlSchema:composition.publicControls,controlSchemaHash:'a'.repeat(64),controls:state.values(),controlSequence:0,nodeControls:{sourceHash:'graph-revision',nodes:state.snapshot().nodes},controlAnimations:[],controlAnimationIssues:[],animationSequence:0,composition};
   let snapshot:any={connection:'connected',message:null,receivedAtMs:1000,authoring:runtime,host:null,jobs:[],visualFps:null,uiFps:null};
-  const calls:any[]=[],listeners=new Set<()=>void>();
+  const calls:any[]=[],listeners=new Set<()=>void>();let rejectNext:string|null=null;
   const client={getSnapshot:()=>snapshot,subscribe:(fn:()=>void)=>{listeners.add(fn);return()=>{listeners.delete(fn);};},invoke:async(op:any)=>{
-    calls.push(op);if(op.name==='lux.node.parameters.set'){state.applyNode(op.input.nodePath,op.input.values,op.input.expectedControlSchemaHash);
+    calls.push(op);if(rejectNext){const message=rejectNext;rejectNext=null;throw Error(message);}if(op.name==='lux.node.parameters.set'){state.applyNode(op.input.nodePath,op.input.values,op.input.expectedControlSchemaHash);
       runtime={...runtime,controls:state.values(),nodeControls:{sourceHash:runtime.revisionId,nodes:state.snapshot().nodes},controlSequence:runtime.controlSequence+1};}
     else if(op.name==='lux.node.animation.set'){runtime={...runtime,controlAnimations:op.input.animation?[op.input.animation]:[],animationSequence:runtime.animationSequence+1};}
     else assert.fail(`Unexpected operation ${op.name}`);snapshot={...snapshot,authoring:runtime};listeners.forEach(fn=>fn());
@@ -196,16 +196,34 @@ test('Graph selects an instance, opens Inspector, writes only that node and pres
   assert.equal(calls.length,1);assert.deepEqual(calls[0].input.nodePath,[kaleidoscopeAId]);
   assert.equal(runtime.controls.segmentsA,8);assert.equal(runtime.controls.segmentsB,6);
   const animate=selectedInspector.getByRole('button',{name:'Animate Segments'});await act(async()=>{fireEvent.click(animate);});
-  assert.ok(screen.getByRole('dialog',{name:'Segments animation'}));assert.ok(screen.getByText('Press Play to animate.'));
+  const animationDialog=screen.getByRole('dialog',{name:'Animate Segments'});await waitFor(()=>assert.equal(document.activeElement,animationDialog));
+  assert.ok(screen.getByText('Press Play to animate.'));assert.ok(screen.getByRole('button',{name:'Reset base to default'}),'base reset remains available before adding animation');
   await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Add LFO'}));});
   assert.equal(calls[1].name,'lux.node.animation.set');assert.equal(calls[1].input.animation.controlId,'segments');assert.equal(calls[1].input.animation.periodSeconds,2);
   assert.equal(animate.getAttribute('aria-pressed'),'true');
-  await act(async()=>{fireEvent.keyDown(screen.getByRole('dialog',{name:'Segments animation'}),{key:'Escape'});});assert.equal(document.activeElement,animate);
+  const period=screen.getByRole('spinbutton',{name:'Animation period seconds'}) as HTMLInputElement;
+  await act(async()=>{fireEvent.focus(period);fireEvent.change(period,{target:{value:''}});runtime={...runtime,playback:'playing',frameId:'2',timeSeconds:1,effectiveNodeControls:{sourceHash:runtime.revisionId,nodes:state.snapshot().nodes},controlAnimations:runtime.controlAnimations.map((binding:any)=>({...binding}))};snapshot={...snapshot,authoring:runtime};listeners.forEach(fn=>fn());await new Promise(resolve=>setTimeout(resolve,120));});
+  assert.equal(period.value,'','equivalent frame snapshots must not overwrite an active draft');
+  await act(async()=>{fireEvent.blur(period);});assert.equal(calls.length,2,'blank animation draft must not write');
+  assert.equal(period.value,'2');
+  await act(async()=>{runtime={...runtime,playback:'paused'};snapshot={...snapshot,authoring:runtime};listeners.forEach(fn=>fn());});
+  await act(async()=>{fireEvent.focus(period);fireEvent.blur(period);});assert.equal(calls.length,2,'unchanged animation draft must not write or add undo');
+  const amount=screen.getByRole('spinbutton',{name:'Animation amount'}) as HTMLInputElement;await act(async()=>{fireEvent.focus(amount);fireEvent.change(amount,{target:{value:''}});});await act(async()=>{fireEvent.blur(amount);});assert.equal(calls.length,2,'blank amount must not become zero');
+  fireEvent.click(screen.getByText('More'));const phase=screen.getByRole('spinbutton',{name:'Animation start phase'}) as HTMLInputElement;await act(async()=>{fireEvent.focus(phase);fireEvent.change(phase,{target:{value:''}});});await act(async()=>{fireEvent.blur(phase);});assert.equal(calls.length,2,'blank phase must not become zero');
+  const enabled=screen.getByRole('checkbox',{name:'On'});await act(async()=>{fireEvent.click(enabled);});
+  assert.equal(calls[2].input.animation.enabled,false);assert.equal(animate.getAttribute('aria-pressed'),'false');assert.equal(document.querySelector('.animation-range'),null);
+  await act(async()=>{fireEvent.click(screen.getByRole('checkbox',{name:'Off'}));});assert.equal(animate.getAttribute('aria-pressed'),'true');
+  await act(async()=>{runtime={...runtime,controlAnimationIssues:[{index:0,nodePath:[kaleidoscopeAId],controlId:'segments',message:'Animation target no longer matches this control.'}]};snapshot={...snapshot,authoring:runtime};listeners.forEach(fn=>fn());});
+  assert.equal(animate.getAttribute('aria-pressed'),'false');assert.equal(screen.getByRole('checkbox',{name:'Unavailable'}).hasAttribute('disabled'),true);assert.ok(screen.getByText('Animation target no longer matches this control.'));
+  await act(async()=>{runtime={...runtime,controlAnimationIssues:[]};snapshot={...snapshot,authoring:runtime};listeners.forEach(fn=>fn());});
+  rejectNext='Restart was rejected';await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Restart animation'}));});assert.equal(calls.at(-1).input.restart,true);assert.ok(await screen.findByText(/Restart was rejected/));
+  await act(async()=>{fireEvent.keyDown(screen.getByRole('dialog',{name:'Animate Segments'}),{key:'Escape'});});assert.equal(document.activeElement,animate);
   await click('Zoom in');const transform=document.querySelector<HTMLElement>('.graph-content')!.style.transform;
   fireEvent.change(screen.getByLabelText('Move panel'),{target:{value:'graph'}});await click('Close selected panel');await click('Open Graph');
   assert.equal(document.querySelector<HTMLElement>('.graph-content')!.style.transform,transform);
   assert.equal(nodes[1]!.getAttribute('aria-pressed'),'true');
-  await act(async()=>{fireEvent.click(nodes[2]!);});
+  await act(async()=>{fireEvent.click(animate);});assert.ok(screen.getByRole('dialog',{name:'Animate Segments'}));
+  await act(async()=>{fireEvent.click(nodes[2]!);});assert.equal(screen.queryByRole('dialog',{name:'Animate Segments'}),null,'changing nodes closes the old animation editor');
   assert.equal(document.querySelector<HTMLInputElement>('.inspector input[type="number"]')!.value,'6');
   assert.equal(runtime.nodeControls.nodes.find((node:any)=>node.nodePath[0]===kaleidoscopeBId).values.segments,6);
   assert.equal(runtime.generation,1);assert.equal(runtime.playback,'paused');ui.unmount();

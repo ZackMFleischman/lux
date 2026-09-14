@@ -36,6 +36,18 @@ test('renderer coalesces frame observations, caches reads and publishes latest w
   off();
 });
 
+test('renderer bounds animation time and effective-value observations to UI cadence', context => {
+  context.mock.timers.enable({ apis: ['setTimeout'] });
+  const source = fixture(), view = createRendererSnapshot(source.client);
+  const initial = view.getSnapshot(); let notifications = 0;
+  const off = view.subscribe(() => { notifications++; });
+  const node = {nodePath:['node'],definitionHash:'d'.repeat(64),schemaHash:'s'.repeat(64),schema:[],values:{amount:0.5}};
+  for (let frame = 1; frame <= 60; frame++) source.publish({receivedAtMs:frame,authoring:{...initial.authoring!,frameId:String(frame),timeSeconds:frame/60,effectiveNodeControls:{sourceHash:'revision',nodes:[{...node,values:{amount:frame/60}}]}} as any});
+  assert.equal(notifications,0,'render-clock animation observations must not synchronously rerender the dock tree');
+  context.mock.timers.tick(100);assert.equal(notifications,1);assert.equal(view.getSnapshot(),source.client.getSnapshot());
+  off();
+});
+
 test('control, transport, owner, fault and jobs changes bypass pending frame delay', context => {
   context.mock.timers.enable({ apis: ['setTimeout'] });
   const source = fixture(), view = createRendererSnapshot(source.client);

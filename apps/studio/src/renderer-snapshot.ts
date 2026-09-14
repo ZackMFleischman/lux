@@ -4,7 +4,10 @@ import type { StudioClient, StudioSnapshot } from './service-client.ts';
 // remain urgent, including applied controls, transport, owner, faults and jobs.
 function urgentState(snapshot: StudioSnapshot): string {
   const { receivedAtMs, visualFps, uiFps, performance, authoring, ...state } = snapshot;
-  const runtime = authoring ? (({ frameId, ...rest }) => rest)(authoring) : null;
+  // Animation time and effective values advance with the render clock. They are
+  // display-only observations, so keep them on the same bounded UI cadence as
+  // frame/FPS updates. Base values, bindings, issues and transport remain urgent.
+  const runtime = authoring ? (({ frameId, timeSeconds, effectiveNodeControls, ...rest }) => rest)(authoring) : null;
   return JSON.stringify({ ...state, authoring: runtime });
 }
 
