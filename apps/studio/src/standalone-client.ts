@@ -61,6 +61,9 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     if (this.busy || !this.source || !runtime || runtime.playback === 'failed' || this.pending.size) {
       throw Error('Wait for a working preview before saving a look.');
     }
+    if (runtime.output.width > 1920 || runtime.output.height > 1080) {
+      throw Error('Set Preview to 1920 × 1080 or smaller before saving a look.');
+    }
     const state = getRuntimeControlState(runtime);
     const controls = state.sdkVersion === '0.4.0'
       ? {sourceHash: runtime.revisionId, nodes: state.nodeControls!.nodes}

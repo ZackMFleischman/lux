@@ -394,3 +394,10 @@ test('Look activation uses saved resolution only after success and snapshots acc
 });
 
 
+
+test('saving a look above the scene format resolution limit gives a short actionable error',async t=>{
+ const f=fixture(t);await f.start();const runtime=f.client.getSnapshot().authoring!;
+ const resizing=f.client.invoke({name:'lux.preview.resize',input:{requestId:'large-look',instanceId:runtime.instanceId,expectedGeneration:runtime.generation,width:2560,height:1440}});await f.flush();WorkerFixture.all.at(-1)!.reply({type:'ready'});await resizing;
+ assert.throws(()=>f.client.acceptedDocument(),{message:'Set Preview to 1920 × 1080 or smaller before saving a look.'});
+ WorkerFixture.all.forEach(worker=>worker.terminate());f.scheduled.clear();
+});

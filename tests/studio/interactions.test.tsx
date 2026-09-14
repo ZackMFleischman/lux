@@ -46,17 +46,15 @@ test('RTL: discard confirmation is an accessible in-app dialog with safe cancel,
   await user.click(screen.getByRole('button', { name: 'Choose another scene' }));
   assert.ok(screen.getByRole('dialog', { name: 'Discard unsaved changes?' }));
   await user.click(screen.getByRole('button', { name: 'Keep editing' }));
-  assert.deepEqual(answers, [false]);
-  await act(async () => { await new Promise(resolve => setTimeout(resolve, 250)); });
+  await waitFor(() => assert.deepEqual(answers, [false]));
   assert.equal(screen.queryByRole('dialog'), null);
   await user.click(screen.getByRole('button', { name: 'Choose another scene' }));
   await user.keyboard('{Escape}');
-  assert.deepEqual(answers, [false, false]);
-  await act(async () => { await new Promise(resolve => setTimeout(resolve, 250)); });
+  await waitFor(() => assert.deepEqual(answers, [false, false]));
   assert.equal(screen.queryByRole('dialog'), null);
   await user.click(screen.getByRole('button', { name: 'Choose another scene' }));
   await user.click(screen.getByRole('button', { name: 'Discard and open' }));
-  assert.deepEqual(answers, [false, false, true]);
+  await waitFor(() => assert.deepEqual(answers, [false, false, true]));
 });
 
 test('RTL: code-defined controls expose independent values, numeric entry and defaults without Intensity', async () => {
