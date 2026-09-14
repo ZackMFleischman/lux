@@ -167,11 +167,17 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   await click('Problems: 0. Open Jobs and diagnostics');
   assert.ok(document.querySelector('.studio-dock-grid .studio-pane-jobs'));
   assert.ok([...document.querySelectorAll('.studio-dock-grid .dv-tab')].some(node => node.textContent?.trim() === 'Jobs'));
+  selectedPanel = 'jobs';
+  await click('Close selected panel');
+  assert.ok(!document.querySelector('.studio-dock-grid .studio-pane-jobs'));
   await click('Open Preview');
   await click('Maximize');
   assert.ok(document.querySelector<HTMLElement>('.studio-dock-grid')!.hidden);
   await click('Problems: 0. Open Jobs and diagnostics');
   assert.ok(!document.querySelector<HTMLElement>('.studio-dock-grid')!.hidden, 'Footer details restore a maximized workspace');
+  const reopenedJobsTab = [...document.querySelectorAll('.studio-dock-grid .dv-tab')].find(node => node.textContent?.trim() === 'Jobs');
+  assert.ok(reopenedJobsTab?.classList.contains('dv-active-tab'), 'Jobs is reopened and active');
+  assert.ok(reopenedJobsTab?.closest('.dv-groupview')?.contains(document.activeElement), 'Focus moves into the Jobs group');
   assert.equal(document.querySelector('.cm-editor'), editorNode);
   assert.equal(attaches, 1); assert.equal(detaches, 0); assert.equal(subscriptions, 1);
   for (const kind of ['preview', 'source', 'library', 'inspector', 'jobs']) {
