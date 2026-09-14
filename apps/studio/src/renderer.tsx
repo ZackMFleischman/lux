@@ -40,6 +40,19 @@ function controlOwner(snapshot: StudioSnapshot): string | null {
   return snapshot.connection === 'connected' && runtime?.authority === 'studio'
     ? parameterOwner(runtime) : null;
 }
+const activeJobStates = new Set(['queued', 'pending', 'running', 'compiling', 'initializing']);
+function sentenceCase(value: string): string { return value ? value[0]!.toUpperCase() + value.slice(1) : value; }
+export function studioStatus(snapshot: StudioSnapshot): { build: string; building: boolean; problems: number; runtime: string } {
+  const jobs = [...snapshot.jobs];
+  const latest = jobs.at(-1), active = jobs.findLast(job => activeJobStates.has(job.state.toLowerCase()));
+  const build = active?.summary ?? (latest?.state.toLowerCase() === 'failed' ? 'Build failed'
+    : latest?.state.toLowerCase() === 'succeeded' ? 'Build ready' : 'Build idle');
+  const problems = (snapshot.authoring?.fault ? 1 : 0) + jobs.filter(job => !!job.fault || job.state.toLowerCase() === 'failed').length;
+  const runtime = snapshot.connection === 'connecting' ? 'Connecting' : snapshot.connection !== 'connected' ? 'Disconnected'
+    : snapshot.authoring?.fault || snapshot.authoring?.playback === 'failed' ? 'Failed'
+    : snapshot.authoring ? sentenceCase(snapshot.authoring.playback) : 'No runtime';
+  return { build, building: !!active, problems, runtime };
+}
 function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel,libraryPanel, appCommands, fileMenu, appError, controlEdits }: StudioProps) {
   const [toolsHost, setToolsHost] = useState<HTMLElement | null>(null);
   const [transportMenu, setTransportMenu] = useState<HTMLElement | null>(null);
@@ -53,13 +66,21 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const [maximizedInspector, setMaximizedInspector] = useState(false);
   const [pendingCommands, setPendingCommands] = useState(0);
   const transportPending = useRef(false);
+  const jobsRef = useRef<HTMLElement>(null), openPanelRef = useRef<null | ((kind: 'jobs' | 'inspector') => void)>(null);
+  const bindOpenPanel = useCallback((action: null | ((kind: 'jobs' | 'inspector') => void)) => { openPanelRef.current = action; }, []);
+  const [jobsRequest, setJobsRequest] = useState(0);
+  useEffect(() => {
+    if (!jobsRequest) return;
+    if (openPanelRef.current) openPanelRef.current('jobs');
+    else jobsRef.current?.focus();
+  }, [jobsRequest]);
   const [fullscreenHint, setFullscreenHint] = useState(false);
   const busy = pendingCommands > 0;
   const [error, setError] = useState<string | null>(null);
   const [clock, setClock] = useState(() => nowMs ?? Date.now());
   const runtime = snapshot.authoring;
-  const openPanelRef=useRef<null|((kind:'inspector')=>void)>(null);
-  const bindOpenPanel=useCallback((action:null|((kind:'inspector')=>void))=>{openPanelRef.current=action;},[]);
+  const status = studioStatus(snapshot);
+  useEffect(() => { setError(null); }, [runtime?.instanceId, runtime?.generation]);
   const [graphSelection,setGraphSelection]=useState<NodePath|null>(null);
   const selectedNodePath=graphSelection??undefined;
   const selectedNode=selectedNodePath?compositionOccurrence(runtime,selectedNodePath):undefined;
@@ -156,7 +177,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
         <section><Disclosure title="Runtime"><dl className="identity"><dt>Authoring revision</dt><dd>{runtime?.revisionId ?? 'Unavailable'}</dd><dt>Instance</dt><dd>{runtime?.instanceId ?? 'Unavailable'}</dd><dt>Generation / clock epoch</dt><dd>{runtime ? `${runtime.generation} / ${runtime.clockEpoch}` : 'Unavailable'}</dd><dt>Completed frame</dt><dd>{runtime?.frameId ?? 'Unavailable'}</dd></dl></Disclosure></section>
         <section><Disclosure title="Host output"><p className="host-revision">{snapshot.host?.revisionId ?? 'No host status available'}</p><p className="hint">Authoring changes do not update a pinned host revision.</p></Disclosure></section>
       </Paper>;
-  const jobsPane = <section className="diagnostics" aria-label="Jobs and diagnostics"><div className="section-heading"><h2>Jobs & diagnostics</h2><span className="subtle">{snapshot.jobs.length} reported</span></div>
+  const openJobs = () => { setMaximized(false); setJobsRequest(value => value + 1); };
+  const jobsPane = <section ref={jobsRef} tabIndex={-1} className="diagnostics" aria-label="Jobs and diagnostics"><div className="section-heading"><h2>Jobs & diagnostics</h2><span className="subtle">{snapshot.jobs.length} reported</span></div>
       {runtime?.fault && <p className="error" role="alert"><strong>{runtime.fault.code}</strong> · {runtime.fault.message}</p>}
       {snapshot.jobs.map(job => <p key={job.jobId} className={job.fault ? 'error' : ''}><span className="tag">{job.state}</span> {job.summary}{job.fault && ` · ${job.fault}`}</p>)}
       {!runtime?.fault && snapshot.jobs.length === 0 && <p>{snapshot.message ?? 'No jobs reported.'}</p>}
@@ -175,6 +197,10 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
       {sourcePanel ? <StudioDockShell onOpenPanelReady={bindOpenPanel} toolsHost={toolsHost} compact={compact} showInspector={showMaximizedInspector} preview={previewPane} source={sourcePanel} library={libraryPanel??<section aria-label="Shared component library">Library unavailable.</section>} inspector={inspectorPane} jobs={jobsPane} graph={<GraphPanel runtime={runtime} selected={selectedNodePath?nodeKey(selectedNodePath):null} onSelect={selectGraphNode}/>} /> : <>{previewPane}{(!compact || showMaximizedInspector) && inspectorPane}</>}
     </div>
     {!sourcePanel && !compact && jobsPane}
-    <footer className="status-bar" hidden={windowState.fullscreen}><span><i className="status-dot" />{snapshot.connection === 'connected' ? 'Authoring service' : 'Awaiting authoring service'}</span><span>Presentation only · output size is independent of window size</span><span>TRACER 0.1</span></footer>
+    <footer className="status-bar" hidden={windowState.fullscreen || previewOnly} aria-label="Studio status">
+      <button type="button" className={`status-item status-build ${status.build === 'Build failed' ? 'status-error' : ''}`} aria-busy={status.building} aria-label={`Build status: ${status.build}. Open Jobs and diagnostics`} onClick={openJobs}><span aria-hidden="true" className={status.building ? 'status-spinner' : 'status-build-icon'}>{status.building ? '' : '↻'}</span><span aria-live="polite">{status.build}</span></button>
+      <button type="button" className={`status-item ${status.problems ? 'status-error' : ''}`} aria-label={`Problems: ${status.problems}. Open Jobs and diagnostics`} onClick={openJobs}><span aria-hidden="true">!</span><span>{status.problems} {status.problems === 1 ? 'problem' : 'problems'}</span></button>
+      <button type="button" className={`status-item status-runtime ${status.runtime === 'Failed' || status.runtime === 'Disconnected' ? 'status-error' : ''}`} aria-label={`Runtime status: ${status.runtime}. Open Jobs and diagnostics`} onClick={openJobs}><span className="status-dot" aria-hidden="true" /><span>{status.runtime}</span></button>
+    </footer>
   </div>;
 }
