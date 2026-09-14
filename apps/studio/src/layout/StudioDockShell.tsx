@@ -6,7 +6,7 @@ import { LuxDockLayout } from './LuxDockLayout.tsx';
 import { createStudioPanelRegistry, PanelRegistry } from './registry.ts';
 import type { LuxDockviewAdapter, LayoutStorage } from './dockview-adapter.ts';
 
-const kinds = ['preview', 'source', 'library', 'inspector', 'jobs'] as const;
+const kinds = ['preview', 'source', 'library', 'inspector', 'jobs', 'graph'] as const;
 type Kind = typeof kinds[number];
 // Resolve Storage only during an operation so denied access uses adapter recovery.
 const storage: LayoutStorage = {
@@ -16,7 +16,7 @@ const storage: LayoutStorage = {
 };
 /** The portals own real panes above Dockview mounts. Reparenting their host preserves
  * the same canvas, editor/undo, subscriptions and React state even through closure. */
-export function StudioDockShell({ compact, showInspector, toolsHost, ...content }: { compact: boolean; showInspector: boolean; toolsHost?: HTMLElement | null } & Record<Kind, ReactNode>) {
+export function StudioDockShell({ compact, showInspector, toolsHost, onOpenPanelReady, ...content }: { compact: boolean; showInspector: boolean; toolsHost?: HTMLElement | null; onOpenPanelReady?: (action:null|((kind:Kind)=>void))=>void } & Record<Exclude<Kind,'graph'>, ReactNode> & {graph?:ReactNode}) {
   const [mode] = useState<'desktop' | 'laptop'>(() => window.innerWidth < 1100 ? 'laptop' : 'desktop');
   const [name, setName] = useState('Default'), [message, setMessage] = useState('');
   const [panel, setPanel] = useState<Kind>('source'), [reference, setReference] = useState<Kind>('preview');
@@ -49,6 +49,7 @@ export function StudioDockShell({ compact, showInspector, toolsHost, ...content 
     try { if (!adapter.current) throw Error('Layout is loading'); run(adapter.current); }
     catch (reason) { setMessage(String(reason)); }
   }
+  useLayoutEffect(()=>()=>onOpenPanelReady?.(null),[onOpenPanelReady]);
   function reset(next: 'desktop' | 'laptop') {
     action(value => { value.reset(name, next); setMessage(`Reset to ${next} layout`); });
   }
@@ -70,7 +71,7 @@ export function StudioDockShell({ compact, showInspector, toolsHost, ...content 
     {toolsHost ? createPortal(tools, toolsHost) : tools}
 
     <div className="studio-dock-grid" hidden={compact}><LuxDockLayout registry={registry} panels={panels} storage={storage} nonce={nonce} mode={mode}
-      onReady={(value, result) => { adapter.current = value; if (result.reason && result.reason !== 'No saved personal layout') setMessage(result.reason); }} /></div>
+      onReady={(value, result) => { adapter.current = value; onOpenPanelReady?.(kind=>{if(kind==='inspector')value.openBeside(kind,'graph');else value.open(kind);}); if (result.reason && result.reason !== 'No saved personal layout') setMessage(result.reason); }} /></div>
     <div className={`studio-expanded-pane ${showInspector ? 'studio-expanded-with-inspector' : ''}`} hidden={!compact} ref={expanded} />
     {kinds.map(kind => createPortal(content[kind], hosts[kind], kind))}
   </div>;

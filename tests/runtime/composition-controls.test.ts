@@ -9,6 +9,18 @@ import {nodeIdSchema} from '../../packages/runtime-contracts/src/identities.ts';
 const hash=(value:string)=>createHash('sha256').update(value).digest('hex');
 function profile(){const source=compositionSourceBundle(),asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));return extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash})!;}
 const kaleidoA=nodeIdSchema.parse(kaleidoscopeAId),kaleidoB=nodeIdSchema.parse(kaleidoscopeBId);
+test('node writes update only their instance and public aliases, rejecting stale or invalid writes atomically',()=>{
+ const p=profile(),state=createCompositionControlState(p),node=p.nodes.find(row=>row.nodePath[0]===kaleidoA)!;
+ state.applyNode([kaleidoA],{segments:8},node.schemaHash);
+ assert.deepEqual(state.nodeValues([kaleidoA]),{segments:8});
+ assert.deepEqual(state.nodeValues([kaleidoB]),{segments:6});
+ assert.equal(state.values().segmentsA,8);
+ const saved=state.snapshot();
+ for(const [path,patch,schemaHash] of [[[kaleidoA],{segments:999},node.schemaHash],[[kaleidoA],{missing:1},node.schemaHash],[[kaleidoA],{segments:4},'0'.repeat(64)],[[nodeIdSchema.parse('00000000-0000-4000-8000-000000000000')],{segments:4},node.schemaHash]] as const){
+  assert.throws(()=>state.applyNode(path,patch,schemaHash));assert.deepEqual(state.snapshot(),saved);
+ }
+ assert.deepEqual(createCompositionControlState(p,saved).nodeValues([kaleidoA]),{segments:8});
+});
 test('composition controls keep one canonical leaf state and derive independent public aliases',()=>{
  const p=profile(),state=createCompositionControlState(p);assert.deepEqual(state.values(),{ballIntensity:.6,segmentsA:6,segmentsB:6});state.apply({ballIntensity:.6,segmentsA:4,segmentsB:9});assert.deepEqual(state.nodeValues([kaleidoA]),{segments:4});assert.deepEqual(state.nodeValues([kaleidoB]),{segments:9});assert.deepEqual(state.values(),{ballIntensity:.6,segmentsA:4,segmentsB:9});
 });
