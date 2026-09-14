@@ -146,10 +146,10 @@ Visual parameters belong to each visual's code. `intensity` is an optional concr
 
 Use `start-lux` / `pnpm studio:creative` for user creative work. Its reserved
 `.worktrees/lux-creative` checkout and build stay at the recorded commit until an
-explicit user-requested upgrade. That request authorizes the shipped start-lux
-upgrade procedure without another approval; it preserves the scene and rollback
-checkout/build, verifies non-divergent latest main, and touches only the verified
-creative process and reservation. Do not edit, rebuild, update dependencies in,
+automatic normal creative start refreshes it to verified latest main. The shipped
+start-lux refresh procedure needs no further approval; it preserves the scene and
+rollback checkout/build, verifies non-divergent latest main, and touches only the
+verified creative process and reservation. Do not edit, rebuild, update dependencies in,
 test against, prune, or terminate that creative checkout or instance during
 development. Keep saved creative scenes outside test artifact directories.
 
