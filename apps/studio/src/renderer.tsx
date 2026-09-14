@@ -1,4 +1,4 @@
-import {GraphPanel,compositionNodes,nodeKey} from './GraphPanel.tsx';
+import {GraphPanel,compositionNodeLabel,compositionOccurrence,nodeKey} from './GraphPanel.tsx';
 import type {NodePath} from '../../../packages/runtime-contracts/src/graph.ts';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { Alert, Button, Chip, CssBaseline, Paper, ThemeProvider, IconButton, Tooltip, Menu, MenuItem } from '@mui/material';
@@ -74,12 +74,10 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const [clock, setClock] = useState(() => nowMs ?? Date.now());
   const runtime = snapshot.authoring;
   const status = studioStatus(snapshot);
-
-
-  const [graphSelection,setGraphSelection]=useState<{revision:string;path:NodePath}|null>(null);
-  const selectedNodePath=graphSelection&&graphSelection.revision===runtime?.revisionId?graphSelection.path:undefined;
-  const selectedNode=selectedNodePath?compositionNodes(runtime).find(node=>nodeKey(node.nodePath)===nodeKey(selectedNodePath)):undefined;
-  function selectGraphNode(path:NodePath|null){setGraphSelection(path&&runtime?{revision:runtime.revisionId,path}:null);openPanelRef.current?.('inspector');}
+  const [graphSelection,setGraphSelection]=useState<NodePath|null>(null);
+  const selectedNodePath=graphSelection??undefined;
+  const selectedNode=selectedNodePath?compositionOccurrence(runtime,selectedNodePath):undefined;
+  function selectGraphNode(path:NodePath|null){setGraphSelection(path?[...path]:null);openPanelRef.current?.('inspector');}
   const available = snapshot.connection === 'connected' && runtime?.authority === 'studio';
   useEffect(() => {
     if (nowMs !== undefined) return;
@@ -164,7 +162,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
       </Paper>;
   const inspectorPane = <Paper component="aside" square className="inspector" aria-label="Scene controls and status">
         <section><Disclosure title="Controls" defaultOpen className="controls-section" badge={<Chip label="LIVE" />}>
-          <p className="inspector-target">{selectedNode?.label??(selectedNodePath?'Selected node unavailable':runtime?.composition?'Composition controls':'Visual controls')}</p>
+          <p className="inspector-target">{selectedNodePath&&selectedNode?compositionNodeLabel(runtime,selectedNodePath):(selectedNodePath?'Selected node unavailable':runtime?.composition?'Composition controls':'Visual controls')}</p>
           <ParameterInspector nodePath={selectedNodePath} runtime={runtime} available={!!available} client={client} controller={controller} onError={setError} edits={controlEdits} />
         </Disclosure></section>
         <section><Disclosure title="Performance"><PerformanceStatus performance={snapshot.performance} /><MetricView label="Visual delivery" metric={snapshot.visualFps} nowMs={nowMs ?? clock} /><MetricView label="UI cadence" metric={snapshot.uiFps} nowMs={nowMs ?? clock} />
@@ -189,7 +187,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
     </header>
     {appError && <Alert severity="error">{appError}</Alert>}
     <div className="workspace">
-      {sourcePanel ? <StudioDockShell onOpenPanelReady={bindOpenPanel} toolsHost={toolsHost} compact={compact} showInspector={showMaximizedInspector} preview={previewPane} source={sourcePanel} library={libraryPanel??<section aria-label="Shared component library">Library unavailable.</section>} inspector={inspectorPane} jobs={jobsPane} graph={<GraphPanel key={runtime?.revisionId??'empty'} runtime={runtime} selected={selectedNode?nodeKey(selectedNode.nodePath):null} onSelect={selectGraphNode}/>} /> : <>{previewPane}{(!compact || showMaximizedInspector) && inspectorPane}</>}
+      {sourcePanel ? <StudioDockShell onOpenPanelReady={bindOpenPanel} toolsHost={toolsHost} compact={compact} showInspector={showMaximizedInspector} preview={previewPane} source={sourcePanel} library={libraryPanel??<section aria-label="Shared component library">Library unavailable.</section>} inspector={inspectorPane} jobs={jobsPane} graph={<GraphPanel runtime={runtime} selected={selectedNodePath?nodeKey(selectedNodePath):null} onSelect={selectGraphNode}/>} /> : <>{previewPane}{(!compact || showMaximizedInspector) && inspectorPane}</>}
     </div>
     {!sourcePanel && !compact && jobsPane}
     <footer className="status-bar" hidden={windowState.fullscreen} aria-label="Studio status">
