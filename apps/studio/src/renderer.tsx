@@ -117,6 +117,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
             {maximized && !windowState.fullscreen && <Button aria-pressed={maximizedInspector} onClick={() => setMaximizedInspector(value => !value)}>{maximizedInspector ? 'Hide Inspector' : 'Show Inspector'}</Button>}
             {(previewOnly || windowState.detached || windows?.popout) && <Button disabled={!windows} onClick={() => windows && windowAction(() => previewOnly || windowState.detached ? windows.dock() : windows.popout!())}>{previewOnly || windowState.detached ? 'Dock preview' : 'Pop out'}</Button>}
             <Button disabled={!windows} onClick={() => windows && windowAction(() => windows.fullscreen(!windowState.fullscreen))}>{windowState.fullscreen ? 'Exit fullscreen' : 'Fullscreen'}</Button>
+          </div>
+          <div className="preview-resolution-controls">
             <label className="preview-resolution">Resolution
               <select aria-label="Preview resolution preset" disabled={!available || busy} value={presetValue} onChange={event => { const parts = event.target.value.split('x'); const width = Number(parts[0]), height = Number(parts[1]); if (Number.isInteger(width) && Number.isInteger(height)) void command(() => controller.resize(width, height)); }}>
                 <option value="custom">Custom</option><option value="1280x720">1280 × 720</option><option value="1920x1080">1920 × 1080</option><option value="2560x1440">2560 × 1440</option>
