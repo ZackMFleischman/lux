@@ -13,7 +13,7 @@ class CompositionWorker {
   onmessage:any;onerror:any;messages:any[]=[];init:any;terminated=false;
   constructor(){CompositionWorker.all.push(this);}
   postMessage(message:any){this.messages.push(message);if(message.type==='init'){this.init=message;queueMicrotask(()=>this.reply({type:'ready'}));}}
-  reply(extra:any){this.onmessage?.({data:{...this.init,type:'status',frameId:'1',timeSeconds:0,clockEpoch:0,controlSequence:0,playback:'paused',...extra,effectiveNodeControls:extra.effectiveNodeControls??extra.nodeControls??this.init.nodeControls}});}
+  reply(extra:any){this.onmessage?.({data:{...this.init,type:'status',frameId:'1',timeSeconds:0,clockEpoch:0,controlSequence:0,playback:this.init.playing?'playing':'paused',...extra,effectiveNodeControls:extra.effectiveNodeControls??extra.nodeControls??this.init.nodeControls}});}
   terminate(){this.terminated=true;}
 }
 

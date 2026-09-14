@@ -36,7 +36,7 @@ try {
   read.source.files['lib/color.ts'] = 'export const green = 0.2;';
   read.source.files[read.source.entry] = "import { green } from './lib/color.ts';\n" + read.source.files[read.source.entry].replace('vec4(level, 0.2, 0.4, 1)', 'vec4(level, green, 0.4, 1)');
   const first = parsed(await call('lux.studio.build', { expectedDraftVersion: read.draftVersion, source: read.source }));
-  assert.equal(first.status.authoring.playback, 'paused');
+  assert.equal(first.status.authoring.playback, 'playing');
   const target = { instanceId: first.status.authoring.instanceId, expectedGeneration: first.status.authoring.generation };
   const controlled = parsed(await call('lux.studio.parameters', { ...target, expectedRevisionId: first.status.authoring.revisionId, values: { intensity: 0.8 } }));
   assert.equal(controlled.status.authoring.intensity, 0.8);
