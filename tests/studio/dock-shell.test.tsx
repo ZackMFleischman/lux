@@ -228,3 +228,33 @@ test('Graph selects an instance, opens Inspector, writes only that node and pres
   assert.equal(runtime.nodeControls.nodes.find((node:any)=>node.nodePath[0]===kaleidoscopeBId).values.segments,6);
   assert.equal(runtime.generation,1);assert.equal(runtime.playback,'paused');ui.unmount();
 });
+
+test('Graph enters nested components one level at a time and edits an exposed control through its canonical leaf',async()=>{
+  const {parse}=await import('@babel/parser');const {createHash}=await import('node:crypto');
+  const {extractCompositionDeclaration}=await import('../../apps/build-worker/src/composition-declarations.mjs');
+  const {nestedCompositionSourceBundle,compositeAId,wrapperNodeId,wrappedEffectId}=await import('../compiler/composition-fixture.mjs');
+  const {createCompositionControlState}=await import('../../packages/runtime/src/components/composition-controls.ts');
+  const source=nestedCompositionSourceBundle(),asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text as string,{sourceType:'module',plugins:['typescript']})]));
+  const composition=extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash:(value:string)=>createHash('sha256').update(value).digest('hex')})!,state=createCompositionControlState(composition);
+  let runtime:any={instanceId:'nested-instance',generation:1,revisionId:'nested-r1',sceneName:'Nested fixture',authority:'studio',playback:'paused',clockEpoch:0,frameId:'1',output:{width:1280,height:720},fault:null,sdkVersion:'0.4.0',controlSchema:composition.publicControls,controlSchemaHash:'a'.repeat(64),controls:state.values(),controlSequence:0,nodeControls:{sourceHash:'nested-r1',nodes:state.snapshot().nodes},controlAnimations:[],controlAnimationIssues:[],animationSequence:0,composition};
+  let snapshot:any={connection:'connected',message:null,receivedAtMs:1000,authoring:runtime,host:null,jobs:[],visualFps:null,uiFps:null};const calls:any[]=[],listeners=new Set<()=>void>();
+  const client={getSnapshot:()=>snapshot,subscribe:(fn:()=>void)=>{listeners.add(fn);return()=>listeners.delete(fn);},invoke:async(op:any)=>{calls.push(op);if(op.name!=='lux.node.parameters.set')assert.fail(`Unexpected operation ${op.name}`);state.applyNode(op.input.nodePath,op.input.values,op.input.expectedControlSchemaHash);runtime={...runtime,controls:state.values(),nodeControls:{sourceHash:runtime.revisionId,nodes:state.snapshot().nodes},controlSequence:runtime.controlSequence+1};snapshot={...snapshot,authoring:runtime};listeners.forEach(fn=>fn());}};
+  window.localStorage.clear();const ui=render(<StudioApp client={client} nowMs={1000} sourcePanel={<div>Source fixture</div>}/>);
+  await act(async()=>{fireEvent.click(screen.getByText('View'));});await click('Open Graph');
+  const composite=screen.getByRole('button',{name:/Double mirror 1/});await act(async()=>{fireEvent.click(composite);});
+  assert.ok(within(document.querySelector('.inspector')!).getByText('Double mirror 1'));
+  const alias=within(document.querySelector('.inspector')!).getByRole('spinbutton',{name:'firstSegments · Segments value'});
+  await act(async()=>{fireEvent.change(alias,{target:{value:'9'}});fireEvent.keyDown(alias,{key:'Enter'});});
+  assert.deepEqual(calls[0].input.nodePath,[compositeAId,wrapperNodeId,wrappedEffectId]);assert.deepEqual(calls[0].input.values,{segments:9});
+  await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Open component'}));});
+  assert.equal(document.querySelectorAll('.graph-node').length,2);assert.ok(screen.getByRole('navigation',{name:'Component breadcrumb'}));
+  const wrapper=screen.getByRole('button',{name:/Wrapped mirror/});await act(async()=>{fireEvent.click(wrapper);fireEvent.dblClick(wrapper);});
+  assert.equal(document.querySelectorAll('.graph-node').length,1);assert.ok(screen.getByRole('button',{name:'Back to Double mirror 1'}));
+  await act(async()=>{runtime={...runtime,revisionId:'nested-r2'};snapshot={...snapshot,authoring:runtime};listeners.forEach(fn=>fn());});
+  assert.ok(within(document.querySelector('.inspector')!).getByText('Wrapped mirror'),'selection survives an accepted rebuild when the full path remains');
+  await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Back to Double mirror 1'}));});
+  await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Back to Nested demo'}));});
+  const second=screen.getByRole('button',{name:/Double mirror 2/});await act(async()=>{fireEvent.keyDown(second,{key:'Enter'});});
+  assert.ok(screen.getByRole('button',{name:'Double mirror 2',current:'page'}));assert.ok(within(document.querySelector('.inspector')!).getByText('Double mirror 2'));
+  ui.unmount();
+});

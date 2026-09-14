@@ -34,6 +34,13 @@ async function link() {
     ...(artifact.artifactVersion>=4 ? {'compiler/component-declarations.mjs':join(root,'apps/build-worker/src/component-declarations.mjs')} : {}),
     ...(artifact.artifactVersion===5 ? Object.fromEntries(['composition-profile.mjs','composition-profile.d.mts'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
     ...(artifact.artifactVersion===5 ? {'compiler/composition-declarations.mjs':join(root,'apps/build-worker/src/composition-declarations.mjs')} : {}),
+    ...(artifact.artifactVersion===5 ? {
+      'runtime/nested-validate.ts':join(root,'packages/runtime/src/graph/nested-validate.ts'),
+      'runtime/nested-plan.ts':join(root,'packages/runtime/src/graph/nested-plan.ts'),
+      'contracts/nested-graph.ts':join(root,'packages/runtime-contracts/src/nested-graph.ts'),
+      'contracts/graph.ts':join(root,'packages/runtime-contracts/src/graph.ts'),
+      'contracts/identities.ts':join(root,'packages/runtime-contracts/src/identities.ts'),
+    } : {}),
     ...await assetDependencyPaths(root),
     'typescript/package.json': join(dependencyRoot, 'typescript/package.json'),
     '@babel/parser/package.json': join(dependencyRoot, '@babel/parser/package.json'),

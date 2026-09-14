@@ -22,3 +22,44 @@ export default defineComposition({definitions:{ball,kaleidoscope},nodes:[
  {id:'segmentsA',nodeId:'${kaleidoscopeAId}',controlId:'segments'},
  {id:'segmentsB',nodeId:'${kaleidoscopeBId}',controlId:'segments'}]});`;
 export const compositionSourceBundle=()=>({sdkVersion:'0.4.0',entry:'composition.ts',files:{'composition.ts':compositionSource,'ball.ts':ballSource,'kaleidoscope.ts':kaleidoscopeSource}});
+
+export const compositeAId='44444444-4444-4444-8444-444444444444';
+export const compositeBId='55555555-5555-4555-8555-555555555555';
+export const wrapperNodeId='66666666-6666-4666-8666-666666666666';
+export const wrappedEffectId='77777777-7777-4777-8777-777777777777';
+export const directEffectId='88888888-8888-4888-8888-888888888888';
+export const nestedEdgeAId='cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+export const nestedEdgeBId='dddddddd-dddd-4ddd-8ddd-dddddddddddd';
+export const innerEdgeId='eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';
+export const wrapperSource=`import {defineComposition} from '@lux/visual-sdk';
+import kaleidoscope from './kaleidoscope.ts';
+export default defineComposition({label:'Wrapped mirror',definitions:{kaleidoscope},nodes:[
+ {id:'${wrappedEffectId}',definition:'kaleidoscope'}],edges:[],
+ input:{nodeId:'${wrappedEffectId}',portId:'image'},output:{nodeId:'${wrappedEffectId}',portId:'image'},expose:[
+ {id:'segments',nodeId:'${wrappedEffectId}',controlId:'segments'}]});`;
+export const reusableCompositeSource=`import {defineComposition} from '@lux/visual-sdk';
+import wrapped from './wrapper.ts';
+import kaleidoscope from './kaleidoscope.ts';
+export default defineComposition({label:'Double mirror',definitions:{wrapped,kaleidoscope},nodes:[
+ {id:'${wrapperNodeId}',definition:'wrapped'},
+ {id:'${directEffectId}',definition:'kaleidoscope'}],edges:[
+ {id:'${innerEdgeId}',from:{nodeId:'${wrapperNodeId}',portId:'image'},to:{nodeId:'${directEffectId}',portId:'image'},delay:'none'}],
+ input:{nodeId:'${wrapperNodeId}',portId:'image'},output:{nodeId:'${directEffectId}',portId:'image'},expose:[
+ {id:'firstSegments',nodeId:'${wrapperNodeId}',controlId:'segments'},
+ {id:'secondSegments',nodeId:'${directEffectId}',controlId:'segments'}]});`;
+export const nestedCompositionSource=`import {defineComposition} from '@lux/visual-sdk';
+import ball from './ball.ts';
+import composite from './composite.ts';
+export default defineComposition({label:'Nested demo',definitions:{ball,composite},nodes:[
+ {id:'${ballId}',definition:'ball'},
+ {id:'${compositeAId}',definition:'composite'},
+ {id:'${compositeBId}',definition:'composite'}],edges:[
+ {id:'${nestedEdgeAId}',from:{nodeId:'${ballId}',portId:'image'},to:{nodeId:'${compositeAId}',portId:'image'},delay:'none'},
+ {id:'${nestedEdgeBId}',from:{nodeId:'${compositeAId}',portId:'image'},to:{nodeId:'${compositeBId}',portId:'image'},delay:'none'}],
+ output:{nodeId:'${compositeBId}',portId:'image'},expose:[
+ {id:'ballIntensity',nodeId:'${ballId}',controlId:'intensity'},
+ {id:'segmentsA',nodeId:'${compositeAId}',controlId:'firstSegments'},
+ {id:'segmentsB',nodeId:'${compositeBId}',controlId:'secondSegments'}]});`;
+export const nestedCompositionSourceBundle=()=>({sdkVersion:'0.4.0',entry:'composition.ts',files:{
+ 'composition.ts':nestedCompositionSource,'composite.ts':reusableCompositeSource,'wrapper.ts':wrapperSource,
+ 'ball.ts':ballSource,'kaleidoscope.ts':kaleidoscopeSource}});

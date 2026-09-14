@@ -6,5 +6,5 @@
     "types": ["node", "react", "react-dom"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "../../tests/studio/**/*.ts", "../../tests/studio/**/*.tsx"],
-  "exclude": ["../../tests/studio/fixtures/prismatic-composition/**/*.ts"]
+  "exclude": ["../../tests/studio/fixtures/prismatic-composition/**/*.ts", "../../tests/studio/fixtures/nested-prismatic-composition/**/*.ts"]
 }
