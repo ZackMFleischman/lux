@@ -100,11 +100,28 @@ export function GraphPanel({runtime,selected,onSelect}:{runtime:RuntimeView|null
       onClickCapture={event => { if (suppressClick.current) { event.preventDefault(); event.stopPropagation(); suppressClick.current = false; } }}>
       <div className="graph-content" style={{width,height,transform:`translate(${view.x}px,${view.y}px) scale(${view.zoom})`}}>
         <svg className="graph-wires" width={width} height={height} aria-label="Node connections">
-          {body.edges.map(edge=>{const from=nodes.findIndex(node=>node.id===edge.from.nodeId),to=nodes.findIndex(node=>node.id===edge.to.nodeId);return <g key={edge.id}><title>{nodes[from]?.label} {edge.from.portId} to {nodes[to]?.label} {edge.to.portId}</title><path d={`M ${from*250+220} 82 C ${from*250+235} 82,${to*250-15} 82,${to*250} 82`}/></g>;})}
+          {body.edges.map(edge => {
+            const from = nodes.findIndex(node => node.id === edge.from.nodeId);
+            const to = nodes.findIndex(node => node.id === edge.to.nodeId);
+            const highlighted = selected === nodeKey(nodes[from]!.nodePath) || selected === nodeKey(nodes[to]!.nodePath);
+            const midpoint = (from * 250 + 220 + to * 250) / 2;
+            return <g key={edge.id} className={`graph-connection${highlighted ? ' graph-connection-selected' : ''}`}>
+              <title>{nodes[from]?.label} {edge.from.portId} to {nodes[to]?.label} {edge.to.portId}</title>
+              <path d={`M ${from * 250 + 220} 82 C ${from * 250 + 235} 82,${to * 250 - 15} 82,${to * 250} 82`} />
+              <polygon points={`${midpoint - 3},78 ${midpoint + 3},82 ${midpoint - 3},86`} />
+            </g>;
+          })}
         </svg>
         {nodes.map((node,index)=><button type="button" className="graph-node" key={nodeKey(node.nodePath)} style={{left:index*250}} aria-pressed={selected===nodeKey(node.nodePath)} onClick={()=>onSelect(node.nodePath)} onDoubleClick={()=>enter(node.nodePath)} onKeyDown={event=>{if(event.key==='Enter'&&node.definition.kind==='graph'){event.preventDefault();onSelect(node.nodePath);enter(node.nodePath);}}}>
           <strong>{node.label}</strong><span className="graph-node-kind">{node.definition.kind==='graph'?'Component':Object.keys(node.metadata.inputs).length?'Effect':'Source'}</span>
-          <span className="graph-ports"><span>{Object.entries(node.metadata.inputs).map(([id,port])=><span key={id}>● {port.label}</span>)}</span><span>{Object.entries(node.metadata.outputs).map(([id,port])=><span key={id}>{port.label} ●</span>)}</span></span>
+          <span className="graph-ports">
+            <span>{Object.entries(node.metadata.inputs).map(([id, port]) => <span className="graph-port graph-port-input" key={id} title={`${port.label} input`}>
+              <span className="graph-port-anchor" aria-hidden="true" /><span>{port.label}</span>
+            </span>)}</span>
+            <span>{Object.entries(node.metadata.outputs).map(([id, port]) => <span className="graph-port graph-port-output" key={id} title={`${port.label} output`}>
+              <span>{port.label}</span><span className="graph-port-anchor" aria-hidden="true" />
+            </span>)}</span>
+          </span>
           {output?.nodeId===node.id&&<span className="graph-final-output">Final output · {output.portId}</span>}
         </button>)}
       </div>
