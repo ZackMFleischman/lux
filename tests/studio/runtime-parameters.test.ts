@@ -15,7 +15,7 @@ class WorkerFixture {
   onmessage:any; onerror:any; messages:any[]=[]; init:any;terminated=false;
   constructor(){WorkerFixture.all.push(this);}
   postMessage(message:any){this.messages.push(message);if(message.type==='init'){this.init=message;queueMicrotask(()=>{if(WorkerFixture.failNext){WorkerFixture.failNext=false;this.reply({type:'failure',message:'candidate failed'});}else this.reply({type:'ready'});});}}
-  reply(extra:any){this.onmessage?.({data:{...this.init,type:'status',frameId:'1',timeSeconds:0,clockEpoch:0,controlSequence:0,playback:'paused',...extra}});}
+  reply(extra:any){this.onmessage?.({data:{...this.init,type:'status',frameId:'1',timeSeconds:0,clockEpoch:0,controlSequence:0,playback:this.init.playing?'playing':'paused',...extra}});}
   terminate(){this.terminated=true;}
 }
 async function fixture(t:any,enabled=true){

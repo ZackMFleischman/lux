@@ -32,6 +32,7 @@ export interface AuthoringApi {
 }
 declare global { interface Window { luxAuthoring: AuthoringApi } }
 type RetryPolicy={lastFaultAt:number|null};
+type ReplacementPlaybackIntent={playing:boolean;settling:boolean;synchronize?:()=>void};
 type Running = { worker: Worker; canvas: HTMLCanvasElement; instanceId: string; generation: number; revisionId: string; performance:PerformanceReceiver;retryPolicy:RetryPolicy;autoRetry:boolean;playback:'playing'|'paused';
   lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; animations:number; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>>; desiredControls?:ControlValues; desiredNodeControls?:SavedNodeControlSnapshot;desiredControlAnimations?:readonly ControlAnimationBinding[]; };
 export class StandaloneClient implements StudioClient, PresentationPort {
@@ -44,6 +45,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private accepted: { linked: LinkedEnvelope; revisionId: string; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>> } | null = null;
   private previewOutput: Readonly<Pick<OutputSettings,'width'|'height'>> = DEFAULT_OUTPUT;
   private busy = false;
+  private replacementPlayback:ReplacementPlaybackIntent|null=null;
   private automaticRetry:ReturnType<typeof setTimeout>|undefined;
   private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; playback?:boolean; expectedControlSequence?:number; expectedControls?:ControlValues; expectedNodeControls?:SavedNodeControlSnapshot;expectedAnimationSequence?:number;expectedControlAnimations?:readonly ControlAnimationBinding[]; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
   private api: AuthoringApi;
@@ -64,6 +66,8 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     }
     this.cancelAutomaticRetry();
     this.busy = true;
+    const playbackIntent:ReplacementPlaybackIntent={playing:true,settling:false};
+    this.replacementPlayback=playbackIntent;
     const jobId = crypto.randomUUID();
     this.publish({ jobs: [{ jobId, state: 'compiling', summary: 'Compiling visual…' }] });
     try {
@@ -99,14 +103,14 @@ export class StandaloneClient implements StudioClient, PresentationPort {
         migration=initial.changes;state={sdkVersion:supportedSdkVersion,controlSchema:schema,controlSchemaHash:schemaHash,controls:initial.values,controlSequence:0};
       }
       this.publish({ jobs: [{ jobId, state: 'initializing', summary: 'Preparing preview…' }] });
-      await this.start(linked, result.sourceHash,state,migration, {lastFaultAt:null}, undefined, this.previewOutput);
+      await this.start(linked, result.sourceHash,state,migration, {lastFaultAt:null}, playbackIntent.playing, this.previewOutput,playbackIntent);
       this.source = submittedSource;
       this.accepted = { linked, revisionId: result.sourceHash,state,output:this.previewOutput };
       this.publish({ message:null,jobs: [{ jobId, state: 'succeeded', summary: 'Visual is ready in Lux.' }] });
     } catch (error) { this.publish({ jobs: [{ jobId, state: 'failed', summary: 'Build failed; previous preview retained.', fault: String(error) }] }); throw error; }
-    finally { this.busy = false; this.scheduleAutomaticRetry(); }
+    finally { if(this.replacementPlayback===playbackIntent)this.replacementPlayback=null;this.busy = false; this.scheduleAutomaticRetry(); }
   }
-  private async start(linked: LinkedEnvelope, revisionId: string, state:RuntimeControlState, migration:readonly ControlMigration[]=[],retryPolicy:RetryPolicy={lastFaultAt:null},playingOverride?:boolean, output:Readonly<Pick<OutputSettings,'width'|'height'>>=this.previewOutput): Promise<void> {
+  private async start(linked: LinkedEnvelope, revisionId: string, state:RuntimeControlState, migration:readonly ControlMigration[]=[],retryPolicy:RetryPolicy={lastFaultAt:null},playingOverride?:boolean, output:Readonly<Pick<OutputSettings,'width'|'height'>>=this.previewOutput,playbackIntent?:ReplacementPlaybackIntent): Promise<void> {
     const playing = playingOverride ?? this.snapshot.authoring?.playback === 'playing';
     const canvas = document.createElement('canvas'); canvas.width = output.width; canvas.height = output.height;
     canvas.style.cssText = 'width:100%;height:100%;position:absolute;inset:0;object-fit:contain';
@@ -115,13 +119,39 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0,animations:0,state,output,performance:undefined as any,retryPolicy,autoRetry:false,playback:playing?'playing':'paused' };
     candidate.performance=new PerformanceReceiver({instanceId:candidate.instanceId,generation:candidate.generation,revisionId},performance.now());
     const previous = this.running;
-    let ready = false;
+    let ready = false,initialized=false,synchronizationRequestId:string|undefined,latestStatus:any;
+    let synchronizePlayback:()=>void=()=>{};
     try {
       await new Promise<void>((resolve, reject) => {
         const abort = (error: Error) => { clearTimeout(timer); this.stop(candidate, error.message); reject(error); };
         const timer = setTimeout(() => abort(Error('Visual initialization exceeded five seconds')), 5000);
         candidate.activationTimer = timer;
         const fail = (message: string) => { if (!ready) abort(Error(message)); else this.fault(candidate, message); };
+        const publishRuntime=(message:any)=>this.publish({ authoring: { instanceId: candidate.instanceId, generation: candidate.generation, revisionId,
+          ...('linkedVersion' in linked&&linked.linkedVersion===5?{composition:linked.composition}:{}),
+          sceneName: 'Untitled visual', authority: 'studio', playback: message.playback,
+          ...candidate.state,controlMigration:migration,clockEpoch: message.clockEpoch,timeSeconds:message.timeSeconds, frameId: message.frameId,
+          ...(state.sdkVersion==='0.1.0'?{intensity:candidate.state.controls.intensity}:{}),
+          output: candidate.output, fault: null } as RuntimeView });
+        const promote=()=>{
+          if(ready||!initialized||!latestStatus)return;
+          if(playbackIntent?.settling)return;
+          if(playbackIntent&&candidate.playback!==(playbackIntent.playing?'playing':'paused'))return;
+          ready=true;clearTimeout(timer);this.running=candidate;
+          if(previous){this.stop(previous,'Runtime changed before command completed');previous.canvas.remove();}
+          this.target?.appendChild(canvas);this.publish({performance:candidate.performance.snapshot});publishRuntime(latestStatus);resolve();
+        };
+        synchronizePlayback=()=>{
+          if(!initialized||ready||candidate.terminal)return;
+          if(!playbackIntent){promote();return;}
+          const desired=playbackIntent.playing?'playing':'paused';
+          if(candidate.playback===desired){promote();return;}
+          if(synchronizationRequestId)return;
+          synchronizationRequestId=crypto.randomUUID();
+          try{worker.postMessage({type:'playback',action:playbackIntent.playing?'play':'pause',requestId:synchronizationRequestId,instanceId:candidate.instanceId,generation:candidate.generation});}
+          catch(error){fail(String(error));}
+        };
+        if(playbackIntent)playbackIntent.synchronize=synchronizePlayback;
         // Candidate JS needs the same liveness deadline as an accepted worker.
         // Healthy asynchronous startup can still use the independent 5 s cap.
         candidate.watchdog = setInterval(() => {
@@ -196,20 +226,12 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           candidate.playback=message.playback;
           candidate.lastHeartbeat = performance.now();
           if (BigInt(message.frameId) > BigInt(candidate.frameId)) { candidate.frameId = message.frameId; candidate.lastFrame = performance.now(); }
-          if (message.type === 'ready' && !ready) {
-            ready = true; clearTimeout(timer); this.running = candidate;
-            if (previous) { this.stop(previous, 'Runtime changed before command completed'); previous.canvas.remove(); }
-            this.target?.appendChild(canvas);
-            this.publish({performance:candidate.performance.snapshot});
-            resolve();
-          }
+          latestStatus=message;
+          if(message.type==='ready'&&!initialized)initialized=true;
+          if(message.requestId===synchronizationRequestId)synchronizationRequestId=undefined;
+          if(initialized&&!ready){synchronizePlayback();if(!ready)return;}
           if (this.running !== candidate) return;
-          this.publish({ authoring: { instanceId: candidate.instanceId, generation: candidate.generation, revisionId,
-            ...('linkedVersion' in linked&&linked.linkedVersion===5?{composition:linked.composition}:{}),
-            sceneName: 'Untitled visual', authority: 'studio', playback: message.playback,
-            ...candidate.state,controlMigration:migration,clockEpoch: message.clockEpoch,timeSeconds:message.timeSeconds, frameId: message.frameId,
-            ...(state.sdkVersion==='0.1.0'?{intensity:applied.intensity}:{}),
-            output: candidate.output, fault: null } as RuntimeView });
+          publishRuntime(message);
           const wait = this.pending.get(message.requestId);
           if (wait?.runtime === candidate && wait.kind === 'command' &&
               (wait.expectedControlSequence === undefined ||
@@ -223,6 +245,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           revisionId, linked: structuredClone(linked), canvas: offscreen,...state,settings: {...DEFAULT_OUTPUT,...output}, playing, performanceMode:this.performanceMode }, [offscreen]);
       });
     } catch (error) { this.stop(candidate, String(error)); canvas.remove(); throw error; }
+    finally{if(playbackIntent?.synchronize===synchronizePlayback)playbackIntent.synchronize=undefined;}
   }
   private stop(runtime: Running, message: string) {
     if(runtime===this.running){this.cancelAutomaticRetry();runtime.autoRetry=false;}
@@ -269,7 +292,8 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     operation = parsed.data;
     const runtime = this.running, input = operation.input;
     if (this.snapshot.authoring?.authority !== 'studio') throw Error('Authority conflict: Studio cannot control this instance');
-    if (this.busy) throw Error('A visual build is already running');
+    const replacementPlayback=this.busy&&this.replacementPlayback&&operation.name==='lux.playback'&&operation.input.action!=='reset'?this.replacementPlayback:null;
+    if (this.busy&&!replacementPlayback) throw Error('A visual build is already running');
     if (!runtime || input.instanceId !== runtime.instanceId || input.expectedGeneration !== runtime.generation) throw Error('Runtime changed; retry using its current state');
     if (operation.name === 'lux.runtime.restart') {
       if (!this.accepted) throw Error('No visual to restart');
@@ -289,7 +313,9 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     }
     if (this.snapshot.authoring?.playback === 'failed') throw Error('Restart the failed runtime first');
     if (this.pending.has(input.requestId)) throw Error('Request ID already pending');
+    if(replacementPlayback&&[...this.pending.values()].some(wait=>wait.runtime===runtime&&wait.playback))throw Error('Wait for the playback command to complete, then try again.');
     let message;
+    let replacementPlaybackPrevious:boolean|undefined;
     if (operation.name === 'lux.parameters.set') {
       if (operation.input.expectedRevisionId !== runtime.revisionId) throw Error('Revision changed; read current runtime state');
       if((runtime.state.sdkVersion!=='0.1.0'||operation.input.expectedControlSchemaHash!==undefined)&&operation.input.expectedControlSchemaHash!==runtime.state.controlSchemaHash)throw Error('Control schema changed; read current runtime state');
@@ -327,14 +353,21 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       if(index>=0)current.splice(index,1,...(operation.input.animation?[operation.input.animation]:[]));else if(operation.input.animation)current.push(operation.input.animation);
       runtime.desiredControlAnimations=validateControlAnimationBindings(current);
       message={type:'animations',animationSequence:++runtime.animations,controlAnimations:runtime.desiredControlAnimations,...(operation.input.restart?{restart:{nodePath:operation.input.nodePath,controlId:operation.input.controlId}}:{})};
-    } else message = { type: 'playback', action: operation.input.action };
-    return new Promise((resolve, reject) => {
+    } else {
+      message = { type: 'playback', action: operation.input.action };
+      if(replacementPlayback){replacementPlaybackPrevious=replacementPlayback.playing;replacementPlayback.playing=operation.input.action==='play';replacementPlayback.settling=true;replacementPlayback.synchronize?.();}
+    }
+    const result=new Promise((resolve, reject) => {
       const timer = setTimeout(() => this.fault(runtime, 'Runtime command timed out'), 5000);
       this.pending.set(input.requestId, { runtime, kind: 'command', playback: message.type === 'playback', resolve, reject, timer,
         ...('controlSequence' in message ? { expectedControlSequence: message.controlSequence, expectedControls: runtime.desiredControls,expectedNodeControls:runtime.desiredNodeControls } : {}),
         ...('animationSequence' in message?{expectedAnimationSequence:message.animationSequence,expectedControlAnimations:runtime.desiredControlAnimations}:{}) });
       try { runtime.worker.postMessage({ ...message, requestId: input.requestId, instanceId: runtime.instanceId, generation: runtime.generation }); }
       catch (error) { this.fault(runtime, String(error)); }
+    });
+    if(!replacementPlayback)return result;
+    return result.then(value=>{replacementPlayback.settling=false;replacementPlayback.synchronize?.();return value;},error=>{
+      replacementPlayback.playing=replacementPlaybackPrevious!;replacementPlayback.settling=false;replacementPlayback.synchronize?.();throw error;
     });
   }
   async attach({ target, runtimeKey }: Parameters<PresentationPort['attach']>[0]) {

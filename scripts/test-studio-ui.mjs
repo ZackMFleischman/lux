@@ -40,8 +40,8 @@ try {
   await page.getByText('View', { exact: true }).click();
   await page.getByRole('button', { name: 'Build', exact: true }).click();
   await page.locator('.preview-surface canvas').waitFor();
-  await page.waitForFunction(() => !document.querySelector('.preview-empty') && document.querySelector('.playback-state')?.textContent === 'paused');
-  report.checks.push('Real example builds and starts paused');
+  await page.waitForFunction(() => !document.querySelector('.preview-empty') && document.querySelector('.playback-state')?.textContent === 'playing');
+  report.checks.push('Real example builds and starts playing');
   const appBar = await page.locator('.app-bar').boundingBox(), transport = await page.locator('.transport').boundingBox();
   assert.ok(appBar && appBar.height <= 44, 'compact application bar');
   assert.ok(transport && transport.height <= 40, 'compact transport');
@@ -66,6 +66,8 @@ try {
     });
     window.__qaObserver.observe(document.querySelector('.transport'), { subtree: true, attributes: true, attributeFilter: ['disabled'] });
   });
+  await page.getByRole('button', { name: 'Pause', exact: true }).click();
+  await page.waitForFunction(() => document.querySelector('.playback-state')?.textContent === 'paused');
   const before = await page.locator('.preview-surface').boundingBox();
   for (let i = 0; i < 3; i++) {
     await page.getByRole('button', { name: 'Play', exact: true }).click();

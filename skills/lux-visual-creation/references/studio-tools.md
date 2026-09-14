@@ -64,7 +64,7 @@ Read live tool schemas if available; these are the checked adapter's contracts. 
 | --- | --- |
 | `discover` | `{}` → adapter-checkout SDK source, example, shared types, imports, declared capabilities. No running-app handshake; can succeed with Studio closed. |
 | `read` | `{}` → `{ source, draftVersion, ..., status }`. Complete source; don't truncate assets/files when storing it for an edit. |
-| `build` | `{ expectedDraftVersion, source, libraryLinks?: [{ componentId, mountPath }] }` → `{ draftVersion, status }` after resolving linked component source and candidate promotion. This is a complete replacement. Preserve current links from `read.libraryLinks` unless the requested edit changes them. |
+| `build` | `{ expectedDraftVersion, source, libraryLinks?: [{ componentId, mountPath }] }` → `{ draftVersion, status }` after resolving linked component source and candidate promotion. The accepted candidate starts playing by default. A later explicit Pause during the operation wins before promotion. This is a complete replacement. Preserve current links from `read.libraryLinks` unless the requested edit changes them. |
 | `status` | `{}` → snapshot containing `authoring`, which is null before a working runtime exists. |
 | `capture` | `{}` → PNG image block plus JSON metadata. Captures the current completed frame; it does not advance paused playback. |
 | `playback` | `{ instanceId, expectedGeneration, action: 'play' | 'pause' | 'reset' }` → `{ applied, status }`. Reset preserves playing/paused state. |
@@ -83,6 +83,6 @@ Current tools do not expose scene Save/Open, export, resolution changes or audio
 
 ## Editor and scene commands
 
-In the Source editor, Ctrl/Cmd+S builds and applies the complete edited source bundle to preview; it does not save a single file or the scene to disk. Ctrl/Cmd+Shift+S saves the scene. File Save and Save as remain explicit scene commands. Ctrl/Cmd+F opens editor search; shortcut hints are not permanently displayed. MCP `build` still performs the same complete-source replacement and is the supported agent edit path.
+In the Source editor, Ctrl/Cmd+S builds and applies the complete edited source bundle to preview; it does not save a single file or the scene to disk. Successful Build and scene Open operations start playback. A Pause issued after either operation begins takes precedence before candidate promotion. Ctrl/Cmd+Shift+S saves the scene. File Save and Save as remain explicit scene commands. Ctrl/Cmd+F opens editor search; shortcut hints are not permanently displayed. MCP `build` still performs the same complete-source replacement and is the supported agent edit path.
 
 The Source panel's Import images, selected-image Replace and Remove commands change the draft; Build explicitly applies it. PNG/JPEG/BMP source assets also work in an offline Resolume export when the running app reports `assetExport: true`. File Export packages the scene's original image bytes and required runtime for offline playback. This is a UI workflow, not a new MCP export tool; creating a package does not install/register it or prove its behavior in Resolume. See [image assets](image-assets.md) before editing asset records.

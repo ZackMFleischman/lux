@@ -34,6 +34,8 @@ try {
   await menu(); await page.getByRole('textbox', { name: 'Layout name', exact: true }).fill('Automated Dock QA');
   await page.getByRole('button', { name: 'Reset desktop layout', exact: true }).click(); await done();
   await page.getByRole('button', { name: 'Build', exact: true }).click();
+  await page.waitForFunction(() => document.querySelector('.playback-state')?.textContent === 'playing');
+  await page.getByRole('button', { name: 'Pause', exact: true }).click();
   await page.waitForFunction(() => document.querySelector('.playback-state')?.textContent === 'paused');
   await page.locator('.cm-editor').waitFor();
   await page.evaluate(() => { window.__dockCanvas = document.querySelector('.preview-surface canvas'); window.__dockEditor = document.querySelector('.cm-editor'); });
