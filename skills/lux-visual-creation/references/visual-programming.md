@@ -8,6 +8,12 @@ A source bundle contains `sdkVersion`, an `entry` such as `visual.ts`, and a `fi
 
 The entry must directly `export default defineVisual({...})`, importing `defineVisual` from `@lux/visual-sdk`. SDK 0.2 requires `{ controls, create }`. `controls` is a static literal map of 0–32 numeric descriptors: `{ type: 'number', label, default, min, max, step?, unit?, description? }`. Use camelCase IDs. `description` is optional plain text, up to 512 characters, that Studio shows as help on hover or keyboard focus. No computed metadata, spreads, functions or imported declarations. `frame.controls` is typed from those IDs. Empty `{}` means no controls; do not invent Intensity. The source bundle must set `sdkVersion: '0.2.0'`. Legacy 0.1 sources retain `{ create }` and their compatibility intensity field. Discovery's contract and parameter types describe exact bounds.
 
+## Readable authored TypeScript
+
+Source is part of the creative workflow. Write TypeScript for a person reading and editing it in Studio. Use one import member per line when an import is long. Put metadata, control declarations, lifecycle methods, and object literals on several indented lines. Give intermediate shader expressions and resources their own named declarations. Put one statement on each line, especially in `update`, `reset`, and `dispose`.
+
+Keep a short object or method on one line only when it remains easy to scan. Preserve existing comments, file layout, controls, and behavior when reformatting a user visual. Do not minify, compress, or replace a complete source bundle merely to alter formatting. A formatter may be used if it is already available, but Lux does not require a formatter dependency or a formatting build step.
+
 ## Linear image composition
 
 SDK 0.4 uses `defineComponent` in leaf modules and `defineComposition` in the entry. Component metadata statically declares image ports, numeric controls, descriptions, and lifecycle. A component instance implements `update(frame)`, `evaluate(inputs, evaluation)`, `reset(seed)`, and `dispose()`. Its evaluation returns `{ image: await evaluation.render(scene, camera) }`; an effect reads `inputs.image.texture` and renders its own output. Lux owns intermediate render targets and releases them only after downstream GPU work settles.

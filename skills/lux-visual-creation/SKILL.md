@@ -19,6 +19,8 @@ Call `discover`, then `read`. Discovery supplies the adapter checkout's SDK cont
 
 Read [visual programming](references/visual-programming.md) before the first implementation. For procedural displacement, read [noise and meaningful parameters](references/noise-and-parameters.md); its [sphere template](assets/noise-sphere.ts) illustrates a CPU-compiled starting point, not a visually approved finished design.
 
+Keep generated and revised TypeScript readable in Studio Source. Use normal indentation, spacing, multiline metadata and controls, and one statement per line in lifecycle methods. Preserve user comments and existing behavior when formatting. A formatter is optional; do not add a formatter dependency or build step for this purpose.
+
 For PNG, JPEG or BMP images, read [image assets](references/image-assets.md). Check the running app's `capabilities.imageFormats` and `assetExport`, not just the adapter's advertised formats. Use `context.images` for admitted decoded pixels; preserve original asset bytes in complete-source edits. The [image plane example](assets/image-plane.ts) shows texture setup and disposal.
 
 - Preserve existing files and assets unless the requested change removes them. Build replaces the **entire bundle**, not one file or a patch. Preserve `sourceVersion` and `assets` on v2 documents.
