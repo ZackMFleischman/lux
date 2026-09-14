@@ -73,7 +73,14 @@ export function AuthoringApp() {
   useEffect(() => window.luxAuthoring.onAgentCommand(async command => {
     if (lookOperation.current && !['read', 'status'].includes(command.method)) throw Error('Wait for the look operation to finish');
     if (confirmation.isPending() && !['read', 'status', 'capture','library.list','library.read'].includes(command.method)) throw Error('Studio is waiting for a user confirmation');
-    if (['parameters', 'playback', 'restart'].includes(command.method)) return dispatchRuntimeCommand(client, command.method, command.params);
+    if (['parameters', 'playback', 'restart'].includes(command.method)) {
+      const write = dispatchRuntimeCommand(client, command.method, command.params);
+      if (command.method === 'parameters') {
+        pendingControlWrites.current.add(write);
+        void write.then(() => pendingControlWrites.current.delete(write), () => pendingControlWrites.current.delete(write));
+      }
+      return write;
+    }
     if(command.method==='library.list')return window.luxLibrary.list();
     if(command.method==='library.read')return window.luxLibrary.read(command.params.id);
     if(command.method==='library.create'||command.method==='library.update'){
