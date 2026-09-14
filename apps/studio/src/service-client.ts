@@ -31,6 +31,13 @@ export function getRuntimeControlState(runtime:RuntimeView):RuntimeControlState 
       ...(runtime.effectiveNodeControls?{effectiveNodeControls:runtime.effectiveNodeControls}:{}),
       controlAnimations:runtime.controlAnimations??Object.freeze([]),controlAnimationIssues:runtime.controlAnimationIssues??Object.freeze([]),animationSequence:runtime.animationSequence??0}:{})});
 }
+/** Saved visual edits exclude playback and sampled animation values. */
+export function runtimeEditSignature(runtime: RuntimeView | null): string | null {
+  if (!runtime) return null;
+  const state = getRuntimeControlState(runtime);
+  return JSON.stringify({controls: state.controls, nodes: state.nodeControls?.nodes,
+    animations: state.controlAnimations ?? [], output: runtime.output});
+}
 export type StudioSnapshot = Readonly<{
   connection: 'disconnected' | 'connecting' | 'connected'; message: string | null;
   receivedAtMs: number | null; authoring: RuntimeView | null;

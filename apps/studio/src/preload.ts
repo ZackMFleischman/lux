@@ -2,6 +2,13 @@ import { contextBridge, ipcRenderer } from 'electron';
 import type { StudioWindowClient, WindowState } from './window-client.ts';
 import type { StudioExportClient } from './export-client.ts';
 import type { ComponentLibraryClient } from './library-client.ts';
+import type { LookClient } from './look-client.ts';
+const lookApi: LookClient = {
+  list: () => ipcRenderer.invoke('studio:looks', 'list'),
+  read: id => ipcRenderer.invoke('studio:looks', 'read', id),
+  save: input => ipcRenderer.invoke('studio:looks', 'save', input),
+};
+contextBridge.exposeInMainWorld('luxLooks', Object.freeze(lookApi));
 
 const api: StudioWindowClient = {
   getState: () => ipcRenderer.invoke('studio:window', 'state'),

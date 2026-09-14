@@ -3,7 +3,8 @@ import { getRuntimeControlState } from './service-client.ts';
 import type { PresentationPort } from './presentation.ts';
 import type { SourceBundle, OutputSettings } from '../../../packages/runtime-contracts/src/index.ts';
 import { studioOperationSchema } from './runtime-operations.ts';
-import { DEFAULT_OUTPUT } from '../../../packages/runtime-contracts/src/index.ts';
+import { DEFAULT_OUTPUT, outputSettingsSchema } from '../../../packages/runtime-contracts/src/index.ts';
+import { createSceneDocument } from '../../../packages/core/src/scene-document.ts';
 import { SourceCompileError } from './source/diagnostics.ts';
 import type { LinkedEnvelope } from '../../build-worker/src/artifact-identity.mjs';
 import { normalizeControlSchema, validateControlSnapshot, validateControlPatch } from '../../../packages/runtime-contracts/src/parameters.mjs';
@@ -55,11 +56,28 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   getSnapshot = () => this.snapshot;
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
   private publish(patch: Partial<StudioSnapshot>) { this.snapshot = { ...this.snapshot, ...patch, receivedAtMs: Date.now() }; for (const listener of this.listeners) listener(); }
-  async submit(source: SourceBundle, options:{savedControls?:SavedControlSnapshot;savedControlAnimations?:readonly ControlAnimationBinding[]}={}): Promise<void> {
+  acceptedDocument() {
+    const runtime = this.snapshot.authoring;
+    if (this.busy || !this.source || !runtime || runtime.playback === 'failed' || this.pending.size) {
+      throw Error('Wait for a working preview before saving a look.');
+    }
+    if (runtime.output.width > 1920 || runtime.output.height > 1080) {
+      throw Error('Set Preview to 1920 × 1080 or smaller before saving a look.');
+    }
+    const state = getRuntimeControlState(runtime);
+    const controls = state.sdkVersion === '0.4.0'
+      ? {sourceHash: runtime.revisionId, nodes: state.nodeControls!.nodes}
+      : state.sdkVersion === '0.1.0' ? {intensity: runtime.intensity ?? 0.5}
+      : {sourceHash: runtime.revisionId, schema: state.controlSchema, schemaHash: state.controlSchemaHash, values: state.controls};
+    return createSceneDocument(structuredClone(this.source), {...DEFAULT_OUTPUT, ...runtime.output}, controls, [], state.controlAnimations ?? []);
+  }
+  async submit(source: SourceBundle, options:{savedControls?:SavedControlSnapshot;savedControlAnimations?:readonly ControlAnimationBinding[];output?:OutputSettings}={}): Promise<void> {
     if(source.sdkVersion!=='0.1.0'&&source.sdkVersion!=='0.2.0'&&source.sdkVersion!=='0.4.0')throw Error('Unsupported Studio SDK');
     const supportedSdkVersion=source.sdkVersion;
     if(source.sdkVersion==='0.2.0'&&!this.codeDeclaredParameters)throw Error('Code-declared parameters are not enabled in this Studio UI yet');
     if (this.busy) throw Error('A visual build is already running');
+    const requestedOutput = options.output ? outputSettingsSchema.parse(options.output) : this.previewOutput;
+    if (options.output && (options.output.fps !== 60 || options.output.seed !== 0)) throw Error('Looks currently support 60 fps and seed 0.');
     // A replacement must not snapshot playback before an admitted command settles.
     if ([...this.pending.values()].some(wait => wait.runtime === this.running && wait.playback)) {
       throw Error('Wait for the playback command to complete, then build again.');
@@ -103,7 +121,8 @@ export class StandaloneClient implements StudioClient, PresentationPort {
         migration=initial.changes;state={sdkVersion:supportedSdkVersion,controlSchema:schema,controlSchemaHash:schemaHash,controls:initial.values,controlSequence:0};
       }
       this.publish({ jobs: [{ jobId, state: 'initializing', summary: 'Preparing preview…' }] });
-      await this.start(linked, result.sourceHash,state,migration, {lastFaultAt:null}, playbackIntent.playing, this.previewOutput,playbackIntent);
+      await this.start(linked, result.sourceHash,state,migration, {lastFaultAt:null}, playbackIntent.playing, requestedOutput,playbackIntent);
+      this.previewOutput = requestedOutput;
       this.source = submittedSource;
       this.accepted = { linked, revisionId: result.sourceHash,state,output:this.previewOutput };
       this.publish({ message:null,jobs: [{ jobId, state: 'succeeded', summary: 'Visual is ready in Lux.' }] });

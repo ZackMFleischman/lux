@@ -72,3 +72,12 @@ test('standalone guarded MCP commands wait for applied state and reject invalid/
     if (oldDocument) Object.defineProperty(globalThis, 'document', oldDocument); else Reflect.deleteProperty(globalThis, 'document');
   }
 });
+
+test('saved edit signature tracks output and base controls but ignores playback and animation samples',async()=>{
+ const {runtimeEditSignature}=await import('../../apps/studio/src/service-client.ts');
+ const base:any={intensity:.5,output:{width:1280,height:720},playback:'paused',frameId:'1',clockEpoch:0};
+ const prior=runtimeEditSignature(base);
+ assert.equal(runtimeEditSignature({...base,playback:'playing',frameId:'50',clockEpoch:3,timeSeconds:2,controlSequence:4}),prior);
+ assert.notEqual(runtimeEditSignature({...base,output:{width:1920,height:1080}}),prior);
+ assert.notEqual(runtimeEditSignature({...base,intensity:.7}),prior);
+});
