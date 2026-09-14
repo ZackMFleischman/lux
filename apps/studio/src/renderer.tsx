@@ -74,6 +74,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const [clock, setClock] = useState(() => nowMs ?? Date.now());
   const runtime = snapshot.authoring;
   const status = studioStatus(snapshot);
+  useEffect(() => { setError(null); }, [runtime?.instanceId, runtime?.generation]);
   const [graphSelection,setGraphSelection]=useState<NodePath|null>(null);
   const selectedNodePath=graphSelection??undefined;
   const selectedNode=selectedNodePath?compositionOccurrence(runtime,selectedNodePath):undefined;

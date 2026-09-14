@@ -205,6 +205,8 @@ test('RTL: failed runtime command shows actionable error without a successful-st
   await waitFor(() => assert.match(screen.getByRole('alert').textContent ?? '', /Runtime unavailable/));
   assert.equal(screen.queryByText('Request accepted. Awaiting applied runtime status.'), null);
   assert.ok(screen.getByText('revision-2'));
+  await act(async () => fixture.publish({ generation: 3, revisionId: 'revision-3', fault: null }));
+  assert.ok(!screen.queryByRole('alert'), 'A new working runtime clears the previous command error');
 });
 
 test('RTL: pending playback preserves button styling and ignores duplicate transport commands', async () => {
