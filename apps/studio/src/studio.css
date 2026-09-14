@@ -108,6 +108,9 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 .graph-breadcrumb button { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .graph-viewport { position: relative; flex: 1; min-height: 180px; overflow: hidden; touch-action: none; background-color: #15181e; background-image: radial-gradient(#343943 1px, transparent 1px); background-size: 20px 20px; }
 .graph-content { position: absolute; transform-origin: top left; }
+.graph-viewport { cursor: grab; }
+.graph-viewport.graph-panning, .graph-panning * { cursor: grabbing !important; user-select: none; }
+.graph-toolbar button[aria-pressed="true"] { background: #b4a4e91f; color: #eee9ff; }
 .graph-wires { position: absolute; overflow: visible; pointer-events: none; }
 .graph-wires path { fill: none; stroke: #7e91ae; stroke-width: 2; }
 .graph-node { position: absolute; top: 0; width: 220px; height: 142px; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; text-align: left; padding: 14px; border: 1px solid #596271; border-radius: 8px; background: #242a34; color: #f0f2f5; cursor: pointer; font: inherit; }
