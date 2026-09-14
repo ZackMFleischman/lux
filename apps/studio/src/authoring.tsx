@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, useRef, useSyncExternalStore } from 'reac
 import { Button, ThemeProvider } from '@mui/material';
 import { StudioApp } from './renderer.tsx';
 import { studioTheme } from './theme.ts';
-import { getRuntimeControlState } from './service-client.ts';
+import { getRuntimeControlState, runtimeEditSignature } from './service-client.ts';
 import { StandaloneClient } from './standalone-client.ts';
 import { DEFAULT_OUTPUT } from '../../../packages/runtime-contracts/src/index.ts';
 import { createSceneDocument } from '../../../packages/core/src/scene-document.ts';
@@ -102,7 +102,7 @@ export function AuthoringApp() {
   }), [confirmation.confirm]);
   useEffect(() => { void window.luxAuthoring.dirty(dirty); }, [dirty]);
   useEffect(() => {
-    const signature = () => { const runtime = client.getSnapshot().authoring; return runtime ? JSON.stringify(getRuntimeControlState(runtime).controls) : null; };
+    const signature = () => runtimeEditSignature(client.getSnapshot().authoring);
     let value = signature();
     return client.subscribe(() => { const next = signature(); if (value !== null && next !== null && next !== value) session.controlsChanged(); value = next; });
   }, [session]);
