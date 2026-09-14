@@ -13,7 +13,18 @@ export async function prepareWorkerCompositionState(message,admission){
  if(admission?.kind!=='composition'||message.sdkVersion!=='0.4.0'||admission.sdkVersion!=='0.4.0'||admission.executionModel!=='image-chain-v1')bad();const profile=normalizeImageCompositionProfile(admission.composition),schema=normalizeControlSchema(message.controlSchema);if(canonicalControlSchemaJson(schema)!==canonicalControlSchemaJson(profile.publicControls)||message.controlSchemaHash!==admission.controlSchemaHash)bad();
  const state=createCompositionControlState(profile,message.nodeControls);state.apply(validateControlSnapshot(schema,message.controls));let sequence=0;
  let animations=normalizeControlAnimations(message.controlAnimations,profile),animationSequence=0;const animated=createControlAnimationEvaluator(profile,state,animations);
- function checkDefinition(module){const definition=plain(own(module,'default'),['kind','sdkVersion','definitions','nodes','edges','output','expose']);if(own(definition,'kind')!=='composition'||own(definition,'sdkVersion')!=='0.4.0')bad();for(const field of ['nodes','edges','output','expose'])if(stringify(data(own(definition,field)))!==stringify(profile.declaration[field]))bad();const actual=plain(own(definition,'definitions'),Object.keys(profile.definitionNames)),byHash={};for(const [name,definitionHash] of Object.entries(profile.definitionNames)){const component=plain(own(actual,name),['kind','sdkVersion','metadata','create']);if(own(component,'kind')!=='component'||own(component,'sdkVersion')!=='0.4.0'||typeof own(component,'create')!=='function'||canonicalComponentMetadataJson(data(own(component,'metadata')))!==canonicalComponentMetadataJson(profile.definitions[definitionHash].metadata))bad();byHash[definitionHash]=component;}return freeze(byHash);}
+ function checkDefinition(module){
+  const byHash={},modules=profile.moduleDeclarations??{[profile.graph.rootDefinitionHash]:{definitionNames:profile.definitionNames,declaration:profile.declaration}};
+  function visit(value,definitionHash){
+   const admitted=profile.definitions[definitionHash];if(!admitted)bad();
+   if(admitted.kind==='code'){
+    const component=plain(value,['kind','sdkVersion','metadata','create']);if(own(component,'kind')!=='component'||own(component,'sdkVersion')!=='0.4.0'||typeof own(component,'create')!=='function'||canonicalComponentMetadataJson(data(own(component,'metadata')))!==canonicalComponentMetadataJson(admitted.metadata))bad();
+    if(byHash[definitionHash]&&byHash[definitionHash]!==component)bad();byHash[definitionHash]=component;return;
+   }
+   const sealed=modules[definitionHash];if(!sealed)bad();const declaration=sealed.declaration,literalFields=Object.keys(declaration).filter(key=>key!=='definitions'),definition=plain(value,['kind','sdkVersion','definitions',...literalFields]);if(own(definition,'kind')!=='composition'||own(definition,'sdkVersion')!=='0.4.0')bad();for(const field of literalFields)if(stringify(data(own(definition,field)))!==stringify(declaration[field]))bad();const actual=plain(own(definition,'definitions'),Object.keys(sealed.definitionNames));for(const [name,childHash] of Object.entries(sealed.definitionNames))visit(own(actual,name),childHash);
+  }
+  visit(own(module,'default'),profile.graph.rootDefinitionHash);return freeze(byHash);
+ }
  return freeze({checkDefinition,values:animated.values,nodeValues:animated.nodeValues,
   apply(input,nextSequence,hash){if(!safe(nextSequence)||nextSequence<=sequence||hash!==admission.controlSchemaHash)bad();state.apply(validateControlSnapshot(schema,input));sequence=nextSequence;},
   applyNode(path,input,nextSequence,hash){if(!safe(nextSequence)||nextSequence<=sequence)bad();state.applyNode(path,input,hash);sequence=nextSequence;},

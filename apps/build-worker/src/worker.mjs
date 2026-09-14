@@ -131,6 +131,13 @@ async function main() {
     ...((component||composition) ? {'compiler/component-declarations.mjs':join(root,'apps/build-worker/src/component-declarations.mjs')} : {}),
     ...(composition ? Object.fromEntries(['composition-profile.mjs','composition-profile.d.mts'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
     ...(composition ? {'compiler/composition-declarations.mjs':join(root,'apps/build-worker/src/composition-declarations.mjs')} : {}),
+    ...(composition ? {
+      'runtime/nested-validate.ts':join(root,'packages/runtime/src/graph/nested-validate.ts'),
+      'runtime/nested-plan.ts':join(root,'packages/runtime/src/graph/nested-plan.ts'),
+      'contracts/nested-graph.ts':join(root,'packages/runtime-contracts/src/nested-graph.ts'),
+      'contracts/graph.ts':join(root,'packages/runtime-contracts/src/graph.ts'),
+      'contracts/identities.ts':join(root,'packages/runtime-contracts/src/identities.ts'),
+    } : {}),
     ...await assetDependencyPaths(root),
     'compiler/worker.mjs': fileURLToPath(import.meta.url),
     'compiler/source-policy.mjs': join(root, 'apps/build-worker/src/source-policy.mjs'),

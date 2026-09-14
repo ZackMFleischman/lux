@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {parse} from '@babel/parser';
 import {createHash} from 'node:crypto';
 import {extractCompositionDeclaration} from '../../apps/build-worker/src/composition-declarations.mjs';
-import {compositionSourceBundle,ballId,kaleidoscopeAId,kaleidoscopeBId} from './composition-fixture.mjs';
+import {compositionSourceBundle,nestedCompositionSourceBundle,ballId,kaleidoscopeAId,kaleidoscopeBId,compositeAId,compositeBId,wrapperNodeId,wrappedEffectId,directEffectId} from './composition-fixture.mjs';
 const hash=value=>createHash('sha256').update(value).digest('hex');
 test('static composition extraction derives canonical controls and distinct same-named leaf bindings without executing source',()=>{
  const source=compositionSourceBundle(),asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));
@@ -18,4 +18,33 @@ test('composition extraction rejects duplicate exposure and a non-linear graph',
   const files={...source.files,'composition.ts':text},asts=Object.fromEntries(Object.entries(files).map(([path,value])=>[path,parse(value,{sourceType:'module',plugins:['typescript']})]));
   assert.throws(()=>extractCompositionDeclaration({entry:source.entry,files,asts,hash}),/duplicate|linear|writer|duplicate/i);
  }
+});
+test('static extraction recursively admits reusable compositions and derives canonical leaf paths',()=>{
+ const source=nestedCompositionSourceBundle(),asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));
+ const profile=extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash});
+ assert.equal(profile.definitions[profile.graph.rootDefinitionHash].metadata.label,'Nested demo');
+ assert.deepEqual(profile.nodes.map(row=>row.nodePath),[
+  [ballId],
+  [compositeAId,wrapperNodeId,wrappedEffectId],
+  [compositeAId,directEffectId],
+  [compositeBId,wrapperNodeId,wrappedEffectId],
+  [compositeBId,directEffectId],
+ ]);
+ assert.deepEqual(profile.publicControlBindings.segmentsA,[{nodePath:[compositeAId,wrapperNodeId,wrappedEffectId],controlId:'segments',active:true}]);
+ assert.deepEqual(profile.publicControlBindings.segmentsB,[{nodePath:[compositeBId,directEffectId],controlId:'segments',active:true}]);
+ const graphDefinitions=Object.values(profile.definitions).filter(row=>row.kind==='graph');
+ assert.equal(graphDefinitions.length,3);
+ assert.deepEqual(graphDefinitions.map(row=>row.metadata.inputs.image?.label??null).sort(),['Image','Image',null]);
+});
+test('recursive composition import cycles reject before authored code can execute',()=>{
+ const source=nestedCompositionSourceBundle();
+ source.files['wrapper.ts']=`import {defineComposition} from '@lux/visual-sdk'; import composite from './composite.ts'; export default defineComposition({definitions:{composite},nodes:[{id:'${wrappedEffectId}',definition:'composite'}],edges:[],input:{nodeId:'${wrappedEffectId}',portId:'image'},output:{nodeId:'${wrappedEffectId}',portId:'image'},expose:[]});`;
+ const asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));
+ assert.throws(()=>extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash}),/cycle|recursive/i);
+});
+test('recursive extraction rejects flattened chains above eight leaves and graph depth above eight',()=>{
+ const ids=Array.from({length:9},(_,index)=>`${String(index+1).padStart(8,'0')}-0000-4000-8000-${String(index+1).padStart(12,'0')}`),edgeIds=Array.from({length:8},(_,index)=>`${(index+10).toString(16).padStart(8,'0')}-0000-4000-8000-${String(index+10).padStart(12,'0')}`),base=compositionSourceBundle();
+ const overlong={sdkVersion:'0.4.0',entry:'composition.ts',files:{...base.files,'composition.ts':`import {defineComposition} from '@lux/visual-sdk';import ball from './ball.ts';import kaleidoscope from './kaleidoscope.ts';export default defineComposition({definitions:{ball,kaleidoscope},nodes:[${ids.map((id,index)=>`{id:'${id}',definition:'${index?'kaleidoscope':'ball'}'}`).join(',')}],edges:[${edgeIds.map((id,index)=>`{id:'${id}',from:{nodeId:'${ids[index]}',portId:'image'},to:{nodeId:'${ids[index+1]}',portId:'image'},delay:'none'}`).join(',')}],output:{nodeId:'${ids.at(-1)}',portId:'image'},expose:[]});`}};
+ const deepFiles={'ball.ts':base.files['ball.ts']};for(let index=8;index>=0;index--){const child=index===8?'ball':`level${index+1}`,definition=index===8?'ball':'nested';deepFiles[`level${index}.ts`]=`import {defineComposition} from '@lux/visual-sdk';import ${definition} from './${child}.ts';export default defineComposition({definitions:{${definition}},nodes:[{id:'${ids[index]}',definition:'${definition}'}],edges:[],output:{nodeId:'${ids[index]}',portId:'image'},expose:[]});`;}
+ for(const source of [overlong,{sdkVersion:'0.4.0',entry:'level0.ts',files:deepFiles}]){const asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));assert.throws(()=>extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash}),/1–8|level budget/i);}
 });
