@@ -106,10 +106,11 @@ export function GraphPanel({runtime,selected,onSelect}:{runtime:RuntimeView|null
             const to = nodes.findIndex(node => node.id === edge.to.nodeId);
             const highlighted = selected === nodeKey(nodes[from]!.nodePath) || selected === nodeKey(nodes[to]!.nodePath);
             const midpoint = (from * 250 + 220 + to * 250) / 2;
+            const direction = Math.sign(to * 250 - (from * 250 + 220));
             return <g key={edge.id} className={`graph-connection${highlighted ? ' graph-connection-selected' : ''}`}>
               <title>{nodes[from]?.label} {edge.from.portId} to {nodes[to]?.label} {edge.to.portId}</title>
               <path d={`M ${from * 250 + 220} 82 C ${from * 250 + 235} 82,${to * 250 - 15} 82,${to * 250} 82`} />
-              <polygon points={`${midpoint - 3},78 ${midpoint + 3},82 ${midpoint - 3},86`} />
+              <polygon points={`${midpoint - direction * 3},78 ${midpoint + direction * 3},82 ${midpoint - direction * 3},86`} />
             </g>;
           })}
         </svg>

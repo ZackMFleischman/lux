@@ -415,3 +415,29 @@ test('Graph wheel zoom anchors at the pointer and background gestures keep selec
   await click('Scene controls');
   assert.deepEqual(selections, [null, null]);
 });
+
+test('Graph connections point from output to input with reversed node declarations', async () => {
+  const { GraphPanel } = await import('../../apps/studio/src/GraphPanel.tsx');
+  const { parse } = await import('@babel/parser');
+  const { createHash } = await import('node:crypto');
+  const { extractCompositionDeclaration } = await import('../../apps/build-worker/src/composition-declarations.mjs');
+  const { nestedCompositionSourceBundle } = await import('../compiler/composition-fixture.mjs');
+  const source = nestedCompositionSourceBundle();
+  const asts = Object.fromEntries(Object.entries(source.files).map(([path, text]) => [path, parse(text as string, { sourceType: 'module', plugins: ['typescript'] })]));
+  const composition = structuredClone(extractCompositionDeclaration({ entry: source.entry, files: source.files, asts, hash: (text: string) => createHash('sha256').update(text).digest('hex') }));
+  assert.ok(composition);
+  const definition = composition.definitions[composition.graph.rootDefinitionHash];
+  assert.ok(definition?.kind === 'graph');
+  const body = definition.body;
+  (body.nodes as Array<typeof body.nodes[number]>).reverse();
+  render(<GraphPanel runtime={{ composition } as any} selected={null} onSelect={() => {}} />);
+  const wires = [...document.querySelectorAll('.graph-connection')];
+  assert.ok(wires.length > 0);
+  for (const [index, wire] of wires.entries()) {
+    const edge = body.edges[index]!;
+    const from = body.nodes.findIndex((node: any) => node.id === edge.from.nodeId);
+    const to = body.nodes.findIndex((node: any) => node.id === edge.to.nodeId);
+    const points = wire.querySelector('polygon')!.getAttribute('points')!.split(' ').map(point => point.split(',').map(Number));
+    assert.equal(Math.sign(points[1]![0]! - points[0]![0]!), Math.sign(to * 250 - (from * 250 + 220)));
+  }
+});
