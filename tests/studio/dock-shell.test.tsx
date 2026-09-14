@@ -1,4 +1,4 @@
-import test, { after } from 'node:test';
+import test, { after, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 const dom = new JSDOM('<!doctype html><meta name="style-nonce" content="abcdefghijklmnopqrstuvwx"><body></body>', { url: 'http://localhost', pretendToBeVisual: true });
@@ -16,7 +16,58 @@ const { createSourceWorkspace } = await import('../../apps/studio/src/source/wor
 const { EditorView } = await import('@codemirror/view');
 const { undo } = await import('@codemirror/commands');
 after(() => { cleanup(); dom.window.close(); });
-async function click(name: string) { await act(async () => { fireEvent.click(screen.getByRole('button', { name })); }); }
+afterEach(() => cleanup());
+let selectedPanel = 'source';
+async function pressButton(name: string) {
+  await act(async () => { const button = screen.getByRole('button', { name }); button.focus(); fireEvent.click(button); });
+}
+async function openLayouts() {
+  if (screen.queryByRole('dialog', { name: 'Workspace layouts' })) return;
+  await pressButton('View');
+  await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: 'Layouts…' })); });
+}
+async function closeLayouts() {
+  if (!document.querySelector('[role="dialog"]')) return;
+  if (screen.queryByRole('dialog', { name: 'Workspace layouts' })) await pressButton('Done');
+  // MUI hides the dialog from accessibility before its exit transition removes
+  // the modal and restores access to the underlying workspace.
+  await waitFor(() => {
+    assert.ok(!document.querySelector('[role="dialog"]'));
+    assert.ok(screen.queryByRole('button', { name: 'View' }));
+  });
+}
+async function click(name: string) {
+  if (name.startsWith('Open ')) {
+    await closeLayouts();
+    if (!screen.queryByRole('menu', { name: 'View' })) await pressButton('View');
+    await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: name.slice(5) })); });
+    await waitFor(() => {
+      assert.ok(!document.querySelector('[role="menu"]'));
+      assert.ok(screen.queryByRole('button', { name: 'View' }));
+    });
+    return;
+  }
+  if (name === 'Close selected panel') {
+    await closeLayouts();
+    const titles: Record<string, string> = { source: 'Source', preview: 'Preview', library: 'Library', inspector: 'Inspector', jobs: 'Jobs', graph: 'Graph' };
+    const tab = [...document.querySelectorAll('.dv-tab')].find(node => node.textContent?.trim() === titles[selectedPanel]);
+    assert.ok(tab, `Expected ${selectedPanel} tab`);
+    const close = tab.querySelector('.dv-default-tab-action');
+    assert.ok(close);
+    await act(async () => { fireEvent.click(close); });
+    return;
+  }
+  if (name === 'Move to tab group') {
+    await closeLayouts();
+    await click('Open Preview');
+    await pressButton('Add pane to Preview group');
+    await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: /^(Move Source here|Focus Source)$/ })); });
+    await waitFor(() => assert.ok(!document.querySelector('[role="menu"]')));
+    return;
+  }
+  if (/^(Reset .* layout|Save layout|Restore layout)$/.test(name)) await openLayouts();
+  await pressButton(name);
+}
 test('real dock panes preserve canvas, editor undo and runtime subscriptions through close, tab, reset, restore and fullscreen', async () => {
   const runtime = { instanceId: '44ff55f0-8ea6-4fbf-89d5-665923f65cad', generation: 2, revisionId: 'revision-2', sceneName: 'Fixture',
     authority: 'studio' as const, playback: 'paused' as const, clockEpoch: 1, frameId: '10', intensity: 0.5, output: { width: 1920, height: 1080 }, fault: null };
@@ -37,7 +88,7 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   const editorNode = document.querySelector('.cm-editor') as HTMLElement;
   const editor = EditorView.findFromDOM(editorNode)!;
   await act(async () => { editor.dispatch({ changes: { from: 0, insert: '// draft\n' } }); });
-  await act(async () => { fireEvent.click(screen.getByText('View')); });
+
   await click('Close selected panel');
   assert.equal(document.contains(editorNode), false);
   await click('Open Source');
@@ -45,13 +96,13 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   await act(async () => { assert.equal(undo(editor), true); });
   assert.equal(workspace.getSnapshot().source.files['main.ts'], 'export const value = 1');
   await click('Move to tab group');
-  fireEvent.change(screen.getByLabelText('Move panel'), { target: { value: 'preview' } });
+  selectedPanel = 'preview';
   await click('Close selected panel');
   assert.equal(document.contains(canvas), false);
   await click('Open Preview');
   assert.ok(document.contains(canvas));
   assert.equal(attaches, 1);
-  fireEvent.change(screen.getByLabelText('Move panel'), { target: { value: 'source' } });
+  selectedPanel = 'source';
   // Preserve a named non-default arrangement while resetting a different entry.
   // Resetting the saved name would delete it and exercise only missing fallback.
   await click('Reset desktop layout');
@@ -65,7 +116,7 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   assert.equal(groupFor('Source'), groupFor('Preview'));
   assert.notEqual(groupFor('Library'), groupFor('Preview'));
   await act(async () => { editor.dispatch({ changes: { from: 0, insert: '// saved layout draft\n' } }); });
-  fireEvent.change(screen.getByLabelText('Layout name'), { target: { value: 'Authoring tabs' } });
+  await openLayouts(); fireEvent.change(screen.getByLabelText('Layout name'), { target: { value: 'Authoring tabs' } });
   await click('Save layout');
   const saved = window.localStorage.getItem('lux.personal-layout.v1.Authoring%20tabs');
   assert.ok(saved);
@@ -74,7 +125,7 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   assert.equal(document.querySelectorAll('.studio-dock-grid .dv-groupview').length, 4);
   assert.notEqual(groupFor('Source'), groupFor('Preview'));
   assert.equal(window.localStorage.getItem('lux.personal-layout.v1.Authoring%20tabs'), saved);
-  fireEvent.change(screen.getByLabelText('Layout name'), { target: { value: 'Authoring tabs' } });
+  await openLayouts(); fireEvent.change(screen.getByLabelText('Layout name'), { target: { value: 'Authoring tabs' } });
   await click('Restore layout');
   assert.ok(screen.getByText('Restored layout: Authoring tabs'));
   assert.equal(document.querySelectorAll('.studio-dock-grid .dv-groupview').length, 4);
@@ -89,7 +140,7 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   await click('Reset laptop layout');
   await click('Open Preview');
   assert.equal(canvas.closest('.preview-surface'), document.querySelector('.preview-surface'));
-  await click('Fullscreen');
+  await closeLayouts(); await click('Fullscreen');
   assert.equal(canvas.closest('.studio-expanded-pane')?.hasAttribute('hidden'), false);
   assert.equal(screen.queryByRole('button', { name: 'Play' }), null);
   await act(async () => { fireEvent.keyDown(window, { key: 'Escape' }); });
@@ -110,7 +161,7 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   assert.equal(document.querySelector('.cm-editor'), editorNode);
   assert.equal(attaches, 1); assert.equal(detaches, 0); assert.equal(subscriptions, 1);
   for (const kind of ['preview', 'source', 'library', 'inspector', 'jobs']) {
-    fireEvent.change(screen.getByLabelText('Move panel'), { target: { value: kind } });
+    selectedPanel = kind;
     await click('Close selected panel');
   }
   assert.equal(document.querySelectorAll('.studio-dock-grid .dv-groupview').length, 0);
@@ -136,8 +187,7 @@ test('group menu targets its owning group, cancels with focus and rejects a vani
   assert.equal(document.activeElement, focus);
   fireEvent.keyDown(focus, { key: 'ArrowDown' });
   assert.equal(document.activeElement, screen.getByRole('menuitem', { name: 'Move Source here' }));
-  fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
-  await waitFor(() => assert.equal(document.activeElement, trigger));
+  fireEvent.keyDown(document.activeElement!, { key: 'Escape' }); await waitFor(() => assert.equal(document.activeElement, trigger));
   await act(async () => { fireEvent.click(trigger); });
   await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: 'Move Source here' })); });
   await waitFor(() => assert.ok(document.activeElement?.closest('.dv-groupview')));
@@ -176,11 +226,11 @@ test('Graph selects an instance, opens Inspector, writes only that node and pres
   }};
   window.localStorage.clear();
   const ui=render(<StudioApp client={client} nowMs={1000} sourcePanel={<div>Source fixture</div>}/>);
-  await act(async()=>{fireEvent.click(screen.getByText('View'));});await click('Open Graph');
+  await click('Open Graph');
   const nodes=[...document.querySelectorAll<HTMLButtonElement>('.graph-node')];assert.equal(nodes.length,3);
   assert.equal(document.querySelectorAll('.graph-wires path').length,2);
   assert.equal(document.querySelectorAll('.graph-final-output').length,1);
-  fireEvent.change(screen.getByLabelText('Move panel'),{target:{value:'inspector'}});await click('Close selected panel');
+  selectedPanel = 'inspector';await click('Close selected panel');
   await act(async()=>{nodes[1]!.focus();fireEvent.click(nodes[1]!);});
   assert.ok(document.querySelector('.inspector'));
   assert.equal(calls.length,0,'selection must not invoke a runtime operation');
@@ -219,7 +269,7 @@ test('Graph selects an instance, opens Inspector, writes only that node and pres
   rejectNext='Restart was rejected';await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Restart animation'}));});assert.equal(calls.at(-1).input.restart,true);assert.ok(await screen.findByText(/Restart was rejected/));
   await act(async()=>{fireEvent.keyDown(screen.getByRole('dialog',{name:'Animate Segments'}),{key:'Escape'});});assert.equal(document.activeElement,animate);
   await click('Zoom in');const transform=document.querySelector<HTMLElement>('.graph-content')!.style.transform;
-  fireEvent.change(screen.getByLabelText('Move panel'),{target:{value:'graph'}});await click('Close selected panel');await click('Open Graph');
+  selectedPanel = 'graph';await click('Close selected panel');await click('Open Graph');
   assert.equal(document.querySelector<HTMLElement>('.graph-content')!.style.transform,transform);
   assert.equal(nodes[1]!.getAttribute('aria-pressed'),'true');
   await act(async()=>{fireEvent.click(animate);});assert.ok(screen.getByRole('dialog',{name:'Animate Segments'}));
@@ -243,7 +293,9 @@ test('Graph enters nested components one level at a time and edits an exposed co
   await act(async()=>{fireEvent.click(screen.getByText('View'));});await click('Open Graph');
   const composite=screen.getByRole('button',{name:/Double mirror 1/});await act(async()=>{fireEvent.click(composite);});
   assert.ok(within(document.querySelector('.inspector')!).getByText('Double mirror 1'));
-  const alias=within(document.querySelector('.inspector')!).getByRole('spinbutton',{name:'firstSegments · Segments value'});
+  // JSDOM has no pane geometry; Dockview can hide its zero-size overlay.
+  // Actual pane visibility is covered by the private Studio screenshot run.
+  const alias=within(document.querySelector('.inspector')!).getByLabelText('firstSegments · Segments value');
   await act(async()=>{fireEvent.change(alias,{target:{value:'9'}});fireEvent.keyDown(alias,{key:'Enter'});});
   assert.deepEqual(calls[0].input.nodePath,[compositeAId,wrapperNodeId,wrappedEffectId]);assert.deepEqual(calls[0].input.values,{segments:9});
   await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Open component'}));});
@@ -256,5 +308,21 @@ test('Graph enters nested components one level at a time and edits an exposed co
   await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Back to Nested demo'}));});
   const second=screen.getByRole('button',{name:/Double mirror 2/});await act(async()=>{fireEvent.keyDown(second,{key:'Enter'});});
   assert.ok(screen.getByRole('button',{name:'Double mirror 2',current:'page'}));assert.ok(within(document.querySelector('.inspector')!).getByText('Double mirror 2'));
+  ui.unmount();
+});
+
+test('View is a compact keyboard menu with recoverable panes and a separate layout dialog', async () => { const { StudioDockShell } = await import('../../apps/studio/src/layout/StudioDockShell.tsx');
+  const ui = render(<StudioDockShell compact={false} showInspector={false}
+    preview={<p>Preview content</p>} source={<p>Source content</p>} library={<p>Library content</p>}
+    inspector={<p>Inspector content</p>} jobs={<p>Jobs content</p>} graph={<p>Graph content</p>} />);
+  await click('View'); const menu = screen.getByRole('menu', { name: 'View' });
+  assert.equal(within(menu).getAllByRole('menuitem').length, 7); assert.equal(screen.queryByLabelText('Move panel'), null);
+  assert.equal(screen.queryByLabelText('Layout name'), null); const first = within(menu).getByRole('menuitem', { name: 'Preview' }); assert.ok(document.activeElement === first, 'View focuses its first pane item');
+  fireEvent.keyDown(first, { key: 'ArrowDown' }); assert.ok(document.activeElement === within(menu).getByRole('menuitem', { name: 'Source' }), 'ArrowDown focuses Source');
+  fireEvent.keyDown(document.activeElement!, { key: 'Escape' }); await waitFor(() => assert.ok(document.activeElement === screen.getByRole('button', { name: 'View' }), 'Restore focus to View')); await click('View'); await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: 'Layouts…' })); });
+  const dialog = screen.getByRole('dialog', { name: 'Workspace layouts' });
+  assert.ok(within(dialog).getByLabelText('Layout name'));
+  await click('Done');
+  await waitFor(() => assert.ok(!screen.queryByRole('dialog')));
   ui.unmount();
 });

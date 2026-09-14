@@ -1,7 +1,7 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { Alert, Button, TextField } from '@mui/material';
+import { Alert, Button, TextField, Menu, MenuItem, Divider, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { LuxDockLayout } from './LuxDockLayout.tsx';
 import { createStudioPanelRegistry, PanelRegistry } from './registry.ts';
 import type { LuxDockviewAdapter, LayoutStorage } from './dockview-adapter.ts';
@@ -19,7 +19,9 @@ const storage: LayoutStorage = {
 export function StudioDockShell({ compact, showInspector, toolsHost, onOpenPanelReady, ...content }: { compact: boolean; showInspector: boolean; toolsHost?: HTMLElement | null; onOpenPanelReady?: (action:null|((kind:Kind)=>void))=>void } & Record<Exclude<Kind,'graph'>, ReactNode> & {graph?:ReactNode}) {
   const [mode] = useState<'desktop' | 'laptop'>(() => window.innerWidth < 1100 ? 'laptop' : 'desktop');
   const [name, setName] = useState('Default'), [message, setMessage] = useState('');
-  const [panel, setPanel] = useState<Kind>('source'), [reference, setReference] = useState<Kind>('preview');
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const [layoutsOpen, setLayoutsOpen] = useState(false);
+  const viewButton = useRef<HTMLButtonElement | null>(null);
   const adapter = useRef<LuxDockviewAdapter | null>(null), expanded = useRef<HTMLDivElement>(null);
   const compactRef = useRef(compact); compactRef.current = compact;
   const hosts = useMemo(() => Object.fromEntries(kinds.map(kind => {
@@ -54,21 +56,36 @@ export function StudioDockShell({ compact, showInspector, toolsHost, onOpenPanel
     action(value => { value.reset(name, next); setMessage(`Reset to ${next} layout`); });
   }
   const nonce = document.querySelector<HTMLMetaElement>('meta[name="style-nonce"]')?.content ?? '';
-  const tools = <details className="layout-tools" hidden={compact} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }}><summary>View</summary><div className="layout-tools-content">
-
-      <div className="layout-actions" aria-label="Add panel">{kinds.map(kind => <Button key={kind} onClick={() => action(value => value.open(kind))}>Open {registry.get(kind).title}</Button>)}</div>
-      <div className="layout-actions"><TextField size="small" label="Layout name" value={name} onChange={event => setName(event.target.value)} />
+  const tools = <div className="layout-tools" hidden={compact}>
+    <Button ref={viewButton} aria-haspopup="menu" aria-expanded={!!menuAnchor}
+      onClick={event => setMenuAnchor(event.currentTarget)}>View</Button>
+    <Menu anchorEl={menuAnchor} open={!!menuAnchor} onClose={() => setMenuAnchor(null)}
+      slotProps={{ list: { 'aria-label': 'View', dense: true } }}
+      onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); setMenuAnchor(null); } }}>
+      {kinds.map(kind => <MenuItem key={kind} onClick={() => {
+        setMenuAnchor(null);
+        action(value => value.open(kind));
+      }}>{registry.get(kind).title}</MenuItem>)}
+      <Divider />
+      <MenuItem onClick={() => { setMenuAnchor(null); setLayoutsOpen(true); }}>Layouts…</MenuItem>
+    </Menu>
+    <Dialog open={layoutsOpen} onClose={() => setLayoutsOpen(false)} aria-labelledby="workspace-layouts-title"
+      maxWidth="xs" fullWidth slotProps={{ transition: { onExited: () => viewButton.current?.focus() } }}
+      onKeyDown={event => { if (event.key === 'Escape') event.stopPropagation(); }}>
+      <DialogTitle id="workspace-layouts-title">Workspace layouts</DialogTitle>
+      <DialogContent>
+        <div className="layout-actions"><TextField size="small" label="Layout name" value={name} onChange={event => setName(event.target.value)} />
         <Button onClick={() => action(value => { value.save(name); setMessage(`Saved layout: ${name}`); })}>Save layout</Button>
         <Button onClick={() => action(value => { const result = value.restore(name); setMessage(result.restored ? `Restored layout: ${name}` : result.reason ?? 'Default layout restored'); })}>Restore layout</Button>
         <Button onClick={() => reset('desktop')}>Reset desktop layout</Button><Button onClick={() => reset('laptop')}>Reset laptop layout</Button></div>
-      <div className="layout-actions"><label>Move panel <select aria-label="Move panel" value={panel} onChange={event => setPanel(event.target.value as Kind)}>{kinds.map(kind => <option key={kind}>{kind}</option>)}</select></label>
-        <label>Relative to <select aria-label="Relative to" value={reference} onChange={event => setReference(event.target.value as Kind)}>{kinds.map(kind => <option key={kind}>{kind}</option>)}</select></label>
-        {(['left', 'right', 'top', 'bottom', 'center'] as const).map(position => <Button key={position} onClick={() => action(value => value.move(panel, reference, position))}>Move {position === 'center' ? 'to tab group' : position}</Button>)}
-        <Button onClick={() => action(value => value.close(panel))}>Close selected panel</Button></div>
-      {message && <Alert severity="info" role="status">{message}</Alert>}
-    </div></details>;
+        {message && <Alert severity="info" role="status">{message}</Alert>}
+      </DialogContent>
+      <DialogActions><Button onClick={() => setLayoutsOpen(false)}>Done</Button></DialogActions>
+    </Dialog>
+  </div>;
   return <div className={`studio-dock-shell ${compact ? 'dock-compact' : ''}`}>
     {toolsHost ? createPortal(tools, toolsHost) : tools}
+    {message && !layoutsOpen && <Alert severity="info" role="status" onClose={() => setMessage('')}>{message}</Alert>}
 
     <div className="studio-dock-grid" hidden={compact}><LuxDockLayout registry={registry} panels={panels} storage={storage} nonce={nonce} mode={mode}
       onReady={(value, result) => { adapter.current = value; onOpenPanelReady?.(kind=>{if(kind==='inspector')value.openBeside(kind,'graph');else value.open(kind);}); if (result.reason && result.reason !== 'No saved personal layout') setMessage(result.reason); }} /></div>
