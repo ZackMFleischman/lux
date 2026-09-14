@@ -435,9 +435,9 @@ test('Graph connections point from output to input with reversed node declaratio
   assert.ok(wires.length > 0);
   for (const [index, wire] of wires.entries()) {
     const edge = body.edges[index]!;
-    const from = body.nodes.findIndex((node: any) => node.id === edge.from.nodeId);
-    const to = body.nodes.findIndex((node: any) => node.id === edge.to.nodeId);
+    const coordinates = wire.querySelector('path')!.getAttribute('d')!.match(/-?[\d.]+/g)!.map(Number);
+    assert.ok(coordinates[0]! < coordinates[6]!, 'display order follows signal flow even when declarations are reversed');
     const points = wire.querySelector('polygon')!.getAttribute('points')!.split(' ').map(point => point.split(',').map(Number));
-    assert.equal(Math.sign(points[1]![0]! - points[0]![0]!), Math.sign(to * 250 - (from * 250 + 220)));
+    assert.equal(Math.sign(points[1]![0]! - points[0]![0]!), 1);
   }
 });

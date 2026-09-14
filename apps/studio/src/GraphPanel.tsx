@@ -13,6 +13,20 @@ export function compositionOccurrence(runtime:RuntimeView|null,path:NodePath){re
 function children(profile:Profile,focus:NodePath){const definition=profileOccurrence(profile,focus)?.definition;if(definition?.kind!=='graph')return [];
   return definition.body.nodes.map(node=>{const child=profile.definitions[node.definitionHash]!,nodePath=[...focus,node.id] as NodePath,siblings=definition.body.nodes.filter(row=>row.definitionHash===node.definitionHash),index=siblings.findIndex(row=>row.id===node.id);return {...node,nodePath,definition:child,metadata:child.metadata,label:child.metadata.label+(siblings.length>1?` ${index+1}`:'')};});}
 export function compositionNodes(runtime:RuntimeView|null){const profile=runtime?.composition;if(!profile)return [];const current=profile,result:ReturnType<typeof children>=[];function visit(path:NodePath){for(const node of children(current,path)){result.push(node);if(node.definition.kind==='graph')visit(node.nodePath);}}visit([]);return result;}
+function orderedChildren(profile: Profile, focus: NodePath) {
+  const nodes = children(profile, focus);
+  const definition = profileOccurrence(profile, focus)?.definition;
+  if (definition?.kind !== 'graph') return nodes;
+  const remaining = new Set(nodes.map(node => node.id));
+  const ordered: typeof nodes = [];
+  while (remaining.size) {
+    const next = nodes.find(node => remaining.has(node.id) && !definition.body.edges.some(edge => edge.to.nodeId === node.id && remaining.has(edge.from.nodeId)));
+    if (!next) return nodes;
+    ordered.push(next);
+    remaining.delete(next.id);
+  }
+  return ordered;
+}
 export function compositionControlTarget(runtime:RuntimeView|null,path:NodePath,controlId:string){const profile=runtime?.composition;if(!profile)return undefined;let occurrence=compositionOccurrence(runtime,path),targetPath=[...path] as NodePath,targetControl=controlId;
   while(occurrence?.definition.kind==='graph'){const refs=occurrence.definition.body.controlBindings[targetControl];if(refs?.length!==1)return undefined;targetPath=[...targetPath,refs[0]!.nodeId];targetControl=refs[0]!.controlId;occurrence=compositionOccurrence(runtime,targetPath);}
   return occurrence?.definition.kind==='code'?{nodePath:targetPath,controlId:targetControl}:undefined;
@@ -33,7 +47,7 @@ export function GraphPanel({runtime,selected,onSelect}:{runtime:RuntimeView|null
   }
   const focusOccurrence=compositionOccurrence(runtime,focus),activeFocus=(focusOccurrence?.definition.kind==='graph'?focus:[]) as NodePath;
   useEffect(()=>{if(nodeKey(activeFocus)!==nodeKey(focus))setFocus(activeFocus);},[profile,focus,activeFocus]);
-  const nodes=useMemo(()=>profile?children(profile,activeFocus):[],[profile,nodeKey(activeFocus)]),definition=compositionOccurrence(runtime,activeFocus)?.definition,body=definition?.kind==='graph'?definition.body:null,output=body?.outputBindings.image;
+  const nodes=useMemo(()=>profile?orderedChildren(profile,activeFocus):[],[profile,nodeKey(activeFocus)]),definition=compositionOccurrence(runtime,activeFocus)?.definition,body=definition?.kind==='graph'?definition.body:null,output=body?.outputBindings.image;
   const selectedNode=nodes.find(node=>nodeKey(node.nodePath)===selected),canOpen=selectedNode?.definition.kind==='graph',width=Math.max(240,nodes.length*250-30),height=180;
   function fit(){const box=viewport.current?.getBoundingClientRect();if(!box)return;const zoom=Math.max(.2,Math.min(1,(box.width-48)/width,(box.height-48)/height));updateView({x:(box.width-width*zoom)/2,y:Math.max(24,(box.height-height*zoom)/2),zoom});}
   function zoom(factor: number, point?: { x: number; y: number }) {
