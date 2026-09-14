@@ -14,6 +14,7 @@ import type { StudioClient, StudioSnapshot, Metric } from './service-client.ts';
 import type { PresentationPort } from './presentation.ts';
 import type { StudioWindowClient, WindowState } from './window-client.ts';
 import { createRendererSnapshot } from './renderer-snapshot.ts';
+import { Disclosure } from './Disclosure.tsx';
 
 export function metricText(metric: Metric | null, nowMs: number): { value: string; detail: string } {
   if (!metric || !Number.isFinite(metric.value) || metric.value < 0 || !Number.isFinite(metric.sampledAtMs) ||
@@ -146,14 +147,14 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
         </div><span className="playback-state">{runtime?.playback ?? 'Awaiting service'}</span></div>
       </Paper>;
   const inspectorPane = <Paper component="aside" square className="inspector" aria-label="Scene controls and status">
-        <section><details className="controls-section" open><summary className="section-heading"><span className="section-title">Controls</span><Chip label="LIVE" /></summary>
+        <section><Disclosure title="Controls" defaultOpen className="controls-section" badge={<Chip label="LIVE" />}>
           <p className="inspector-target">{selectedNode?.label??(selectedNodePath?'Selected node unavailable':runtime?.composition?'Composition controls':'Visual controls')}</p>
           <ParameterInspector nodePath={selectedNodePath} runtime={runtime} available={!!available} client={client} controller={controller} onError={setError} edits={controlEdits} />
-        </details></section>
-        <section><details><summary>Performance</summary><PerformanceStatus performance={snapshot.performance} /><MetricView label="Visual delivery" metric={snapshot.visualFps} nowMs={nowMs ?? clock} /><MetricView label="UI cadence" metric={snapshot.uiFps} nowMs={nowMs ?? clock} />
-          <p className="hint">Delivery and interface cadence are measured separately.</p></details></section>
-        <section><details><summary>Runtime</summary><dl className="identity"><dt>Authoring revision</dt><dd>{runtime?.revisionId ?? 'Unavailable'}</dd><dt>Instance</dt><dd>{runtime?.instanceId ?? 'Unavailable'}</dd><dt>Generation / clock epoch</dt><dd>{runtime ? `${runtime.generation} / ${runtime.clockEpoch}` : 'Unavailable'}</dd><dt>Completed frame</dt><dd>{runtime?.frameId ?? 'Unavailable'}</dd></dl></details></section>
-        <section><details><summary>Host output</summary><p className="host-revision">{snapshot.host?.revisionId ?? 'No host status available'}</p><p className="hint">Authoring changes do not update a pinned host revision.</p></details></section>
+        </Disclosure></section>
+        <section><Disclosure title="Performance"><PerformanceStatus performance={snapshot.performance} /><MetricView label="Visual delivery" metric={snapshot.visualFps} nowMs={nowMs ?? clock} /><MetricView label="UI cadence" metric={snapshot.uiFps} nowMs={nowMs ?? clock} />
+          <p className="hint">Delivery and interface cadence are measured separately.</p></Disclosure></section>
+        <section><Disclosure title="Runtime"><dl className="identity"><dt>Authoring revision</dt><dd>{runtime?.revisionId ?? 'Unavailable'}</dd><dt>Instance</dt><dd>{runtime?.instanceId ?? 'Unavailable'}</dd><dt>Generation / clock epoch</dt><dd>{runtime ? `${runtime.generation} / ${runtime.clockEpoch}` : 'Unavailable'}</dd><dt>Completed frame</dt><dd>{runtime?.frameId ?? 'Unavailable'}</dd></dl></Disclosure></section>
+        <section><Disclosure title="Host output"><p className="host-revision">{snapshot.host?.revisionId ?? 'No host status available'}</p><p className="hint">Authoring changes do not update a pinned host revision.</p></Disclosure></section>
       </Paper>;
   const jobsPane = <section className="diagnostics" aria-label="Jobs and diagnostics"><div className="section-heading"><h2>Jobs & diagnostics</h2><span className="subtle">{snapshot.jobs.length} reported</span></div>
       {runtime?.fault && <p className="error" role="alert"><strong>{runtime.fault.code}</strong> · {runtime.fault.message}</p>}
