@@ -41,3 +41,7 @@ test('compiler seals recursively imported compositions and their admitted nested
  const forged=structuredClone(result.artifact);forged.dependencyHashes['runtime/nested-plan.ts']='0'.repeat(64);forged.bundleHash=createHash('sha256').update(JSON.stringify(artifactBody(forged))).digest('hex');
  await assert.rejects(linkRuntime(forged,options),/dependency hash/i,'linking rechecks the sealed nested planner identity');
 });
+test('compiler attributes a rejected nested declaration to its imported source module',async()=>{
+ const source=nestedCompositionSourceBundle(),missing='99999999-9999-4999-8999-999999999999';source.files['wrapper.ts']=source.files['wrapper.ts'].replace(`output:{nodeId:'${wrappedEffectId}'`,`output:{nodeId:'${missing}'`);
+ const result=await compileVisual({source},options);assert.equal(result.ok,false);assert.equal(result.diagnostics[0].file,'wrapper.ts');assert.ok(result.diagnostics[0].line>1);assert.match(result.diagnostics[0].message,/missing immediate node/i);
+});

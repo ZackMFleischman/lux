@@ -74,7 +74,7 @@ async function main() {
       }
     } catch (error) { return { ok: false, code: error.code, diagnostics: [diagnostic(error, path)] }; }
   }
-  if(source.sdkVersion==='0.4.0'){try{composition=extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash:sha});controls=composition.publicControls;}catch(error){return {ok:false,code:error.code||'COMPILE_FAILED',diagnostics:[diagnostic(error,source.entry)]};}}
+  if(source.sdkVersion==='0.4.0'){try{composition=extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash:sha});controls=composition.publicControls;}catch(error){return {ok:false,code:error.code||'COMPILE_FAILED',diagnostics:[diagnostic(error,error.file??source.entry)]};}}
   for (const [path, text] of Object.entries(source.files)) {
     await mkdir(dirname(join(workspace, 'source', path)), { recursive: true });
     await writeFile(join(workspace, 'source', path), text);

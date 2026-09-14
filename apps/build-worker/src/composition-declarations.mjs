@@ -5,7 +5,7 @@ import {canonicalControlSchemaJson} from '../../../packages/runtime-contracts/sr
 import {normalizeImageCompositionProfile} from '../../../packages/runtime-contracts/src/composition-profile.mjs';
 import {validateNestedGraph} from '../../../packages/runtime/src/graph/nested-validate.ts';
 import {planNestedGraph} from '../../../packages/runtime/src/graph/nested-plan.ts';
-function fail(node,message){throw Object.assign(Error(message),{code:'COMPILE_FAILED',loc:node?.loc?.start??{line:1,column:0}});}
+function fail(node,message,file){throw Object.assign(Error(message),{code:'COMPILE_FAILED',loc:node?.loc?.start??{line:1,column:0},...(file?{file}:{})});}
 function unwrap(node){while(node&&['TSAsExpression','TSSatisfiesExpression','TSTypeAssertion','ParenthesizedExpression'].includes(node.type))node=node.expression;return node;}
 function rows(node,allowShorthand=false){node=unwrap(node);if(node?.type!=='ObjectExpression')fail(node,'Composition requires inline literal objects');const result=new Map();for(const p of node.properties){if(p.type!=='ObjectProperty'||p.computed||(!allowShorthand&&p.shorthand)||!['Identifier','StringLiteral'].includes(p.key?.type))fail(p,'Composition requires literal data keys; no spreads, methods, accessors or computed keys');const key=p.key.name??p.key.value;if(result.has(key))fail(p,'Duplicate literal property: '+key);result.set(key,p);}return result;}
 function literal(node){node=unwrap(node);if(['StringLiteral','NumericLiteral'].includes(node?.type))return node.value;if(node?.type==='NullLiteral')return null;if(node?.type==='ArrayExpression')return node.elements.map(literal);if(node?.type==='ObjectExpression'){const result={};for(const [key,p] of rows(node))result[key]=literal(p.value);return result;}fail(node,'Composition graph requires literals; no calls, references or expressions');}
@@ -16,8 +16,8 @@ const imagePort=Object.freeze({type:Object.freeze({kind:'image',colorSpace:'line
 const samePath=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 function assertLinear(plan,node){if(plan.nodes.length<1||plan.nodes.length>8)fail(node,'Composition flattened image chain must contain 1–8 components');if(plan.prunedNodePaths.length)fail(node,'Composition graph must not contain nodes outside the selected linear image chain');for(let i=0;i<plan.nodes.length;i++){const inputs=plan.nodes[i].inputs;if(inputs.length!==(i?1:0)||i&&(!samePath(inputs[0].source.nodePath,plan.nodes[i-1].nodePath)||inputs[0].portId!=='image'||inputs[0].source.portId!=='image'))fail(node,'Composition graph must be one linear image chain');}if(!samePath(plan.finalOutput.nodePath,plan.nodes.at(-1).nodePath)||plan.finalOutput.portId!=='image')fail(node,'Composition output must end the linear image chain');}
 export function extractCompositionDeclaration({entry,files,asts,hash}){
- const definitions={},modules={},memo=new Map(),active=new Set();
- function extract(path){
+ const definitions={},modules={},moduleNodes={},memo=new Map(),active=new Set();
+ function extractModule(path){
   if(memo.has(path))return memo.get(path);if(active.has(path))fail(null,'Recursive composition import cycle');if(!Object.hasOwn(files,path)||!asts[path])fail(null,'Missing imported component source');active.add(path);
   const componentCall=sdkCall(asts[path],'defineComponent'),compositionCall=sdkCall(asts[path],'defineComposition');
   if(componentCall.match){let metadata;try{metadata=extractComponentDeclaration(asts[path],'image-chain-v1');}catch(error){fail(componentCall.exported,error.message);}const definitionHash=hash(path+'\0'+files[path]);definitions[definitionHash]={kind:'code',metadata};const result={kind:'code',definitionHash,metadata,modulePath:path};memo.set(path,result);active.delete(path);return result;}
@@ -31,10 +31,11 @@ export function extractCompositionDeclaration({entry,files,asts,hash}){
   const declaration={definitions:declarationDefinitions,nodes,edges,...(input?{input}:{}),output,expose,...(label!==undefined?{label}: {})};
   const definitionHash=hash(path+'\0'+files[path]+'\0'+JSON.stringify(definitionNames));
   definitions[definitionHash]={kind:'graph',metadata,body:{nodes:nodes.map(node=>({id:node.id,definitionHash:definitionNames[node.definition],controlDefaults:{}})),edges,inputBindings:input?{image:[input]}:{},outputBindings:{image:output},controlBindings}};
-  modules[definitionHash]={modulePath:path,definitionNames,declaration};const result={kind:'graph',definitionHash,metadata,modulePath:path,declaration,definitionNames};memo.set(path,result);active.delete(path);return result;
+  modules[definitionHash]={modulePath:path,definitionNames,declaration};moduleNodes[definitionHash]=outer.get('output').value;const result={kind:'graph',definitionHash,metadata,modulePath:path,declaration,definitionNames};memo.set(path,result);active.delete(path);return result;
  }
+ function extract(path){try{return extractModule(path);}catch(error){if(!error.file)error.file=path;throw error;}}
  const root=extract(entry);if(root.kind!=='graph')fail(null,'Entry must export default defineComposition({...}) imported from @lux/visual-sdk');
- let admitted,plan;try{admitted=validateNestedGraph({version:2,rootDefinitionHash:root.definitionHash,outputPort:'image'},definitions);plan=planNestedGraph(admitted);assertLinear(plan,asts[entry]?.program??asts[entry]);}catch(error){fail(null,'Composition graph must be one linear image chain: '+error.message);}
+ let admitted,plan;try{admitted=validateNestedGraph({version:2,rootDefinitionHash:root.definitionHash,outputPort:'image'},definitions);plan=planNestedGraph(admitted);assertLinear(plan,asts[entry]?.program??asts[entry]);}catch(error){const definitionHash=Object.keys(modules).find(value=>String(error.message).includes(value));fail(definitionHash?moduleNodes[definitionHash]:null,'Composition graph must be one linear image chain: '+error.message,definitionHash?modules[definitionHash].modulePath:entry);}
  const profileNodes=plan.nodes.map(node=>{const schema=admitted.definitions[node.definitionHash].metadata.controls;return {nodePath:node.nodePath,definitionHash:node.definitionHash,schema,schemaHash:hash(canonicalControlSchemaJson(schema))};});
  try{return normalizeImageCompositionProfile({version:1,declaration:root.declaration,definitionNames:root.definitionNames,moduleDeclarations:modules,graph:admitted.graph,definitions:admitted.definitions,publicControls:plan.publicControls,publicControlBindings:plan.publicControlBindings,nodes:profileNodes});}catch(error){fail(null,error.message);}
 }
