@@ -9,7 +9,7 @@ Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true,
   ResizeObserver: class { observe() {} unobserve() {} disconnect() {} } });
 dom.window.Range.prototype.getClientRects = () => [] as unknown as DOMRectList;
 dom.window.Range.prototype.getBoundingClientRect = () => new dom.window.DOMRect();
-const { render, screen, cleanup, fireEvent, act, waitFor } = await import('@testing-library/react');
+const { render, screen, cleanup, fireEvent, act, waitFor, within } = await import('@testing-library/react');
 const { StudioApp } = await import('../../apps/studio/src/renderer.tsx');
 const { SourcePanel } = await import('../../apps/studio/src/source/SourcePanel.tsx');
 const { createSourceWorkspace } = await import('../../apps/studio/src/source/workspace.ts');
@@ -182,6 +182,13 @@ test('Graph selects an instance, opens Inspector, writes only that node and pres
   await act(async()=>{nodes[1]!.focus();fireEvent.click(nodes[1]!);});
   assert.ok(document.querySelector('.inspector'));
   assert.equal(calls.length,0,'selection must not invoke a runtime operation');
+  const selectedInspector=within(document.querySelector('.inspector')!);
+  const selectedControlLabel=selectedInspector.getByText('Segments');
+  assert.ok(selectedInspector.getByText('Mirror segments'));
+  assert.equal(selectedControlLabel.getAttribute('tabindex'),'0','selected-node help must remain keyboard accessible');
+  fireEvent.mouseOver(selectedControlLabel);
+  assert.ok(await screen.findByRole('tooltip',{name:'Mirror segments'}));
+  fireEvent.mouseOut(selectedControlLabel);
   const input=document.querySelector<HTMLInputElement>('.inspector input[type="number"]')!;
   await act(async()=>{fireEvent.change(input,{target:{value:'8'}});fireEvent.keyDown(input,{key:'Enter'});});
   assert.equal(calls.length,1);assert.deepEqual(calls[0].input.nodePath,[kaleidoscopeAId]);
