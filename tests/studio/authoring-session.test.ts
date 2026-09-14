@@ -202,13 +202,15 @@ test('linked build resolves the latest library source, persists its revision, sh
 test('opening a linked scene tries the latest revision then visibly falls back to the saved working source',async()=>{
  const fallbackSource={...compositionSource(),files:{...compositionSource().files,'library/shared/component.ts':'export const color = "violet";'}};
  const link={componentId:libraryId,mountPath:'library/shared',resolvedRevision:1,files:['library/shared/component.ts']};
- const document=createSceneDocument(fallbackSource,DEFAULT_OUTPUT,compositionCache(fallbackSource),[link]);
- const w=createSourceWorkspace(compositionSource()),attempts:string[]=[];let accepted=compositionCache(compositionSource());
- const session=createAuthoringSession(w,{readLibraryComponent:async()=>componentRecord(2,'invalid'),getControlSnapshot:()=>accepted,save:async()=>null,
-  open:async()=>({token:'opened',name:'linked.lux-scene',document}),submit:async s=>{attempts.push(s.files['library/shared/component.ts']!);if(s.files['library/shared/component.ts']!.includes('invalid'))throw Error('updated component failed');accepted=compositionCache(s);}});
+ const cached=compositionCache(fallbackSource),animations=[{nodePath:cached.nodes[0]!.nodePath,definitionHash:cached.nodes[0]!.definitionHash,schemaHash:cached.nodes[0]!.schemaHash,controlId:'height',shape:'triangle' as const,periodSeconds:3,amount:.2,phase:.25,enabled:true}];
+ const document=createSceneDocument(fallbackSource,DEFAULT_OUTPUT,cached,[link],animations);
+ const w=createSourceWorkspace(compositionSource()),attempts:string[]=[],appliedAnimations:unknown[]=[];let accepted=compositionCache(compositionSource());
+ const session=createAuthoringSession(w,{readLibraryComponent:async()=>componentRecord(2,'invalid'),getControlSnapshot:()=>accepted,getControlAnimations:()=>animations,save:async()=>null,
+  open:async()=>({token:'opened',name:'linked.lux-scene',document}),submit:async(s,options)=>{attempts.push(s.files['library/shared/component.ts']!);appliedAnimations.push(options?.savedControlAnimations);if(s.files['library/shared/component.ts']!.includes('invalid'))throw Error('updated component failed');accepted=compositionCache(s);}});
  await session.open();
  assert.deepEqual(attempts,['export const color = "invalid";','export const color = "violet";']);
  assert.equal(session.read().libraryLinks[0]?.resolvedRevision,1);
  assert.match(session.getSnapshot().libraryFallbacks[0]?.message??'',/updated component failed/);
+ assert.deepEqual(appliedAnimations,[animations,animations]);
  assert.equal(w.getSnapshot().hasRunningSource,true);
 });

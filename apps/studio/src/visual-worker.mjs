@@ -26,7 +26,7 @@ let drawStarted=0,scheduleEpoch=0;
 let performanceMode='routine';
 let stopped = false, externallyDriven=false, timer, heartbeat, telemetryTimer, collector, gpuTimer, gpuCapability, chain = Promise.resolve();
 const send = (type, extra = {}) => post({ type, ...identity, ...extra });
-function state() { return { ...clock.snapshot(), frameId: String(frame),...controlState.state() }; }
+function state() { const clockState=clock.snapshot();return { ...clockState, frameId: String(frame),...controlState.state(clockState.timeSeconds) }; }
 function runOperation(operation) {
   // Device loss bypasses the command queue. Keep the current command's lifetime
   // separate from terminal cleanup so teardown can await it without awaiting itself.
@@ -69,7 +69,7 @@ async function draw(requestId, type = 'frame') {
   if(profiling)gpuTimer.begin(frame+1);
   const updateStart=profiling?now():0;
   await visual.update(freeze({ tick: tick++, timeSeconds: time.timeSeconds,
-    deltaSeconds: Math.max(0, time.timeSeconds - lastTime), controls: controlState.values(), events: freeze([]) }));
+    deltaSeconds: Math.max(0, time.timeSeconds - lastTime), controls: controlState.values(time.timeSeconds), events: freeze([]) }));
   requireRunning();
   const updateEnd=profiling?now():0;
   const renderResult=visual.render(freeze({ width: settings.width, height: settings.height, colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }));
@@ -153,7 +153,8 @@ async function initialize(message) {
     const resources=freeze({async produce(output){const call=staged;staged=undefined;if(!call)throw new RuntimeError('Missing staged component render');const target=new module.RenderTarget(descriptor.width,descriptor.height);target.texture.colorSpace=module.SRGBColorSpace;targets.set(output,target);renderer.setRenderTarget(target);try{await renderer.render(call.scene,call.camera);}finally{renderer.setRenderTarget(null);}},release(image){const target=targets.get(image);if(!target)throw new RuntimeError('Missing component image allocation');targets.delete(image);const settled=device.queue.onSubmittedWorkDone().then(()=>target.dispose());settlements.add(settled);settled.then(()=>settlements.delete(settled),error=>{settlementFailure??=error;settlements.delete(settled);});},capture(){}});
     const backend=freeze({resources,stage(scene,camera){if(staged)throw new RuntimeError('Component render already staged');staged={scene,camera};},texture(image){const target=targets.get(image);if(!target)throw new RuntimeError('Missing component input image');return target.texture;},async present(image){const target=targets.get(image);if(!target)throw new RuntimeError('Missing final component image');const copyMaterial=new module.MeshBasicNodeMaterial();copyMaterial.fragmentNode=module.sampleTexture(target.texture);const copy=new module.QuadMesh(copyMaterial);renderer.setRenderTarget(outputTarget);try{copy.render(renderer);}finally{renderer.setRenderTarget(null);copyMaterial.dispose();}},async drain(){while(settlements.size)await Promise.allSettled([...settlements]);if(settlementFailure)throw settlementFailure;}});
     const plan=prepareGraphRuntimePlan(validateNestedGraph(profile.graph,profile.definitions));
-    compositionBridge=await createImageCompositionVisual({plan,definitions:create,context:freeze(context),backend});visual=compositionBridge;authoredCleanup=()=>compositionBridge.dispose();
+    compositionBridge=await createImageCompositionVisual({plan,definitions:create,context:freeze(context),backend,
+      nodeControls:(path,frame)=>controlState.nodeValues(path,frame.timeSeconds)});visual=compositionBridge;authoredCleanup=()=>compositionBridge.dispose();
   }else if(prepared.admission.kind==='component'){
     const instance=await create(freeze(context));
     authoredCleanup=componentDisposer(instance);
@@ -198,10 +199,15 @@ onmessage = event => {
       if(!controlState.applyNode)throw Error('This visual has no composition nodes');
       controlState.applyNode(message.nodePath,message.values,message.controlSequence,message.controlSchemaHash);
       await draw(message.requestId, 'status'); schedule();
+    } else if(message.type==='animations'){
+      if(!controlState.applyAnimations)throw Error('This visual cannot animate node controls');
+      controlState.applyAnimations(message.controlAnimations,message.animationSequence,clock.snapshot().timeSeconds);
+      if(message.restart)controlState.restartAnimation(message.restart.nodePath,message.restart.controlId,clock.snapshot().timeSeconds);
+      await draw(message.requestId,'status');schedule();
     } else if (message.type === 'playback') {
       if (!['play', 'pause', 'reset'].includes(message.action)) throw Error('Invalid playback command');
       clearTimeout(timer);
-      if (message.action === 'reset') { clock.reset(); random.reset(settings.seed); await visual.reset(settings.seed); lastTime = 0; tick = 0; }
+      if (message.action === 'reset') { clock.reset(); controlState.resetAnimations?.(0); random.reset(settings.seed); await visual.reset(settings.seed); lastTime = 0; tick = 0; }
       else clock[message.action]();
       await draw(message.requestId, 'status'); schedule();
     } else if (message.type === 'capture') {

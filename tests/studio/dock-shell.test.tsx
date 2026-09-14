@@ -165,12 +165,14 @@ test('Graph selects an instance, opens Inspector, writes only that node and pres
   const source=compositionSourceBundle(),asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));
   const composition=extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash:(value:string)=>createHash('sha256').update(value).digest('hex')})!;
   const state=createCompositionControlState(composition);
-  let runtime:any={instanceId:'graph-instance',generation:1,revisionId:'graph-revision',sceneName:'Graph fixture',authority:'studio',playback:'paused',clockEpoch:0,frameId:'1',output:{width:1280,height:720},fault:null,sdkVersion:'0.4.0',controlSchema:composition.publicControls,controlSchemaHash:'a'.repeat(64),controls:state.values(),controlSequence:0,nodeControls:{sourceHash:'graph-revision',nodes:state.snapshot().nodes},composition};
+  let runtime:any={instanceId:'graph-instance',generation:1,revisionId:'graph-revision',sceneName:'Graph fixture',authority:'studio',playback:'paused',clockEpoch:0,frameId:'1',output:{width:1280,height:720},fault:null,sdkVersion:'0.4.0',controlSchema:composition.publicControls,controlSchemaHash:'a'.repeat(64),controls:state.values(),controlSequence:0,nodeControls:{sourceHash:'graph-revision',nodes:state.snapshot().nodes},controlAnimations:[],controlAnimationIssues:[],animationSequence:0,composition};
   let snapshot:any={connection:'connected',message:null,receivedAtMs:1000,authoring:runtime,host:null,jobs:[],visualFps:null,uiFps:null};
   const calls:any[]=[],listeners=new Set<()=>void>();
   const client={getSnapshot:()=>snapshot,subscribe:(fn:()=>void)=>{listeners.add(fn);return()=>{listeners.delete(fn);};},invoke:async(op:any)=>{
-    calls.push(op);assert.equal(op.name,'lux.node.parameters.set');state.applyNode(op.input.nodePath,op.input.values,op.input.expectedControlSchemaHash);
-    runtime={...runtime,controls:state.values(),nodeControls:{sourceHash:runtime.revisionId,nodes:state.snapshot().nodes},controlSequence:runtime.controlSequence+1};snapshot={...snapshot,authoring:runtime};listeners.forEach(fn=>fn());
+    calls.push(op);if(op.name==='lux.node.parameters.set'){state.applyNode(op.input.nodePath,op.input.values,op.input.expectedControlSchemaHash);
+      runtime={...runtime,controls:state.values(),nodeControls:{sourceHash:runtime.revisionId,nodes:state.snapshot().nodes},controlSequence:runtime.controlSequence+1};}
+    else if(op.name==='lux.node.animation.set'){runtime={...runtime,controlAnimations:op.input.animation?[op.input.animation]:[],animationSequence:runtime.animationSequence+1};}
+    else assert.fail(`Unexpected operation ${op.name}`);snapshot={...snapshot,authoring:runtime};listeners.forEach(fn=>fn());
   }};
   window.localStorage.clear();
   const ui=render(<StudioApp client={client} nowMs={1000} sourcePanel={<div>Source fixture</div>}/>);
@@ -193,6 +195,12 @@ test('Graph selects an instance, opens Inspector, writes only that node and pres
   await act(async()=>{fireEvent.change(input,{target:{value:'8'}});fireEvent.keyDown(input,{key:'Enter'});});
   assert.equal(calls.length,1);assert.deepEqual(calls[0].input.nodePath,[kaleidoscopeAId]);
   assert.equal(runtime.controls.segmentsA,8);assert.equal(runtime.controls.segmentsB,6);
+  const animate=selectedInspector.getByRole('button',{name:'Animate Segments'});await act(async()=>{fireEvent.click(animate);});
+  assert.ok(screen.getByRole('dialog',{name:'Segments animation'}));assert.ok(screen.getByText('Press Play to animate.'));
+  await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Add LFO'}));});
+  assert.equal(calls[1].name,'lux.node.animation.set');assert.equal(calls[1].input.animation.controlId,'segments');assert.equal(calls[1].input.animation.periodSeconds,2);
+  assert.equal(animate.getAttribute('aria-pressed'),'true');
+  await act(async()=>{fireEvent.keyDown(screen.getByRole('dialog',{name:'Segments animation'}),{key:'Escape'});});assert.equal(document.activeElement,animate);
   await click('Zoom in');const transform=document.querySelector<HTMLElement>('.graph-content')!.style.transform;
   fireEvent.change(screen.getByLabelText('Move panel'),{target:{value:'graph'}});await click('Close selected panel');await click('Open Graph');
   assert.equal(document.querySelector<HTMLElement>('.graph-content')!.style.transform,transform);

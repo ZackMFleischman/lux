@@ -14,7 +14,7 @@ class CompositionWorker {
   onmessage:any;onerror:any;messages:any[]=[];init:any;terminated=false;
   constructor(){CompositionWorker.all.push(this);}
   postMessage(message:any){this.messages.push(message);if(message.type==='init'){this.init=message;queueMicrotask(()=>this.reply({type:'ready'}));}}
-  reply(extra:any){this.onmessage?.({data:{...this.init,type:'status',frameId:'1',timeSeconds:0,clockEpoch:0,controlSequence:0,playback:'paused',...extra}});}
+  reply(extra:any){this.onmessage?.({data:{...this.init,type:'status',frameId:'1',timeSeconds:0,clockEpoch:0,controlSequence:0,playback:'paused',...extra,effectiveNodeControls:extra.effectiveNodeControls??extra.nodeControls??this.init.nodeControls}});}
   terminate(){this.terminated=true;}
 }
 
@@ -50,9 +50,16 @@ test('Studio promotes, edits and restarts a composition from canonical leaf snap
   next.applyNode(node.nodePath,{segments:7},node.schemaHash);
   worker.reply({requestId:'node-a',controls:next.values(),nodeControls:next.snapshot(),controlSequence:2});await nodeWrite;
   assert.deepEqual(client.getSnapshot().authoring!.controls,{ballIntensity:.6,segmentsA:7,segmentsB:11});
+  const binding={nodePath:node.nodePath,definitionHash:node.definitionHash,schemaHash:node.schemaHash,controlId:'segments',shape:'sine' as const,periodSeconds:2,amount:3,phase:0,enabled:true};
+  const animationWrite=client.invoke({name:'lux.node.animation.set',input:{requestId:'animate-a',instanceId:runtime.instanceId,expectedGeneration:runtime.generation,
+    expectedRevisionId:runtime.revisionId,expectedControlSchemaHash:node.schemaHash,nodePath:node.nodePath,controlId:'segments',animation:binding}} as any);
+  assert.deepEqual(worker.messages.at(-1),{type:'animations',requestId:'animate-a',instanceId:runtime.instanceId,generation:runtime.generation,animationSequence:1,controlAnimations:[binding]});
+  worker.reply({requestId:'animate-a',controls:next.values(),nodeControls:next.snapshot(),controlSequence:2,controlAnimations:[binding],animationSequence:1});await animationWrite;
+  assert.deepEqual(client.getSnapshot().authoring!.controlAnimations,[binding]);
   await assert.rejects(client.submit({...source,files:{...source.files,'composition.ts':'invalid'}} as any),/invalid composition/);
   assert.equal(client.getSnapshot().authoring!.generation,runtime.generation);const before=compiles;
   await client.invoke({name:'lux.runtime.restart',input:{requestId:'restart',instanceId:runtime.instanceId,expectedGeneration:runtime.generation}});
   assert.equal(compiles,before);assert.deepEqual(CompositionWorker.all.at(-1)!.init.controls,{ballIntensity:.6,segmentsA:7,segmentsB:11});
   assert.deepEqual(CompositionWorker.all.at(-1)!.init.nodeControls.nodes.find((row:any)=>row.nodePath[0]===kaleidoscopeAId).values,{segments:7});
+  assert.deepEqual(CompositionWorker.all.at(-1)!.init.controlAnimations,[binding]);
 });

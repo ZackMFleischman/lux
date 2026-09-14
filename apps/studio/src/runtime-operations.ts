@@ -8,11 +8,15 @@ const valuesSchema=z.record(z.number().finite()).refine(values=>Object.keys(valu
 export const parameterInputSchema = z.object({ ...target, expectedRevisionId: z.string().min(1), expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/).optional(),values:valuesSchema, mode: z.literal('live').default('live') }).strict();
 export const playbackInputSchema = z.object({ ...target, action: z.enum(['play', 'pause', 'reset']) }).strict();
 export const nodeParameterInputSchema=parameterInputSchema.extend({nodePath:z.array(nodeIdSchema).min(1).max(16),expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/)});
+const animationBindingSchema=z.object({nodePath:z.array(nodeIdSchema).min(1).max(8),definitionHash:z.string().regex(/^[a-f0-9]{64}$/),schemaHash:z.string().regex(/^[a-f0-9]{64}$/),
+  controlId:z.string().min(1).max(64),shape:z.enum(['sine','triangle','saw','square']),periodSeconds:z.number().finite().min(.05).max(3600),amount:z.number().finite().nonnegative(),phase:z.number().finite().min(0).max(1),enabled:z.boolean()}).strict();
+export const nodeAnimationInputSchema=z.object({...target,expectedRevisionId:z.string().min(1),expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/),nodePath:z.array(nodeIdSchema).min(1).max(8),controlId:z.string().min(1).max(64),animation:animationBindingSchema.nullable(),restart:z.boolean().optional()}).strict();
 export const restartInputSchema = z.object(target).strict();
 export const previewResizeInputSchema = z.object({ ...target, width: z.number().int().min(1).max(3840), height: z.number().int().min(1).max(2160) }).strict();
 const requestId = z.string().min(1).max(100);
 export const studioOperationSchema = z.discriminatedUnion('name', [
   z.object({name:z.literal('lux.node.parameters.set'),input:nodeParameterInputSchema.extend({requestId})}).strict(),
+  z.object({name:z.literal('lux.node.animation.set'),input:nodeAnimationInputSchema.extend({requestId})}).strict(),
   z.object({ name: z.literal('lux.parameters.set'), input: parameterInputSchema.extend({ requestId }) }).strict(),
   z.object({ name: z.literal('lux.playback'), input: playbackInputSchema.extend({ requestId }) }).strict(),
   z.object({ name: z.literal('lux.runtime.restart'), input: restartInputSchema.extend({ requestId }) }).strict(),

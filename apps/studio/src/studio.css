@@ -86,6 +86,16 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 .parameter-row .MuiIconButton-root{width:22px;height:22px;padding:2px;font-size:14px}
 .parameter-row .MuiSlider-root{display:block;width:calc(100% - 8px);height:2px;padding:8px 0;margin:0 4px}
 .parameter-row .MuiSlider-thumb{width:9px;height:9px}
+.parameter-row .animation-on{font-size:7px;font-weight:800;margin-left:1px;line-height:1}
+.animation-range{position:relative;height:4px;margin:-5px 5px 3px;background:#242832;border-radius:4px}
+.animation-range span{position:absolute;top:1px;height:2px;background:#786bd2;border-radius:2px}
+.animation-range i{position:absolute;top:-1px;width:2px;height:6px;background:#fff;border-radius:2px;transform:translateX(-1px)}
+.animation-popper{z-index:1400}
+.animation-editor{width:240px;padding:12px;display:flex;flex-direction:column;gap:9px;border:1px solid #4a4f60}
+.animation-editor header{display:flex;justify-content:space-between;gap:12px}.animation-editor header span{color:#8c90a2;font-size:11px}
+.animation-editor>label,.animation-editor details label{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px}
+.animation-editor .MuiInputBase-root{width:92px}.animation-editor details{font-size:11px}.animation-editor details>*{margin-top:7px}
+.animation-range-label{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#8c90a2}.animation-range-label strong{color:#fff;font-variant-numeric:tabular-nums}
 .graph-panel { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
 .graph-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; padding: 6px 10px; border-bottom: 1px solid #343943; }
 .graph-toolbar button { min-width: 32px; }

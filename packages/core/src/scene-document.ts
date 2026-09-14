@@ -8,6 +8,8 @@ import { nodeIdSchema } from '../../runtime-contracts/src/identities.ts';
 import type { NodePath, DefinitionHash } from '../../runtime-contracts/src/graph.ts';
 import { validateSceneLibraryLinks } from './component-library.ts';
 import type { SceneLibraryLink } from './component-library.ts';
+import {validateControlAnimationBindings} from '../../runtime-contracts/src/control-animation.mjs';
+import type {ControlAnimationBinding} from '../../runtime-contracts/src/control-animation.mjs';
 
 const legacySchema = z.object({ format: z.literal('lux-scene'), version: z.literal(1), source: legacySourceBundleSchema.extend({sdkVersion:z.literal('0.1.0')}), settings: outputSettingsSchema, controls: controlValuesSchema }).strict();
 const schema = z.discriminatedUnion('version',[legacySchema,legacySchema.extend({version:z.literal(2),source:assetSourceBundleSchema.extend({sdkVersion:z.literal('0.1.0')})}).strict()]);
@@ -15,8 +17,8 @@ export type SavedControlSnapshot = Readonly<{sourceHash:string;schema:ControlSch
 type LegacySceneDocument = z.infer<typeof schema>;
 export type ParameterSceneDocument = Readonly<{format:'lux-scene';version:3;source:SourceBundle;settings:OutputSettings;controls:SavedControlSnapshot}>;
 export type SavedNodeControlSnapshot=Readonly<{sourceHash:string;nodes:readonly Readonly<{nodePath:NodePath;definitionHash:DefinitionHash;schema:ControlSchema;schemaHash:string;values:ParameterValues}>[]}>;
-export type CompositionSceneDocument=Readonly<{format:'lux-scene';version:4;source:SourceBundle;settings:OutputSettings;controls:SavedNodeControlSnapshot}>;
-export type LinkedCompositionSceneDocument=Readonly<{format:'lux-scene';version:5;source:SourceBundle;settings:OutputSettings;controls:SavedNodeControlSnapshot;libraryLinks:readonly SceneLibraryLink[]}>;
+export type CompositionSceneDocument=Readonly<{format:'lux-scene';version:4;source:SourceBundle;settings:OutputSettings;controls:SavedNodeControlSnapshot;controlAnimations:readonly ControlAnimationBinding[]}>;
+export type LinkedCompositionSceneDocument=Readonly<{format:'lux-scene';version:5;source:SourceBundle;settings:OutputSettings;controls:SavedNodeControlSnapshot;libraryLinks:readonly SceneLibraryLink[];controlAnimations:readonly ControlAnimationBinding[]}>;
 export type SceneDocument = LegacySceneDocument | ParameterSceneDocument | CompositionSceneDocument | LinkedCompositionSceneDocument;
 
 /** Synchronous data validation; persisted/admitted caches also require verifySceneDocument. */
@@ -54,8 +56,8 @@ export function validateSceneDocument(value: unknown): SceneDocument {
   // Validate raw records before schema cloning can erase inherited/accessor
   // properties and their provenance. Preserve legacy scene source ordering.
   const raw = snapshotRecord(value);
-  const fields=raw.version===5?['format','version','source','settings','controls','libraryLinks']:['format','version','source','settings','controls'];
-  if(Object.keys(raw).length!==fields.length||fields.some(field=>!Object.hasOwn(raw,field)))throw Error('Missing or unsupported scene fields');
+  const fields=raw.version===5?['format','version','source','settings','controls','libraryLinks']:['format','version','source','settings','controls'],optional=(raw.version===4||raw.version===5)&&Object.hasOwn(raw,'controlAnimations')?['controlAnimations']:[];
+  if(Object.keys(raw).length!==fields.length+optional.length||fields.some(field=>!Object.hasOwn(raw,field)))throw Error('Missing or unsupported scene fields');
   const source = validateSource(raw.source);
   if(raw.version===3) {
     if(raw.format!=='lux-scene' || source.sdkVersion!=='0.2.0') throw Error('Scene v3 requires SDK 0.2.0 source');
@@ -63,16 +65,17 @@ export function validateSceneDocument(value: unknown): SceneDocument {
     if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>7340032) throw Error('Scene v3 JSON exceeds 7 MiB');
     return result;
   }
-  if(raw.version===4){if(raw.format!=='lux-scene'||source.sdkVersion!=='0.4.0')throw Error('Scene v4 requires SDK 0.4.0 source');const result:CompositionSceneDocument=Object.freeze({format:'lux-scene',version:4,source,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedNodeControlSnapshot(raw.controls)});if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>7340032)throw Error('Scene v4 JSON exceeds 7 MiB');return result;}
-  if(raw.version===5){if(raw.format!=='lux-scene'||source.sdkVersion!=='0.4.0')throw Error('Scene v5 requires SDK 0.4.0 source');const result:LinkedCompositionSceneDocument=Object.freeze({format:'lux-scene',version:5,source,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedNodeControlSnapshot(raw.controls),libraryLinks:validateSceneLibraryLinks(raw.libraryLinks)});if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>7340032)throw Error('Scene v5 JSON exceeds 7 MiB');return result;}
+  if(raw.version===4){if(raw.format!=='lux-scene'||source.sdkVersion!=='0.4.0')throw Error('Scene v4 requires SDK 0.4.0 source');const result:CompositionSceneDocument=Object.freeze({format:'lux-scene',version:4,source,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedNodeControlSnapshot(raw.controls),controlAnimations:validateControlAnimationBindings(raw.controlAnimations??[])});if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>7340032)throw Error('Scene v4 JSON exceeds 7 MiB');return result;}
+  if(raw.version===5){if(raw.format!=='lux-scene'||source.sdkVersion!=='0.4.0')throw Error('Scene v5 requires SDK 0.4.0 source');const result:LinkedCompositionSceneDocument=Object.freeze({format:'lux-scene',version:5,source,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedNodeControlSnapshot(raw.controls),libraryLinks:validateSceneLibraryLinks(raw.libraryLinks),controlAnimations:validateControlAnimationBindings(raw.controlAnimations??[])});if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>7340032)throw Error('Scene v5 JSON exceeds 7 MiB');return result;}
   const result = schema.parse({...raw,source:raw.version===2 ? source : raw.source,
     settings:snapshotRecord(raw.settings),controls:snapshotRecord(raw.controls)});
   const snapshot = result.version === 2 ? {...result,source:source as Extract<LegacySceneDocument,{version:2}>['source']} : result;
   if (snapshot.version === 2 && new TextEncoder().encode(JSON.stringify(snapshot,null,2)+'\n').byteLength > 7340032) throw Error('Scene v2 JSON exceeds 7 MiB');
   return snapshot;
 }
-export function createSceneDocument(source: SourceBundle, settings: OutputSettings, controls: ControlValues | SavedControlSnapshot | SavedNodeControlSnapshot, libraryLinks:readonly SceneLibraryLink[]=[]): SceneDocument {
+export function createSceneDocument(source: SourceBundle, settings: OutputSettings, controls: ControlValues | SavedControlSnapshot | SavedNodeControlSnapshot, libraryLinks:readonly SceneLibraryLink[]=[],controlAnimations:readonly ControlAnimationBinding[]=[]): SceneDocument {
   const links=validateSceneLibraryLinks(libraryLinks),version=source.sdkVersion==='0.4.0'?(links.length?5:4):source.sdkVersion==='0.2.0' ? 3 : 'sourceVersion' in source ? 2 : 1;
   if(links.length&&version!==5)throw Error('Library links require SDK 0.4.0 composition source');
-  return validateSceneDocument({format:'lux-scene',version,source,settings,controls,...(version===5?{libraryLinks:links}:{})});
+  if(controlAnimations.length&&version!==4&&version!==5)throw Error('Control animations require SDK 0.4.0 composition source');
+  return validateSceneDocument({format:'lux-scene',version,source,settings,controls,...(version===5?{libraryLinks:links}:{}),...((version===4||version===5)?{controlAnimations}: {})});
 }

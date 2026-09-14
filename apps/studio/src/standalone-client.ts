@@ -17,6 +17,8 @@ import { collectionMode } from '../../../packages/performance/collection-mode.mj
 import type { CollectionMode } from '../../../packages/performance/collection-mode.mjs';
 import { createCompositionControlState } from '../../../packages/runtime/src/components/composition-controls.ts';
 import type { SavedNodeControlSnapshot } from '../../../packages/core/src/scene-document.ts';
+import {validateControlAnimationBindings} from '../../../packages/runtime-contracts/src/control-animation.mjs';
+import type {ControlAnimationBinding,ControlAnimationIssue} from '../../../packages/runtime-contracts/src/control-animation.mjs';
 export interface AuthoringApi {
   example(): Promise<SourceBundle>;
   compile(source: SourceBundle): Promise<any>;
@@ -31,7 +33,7 @@ export interface AuthoringApi {
 declare global { interface Window { luxAuthoring: AuthoringApi } }
 type RetryPolicy={lastFaultAt:number|null};
 type Running = { worker: Worker; canvas: HTMLCanvasElement; instanceId: string; generation: number; revisionId: string; performance:PerformanceReceiver;retryPolicy:RetryPolicy;autoRetry:boolean;playback:'playing'|'paused';
-  lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>>; desiredControls?:ControlValues; desiredNodeControls?:SavedNodeControlSnapshot; };
+  lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; animations:number; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>>; desiredControls?:ControlValues; desiredNodeControls?:SavedNodeControlSnapshot;desiredControlAnimations?:readonly ControlAnimationBinding[]; };
 export class StandaloneClient implements StudioClient, PresentationPort {
   private snapshot: StudioSnapshot = { connection: 'connected', message: 'Open an example or write a visual, then Build & preview.', receivedAtMs: Date.now(), authoring: null, host: null, jobs: [], visualFps: null, uiFps: null };
   private listeners = new Set<() => void>();
@@ -43,7 +45,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private previewOutput: Readonly<Pick<OutputSettings,'width'|'height'>> = DEFAULT_OUTPUT;
   private busy = false;
   private automaticRetry:ReturnType<typeof setTimeout>|undefined;
-  private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; playback?:boolean; expectedControlSequence?:number; expectedControls?:ControlValues; expectedNodeControls?:SavedNodeControlSnapshot; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
+  private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; playback?:boolean; expectedControlSequence?:number; expectedControls?:ControlValues; expectedNodeControls?:SavedNodeControlSnapshot;expectedAnimationSequence?:number;expectedControlAnimations?:readonly ControlAnimationBinding[]; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
   private api: AuthoringApi;
   private codeDeclaredParameters:boolean;
   private readonly performanceMode:CollectionMode;
@@ -51,7 +53,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   getSnapshot = () => this.snapshot;
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
   private publish(patch: Partial<StudioSnapshot>) { this.snapshot = { ...this.snapshot, ...patch, receivedAtMs: Date.now() }; for (const listener of this.listeners) listener(); }
-  async submit(source: SourceBundle, options:{savedControls?:SavedControlSnapshot}={}): Promise<void> {
+  async submit(source: SourceBundle, options:{savedControls?:SavedControlSnapshot;savedControlAnimations?:readonly ControlAnimationBinding[]}={}): Promise<void> {
     if(source.sdkVersion!=='0.1.0'&&source.sdkVersion!=='0.2.0'&&source.sdkVersion!=='0.4.0')throw Error('Unsupported Studio SDK');
     const supportedSdkVersion=source.sdkVersion;
     if(source.sdkVersion==='0.2.0'&&!this.codeDeclaredParameters)throw Error('Code-declared parameters are not enabled in this Studio UI yet');
@@ -89,7 +91,8 @@ export class StandaloneClient implements StudioClient, PresentationPort {
         const composition=createCompositionControlState(linked.composition,nodeSaved);
         migration=composition.changes();
         state={sdkVersion:'0.4.0',controlSchema:schema,controlSchemaHash:schemaHash,controls:composition.values(),controlSequence:0,
-          nodeControls:Object.freeze({sourceHash:result.sourceHash,nodes:composition.snapshot().nodes})};
+          nodeControls:Object.freeze({sourceHash:result.sourceHash,nodes:composition.snapshot().nodes}),
+          controlAnimations:validateControlAnimationBindings(options.savedControlAnimations??previous?.controlAnimations),controlAnimationIssues:Object.freeze([]),animationSequence:0};
       }else{
         const flatSaved=saved&&'schema' in saved?saved:undefined;
         const initial=initialControlValues(schema,flatSaved??(previous?{schema:previous.controlSchema,values:previous.controls}:undefined));
@@ -109,7 +112,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     canvas.style.cssText = 'width:100%;height:100%;position:absolute;inset:0;object-fit:contain';
     const worker = new Worker(new URL('./visual-worker.js', import.meta.url), { type: 'module' });
     const candidate: Running = { worker, canvas, instanceId: this.running?.instanceId ?? crypto.randomUUID(), generation: ++this.generation,
-      revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0,state,output,performance:undefined as any,retryPolicy,autoRetry:false,playback:playing?'playing':'paused' };
+      revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0,animations:0,state,output,performance:undefined as any,retryPolicy,autoRetry:false,playback:playing?'playing':'paused' };
     candidate.performance=new PerformanceReceiver({instanceId:candidate.instanceId,generation:candidate.generation,revisionId},performance.now());
     const previous = this.running;
     let ready = false;
@@ -159,7 +162,9 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           if (!['ready', 'frame', 'status'].includes(message.type) || !/^\d{1,20}$/.test(message.frameId) ||
               !Number.isFinite(message.timeSeconds) || !Number.isSafeInteger(message.clockEpoch) ||
               !['playing', 'paused'].includes(message.playback) || !Number.isSafeInteger(message.controlSequence) || message.controlSequence < 0) return;
-          let applied:ControlValues,compositionNodeControls:SavedNodeControlSnapshot|undefined;
+          const animationSequence=message.animationSequence??0;
+          if(!Number.isSafeInteger(animationSequence)||animationSequence<0||animationSequence>candidate.animations)return;
+          let applied:ControlValues,compositionNodeControls:SavedNodeControlSnapshot|undefined,effectiveNodeControls:SavedNodeControlSnapshot|undefined,controlAnimations:readonly ControlAnimationBinding[]=Object.freeze([]),controlAnimationIssues:readonly ControlAnimationIssue[]=Object.freeze([]);
           try {
             applied=validateControlSnapshot(state.controlSchema,state.sdkVersion==='0.1.0'?{intensity:message.intensity}:message.controls);
             if(state.sdkVersion!=='0.1.0'&&(message.controlSchemaHash!==state.controlSchemaHash||message.sdkVersion!==state.sdkVersion||message.controlSequence>candidate.controls))throw Error('Invalid runtime schema identity');
@@ -169,12 +174,21 @@ export class StandaloneClient implements StudioClient, PresentationPort {
               const composition=createCompositionControlState(linked.composition,nodeControls);
               if(JSON.stringify(composition.values())!==JSON.stringify(applied))throw Error('Composition public controls do not match canonical node values');
               compositionNodeControls=Object.freeze({sourceHash:revisionId,nodes:composition.snapshot().nodes});
+              if(!message.effectiveNodeControls)throw Error('Missing effective animation values');
+              const effective=createCompositionControlState(linked.composition,message.effectiveNodeControls);
+              effectiveNodeControls=Object.freeze({sourceHash:revisionId,nodes:effective.snapshot().nodes});
+              controlAnimations=validateControlAnimationBindings(message.controlAnimations);
+              if(!Array.isArray(message.controlAnimationIssues))throw Error('Invalid animation issues');
+              controlAnimationIssues=Object.freeze(message.controlAnimationIssues.map((issue:any)=>{
+                if(!issue||!Number.isSafeInteger(issue.index)||issue.index<0||!Array.isArray(issue.nodePath)||issue.nodePath.some((id:unknown)=>typeof id!=='string')||typeof issue.controlId!=='string'||typeof issue.message!=='string')throw Error('Invalid animation issue');
+                return Object.freeze({index:issue.index,nodePath:Object.freeze([...issue.nodePath]),controlId:issue.controlId,message:issue.message});
+              }));
             }
-            if(message.type==='ready'&&(message.controlSequence!==0||JSON.stringify(applied)!==JSON.stringify(state.controls)))throw Error('Initial control snapshot mismatch');
+            if(message.type==='ready'&&(message.controlSequence!==0||animationSequence!==0||JSON.stringify(applied)!==JSON.stringify(state.controls)||JSON.stringify(controlAnimations)!==JSON.stringify(state.controlAnimations??[])))throw Error('Initial control snapshot mismatch');
           } catch(error) {if(message.type==='ready')fail(String(error));return;}
           if(ready&&message.controlSequence<candidate.state.controlSequence)return;
           candidate.state={...state,controls:applied,controlSequence:message.controlSequence,
-            ...(compositionNodeControls?{nodeControls:compositionNodeControls}:{})};
+            ...(compositionNodeControls?{nodeControls:compositionNodeControls,effectiveNodeControls,controlAnimations,controlAnimationIssues,animationSequence}:{} )};
           candidate.playback=message.playback;
           candidate.lastHeartbeat = performance.now();
           if (BigInt(message.frameId) > BigInt(candidate.frameId)) { candidate.frameId = message.frameId; candidate.lastFrame = performance.now(); }
@@ -189,13 +203,14 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           this.publish({ authoring: { instanceId: candidate.instanceId, generation: candidate.generation, revisionId,
             ...('linkedVersion' in linked&&linked.linkedVersion===5?{composition:linked.composition}:{}),
             sceneName: 'Untitled visual', authority: 'studio', playback: message.playback,
-            ...candidate.state,controlMigration:migration,clockEpoch: message.clockEpoch, frameId: message.frameId,
+            ...candidate.state,controlMigration:migration,clockEpoch: message.clockEpoch,timeSeconds:message.timeSeconds, frameId: message.frameId,
             ...(state.sdkVersion==='0.1.0'?{intensity:applied.intensity}:{}),
             output: candidate.output, fault: null } as RuntimeView });
           const wait = this.pending.get(message.requestId);
           if (wait?.runtime === candidate && wait.kind === 'command' &&
               (wait.expectedControlSequence === undefined ||
-                (message.controlSequence === wait.expectedControlSequence && JSON.stringify(applied) === JSON.stringify(wait.expectedControls) && (!wait.expectedNodeControls || JSON.stringify(compositionNodeControls)===JSON.stringify(wait.expectedNodeControls))))) {
+                (message.controlSequence === wait.expectedControlSequence && JSON.stringify(applied) === JSON.stringify(wait.expectedControls) && (!wait.expectedNodeControls || JSON.stringify(compositionNodeControls)===JSON.stringify(wait.expectedNodeControls)))) &&
+              (wait.expectedAnimationSequence===undefined || (animationSequence===wait.expectedAnimationSequence&&JSON.stringify(controlAnimations)===JSON.stringify(wait.expectedControlAnimations)))) {
             clearTimeout(wait.timer); this.pending.delete(message.requestId); wait.resolve(message);
           }
         };
@@ -232,7 +247,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       this.automaticRetry=undefined;
       if(this.busy||this.running!==runtime||!runtime.autoRetry)return;
       runtime.autoRetry=false;this.busy=true;this.publish({message:'Automatically restarting the accepted visual…'});
-      void this.start(accepted.linked,accepted.revisionId,{...runtime.state,controls:runtime.desiredControls??runtime.state.controls,nodeControls:runtime.desiredNodeControls??runtime.state.nodeControls,controlSequence:0},[],runtime.retryPolicy,runtime.playback==='playing',accepted.output)
+      void this.start(accepted.linked,accepted.revisionId,{...runtime.state,controls:runtime.desiredControls??runtime.state.controls,nodeControls:runtime.desiredNodeControls??runtime.state.nodeControls,controlAnimations:runtime.desiredControlAnimations??runtime.state.controlAnimations,controlSequence:0,animationSequence:0},[],runtime.retryPolicy,runtime.playback==='playing',accepted.output)
         .then(()=>{if(!this.running?.terminal)this.publish({message:null});})
         .catch(error=>{runtime.retryPolicy.lastFaultAt=performance.now();if(this.running===runtime)this.publish({message:`Automatic restart failed. Restart explicitly to retry. ${String(error).slice(0,500)}`});})
         .finally(()=>{this.busy=false;this.scheduleAutomaticRetry();});
@@ -256,7 +271,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       if (!this.accepted) throw Error('No visual to restart');
       this.cancelAutomaticRetry();runtime.autoRetry=false;
       this.busy = true;
-      try { await this.start(this.accepted.linked, this.accepted.revisionId, {...runtime.state,controls:runtime.desiredControls??runtime.state.controls,nodeControls:runtime.desiredNodeControls??runtime.state.nodeControls,controlSequence:0},[],runtime.retryPolicy,undefined,this.accepted.output); this.publish({message:null});return this.snapshot.authoring; }
+      try { await this.start(this.accepted.linked, this.accepted.revisionId, {...runtime.state,controls:runtime.desiredControls??runtime.state.controls,nodeControls:runtime.desiredNodeControls??runtime.state.nodeControls,controlAnimations:runtime.desiredControlAnimations??runtime.state.controlAnimations,controlSequence:0,animationSequence:0},[],runtime.retryPolicy,undefined,this.accepted.output); this.publish({message:null});return this.snapshot.authoring; }
       catch(error){if(runtime.terminal)runtime.retryPolicy.lastFaultAt=performance.now();throw error;}
       finally { this.busy = false;this.scheduleAutomaticRetry(); }
     }
@@ -264,7 +279,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       if (!this.accepted) throw Error('No visual to resize');
       const output = { width: operation.input.width, height: operation.input.height };
       this.busy = true;
-      try { await this.start(this.accepted.linked, this.accepted.revisionId, {...runtime.state,controls:runtime.desiredControls??runtime.state.controls,nodeControls:runtime.desiredNodeControls??runtime.state.nodeControls,controlSequence:0},[],runtime.retryPolicy,undefined,output);
+      try { await this.start(this.accepted.linked, this.accepted.revisionId, {...runtime.state,controls:runtime.desiredControls??runtime.state.controls,nodeControls:runtime.desiredNodeControls??runtime.state.nodeControls,controlAnimations:runtime.desiredControlAnimations??runtime.state.controlAnimations,controlSequence:0,animationSequence:0},[],runtime.retryPolicy,undefined,output);
         this.previewOutput = output; this.accepted = {...this.accepted,output}; this.publish({message:null}); return this.snapshot.authoring; }
       finally { this.busy = false; this.scheduleAutomaticRetry(); }
     }
@@ -295,11 +310,25 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       runtime.desiredControls=state.values();
       message={type:'node-controls',nodePath:operation.input.nodePath,values:operation.input.values,
         controlSchemaHash:operation.input.expectedControlSchemaHash,controlSequence:++runtime.controls};
+    } else if(operation.name==='lux.node.animation.set'){
+      const linked=this.accepted?.linked,node=runtime.state.nodeControls?.nodes.find(row=>JSON.stringify(row.nodePath)===JSON.stringify(operation.input.nodePath));
+      if(!linked||!('linkedVersion' in linked)||linked.linkedVersion!==5||!node)throw Error('This visual has no matching composition node');
+      if(operation.input.expectedRevisionId!==runtime.revisionId)throw Error('Revision changed; read current runtime state');
+      if(operation.input.expectedControlSchemaHash!==node.schemaHash)throw Error('Composition node control schema changed');
+      if(!node.schema.some(row=>row.id===operation.input.controlId))throw Error('Composition node control is unavailable');
+      if(runtime.animations>=Number.MAX_SAFE_INTEGER)throw Error('Animation sequence exhausted; restart runtime');
+      if(operation.input.animation){const animation=validateControlAnimationBindings([operation.input.animation])[0]!;
+        if(JSON.stringify(animation.nodePath)!==JSON.stringify(node.nodePath)||animation.controlId!==operation.input.controlId||animation.definitionHash!==node.definitionHash||animation.schemaHash!==node.schemaHash)throw Error('Animation target identity changed');}
+      const current=[...(runtime.desiredControlAnimations??runtime.state.controlAnimations??[])],index=current.findIndex(row=>JSON.stringify(row.nodePath)===JSON.stringify(node.nodePath)&&row.controlId===operation.input.controlId);
+      if(index>=0)current.splice(index,1,...(operation.input.animation?[operation.input.animation]:[]));else if(operation.input.animation)current.push(operation.input.animation);
+      runtime.desiredControlAnimations=validateControlAnimationBindings(current);
+      message={type:'animations',animationSequence:++runtime.animations,controlAnimations:runtime.desiredControlAnimations,...(operation.input.restart?{restart:{nodePath:operation.input.nodePath,controlId:operation.input.controlId}}:{})};
     } else message = { type: 'playback', action: operation.input.action };
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => this.fault(runtime, 'Runtime command timed out'), 5000);
       this.pending.set(input.requestId, { runtime, kind: 'command', playback: message.type === 'playback', resolve, reject, timer,
-        ...((message.type === 'controls'||message.type==='node-controls') ? { expectedControlSequence: message.controlSequence, expectedControls: runtime.desiredControls,expectedNodeControls:runtime.desiredNodeControls } : {}) });
+        ...('controlSequence' in message ? { expectedControlSequence: message.controlSequence, expectedControls: runtime.desiredControls,expectedNodeControls:runtime.desiredNodeControls } : {}),
+        ...('animationSequence' in message?{expectedAnimationSequence:message.animationSequence,expectedControlAnimations:runtime.desiredControlAnimations}:{}) });
       try { runtime.worker.postMessage({ ...message, requestId: input.requestId, instanceId: runtime.instanceId, generation: runtime.generation }); }
       catch (error) { this.fault(runtime, String(error)); }
     });

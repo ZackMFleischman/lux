@@ -45,6 +45,7 @@ export function AuthoringApp() {
       }
       return { sourceHash: runtime.revisionId, schema: state.controlSchema, schemaHash: state.controlSchemaHash, values: state.controls };
     },
+    getControlAnimations:()=>client.getSnapshot().authoring?.controlAnimations??[],
     readLibraryComponent:id=>window.luxLibrary.read(id),
   }), [workspace]);
   const pendingControlWrites = useRef(new Set<Promise<unknown>>());

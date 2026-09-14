@@ -6,6 +6,7 @@ import type { RuntimeControlState } from './controls/control-state.ts';
 import type { PerformanceSnapshot } from './performance/performance-state.ts';
 import type { ImageCompositionProfile } from '../../../packages/runtime-contracts/src/composition-profile.mjs';
 import type { NodePath } from '../../../packages/runtime-contracts/src/graph.ts';
+import type {ControlAnimationBinding} from '../../../packages/runtime-contracts/src/control-animation.mjs';
 export type { RuntimeKey } from '../../../packages/runtime-contracts/src/index.ts';
 /** Provisional Studio view port over canonical runtime identity/output/control
  * DTOs. This is not a competing application service or frozen core API. */
@@ -15,7 +16,7 @@ export type Metric = Readonly<{ value: number; sampledAtMs: number; coverage: nu
 export type RuntimeView = RuntimeKey & Readonly<{
   revisionId: string; sceneName: string; authority: 'studio' | 'host';
   playback: 'playing' | 'paused' | 'starting' | 'failed';
-  clockEpoch: number; frameId: string | null; controlMigration?: readonly ControlMigration[];
+  clockEpoch: number; timeSeconds?:number; frameId: string | null; controlMigration?: readonly ControlMigration[];
   output: Readonly<Pick<OutputSettings, 'width' | 'height'>>;
   fault: Readonly<{ code: string; message: string }> | null;
   composition?: ImageCompositionProfile;
@@ -26,7 +27,9 @@ export function getRuntimeControlState(runtime:RuntimeView):RuntimeControlState 
   return Object.freeze({sdkVersion:runtime.sdkVersion??'0.1.0',controlSchema:schema,
     controlSchemaHash:runtime.controlSchemaHash??LEGACY_CONTROL_SCHEMA_HASH,
     controls:validateControlSnapshot(schema,runtime.controls??{intensity:runtime.intensity}),controlSequence:runtime.controlSequence??0,
-    ...(runtime.sdkVersion==='0.4.0'&&runtime.nodeControls?{nodeControls:runtime.nodeControls}:{})});
+    ...(runtime.sdkVersion==='0.4.0'&&runtime.nodeControls?{nodeControls:runtime.nodeControls,
+      ...(runtime.effectiveNodeControls?{effectiveNodeControls:runtime.effectiveNodeControls}:{}),
+      controlAnimations:runtime.controlAnimations??Object.freeze([]),controlAnimationIssues:runtime.controlAnimationIssues??Object.freeze([]),animationSequence:runtime.animationSequence??0}:{})});
 }
 export type StudioSnapshot = Readonly<{
   connection: 'disconnected' | 'connecting' | 'connected'; message: string | null;
@@ -43,6 +46,8 @@ export type StudioOperation =
       expectedRevisionId: string; expectedControlSchemaHash:string; nodePath:NodePath; values:ControlValues; mode:'live' } }
   | { name: 'lux.parameters.set'; input: { requestId: string; instanceId: string; expectedGeneration: number;
       expectedRevisionId: string; expectedControlSchemaHash?:string; values: ControlValues; mode: 'live' } }
+  | { name: 'lux.node.animation.set'; input: { requestId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string;
+      expectedControlSchemaHash:string;nodePath:NodePath;controlId:string;animation:ControlAnimationBinding|null;restart?:boolean } }
   | { name: 'lux.playback'; input: { requestId: string; instanceId: string; expectedGeneration: number; action: 'play' | 'pause' | 'reset' } }
   | { name: 'lux.runtime.restart'; input: { requestId: string; instanceId: string; expectedGeneration: number } }
   | { name: 'lux.preview.resize'; input: { requestId: string; instanceId: string; expectedGeneration: number; width: number; height: number } };
@@ -85,6 +90,12 @@ export class StudioController {
     return this.client.invoke({name:'lux.node.parameters.set',input:{requestId:this.requestId(),instanceId:target.instanceId,
       expectedGeneration:target.generation,expectedRevisionId:target.revisionId,expectedControlSchemaHash:node.schemaHash,
       nodePath:[...node.nodePath],values:patch,mode:'live'}});
+  }
+  async setNodeAnimation(nodePath:NodePath,controlId:string,animation:ControlAnimationBinding|null,restart=false):Promise<unknown>{
+    const target=this.target(),node=target.nodeControls?.nodes.find(row=>JSON.stringify(row.nodePath)===JSON.stringify(nodePath));
+    if(target.sdkVersion!=='0.4.0'||!node||!node.schema.some(row=>row.id===controlId))throw Error('Composition node control is unavailable');
+    return this.client.invoke({name:'lux.node.animation.set',input:{requestId:this.requestId(),instanceId:target.instanceId,expectedGeneration:target.generation,
+      expectedRevisionId:target.revisionId,expectedControlSchemaHash:node.schemaHash,nodePath:[...node.nodePath],controlId,animation,...(restart?{restart:true}:{})}});
   }
   async setParameters(values:ControlValues):Promise<unknown> {
     const target = this.target();

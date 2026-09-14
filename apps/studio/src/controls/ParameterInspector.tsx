@@ -1,91 +1,53 @@
 import type {NodePath} from '../../../../packages/runtime-contracts/src/graph.ts';
-import { useEffect, useRef, useState } from 'react';
-import { IconButton, Slider, TextField, Tooltip } from '@mui/material';
-import { getRuntimeControlState } from '../service-client.ts';
-import type { RuntimeView, StudioClient, StudioController } from '../service-client.ts';
-import type { NumberControlDefinition } from '../../../../packages/runtime-contracts/src/parameters.mjs';
-export type ControlEdits = { changed(): void; track(write: Promise<unknown>): void };
+import type {ControlAnimationBinding,ControlAnimationShape} from '../../../../packages/runtime-contracts/src/control-animation.mjs';
+import type {NumberControlDefinition} from '../../../../packages/runtime-contracts/src/parameters.mjs';
+import {useEffect,useRef,useState} from 'react';
+import {Button,Checkbox,ClickAwayListener,Divider,FormControlLabel,IconButton,MenuItem,Paper,Popper,Select,Slider,TextField,Tooltip} from '@mui/material';
+import {getRuntimeControlState} from '../service-client.ts';
+import type {RuntimeView,StudioClient,StudioController} from '../service-client.ts';
+export type ControlEdits={changed():void;track(write:Promise<unknown>):void};
 
-export function parameterOwner(runtime: RuntimeView | null, nodePath?:NodePath): string | null {
-  return runtime?.authority === 'studio'
-    ? JSON.stringify([runtime.instanceId, runtime.generation, runtime.revisionId, runtime.controlSchemaHash,nodePath??null]) : null;
+export function parameterOwner(runtime:RuntimeView|null,nodePath?:NodePath):string|null{return runtime?.authority==='studio'?JSON.stringify([runtime.instanceId,runtime.generation,runtime.revisionId,runtime.controlSchemaHash,nodePath??null]):null;}
+const samePath=(a:NodePath,b:NodePath)=>JSON.stringify(a)===JSON.stringify(b);
+
+function ParameterRow({definition,description,displayLabel,applied,effective,owner,available,client,controller,onError,edits,nodePath,node,animation,issue,playback,open,onOpen,onClose}:{definition:NumberControlDefinition;description?:string;displayLabel:string;applied:number;effective:number;owner:string|null;available:boolean;client:StudioClient;controller:StudioController;onError:(error:string|null)=>void;edits?:ControlEdits;nodePath?:NodePath;node?:NonNullable<RuntimeView['nodeControls']>['nodes'][number];animation?:ControlAnimationBinding;issue?:string;playback:RuntimeView['playback'];open:boolean;onOpen:()=>void;onClose:()=>void;}){
+  const [value,setValue]=useState(applied),[text,setText]=useState(String(applied));
+  const [optimistic,setOptimistic]=useState<ControlAnimationBinding|undefined>(animation),[period,setPeriod]=useState(String(animation?.periodSeconds??2));
+  const [amount,setAmount]=useState(String(animation?.amount??Math.max(definition.step??0,(definition.max-definition.min)/10))),[phase,setPhase]=useState(String(animation?.phase??0));
+  const intent=useRef<object|null>(null),editing=useRef(false),button=useRef<HTMLButtonElement|null>(null),editor=useRef<HTMLDivElement|null>(null),undo=useRef<(ControlAnimationBinding|null)[]>([]);
+  useEffect(()=>{if(!intent.current){setValue(applied);if(!editing.current)setText(String(applied));}},[applied]);
+  useEffect(()=>{setOptimistic(animation);if(animation){setPeriod(String(animation.periodSeconds));setAmount(String(animation.amount));setPhase(String(animation.phase));}},[animation]);
+  useEffect(()=>()=>{intent.current=null;},[]);
+  useEffect(()=>{if(open)requestAnimationFrame(()=>editor.current?.focus());},[open]);
+  async function change(next:number){if(!available||!owner||parameterOwner(client.getSnapshot().authoring,nodePath)!==owner||!Number.isFinite(next)||next<definition.min||next>definition.max)return;const pending={};intent.current=pending;setValue(next);setText(String(next));onError(null);edits?.changed();try{const write=nodePath?controller.setNodeParameters(nodePath,{[definition.id]:next}):controller.setParameters({[definition.id]:next});edits?.track(write);await write;}catch(error){if(intent.current===pending&&parameterOwner(client.getSnapshot().authoring,nodePath)===owner)onError(String(error));}finally{if(intent.current===pending){intent.current=null;const current=client.getSnapshot();if(parameterOwner(current.authoring,nodePath)===owner&&current.authoring){const confirmed=(nodePath?current.authoring.nodeControls?.nodes.find(row=>samePath(row.nodePath,nodePath))?.values[definition.id]:getRuntimeControlState(current.authoring).controls[definition.id])??applied;setValue(confirmed);if(!editing.current)setText(String(confirmed));}}}}
+  function commitText(){editing.current=false;const next=text.trim()===''?NaN:Number(text);if(!Number.isFinite(next)||next<definition.min||next>definition.max){setText(String(value));onError(`${displayLabel} must be between ${definition.min} and ${definition.max}.`);return;}if(next!==value)void change(next);}
+  async function setAnimation(next:ControlAnimationBinding|undefined,record=true){if(!available||!owner||!nodePath||!node||parameterOwner(client.getSnapshot().authoring,nodePath)!==owner)return;if(record)undo.current.push(optimistic??null);const pending={};intent.current=pending;setOptimistic(next);onError(null);edits?.changed();const write=controller.setNodeAnimation(nodePath,definition.id,next??null);edits?.track(write);try{await write;}catch(error){if(intent.current===pending&&parameterOwner(client.getSnapshot().authoring,nodePath)===owner){setOptimistic(animation);onError(String(error));}}finally{if(intent.current===pending)intent.current=null;}}
+  const active=optimistic??animation;
+  const add=()=>setAnimation({nodePath:[...nodePath!],definitionHash:node!.definitionHash,schemaHash:node!.schemaHash,controlId:definition.id,shape:'sine',periodSeconds:2,amount:Math.max(definition.step??0,(definition.max-definition.min)/10),phase:0,enabled:true});
+  const update=(patch:Partial<ControlAnimationBinding>)=>active&&setAnimation({...active,...patch});
+  const commitDraft=(kind:'period'|'amount'|'phase')=>{if(!active)return;const raw=kind==='period'?period:kind==='amount'?amount:phase,next=Number(raw),valid=Number.isFinite(next)&&(kind==='period'?next>=.05&&next<=3600:kind==='amount'?next>=0:next>=0&&next<=1);if(!valid){onError(kind==='period'?'Period must be between 0.05 and 3600 seconds.':kind==='amount'?'Amount must be zero or greater.':'Phase must be between 0 and 1.');setPeriod(String(active.periodSeconds));setAmount(String(active.amount));setPhase(String(active.phase));return;}void update(kind==='period'?{periodSeconds:next}:kind==='amount'?{amount:next}:{phase:next});};
+  const minimum=Math.max(definition.min,applied-(active?.amount??0)),maximum=Math.min(definition.max,applied+(active?.amount??0)),limited=!!active&&(applied-active.amount<definition.min||applied+active.amount>definition.max),span=definition.max-definition.min;
+  const controlDescription=definition.description??description;
+  const label=<label className="parameter-name" htmlFor={`parameter-${definition.id}`} {...(controlDescription?{tabIndex:0}:{title:`${displayLabel}${definition.unit?` (${definition.unit})`:''}`})}>{displayLabel}{definition.unit&&<small> {definition.unit}</small>}</label>;
+  return <div className="parameter-row" data-control-id={definition.id} data-applied-value={applied}><div className="parameter-heading">
+    {controlDescription?<Tooltip title={controlDescription} placement="left-start" disableInteractive slotProps={{tooltip:{className:'control-description-tooltip'}}}>{label}</Tooltip>:label}
+    <TextField id={`parameter-${definition.id}`} className="parameter-number" size="small" type="number" value={text} disabled={!available} slotProps={{htmlInput:{'aria-label':`${displayLabel} value`,min:definition.min,max:definition.max,step:definition.step??'any'}}} onChange={event=>{editing.current=true;setText(event.target.value);edits?.changed();}} onBlur={commitText} onKeyDown={event=>{if(event.key==='Enter'){event.preventDefault();commitText();}if(event.key==='Escape'){event.stopPropagation();editing.current=false;setText(String(value));}}}/>
+    {nodePath?<Tooltip title={active?'Edit animation':'Animate this control'}><span><IconButton ref={button} size="small" disabled={!available} aria-label={`Animate ${displayLabel}`} aria-pressed={!!active} onClick={onOpen}><span aria-hidden="true">∿</span>{active&&<small className="animation-on">ON</small>}</IconButton></span></Tooltip>:<Tooltip title="Reset to default"><span><IconButton size="small" disabled={!available} aria-label={`Reset ${displayLabel} to default`} onClick={()=>void change(definition.default)}>↺</IconButton></span></Tooltip>}
+  </div>{description&&<p className="hint">{description}</p>}<Slider size="small" aria-label={displayLabel} min={definition.min} max={definition.max} step={definition.step??span/100} value={value} disabled={!available} onChange={(_e,next)=>{if(typeof next==='number')void change(next);}}/>
+  {active&&<div className="animation-range" aria-label={`${displayLabel} animation range ${minimum} to ${maximum}; current ${effective}`}><span style={{left:`${100*(minimum-definition.min)/span}%`,right:`${100*(definition.max-maximum)/span}%`}}/><i style={{left:`${100*(effective-definition.min)/span}%`}}/></div>}
+  <Popper open={open} anchorEl={button.current} placement="left-start" className="animation-popper"><ClickAwayListener onClickAway={onClose}><Paper ref={editor} role="dialog" aria-label={`${displayLabel} animation`} tabIndex={-1} onKeyDown={event=>{if(event.key==='Escape'){event.stopPropagation();onClose();button.current?.focus();}}} className="animation-editor"><header><strong>{displayLabel}</strong><span>Animation</span></header>{issue&&<p role="alert">{issue}</p>}{playback==='paused'&&<p className="hint">Press Play to animate.</p>}
+    {!active?<><p className="hint">Move this control automatically with a repeating waveform.</p><Button variant="contained" onClick={add}>Add LFO</Button>{undo.current.length>0&&<Button onClick={()=>{const prior=undo.current.pop();if(prior)void setAnimation(prior,false);}}>Undo remove</Button>}</>:<><FormControlLabel control={<Checkbox checked={active.enabled} onChange={event=>void update({enabled:event.target.checked})}/>} label={active.enabled?'On':'Off'}/>
+      <label>Shape<Select size="small" value={active.shape} onChange={event=>void update({shape:event.target.value as ControlAnimationShape})}>{(['sine','triangle','saw','square'] as const).map(shape=><MenuItem key={shape} value={shape}>{shape[0]!.toUpperCase()+shape.slice(1)}</MenuItem>)}</Select></label>
+      <label>Period <TextField size="small" type="number" value={period} slotProps={{htmlInput:{min:.05,max:3600,step:.05,'aria-label':'Animation period seconds'}}} onChange={event=>setPeriod(event.target.value)} onBlur={()=>commitDraft('period')} onKeyDown={event=>{if(event.key==='Enter')commitDraft('period');}}/> s</label><Slider size="small" aria-label="Animation period" min={.05} max={Math.min(10,3600)} step={.05} value={Math.min(10,Math.max(.05,Number(period)||.05))} onChange={(_e,next)=>setPeriod(String(next))} onChangeCommitted={(_e,next)=>{if(typeof next==='number')void update({periodSeconds:next});}}/>
+      <label>Amount <TextField size="small" type="number" value={amount} slotProps={{htmlInput:{min:0,step:definition.step??'any','aria-label':'Animation amount'}}} onChange={event=>setAmount(event.target.value)} onBlur={()=>commitDraft('amount')} onKeyDown={event=>{if(event.key==='Enter')commitDraft('amount');}}/></label><Slider size="small" aria-label="Animation amount range" min={0} max={span} step={definition.step??span/100} value={Math.min(span,Math.max(0,Number(amount)||0))} onChange={(_e,next)=>setAmount(String(next))} onChangeCommitted={(_e,next)=>{if(typeof next==='number')void update({amount:next});}}/>
+      <div className="animation-range-label"><span>{minimum}</span><strong>{effective}</strong><span>{maximum}</span></div>{limited&&<p className="hint">Limited by control range.</p>}<Divider/><details><summary>More</summary><label>Start phase <TextField size="small" type="number" value={phase} slotProps={{htmlInput:{min:0,max:1,step:.01,'aria-label':'Animation start phase'}}} onChange={event=>setPhase(event.target.value)} onBlur={()=>commitDraft('phase')}/></label><Button onClick={()=>{if(nodePath)void controller.setNodeAnimation(nodePath,definition.id,active,true);}}>Restart animation</Button><Button onClick={()=>void change(definition.default)}>Reset base to default</Button><Button color="error" onClick={()=>void setAnimation(undefined)}>Remove animation</Button></details><Button disabled={undo.current.length===0} onClick={()=>{const prior=undo.current.pop();void setAnimation(prior??undefined,false);}}>Undo animation change</Button></>}
+  </Paper></ClickAwayListener></Popper></div>;
 }
-function ParameterRow({ definition, displayLabel, applied, owner, available, client, controller, onError, edits, nodePath, description }: {
-  definition: NumberControlDefinition; applied: number; owner: string | null; available: boolean;
-  displayLabel: string; description?:string;
-  client: StudioClient; controller: StudioController; onError: (error: string | null) => void;
-  edits?: ControlEdits; nodePath?:NodePath;
-}) {
-  const [value, setValue] = useState(applied);
-  const [text, setText] = useState(String(applied));
-  const intent = useRef<object | null>(null);
-  const editing = useRef(false);
-  useEffect(() => {
-    if (intent.current) return;
-    setValue(applied);
-    if (!editing.current) setText(String(applied));
-  }, [applied]);
-  useEffect(() => () => { intent.current = null; }, []);
-  async function change(next: number) {
-    if (!available || !owner || parameterOwner(client.getSnapshot().authoring,nodePath) !== owner || !Number.isFinite(next) || next < definition.min || next > definition.max) return;
-    const pending = {};
-    intent.current = pending;
-    setValue(next); setText(String(next)); onError(null);
-    edits?.changed();
-    try { const write = (nodePath?controller.setNodeParameters(nodePath,{[definition.id]:next}):controller.setParameters({ [definition.id]: next })); edits?.track(write); await write; }
-    catch (error) {
-      if (intent.current === pending && parameterOwner(client.getSnapshot().authoring,nodePath) === owner) onError(String(error));
-    } finally {
-      if (intent.current === pending) {
-        intent.current = null;
-        const current = client.getSnapshot();
-        if (parameterOwner(current.authoring,nodePath) === owner && current.authoring) {
-          const confirmed = (nodePath?current.authoring.nodeControls?.nodes.find(row=>JSON.stringify(row.nodePath)===JSON.stringify(nodePath))?.values[definition.id]:getRuntimeControlState(current.authoring).controls[definition.id]) ?? applied;
-          setValue(confirmed); if (!editing.current) setText(String(confirmed));
-        }
-      }
-    }
-  }
-  function commitText() {
-    editing.current = false;
-    const next = text.trim() === '' ? NaN : Number(text);
-    if (!Number.isFinite(next) || next < definition.min || next > definition.max) {
-      setText(String(value)); onError(`${displayLabel} must be between ${definition.min} and ${definition.max}.`); return;
-    }
-    if (next !== value) void change(next);
-  }
-  const controlDescription = definition.description ?? description;
-  const label = <label className="parameter-name" htmlFor={`parameter-${definition.id}`} {...(controlDescription ? { tabIndex: 0 } : { title: `${displayLabel}${definition.unit ? ` (${definition.unit})` : ''}` })}>{displayLabel}{definition.unit && <small> {definition.unit}</small>}</label>;
-  return <div className="parameter-row" data-control-id={definition.id} data-applied-value={applied}>
-    <div className="parameter-heading">
-      {controlDescription ? <Tooltip title={controlDescription} placement="left-start" disableInteractive slotProps={{ tooltip: { className: 'control-description-tooltip' } }}>{label}</Tooltip> : label}
-      <TextField id={`parameter-${definition.id}`} className="parameter-number" size="small" type="number" value={text} disabled={!available}
-        slotProps={{ htmlInput: { 'aria-label': `${displayLabel} value`, min: definition.min, max: definition.max, step: definition.step ?? 'any' } }}
-        onChange={event => { editing.current = true; setText(event.target.value); edits?.changed(); }}
-        onBlur={commitText} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); commitText(); } if (event.key === 'Escape') { event.stopPropagation(); editing.current = false; setText(String(value)); } }} />
-      <Tooltip title="Reset to default"><span><IconButton size="small" disabled={!available} aria-label={`Reset ${displayLabel} to default`} onClick={() => void change(definition.default)}>↺</IconButton></span></Tooltip>
-    </div>
-    {description&&<p className="hint">{description}</p>}
-    <Slider size="small" aria-label={displayLabel} min={definition.min} max={definition.max}
-      step={definition.step ?? (definition.max - definition.min) / 100} value={value} disabled={!available}
-      onChange={(_event, next) => { if (typeof next === 'number') void change(next); }} />
-  </div>;
-}
-export function ParameterInspector({ runtime, available, client, controller, onError, edits, nodePath }: {
-  runtime: RuntimeView | null; available: boolean; client: StudioClient; controller: StudioController;
-  onError: (error: string | null) => void;
-  edits?: ControlEdits; nodePath?:NodePath;
-}) {
-  if (!runtime) return <p className="hint">Build a visual to see its controls.</p>;
-  const node=nodePath?runtime.nodeControls?.nodes.find(row=>JSON.stringify(row.nodePath)===JSON.stringify(nodePath)):null;
-  if(nodePath&&!node)return <p className="hint">This node is no longer available. Select another node.</p>;
-  const state=node?{controlSchema:node.schema,controls:node.values}:getRuntimeControlState(runtime), owner = parameterOwner(runtime,nodePath);
-  const labelCounts = new Map<string, number>();
-  for (const definition of state.controlSchema) labelCounts.set(definition.label, (labelCounts.get(definition.label) ?? 0) + 1);
-  const displayLabel = (definition: NumberControlDefinition) => labelCounts.get(definition.label)! > 1 ? `${definition.id} · ${definition.label}` : definition.label;
-  return <>{state.controlSchema.length === 0 && <p className="hint">This visual defines no live controls.</p>}
-    {state.controlSchema.map(definition => <ParameterRow key={`${owner}:${definition.id}`} definition={definition} displayLabel={displayLabel(definition)}
-      description={node&&runtime.composition?runtime.composition.definitions[node.definitionHash]?.metadata.controlDescriptions[definition.id]:undefined} applied={state.controls[definition.id]!} owner={owner} available={available} client={client} controller={controller} onError={onError} edits={edits} nodePath={nodePath} />)}
-    {!!runtime.controlMigration?.length && <details><summary>Controls updated</summary>{runtime.controlMigration.map(change => <p key={change.id}>{change.id}: {change.reason.replaceAll('-', ' ')}</p>)}</details>}
-  </>;
+
+export function ParameterInspector({runtime,available,client,controller,onError,edits,nodePath}:{runtime:RuntimeView|null;available:boolean;client:StudioClient;controller:StudioController;onError:(error:string|null)=>void;edits?:ControlEdits;nodePath?:NodePath}){
+  const [openId,setOpenId]=useState<string|null>(null),targetOwner=parameterOwner(runtime,nodePath);useEffect(()=>setOpenId(null),[targetOwner]);if(!runtime)return <p className="hint">Build a visual to see its controls.</p>;
+  const node=nodePath?runtime.nodeControls?.nodes.find(row=>samePath(row.nodePath,nodePath)):null;if(nodePath&&!node)return <p className="hint">This node is no longer available. Select another node.</p>;
+  const state=node?{controlSchema:node.schema,controls:node.values}:getRuntimeControlState(runtime),owner=targetOwner,effectiveNode=nodePath?runtime.effectiveNodeControls?.nodes.find(row=>samePath(row.nodePath,nodePath)):undefined;
+  const counts=new Map<string,number>();for(const definition of state.controlSchema)counts.set(definition.label,(counts.get(definition.label)??0)+1);const display=(d:NumberControlDefinition)=>counts.get(d.label)!>1?`${d.id} · ${d.label}`:d.label;
+  return <>{state.controlSchema.length===0&&<p className="hint">This visual defines no live controls.</p>}{state.controlSchema.map(definition=>{const animation=runtime.controlAnimations?.find(row=>!!nodePath&&samePath(row.nodePath,nodePath)&&row.controlId===definition.id),issue=runtime.controlAnimationIssues?.find(row=>!!nodePath&&samePath(row.nodePath,nodePath)&&row.controlId===definition.id)?.message;return <ParameterRow key={`${owner}:${definition.id}`} definition={definition} description={node&&runtime.composition?runtime.composition.definitions[node.definitionHash]?.metadata.controlDescriptions[definition.id]:undefined} displayLabel={display(definition)} applied={state.controls[definition.id]!} effective={effectiveNode?.values[definition.id]??state.controls[definition.id]!} owner={owner} available={available} client={client} controller={controller} onError={onError} edits={edits} nodePath={nodePath} node={node??undefined} animation={animation} issue={issue} playback={runtime.playback} open={openId===definition.id} onOpen={()=>setOpenId(openId===definition.id?null:definition.id)} onClose={()=>setOpenId(null)}/>;})}</>;
 }
