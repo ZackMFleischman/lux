@@ -8,7 +8,7 @@ Object.defineProperty(globalThis, 'IS_REACT_ACT_ENVIRONMENT', { configurable: tr
 // jsdom has no layout; these only allow CodeMirror's scheduled geometry reads.
 dom.window.Range.prototype.getClientRects = () => [] as unknown as DOMRectList;
 dom.window.Range.prototype.getBoundingClientRect = () => new dom.window.DOMRect();
-const { render, screen, cleanup, fireEvent, act } = await import('@testing-library/react');
+const { render, screen, cleanup, fireEvent, act, waitFor } = await import('@testing-library/react');
 const { SourcePanel } = await import('../../apps/studio/src/source/SourcePanel.tsx');
 const { createSourceWorkspace } = await import('../../apps/studio/src/source/workspace.ts');
 const { EditorView } = await import('@codemirror/view');
@@ -306,7 +306,9 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
   };
   const { AuthoringApp } = await import('../../apps/studio/src/authoring.tsx');
   await act(async () => { render(<AuthoringApp />); });
-  await click(screen.getByRole('button', { name: 'Open Source' }));
+  await click(screen.getByRole('button', { name: 'View' }));
+  await click(screen.getByRole('menuitem', { name: 'Source' }));
+  await waitFor(() => assert.ok(screen.queryByRole('button', { name: 'View' })));
   await click(screen.getByRole('button', { name: 'Open lib/color.ts' }));
   await act(async () => { view().dispatch({ changes: { from: 0, to: view().state.doc.length, insert: 'export const color = 42' } }); });
   const editor = view();

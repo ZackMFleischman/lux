@@ -158,6 +158,26 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   await click('Open Inspector');
   assert.ok(screen.getByText('11'));
   await click('Open Preview');
+  selectedPanel = 'jobs';
+  await click('Close selected panel');
+  assert.equal(document.querySelector('.studio-dock-grid .studio-pane-jobs'), null);
+  const problems = screen.getByRole('button', { name: 'Problems: 0. Open Jobs and diagnostics' });
+  problems.focus();
+  assert.equal(document.activeElement, problems);
+  await click('Problems: 0. Open Jobs and diagnostics');
+  assert.ok(document.querySelector('.studio-dock-grid .studio-pane-jobs'));
+  assert.ok([...document.querySelectorAll('.studio-dock-grid .dv-tab')].some(node => node.textContent?.trim() === 'Jobs'));
+  selectedPanel = 'jobs';
+  await click('Close selected panel');
+  assert.ok(!document.querySelector('.studio-dock-grid .studio-pane-jobs'));
+  await click('Open Preview');
+  await click('Maximize');
+  assert.ok(document.querySelector<HTMLElement>('.studio-dock-grid')!.hidden);
+  await click('Problems: 0. Open Jobs and diagnostics');
+  assert.ok(!document.querySelector<HTMLElement>('.studio-dock-grid')!.hidden, 'Footer details restore a maximized workspace');
+  const reopenedJobsTab = [...document.querySelectorAll('.studio-dock-grid .dv-tab')].find(node => node.textContent?.trim() === 'Jobs');
+  assert.ok(reopenedJobsTab?.classList.contains('dv-active-tab'), 'Jobs is reopened and active');
+  assert.ok(reopenedJobsTab?.closest('.dv-groupview')?.contains(document.activeElement), 'Focus moves into the Jobs group');
   assert.equal(document.querySelector('.cm-editor'), editorNode);
   assert.equal(attaches, 1); assert.equal(detaches, 0); assert.equal(subscriptions, 1);
   for (const kind of ['preview', 'source', 'library', 'inspector', 'jobs']) {
@@ -383,7 +403,9 @@ test('Graph wheel zoom anchors at the pointer and background gestures keep selec
   assert.ok(!viewport.classList.contains('graph-panning'));
   for (const delta of [-10000, 10000, 10000, 10000]) {
     const old = transform();
-    await act(async () => { viewport.dispatchEvent(new dom.window.WheelEvent('wheel', { deltaY: delta, clientX: 600, clientY: 300, bubbles: true, cancelable: true })); });
+    const wheelEvent = new dom.window.WheelEvent('wheel', { deltaY: delta, clientX: 600, clientY: 300, bubbles: true, cancelable: true });
+    await act(async () => { viewport.dispatchEvent(wheelEvent); });
+    assert.equal(wheelEvent.defaultPrevented, true, 'graph owns wheel scrolling even at zoom limits');
     const next = transform();
     assert.ok(next.zoom >= .2 && next.zoom <= 2);
     assert.ok(Math.abs((500 - old.x) / old.zoom - (500 - next.x) / next.zoom) < 1e-8);

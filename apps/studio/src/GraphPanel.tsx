@@ -54,7 +54,8 @@ export function GraphPanel({runtime,selected,onSelect}:{runtime:RuntimeView|null
       const box = canvas.getBoundingClientRect();
       const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? box.height : 1;
       const delta = Math.max(-1000, Math.min(1000, event.deltaY * unit));
-      if (zoom(Math.exp(-delta * .002), { x: event.clientX - box.left, y: event.clientY - box.top })) event.preventDefault();
+      event.preventDefault();
+      zoom(Math.exp(-delta * .002), { x: event.clientX - box.left, y: event.clientY - box.top });
     };
     canvas.addEventListener('wheel', wheel, { passive: false });
     return () => canvas.removeEventListener('wheel', wheel);

@@ -23,7 +23,7 @@ test('standalone guarded MCP commands wait for applied state and reject invalid/
   try {
     await client.submit(source);
     const initial = client.getSnapshot().authoring!;
-    assert.equal(initial.playback, 'paused');
+    assert.equal(initial.playback, 'playing');
     const worker = FakeWorker.all.at(-1)!;
     const target = { instanceId: initial.instanceId, expectedGeneration: initial.generation };
     const parameters = { ...target, expectedRevisionId: initial.revisionId, values: { intensity: 0.8 } };

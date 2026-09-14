@@ -31,3 +31,28 @@ test('connected view distinguishes actual zero measurement, stale coverage and h
   assert.match(html, /host-revision/); assert.match(html, /author-revision/);
   assert.match(html, /COMPILE_FAILED/); assert.match(html, /Line 8: unknown symbol/);
 });
+
+test('status bar exposes current build, problem and runtime health as actionable labels', () => {
+  let snapshot: StudioSnapshot = {
+    connection: 'connected', message: null, receivedAtMs: 1000,
+    authoring: { instanceId: 'instance-1', generation: 2, revisionId: 'author-revision', sceneName: 'Scene', authority: 'studio',
+      playback: 'paused', clockEpoch: 1, frameId: '81', intensity: 0.5, output: { width: 1920, height: 1080 }, fault: null },
+    host: null, jobs: [{ jobId: 'build-1', state: 'compiling', summary: 'Compiling visual…' }],
+    visualFps: null, uiFps: null,
+  };
+  const client: StudioClient = { getSnapshot: () => snapshot, subscribe: () => () => {}, invoke: async () => ({}) };
+  const html = renderToStaticMarkup(<StudioApp client={client} nowMs={1000} />);
+  assert.match(html, /aria-label="Build status: Compiling visual…\. Open Jobs and diagnostics"/);
+  assert.match(html, />Compiling visual…</);
+  assert.match(html, /aria-label="Problems: 0\. Open Jobs and diagnostics"/);
+  assert.match(html, />0 problems</);
+  assert.match(html, /aria-label="Runtime status: Paused\. Open Jobs and diagnostics"/);
+  assert.match(html, />Paused</);
+  assert.doesNotMatch(html, /Presentation only|TRACER 0\.1/);
+  assert.match(html, /class="status-spinner"/);
+  assert.match(html, /aria-busy="true"/);
+  snapshot = { ...snapshot, jobs: [{ jobId: 'build-1', state: 'succeeded', summary: 'Visual is ready in Lux.' }] };
+  const finished = renderToStaticMarkup(<StudioApp client={client} nowMs={1000} />);
+  assert.doesNotMatch(finished, /class="status-spinner"/);
+  assert.match(finished, />Build ready</);
+});
