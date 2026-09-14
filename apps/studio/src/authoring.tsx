@@ -32,6 +32,7 @@ export function AuthoringApp() {
   const [diagnostics, setDiagnostics] = useState<SourceDiagnostic[]>([]);
   const [libraryVersion, setLibraryVersion] = useState(0);
   const [looksOpen, setLooksOpen] = useState(false);
+  const fileSummary = useRef<HTMLElement>(null);
   const lookOperation = useRef(false);
   const composing = useRef(false);
   const workspace = useMemo(() => createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': '' } }), []);
@@ -182,7 +183,7 @@ export function AuthoringApp() {
       await session.loadLook(id); setDiagnostics([]); setError(''); return true;
     });
   }
-  const fileMenu = <details className="file-tools" onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }}><summary>File</summary><div className="file-tools-content" onClick={event => { if ((event.target as Element).closest('button')) event.currentTarget.closest('details')!.open = false; }}>
+  const fileMenu = <details className="file-tools" onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }}><summary ref={fileSummary}>File</summary><div className="file-tools-content" onClick={event => { if ((event.target as Element).closest('button')) event.currentTarget.closest('details')!.open = false; }}>
       <Button disabled={busy} onClick={() => void open()}>Open</Button><Button disabled={busy} title="Save scene (Ctrl/Cmd+Shift+S in source)" onClick={() => void save()}>Save</Button><Button disabled={busy} onClick={() => void save(true)}>Save as</Button>
       <Button disabled={busy} onClick={() => setLooksOpen(true)}>Looks…</Button>
       <ExportDialog disabled={busy || composing.current} defaultName={io.name} create={async name => { if (pendingControlWrites.current.size) await finishControlWrites(); return session.exportSource(name); }} />
@@ -200,7 +201,7 @@ export function AuthoringApp() {
     onFork={id=>{try{session.forkLibraryComponent(id);}catch(reason){setError(String(reason));}}} onError={reason=>setError(String(reason))}/>;
   return <ThemeProvider theme={studioTheme}><div className="authoring-shell">
     {confirmation.dialog}
-    <LooksDialog open={looksOpen} onClose={() => setLooksOpen(false)} client={window.luxLooks} onSave={saveLook} onLoad={loadLook} />
+    <LooksDialog open={looksOpen} onClose={() => setLooksOpen(false)} onClosed={() => fileSummary.current?.focus()} client={window.luxLooks} onSave={saveLook} onLoad={loadLook} />
     <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} appCommands={commands} appError={error} controlEdits={controlEdits} libraryPanel={libraryPanel}
       sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onApply={() => void build()} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnostics={diagnostics} />} />
   </div></ThemeProvider>;
