@@ -383,7 +383,9 @@ test('Graph wheel zoom anchors at the pointer and background gestures keep selec
   assert.ok(!viewport.classList.contains('graph-panning'));
   for (const delta of [-10000, 10000, 10000, 10000]) {
     const old = transform();
-    await act(async () => { viewport.dispatchEvent(new dom.window.WheelEvent('wheel', { deltaY: delta, clientX: 600, clientY: 300, bubbles: true, cancelable: true })); });
+    const wheelEvent = new dom.window.WheelEvent('wheel', { deltaY: delta, clientX: 600, clientY: 300, bubbles: true, cancelable: true });
+    await act(async () => { viewport.dispatchEvent(wheelEvent); });
+    assert.equal(wheelEvent.defaultPrevented, true, 'graph owns wheel scrolling even at zoom limits');
     const next = transform();
     assert.ok(next.zoom >= .2 && next.zoom <= 2);
     assert.ok(Math.abs((500 - old.x) / old.zoom - (500 - next.x) / next.zoom) < 1e-8);
