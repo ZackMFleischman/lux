@@ -34,12 +34,13 @@ export function StudioMenu({ label, children, buttonRef, className = '' }: {
       aria-controls={open ? id : undefined} className="studio-menu-trigger" color="inherit"
       onClick={() => setActive(current => current === id ? null : id)}
       onKeyDown={event => {
+        if (event.key === 'Escape' && open) { event.preventDefault(); event.stopPropagation(); close(true); }
         if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); setActive(id); }
         if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') { event.preventDefault(); adjacent(event.key === 'ArrowRight' ? 1 : -1); }
       }}>{label}</Button>
     <Popper open={open} anchorEl={trigger.current} placement="bottom-start" sx={{ zIndex: 1300 }}>
       <Paper className="studio-menu-paper">
-        <MenuList id={id} aria-label={label} autoFocusItem dense
+        <MenuList id={id} aria-label={label} autoFocus autoFocusItem dense
           onClick={event => { if ((event.target as Element).closest('[role="menuitem"]:not([aria-disabled="true"])')) close(); }}
           onKeyDown={event => {
             if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); close(true); }

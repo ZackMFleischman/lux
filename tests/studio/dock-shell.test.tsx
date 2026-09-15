@@ -468,3 +468,12 @@ test('File and View share one menu and restore keyboard focus', async () => {
   assert.equal(screen.queryByRole('menu'), null);
   assert.equal(document.activeElement, screen.getByRole('button', { name: 'File' }));
 });
+
+test('disabled application menu still closes with Escape while building', async () => {
+  const { StudioMenu } = await import('../../apps/studio/src/StudioMenu.tsx');
+  const { MenuItem } = await import('@mui/material');
+  render(<StudioMenu label="File"><MenuItem disabled>Open</MenuItem></StudioMenu>);
+  await pressButton('File');
+  await act(async () => fireEvent.keyDown(document.activeElement!, { key: 'Escape' }));
+  assert.equal(screen.queryByRole('menu'), null);
+});
