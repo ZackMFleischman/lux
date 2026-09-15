@@ -2,7 +2,7 @@
 
 ## Connection
 
-Use configured `lux.studio.*` tools when discovery confirms the intended profile and checkout. Tool search can discover a configured server; absence of those tools does not prove Lux lacks an adapter. For the user creative workflow, **start-lux** supplies the selected branch checkout and an automatically isolated profile; a configured development adapter is a different target.
+Use configured `lux.studio.*` tools when discovery confirms the intended profile and checkout. Tool search can discover a configured server; absence of those tools does not prove Lux lacks an adapter. For the user creative workflow, **start-lux** supplies either the installed app runtime or the selected branch checkout and its isolated profile; a configured development adapter is a different target. The desktop installation record is `%LOCALAPPDATA%/Programs/Lux/installation.json`. Its bundled Node can run `<workspace>/scripts/studio-desktop.mjs --status` to report live connection details, or `--start` when opening the app is requested. Use its returned MCP command; no port configuration is needed.
 
 For a local coding agent with terminal access, locate the Lux checkout/build used to launch the current Studio. Use known launch context or inspect its process command line when needed; do not ask the user to reconfirm a path already established. Check that checkout for `scripts/studio-mcp.mjs`; do not assume a particular username, drive, or `.worktrees/tracer` directory exists. Launch that **adapter only**, with the project's installed Node version and dependencies:
 

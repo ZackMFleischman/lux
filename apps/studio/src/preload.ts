@@ -22,7 +22,8 @@ const api: StudioWindowClient = {
   },
 };
 contextBridge.exposeInMainWorld('luxStudioWindows', Object.freeze(api));
-const exportApi: StudioExportClient = { create: request => ipcRenderer.invoke('studio:export', request) };
+const exportApi: StudioExportClient = { create: request => ipcRenderer.invoke('studio:export', request),
+  ...(process.argv.includes('--lux-no-export') ? { unavailableReason: 'Resolume export is not included in this desktop build.' } : {}) };
 contextBridge.exposeInMainWorld('luxExport', Object.freeze(exportApi));
 contextBridge.exposeInMainWorld('luxConfirmation', Object.freeze({
   onCloseRequest: (listener: (id: string) => void) => {
@@ -47,6 +48,7 @@ contextBridge.exposeInMainWorld('luxAuthoring', Object.freeze({
         error => ipcRenderer.invoke('studio:agent-result', command.id, { ok: false, error: String(error?.message || error) }));
     };
     ipcRenderer.on('studio:agent-command', callback);
+    void ipcRenderer.invoke('studio:agent-ready');
     return () => ipcRenderer.removeListener('studio:agent-command', callback);
   },
 }));

@@ -27,6 +27,8 @@ await build({ ...common, entryPoints: [join(directory, 'src/source/admission-wor
 await build({ ...common, entryPoints: [join(directory, 'src/source/image-preview-worker.mjs')], outfile: join(dist, 'image-preview-worker.js'),
   platform: 'browser', format: 'esm', target: 'chrome140' });
 await copyFile(join(directory, 'src/index.html'), join(dist, 'index.html'));
+await copyFile(join(directory, 'assets/branding/lux-icon.png'), join(dist, 'lux-icon.png'));
+await copyFile(join(directory, 'assets/branding/lux-favicon.svg'), join(dist, 'lux-favicon.svg'));
 if (process.argv.includes('--tests')) await build({ ...common,
   entryPoints: [join(root, 'tests/studio/view.test.tsx')], outfile: join(dist, 'view.test.cjs'),
   platform: 'node', format: 'cjs', target: 'node24', jsx: 'automatic' });

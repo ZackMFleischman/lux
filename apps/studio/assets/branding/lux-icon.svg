@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Lux icon</title>
+  <desc id="desc">A luminous cyan and lilac L light beam on a deep indigo rounded square.</desc>
+  <defs>
+    <linearGradient id="base" x1="100" y1="60" x2="910" y2="970" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#202552"/>
+      <stop offset=".48" stop-color="#111634"/>
+      <stop offset="1" stop-color="#090B21"/>
+    </linearGradient>
+    <linearGradient id="beam" x1="350" y1="235" x2="735" y2="745" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B6F7FF"/>
+      <stop offset=".43" stop-color="#72E8FF"/>
+      <stop offset="1" stop-color="#B69AFF"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="420" y1="220" x2="700" y2="740" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F2FDFF" stop-opacity=".98"/>
+      <stop offset="1" stop-color="#D8C8FF" stop-opacity=".62"/>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="34"/>
+    </filter>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" rx="228" fill="url(#base)"/>
+  <ellipse cx="390" cy="300" rx="205" ry="178" fill="#44DDFE" opacity=".17" filter="url(#glow)"/>
+  <ellipse cx="666" cy="674" rx="223" ry="160" fill="#A88BFF" opacity=".16" filter="url(#glow)"/>
+  <path d="M370 241 486 210v411h244l-2 122H370z" fill="#69E6FF" opacity=".26" filter="url(#soft)"/>
+  <path d="M370 241 486 210v411h244l-2 122H370z" fill="url(#beam)"/>
+  <path d="m388 263 76-21v403h240l-.6 26H395z" fill="url(#edge)" opacity=".62"/>
+  <path d="m486 621 244 0-2 122h-24l1-98H486z" fill="#C3ADFF" opacity=".42"/>
+  <rect x=".75" y=".75" width="1022.5" height="1022.5" rx="227.25" fill="none" stroke="#B8C8FF" stroke-opacity=".18" stroke-width="1.5"/>
+</svg>

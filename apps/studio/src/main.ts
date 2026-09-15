@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, dialog, clipboard } from 'electron';
 import { join, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { randomBytes } from 'node:crypto';
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, rename } from 'node:fs/promises';
 import { mkdirSync } from 'node:fs';
 import { StudioWindows, isTrustedStudioUrl } from './windows.ts';
 import { createStudioPage } from './page.ts';
@@ -21,6 +21,7 @@ import type { SourceBundle } from '../../../packages/runtime-contracts/src/index
 // This process owns presentation windows only. It never creates a render service,
 // starts an authoring instance, or terminates a host-owned process.
 app.setName('Lux Studio');
+if (process.platform === 'win32') app.setAppUserModelId('Lux.Studio');
 app.commandLine.appendSwitch('force_high_performance_gpu');
 const workspace = process.env.LUX_WORKSPACE ? resolve(process.env.LUX_WORKSPACE) : resolve(__dirname, '../../..');
 const studioProfile = resolveStudioSession({ workspace, appData: app.getPath('appData') });
@@ -99,7 +100,9 @@ function createWindow(preview: boolean): BrowserWindow {
   const window = new BrowserWindow({
     width: preview ? 1100 : 1440, height: preview ? 720 : 900, minWidth: 620, minHeight: 480,
     show: false, backgroundColor: '#111217', title: preview ? 'Lux — Preview' : 'Lux Studio', autoHideMenuBar: true,
-    webPreferences: { preload: join(__dirname, 'preload.cjs'), nodeIntegration: false, contextIsolation: true, sandbox: true },
+    icon: join(__dirname, 'lux-icon.png'),
+    webPreferences: { preload: join(__dirname, 'preload.cjs'), nodeIntegration: false, contextIsolation: true, sandbox: true,
+      additionalArguments: process.env.LUX_STUDIO_DESKTOP === '1' ? ['--lux-no-export'] : [] },
   });
   owned.add(window);
   window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
@@ -116,11 +119,18 @@ app.whenReady().then(async () => {
   // The single-instance lock prevents another UI process overwriting this
   // session's nonce-bearing local page. No renderer service lock is involved.
   if (!app.requestSingleInstanceLock()) { app.quit(); return; }
+  let markAgentReady = () => {};
+  const agentReady = new Promise<void>(resolve => { markAgentReady = resolve; });
+  ipcMain.handle('studio:agent-ready', event => {
+    if (!trusted(event)) throw Error('Untrusted agent listener');
+    if (BrowserWindow.fromWebContents(event.sender) === mainWindow) markAgentReady();
+  });
   await mkdir(app.getPath('userData'), { recursive: true });
   const template = await readFile(join(__dirname, 'index.html'), 'utf8');
   await writeFile(page, createStudioPage(template, pathToFileURL(__dirname + sep).href, randomBytes(24).toString('base64')));
   ipcMain.handle('studio:export', (event, request: unknown) => {
     if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted export sender');
+    if (process.env.LUX_STUDIO_DESKTOP === '1') throw Error('Resolume export is not included in this desktop build.');
     return exportService.create(request);
   });
   ipcMain.handle('studio:library',async(event,action:unknown,value:unknown)=>{
@@ -212,7 +222,6 @@ app.whenReady().then(async () => {
     const timer = setTimeout(() => { agentRequests.delete(id); reject(Error('Studio did not finish the operation in time')); }, 70000);
     agentRequests.set(id, { resolve: result => resolve(method === 'status' ? { ...(result as object), studioSession } : result), reject, timer }); mainWindow.webContents.send('studio:agent-command', { id, method, params });
   }));
-  await writeFile(studioProfile.endpointPath, JSON.stringify({ version: 1, ...studioSession, url: bridge.url, token: bridge.token }));
   app.once('will-quit', () => { bridge.close(); for (const pending of agentRequests.values()) { clearTimeout(pending.timer); pending.reject(Error('Studio closed')); } agentRequests.clear(); });
   mainWindow.on('close', event => {
     if (process.env.LUX_STUDIO_SMOKE !== '1' && !closeConfirmation.allowClose(dirty)) { event.preventDefault(); return; }
@@ -221,7 +230,17 @@ app.whenReady().then(async () => {
   if (process.env.LUX_STUDIO_SMOKE === '1') setTimeout(() => { console.error('Studio smoke timeout'); app.exit(3); }, 90000);
   if (process.env.LUX_STUDIO_MCP_TEST === '1') setTimeout(() => { console.error('Studio MCP test timeout'); app.exit(3); }, 120000);
   mainWindow.webContents.on('console-message', details => console.log('Studio:', details.message));
-  await mainWindow.loadFile(page); mainWindow.show();
+  await mainWindow.loadFile(page);
+  let readyTimer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    await Promise.race([agentReady, new Promise<never>((_, reject) => {
+      readyTimer = setTimeout(() => reject(Error('Studio agent listener did not become ready')), 30000);
+    })]);
+  } finally { clearTimeout(readyTimer); }
+  const endpointTemp = `${studioProfile.endpointPath}.${studioSession.sessionId}.tmp`;
+  await writeFile(endpointTemp, JSON.stringify({ version: 1, ...studioSession, url: bridge.url, token: bridge.token }));
+  await rename(endpointTemp, studioProfile.endpointPath);
+  mainWindow.show();
 }).catch(error => { console.error('Studio startup failed:', error); app.exit(1); });
 app.on('second-instance', () => {
   if (!mainWindow || mainWindow.isDestroyed()) return;

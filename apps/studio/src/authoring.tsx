@@ -198,7 +198,8 @@ export function AuthoringApp() {
     <MenuItem disabled={busy} onClick={() => void save()}>Save</MenuItem>
     <MenuItem disabled={busy} onClick={() => void save(true)}>Save as</MenuItem>
     <MenuItem disabled={busy} onClick={() => setLooksOpen(true)}>Looks…</MenuItem>
-    <MenuItem disabled={busy || composing.current} onClick={() => setExportOpen(true)}>Export for Resolume</MenuItem>
+    <MenuItem disabled={busy || composing.current || !!window.luxExport?.unavailableReason} title={window.luxExport?.unavailableReason} onClick={() => setExportOpen(true)}>
+      Export for Resolume{window.luxExport?.unavailableReason ? ' (not included)' : ''}</MenuItem>
   </StudioMenu>;
   const commands = <>
     <span className="document-name" title={io.name}><span className="document-label">Scene</span><span className="document-title">{io.name}</span>{dirty && <span aria-label="Unsaved changes"> *</span>}</span>

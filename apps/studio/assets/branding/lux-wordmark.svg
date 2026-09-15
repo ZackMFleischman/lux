@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 128" role="img" aria-labelledby="title">
+  <title id="title">Lux</title>
+  <defs>
+    <linearGradient id="b" x1="12" y1="9" x2="114" y2="119" gradientUnits="userSpaceOnUse"><stop stop-color="#202552"/><stop offset="1" stop-color="#090B21"/></linearGradient>
+    <linearGradient id="l" x1="38" y1="25" x2="92" y2="95" gradientUnits="userSpaceOnUse"><stop stop-color="#BAF8FF"/><stop offset=".48" stop-color="#72E8FF"/><stop offset="1" stop-color="#B69AFF"/></linearGradient>
+  </defs>
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#b)"/>
+  <path d="m47 27 17-5v48h36l-.3 25H47z" fill="url(#l)"/>
+  <text x="151" y="88" fill="#F4F5FF" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="76" font-weight="650" letter-spacing="-3">Lux</text>
+</svg>

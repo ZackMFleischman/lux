@@ -7,7 +7,13 @@ description: Use when the user invokes /start-lux or $start-lux, or asks to open
 
 Start or reuse Lux in this conversation. Load [lux-visual-creation](../lux-visual-creation/SKILL.md) for the creative work. Do not create another agent or task.
 
-## Start
+## Installed app
+
+When no branch or development checkout is explicitly requested, check `%LOCALAPPDATA%/Programs/Lux/installation.json`. If present, read its `node` and `workspace` fields and run the bundled Node with `<workspace>/scripts/studio-desktop.mjs --start`. This opens or reuses the installed app without building anything. Use the returned `mcp` configuration and live session ID. The app, compiler, SDK and adapter are all from the installed build. Do not reinstall or upgrade it as part of normal startup. If the record is invalid or a different desktop build is still running, preserve that session and report the concrete failure.
+
+If there is no installation, or the user explicitly selects a branch/checkout, use the checkout launch below.
+
+## Checkout launch
 
 Use the user's selected branch checkout, otherwise the current Lux checkout (normally main; known local repository: C:\Users\zFlei\repos\lux). If a different branch is requested, use its existing checkout or a normal Git worktree; do not switch a checkout occupied by development. Use the project's pinned Node and installed dependencies.
 
@@ -29,6 +35,6 @@ Wait up to 60 seconds in short intervals for discovery and live read/status. A l
 
 Inspect the existing scene and preview. Carry out the supplied visual brief, or confirm readiness and ask what to create. Preserve the scene and playback state. Save scenes outside development/test artifact directories.
 
-The visual compiler still reads SDK/compiler source and dependencies from the selected checkout. Do development edits in another normal checkout while this Studio runs; private app output is not a self-contained installation. A standalone installed app is separate work.
+The visual compiler still reads SDK/compiler source and dependencies from the selected checkout. Do development edits in another normal checkout while this Studio runs; private app output is not a self-contained installation. The installed app above includes its own compiler and SDK and has no dependency on the development checkout.
 
 Development tests use fresh `test-*` profiles and their own build outputs when sharing a checkout. Do not terminate the user's Studio or mutate its private build/profile. GPU load and dependency changes still require coordination. Existing legacy creative sessions and saved files stay untouched; they are not startup prerequisites.

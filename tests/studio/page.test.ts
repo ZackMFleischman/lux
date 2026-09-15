@@ -11,6 +11,7 @@ test('Emotion styling is allowed only through a nonce while script and network p
   assert.match(page, /connect-src 'none'/);
   assert.match(page, /script-src 'self'/);
   assert.match(page, /file:\/\/\/C:\/Lux\/studio\/dist\/renderer.js/);
+  assert.match(page, /file:\/\/\/C:\/Lux\/studio\/dist\/lux-favicon.svg/);
   assert.doesNotMatch(page, /unsafe-inline|__STYLE_NONCE__|__RENDERER_JS__/);
 });
 
