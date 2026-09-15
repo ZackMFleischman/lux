@@ -1,3 +1,4 @@
+import { InspectorBreadcrumb } from './InspectorBreadcrumb.tsx';
 import {GraphPanel,compositionNodeLabel,compositionOccurrence,nodeKey} from './GraphPanel.tsx';
 import type {NodePath} from '../../../packages/runtime-contracts/src/graph.ts';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
@@ -83,7 +84,6 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   useEffect(() => { setError(null); }, [runtime?.instanceId, runtime?.generation]);
   const [graphSelection,setGraphSelection]=useState<NodePath|null>(null);
   const selectedNodePath=graphSelection??undefined;
-  const selectedNode=selectedNodePath?compositionOccurrence(runtime,selectedNodePath):undefined;
   function selectGraphNode(path:NodePath|null){setGraphSelection(path?[...path]:null);openPanelRef.current?.('inspector');}
   const available = snapshot.connection === 'connected' && runtime?.authority === 'studio';
   useEffect(() => {
@@ -169,7 +169,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
       </Paper>;
   const inspectorPane = <Paper component="aside" square className="inspector" aria-label="Scene controls and status">
         <section><Disclosure title="Controls" defaultOpen className="controls-section" badge={<Chip label="LIVE" />}>
-          <p className="inspector-target">{selectedNodePath&&selectedNode?compositionNodeLabel(runtime,selectedNodePath):(selectedNodePath?'Selected node unavailable':runtime?.composition?'Composition controls':'Visual controls')}</p>
+          <InspectorBreadcrumb runtime={runtime} path={selectedNodePath} onSelect={setGraphSelection} />
           <ParameterInspector nodePath={selectedNodePath} runtime={runtime} available={!!available} client={client} controller={controller} onError={setError} edits={controlEdits} />
         </Disclosure></section>
         <section><Disclosure title="Performance"><PerformanceStatus performance={snapshot.performance} /><MetricView label="Visual delivery" metric={snapshot.visualFps} nowMs={nowMs ?? clock} /><MetricView label="UI cadence" metric={snapshot.uiFps} nowMs={nowMs ?? clock} />
