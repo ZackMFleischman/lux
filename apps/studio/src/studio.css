@@ -149,9 +149,12 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 .app-bar .studio-build-button:hover { background:#30323d; border-color:#777b90; }
 .studio-dock-grid .dv-tab.dv-inactive-tab .dv-default-tab .dv-default-tab-action { visibility:visible; }
 
-.inspector-breadcrumb { margin:6px 0 10px; }
-.inspector-breadcrumb ol { display:flex; flex-wrap:wrap; align-items:center; gap:2px; margin:0; padding:0; list-style:none; }
-.inspector-breadcrumb li { display:flex; align-items:center; min-width:0; max-width:100%; }
-.inspector-breadcrumb li+li::before { content:"/"; color:#858b9f; margin:0 3px; }
-.inspector-breadcrumb .MuiButton-root { font-size:12px; line-height:1.5; padding:2px 4px; text-align:left; white-space:normal; overflow-wrap:anywhere; min-width:0; color:#b4a4e9; }
-.inspector-breadcrumb [aria-current="page"] { color:#e1e2ec; font-weight:600; }
+.inspector-breadcrumb { margin:2px 0 6px; }
+.inspector-breadcrumb ol { display:flex; align-items:center; height:20px; gap:0; margin:0; padding:0; list-style:none; }
+.inspector-breadcrumb li { display:flex; align-items:center; flex:0 0 auto; min-width:0; }
+.inspector-breadcrumb li+li::before { content:"›"; color:#72798a; margin:0 2px; }
+.inspector-breadcrumb .MuiButton-root { font-size:11px; font-weight:400; line-height:16px; height:20px; padding:0 2px; min-width:0; color:#8f96aa; white-space:nowrap; }
+.inspector-breadcrumb .inspector-current { flex:1 1 auto; overflow:hidden; }
+.inspector-current .MuiButton-root { min-width:0; max-width:100%; }
+.inspector-current span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.inspector-breadcrumb [aria-current="page"] { color:#b7bccb; font-weight:400; }

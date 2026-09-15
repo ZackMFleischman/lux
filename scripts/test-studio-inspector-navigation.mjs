@@ -9,7 +9,7 @@ import { join, resolve } from 'node:path';
 import { studioTestEnvironment, resolveStudioSession } from './studio-session.mjs';
 import { installedElectron } from './studio-electron.mjs';
 const root=resolve(import.meta.dirname,'..');
-const output=join(root,'artifacts/inspector-navigation',`run-${Date.now()}`); await mkdir(output,{recursive:true});
+const output=join(root,'artifacts/compact-breadcrumb',`run-${Date.now()}`); await mkdir(output,{recursive:true});
 const env={...studioTestEnvironment(),LUX_NODE_EXECUTABLE:process.execPath};
 const report={ok:false,root,commit:execFileSync('git',['-c',`safe.directory=${root}`,'rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),session:resolveStudioSession({workspace:root,env}),checks:[],errors:[]};
 let app,page,client,child;
@@ -30,7 +30,7 @@ try {
  const node=name=>page.locator('.graph-node').filter({hasText:name});
  await node('Double mirror 1').dblclick();await node('Wrapped mirror').dblclick();await page.locator('.graph-node').first().click();
  const nav=page.getByRole('navigation',{name:'Inspector controls path'});
- await nav.getByRole('button',{name:'Controls for Wrapped mirror',exact:true}).waitFor();
+ await nav.getByRole('button',{name:'Parent controls',exact:true}).waitFor();
  const graphTab=page.locator('.dv-tab').filter({hasText:/^Graph$/});await graphTab.locator('.dv-default-tab-action').click();
  assert.equal(await graphTab.count(),0);
  const before=(await call('status')).authoring;
@@ -38,11 +38,16 @@ try {
  assert.ok(report.headings.every(h=>h.fontSize==='14px'));
  await page.screenshot({path:join(output,'nested-inspector.png')});
  await page.setViewportSize({width:820,height:720});await page.screenshot({path:join(output,'narrow-inspector.png')});
- const bounds=await nav.evaluate(el=>({width:el.clientWidth,scroll:el.scrollWidth}));assert.ok(bounds.scroll<=bounds.width+1,'Breadcrumb wraps within Inspector');
- await nav.getByRole('button',{name:'Controls for Wrapped mirror',exact:true}).click();
+ const bounds=await nav.evaluate(el=>({width:el.clientWidth,scroll:el.scrollWidth,height:el.getBoundingClientRect().height}));assert.ok(bounds.scroll<=bounds.width+1,'Breadcrumb fits Inspector');assert.ok(bounds.height<=20,'Breadcrumb stays one compact line');
+ await nav.getByRole('button',{name:'Parent controls',exact:true}).click();await page.screenshot({path:join(output,'parent-menu.png')});
+ await page.getByRole('menuitem',{name:'Wrapped mirror',exact:true}).click();
+ await page.getByRole('menu').waitFor({state:'hidden'});
+ await page.waitForFunction(()=>document.activeElement?.getAttribute('aria-label')==='Controls for Wrapped mirror');
  await nav.getByRole('button',{name:'Controls for Wrapped mirror',current:'page'}).waitFor();
  assert.equal(await page.evaluate(()=>document.activeElement?.getAttribute('aria-label')),'Controls for Wrapped mirror');
- await nav.getByRole('button',{name:'Controls for Double mirror 1',exact:true}).click();
+ await nav.getByRole('button',{name:'Parent controls',exact:true}).click();
+ await page.getByRole('menuitem',{name:'Double mirror 1',exact:true}).click();
+ await page.getByRole('menu').waitFor({state:'hidden'});
  await nav.getByRole('button',{name:'Controls for Double mirror 1',current:'page'}).waitFor();
  const scene=nav.getByRole('button',{name:'Scene controls',exact:true});await scene.focus();await page.keyboard.press('Enter');
  await nav.getByRole('button',{name:'Scene controls',current:'page'}).waitFor();
@@ -50,7 +55,7 @@ try {
  const after=(await call('status')).authoring;
  assert.equal(after.controlSequence,before.controlSequence);assert.deepEqual(after.controls,before.controls);assert.deepEqual(after.nodeControls,before.nodeControls);assert.equal(after.generation,before.generation);
  await page.screenshot({path:join(output,'scene-controls.png')});
- report.checks=['Nested leaf to both parents and Scene with Graph closed','Keyboard activation and focus retained','Control values and runtime unchanged by navigation','Shared headings14px; normal and narrow breadcrumb wrap'];assert.deepEqual(report.errors,[]);report.ok=true;
+ report.checks=['Nested leaf to both parents and Scene with Graph closed','Keyboard activation and focus retained','Control values and runtime unchanged by navigation','Quiet single20px breadcrumb; full parent menu and normal/narrow layouts'];assert.deepEqual(report.errors,[]);report.ok=true;
 }catch(error){report.error=String(error.stack??error);if(page)await page.screenshot({path:join(output,'failure.png')}).catch(()=>{});process.exitCode=1;}
 finally{await client?.close();if(app)await app.close();if(child){child.kill();await new Promise(resolve=>{if(child.exitCode!==null)resolve();else child.once('exit',resolve);});}if(report.pid){try{process.kill(report.pid,0);report.processExited=false;}catch{report.processExited=true;}}await writeFile(join(output,'result.json'),JSON.stringify(report,null,2));console.log(JSON.stringify({output,...report},null,2));}
 
