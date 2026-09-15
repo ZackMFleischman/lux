@@ -27,7 +27,7 @@ export class SceneFileStore {
     const token = randomUUID(), fileHash = hash(bytes); this.bindings.set(token, { path: resolve(path), hash: fileHash });
     return { token, document: snapshot, fileHash, name: path.split(/[\\/]/).pop()! };
   }
-  async saveAs(path: string, value: unknown, options: {overwrite?: boolean} = {}) {
+  async saveAs(path: string, value: unknown, options: {overwrite?: boolean} = {overwrite:true}) {
     const snapshot = await verifySceneDocument(value), target = resolve(path), token = randomUUID();
     let initial: string | null = null;
     try { initial = hash(await boundedRead(target)); } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
