@@ -161,7 +161,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         const result = await ports.save({ token, saveAs, document });
         if (result) { token = result.token; workspace.markSaved(snapshot.version);
           update({ name: result.name, controlsDirty: controlsVersion !== controlVersion,libraryDirty:false }); }
-        return {name:result.name,path,draftVersion:workspace.getSnapshot().version};
+        return result;
       });
     },
     savePath(path:string,expectedVersion:number,overwrite:boolean) {
@@ -190,7 +190,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         workspace.replaceDocument(resolution.source);await workspace.submit(resolution.source,workspace.getSnapshot().version,async()=>{});
         token=result.token;libraryLinks=resolution.links;pendingDocumentControls=null;pendingDocumentAnimations=null;
         update({name:result.name,controlsDirty:false,libraryDirty:JSON.stringify(resolution.links)!==JSON.stringify(savedLinks),libraryUpdates:Object.freeze([]),libraryFallbacks:resolution.fallbacks});
-        return result;
+        return {name:result.name,path,draftVersion:workspace.getSnapshot().version};
       });
     },
     open() {
