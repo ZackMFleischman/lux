@@ -14,7 +14,7 @@ const env={...studioTestEnvironment(),LUX_NODE_EXECUTABLE:process.execPath};
 const report={ok:false,root,commit:execFileSync('git',['-c',`safe.directory=${root}`,'rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),session:resolveStudioSession({workspace:root,env}),checks:[],errors:[]};
 let app,page,client;
 try {
- app=await _electron.launch({executablePath:installedElectron(root),args:[join(root,'apps/studio/dist/main.cjs')],cwd:root,env,chromiumSandbox:true}); report.pid=app.process().pid;
+ app=await _electron.launch({executablePath:installedElectron(root),args:[join(root,'apps/studio/dist/main.cjs')],cwd:root,env,chromiumSandbox:true}); report.pid=await app.evaluate(() => process.pid);
  page=await app.firstWindow();page.setDefaultTimeout(15000);page.on('pageerror',e=>report.errors.push(e.message));
  let endpoint;
  for(let i=0;i<100;i++){try{endpoint=JSON.parse(await readFile(report.session.endpointPath,'utf8'));if(endpoint.pid===report.pid)break;}catch{}await page.waitForTimeout(100);}

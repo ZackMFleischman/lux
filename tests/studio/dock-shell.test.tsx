@@ -180,7 +180,7 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   assert.ok(reopenedJobsTab?.closest('.dv-groupview')?.contains(document.activeElement), 'Focus moves into the Jobs group');
   assert.equal(document.querySelector('.cm-editor'), editorNode);
   assert.equal(attaches, 1); assert.equal(detaches, 0); assert.equal(subscriptions, 1);
-  for (const kind of ['preview', 'source', 'library', 'inspector', 'jobs']) {
+  for (const kind of ['preview', 'source', 'graph', 'library', 'inspector', 'jobs']) {
     selectedPanel = kind;
     await click('Close selected panel');
   }
