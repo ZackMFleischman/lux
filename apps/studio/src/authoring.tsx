@@ -104,7 +104,7 @@ export function AuthoringApp() {
     if(command.method==='scene.open'){
       await finishControlWrites();const current=workspace.getSnapshot(),io=session.getSnapshot();
       if((current.dirty||io.controlsDirty||io.libraryDirty)&&!command.params.discardDirty)throw Error('Scene has unsaved changes; pass discardDirty:true to open another scene');
-      return session.openPath(command.params.path,command.params.expectedDraftVersion);
+      const result=await session.openPath(command.params.path,command.params.expectedDraftVersion);setError('');setDiagnostics([]);return result;
     }
     if (command.method !== 'build' || session.getSnapshot().busy || composing.current) throw Error('Studio is busy or command is unsupported');
     const source = command.params.source as SourceBundle;
