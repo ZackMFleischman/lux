@@ -1,3 +1,5 @@
+import { StudioMenu, StudioMenuProvider } from './StudioMenu.tsx';
+import { MenuItem } from '@mui/material';
 import { useEffect, useState, useMemo, useRef, useSyncExternalStore } from 'react';
 import { Button, ThemeProvider } from '@mui/material';
 import { StudioApp } from './renderer.tsx';
@@ -32,7 +34,8 @@ export function AuthoringApp() {
   const [diagnostics, setDiagnostics] = useState<SourceDiagnostic[]>([]);
   const [libraryVersion, setLibraryVersion] = useState(0);
   const [looksOpen, setLooksOpen] = useState(false);
-  const fileSummary = useRef<HTMLElement>(null);
+  const fileSummary = useRef<HTMLButtonElement>(null);
+  const [exportOpen, setExportOpen] = useState(false);
   const lookOperation = useRef(false);
   const composing = useRef(false);
   const workspace = useMemo(() => createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': '' } }), []);
@@ -190,26 +193,28 @@ export function AuthoringApp() {
       await session.loadLook(id); setDiagnostics([]); setError(''); return true;
     });
   }
-  const fileMenu = <details className="file-tools" onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }}><summary ref={fileSummary}>File</summary><div className="file-tools-content" onClick={event => { if ((event.target as Element).closest('button')) event.currentTarget.closest('details')!.open = false; }}>
-      <Button disabled={busy} onClick={() => void open()}>Open</Button><Button disabled={busy} title="Save scene (Ctrl/Cmd+Shift+S in source)" onClick={() => void save()}>Save</Button><Button disabled={busy} onClick={() => void save(true)}>Save as</Button>
-      <Button disabled={busy} onClick={() => setLooksOpen(true)}>Looks…</Button>
-      <ExportDialog disabled={busy || composing.current} defaultName={io.name} create={async name => { if (pendingControlWrites.current.size) await finishControlWrites(); return session.exportSource(name); }} />
-    </div></details>;
+  const fileMenu = <StudioMenu label="File" buttonRef={fileSummary} className="file-tools">
+    <MenuItem disabled={busy} onClick={() => void open()}>Open</MenuItem>
+    <MenuItem disabled={busy} onClick={() => void save()}>Save</MenuItem>
+    <MenuItem disabled={busy} onClick={() => void save(true)}>Save as</MenuItem>
+    <MenuItem disabled={busy} onClick={() => setLooksOpen(true)}>Looks…</MenuItem>
+    <MenuItem disabled={busy || composing.current} onClick={() => setExportOpen(true)}>Export for Resolume</MenuItem>
+  </StudioMenu>;
   const commands = <>
     <span className="document-name" title={io.name}><span className="document-label">Scene</span><span className="document-title">{io.name}</span>{dirty && <span aria-label="Unsaved changes"> *</span>}</span>
-    <Button variant="contained" disabled={busy} aria-label="Build" aria-busy={busy} title="Build preview (Ctrl/Cmd+S in source)" onClick={() => void build()}>
-      <span className="build-button-icon" aria-hidden="true">{busy && <span className="status-spinner" />}</span>Build
+    <Button className="studio-build-button" variant="outlined" color="inherit" disabled={busy} aria-label="Build" aria-busy={busy} title="Build preview (Ctrl/Cmd+S in source)" onClick={() => void build()}>
+      {busy && <span className="status-spinner" aria-hidden="true" />}Build
     </Button>
-    <span className="build-status" role="status">{draft.runningMatchesDraft ? 'Preview current' : draft.hasRunningSource ? 'Preview shows previous source' : 'Not built'}</span>
   </>;
   const links=session.read().libraryLinks;
   const libraryPanel=<LibraryPanel client={window.luxLibrary} links={links} updates={io.libraryUpdates} fallbacks={io.libraryFallbacks} refreshKey={libraryVersion}
     onApplyUpdates={async()=>{setError('');try{await session.applyLibraryUpdates();setDiagnostics([]);}catch(reason){setError(String(reason));throw reason;}}}
     onFork={id=>{try{session.forkLibraryComponent(id);}catch(reason){setError(String(reason));}}} onError={reason=>setError(String(reason))}/>;
-  return <ThemeProvider theme={studioTheme}><div className="authoring-shell">
+  return <ThemeProvider theme={studioTheme}><StudioMenuProvider><div className="authoring-shell">
     {confirmation.dialog}
+    <ExportDialog disabled={busy || composing.current} open={exportOpen} onClose={() => setExportOpen(false)} onClosed={() => fileSummary.current?.focus()} defaultName={io.name} create={async name => { if (pendingControlWrites.current.size) await finishControlWrites(); return session.exportSource(name); }} />
     <LooksDialog open={looksOpen} onClose={() => setLooksOpen(false)} onClosed={() => fileSummary.current?.focus()} client={window.luxLooks} onSave={saveLook} onLoad={loadLook} />
     <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} appCommands={commands} appError={error} controlEdits={controlEdits} libraryPanel={libraryPanel}
       sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onApply={() => void build()} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnostics={diagnostics} />} />
-  </div></ThemeProvider>;
+  </div></StudioMenuProvider></ThemeProvider>;
 }

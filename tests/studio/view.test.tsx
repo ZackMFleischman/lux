@@ -46,7 +46,7 @@ test('status bar exposes current build, problem and runtime health as actionable
   assert.match(html, />Compiling visual…</);
   assert.match(html, /aria-label="Problems: 0\. Open Jobs and diagnostics"/);
   assert.match(html, />0 problems</);
-  assert.match(html, /aria-label="Runtime status: Paused\. Open Jobs and diagnostics"/);
+  assert.doesNotMatch(html, /Runtime status:|playback-state|Service connected/);
   assert.match(html, />Paused</);
   assert.doesNotMatch(html, /Presentation only|TRACER 0\.1/);
   assert.match(html, /class="status-spinner"/);

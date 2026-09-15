@@ -221,7 +221,7 @@ test('RTL: pending playback preserves button styling and ignores duplicate trans
   await user.click(screen.getByRole('button', { name: 'Play' }));
   fireEvent.change(screen.getByRole('slider', { name: 'Intensity' }), { target: { value: '0.8' } });
   await waitFor(() => assert.equal(fixture.calls.length, 2));
-  assert.equal(document.querySelector('.playback-state')?.textContent, 'paused');
+  assert.ok(screen.getByRole('button', { name: 'Play' }));
   await act(async () => finishIntensity());
   assert.equal((screen.getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled, false);
   await user.click(screen.getByRole('button', { name: 'More playback actions' }));
@@ -232,9 +232,9 @@ test('RTL: pending playback preserves button styling and ignores duplicate trans
   assert.equal(fixture.calls.length, 2);
   await act(async () => finishPlay());
   assert.equal((screen.getByRole('button', { name: 'Play' }) as HTMLButtonElement).disabled, false);
-  assert.equal(document.querySelector('.playback-state')?.textContent, 'paused');
+  assert.ok(screen.getByRole('button', { name: 'Play' }));
   await act(async () => fixture.update());
-  assert.equal(document.querySelector('.playback-state')?.textContent, 'playing');
+  assert.ok(screen.getByRole('button', { name: 'Pause' }));
 });
 
 test('RTL: intensity writes do not disable transport or insert a success alert', async () => {
