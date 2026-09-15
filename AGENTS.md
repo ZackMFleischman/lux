@@ -163,22 +163,9 @@ Visual parameters belong to each visual's code. `intensity` is an optional concr
 
 ## Creative session isolation
 
-Use `start-lux` / `pnpm studio:creative` for user creative work. Its reserved
-`.worktrees/lux-creative` checkout and build stay at the recorded commit until an
-automatic normal creative start refreshes it to verified latest main. The shipped
-start-lux refresh procedure needs no further approval; it preserves the scene and
-rollback checkout/build, verifies non-divergent latest main, and touches only the
-verified creative process and reservation. Do not edit, rebuild, update dependencies in,
-test against, prune, or terminate that creative checkout or instance during
-development. Keep saved creative scenes outside test artifact directories.
+Use `start-lux` / `pnpm studio:creative` for user creative work. Start from the selected branch checkout or main. The launcher automatically isolates its profile and built app files from development, reuses a responsive session, and builds current app source after it closes. The visual compiler still reads the selected checkout: use another normal development checkout for source edits while the user app runs. There is no reserved-version checkout or refresh procedure. Do not change dependencies beneath a running Studio or terminate the user's process. Preserve saved scenes outside test artifact directories. Existing legacy creative worktrees and profile data are retained; startup does not depend on them.
 
-Ordinary Studio and MCP launches select a profile derived from their checkout.
-Explicit profiles must match in Studio and its adapter; creative uses `creative`.
-Every automated Studio launch must use `studioTestEnvironment()` and pass that
-same environment to its MCP adapter. Never reuse the creative profile or the
-legacy shared endpoint for a test. Only close the process owned by that test.
-Concurrent profiles still share the GPU, so coordinate graphics load and retain
-all native-input provenance requirements.
+Ordinary Studio and MCP launches select a profile derived from their checkout. Explicit profiles must match in Studio and its adapter; use the creative launch receipt's profile. Every automated Studio launch must use `studioTestEnvironment()` and pass that same environment to its MCP adapter. Never reuse a user profile or the legacy shared endpoint for a test. Only close the process owned by that test. Concurrent profiles still share the GPU, so coordinate graphics load and retain all native-input provenance requirements.
 
 Both `skills/lux-visual-creation/` and `skills/start-lux/` ship from this repository.
 After changes, install/check the first with `node scripts/install-visual-skill.mjs`

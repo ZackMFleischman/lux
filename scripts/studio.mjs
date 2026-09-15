@@ -10,6 +10,6 @@ const env = { ...(smoke ? studioTestEnvironment() : process.env), LUX_NODE_EXECU
 if (smoke) { env.LUX_STUDIO_SMOKE = '1'; delete env.LUX_STUDIO_MCP_TEST; }
 else { delete env.LUX_STUDIO_SMOKE; delete env.LUX_STUDIO_MCP_TEST; }
 delete env.ELECTRON_RUN_AS_NODE;
-const child = spawn(electron, [resolve(root, 'apps/studio/dist/main.cjs')], { cwd: root, env, stdio: 'inherit', windowsHide: false });
+const child = spawn(electron, [resolve(env.LUX_STUDIO_DIST || resolve(root, 'apps/studio/dist'), 'main.cjs')], { cwd: root, env, stdio: 'inherit', windowsHide: false });
 child.on('error', error => { console.error(error); process.exitCode = 1; });
 child.on('exit', code => { process.exitCode = code ?? 1; });

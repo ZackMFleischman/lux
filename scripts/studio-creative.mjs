@@ -1,7 +1,8 @@
 import { execFileSync, spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile, realpath, readdir, lstat, rmdir } from 'node:fs/promises';
-import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
+import { mkdir, readFile, writeFile, realpath, rmdir, unlink } from 'node:fs/promises';
+import { isAbsolute, join, relative, resolve, sep } from 'node:path';
+import { setTimeout } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
 import { canonicalWorkspace, createStudioConnection, resolveStudioSession, studioAppData } from './studio-session.mjs';
 import { ensureElectron } from './studio-electron.mjs';
@@ -14,39 +15,33 @@ async function readJson(path) {
   try { return JSON.parse(await readFile(path, 'utf8')); }
   catch (error) { if (error.code === 'ENOENT') return null; throw error; }
 }
+function processAlive(pid) {
+  if (!Number.isSafeInteger(pid) || pid <= 0) return false;
+  try { process.kill(pid, 0); return true; }
+  catch (error) { return error.code !== 'ESRCH'; }
+}
 async function locked(directory, name, operation) {
   await mkdir(directory, { recursive: true });
   const lock = join(directory, name);
   try { await mkdir(lock); }
-  catch (error) { if (error.code === 'EEXIST') throw Error(`Creative startup is already reserved (${lock}). Inspect the owning launcher before removing a stale lock.`); throw error; }
+  catch (error) { if (error.code === 'EEXIST') throw Error(`Creative startup is already in progress (${lock}). Inspect the owning launcher before removing a stale lock.`); throw error; }
   try { return await operation(); }
   finally { await rmdir(lock); }
 }
 
-/** Pin once. Never reset, clean, switch or rebuild an existing creative checkout. */
-export async function prepareCreativeCheckout({ source, appData = studioAppData() }) {
-  source = canonicalWorkspace(source);
-  const common = git(source, ['rev-parse', '--path-format=absolute', '--git-common-dir']);
-  const checkout = resolve(dirname(common), '.worktrees', 'lux-creative');
-  const directory = join(appData, 'Lux', 'Studio', 'profiles', 'creative');
-  return locked(directory, 'prepare.lock', async () => {
-    const recordPath = join(directory, 'checkout.json');
-    let record = await readJson(recordPath);
-    if (!record) {
-      try { await lstat(checkout); throw Error(`Unregistered creative checkout exists at ${checkout}; inspect it before adopting or moving it.`); }
-      catch (error) { if (error.code !== 'ENOENT') throw error; }
-      const commit = git(source, ['rev-parse', 'HEAD']);
-      git(source, ['worktree', 'add', '--detach', checkout, commit]);
-      git(source, ['worktree', 'lock', '--reason', 'Reserved user creative Studio; upgrades require explicit user request', checkout]);
-      record = { version: 1, checkout: canonicalWorkspace(checkout), commit };
-      await writeFile(recordPath, JSON.stringify(record, null, 2), { flag: 'wx' });
-    }
-    if (record.version !== 1 || !/^[0-9a-f]{40}$/.test(record.commit) ||
-        record.checkout !== canonicalWorkspace(checkout)) throw Error('Creative checkout reservation does not match this repository');
-    if (git(record.checkout, ['rev-parse', 'HEAD']) !== record.commit) throw Error('Creative checkout commit changed; an explicit upgrade is required');
-    if (git(record.checkout, ['status', '--porcelain', '--untracked-files=no'])) throw Error('Creative checkout has modified source; preserve it and investigate before launch');
-    return record;
-  });
+/** Select the caller's checkout. No Git mutation or persistent version reservation. */
+export async function prepareCreativeCheckout({ source }) {
+  const checkout = canonicalWorkspace(source);
+  return { checkout, commit: git(checkout, ['rev-parse', 'HEAD']),
+    branch: git(checkout, ['branch', '--show-current']) || null };
+}
+
+export function creativeEnvironment(source, parent = process.env) {
+  const workspace = canonicalWorkspace(source);
+  const env = { ...parent, LUX_STUDIO_PROFILE: 'creative-' + createHash('sha256').update(workspace).digest('hex').slice(0, 24),
+    LUX_NODE_EXECUTABLE: process.execPath, LUX_WORKSPACE: workspace };
+  for (const key of ['LUX_STUDIO_MCP_TEST', 'LUX_STUDIO_SMOKE', 'ELECTRON_RUN_AS_NODE', 'LUX_STUDIO_SESSION_ID', 'LUX_STUDIO_DIST']) delete env[key];
+  return env;
 }
 
 function contains(root, path) {
@@ -60,7 +55,7 @@ export async function verifyCreativeDependencies(checkout) {
   const modules = join(checkout, 'node_modules');
   try {
     const physicalModules = await realpath(modules);
-    if (!contains(canonicalWorkspace(checkout), canonicalWorkspace(physicalModules))) throw Error('Creative dependencies must be local to the pinned checkout');
+    if (!contains(canonicalWorkspace(checkout), canonicalWorkspace(physicalModules))) throw Error('Creative dependencies must be local to the selected checkout');
     for (const [name, version] of Object.entries({ ...pkg.dependencies, ...pkg.devDependencies })) {
       const location = await realpath(join(modules, name));
       if (!contains(physicalModules, location)) throw Error(`Creative dependency ${name} resolves outside its own node_modules`);
@@ -68,56 +63,39 @@ export async function verifyCreativeDependencies(checkout) {
       if (installed.name !== name || installed.version !== version) throw Error(`Creative dependency version mismatch: ${name}`);
     }
   } catch (error) {
-    if (error.code === 'ENOENT') throw Error(`Creative dependencies are not installed in ${modules}. Prepare the pinned dependencies there; do not link the development node_modules.`);
+    if (error.code === 'ENOENT') throw Error(`Creative dependencies are not installed in ${modules}. Prepare the checkout dependencies there; do not link the development node_modules.`);
     throw error;
   }
 }
 
-async function buildInventory(directory) {
-  const hashes = {};
-  async function visit(path, prefix = '') {
-    for (const entry of await readdir(path, { withFileTypes: true })) {
-      const key = prefix + entry.name, full = join(path, entry.name);
-      if (entry.isSymbolicLink()) throw Error('Creative build must not contain linked files');
-      if (entry.isDirectory()) await visit(full, `${key}/`);
-      else if (entry.isFile()) hashes[key] = createHash('sha256').update(await readFile(full)).digest('hex');
-    }
-  }
-  await visit(directory);
-  if (!hashes['main.cjs']) throw Error('Creative Studio build is incomplete');
-  return Object.fromEntries(Object.entries(hashes).sort(([a], [b]) => a.localeCompare(b)));
-}
 
-async function start(source, prepareOnly) {
-  const appData = studioAppData(), directory = join(appData, 'Lux', 'Studio', 'profiles', 'creative');
+export async function startCreativeStudio({ source, prepareOnly = false, env = creativeEnvironment(source), appData = studioAppData(env) }) {
+  const session = resolveStudioSession({ workspace: source, appData, env });
+  const directory = session.directory;
   return locked(directory, 'launch.lock', async () => {
+    const pendingPath = join(directory, 'launch.json');
     const record = await prepareCreativeCheckout({ source, appData });
-    const env = { ...process.env, LUX_STUDIO_PROFILE: 'creative', LUX_NODE_EXECUTABLE: process.execPath };
-    delete env.LUX_STUDIO_MCP_TEST; delete env.LUX_STUDIO_SMOKE; delete env.ELECTRON_RUN_AS_NODE; delete env.LUX_STUDIO_SESSION_ID;
-    const session = resolveStudioSession({ workspace: record.checkout, appData, env });
-    const info = { ...record, profile: 'creative', adapter: join(record.checkout, 'scripts', 'studio-mcp.mjs') };
+    const info = { ...record, profile: session.profile, adapter: join(record.checkout, 'scripts', 'studio-mcp.mjs'),
+      mcp: { command: process.execPath, args: [join(record.checkout, 'scripts', 'studio-mcp.mjs')], cwd: record.checkout,
+        env: { LUX_STUDIO_PROFILE: session.profile } } };
     if (prepareOnly) return { ...info, prepared: true };
-    try { await createStudioConnection(session, { timeoutMs: 5000 })('status'); return { ...info, running: true, reused: true }; }
+    try {
+      const status = await createStudioConnection(session, { timeoutMs: 5000 })('status');
+      info.mcp.env.LUX_STUDIO_SESSION_ID = status.studioSession.sessionId;
+      return { ...info, running: true, reused: true, studioSession: status.studioSession,
+        advice: 'Reused the existing app build; checkout commit describes current source, not the running build.' };
+    }
     catch (error) {
       const endpoint = await readJson(session.endpointPath);
-      if (Number.isSafeInteger(endpoint?.pid) && endpoint.pid > 0) {
-        let alive = true;
-        try { process.kill(endpoint.pid, 0); } catch (probe) { if (probe.code === 'ESRCH') alive = false; }
-        if (alive) throw Error(`Creative Studio already has a live process but could not connect: ${error.message}`);
-      }
+      if (processAlive(endpoint?.pid)) throw Error(`Creative Studio already has a live process but could not connect: ${error.message}`);
+      const pending = await readJson(pendingPath);
+      if (processAlive(pending?.launcherPid)) throw Error(`Studio launch is still running. Inspect ${join(directory, 'startup.log')} before retrying.`);
     }
     await verifyCreativeDependencies(record.checkout);
     ensureElectron(record.checkout);
-    const buildRecordPath = join(directory, 'build.json'), dist = join(record.checkout, 'apps', 'studio', 'dist');
-    const built = await readJson(buildRecordPath);
-    if (built) {
-      if (built.commit !== record.commit || JSON.stringify(built.files) !== JSON.stringify(await buildInventory(dist))) {
-        throw Error('Creative build changed; do not rebuild a reserved version without an explicit upgrade');
-      }
-    } else {
-      execFileSync(process.execPath, [join(record.checkout, 'apps/studio/build.mjs')], { cwd: record.checkout, env, windowsHide: true, stdio: 'inherit' });
-      await writeFile(buildRecordPath, JSON.stringify({ commit: record.commit, files: await buildInventory(dist) }), { flag: 'wx' });
-    }
+    // Rebuild only after both app and pending launcher are gone. Keep disk use bounded.
+    env.LUX_STUDIO_DIST = join(directory, 'build');
+    execFileSync(process.execPath, [join(record.checkout, 'apps/studio/build.mjs')], { cwd: record.checkout, env, windowsHide: true, stdio: 'inherit' });
     const log = join(directory, 'startup.log');
     const { openSync, closeSync } = await import('node:fs');
     const fd = openSync(log, 'a');
@@ -126,7 +104,22 @@ async function start(source, prepareOnly) {
         cwd: record.checkout, env, detached: true, windowsHide: true, stdio: ['ignore', fd, fd] });
       await new Promise((resolve, reject) => { child.once('spawn', resolve); child.once('error', reject); });
       child.unref();
-      return { ...info, launched: true, launcherPid: child.pid, log, advice: 'Verify MCP live status before declaring readiness.' };
+      await writeFile(pendingPath, JSON.stringify({ launcherPid: child.pid, build: env.LUX_STUDIO_DIST }));
+      // Hold the launch lock until the endpoint is ready, so a second start cannot rebuild or spawn a duplicate.
+      const connect = createStudioConnection(session, { timeoutMs: 2000 });
+      const deadline = Date.now() + 60000;
+      let lastError;
+      while (Date.now() < deadline) {
+        try {
+          const status = await connect('status');
+          info.mcp.env.LUX_STUDIO_SESSION_ID = status.studioSession.sessionId;
+          await unlink(pendingPath);
+          return { ...info, running: true, launched: true, studioSession: status.studioSession,
+            launcherPid: child.pid, build: env.LUX_STUDIO_DIST, log };
+        } catch (error) { lastError = error; }
+        await setTimeout(250);
+      }
+      throw Error(`Studio did not become ready within 60 seconds. Inspect ${log} before retrying: ${lastError?.message}`);
     } finally { closeSync(fd); }
   });
 }
@@ -134,7 +127,7 @@ async function start(source, prepareOnly) {
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
   if (args.some(arg => arg !== '--prepare')) { console.error('Usage: node scripts/studio-creative.mjs [--prepare]'); process.exitCode = 1; }
-  else start(resolve(import.meta.dirname, '..'), args.includes('--prepare'))
+  else startCreativeStudio({ source: resolve(import.meta.dirname, '..'), prepareOnly: args.includes('--prepare') })
     .then(result => console.log(JSON.stringify(result, null, 2)))
     .catch(error => { console.error(error.message); process.exitCode = 1; });
 }

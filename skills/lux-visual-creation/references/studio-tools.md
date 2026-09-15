@@ -2,7 +2,7 @@
 
 ## Connection
 
-Use configured `lux.studio.*` tools when discovery confirms the intended profile and checkout. Tool search can discover a configured server; absence of those tools does not prove Lux lacks an adapter. For the user creative workflow, **start-lux** supplies a pinned checkout and selects `creative`; a configured development adapter is a different target.
+Use configured `lux.studio.*` tools when discovery confirms the intended profile and checkout. Tool search can discover a configured server; absence of those tools does not prove Lux lacks an adapter. For the user creative workflow, **start-lux** supplies the selected branch checkout and an automatically isolated profile; a configured development adapter is a different target.
 
 For a local coding agent with terminal access, locate the Lux checkout/build used to launch the current Studio. Use known launch context or inspect its process command line when needed; do not ask the user to reconfirm a path already established. Check that checkout for `scripts/studio-mcp.mjs`; do not assume a particular username, drive, or `.worktrees/tracer` directory exists. Launch that **adapter only**, with the project's installed Node version and dependencies:
 
@@ -10,7 +10,7 @@ For a local coding agent with terminal access, locate the Lux checkout/build use
 command: <absolute path to Node executable>
 args: [<absolute Lux checkout>/scripts/studio-mcp.mjs]
 cwd: <absolute Lux checkout>
-env: { LUX_STUDIO_PROFILE: "creative", LUX_STUDIO_SESSION_ID: "<known live session ID, when available>" }
+env: { LUX_STUDIO_PROFILE: "<profile returned by start-lux>", LUX_STUDIO_SESSION_ID: "<known live session ID, when available>" }
 transport: stdio
 ```
 
@@ -42,7 +42,7 @@ try {
   await client.connect(new StdioClientTransport({
     command: process.execPath,
     args: [resolve('scripts/studio-mcp.mjs')], cwd: process.cwd(),
-    env: { ...process.env, LUX_STUDIO_PROFILE: 'creative',
+    env: { ...process.env, LUX_STUDIO_PROFILE: process.env.LUX_STUDIO_PROFILE,
       // Omit only for the initial read when no live session has been selected.
       ...(selectedSessionId ? { LUX_STUDIO_SESSION_ID: selectedSessionId } : {}) }
   }));

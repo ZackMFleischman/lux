@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 
 const directory = dirname(fileURLToPath(import.meta.url));
 const root = join(directory, '../..');
-const dist = join(directory, 'dist');
+const dist = process.env.LUX_STUDIO_DIST || join(directory, 'dist');
 await mkdir(dist, { recursive: true });
 const common = { bundle: true, sourcemap: true, logLevel: 'info', absWorkingDir: root };
 await build({ ...common, entryPoints: [join(directory, 'src/main.ts')], outfile: join(dist, 'main.cjs'),

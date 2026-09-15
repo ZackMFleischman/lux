@@ -4,10 +4,24 @@ import { mkdtemp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { prepareCreativeCheckout, verifyCreativeDependencies } from '../../scripts/studio-creative.mjs';
+import { prepareCreativeCheckout, verifyCreativeDependencies, creativeEnvironment, startCreativeStudio } from '../../scripts/studio-creative.mjs';
+import { resolveStudioSession } from '../../scripts/studio-session.mjs';
 import { installedElectron } from '../../scripts/studio-electron.mjs';
 
-test('creative checkout keeps its original commit while development advances, and detects edits', async t => {
+test('creative profile is stable per checkout and distinct from development and inherited tests', async t => {
+  const temp = await mkdtemp(join(tmpdir(), 'lux-profiles-'));
+  t.after(() => rm(temp, { recursive: true, force: true }));
+  const other = join(temp, 'other'); await mkdir(other);
+  const env = creativeEnvironment(temp, { LUX_STUDIO_PROFILE: 'test-inherited', LUX_STUDIO_MCP_TEST: '1',
+    LUX_STUDIO_SESSION_ID: 'old', LUX_STUDIO_DIST: 'development-output', ELECTRON_RUN_AS_NODE: '1' });
+  assert.equal(env.LUX_STUDIO_PROFILE, creativeEnvironment(temp, {}).LUX_STUDIO_PROFILE);
+  assert.notEqual(env.LUX_STUDIO_PROFILE, creativeEnvironment(other, {}).LUX_STUDIO_PROFILE);
+  assert.notEqual(env.LUX_STUDIO_PROFILE, resolveStudioSession({ workspace: temp, env: {}, appData: temp }).profile);
+  for (const key of ['LUX_STUDIO_MCP_TEST', 'LUX_STUDIO_SESSION_ID', 'LUX_STUDIO_DIST', 'ELECTRON_RUN_AS_NODE']) assert.equal(env[key], undefined);
+  assert.equal(resolveStudioSession({ workspace: temp, env, appData: temp }).profile, env.LUX_STUDIO_PROFILE);
+});
+
+test('creative startup uses the selected checkout as it advances, without reserving a worktree', async t => {
   const temp = await mkdtemp(join(tmpdir(), 'lux-creative-'));
   t.after(() => rm(temp, { recursive: true, force: true }));
   const source = join(temp, 'source'), appData = join(temp, 'data'); await mkdir(source);
@@ -21,10 +35,19 @@ test('creative checkout keeps its original commit while development advances, an
   assert.equal(await readFile(join(first.checkout, 'scene.txt'), 'utf8'), 'original');
   await writeFile(join(source, 'scene.txt'), 'development'); git('commit', '-qam', 'Development');
   const second = await prepareCreativeCheckout({ source, appData });
-  assert.deepEqual(second, first);
-  assert.equal(await readFile(join(first.checkout, 'scene.txt'), 'utf8'), 'original');
+  assert.equal(second.checkout, first.checkout);
+  assert.equal(second.commit, git('rev-parse', 'HEAD'));
+  assert.notEqual(second.commit, original);
+  assert.equal(await readFile(join(first.checkout, 'scene.txt'), 'utf8'), 'development');
   await writeFile(join(first.checkout, 'scene.txt'), 'unexpected edit');
-  await assert.rejects(prepareCreativeCheckout({ source, appData }), /changed|modified/i);
+  assert.equal((await prepareCreativeCheckout({ source, appData })).checkout, first.checkout);
+  assert.equal(git('worktree', 'list', '--porcelain').match(/^worktree /gm).length, 1);
+  // A previous launch can still be starting without an endpoint. Never build/spawn again.
+  const env = creativeEnvironment(source, {});
+  const session = resolveStudioSession({ workspace: source, env, appData });
+  await mkdir(session.directory, { recursive: true });
+  await writeFile(join(session.directory, 'launch.json'), JSON.stringify({ launcherPid: process.pid }));
+  await assert.rejects(startCreativeStudio({ source, env, appData }), /launch is still running/);
 });
 
 test('creative dependency check rejects parent fallback without executing package code', async t => {

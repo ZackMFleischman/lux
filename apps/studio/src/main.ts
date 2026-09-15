@@ -22,7 +22,7 @@ import type { SourceBundle } from '../../../packages/runtime-contracts/src/index
 // starts an authoring instance, or terminates a host-owned process.
 app.setName('Lux Studio');
 app.commandLine.appendSwitch('force_high_performance_gpu');
-const workspace = resolve(__dirname, '../../..');
+const workspace = process.env.LUX_WORKSPACE ? resolve(process.env.LUX_WORKSPACE) : resolve(__dirname, '../../..');
 const studioProfile = resolveStudioSession({ workspace, appData: app.getPath('appData') });
 const studioSession = { profile: studioProfile.profile, workspace: studioProfile.workspace,
   sessionId: randomBytes(18).toString('hex'), pid: process.pid };
