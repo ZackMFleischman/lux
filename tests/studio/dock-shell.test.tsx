@@ -180,7 +180,7 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   assert.ok(reopenedJobsTab?.closest('.dv-groupview')?.contains(document.activeElement), 'Focus moves into the Jobs group');
   assert.equal(document.querySelector('.cm-editor'), editorNode);
   assert.equal(attaches, 1); assert.equal(detaches, 0); assert.equal(subscriptions, 1);
-  for (const kind of ['preview', 'source', 'library', 'inspector', 'jobs']) {
+  for (const kind of ['preview', 'source', 'graph', 'library', 'inspector', 'jobs']) {
     selectedPanel = kind;
     await click('Close selected panel');
   }
@@ -219,7 +219,7 @@ test('group menu targets its owning group, cancels with focus and rejects a vani
   await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: 'Open Source' })); });
   assert.ok(groups(adapter.capture('check').dock.grid.root).find((g: any) => g.id === 'preview-group').views.includes('source'));
   const target = adapter.groupTarget('jobs-group');
-  await act(async () => { adapter.close('jobs'); });
+  await act(async () => { adapter.close('jobs'); adapter.close('graph'); });
   const before = adapter.capture('check');
   assert.throws(() => adapter.openInGroup('source', target), /no longer exists/);
   assert.deepEqual(adapter.capture('check'), before);
@@ -440,4 +440,40 @@ test('Graph connections point from output to input with reversed node declaratio
     const points = wire.querySelector('polygon')!.getAttribute('points')!.split(' ').map(point => point.split(',').map(Number));
     assert.equal(Math.sign(points[1]![0]! - points[0]![0]!), 1);
   }
+});
+
+test('workspace chrome omits redundant connection and playback labels', async () => {
+  const runtime = { instanceId: '44ff55f0-8ea6-4fbf-89d5-665923f65cad', generation: 2, revisionId: 'revision-2', sceneName: 'Fixture', authority: 'studio', playback: 'playing', clockEpoch: 1, frameId: '10', intensity: 0.5, output: { width: 1280, height: 720 }, fault: null };
+  const snapshot = { connection: 'connected', message: null, receivedAtMs: 1000, authoring: runtime, host: null, jobs: [], visualFps: null, uiFps: null };
+  render(<StudioApp client={{ getSnapshot: () => snapshot, subscribe: () => () => {}, invoke: async () => {} } as any} nowMs={1000} />);
+  assert.equal(document.querySelector('.connection'), null);
+  assert.equal(document.querySelector('.playback-state'), null);
+  assert.equal(document.querySelector('.status-runtime'), null);
+  assert.ok(screen.getByRole('button', { name: 'Pause' }));
+});
+
+test('File and View share one menu and restore keyboard focus', async () => {
+  const { StudioMenu, StudioMenuProvider } = await import('../../apps/studio/src/StudioMenu.tsx');
+  const { MenuItem } = await import('@mui/material');
+  render(<StudioMenuProvider><header><StudioMenu label="File"><MenuItem>Open</MenuItem></StudioMenu><StudioMenu label="View"><MenuItem>Preview</MenuItem></StudioMenu></header></StudioMenuProvider>);
+  await pressButton('File');
+  assert.ok(screen.getByRole('menu', { name: 'File' }));
+  await pressButton('View');
+  assert.equal(screen.queryByRole('menu', { name: 'File' }), null);
+  assert.ok(screen.getByRole('menu', { name: 'View' }));
+  await act(async () => fireEvent.keyDown(screen.getByRole('menu', { name: 'View' }), { key: 'ArrowLeft' }));
+  assert.ok(screen.getByRole('menu', { name: 'File' }));
+  assert.equal(screen.queryByRole('menu', { name: 'View' }), null);
+  await act(async () => fireEvent.keyDown(screen.getByRole('menu', { name: 'File' }), { key: 'Escape' }));
+  assert.equal(screen.queryByRole('menu'), null);
+  assert.equal(document.activeElement, screen.getByRole('button', { name: 'File' }));
+});
+
+test('disabled application menu still closes with Escape while building', async () => {
+  const { StudioMenu } = await import('../../apps/studio/src/StudioMenu.tsx');
+  const { MenuItem } = await import('@mui/material');
+  render(<StudioMenu label="File"><MenuItem disabled>Open</MenuItem></StudioMenu>);
+  await pressButton('File');
+  await act(async () => fireEvent.keyDown(document.activeElement!, { key: 'Escape' }));
+  assert.equal(screen.queryByRole('menu'), null);
 });

@@ -1,3 +1,4 @@
+import { StudioMenu } from '../StudioMenu.tsx';
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
@@ -19,7 +20,6 @@ const storage: LayoutStorage = {
 export function StudioDockShell({ compact, showInspector, toolsHost, onOpenPanelReady, ...content }: { compact: boolean; showInspector: boolean; toolsHost?: HTMLElement | null; onOpenPanelReady?: (action:null|((kind:Kind)=>void))=>void } & Record<Exclude<Kind,'graph'>, ReactNode> & {graph?:ReactNode}) {
   const [mode] = useState<'desktop' | 'laptop'>(() => window.innerWidth < 1100 ? 'laptop' : 'desktop');
   const [name, setName] = useState('Default'), [message, setMessage] = useState('');
-  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [layoutsOpen, setLayoutsOpen] = useState(false);
   const viewButton = useRef<HTMLButtonElement | null>(null);
   const adapter = useRef<LuxDockviewAdapter | null>(null), expanded = useRef<HTMLDivElement>(null);
@@ -57,18 +57,11 @@ export function StudioDockShell({ compact, showInspector, toolsHost, onOpenPanel
   }
   const nonce = document.querySelector<HTMLMetaElement>('meta[name="style-nonce"]')?.content ?? '';
   const tools = <div className="layout-tools" hidden={compact}>
-    <Button ref={viewButton} aria-haspopup="menu" aria-expanded={!!menuAnchor}
-      onClick={event => setMenuAnchor(event.currentTarget)}>View</Button>
-    <Menu anchorEl={menuAnchor} open={!!menuAnchor} onClose={() => setMenuAnchor(null)}
-      slotProps={{ list: { 'aria-label': 'View', dense: true } }}
-      onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); setMenuAnchor(null); } }}>
-      {kinds.map(kind => <MenuItem key={kind} onClick={() => {
-        setMenuAnchor(null);
-        action(value => value.open(kind));
-      }}>{registry.get(kind).title}</MenuItem>)}
+    <StudioMenu label="View" buttonRef={viewButton}>
+      {kinds.map(kind => <MenuItem key={kind} onClick={() => action(value => value.open(kind))}>{registry.get(kind).title}</MenuItem>)}
       <Divider />
-      <MenuItem onClick={() => { setMenuAnchor(null); setLayoutsOpen(true); }}>Layouts…</MenuItem>
-    </Menu>
+      <MenuItem onClick={() => setLayoutsOpen(true)}>Layouts…</MenuItem>
+    </StudioMenu>
     <Dialog open={layoutsOpen} onClose={() => setLayoutsOpen(false)} aria-labelledby="workspace-layouts-title"
       maxWidth="xs" fullWidth slotProps={{ transition: { onExited: () => viewButton.current?.focus() } }}
       onKeyDown={event => { if (event.key === 'Escape') event.stopPropagation(); }}>

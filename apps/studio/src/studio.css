@@ -135,3 +135,16 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 .graph-hint { margin: 0; padding: 8px 12px; font-size: 12px; color: #b9c2d1; }
 .inspector-target { margin: 8px 0; font-weight: 600; }
 .look-save-row{display:flex;gap:8px;align-items:center;margin:12px 0}.look-save-row .MuiTextField-root{flex:1;min-width:0}.look-list{max-height:320px;overflow:auto;margin-top:8px}.look-row{display:flex;align-items:center;border:1px solid transparent;border-radius:4px;margin:4px 0}.look-row.selected{border-color:#a69ada;background:#292b38}.look-select{display:flex;align-items:center;gap:10px;flex:1;min-width:0;text-align:left;border:0;background:transparent;color:inherit;padding:6px;cursor:pointer}.look-select>span:last-child{min-width:0}.look-select strong,.look-select small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.look-select small{color:#a6a9b8;font-size:11px;margin-top:4px}.look-select img,.look-placeholder{width:72px;height:42px;object-fit:contain;background:#11131a;flex:none}.look-placeholder{display:grid;place-items:center}.looks-dialog .MuiDialogActions-root>button{max-width:100%;overflow:hidden;text-overflow:ellipsis}.look-save-row button{flex:none}
+
+/* Shared application menus and quiet workspace chrome. */
+.studio-menu { display:flex; align-items:center; }
+.studio-menu .studio-menu-trigger { height:28px; padding:0 8px; font:500 12px/1.4 Inter,"Segoe UI",sans-serif; color:#d2d4df; border-radius:4px; }
+.studio-menu-trigger:hover, .studio-menu-trigger[aria-expanded="true"] { background:#30323d; }
+.studio-menu-paper { min-width:200px; max-width:calc(100vw - 16px); border:1px solid #3b3e4b; box-shadow:0 8px 24px #0006; }
+.studio-menu-paper .MuiMenu-list { padding:4px; }
+.studio-menu-paper .MuiMenuItem-root { min-height:30px; padding:5px 10px; border-radius:3px; font:400 12px/1.5 Inter,"Segoe UI",sans-serif; color:#d2d4df; }
+.studio-menu-paper .MuiMenuItem-root:hover, .studio-menu-paper .MuiMenuItem-root.Mui-focusVisible { background:#30323d; }
+.app-bar .document-name { flex:0 1 auto; max-width:55vw; }
+.app-bar .studio-build-button { height:28px; gap:6px; padding:0 10px; border-color:#494d5d; color:#e1e2ec; font-size:12px; margin-left:4px; }
+.app-bar .studio-build-button:hover { background:#30323d; border-color:#777b90; }
+.studio-dock-grid .dv-tab.dv-inactive-tab .dv-default-tab .dv-default-tab-action { visibility:visible; }

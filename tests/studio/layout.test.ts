@@ -8,10 +8,14 @@ import { JSDOM } from 'jsdom';
 test('versioned desktop split and laptop tab layouts contain only registered real panel kinds', () => {
   const registry = createStudioPanelRegistry();
   const desktop = defaultPersonalLayout(registry, 'desktop'), laptop = defaultPersonalLayout(registry, 'laptop');
-  assert.deepEqual(Object.keys(desktop.dock.panels), ['preview', 'source', 'library', 'inspector', 'jobs']);
+  assert.deepEqual(Object.keys(desktop.dock.panels), ['preview', 'source', 'graph', 'library', 'inspector', 'jobs']);
   assert.deepEqual(parsePersonalLayout(JSON.stringify(desktop), registry), desktop);
-  assert.equal((laptop.dock.grid.root.data as any[])[0].data.views.length, 5);
+  assert.equal((laptop.dock.grid.root.data as any[])[0].data.views.length, 6);
   assert.notDeepEqual(desktop.dock.grid.root, laptop.dock.grid.root);
+  const lower = (desktop.dock.grid.root.data as any[])[0].data[1];
+  assert.deepEqual(lower.data.views, ['graph', 'jobs']);
+  assert.equal(lower.data.activeView, 'graph');
+  assert.ok((laptop.dock.grid.root.data as any[])[0].data.views.includes('graph'));
   assert.equal(registry.get('graph').title,'Graph');
   assert.throws(() => registry.get('timeline'), /Unavailable/);
   const expanded = createStudioPanelRegistry([{ kind: 'timeline', title: 'Timeline', multiple: false, parseViewState: () => ({}) }]);
@@ -66,7 +70,7 @@ test('real Dockview CPU adapter moves, saves, restores, reopens and resets witho
   const data = new Map<string, string>(), storage = { getItem: (key: string) => data.get(key) ?? null, setItem: (key: string, value: string) => { data.set(key, value); }, removeItem: (key: string) => { data.delete(key); } };
   const adapter = new LuxDockviewAdapter(api, registry, storage, 'desktop');
   t.after(() => { adapter.dispose(); api.dispose(); dom.window.close(); for (const [key, value] of originals) if (value) Object.defineProperty(globalThis, key, value); else Reflect.deleteProperty(globalThis, key); });
-  assert.equal(adapter.restore('Personal').restored, false); assert.equal(api.totalPanels, 5);
+  assert.equal(adapter.restore('Personal').restored, false); assert.equal(api.totalPanels, 6);
   const beforeInvalidOpen = JSON.stringify(adapter.capture('Personal'));
   for (const id of ['__proto__', 'constructor', 'prototype']) {
     assert.throws(() => adapter.open('inspector', id), /Invalid panel identity/);
@@ -78,7 +82,7 @@ test('real Dockview CPU adapter moves, saves, restores, reopens and resets witho
   assert.equal(api.getPanel('source')!.group.id, api.getPanel('preview')!.group.id);
   adapter.close('inspector-2'); adapter.save('Personal');
   assert.equal(api.getPanel('inspector-2'), undefined);
-  adapter.reset('Temporary'); assert.equal(api.totalPanels, 5);
+  adapter.reset('Temporary'); assert.equal(api.totalPanels, 6);
   assert.equal(adapter.restore('Personal').restored, true); adapter.open('inspector', 'inspector-2');
   assert.equal(api.getPanel('inspector-2')!.params!.viewState.lockedTargetId, 'node-b');
   assert.equal(api.getPanel('inspector')!.params!.viewState.lockedTargetId, 'node-a');
@@ -88,7 +92,7 @@ test('real Dockview CPU adapter moves, saves, restores, reopens and resets witho
   const oldSet = storage.setItem; storage.setItem = () => { throw Error('disk quota'); };
   assert.throws(() => adapter.save('Before'), /quota/); assert.equal(JSON.stringify(adapter.capture('Before')), beforeFailure); storage.setItem = oldSet;
   const read = storage.getItem; storage.getItem = () => { throw Error('storage unavailable'); };
-  assert.match(adapter.restore('Unreadable').reason!, /storage unavailable/); assert.equal(api.totalPanels, 5); storage.getItem = read;
-  data.set('lux.personal-layout.v1.Broken', '{bad'); assert.equal(adapter.restore('Broken').restored, false); assert.equal(api.totalPanels, 5);
+  assert.match(adapter.restore('Unreadable').reason!, /storage unavailable/); assert.equal(api.totalPanels, 6); storage.getItem = read;
+  data.set('lux.personal-layout.v1.Broken', '{bad'); assert.equal(adapter.restore('Broken').restored, false); assert.equal(api.totalPanels, 6);
   adapter.dispose(); assert.throws(() => adapter.save('Personal'), /disposed/);
 });
