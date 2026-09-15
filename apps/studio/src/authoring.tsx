@@ -40,7 +40,7 @@ export function AuthoringApp() {
   const composing = useRef(false);
   const workspace = useMemo(() => createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': '' } }), []);
   const session = useMemo(() => createAuthoringSession(workspace, {
-    submit: (source, options) => client.submit(source, options), save: request => window.luxAuthoring.save(request), savePath: request => window.luxAuthoring.savePath(request), open: () => window.luxAuthoring.open(), openPath: path => window.luxAuthoring.openPath(path),
+    submit: (source, options) => client.submit(source, options), save: request => window.luxAuthoring.save(request), savePath: request => {if(!window.luxAuthoring.savePath)throw Error('Path save is unavailable');return window.luxAuthoring.savePath(request);}, open: () => window.luxAuthoring.open(), openPath: path => {if(!window.luxAuthoring.openPath)throw Error('Path open is unavailable');return window.luxAuthoring.openPath(path);},
     export: request => window.luxExport.create(request),
     getControls: () => ({ intensity: client.getSnapshot().authoring?.intensity ?? 0.5 }), settleControls: finishControlWrites,
     getControlSnapshot: () => {
