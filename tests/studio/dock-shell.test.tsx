@@ -219,7 +219,7 @@ test('group menu targets its owning group, cancels with focus and rejects a vani
   await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: 'Open Source' })); });
   assert.ok(groups(adapter.capture('check').dock.grid.root).find((g: any) => g.id === 'preview-group').views.includes('source'));
   const target = adapter.groupTarget('jobs-group');
-  await act(async () => { adapter.close('jobs'); });
+  await act(async () => { adapter.close('jobs'); adapter.close('graph'); });
   const before = adapter.capture('check');
   assert.throws(() => adapter.openInGroup('source', target), /no longer exists/);
   assert.deepEqual(adapter.capture('check'), before);
