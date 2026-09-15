@@ -335,7 +335,8 @@ test('Graph enters nested components one level at a time and edits an exposed co
   assert.equal(inspector.getByRole('button',{name:'Controls for Double mirror 1'}),document.activeElement);
   await act(async()=>{fireEvent.click(inspector.getByRole('button',{name:'Scene controls'}));});
   assert.equal(calls.length,writes,'Navigation does not write control values');
-  assert.ok(inspector.getByRole('button',{name:'Scene controls',current:'page'}));
+  assert.ok(!inspector.queryByRole('navigation',{name:'Inspector controls path'}));
+  assert.ok(document.activeElement===document.querySelector('.inspector summary'));
   assert.equal(document.querySelectorAll('.dv-tab').length,5,'Inspector navigation does not reopen Graph');
   await click('Open Graph');
 
