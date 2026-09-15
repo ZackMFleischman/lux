@@ -30,7 +30,7 @@ function MetricView({ label, metric, nowMs }: { label: string; metric: Metric | 
 }
 export type StudioProps = {
   controlEdits?: ControlEdits;
-  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; libraryPanel?:ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; appError?: string;
+  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; libraryPanel?:ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; appError?: string; sourceChanged?: boolean;
 };
 export function StudioApp(props: StudioProps) {
   return <ThemeProvider theme={studioTheme}><CssBaseline /><StudioLayout {...props} /></ThemeProvider>;
@@ -53,7 +53,7 @@ export function studioStatus(snapshot: StudioSnapshot): { build: string; buildin
     : snapshot.authoring ? sentenceCase(snapshot.authoring.playback) : 'No runtime';
   return { build, building: !!active, problems, runtime };
 }
-function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel,libraryPanel, appCommands, fileMenu, appError, controlEdits }: StudioProps) {
+function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel,libraryPanel, appCommands, fileMenu, appError, controlEdits, sourceChanged }: StudioProps) {
   const [toolsHost, setToolsHost] = useState<HTMLElement | null>(null);
   const [transportMenu, setTransportMenu] = useState<HTMLElement | null>(null);
   const view = useMemo(() => createRendererSnapshot(client), [client]);
@@ -199,6 +199,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
     <footer className="status-bar" hidden={windowState.fullscreen || previewOnly} aria-label="Studio status">
       <button type="button" className={`status-item status-build ${status.build === 'Build failed' ? 'status-error' : ''}`} aria-busy={status.building} aria-label={`Build status: ${status.build}. Open Jobs and diagnostics`} onClick={openJobs}><span aria-hidden="true" className={status.building ? 'status-spinner' : 'status-build-icon'}>{status.building ? '' : '↻'}</span><span aria-live="polite">{status.build}</span></button>
       <button type="button" className={`status-item ${status.problems ? 'status-error' : ''}`} aria-label={`Problems: ${status.problems}. Open Jobs and diagnostics`} onClick={openJobs}><span aria-hidden="true">!</span><span>{status.problems} {status.problems === 1 ? 'problem' : 'problems'}</span></button>
+      {sourceChanged && <span className="status-item" title="Build to apply the source edits to Preview">Source changed · Build to update</span>}
+      {['Connecting', 'Disconnected', 'Failed'].includes(status.runtime) && <button type="button" className="status-item status-runtime status-error" aria-label={`Runtime status: ${status.runtime}. Open Jobs and diagnostics`} onClick={openJobs}>{status.runtime}</button>}
     </footer>
   </div>;
 }

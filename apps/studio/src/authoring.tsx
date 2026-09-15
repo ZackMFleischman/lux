@@ -214,7 +214,7 @@ export function AuthoringApp() {
     {confirmation.dialog}
     <ExportDialog disabled={busy || composing.current} open={exportOpen} onClose={() => setExportOpen(false)} onClosed={() => fileSummary.current?.focus()} defaultName={io.name} create={async name => { if (pendingControlWrites.current.size) await finishControlWrites(); return session.exportSource(name); }} />
     <LooksDialog open={looksOpen} onClose={() => setLooksOpen(false)} onClosed={() => fileSummary.current?.focus()} client={window.luxLooks} onSave={saveLook} onLoad={loadLook} />
-    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} appCommands={commands} appError={error} controlEdits={controlEdits} libraryPanel={libraryPanel}
+    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} sourceChanged={draft.hasRunningSource && !draft.runningMatchesDraft} appCommands={commands} appError={error} controlEdits={controlEdits} libraryPanel={libraryPanel}
       sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onApply={() => void build()} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnostics={diagnostics} />} />
   </div></StudioMenuProvider></ThemeProvider>;
 }

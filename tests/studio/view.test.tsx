@@ -47,10 +47,17 @@ test('status bar exposes current build, problem and runtime health as actionable
   assert.match(html, /aria-label="Problems: 0\. Open Jobs and diagnostics"/);
   assert.match(html, />0 problems</);
   assert.doesNotMatch(html, /Runtime status:|playback-state|Service connected/);
-  assert.match(html, />Paused</);
+  assert.doesNotMatch(html, />Paused<|>Playing</);
   assert.doesNotMatch(html, /Presentation only|TRACER 0\.1/);
   assert.match(html, /class="status-spinner"/);
   assert.match(html, /aria-busy="true"/);
+  const stale = renderToStaticMarkup(<StudioApp client={client} nowMs={1000} sourceChanged />);
+  assert.match(stale, /Source changed · Build to update/);
+  for (const connection of ['connecting', 'disconnected'] as const) {
+    const lost = { ...snapshot, connection };
+    const errorHtml = renderToStaticMarkup(<StudioApp client={{ ...client, getSnapshot: () => lost }} nowMs={1000} />);
+    assert.match(errorHtml, /Runtime status: (Connecting|Disconnected)/);
+  }
   snapshot = { ...snapshot, jobs: [{ jobId: 'build-1', state: 'succeeded', summary: 'Visual is ready in Lux.' }] };
   const finished = renderToStaticMarkup(<StudioApp client={client} nowMs={1000} />);
   assert.doesNotMatch(finished, /class="status-spinner"/);

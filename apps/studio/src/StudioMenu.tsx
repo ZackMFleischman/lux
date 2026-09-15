@@ -43,7 +43,7 @@ export function StudioMenu({ label, children, buttonRef, className = '' }: {
           onClick={event => { if ((event.target as Element).closest('[role="menuitem"]:not([aria-disabled="true"])')) close(); }}
           onKeyDown={event => {
             if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); close(true); }
-            if (event.key === 'Tab') close();
+            if (event.key === 'Tab') { event.preventDefault(); close(true); }
             if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') { event.preventDefault(); adjacent(event.key === 'ArrowRight' ? 1 : -1); }
           }}>{children}</MenuList>
       </Paper>
