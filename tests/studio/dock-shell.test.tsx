@@ -226,11 +226,11 @@ test('group menu targets its owning group, cancels with focus and rejects a vani
   ui.unmount();
 });
 
-test('Graph selects an instance, opens Inspector, writes only that node and preserves selection across panel closure',async()=>{
+test('Scene and component controls expose real animation plus independent reset while descriptions stay in tooltips',async()=>{
   const {parse}=await import('@babel/parser');
   const {createHash}=await import('node:crypto');
   const {extractCompositionDeclaration}=await import('../../apps/build-worker/src/composition-declarations.mjs');
-  const {compositionSourceBundle,kaleidoscopeAId,kaleidoscopeBId}=await import('../compiler/composition-fixture.mjs');
+  const {compositionSourceBundle,ballId,kaleidoscopeAId,kaleidoscopeBId}=await import('../compiler/composition-fixture.mjs');
   const {createCompositionControlState}=await import('../../packages/runtime/src/components/composition-controls.ts');
   const source=compositionSourceBundle(),asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));
   const composition=extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash:(value:string)=>createHash('sha256').update(value).digest('hex')})!;
@@ -246,6 +246,16 @@ test('Graph selects an instance, opens Inspector, writes only that node and pres
   }};
   window.localStorage.clear();
   const ui=render(<StudioApp client={client} nowMs={1000} sourcePanel={<div>Source fixture</div>}/>);
+  await click('Open Inspector');
+  const sceneAnimate=await screen.findByRole('button',{name:'Animate Intensity'});
+  assert.ok(screen.getByRole('button',{name:'Reset Intensity to default'}));
+  await act(async()=>{fireEvent.click(sceneAnimate);});
+  await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Add LFO'}));});
+  assert.equal(calls[0].name,'lux.node.animation.set');assert.deepEqual(calls[0].input.nodePath,[ballId]);assert.equal(calls[0].input.controlId,'intensity');
+  await act(async()=>{fireEvent.keyDown(screen.getByRole('dialog',{name:'Animate Intensity'}),{key:'Escape'});});
+  await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Reset Intensity to default'}));});
+  assert.equal(calls[1].name,'lux.node.parameters.set');assert.deepEqual(calls[1].input.nodePath,[ballId]);assert.deepEqual(calls[1].input.values,{intensity:.6});
+  calls.splice(0);
   await click('Open Graph');
   const nodes=[...document.querySelectorAll<HTMLButtonElement>('.graph-node')];assert.equal(nodes.length,3);
   assert.equal(document.querySelectorAll('.graph-wires path').length,2);
@@ -256,7 +266,8 @@ test('Graph selects an instance, opens Inspector, writes only that node and pres
   assert.equal(calls.length,0,'selection must not invoke a runtime operation');
   const selectedInspector=within(document.querySelector('.inspector')!);
   const selectedControlLabel=selectedInspector.getByText('Segments');
-  assert.ok(selectedInspector.getByText('Mirror segments'));
+  assert.equal(selectedInspector.queryByText('Mirror segments'),null,'descriptions must not occupy an inline row');
+  assert.ok(selectedInspector.getByRole('button',{name:'Reset Segments to default'}));
   assert.equal(selectedControlLabel.getAttribute('tabindex'),'0','selected-node help must remain keyboard accessible');
   fireEvent.mouseOver(selectedControlLabel);
   assert.ok(await screen.findByRole('tooltip',{name:'Mirror segments'}));

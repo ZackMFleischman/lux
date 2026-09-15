@@ -67,6 +67,15 @@ test('RTL: code-defined controls expose independent values, numeric entry and de
   render(<StudioApp client={fixture.client} nowMs={1000} />);
   assert.equal(screen.queryByRole('slider', { name: 'Intensity' }), null);
   assert.equal(within(document.querySelector('.inspector')!).getAllByRole('slider').length, 2);
+  for (const label of ['Spike height', 'Noise scale']) {
+    const animate = screen.getByRole('button', { name: `Animate ${label}` }) as HTMLButtonElement;
+    assert.equal(animate.getAttribute('aria-disabled'), 'true', 'legacy controls expose animation honestly without fabricating a node target');
+    assert.equal((screen.getByRole('button', { name: `Reset ${label} to default` }) as HTMLButtonElement).disabled, false);
+  }
+  const unavailableAnimation=screen.getByRole('button',{name:'Animate Spike height',description:'Animation requires a component-based scene.'});await act(async()=>{unavailableAnimation.focus();});
+  assert.ok(document.activeElement===unavailableAnimation,'unavailable animation reason must be keyboard reachable');
+  assert.ok(await screen.findByRole('tooltip',{name:'Animation requires a component-based scene.'}),'keyboard focus displays the unavailable reason');
+  fireEvent.click(unavailableAnimation);assert.ok(!screen.queryByRole('dialog',{name:'Animate Spike height'}),'unavailable animation cannot open an editor');
   fireEvent.change(screen.getByRole('spinbutton', { name: 'Noise scale value' }), { target: { value: '12' } });
   fireEvent.keyDown(screen.getByRole('spinbutton', { name: 'Noise scale value' }), { key: 'Enter' });
   await waitFor(() => assert.equal(fixture.calls.length, 1));
@@ -87,6 +96,7 @@ test('RTL: control descriptions appear on hover and keyboard focus without creat
   fireEvent.mouseOver(described);
   const tooltip = await screen.findByRole('tooltip', { name: /Expands the area sampled/ });
   assert.ok(tooltip.querySelector('.MuiTooltip-tooltipPlacementLeft'), 'help must open toward Preview');
+  assert.equal(getComputedStyle(tooltip.querySelector('.MuiTooltip-tooltip')!).fontSize, '12px');
   fireEvent.change(screen.getByRole('slider', { name: 'Source sampling radius' }), { target: { value: '2' } });
   await waitFor(() => assert.deepEqual((fixture.calls[0] as any).input.values, { samplingRadius: 2 }));
   fireEvent.mouseOut(described);
