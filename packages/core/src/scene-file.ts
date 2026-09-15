@@ -49,7 +49,7 @@ export class SceneFileStore {
       try {
         const file = await open(temporary, 'wx');
         try { await file.writeFile(bytes); await file.sync(); } finally { await file.close(); }
-        if(binding.noOverwrite){await link(temporary,binding.path);await unlink(temporary);}else await this.replace(temporary,binding.path); committed = true;
+        if(binding.noOverwrite){await link(temporary,binding.path);binding.noOverwrite=false;committed=true;await unlink(temporary).catch(()=>{});}else {await this.replace(temporary,binding.path);committed = true;}
         binding.hash = hash(bytes);
         return { token, document: snapshot, fileHash: binding.hash, name: binding.path.split(/[\\/]/).pop()!, committed: true as const };
       } finally { if (!committed) await unlink(temporary).catch(() => {}); }
