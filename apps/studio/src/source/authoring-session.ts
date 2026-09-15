@@ -172,7 +172,8 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         const controlVersion=controlsVersion,source=structuredClone(snapshot.source);
         const document=createSceneDocument(source,{...DEFAULT_OUTPUT},await documentControls(source),libraryLinks,validateControlAnimationBindings(pendingDocumentAnimations??ports.getControlAnimations?.()??[]));
         const result=await ports.savePath({path,document,overwrite});
-        if(result){token=result.token;workspace.markSaved(snapshot.version);update({name:result.name,controlsDirty:controlsVersion!==controlVersion,libraryDirty:false});}
+        if(!result)return null;
+        token=result.token;workspace.markSaved(snapshot.version);update({name:result.name,controlsDirty:controlsVersion!==controlVersion,libraryDirty:false});
         return {name:result.name,path,draftVersion:workspace.getSnapshot().version};
       });
     },
