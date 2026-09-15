@@ -15,10 +15,14 @@ export function InspectorBreadcrumb({ runtime, path, onSelect }: {
   const hasComponent = !!path?.length;
   const available = !hasComponent || !!compositionOccurrence(runtime, path!);
   const label = available ? compositionNodeLabel(runtime, path ?? []) : 'Unavailable component';
+  if (!hasComponent) return null;
   return <nav className="inspector-breadcrumb" aria-label="Inspector controls path"><ol>
     <li><Button color="inherit" ref={hasComponent ? undefined : currentButton} aria-label="Scene controls"
       aria-current={!hasComponent ? 'page' : undefined}
-      onClick={event => { event.currentTarget.focus(); onSelect(null); }}>Scene</Button></li>
+      onClick={event => {
+        event.currentTarget.closest('details')?.querySelector('summary')?.focus();
+        onSelect(null);
+      }}>Scene</Button></li>
     {parents.length > 0 && <li><Button color="inherit" aria-label="Parent controls" title="Parent controls"
       aria-haspopup="menu" aria-expanded={!!anchor} onClick={event => { selectedParent.current = false; setAnchor(event.currentTarget); }}>…</Button></li>}
     {hasComponent && <li className="inspector-current"><Button color="inherit" ref={currentButton} disabled={!available}
