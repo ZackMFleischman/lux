@@ -14,5 +14,6 @@ export const studioTheme = createTheme({
     MuiPaper: { defaultProps: { elevation: 0 }, styleOverrides: { root: { backgroundImage: 'none' } } },
     MuiChip: { defaultProps: { size: 'small', variant: 'outlined' }, styleOverrides: { root: { fontSize: 9, letterSpacing: 1, borderRadius: 3, height: 23 } } },
     MuiSlider: { defaultProps: { size: 'small' } },
+    MuiTooltip: { styleOverrides: { tooltip: { fontSize: '12px', lineHeight: 1.45 } } },
   },
 });
