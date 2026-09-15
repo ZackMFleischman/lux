@@ -30,6 +30,25 @@ contexts. Use capacity for concrete independent delivery and review. Do not fill
 slots with speculative work. When an immutable run has an obsolete limit,
 checkpoint and stop it before starting its successor at the actual host limit.
 
+### Conductor call and record budget
+
+Ordinary edit/test loops make zero Conductor calls and comments. Read startup
+context once, retain returned IDs/revisions, and contact Conductor only for
+required lifecycle/policy transitions, actual recovery, actionable changes or
+final handoff. Refresh missing or externally changed state and reconcile conflicts;
+keep ownership, approval and validation checks intact. Unchanged host waits need
+no tracker update. Monitoring uses events or bounded fallback polling from the
+shared skills.
+
+Default to one final submission. Intermediate notes contain at most three short
+bullets (normally 80 words): changed fact/reason, evidence link, required next
+action. Record each fact once; transition/submission fields satisfy the handoff.
+Keep routine test failures, corrected typos and retries local. Report workflow
+issues only when blocking, recurring, risking correctness/ownership, or requiring
+a reusable fix; record material user corrections once. Existing reporting rules
+below use this threshold. Keep ticket descriptions focused on outcome, constraints
+and acceptance (normally 150 words); link necessary detailed evidence.
+
 ### Model and context selection
 
 Choose the model and reasoning effort for each fresh delegation. Do not inherit
