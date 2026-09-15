@@ -31,7 +31,7 @@ function MetricView({ label, metric, nowMs }: { label: string; metric: Metric | 
 }
 export type StudioProps = {
   controlEdits?: ControlEdits;
-  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; libraryPanel?:ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; appError?: string; sourceChanged?: boolean;
+  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; libraryPanel?:ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; appError?: string; sourceChanged?: boolean; controlsAvailable?: boolean;
 };
 export function StudioApp(props: StudioProps) {
   return <ThemeProvider theme={studioTheme}><CssBaseline /><StudioLayout {...props} /></ThemeProvider>;
@@ -54,7 +54,7 @@ export function studioStatus(snapshot: StudioSnapshot): { build: string; buildin
     : snapshot.authoring ? sentenceCase(snapshot.authoring.playback) : 'No runtime';
   return { build, building: !!active, problems, runtime };
 }
-function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel,libraryPanel, appCommands, fileMenu, appError, controlEdits, sourceChanged }: StudioProps) {
+function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel,libraryPanel, appCommands, fileMenu, appError, controlEdits, sourceChanged, controlsAvailable }: StudioProps) {
   const [toolsHost, setToolsHost] = useState<HTMLElement | null>(null);
   const [transportMenu, setTransportMenu] = useState<HTMLElement | null>(null);
   const view = useMemo(() => createRendererSnapshot(client), [client]);
@@ -85,7 +85,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const [graphSelection,setGraphSelection]=useState<NodePath|null>(null);
   const selectedNodePath=graphSelection??undefined;
   function selectGraphNode(path:NodePath|null){setGraphSelection(path?[...path]:null);openPanelRef.current?.('inspector');}
-  const available = snapshot.connection === 'connected' && runtime?.authority === 'studio';
+  const available = snapshot.connection === 'connected' && runtime?.authority === 'studio' && controlsAvailable !== false;
   useEffect(() => {
     if (nowMs !== undefined) return;
     const timer = setInterval(() => setClock(Date.now()), 1000);

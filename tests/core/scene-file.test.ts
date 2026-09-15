@@ -80,6 +80,17 @@ test('scene files roundtrip Unicode drafts, settings and controls; external edit
     assert.equal(await readFile(path, 'utf8'), 'external edit');
   } finally { await rm(folder, { recursive: true, force: true }); }
 });
+test('no-overwrite creation is atomic and later token saves remain available', async () => {
+  const folder=await mkdtemp(join(tmpdir(),'lux-no-clobber-'));
+  try {
+    const path=join(folder,'scene.lux-scene'),store=new SceneFileStore();
+    const saved=await store.saveAs(path,document,{overwrite:false});
+    await assert.rejects(new SceneFileStore().saveAs(path,document,{overwrite:false}),/already exists/);
+    await store.save(saved.token,{...document,controls:{intensity:0.3}});
+    const reopened=(await store.open(path)).document.controls;
+    assert.equal('intensity' in reopened?reopened.intensity:undefined,0.3);
+  } finally { await rm(folder,{recursive:true,force:true}); }
+});
 test('invalid UTF8, version, paths and values cannot replace a document', async () => {
   const folder = await mkdtemp(join(tmpdir(), 'lux-files-'));
   try {

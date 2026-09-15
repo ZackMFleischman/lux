@@ -27,6 +27,8 @@ export interface AuthoringApi {
   smokeEnabled?(): Promise<boolean>;
   open(): Promise<any>;
   save(request: unknown): Promise<any>;
+  savePath?(request: unknown): Promise<any>;
+  openPath?(path: string): Promise<any>;
   dirty(value: boolean): Promise<void>;
   smokeSave(document: unknown): Promise<any>;
   onAgentCommand(listener: (command: any) => Promise<unknown>): () => void;

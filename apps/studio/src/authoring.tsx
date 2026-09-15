@@ -40,9 +40,9 @@ export function AuthoringApp() {
   const composing = useRef(false);
   const workspace = useMemo(() => createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': '' } }), []);
   const session = useMemo(() => createAuthoringSession(workspace, {
-    submit: (source, options) => client.submit(source, options), save: request => window.luxAuthoring.save(request), open: () => window.luxAuthoring.open(),
+    submit: (source, options) => client.submit(source, options), save: request => window.luxAuthoring.save(request), savePath: request => {if(!window.luxAuthoring.savePath)throw Error('Path save is unavailable');return window.luxAuthoring.savePath(request);}, open: () => window.luxAuthoring.open(), openPath: path => {if(!window.luxAuthoring.openPath)throw Error('Path open is unavailable');return window.luxAuthoring.openPath(path);},
     export: request => window.luxExport.create(request),
-    getControls: () => ({ intensity: client.getSnapshot().authoring?.intensity ?? 0.5 }),
+    getControls: () => ({ intensity: client.getSnapshot().authoring?.intensity ?? 0.5 }), settleControls: finishControlWrites,
     getControlSnapshot: () => {
       const runtime = client.getSnapshot().authoring;
       if (!runtime) return null;
@@ -77,6 +77,7 @@ export function AuthoringApp() {
     if (lookOperation.current && !['read', 'status'].includes(command.method)) throw Error('Wait for the look operation to finish');
     if (confirmation.isPending() && !['read', 'status', 'capture','library.list','library.read'].includes(command.method)) throw Error('Studio is waiting for a user confirmation');
     if (['parameters', 'playback', 'restart'].includes(command.method)) {
+      if(session.getSnapshot().busy)throw Error('Studio is busy with a scene file operation');
       const write = dispatchRuntimeCommand(client, command.method, command.params);
       if (command.method === 'parameters') {
         pendingControlWrites.current.add(write);
@@ -98,6 +99,12 @@ export function AuthoringApp() {
       const capture = await client.capture(), bytes = new Uint8Array(capture.bytes);
       let binary = ''; for (let i = 0; i < bytes.length; i += 8192) binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
       return { base64: btoa(binary), metadata: capture.metadata };
+    }
+    if(command.method==='scene.save'){await finishControlWrites();return session.savePath(command.params.path,command.params.expectedDraftVersion,command.params.overwrite);}
+    if(command.method==='scene.open'){
+      await finishControlWrites();const current=workspace.getSnapshot(),io=session.getSnapshot();
+      if((current.dirty||io.controlsDirty||io.libraryDirty)&&!command.params.discardDirty)throw Error('Scene has unsaved changes; pass discardDirty:true to open another scene');
+      const result=await session.openPath(command.params.path,command.params.expectedDraftVersion);setError('');setDiagnostics([]);return result;
     }
     if (command.method !== 'build' || session.getSnapshot().busy || composing.current) throw Error('Studio is busy or command is unsupported');
     const source = command.params.source as SourceBundle;
@@ -215,7 +222,7 @@ export function AuthoringApp() {
     {confirmation.dialog}
     <ExportDialog disabled={busy || composing.current} open={exportOpen} onClose={() => setExportOpen(false)} onClosed={() => fileSummary.current?.focus()} defaultName={io.name} create={async name => { if (pendingControlWrites.current.size) await finishControlWrites(); return session.exportSource(name); }} />
     <LooksDialog open={looksOpen} onClose={() => setLooksOpen(false)} onClosed={() => fileSummary.current?.focus()} client={window.luxLooks} onSave={saveLook} onLoad={loadLook} />
-    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} sourceChanged={draft.hasRunningSource && !draft.runningMatchesDraft} appCommands={commands} appError={error} controlEdits={controlEdits} libraryPanel={libraryPanel}
+    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} sourceChanged={draft.hasRunningSource && !draft.runningMatchesDraft} appCommands={commands} appError={error} controlEdits={controlEdits} controlsAvailable={!io.busy} libraryPanel={libraryPanel}
       sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onApply={() => void build()} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnostics={diagnostics} />} />
   </div></StudioMenuProvider></ThemeProvider>;
 }
