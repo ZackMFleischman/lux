@@ -20,10 +20,12 @@ type Ports = {
   readLook?(id: string): Promise<Look>;
   lookThumbnail?(document: SceneDocument): Promise<string | undefined>;
   save(request: { token?: string; saveAs: boolean; document: SceneDocument }): Promise<SavedFile | null>;
+  savePath?(request:{path:string;document:SceneDocument;overwrite:boolean}):Promise<SavedFile|null>;
   getControls?(): ControlValues;
   getControlSnapshot?(): SavedControls | null;
   getControlAnimations?():readonly ControlAnimationBinding[];
   open?(): Promise<(SavedFile & { document: SceneDocument }) | null>;
+  openPath?(path:string):Promise<(SavedFile & {document:SceneDocument})|null>;
   /** Legacy port retained for fixture compatibility; controls now enter submit before activation. */
   applyControls?(controls: ControlValues): Promise<void>;
   export?(request: { name: string; document: SceneDocument }): Promise<{ path: string; releaseId: string; runtimeId: string } | null>;
@@ -158,6 +160,33 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         const result = await ports.save({ token, saveAs, document });
         if (result) { token = result.token; workspace.markSaved(snapshot.version);
           update({ name: result.name, controlsDirty: controlsVersion !== controlVersion,libraryDirty:false }); }
+        return result;
+      });
+    },
+    savePath(path:string,expectedVersion:number,overwrite:boolean) {
+      return exclusive(async()=>{
+        if(!ports.savePath)throw Error('Path save is unavailable');
+        const snapshot=workspace.getSnapshot();if(snapshot.version!==expectedVersion)throw Error('Editor changed; read its source again before saving');
+        const controlVersion=controlsVersion,source=structuredClone(snapshot.source);
+        const document=createSceneDocument(source,{...DEFAULT_OUTPUT},await documentControls(source),libraryLinks,validateControlAnimationBindings(pendingDocumentAnimations??ports.getControlAnimations?.()??[]));
+        const result=await ports.savePath({path,document,overwrite});
+        if(result){token=result.token;workspace.markSaved(snapshot.version);update({name:result.name,controlsDirty:controlsVersion!==controlVersion,libraryDirty:false});}
+        return result;
+      });
+    },
+    openPath(path:string,expectedVersion:number) {
+      return exclusive(async()=>{
+        if(!ports.openPath)throw Error('Path open is unavailable');
+        if(workspace.getSnapshot().version!==expectedVersion)throw Error('Editor changed; read its source again before opening');
+        const result=await ports.openPath(path);if(!result)return null;
+        const document=await verifySceneDocument(result.document);
+        if(document.settings.width!==1920||document.settings.height!==1080||document.settings.fps!==60||document.settings.seed!==0)throw Error('This build supports 1920×1080 at 60 fps with seed 0');
+        const savedControls=await sceneControlSnapshot(document),savedAnimations=document.version===4||document.version===5?document.controlAnimations:Object.freeze([]),savedLinks=document.version===5?document.libraryLinks:Object.freeze([]);
+        const resolution=await resolveLinked(document.source,savedLinks);
+        await ports.submit(resolution.source,{savedControls,savedControlAnimations:savedAnimations,output:document.settings});
+        workspace.replaceDocument(resolution.source);await workspace.submit(resolution.source,workspace.getSnapshot().version,async()=>{});
+        token=result.token;libraryLinks=resolution.links;pendingDocumentControls=null;pendingDocumentAnimations=null;
+        update({name:result.name,controlsDirty:false,libraryDirty:JSON.stringify(resolution.links)!==JSON.stringify(savedLinks),libraryUpdates:Object.freeze([]),libraryFallbacks:resolution.fallbacks});
         return result;
       });
     },

@@ -1,6 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { sourceBuildInputSchema, sourceReadResult,libraryCreateInputSchema,libraryReadInputSchema,libraryUpdateInputSchema } from '../apps/studio/src/source/agent-contract.ts';
+import { sourceBuildInputSchema, sourceReadResult,libraryCreateInputSchema,libraryReadInputSchema,libraryUpdateInputSchema,sceneSaveInputSchema,sceneOpenInputSchema } from '../apps/studio/src/source/agent-contract.ts';
 import { assetLimits } from '../packages/assets/src/index.mjs';
 import { resolve } from 'node:path';
 import { createStudioConnection, resolveStudioSession } from './studio-session.mjs';
@@ -18,7 +18,7 @@ async function runningStudio() {
     selectedSession: { profile: selectedSession.profile, workspace: selectedSession.workspace },
     advice: `Use the same Studio profile and checkout; reconnect the adapter after replacing Studio. ${error.message}` }; }
 }
-server.registerTool('lux.studio.discover', { description: 'Read the exact visual SDK, example and standalone Lux capabilities. Start Lux Studio separately.', inputSchema: {} }, async () => text({ ...await discoverVisualSdk(), scope: 'standalone-studio', tools: ['read', 'build', 'capture', 'status', 'parameters', 'playback', 'restart','library.list','library.read','library.create','library.update'], resolume: false,
+server.registerTool('lux.studio.discover', { description: 'Read the exact visual SDK, example and standalone Lux capabilities. Start Lux Studio separately.', inputSchema: {} }, async () => text({ ...await discoverVisualSdk(), scope: 'standalone-studio', tools: ['read', 'build', 'save', 'open', 'capture', 'status', 'parameters', 'playback', 'restart','library.list','library.read','library.create','library.update'], resolume: false,
   runningStudio: await runningStudio(),
   parameters: { kinds: ['number'], maxCount: 32, declaredInCode: true, requiredGuard: 'expectedControlSchemaHash from current runtime status', implicitControls: false,
     composition: 'SDK 0.4 image-chain-v1 exposes selected leaf controls as independent public aliases; values remain owned by stable node identity.' },
@@ -30,6 +30,8 @@ server.registerTool('lux.studio.read', { description: 'Read complete source and 
 server.registerTool('lux.studio.status', { description: 'Read actual standalone preview status.', inputSchema: {} }, async () => text(await call('status')));
 server.registerTool('lux.studio.build', { description: 'Compile and preview replacement source. Read first; expectedDraftVersion prevents overwriting intervening edits. Failed builds retain the working preview.',
   inputSchema: sourceBuildInputSchema.shape }, async input => text(await call('build', input)));
+server.registerTool('lux.studio.save',{description:'Save the current scene to an explicit .lux-scene path. Read first and pass expectedDraftVersion. Existing paths require overwrite:true; external file changes remain protected.',inputSchema:sceneSaveInputSchema.shape},async input=>text(await call('scene.save',input)));
+server.registerTool('lux.studio.open',{description:'Open an explicit .lux-scene path. Read first and pass expectedDraftVersion. Dirty source, controls, or library links require discardDirty:true; invalid scenes retain the current draft and preview.',inputSchema:sceneOpenInputSchema.shape},async input=>text(await call('scene.open',input)));
 server.registerTool('lux.library.list',{description:'List local shared components with stable IDs, names, descriptions, and current revisions.',inputSchema:{}},async()=>text(await call('library.list')));
 server.registerTool('lux.library.read',{description:'Read one local shared component and its complete current source bundle.',inputSchema:libraryReadInputSchema.shape},async input=>text(await call('library.read',input)));
 server.registerTool('lux.library.create',{description:'Validate and build a zero-input image-source component candidate, then create one stable local library entry at revision 1.',inputSchema:libraryCreateInputSchema.shape},async input=>text(await call('library.create',input)));

@@ -8,6 +8,9 @@ const mountPath=z.string().max(180).regex(/^(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+$
 export const libraryLinkInputSchema=z.object({componentId,mountPath}).strict();
 export const sourceBuildInputSchema = z.object({ expectedDraftVersion: z.number().int().nonnegative(),
   source: sourceBundleSchema,libraryLinks:z.array(libraryLinkInputSchema).max(8).optional() }).strict();
+const scenePath=z.string().min(1).max(1024).refine(path=>path.toLowerCase().endsWith('.lux-scene'),'Scene path must end in .lux-scene');
+export const sceneSaveInputSchema=z.object({path:scenePath,expectedDraftVersion:z.number().int().nonnegative(),overwrite:z.boolean().optional().default(false)}).strict();
+export const sceneOpenInputSchema=z.object({path:scenePath,expectedDraftVersion:z.number().int().nonnegative(),discardDirty:z.boolean().optional().default(false)}).strict();
 export const libraryComponentSourceSchema=legacySourceBundleSchema.extend({sdkVersion:z.literal('0.4.0')});
 export const libraryCreateInputSchema=z.object({name:z.string().trim().min(1).max(80),description:z.string().trim().min(1).max(512),source:libraryComponentSourceSchema}).strict();
 export const libraryReadInputSchema=z.object({id:componentId}).strict();

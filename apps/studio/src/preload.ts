@@ -40,6 +40,8 @@ contextBridge.exposeInMainWorld('luxAuthoring', Object.freeze({
   smokeEnabled: () => ipcRenderer.invoke('studio:authoring', 'smoke-enabled'),
   open: () => ipcRenderer.invoke('studio:authoring', 'open'),
   save: (request: unknown) => ipcRenderer.invoke('studio:authoring', 'save', request),
+  savePath: (request: unknown) => ipcRenderer.invoke('studio:authoring', 'save-path', request),
+  openPath: (path: string) => ipcRenderer.invoke('studio:authoring', 'open-path', path),
   dirty: (value: boolean) => ipcRenderer.invoke('studio:authoring', 'dirty', value),
   smokeSave: (document: unknown) => ipcRenderer.invoke('studio:authoring', 'smoke-save', document),
   onAgentCommand: (listener: (command: unknown) => Promise<unknown>) => {

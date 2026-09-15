@@ -40,7 +40,7 @@ export function AuthoringApp() {
   const composing = useRef(false);
   const workspace = useMemo(() => createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': '' } }), []);
   const session = useMemo(() => createAuthoringSession(workspace, {
-    submit: (source, options) => client.submit(source, options), save: request => window.luxAuthoring.save(request), open: () => window.luxAuthoring.open(),
+    submit: (source, options) => client.submit(source, options), save: request => window.luxAuthoring.save(request), savePath: request => window.luxAuthoring.savePath(request), open: () => window.luxAuthoring.open(), openPath: path => window.luxAuthoring.openPath(path),
     export: request => window.luxExport.create(request),
     getControls: () => ({ intensity: client.getSnapshot().authoring?.intensity ?? 0.5 }),
     getControlSnapshot: () => {
@@ -98,6 +98,12 @@ export function AuthoringApp() {
       const capture = await client.capture(), bytes = new Uint8Array(capture.bytes);
       let binary = ''; for (let i = 0; i < bytes.length; i += 8192) binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
       return { base64: btoa(binary), metadata: capture.metadata };
+    }
+    if(command.method==='scene.save')return session.savePath(command.params.path,command.params.expectedDraftVersion,command.params.overwrite);
+    if(command.method==='scene.open'){
+      const current=workspace.getSnapshot(),io=session.getSnapshot();
+      if((current.dirty||io.controlsDirty||io.libraryDirty)&&!command.params.discardDirty)throw Error('Scene has unsaved changes; pass discardDirty:true to open another scene');
+      return session.openPath(command.params.path,command.params.expectedDraftVersion);
     }
     if (command.method !== 'build' || session.getSnapshot().busy || composing.current) throw Error('Studio is busy or command is unsupported');
     const source = command.params.source as SourceBundle;
