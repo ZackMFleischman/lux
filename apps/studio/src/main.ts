@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, dialog, clipboard } from 'electron';
 import { join, sep, isAbsolute } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { randomBytes } from 'node:crypto';
-import { readFile, writeFile, mkdir, rename, access } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, rename } from 'node:fs/promises';
 import { mkdirSync } from 'node:fs';
 import { StudioWindows, isTrustedStudioUrl } from './windows.ts';
 import { createStudioPage } from './page.ts';
@@ -180,17 +180,16 @@ app.whenReady().then(async () => {
       if (request?.token && !request.saveAs) return files.save(request.token, request.document);
       const result = await dialog.showSaveDialog(mainWindow!, { defaultPath: 'Untitled.lux-scene', filters: [{ name: 'Lux visual', extensions: ['lux-scene'] }] });
       if (result.canceled || !result.filePath) return null;
-      return files.saveAs(result.filePath, request?.document);
+      return files.saveAs(result.filePath, request?.document,{overwrite:true});
     }
     if (action === 'save-path') {
       const request=value as {path?:unknown;document?:unknown;overwrite?:unknown};
       if(typeof request?.path!=='string'||!isAbsolute(request.path)||!request.path.toLowerCase().endsWith('.lux-scene')||typeof request.overwrite!=='boolean')throw Error('Use an absolute .lux-scene path and explicit overwrite flag');
-      if(!request.overwrite){try{await access(request.path);throw Error('Scene file already exists; pass overwrite:true to replace it');}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}}
-      return files.saveAs(request.path,request.document);
+      return files.saveAs(request.path,request.document,{overwrite:request.overwrite});
     }
     if (action === 'smoke-save' && process.env.LUX_STUDIO_SMOKE === '1') {
       const folder = join(workspace, 'artifacts/studio-smoke'); await mkdir(folder, { recursive: true });
-      const path = join(folder, 'roundtrip.lux-scene'); await files.saveAs(path, value); return files.open(path);
+      const path = join(folder, 'roundtrip.lux-scene'); await files.saveAs(path, value,{overwrite:true}); return files.open(path);
     }
     if (action === 'smoke-result' && process.env.LUX_STUDIO_SMOKE === '1') {
       const directory = join(workspace, 'artifacts/studio-smoke'); await mkdir(directory, { recursive: true });

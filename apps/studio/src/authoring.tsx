@@ -42,7 +42,7 @@ export function AuthoringApp() {
   const session = useMemo(() => createAuthoringSession(workspace, {
     submit: (source, options) => client.submit(source, options), save: request => window.luxAuthoring.save(request), savePath: request => window.luxAuthoring.savePath(request), open: () => window.luxAuthoring.open(), openPath: path => window.luxAuthoring.openPath(path),
     export: request => window.luxExport.create(request),
-    getControls: () => ({ intensity: client.getSnapshot().authoring?.intensity ?? 0.5 }),
+    getControls: () => ({ intensity: client.getSnapshot().authoring?.intensity ?? 0.5 }), settleControls: finishControlWrites,
     getControlSnapshot: () => {
       const runtime = client.getSnapshot().authoring;
       if (!runtime) return null;
@@ -99,9 +99,9 @@ export function AuthoringApp() {
       let binary = ''; for (let i = 0; i < bytes.length; i += 8192) binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
       return { base64: btoa(binary), metadata: capture.metadata };
     }
-    if(command.method==='scene.save')return session.savePath(command.params.path,command.params.expectedDraftVersion,command.params.overwrite);
+    if(command.method==='scene.save'){await finishControlWrites();return session.savePath(command.params.path,command.params.expectedDraftVersion,command.params.overwrite);}
     if(command.method==='scene.open'){
-      const current=workspace.getSnapshot(),io=session.getSnapshot();
+      await finishControlWrites();const current=workspace.getSnapshot(),io=session.getSnapshot();
       if((current.dirty||io.controlsDirty||io.libraryDirty)&&!command.params.discardDirty)throw Error('Scene has unsaved changes; pass discardDirty:true to open another scene');
       return session.openPath(command.params.path,command.params.expectedDraftVersion);
     }

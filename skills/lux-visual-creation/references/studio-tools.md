@@ -65,6 +65,8 @@ Read live tool schemas if available; these are the checked adapter's contracts. 
 | `discover` | `{}` → adapter-checkout SDK source, example, shared types, imports, declared capabilities. No running-app handshake; can succeed with Studio closed. |
 | `read` | `{}` → `{ source, draftVersion, ..., status }`. Complete source; don't truncate assets/files when storing it for an edit. |
 | `build` | `{ expectedDraftVersion, source, libraryLinks?: [{ componentId, mountPath }] }` → `{ draftVersion, status }` after resolving linked component source and candidate promotion. The accepted candidate starts playing by default. A later explicit Pause during the operation wins before promotion. This is a complete replacement. Preserve current links from `read.libraryLinks` unless the requested edit changes them. |
+| `save` | `{ path, expectedDraftVersion, overwrite?: false }` → saved scene name/token. `path` is an absolute `.lux-scene` path. Existing targets require explicit `overwrite: true`; no-overwrite uses exclusive creation and retains external-change protection. The saved document includes current controls and control animations. |
+| `open` | `{ path, expectedDraftVersion, discardDirty?: false }` → opened scene name/token. `path` is an absolute `.lux-scene` path. Dirty source, controls, or library links require `discardDirty: true`. Invalid reads or failed candidate activation retain the existing draft and preview. |
 | `status` | `{}` → snapshot containing `authoring`, which is null before a working runtime exists. |
 | `capture` | `{}` → PNG image block plus JSON metadata. Captures the current completed frame; it does not advance paused playback. |
 | `playback` | `{ instanceId, expectedGeneration, action: 'play' | 'pause' | 'reset' }` → `{ applied, status }`. Reset preserves playing/paused state. |
@@ -79,7 +81,7 @@ Obtain `instanceId`, `generation`, `revisionId`, and `playback` from `status.aut
 
 For source edits, `structuredClone(current.source)` is a useful starting point. Modify only the intended entries in `.files`; preserve the remaining bundle. A complete-source build is atomic and version guarded. Typing through Playwright or streaming characters into the user's editor has different concurrency behavior and is not the creation path; token-by-token edit visualization is not exposed by the checked MCP API.
 
-Current tools do not expose scene Save/Open, export, resolution changes or audio inputs. The library tools do not directly save a scene. Numeric visual-defined controls are available; color/Boolean/enum controls are not yet supported. Do not claim a tool result performed those actions. Inspect updated discovery for newer capabilities before concluding they remain unavailable.
+Current tools do not expose export, resolution changes or audio inputs. Numeric visual-defined controls are available; color/Boolean/enum controls are not yet supported. Do not claim a tool result performed those actions. Inspect updated discovery for newer capabilities before concluding they remain unavailable.
 
 ## Editor and scene commands
 

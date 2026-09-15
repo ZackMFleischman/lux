@@ -1,4 +1,4 @@
-import { open, rename, unlink, readFile } from 'node:fs/promises';
+import { open, rename, unlink, readFile, link } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import { validateSceneDocument as document, verifySceneDocument } from './scene-document.ts';
@@ -14,7 +14,7 @@ async function boundedRead(path: string): Promise<Buffer> {
     if (offset > cap) throw Error('Scene file exceeds 8 MiB'); return buffer.subarray(0, offset);
   } finally { await file.close(); }
 }
-type Binding = { path: string; hash: string | null };
+type Binding = { path: string; hash: string | null; noOverwrite?: boolean };
 export class SceneFileStore {
   private bindings = new Map<string, Binding>();
   private queue: Promise<unknown> = Promise.resolve();
@@ -27,11 +27,12 @@ export class SceneFileStore {
     const token = randomUUID(), fileHash = hash(bytes); this.bindings.set(token, { path: resolve(path), hash: fileHash });
     return { token, document: snapshot, fileHash, name: path.split(/[\\/]/).pop()! };
   }
-  async saveAs(path: string, value: unknown) {
+  async saveAs(path: string, value: unknown, options: {overwrite?: boolean} = {}) {
     const snapshot = await verifySceneDocument(value), target = resolve(path), token = randomUUID();
     let initial: string | null = null;
     try { initial = hash(await boundedRead(target)); } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
-    this.bindings.set(token, { path: target, hash: initial });
+    if (!options.overwrite && initial !== null) throw Error('Scene file already exists; pass overwrite:true to replace it');
+    this.bindings.set(token, { path: target, hash: initial, noOverwrite: !options.overwrite });
     try { return await this.save(token, snapshot); } catch (error) { this.bindings.delete(token); throw error; }
   }
   save(token: string, value: unknown) {
@@ -48,7 +49,7 @@ export class SceneFileStore {
       try {
         const file = await open(temporary, 'wx');
         try { await file.writeFile(bytes); await file.sync(); } finally { await file.close(); }
-        await this.replace(temporary, binding.path); committed = true;
+        if(binding.noOverwrite){await link(temporary,binding.path);await unlink(temporary);}else await this.replace(temporary,binding.path); committed = true;
         binding.hash = hash(bytes);
         return { token, document: snapshot, fileHash: binding.hash, name: binding.path.split(/[\\/]/).pop()!, committed: true as const };
       } finally { if (!committed) await unlink(temporary).catch(() => {}); }

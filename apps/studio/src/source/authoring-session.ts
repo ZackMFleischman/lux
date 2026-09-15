@@ -24,6 +24,7 @@ type Ports = {
   getControls?(): ControlValues;
   getControlSnapshot?(): SavedControls | null;
   getControlAnimations?():readonly ControlAnimationBinding[];
+  settleControls?():Promise<void>;
   open?(): Promise<(SavedFile & { document: SceneDocument }) | null>;
   openPath?(path:string):Promise<(SavedFile & {document:SceneDocument})|null>;
   /** Legacy port retained for fixture compatibility; controls now enter submit before activation. */
@@ -160,23 +161,25 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         const result = await ports.save({ token, saveAs, document });
         if (result) { token = result.token; workspace.markSaved(snapshot.version);
           update({ name: result.name, controlsDirty: controlsVersion !== controlVersion,libraryDirty:false }); }
-        return result;
+        return {name:result.name,path,draftVersion:workspace.getSnapshot().version};
       });
     },
     savePath(path:string,expectedVersion:number,overwrite:boolean) {
       return exclusive(async()=>{
         if(!ports.savePath)throw Error('Path save is unavailable');
+        await ports.settleControls?.();
         const snapshot=workspace.getSnapshot();if(snapshot.version!==expectedVersion)throw Error('Editor changed; read its source again before saving');
         const controlVersion=controlsVersion,source=structuredClone(snapshot.source);
         const document=createSceneDocument(source,{...DEFAULT_OUTPUT},await documentControls(source),libraryLinks,validateControlAnimationBindings(pendingDocumentAnimations??ports.getControlAnimations?.()??[]));
         const result=await ports.savePath({path,document,overwrite});
         if(result){token=result.token;workspace.markSaved(snapshot.version);update({name:result.name,controlsDirty:controlsVersion!==controlVersion,libraryDirty:false});}
-        return result;
+        return {name:result.name,path,draftVersion:workspace.getSnapshot().version};
       });
     },
     openPath(path:string,expectedVersion:number) {
       return exclusive(async()=>{
         if(!ports.openPath)throw Error('Path open is unavailable');
+        await ports.settleControls?.();
         if(workspace.getSnapshot().version!==expectedVersion)throw Error('Editor changed; read its source again before opening');
         const result=await ports.openPath(path);if(!result)return null;
         const document=await verifySceneDocument(result.document);
