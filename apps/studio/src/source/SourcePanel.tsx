@@ -3,16 +3,15 @@ import { Alert, Button, Tab, Tabs, TextField, IconButton, Tooltip } from '@mui/m
 import type { SourceWorkspace } from './workspace.ts';
 import { CodeEditor } from './CodeEditor.tsx';
 import { editorCache } from './editor-state.ts';
-import { ProblemsPanel } from './ProblemsPanel.tsx';
-import type { SourceDiagnostic } from './diagnostics.ts';
 import { AssetItem, AssetPreview } from './AssetPreview.tsx';
 import { sourceAssets } from './source-equality.ts';
 import { AssetImport } from './AssetImport.tsx';
 import { Disclosure } from '../Disclosure.tsx';
-export function SourcePanel({ workspace, readOnly, onApply, onSave, onCompositionChange, diagnosticTarget, diagnostics = [] }: {
+export type SourceNavigationTarget = { path: string; offset: number; request: number; documentKey: number; draftVersion: number };
+export function SourcePanel({ workspace, readOnly, onApply, onSave, onCompositionChange, diagnosticTarget, onDiagnosticTargetHandled }: {
   workspace: SourceWorkspace; readOnly: boolean; onApply(): void; onSave(): void; onCompositionChange?(value: boolean): void;
-  diagnosticTarget?: { path: string; offset: number; request: number } | null;
-  diagnostics?: readonly SourceDiagnostic[];
+  diagnosticTarget?: SourceNavigationTarget | null;
+  onDiagnosticTargetHandled?(request: number): void;
 }) {
   const snapshot = useSyncExternalStore(workspace.subscribe, workspace.getSnapshot);
   const [adding, setAdding] = useState(false);
@@ -21,11 +20,19 @@ export function SourcePanel({ workspace, readOnly, onApply, onSave, onCompositio
   const assetPath = assetSelection?.documentKey === snapshot.documentKey && Object.hasOwn(assets, assetSelection.path) ? assetSelection.path : null;
   function openCode(path: string) { setAssetSelection(null); workspace.openFile(path); }
   useLayoutEffect(() => { if (!assetPath) setAssetSelection(null); }, [assetPath]);
-  useLayoutEffect(() => { if (diagnosticTarget) setAssetSelection(null); }, [diagnosticTarget]);
+  useLayoutEffect(() => {
+    if (!diagnosticTarget) return;
+    if (diagnosticTarget.documentKey !== snapshot.documentKey || diagnosticTarget.draftVersion !== snapshot.version ||
+        !Object.hasOwn(snapshot.source.files, diagnosticTarget.path)) {
+      onDiagnosticTargetHandled?.(diagnosticTarget.request);
+      return;
+    }
+    setAssetSelection(null);
+    workspace.openFile(diagnosticTarget.path);
+  }, [diagnosticTarget?.request, snapshot.documentKey, snapshot.version, workspace]);
   const tabs = useRef<HTMLDivElement>(null), focusAfterClose = useRef(false);
   const addButton = useRef<HTMLButtonElement>(null);
   const [newPath, setNewPath] = useState(''), [error, setError] = useState('');
-  const [navigation, setNavigation] = useState<{ path: string; offset: number; request: number; version: number } | null>(null);
   const composing = useRef(false), cache = editorCache(workspace);
   cache.reconcile(snapshot.documentKey, snapshot.source);
   useLayoutEffect(() => {
@@ -70,14 +77,12 @@ export function SourcePanel({ workspace, readOnly, onApply, onSave, onCompositio
       <div className="source-code-content" hidden={!!assetPath}>
       {snapshot.selectedFile && <>
         <CodeEditor documentKey={snapshot.documentKey} path={snapshot.selectedFile} text={snapshot.source.files[snapshot.selectedFile]!} readOnly={locked} cache={cache}
-          onChange={text => attempt(() => workspace.edit(snapshot.selectedFile, text))} diagnosticTarget={diagnosticTarget ?? (navigation?.version === snapshot.version ? navigation : null)}
+          onChange={text => attempt(() => workspace.edit(snapshot.selectedFile, text))} diagnosticTarget={diagnosticTarget}
+          onDiagnosticTargetHandled={onDiagnosticTargetHandled}
           onCompositionChange={value => { composing.current = value; onCompositionChange?.(value); }} /></>}
       {!snapshot.selectedFile && <p>Choose a file to edit. Closed tabs retain their drafts.</p>}
       </div>
       {assetPath && <AssetPreview path={assetPath} asset={assets[assetPath]!} />}
       </div></div>{error && <Alert severity="error">{error}</Alert>}
-      <ProblemsPanel diagnostics={diagnostics} snapshot={snapshot} onNavigate={target => {
-        openCode(target.path); setNavigation(previous => ({ ...target, version: snapshot.version, request: (previous?.request ?? 0) + 1 }));
-      }} />
     </section>;
 }

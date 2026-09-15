@@ -16,6 +16,15 @@ import type { PresentationPort } from './presentation.ts';
 import type { StudioWindowClient, WindowState } from './window-client.ts';
 import { createRendererSnapshot } from './renderer-snapshot.ts';
 import { Disclosure } from './Disclosure.tsx';
+import { ProblemsPanel } from './source/ProblemsPanel.tsx';
+import type { SourceDiagnostic } from './source/diagnostics.ts';
+import type { SourceSnapshot } from './source/workspace.ts';
+
+type SourceDiagnosticsView = {
+  items: readonly SourceDiagnostic[];
+  snapshot: SourceSnapshot;
+  onNavigate(target: { path: string; offset: number }): void;
+};
 
 export function metricText(metric: Metric | null, nowMs: number): { value: string; detail: string } {
   if (!metric || !Number.isFinite(metric.value) || metric.value < 0 || !Number.isFinite(metric.sampledAtMs) ||
@@ -31,7 +40,7 @@ function MetricView({ label, metric, nowMs }: { label: string; metric: Metric | 
 }
 export type StudioProps = {
   controlEdits?: ControlEdits;
-  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; libraryPanel?:ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; appError?: string; sourceChanged?: boolean; controlsAvailable?: boolean;
+  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; sourceDiagnostics?: SourceDiagnosticsView; libraryPanel?:ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; appError?: string; sourceChanged?: boolean; controlsAvailable?: boolean;
 };
 export function StudioApp(props: StudioProps) {
   return <ThemeProvider theme={studioTheme}><CssBaseline /><StudioLayout {...props} /></ThemeProvider>;
@@ -43,18 +52,23 @@ function controlOwner(snapshot: StudioSnapshot): string | null {
 }
 const activeJobStates = new Set(['queued', 'pending', 'running', 'compiling', 'initializing']);
 function sentenceCase(value: string): string { return value ? value[0]!.toUpperCase() + value.slice(1) : value; }
-export function studioStatus(snapshot: StudioSnapshot): { build: string; building: boolean; problems: number; runtime: string } {
+function sourceDiagnosticFault(fault: string | undefined, sourceDiagnostics: readonly SourceDiagnostic[]): boolean {
+  return !!fault && fault.includes('SourceCompileError:') && sourceDiagnostics.length > 0 &&
+    sourceDiagnostics.every(diagnostic => fault.includes(diagnostic.message));
+}
+export function studioStatus(snapshot: StudioSnapshot, sourceProblemCount = 0): { build: string; building: boolean; problems: number; runtime: string } {
   const jobs = [...snapshot.jobs];
   const latest = jobs.at(-1), active = jobs.findLast(job => activeJobStates.has(job.state.toLowerCase()));
   const build = active?.summary ?? (latest?.state.toLowerCase() === 'failed' ? 'Build failed'
     : latest?.state.toLowerCase() === 'succeeded' ? 'Build ready' : 'Build idle');
-  const problems = (snapshot.authoring?.fault ? 1 : 0) + jobs.filter(job => !!job.fault || job.state.toLowerCase() === 'failed').length;
+  const problems = sourceProblemCount + (snapshot.authoring?.fault ? 1 : 0) +
+    jobs.filter(job => !!job.fault || job.state.toLowerCase() === 'failed').length;
   const runtime = snapshot.connection === 'connecting' ? 'Connecting' : snapshot.connection !== 'connected' ? 'Disconnected'
     : snapshot.authoring?.fault || snapshot.authoring?.playback === 'failed' ? 'Failed'
     : snapshot.authoring ? sentenceCase(snapshot.authoring.playback) : 'No runtime';
   return { build, building: !!active, problems, runtime };
 }
-function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel,libraryPanel, appCommands, fileMenu, appError, controlEdits, sourceChanged, controlsAvailable }: StudioProps) {
+function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel,sourceDiagnostics,libraryPanel, appCommands, fileMenu, appError, controlEdits, sourceChanged, controlsAvailable }: StudioProps) {
   const [toolsHost, setToolsHost] = useState<HTMLElement | null>(null);
   const [transportMenu, setTransportMenu] = useState<HTMLElement | null>(null);
   const view = useMemo(() => createRendererSnapshot(client), [client]);
@@ -67,8 +81,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const [maximizedInspector, setMaximizedInspector] = useState(false);
   const [pendingCommands, setPendingCommands] = useState(0);
   const transportPending = useRef(false);
-  const jobsRef = useRef<HTMLElement>(null), openPanelRef = useRef<null | ((kind: 'jobs' | 'inspector') => void)>(null);
-  const bindOpenPanel = useCallback((action: null | ((kind: 'jobs' | 'inspector') => void)) => { openPanelRef.current = action; }, []);
+  const jobsRef = useRef<HTMLElement>(null), openPanelRef = useRef<null | ((kind: 'preview' | 'source' | 'library' | 'inspector' | 'jobs' | 'graph') => void)>(null);
+  const bindOpenPanel = useCallback((action: null | ((kind: 'preview' | 'source' | 'library' | 'inspector' | 'jobs' | 'graph') => void)) => { openPanelRef.current = action; }, []);
   const [jobsRequest, setJobsRequest] = useState(0);
   useEffect(() => {
     if (!jobsRequest) return;
@@ -80,7 +94,10 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const [error, setError] = useState<string | null>(null);
   const [clock, setClock] = useState(() => nowMs ?? Date.now());
   const runtime = snapshot.authoring;
-  const status = studioStatus(snapshot);
+  const sourceProblemCount = sourceDiagnostics?.items.length ?? 0;
+  const matchingSourceFaults = snapshot.jobs.filter(job => sourceDiagnosticFault(job.fault, sourceDiagnostics?.items ?? [])).length;
+  const baseStatus = studioStatus(snapshot, sourceProblemCount);
+  const status = { ...baseStatus, problems: Math.max(0, baseStatus.problems - matchingSourceFaults) };
   useEffect(() => { setError(null); }, [runtime?.instanceId, runtime?.generation]);
   const [graphSelection,setGraphSelection]=useState<NodePath|null>(null);
   const selectedNodePath=graphSelection??undefined;
@@ -178,10 +195,13 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
         <section><Disclosure title="Host output"><p className="host-revision">{snapshot.host?.revisionId ?? 'No host status available'}</p><p className="hint">Authoring changes do not update a pinned host revision.</p></Disclosure></section>
       </Paper>;
   const openJobs = () => { setMaximized(false); setJobsRequest(value => value + 1); };
-  const jobsPane = <section ref={jobsRef} tabIndex={-1} className="diagnostics" aria-label="Jobs and diagnostics"><div className="section-heading"><h2>Jobs & diagnostics</h2><span className="subtle">{snapshot.jobs.length} reported</span></div>
+  const jobsPane = <section ref={jobsRef} tabIndex={-1} className="diagnostics" aria-label="Jobs and diagnostics"><div className="section-heading"><h2>Jobs & diagnostics</h2><span className="subtle">{snapshot.jobs.length} jobs · {sourceProblemCount} diagnostics</span></div>
       {runtime?.fault && <p className="error" role="alert"><strong>{runtime.fault.code}</strong> · {runtime.fault.message}</p>}
-      {snapshot.jobs.map(job => <p key={job.jobId} className={job.fault ? 'error' : ''}><span className="tag">{job.state}</span> {job.summary}{job.fault && ` · ${job.fault}`}</p>)}
-      {!runtime?.fault && snapshot.jobs.length === 0 && <p>{snapshot.message ?? 'No jobs reported.'}</p>}
+      {snapshot.jobs.map(job => <p key={job.jobId} className={job.fault ? 'error' : ''}><span className="tag">{job.state}</span> {job.summary}{job.fault && !sourceDiagnosticFault(job.fault, sourceDiagnostics?.items ?? []) && ` · ${job.fault}`}</p>)}
+      {sourceDiagnostics && <ProblemsPanel diagnostics={sourceDiagnostics.items} snapshot={sourceDiagnostics.snapshot} onNavigate={target => {
+        sourceDiagnostics.onNavigate(target); openPanelRef.current?.('source');
+      }} />}
+      {!runtime?.fault && snapshot.jobs.length === 0 && !sourceProblemCount && <p>{snapshot.message ?? 'No jobs reported.'}</p>}
     </section>;
   return <div className={`studio ${compact ? 'studio-expanded' : ''} ${windowState.fullscreen ? 'studio-preview-fullscreen' : ''}`}>
     {windowState.fullscreen && fullscreenHint && <div className="fullscreen-hint" role="status">Press Escape to exit fullscreen</div>}

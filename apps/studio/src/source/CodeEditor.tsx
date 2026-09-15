@@ -12,6 +12,7 @@ export type CodeEditorProps = {
   documentKey: number; path: string; text: string; readOnly: boolean; cache: EditorStateCache;
   onChange(text: string): boolean | void; onCompositionChange?(composing: boolean): void;
   diagnosticTarget?: { path: string; offset: number; request: number } | null;
+  onDiagnosticTargetHandled?(request: number): void;
 };
 const access = new Compartment();
 const behavior = new Compartment();
@@ -100,6 +101,7 @@ export function CodeEditor(props: CodeEditorProps) {
     const editor = view.current, target = props.diagnosticTarget;
     if (!editor || !target || target.path !== props.path) return;
     editor.dispatch({ selection: { anchor: Math.min(Math.max(target.offset, 0), editor.state.doc.length) }, scrollIntoView: true }); editor.focus();
+    props.onDiagnosticTargetHandled?.(target.request);
   }, [props.diagnosticTarget, props.path]);
   return <><div ref={host} className="source-code-editor" />{failure && <><Alert severity="warning">{failure}</Alert>
     <TextField fullWidth multiline minRows={8} maxRows={16} disabled={props.readOnly} label={`TypeScript source ${props.path}`} value={props.text}

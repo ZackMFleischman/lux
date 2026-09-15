@@ -10,6 +10,7 @@ dom.window.Range.prototype.getClientRects = () => [] as unknown as DOMRectList;
 dom.window.Range.prototype.getBoundingClientRect = () => new dom.window.DOMRect();
 const { render, screen, cleanup, fireEvent, act, waitFor } = await import('@testing-library/react');
 const { SourcePanel } = await import('../../apps/studio/src/source/SourcePanel.tsx');
+const { ProblemsPanel } = await import('../../apps/studio/src/source/ProblemsPanel.tsx');
 const { createSourceWorkspace } = await import('../../apps/studio/src/source/workspace.ts');
 const { EditorView } = await import('@codemirror/view');
 const { undo } = await import('@codemirror/commands');
@@ -124,18 +125,29 @@ test('repeated rejected edits never diverge from admitted source and preserve pr
   await act(async () => { assert.equal(undo(view()), true); });
   assert.equal(w.getSnapshot().source.files['main.ts'], 'export const main = 1');
 });
-test('current diagnostics navigate helper coordinates and edited drafts label them stale', async () => {
+test('current diagnostics expose helper coordinates and external navigation selects the editor target', async () => {
   const w = fixture(), diagnostics = [{ file: 'lib/color.ts', line: 1, column: 8, message: 'A helper error', draftVersion: 0 }];
-  render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => {}} diagnostics={diagnostics} />);
+  let target: { path: string; offset: number } | null = null;
+  const ui = render(<ProblemsPanel diagnostics={diagnostics} snapshot={w.getSnapshot()} onNavigate={value => { target = value; }} />);
   await click(screen.getByRole('button', { name: /A helper error/ }));
+  assert.deepEqual(target, { path: 'lib/color.ts', offset: 7 });
+  assert.ok(target);
+  const navigationTarget = target as { path: string; offset: number };
+  let handled = 0;
+  ui.rerender(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => {}}
+    diagnosticTarget={{ ...navigationTarget, request: 1, documentKey: w.getSnapshot().documentKey, draftVersion: w.getSnapshot().version }}
+    onDiagnosticTargetHandled={request => { handled = request; }} />);
   assert.equal(w.getSnapshot().selectedFile, 'lib/color.ts'); assert.equal(view().state.selection.main.head, 7);
+  assert.equal(handled, 1);
+  ui.rerender(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => {}} diagnosticTarget={null} />);
   await act(async () => { w.edit('main.ts', 'new draft'); });
+  ui.rerender(<ProblemsPanel diagnostics={diagnostics} snapshot={w.getSnapshot()} onNavigate={() => {}} />);
   assert.match(screen.getByText(/Stale diagnostic/).textContent!, /source has changed/);
   assert.equal((screen.getByRole('button', { name: /A helper error/ }) as HTMLButtonElement).disabled, true);
 });
 test('rejected candidate diagnostics explain their origin and cannot navigate the retained source', async () => {
   const w = fixture();
-  render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => {}} diagnostics={[
+  render(<ProblemsPanel snapshot={w.getSnapshot()} onNavigate={() => {}} diagnostics={[
     { file: 'lib/color.ts', line: 1, column: 8, message: 'Candidate helper error', draftVersion: 0, candidateOnly: true },
   ]} />);
   assert.equal((screen.getByRole('button', { name: /Candidate helper error/ }) as HTMLButtonElement).disabled, true);
@@ -293,16 +305,41 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
   const source = fixture().getSnapshot().source;
   const builds: unknown[] = [], saves: any[] = [];
   let finish!: () => void, finishSave!: () => void;
+  let agentCommand!: (command: any) => Promise<any>;
   let holdSave = true;
+  let compileSucceeds = false;
+  class AuthoringWorker {
+    static all: AuthoringWorker[] = [];
+    onmessage: any; onerror: any; init: any; frame = 1; timer?: ReturnType<typeof setInterval>;
+    constructor() { AuthoringWorker.all.push(this); }
+    postMessage(message: any) {
+      if (message.type === 'init') { this.init = message; queueMicrotask(() => {
+        this.reply({ type: 'ready' });
+        this.reply({ type: 'status', playback: 'paused' });
+        this.timer = setInterval(() => this.reply({ type: 'heartbeat', frameId: String(++this.frame), playback: 'paused' }), 100);
+        (this.timer as any).unref?.();
+      }); }
+    }
+    reply(extra: any) { this.onmessage({ data: { ...this.init, type: 'status', frameId: '1', timeSeconds: 0,
+      clockEpoch: 0, controlSequence: 0, intensity: this.init.controls.intensity, playback: 'playing', ...extra } }); }
+    terminate() { if (this.timer) clearInterval(this.timer); }
+  }
+  Object.defineProperty(globalThis, 'Worker', { configurable: true, value: AuthoringWorker });
+  (dom.window.HTMLCanvasElement.prototype as any).transferControlToOffscreen = () => ({});
   const sceneName = 'A deliberately long scene title.lux-scene';
   window.luxAuthoring = {
     example: async () => source,
-    compile: async bundle => { builds.push(structuredClone(bundle)); await new Promise<void>(resolve => { finish = resolve; });
-      return { ok: false, diagnostics: [{ file: 'lib/color.ts', line: 1, column: 8, message: 'Shortcut compile error' }] }; },
+    compile: async bundle => { builds.push(structuredClone(bundle));
+      if (!compileSucceeds) {
+        await new Promise<void>(resolve => { finish = resolve; });
+        return { ok: false, diagnostics: [{ file: 'lib/color.ts', line: 1, column: 8, message: 'Shortcut compile error' }] };
+      }
+      return { ok: true, linked: { code: '' }, sourceHash: 'resolved-source' }; },
     save: async request => { saves.push(request);
       if (holdSave) await new Promise<void>(resolve => { finishSave = resolve; });
       return { token: 'scene-token', name: sceneName }; },
-    open: async () => null, dirty: async () => {}, smokeSave: async () => null, onAgentCommand: () => () => {},
+    open: async () => null, dirty: async () => {}, smokeSave: async () => null,
+    onAgentCommand: handler => { agentCommand = handler; return () => {}; },
   };
   const { AuthoringApp } = await import('../../apps/studio/src/authoring.tsx');
   await act(async () => { render(<AuthoringApp />); });
@@ -323,13 +360,22 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
   assert.equal(saves.length, 0);
   assert.equal(screen.queryByText(/Studio is busy/), null);
   await act(async () => { finish(); });
-  assert.ok(screen.getByRole('button', { name: /Shortcut compile error/ }));
+  await click(screen.getByRole('button', { name: /Problems: 1/ }));
+  await waitFor(() => assert.ok(screen.queryByRole('button', { name: /Shortcut compile error/ })));
+  assert.ok(screen.getByRole('region', { name: 'Source diagnostics' }));
+  assert.equal(screen.queryByRole('region', { name: 'Source problems' }), null);
+  assert.equal(document.querySelector('.source-workspace')?.textContent?.includes('Shortcut compile error'), false);
+  assert.equal(screen.getAllByText(/Shortcut compile error/).length, 1, 'structured diagnostic replaces the repeated compile job fault');
   assert.equal(view(), editor);
-  await act(async () => {
-    fireEvent.keyDown(editor.contentDOM, { key: 's', metaKey: true, shiftKey: true });
-    fireEvent.keyDown(editor.contentDOM, { key: 's', metaKey: true, shiftKey: true });
-    fireEvent.keyDown(editor.contentDOM, { key: 's', ctrlKey: true });
-  });
+  await click(screen.getByRole('button', { name: /Shortcut compile error/ }));
+  await waitFor(() => assert.equal(view().state.selection.main.head, 7));
+  await act(async () => { view().dispatch({ selection: { anchor: 0 } }); });
+  await click(screen.getByRole('button', { name: 'Open main.ts' }));
+  await click(screen.getByRole('button', { name: 'Open lib/color.ts' }));
+  assert.equal(view().state.selection.main.head, 0, 'consumed navigation does not replay when returning to the file');
+  const activeEditor = view();
+  fireEvent.click(screen.getByText('File'));
+  await click(screen.getByRole('menuitem', { name: 'Save' }));
   assert.equal(builds.length, 1); assert.equal(saves.length, 1);
   assert.equal(screen.queryByText(/Studio is busy/), null);
   await act(async () => { holdSave = false; finishSave(); });
@@ -338,14 +384,24 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
   assert.equal(title.getAttribute('title'), sceneName);
   assert.ok(title.textContent?.includes(sceneName));
   assert.equal(title.querySelector('button, summary, [role="button"]'), null);
-  await act(async () => { editor.dispatch({ changes: { from: 0, insert: '// unsaved\n' } }); });
+  await act(async () => { activeEditor.dispatch({ changes: { from: 0, insert: '// unsaved\n' } }); });
   assert.ok(title.textContent?.endsWith(' *'));
   fireEvent.click(screen.getByText('File'));
-  await click(screen.getByRole('button', { name: 'Save' }));
+  await click(screen.getByRole('menuitem', { name: 'Save' }));
   assert.equal(saves.length, 2); assert.equal(saves[1].saveAs, false);
   assert.equal(title.textContent?.endsWith(' *'), false);
   fireEvent.click(screen.getByText('File'));
-  await click(screen.getByRole('button', { name: 'Save as' }));
+  await click(screen.getByRole('menuitem', { name: 'Save as' }));
   assert.equal(saves.length, 3); assert.equal(saves[2].saveAs, true);
-  assert.equal(builds.length, 1);
+  compileSucceeds = true;
+  const current = await agentCommand({ method: 'read', params: {} });
+  await act(async () => { await agentCommand({ method: 'build', params: { source: current.source, expectedDraftVersion: current.draftVersion } }); });
+  assert.equal(screen.queryByText(/Shortcut compile error/), null);
+  assert.ok(screen.getByRole('button', { name: /Problems: 0/ }));
+  assert.equal(builds.length, 2);
+  await act(async () => {
+    AuthoringWorker.all.at(-1)!.reply({ type: 'failure', message: 'test cleanup' });
+    await new Promise(resolve => setTimeout(resolve, 350));
+    AuthoringWorker.all.at(-1)!.reply({ type: 'failure', message: 'test cleanup' });
+  });
 });
