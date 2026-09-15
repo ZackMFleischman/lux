@@ -13,6 +13,7 @@ import { dispatchRuntimeCommand } from './runtime-operations.ts';
 import { createSourceWorkspace } from './source/workspace.ts';
 import { createAuthoringSession } from './source/authoring-session.ts';
 import { SourcePanel } from './source/SourcePanel.tsx';
+import type { SourceNavigationTarget } from './source/SourcePanel.tsx';
 import { SourceCompileError, diagnosticsForSource } from './source/diagnostics.ts';
 import type { SourceDiagnostic } from './source/diagnostics.ts';
 import { ExportDialog } from './ExportDialog.tsx';
@@ -32,6 +33,7 @@ export function AuthoringApp() {
     popout: undefined } : undefined, []);
   const [error, setError] = useState('');
   const [diagnostics, setDiagnostics] = useState<SourceDiagnostic[]>([]);
+  const [diagnosticTarget, setDiagnosticTarget] = useState<SourceNavigationTarget | null>(null);
   const [libraryVersion, setLibraryVersion] = useState(0);
   const [looksOpen, setLooksOpen] = useState(false);
   const fileSummary = useRef<HTMLButtonElement>(null);
@@ -70,9 +72,16 @@ export function AuthoringApp() {
   const io = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const busy = io.busy || draft.busy, dirty = draft.dirty || io.controlsDirty || io.libraryDirty;
   function reportError(reason: unknown, draftVersion: number, submittedSource: SourceBundle) {
-    setError(String(reason));
-    if (reason instanceof SourceCompileError) setDiagnostics(diagnosticsForSource(reason.diagnostics, submittedSource, draftVersion, workspace.getSnapshot()));
+    if (reason instanceof SourceCompileError) {
+      setError('');
+      setDiagnostics(diagnosticsForSource(reason.diagnostics, submittedSource, draftVersion, workspace.getSnapshot()));
+    } else {
+      setDiagnostics([]);
+      setDiagnosticTarget(null);
+      setError(String(reason));
+    }
   }
+  function clearDiagnostics() { setDiagnostics([]); setDiagnosticTarget(null); }
   useEffect(() => window.luxAuthoring.onAgentCommand(async command => {
     if (lookOperation.current && !['read', 'status'].includes(command.method)) throw Error('Wait for the look operation to finish');
     if (confirmation.isPending() && !['read', 'status', 'capture','library.list','library.read'].includes(command.method)) throw Error('Studio is waiting for a user confirmation');
@@ -105,6 +114,7 @@ export function AuthoringApp() {
     try {
       if (pendingControlWrites.current.size) await finishControlWrites();
       await session.build(source, command.params?.expectedDraftVersion,command.params?.libraryLinks);
+      clearDiagnostics();
       return { draftVersion: workspace.getSnapshot().version, status: agentStatus() };
     } catch (reason) { reportError(reason, command.params?.expectedDraftVersion, source); throw reason; }
   }), [session, workspace]);
@@ -144,7 +154,7 @@ export function AuthoringApp() {
     }
   }).catch(reason => setError(String(reason))); }, [session, workspace]);
   async function build() { if (composing.current || session.getSnapshot().busy || workspace.getSnapshot().busy) return; setError(''); const current = session.read();
-    try { if (pendingControlWrites.current.size) await finishControlWrites(); await session.build(current.source, current.draftVersion); setDiagnostics([]); } catch (reason) { reportError(reason, current.draftVersion, current.source); } }
+    try { if (pendingControlWrites.current.size) await finishControlWrites(); await session.build(current.source, current.draftVersion); clearDiagnostics(); } catch (reason) { reportError(reason, current.draftVersion, current.source); } }
   async function save(saveAs = false) {
     if (composing.current || session.getSnapshot().busy || workspace.getSnapshot().busy) return;
     setError('');
@@ -153,7 +163,7 @@ export function AuthoringApp() {
   async function open() {
     if (dirty && !await confirmation.confirm('open')) return;
     setError('');
-    try { await session.open(); setDiagnostics([]); } catch (reason) { const current = workspace.getSnapshot(); reportError(reason, current.version, current.source); }
+    try { if (await session.open()) clearDiagnostics(); } catch (reason) { const current = workspace.getSnapshot(); reportError(reason, current.version, current.source); }
   }
   async function withLookOperation<T>(operation: () => Promise<T>) {
     if (lookOperation.current || session.getSnapshot().busy || workspace.getSnapshot().busy) throw Error('Studio is busy');
@@ -190,7 +200,7 @@ export function AuthoringApp() {
     return withLookOperation(async () => {
       const current = session.getSnapshot();
       if ((workspace.getSnapshot().dirty || current.controlsDirty || current.libraryDirty) && !await confirmation.confirm('load-look')) return false;
-      await session.loadLook(id); setDiagnostics([]); setError(''); return true;
+      await session.loadLook(id); clearDiagnostics(); setError(''); return true;
     });
   }
   const fileMenu = <StudioMenu label="File" buttonRef={fileSummary} className="file-tools">
@@ -209,13 +219,15 @@ export function AuthoringApp() {
   </>;
   const links=session.read().libraryLinks;
   const libraryPanel=<LibraryPanel client={window.luxLibrary} links={links} updates={io.libraryUpdates} fallbacks={io.libraryFallbacks} refreshKey={libraryVersion}
-    onApplyUpdates={async()=>{setError('');try{await session.applyLibraryUpdates();setDiagnostics([]);}catch(reason){setError(String(reason));throw reason;}}}
+    onApplyUpdates={async()=>{setError('');try{await session.applyLibraryUpdates();clearDiagnostics();}catch(reason){setError(String(reason));throw reason;}}}
     onFork={id=>{try{session.forkLibraryComponent(id);}catch(reason){setError(String(reason));}}} onError={reason=>setError(String(reason))}/>;
   return <ThemeProvider theme={studioTheme}><StudioMenuProvider><div className="authoring-shell">
     {confirmation.dialog}
     <ExportDialog disabled={busy || composing.current} open={exportOpen} onClose={() => setExportOpen(false)} onClosed={() => fileSummary.current?.focus()} defaultName={io.name} create={async name => { if (pendingControlWrites.current.size) await finishControlWrites(); return session.exportSource(name); }} />
     <LooksDialog open={looksOpen} onClose={() => setLooksOpen(false)} onClosed={() => fileSummary.current?.focus()} client={window.luxLooks} onSave={saveLook} onLoad={loadLook} />
     <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} sourceChanged={draft.hasRunningSource && !draft.runningMatchesDraft} appCommands={commands} appError={error} controlEdits={controlEdits} libraryPanel={libraryPanel}
-      sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onApply={() => void build()} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnostics={diagnostics} />} />
+      sourceDiagnostics={{ items: diagnostics, snapshot: draft, onNavigate: target => setDiagnosticTarget(previous => ({ ...target, request: (previous?.request ?? 0) + 1, documentKey: draft.documentKey, draftVersion: draft.version })) }}
+      sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onApply={() => void build()} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnosticTarget={diagnosticTarget}
+        onDiagnosticTargetHandled={request => setDiagnosticTarget(current => current?.request === request ? null : current)} />} />
   </div></StudioMenuProvider></ThemeProvider>;
 }

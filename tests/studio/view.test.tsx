@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { StudioApp } from '../../apps/studio/src/renderer.tsx';
 import { createDisconnectedClient } from '../../apps/studio/src/service-client.ts';
+import { createSourceWorkspace } from '../../apps/studio/src/source/workspace.ts';
 import type { StudioClient, StudioSnapshot } from '../../apps/studio/src/service-client.ts';
 
 test('default view shows unavailable output and disabled runtime controls rather than a demo', () => {
@@ -62,4 +63,24 @@ test('status bar exposes current build, problem and runtime health as actionable
   const finished = renderToStaticMarkup(<StudioApp client={client} nowMs={1000} />);
   assert.doesNotMatch(finished, /class="status-spinner"/);
   assert.match(finished, />Build ready</);
+});
+
+test('source diagnostics replace only their matching compile job fault', () => {
+  const source = createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': 'bad source' } }).getSnapshot();
+  let snapshot: StudioSnapshot = {
+    connection: 'connected', message: null, receivedAtMs: 1000, authoring: null, host: null,
+    jobs: [{ jobId: 'build-1', state: 'failed', summary: 'Build failed; previous preview retained.',
+      fault: 'SourceCompileError: visual.ts:1:1 Missing expression' }], visualFps: null, uiFps: null,
+  };
+  const client: StudioClient = { getSnapshot: () => snapshot, subscribe: () => () => {}, invoke: async () => ({}) };
+  const sourceDiagnostics = { items: [{ file: 'visual.ts', line: 1, column: 1, message: 'Missing expression', draftVersion: 0 }],
+    snapshot: source, onNavigate: () => {} };
+  const compile = renderToStaticMarkup(<StudioApp client={client} nowMs={1000} sourceDiagnostics={sourceDiagnostics} />);
+  assert.equal(compile.match(/Missing expression/g)?.length, 1);
+  assert.match(compile, /Problems: 1/);
+  snapshot = { ...snapshot, jobs: [{ ...snapshot.jobs[0]!, fault: 'Error: GPU initialization failed' }] };
+  const unrelated = renderToStaticMarkup(<StudioApp client={client} nowMs={1000} sourceDiagnostics={sourceDiagnostics} />);
+  assert.match(unrelated, /GPU initialization failed/);
+  assert.match(unrelated, /Missing expression/);
+  assert.match(unrelated, /Problems: 2/);
 });

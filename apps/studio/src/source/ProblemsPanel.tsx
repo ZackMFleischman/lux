@@ -6,7 +6,7 @@ export function ProblemsPanel({ diagnostics, snapshot, onNavigate }: {
   diagnostics: readonly SourceDiagnostic[]; snapshot: SourceSnapshot; onNavigate(target: { path: string; offset: number }): void;
 }) {
   if (!diagnostics.length) return null;
-  return <section aria-label="Source problems"><h3>Problems</h3><ul>{diagnostics.map((diagnostic, index) => {
+  return <section aria-label="Source diagnostics"><h3>Source diagnostics</h3><ul>{diagnostics.map((diagnostic, index) => {
     const target = diagnosticTarget(diagnostic, snapshot), stale = diagnostic.draftVersion !== snapshot.version;
     return <li key={index}><Button disabled={!target} onClick={() => target && onNavigate(target)}>
       {diagnostic.file ? `${diagnostic.file}:${diagnostic.line ?? ''}:${diagnostic.column ?? ''} ` : ''}{diagnostic.message}
