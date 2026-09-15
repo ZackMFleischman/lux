@@ -327,7 +327,10 @@ test('Graph enters nested components one level at a time and edits an exposed co
   selectedPanel='graph'; await click('Close selected panel');
   const inspector=within(document.querySelector('.inspector')!);
   const writes=calls.length;
-  await act(async()=>{fireEvent.click(inspector.getByRole('button',{name:'Controls for Double mirror 1'}));});
+  assert.equal(inspector.queryAllByRole('button').filter(button=>button.getAttribute('aria-label')==='Controls for Double mirror 1').length,0);
+  await act(async()=>{fireEvent.click(inspector.getByRole('button',{name:'Parent controls'}));});
+  await act(async()=>{fireEvent.click(screen.getByRole('menuitem',{name:'Double mirror 1'}));});
+  await waitFor(()=>assert.ok(inspector.getByRole('button',{name:'Controls for Double mirror 1'})===document.activeElement));
   assert.ok(inspector.getByLabelText('firstSegments · Segments value'));
   assert.equal(inspector.getByRole('button',{name:'Controls for Double mirror 1'}),document.activeElement);
   await act(async()=>{fireEvent.click(inspector.getByRole('button',{name:'Scene controls'}));});
