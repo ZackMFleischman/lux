@@ -324,6 +324,18 @@ test('Graph enters nested components one level at a time and edits an exposed co
   assert.equal(document.querySelectorAll('.graph-node').length,1);assert.ok(screen.getByRole('button',{name:'Back to Double mirror 1'}));
   await act(async()=>{runtime={...runtime,revisionId:'nested-r2'};snapshot={...snapshot,authoring:runtime};listeners.forEach(fn=>fn());});
   assert.ok(within(document.querySelector('.inspector')!).getByText('Wrapped mirror'),'selection survives an accepted rebuild when the full path remains');
+  selectedPanel='graph'; await click('Close selected panel');
+  const inspector=within(document.querySelector('.inspector')!);
+  const writes=calls.length;
+  await act(async()=>{fireEvent.click(inspector.getByRole('button',{name:'Controls for Double mirror 1'}));});
+  assert.ok(inspector.getByLabelText('firstSegments · Segments value'));
+  assert.equal(inspector.getByRole('button',{name:'Controls for Double mirror 1'}),document.activeElement);
+  await act(async()=>{fireEvent.click(inspector.getByRole('button',{name:'Scene controls'}));});
+  assert.equal(calls.length,writes,'Navigation does not write control values');
+  assert.ok(inspector.getByRole('button',{name:'Scene controls',current:'page'}));
+  assert.equal(document.querySelectorAll('.dv-tab').length,5,'Inspector navigation does not reopen Graph');
+  await click('Open Graph');
+
   await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Back to Double mirror 1'}));});
   await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Back to Nested demo'}));});
   const second=screen.getByRole('button',{name:/Double mirror 2/});await act(async()=>{fireEvent.keyDown(second,{key:'Enter'});});
