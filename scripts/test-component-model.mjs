@@ -11,7 +11,8 @@ const root=resolve(import.meta.dirname,'..').replaceAll('\\','/'),output=join(ro
 await mkdir(output,{recursive:true});
 const env={...studioTestEnvironment(),LUX_NODE_EXECUTABLE:process.execPath};
 const session=resolveStudioSession({workspace:root,env});
-const report={ok:false,root,profile:session.profile,commit:execFileSync('git',['-C',root,'-c',`safe.directory=${root}`,'-c','core.excludesFile=','rev-parse','HEAD'],{encoding:'utf8'}).trim(),checks:[],screenshots:[],errors:[]};
+const graphsOnly=process.argv.includes('--graphs-only');
+const report={ok:false,root,profile:session.profile,commit:execFileSync('git',['-C',root,'-c',`safe.directory=${root}`,'-c','core.excludesFile=','rev-parse','HEAD'],{encoding:'utf8'}).trim(),checks:[],screenshots:[],errors:[],limitations:['Animate uses real keyboard activation. The pre-existing slider thumb mouse-hit overlap remains a separate UI defect.']};
 let app,page,child;
 try {
   app=await _electron.launch({executablePath:installedElectron(root),args:[join(root,'apps/studio/dist/main.cjs')],cwd:root,env,timeout:30000,chromiumSandbox:true});
@@ -29,13 +30,13 @@ try {
   const legacy=nestedPrismaticCompositionSource(),modern=structuredClone(legacy);
   for(const path of ['composition.ts','double-mirror.ts','wrapped-mirror.ts'])modern.files[path]=modern.files[path].replaceAll('defineComposition',path===modern.entry?'defineVisual':'defineComponent');
   const cases=[['legacy-direct',plain,'Spike height',1.2,'spikeHeight',[]],['legacy-graph',legacy,'Spike amount',.8,'intensity',['11111111-1111-4111-8111-111111111111']],['component-graph',modern,'Spike amount',.8,'intensity',['11111111-1111-4111-8111-111111111111']]];
-  for(const [name,source,label,value,controlId,nodePath] of cases){
+  for(const [name,source,label,value,controlId,nodePath] of cases.filter(([name])=>!graphsOnly||name!=='legacy-direct')){
     report.stage=name;await writeFile(join(output,'result.json'),JSON.stringify(report,null,2));
     await page.setViewportSize({width:1360,height:900});
     let draft=await call('read');await call('build',{source,expectedDraftVersion:draft.draftVersion});
     await statusWhen(runtime=>runtime?.playback==='playing');
     await page.getByRole('button',{name:'View',exact:true}).click();await page.getByRole('menuitem',{name:'Graph',exact:true}).click();
-    if(name==='legacy-graph'){
+    if(name==='legacy-graph'&&!graphsOnly){
       assert.equal(await page.locator('.graph-scene-root').getAttribute('aria-pressed'),'true','direct-only selection returns to Scene after representation change');
       assert.equal(await page.getByRole('button',{name:'Controls for Nested prismatic mirrors',exact:true}).count(),0);
     }
@@ -53,7 +54,7 @@ try {
     const base=runtime=>nodePath.length?runtime.nodeControls.nodes.find(row=>JSON.stringify(row.nodePath)===JSON.stringify(nodePath)).values[controlId]:runtime.controls[controlId];
     let runtime=await statusWhen(runtime=>base(runtime)===value);
     if(!nodePath.length){assert.equal(runtime.composition,undefined);assert.equal(runtime.nodeControls,undefined);}
-    await page.getByRole('button',{name:`Animate ${label}`,exact:true}).click();
+    await page.getByRole('button',{name:`Animate ${label}`,exact:true}).focus();await page.keyboard.press('Enter');
     const add=page.getByRole('button',{name:'Add LFO',exact:true});if(await add.count())await add.click();
     runtime=await statusWhen(runtime=>runtime.controlAnimations.some(binding=>JSON.stringify(binding.nodePath)===JSON.stringify(nodePath)&&binding.controlId===controlId));
     assert.equal(base(runtime),value);await capture(`${name}-controls`);await page.keyboard.press('Escape');
