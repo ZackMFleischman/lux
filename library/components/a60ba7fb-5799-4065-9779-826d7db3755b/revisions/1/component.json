@@ -1,0 +1,18 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "a60ba7fb-5799-4065-9779-826d7db3755b",
+  "revision": 1,
+  "name": "Wandering Tracer Renderer",
+  "description": "Paints supplied paths2d over an input image with watercolor pigment, randomized hatching and fine outlines. Does not generate paths.",
+  "updatedAt": "2026-09-16T07:33:27.322Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "renderer.ts",
+    "files": [
+      "renderer.ts",
+      "tracer-spline.ts",
+      "tracer-texture.ts"
+    ]
+  }
+}

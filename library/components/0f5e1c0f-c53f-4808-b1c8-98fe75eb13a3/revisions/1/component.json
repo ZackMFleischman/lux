@@ -1,0 +1,21 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "0f5e1c0f-c53f-4808-b1c8-98fe75eb13a3",
+  "revision": 1,
+  "name": "Wandering Tracers",
+  "description": "Fine watercolor tracers over any image, with separate path generation and rendering. Shared paths can drive region carving.",
+  "updatedAt": "2026-09-16T06:52:19.044Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "overlay.ts",
+    "files": [
+      "overlay.ts",
+      "paths.ts",
+      "renderer.ts",
+      "tracer-spline.ts",
+      "tracer-state.ts",
+      "tracer-texture.ts"
+    ]
+  }
+}

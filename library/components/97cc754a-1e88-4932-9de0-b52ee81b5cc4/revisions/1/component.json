@@ -1,0 +1,17 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "97cc754a-1e88-4932-9de0-b52ee81b5cc4",
+  "revision": 1,
+  "name": "Wandering Tracer Paths",
+  "description": "Independent animated perimeter path generator. Outputs paths2d for drawing, region cuts, or other scene effects.",
+  "updatedAt": "2026-09-16T07:33:20.584Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "paths.ts",
+    "files": [
+      "paths.ts",
+      "tracer-state.ts"
+    ]
+  }
+}
