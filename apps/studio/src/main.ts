@@ -17,6 +17,7 @@ import { resolveStudioSession } from '../../../scripts/studio-session.mjs';
 import { ComponentLibraryStore } from '../../../packages/core/src/component-library-store.ts';
 import { LookStore } from '../../../packages/core/src/look-store.ts';
 import type { SourceBundle } from '../../../packages/runtime-contracts/src/index.ts';
+import { resolveStandardLibrary } from './standard-library.ts';
 
 // This process owns presentation windows only. It never creates a render service,
 // starts an authoring instance, or terminates a host-owned process.
@@ -38,7 +39,11 @@ let mainWindow: BrowserWindow | null = null;
 let closing = false;
 let compiling = false;
 const files = new SceneFileStore();
-const library = new ComponentLibraryStore(join(studioProfile.directory,'component-library.json'),{validateCandidate:async source=>{
+const standardLibrary = resolveStandardLibrary({ workspace, appData: app.getPath('appData'),
+  desktop: process.env.LUX_STUDIO_DESKTOP === '1', overrideRoot: process.env.LUX_STUDIO_LIBRARY_ROOT,
+  canonicalRoot: process.env.LUX_STUDIO_CANONICAL_LIBRARY_ROOT });
+const library = new ComponentLibraryStore(standardLibrary.root,{legacyPath:join(studioProfile.directory,'component-library.json'),
+ seedRoots:standardLibrary.seedRoots,validateCandidate:async source=>{
   const result=await compile({...source,sdkVersion:'0.3.0'} as SourceBundle) as {ok?:boolean;linked?:{linkedVersion?:number};diagnostics?:readonly {message?:string}[]};
   if(!result.ok)throw Error(result.diagnostics?.map(item=>item.message).filter(Boolean).join('; ')||'Library component candidate did not compile');
   if(result.linked?.linkedVersion!==4)throw Error('Library component candidate did not produce a component build');
@@ -135,6 +140,7 @@ app.whenReady().then(async () => {
   });
   ipcMain.handle('studio:library',async(event,action:unknown,value:unknown)=>{
     if(!trusted(event)||BrowserWindow.fromWebContents(event.sender)!==mainWindow)throw Error('Untrusted library sender');
+    if(action==='location')return standardLibrary;
     if(action==='list')return library.list();
     if(action==='read')return library.read(value as string);
     if(action==='create')return library.create(value as Parameters<ComponentLibraryStore['create']>[0]);

@@ -2,6 +2,7 @@ import type { LibraryComponent, LibraryComponentSummary } from '../../../package
 import type { SourceBundle } from '../../../packages/runtime-contracts/src/index.ts';
 
 export interface ComponentLibraryClient {
+  location?():Promise<Readonly<{root:string;kind:'repository'|'fallback'|'test';seedRoots:readonly string[]}>>;
   list(): Promise<readonly LibraryComponentSummary[]>;
   read(id:string): Promise<LibraryComponent>;
   create(input:{name:string;description:string;source:SourceBundle}):Promise<LibraryComponent>;

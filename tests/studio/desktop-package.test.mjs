@@ -2,12 +2,29 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { mkdtemp, mkdir, writeFile, readFile, realpath, rm, symlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { copyIndependentTree, desktopSourceFile, dependencySelection } from '../../scripts/studio-package.mjs';
+import path, { join } from 'node:path';
+import vm from 'node:vm';
+import { copyIndependentTree, desktopSourceFile, dependencySelection, installedMainSource, repositoryLibraryRootFromCommonDirectory } from '../../scripts/studio-package.mjs';
 
 test('package source selection excludes private and development files', () => {
- for(const p of ['packages/visual-sdk/src/index.ts','scripts/studio-compile.mjs','apps/build-worker/src/worker.mjs','package.json']) assert.ok(desktopSourceFile(p),p);
+ for(const p of ['packages/visual-sdk/src/index.ts','scripts/studio-compile.mjs','apps/build-worker/src/worker.mjs','library/catalog.json','library/components/11111111-1111-4111-8111-111111111111/revisions/1/source/component.ts','package.json']) assert.ok(desktopSourceFile(p),p);
  for(const p of ['.env.local','visuals/private.lux','tools/live-copilot/server.ts','artifacts/scene.json','.git/config','docs/private.md']) assert.equal(desktopSourceFile(p),false,p);
+});
+
+test('desktop packaging records the primary repository library for linked worktrees',()=>{
+ assert.equal(repositoryLibraryRootFromCommonDirectory('C:/repo/lux/.git'),join('C:/repo/lux','library'));
+ assert.throws(()=>repositoryLibraryRootFromCommonDirectory('C:/repo/lux/.git/worktrees/feature'),/common directory/i);
+});
+
+test('installed bootstrap discards inherited library overrides except for isolated test launches',()=>{
+ const run=env=>{
+  const process={env:{...env}};
+  vm.runInNewContext(installedMainSource('C:/repo/lux/library'),{__dirname:'C:/installed/app',process,
+   require:id=>id==='node:path'?path:undefined});
+  return process.env;
+ };
+ assert.equal(run({LUX_STUDIO_LIBRARY_ROOT:'C:/unsafe/inherited'}).LUX_STUDIO_LIBRARY_ROOT,undefined);
+ assert.equal(run({LUX_STUDIO_MCP_TEST:'1',LUX_STUDIO_PROFILE:'test-isolated',LUX_STUDIO_LIBRARY_ROOT:'C:/temp/library'}).LUX_STUDIO_LIBRARY_ROOT,'C:/temp/library');
 });
 
 test('dependency copy relocates internal links and copies bytes independently', async t => {
