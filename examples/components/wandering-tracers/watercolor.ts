@@ -1,4 +1,5 @@
 import { defineComponent } from '@lux/visual-sdk';
+import { ornamentWatercolorFragments } from './ornament-watercolor.ts';
 
 // ABI lux/watercolor/v1 supplies the exact animated wash block. The painting
 // consumer inserts it immediately after region geometry and keeps the source
@@ -57,6 +58,11 @@ export default defineComponent({
         label: 'Watercolor',
         description: 'Animated watercolor shader block with its current numeric values.',
       },
+      ornament: {
+        type: { kind: 'shader-field', version: 1, abi: 'lux/ornament-watercolor/v1' },
+        label: 'Ornament watercolor',
+        description: 'Shape-aware ornament color shader helper with its current material values.',
+      },
     },
     controls: {
       palette: { type: 'number', group: 'Color & watercolor', label: 'Wash lightness', default: 0.07, min: -1, max: 1, step: 0.01 },
@@ -64,6 +70,7 @@ export default defineComponent({
       contrast: { type: 'number', group: 'Color & watercolor', label: 'Region contrast', default: 1.05, min: 0, max: 2, step: 0.01 },
       pooling: { type: 'number', group: 'Color & watercolor', label: 'Pigment pooling', default: 0.74, min: 0, max: 2, step: 0.01 },
       blooms: { type: 'number', group: 'Color & watercolor', label: 'Watercolor blooms', default: 0.94, min: 0, max: 2, step: 0.01 },
+      ornamentSaturation: { type: 'number', group: 'Ornament Color', label: 'Saturation', default: 1, min: 0, max: 1.5, step: 0.01 },
     },
     controlDescriptions: {
       palette: 'palette setting for the painting.',
@@ -71,6 +78,7 @@ export default defineComponent({
       contrast: 'contrast setting for the painting.',
       pooling: 'pooling setting for the painting.',
       blooms: 'blooms setting for the painting.',
+      ornamentSaturation: 'Saturation for Living Ornament watercolor anchors and supporting shapes.',
     },
     lifecycle: { state: 'stateless', reset: 'seed' },
   },
@@ -80,6 +88,7 @@ export default defineComponent({
     let contrast = 1.05;
     let pooling = 0.74;
     let blooms = 0.94;
+    let ornamentSaturation = 1;
     return {
       update(frame) {
         palette = frame.controls.palette;
@@ -87,6 +96,7 @@ export default defineComponent({
         contrast = frame.controls.contrast;
         pooling = frame.controls.pooling;
         blooms = frame.controls.blooms;
+        ornamentSaturation = frame.controls.ornamentSaturation;
       },
       async evaluate(_inputs, evaluation) {
         return {
@@ -95,6 +105,12 @@ export default defineComponent({
             abi: 'lux/watercolor/v1',
             fragments: watercolorFragments,
             values: { palette, warmth, contrast, pooling, blooms },
+          }),
+          ornament: evaluation.shaderField('ornament', {
+            version: 1,
+            abi: 'lux/ornament-watercolor/v1',
+            fragments: ornamentWatercolorFragments,
+            values: { palette, warmth, contrast, pooling, blooms, saturation: ornamentSaturation },
           }),
         };
       },

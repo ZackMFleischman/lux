@@ -1,4 +1,5 @@
 import { defineComponent } from '@lux/visual-sdk';
+import { ornamentRegionFragments } from './ornament-regions.ts';
 
 // ABI lux/organic-regions/v1 supplies exactly these two source fragments.
 // The painting consumer inserts them at the original livingPainting body and
@@ -100,6 +101,11 @@ export default defineComponent({
         label: 'Regions',
         description: 'Region geometry and motion shader fragments with their current numeric values.',
       },
+      ornament: {
+        type: { kind: 'shader-field', version: 1, abi: 'lux/ornament-regions/v1' },
+        label: 'Ornament regions',
+        description: 'Layered analytic ornament regions with stable ownership, local coordinates, and visible boundaries.',
+      },
     },
     controls: {
       scale: { type: 'number', group: 'Regions', label: 'Scale', default: 6.2, min: 2, max: 10, step: 0.01 },
@@ -107,6 +113,13 @@ export default defineComponent({
       growth: { type: 'number', group: 'Regions', label: 'Region growth', default: 0.88, min: 0, max: 1.5, step: 0.01 },
       seed: { type: 'number', group: 'Regions', label: 'Variation', default: 7, min: 0, max: 100, step: 1 },
       motion: { type: 'number', group: 'Motion', label: 'Drift', default: 1.08, min: 0, max: 1.5, step: 0.01 },
+      ornamentSize: { type: 'number', group: 'Ornament Shape', label: 'Size', default: 1, min: 0.6, max: 1.5, step: 0.01 },
+      ornamentComplexity: { type: 'number', group: 'Ornament Shape', label: 'Complexity', default: 0.7, min: 0, max: 1.5, step: 0.01 },
+      ornamentConcavity: { type: 'number', group: 'Ornament Shape', label: 'Concavity', default: 0.85, min: 0, max: 1.5, step: 0.01 },
+      ornamentCorridorWidth: { type: 'number', group: 'Ornament Shape', label: 'Corridor width', default: 0.11, min: 0.03, max: 0.25, step: 0.01 },
+      ornamentNesting: { type: 'number', group: 'Ornament Shape', label: 'Nesting', default: 0.65, min: 0, max: 1, step: 0.01 },
+      ornamentMotion: { type: 'number', group: 'Ornament Motion', label: 'Motion', default: 0.15, min: 0, max: 1, step: 0.01 },
+      ornamentGrowth: { type: 'number', group: 'Ornament Motion', label: 'Growth', default: 0.25, min: 0, max: 1, step: 0.01 },
     },
     controlDescriptions: {
       scale: 'scale setting for the painting.',
@@ -114,6 +127,13 @@ export default defineComponent({
       growth: 'growth setting for the painting.',
       seed: 'seed setting for the painting.',
       motion: 'motion setting for the painting.',
+      ornamentSize: 'Overall scale of the broad ornament regions.',
+      ornamentComplexity: 'Adds organic variation and layered lobe detail.',
+      ornamentConcavity: 'Deepens the carved bays within the broad regions.',
+      ornamentCorridorWidth: 'Sets the width of winding connections and thin necks.',
+      ornamentNesting: 'Controls the presence and size of nested islands.',
+      ornamentMotion: 'Sets the subtle attached motion of each region.',
+      ornamentGrowth: 'Sets the amount of slow region breathing.',
     },
     lifecycle: { state: 'stateless', reset: 'seed' },
   },
@@ -123,6 +143,13 @@ export default defineComponent({
     let growth = 0.88;
     let seed = 7;
     let motion = 1.08;
+    let ornamentSize = 1;
+    let ornamentComplexity = 0.7;
+    let ornamentConcavity = 0.85;
+    let ornamentCorridorWidth = 0.11;
+    let ornamentNesting = 0.65;
+    let ornamentMotion = 0.15;
+    let ornamentGrowth = 0.25;
     return {
       update(frame) {
         scale = frame.controls.scale;
@@ -130,6 +157,13 @@ export default defineComponent({
         growth = frame.controls.growth;
         seed = frame.controls.seed;
         motion = frame.controls.motion;
+        ornamentSize = frame.controls.ornamentSize;
+        ornamentComplexity = frame.controls.ornamentComplexity;
+        ornamentConcavity = frame.controls.ornamentConcavity;
+        ornamentCorridorWidth = frame.controls.ornamentCorridorWidth;
+        ornamentNesting = frame.controls.ornamentNesting;
+        ornamentMotion = frame.controls.ornamentMotion;
+        ornamentGrowth = frame.controls.ornamentGrowth;
       },
       async evaluate(_inputs, evaluation) {
         return {
@@ -138,6 +172,21 @@ export default defineComponent({
             abi: 'lux/organic-regions/v1',
             fragments: regionFragments,
             values: { scale, warp, growth, seed, motion },
+          }),
+          ornament: evaluation.shaderField('ornament', {
+            version: 1,
+            abi: 'lux/ornament-regions/v1',
+            fragments: ornamentRegionFragments,
+            values: {
+              size: ornamentSize,
+              complexity: ornamentComplexity,
+              concavity: ornamentConcavity,
+              corridorWidth: ornamentCorridorWidth,
+              nesting: ornamentNesting,
+              motion: ornamentMotion,
+              growth: ornamentGrowth,
+              seed,
+            },
           }),
         };
       },

@@ -37,6 +37,10 @@ fn lpFbm(p: vec2f) -> f32 {
 `,
 });
 
+const ornamentFragments = Object.freeze({
+  helpers: (phrasingFragments.lpPhrase + phrasingFragments.noiseBasis).replaceAll('lp', 'lo'),
+});
+
 export default defineComponent({
   metadata: {
     declarationVersion: 1,
@@ -50,6 +54,11 @@ export default defineComponent({
         type: { kind: 'shader-field', version: 1, abi: 'lux/composition-phrasing/v1' },
         label: 'Phrasing',
         description: 'Phrase and noise shader helpers with the current artistic time and composition values.',
+      },
+      ornament: {
+        type: { kind: 'shader-field', version: 1, abi: 'lux/ornament-phrasing/v1' },
+        label: 'Ornament phrasing',
+        description: 'Shared artistic time and noise helpers for compatible ornament renderers.',
       },
     },
     controls: {
@@ -93,6 +102,12 @@ export default defineComponent({
             version: 1,
             abi: 'lux/composition-phrasing/v1',
             fragments: phrasingFragments,
+            values: { time: artisticTime, pace, phrasing, composition, tension, hierarchy },
+          }),
+          ornament: evaluation.shaderField('ornament', {
+            version: 1,
+            abi: 'lux/ornament-phrasing/v1',
+            fragments: ornamentFragments,
             values: { time: artisticTime, pace, phrasing, composition, tension, hierarchy },
           }),
         };
