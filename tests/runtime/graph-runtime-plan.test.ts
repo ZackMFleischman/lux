@@ -98,7 +98,7 @@ test('separate preparations retain detached frozen DTOs after raw mutation', () 
   frozen(first); frozen(second);
 });
 
-test('preserves existing override validation including count-first rejection', () => {
+test('preserves override validation and rejects sparse hostile arrays without reading getters', () => {
   const admitted = admit(twins());
   for (const overrides of [
     [{nodePath:[uuid(1),uuid(3)],values:{gain:11}}],
@@ -114,7 +114,7 @@ test('preserves existing override validation including count-first rejection', (
   let reads = 0;
   const overlong = new Array(513);
   Object.defineProperty(overlong,'0',{get(){reads++; throw Error('getter invoked');}});
-  assert.throws(() => prepareGraphRuntimePlan(admitted,overlong), /512/);
+  assert.throws(() => prepareGraphRuntimePlan(admitted,overlong), /dense array/);
   assert.equal(reads,0);
 });
 

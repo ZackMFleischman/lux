@@ -58,7 +58,7 @@ export function validateLibraryComponentSummary(value: unknown): LibraryComponen
     description: libraryText(raw.description, 'Component description', 512), updatedAt });
 }
 export function validateLibraryDependencies(value: unknown): readonly LibraryDependency[] {
-  if (!Array.isArray(value) || value.length > 8) throw Error('Library dependencies must contain 0–8 rows');
+  if (!Array.isArray(value)) throw Error('Library dependencies must be an array');
   return Object.freeze(value.map(item => {
     const raw = plainLibraryRecord(item, ['componentId', 'revision', 'mountPath'], 'Library dependency');
     const componentId = componentIdSchema.parse(raw.componentId);
@@ -83,7 +83,7 @@ function mount(value: string): string {
   return value;
 }
 export function validateSceneLibraryLinks(value: unknown): readonly SceneLibraryLink[] {
-  if (!Array.isArray(value) || value.length > 8) throw Error('Scene library links must contain 0–8 rows');
+  if (!Array.isArray(value)) throw Error('Scene library links must be an array');
   const ids = new Set<string>(), paths = new Set<string>();
   return Object.freeze(value.map(item => {
     const raw = plainLibraryRecord(item, ['componentId', 'mountPath', 'resolvedRevision', 'files'], 'Scene library link');
@@ -111,12 +111,10 @@ export async function resolveLibraryComponent(
   componentValue: LibraryComponent,
   read: (id: string, revision?: number) => Promise<LibraryComponent>,
 ): Promise<LibraryComponent> {
-  let visitedInstances = 0;
   const resolveComponent = async (value: LibraryComponent, depth: number, ancestors: ReadonlySet<string>): Promise<LibraryComponent> => {
     const component = validateLibraryComponent(value), key = `${component.id}@${component.revision}`;
     if (ancestors.has(key)) throw Error(`Library dependency cycle includes ${key}`);
-    visitedInstances += 1;
-    if (visitedInstances > 8 || depth > 8) throw Error('Library dependency resolution exceeds the 8-instance or depth limit');
+    if (depth > 8) throw Error('Library dependency resolution exceeds the depth limit');
     const dependencies = component.dependencies ?? [];
     for (let index = 0; index < dependencies.length; index++) {
       for (let other = index + 1; other < dependencies.length; other++) {

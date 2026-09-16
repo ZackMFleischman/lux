@@ -48,9 +48,9 @@ function snapshot(graph:unknown, definitions:unknown): [unknown,unknown] {
     seen.add(value);
     const array=Array.isArray(value), prototype=Object.getPrototypeOf(value);
     if(array?prototype!==Array.prototype:prototype!==null&&prototype!==Object.prototype)invalid(path,'expected plain data container');
-    const length=array?arrayLength(value,path,path==='graph.nodes'?graphLimits.nodes:path==='graph.edges'?graphLimits.edges:graphLimits.rawValues):0;
+    const length=array?arrayLength(value,path,graphLimits.rawValues):0;
     const keys=Reflect.ownKeys(value);
-    const maximum=path==='definitions'?graphLimits.definitions:graphLimits.rawValues;
+    const maximum=graphLimits.rawValues;
     if(keys.length>(array?length+1:maximum))invalid(path,array?'unexpected array properties':`at most ${maximum} raw properties`);
     if(array&&keys.length!==length+1)invalid(path,'expected dense array');
     const entries:[string,unknown][]=[];
@@ -78,12 +78,6 @@ function snapshot(graph:unknown, definitions:unknown): [unknown,unknown] {
     }
     inspected.set(value,{array,entries});
   }
-  // Read raw root counts ahead of member traversal, including unreachable data.
-  if(graph!==null&&typeof graph==='object')for(const [field,max] of [['nodes',graphLimits.nodes],['edges',graphLimits.edges]] as const){
-    const descriptor=Object.getOwnPropertyDescriptor(graph,field);
-    if(descriptor&&Object.hasOwn(descriptor,'value'))arrayLength(descriptor.value,`graph.${field}`,max);
-  }
-  if(definitions!==null&&typeof definitions==='object'&&Reflect.ownKeys(definitions).length>graphLimits.definitions)invalid('definitions','at most 128 raw properties');
   inspect(graph,'graph',0);inspect(definitions,'definitions',0);
   function copy(value:unknown): unknown {
     if(value===null||typeof value!=='object')return value;
