@@ -4,11 +4,31 @@ import { mkdtemp, mkdir, writeFile, readFile, realpath, rm, symlink } from 'node
 import { tmpdir } from 'node:os';
 import path, { join } from 'node:path';
 import vm from 'node:vm';
+import { ComponentLibraryStore } from '../../packages/core/src/component-library-store.ts';
+import * as packaging from '../../scripts/studio-package.mjs';
 import { copyIndependentTree, desktopSourceFile, dependencySelection, installedMainSource, repositoryLibraryRootFromCommonDirectory } from '../../scripts/studio-package.mjs';
 
 test('package source selection excludes private and development files', () => {
  for(const p of ['packages/visual-sdk/src/index.ts','scripts/studio-compile.mjs','scripts/studio-library-context.mjs','apps/build-worker/src/worker.mjs','library/catalog.json','library/components/11111111-1111-4111-8111-111111111111/revisions/1/source/component.ts','package.json']) assert.ok(desktopSourceFile(p),p);
  for(const p of ['.env.local','visuals/private.lux','tools/live-copilot/server.ts','artifacts/scene.json','.git/config','docs/private.md']) assert.equal(desktopSourceFile(p),false,p);
+});
+
+test('desktop library snapshot includes newly saved files and retained history without unrelated files', async t => {
+ const root=await mkdtemp(join(tmpdir(),'lux-package-library-'));t.after(()=>rm(root,{recursive:true,force:true}));
+ const source=join(root,'library'),destination=join(root,'package','library');
+ const store=new ComponentLibraryStore(source);
+ const first=await store.create({name:'New untracked component',description:'Saved after the last commit.',source:{sdkVersion:'0.4.0',entry:'component.ts',files:{'component.ts':'export const value=1;'}}});
+ await store.update({id:first.id,expectedRevision:1,name:first.name,description:first.description,source:{...first.source,files:{'component.ts':'export const value=2;'}}});
+ await rm(join(source,'components',first.id,'revisions','1'),{recursive:true});
+ await writeFile(join(source,'.env.local'),'private');
+ const catalogBefore=await readFile(join(source,'catalog.json'),'utf8');
+ const copied=await packaging.copyDesktopLibrary(source,destination);
+ assert.ok(copied.includes(`components/${first.id}/revisions/2/source/component.ts`));
+ assert.equal(copied.includes('.env.local'),false);
+ assert.equal(copied.includes('.write.lock'),false);
+ assert.equal((await new ComponentLibraryStore(destination).read(first.id)).revision,2);
+ assert.equal(await readFile(join(destination,'components',first.id,'revisions','2','source','component.ts'),'utf8'),'export const value=2;');
+ assert.equal(await readFile(join(source,'catalog.json'),'utf8'),catalogBefore);
 });
 
 test('desktop packaging records the primary repository library for linked worktrees',()=>{
