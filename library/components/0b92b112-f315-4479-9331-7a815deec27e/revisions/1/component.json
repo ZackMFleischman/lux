@@ -1,0 +1,19 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "0b92b112-f315-4479-9331-7a815deec27e",
+  "revision": 1,
+  "name": "Ornament Region Styles",
+  "description": "Paints organic regions with watercolor, ink and six local motif families. Pattern helpers are scene-prototype internals pending separate reusable extraction.",
+  "updatedAt": "2026-09-16T10:30:51.965Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "ornament-renderer.ts",
+    "files": [
+      "ornament-line-patterns.ts",
+      "ornament-packed-patterns.ts",
+      "ornament-renderer.ts",
+      "ornament-ribbon-patterns.ts"
+    ]
+  }
+}

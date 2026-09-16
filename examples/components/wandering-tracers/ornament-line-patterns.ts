@@ -27,13 +27,13 @@ fn loMembranes(r: LoRegion, p: vec2f, t: f32, settings: vec4f) -> f32 {
     let radius = length(q);
     let petalCount = 7.0 + floor(loHash(hubSeed + 31.0) * 4.0);
     let bowedAngle = angle + sin(radius * 4.6 + hubSeed.x + t * motion * 0.05)
-      * variation * 0.22;
+      * variation * 0.78;
     let phase = bowedAngle * petalCount / 6.283185 + loHash(hubSeed + 43.0);
     // The angular distance is converted to a world-space distance by radius,
     // so each fan line stays clean and reaches its owning cell boundary.
     let angularDistance = (fract(phase + 0.5) - 0.5) * 6.283185 / petalCount;
     let spokeDistance = radius * sin(angularDistance);
-    let spokeWidth = max(0.0065 * width, aa * (1.25 + width * 0.85));
+    let spokeWidth = max(0.0045 * width, aa * (1.25 + width * 0.85));
     let spoke = loLineCoverage(spokeDistance, spokeWidth, aa);
     membrane = max(membrane, spoke);
   }

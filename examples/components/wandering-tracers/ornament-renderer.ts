@@ -19,25 +19,27 @@ fn livingOrnament(st: vec2f, view: vec4f, shape: vec4f, detail: vec4f,
   pigment: vec4f, material: vec4f, ink: vec4f, pattern: vec4f, patternStyle: vec4f) -> vec4f {
   let p = (st - 0.5) * vec2f(view.y, 1.0) * 2.0;
   let region = loRegion(p, view.x, view.z, shape, detail);
-  let wash = loWash(region, p, view.x, pigment, material);
+  var wash = loWash(region, p, view.x, pigment, material);
   let id = i32(region.identity + 0.5);
+  if (id == 110) { wash = mix(wash, vec3f(0.56, 0.78, 0.84), 0.78); }
   var marks = 0.0;
   switch id {
     case 101, 105, 109, 113: { marks = loSpirals(region, p, view.x, pattern); }
     case 103, 112, 114: { marks = loRings(region, p, view.x, pattern); }
-    case 102, 104, 108: { marks = loMembranes(region, p, view.x, pattern); }
-    case 107, 115: { marks = loContours(region, p, view.x, pattern); }
+    case 102, 104, 107, 108: { marks = loMembranes(region, p, view.x, pattern); }
+    case 115: { marks = loContours(region, p, view.x, pattern); }
     case 110, 111: { marks = loRibbonMarks(region, p, view.x, pattern); }
     default: { marks = loHatchMarks(region, p, view.x, pattern); }
   }
-  var rest = select(1.0, 1.0 - patternStyle.y, id == 107 || id == 115);
+  var rest = select(1.0, 1.0 - patternStyle.y, id == 115);
   if (id == 101) {
     let clusteredGround = 1.0 - smoothstep(-0.45, 0.2, p.x + p.y * 0.35);
     rest = mix(1.0, clusteredGround, min(patternStyle.y * 1.2, 1.0));
   }
   let inset = smoothstep(ink.x * 1.7, ink.x * 3.2, region.edge);
   let light = dot(wash, vec3f(0.2126, 0.7152, 0.0722));
-  let motifInk = select(vec3f(0.006, 0.004, 0.009), vec3f(0.86, 0.75, 0.60), light < 0.16);
+  var motifInk = select(vec3f(0.006, 0.004, 0.009), vec3f(0.86, 0.75, 0.60), light < 0.16);
+  if (id == 110 || id == 111) { motifInk = vec3f(0.015, 0.19, 0.25); }
   let patterned = mix(wash, motifInk, clamp(marks * patternStyle.x * rest * inset, 0.0, 1.0));
   let color = loFinish(patterned, region, p, ink);
   return vec4f(color, 1.0);

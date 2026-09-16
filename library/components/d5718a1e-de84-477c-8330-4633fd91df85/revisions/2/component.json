@@ -1,0 +1,17 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "d5718a1e-de84-477c-8330-4633fd91df85",
+  "revision": 2,
+  "name": "Organic Boundary Ink",
+  "description": "Uneven warm outlines, hand-drawn character and stationary paper grain. Shader-field for compatible painting renderers.",
+  "updatedAt": "2026-09-16T10:04:38.051Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "boundary.ts",
+    "files": [
+      "boundary.ts",
+      "ornament-boundary.ts"
+    ]
+  }
+}

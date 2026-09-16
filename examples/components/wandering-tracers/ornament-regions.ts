@@ -195,12 +195,14 @@ fn loShapeSdf(index: i32, p: vec2f, t: f32, seed: f32, shape: vec4f,
       d = loSmoothSubtract(d, cleft, 0.040);
     }
     case 9: {
+      let bandPhase = phase + t * motion * 0.10;
       d = loWaveBand(p, -0.06, -0.05, 0.16 + complexity * 0.035, 2.05,
-        phase, corridorWidth * 0.46, 2.35);
+        bandPhase, corridorWidth * 0.46, 2.35);
     }
     case 10: {
+      let bandPhase = phase + 1.7 + t * motion * 0.10;
       d = loWaveBand(p - vec2f(0.10, 0.0), 0.82, 0.0, 0.13 + complexity * 0.04, 2.55,
-        phase + 1.7, corridorWidth * 0.34, 1.55);
+        bandPhase, corridorWidth * 0.34, 1.55);
     }
     case 11: {
       let radius = nesting * 0.3184615 * smallScale;
@@ -282,28 +284,27 @@ fn loRegion(p: vec2f, t: f32, seed: f32, shape: vec4f, detail: vec4f) -> LoRegio
   let center = loRegionCenter(owner, t, seed, detail.y);
   let angle = loRegionAngle(owner, seed);
   // Tangents are expressed in the same attached frame as local coordinates.
+  var attachedLocal = loRotate(p - center, angle);
   var tangent = vec2f(1.0, 0.0);
   if (owner == 9) {
     let bandAngle = -0.06;
-    let local = loRotate(p, bandAngle);
+    let bandLocal = loRotate(p, bandAngle);
     let amplitude = 0.16 + shape.y * 0.035;
     let frequency = 2.05;
-    let phase = loHash(vec2f(99.0, seed + 73.0)) * 6.283185;
-    let slope = amplitude * frequency * cos(local.x * frequency + phase)
-      + amplitude * 0.28 * frequency * 2.17 * cos(local.x * frequency * 2.17 - phase * 0.63);
-    let worldTangent = normalize(loUnrotate(vec2f(1.0, slope), bandAngle));
-    tangent = normalize(loRotate(worldTangent, angle));
+    let phase = loHash(vec2f(99.0, seed + 73.0)) * 6.283185 + t * detail.y * 0.10;
+    let centerline = -0.05 + amplitude * sin(bandLocal.x * frequency + phase)
+      + amplitude * 0.28 * sin(bandLocal.x * frequency * 2.17 - phase * 0.63);
+    attachedLocal = vec2f(bandLocal.x, bandLocal.y - centerline);
   }
   if (owner == 10) {
     let bandAngle = 0.82;
-    let local = loRotate(p - vec2f(0.10, 0.0), bandAngle);
+    let bandLocal = loRotate(p - vec2f(0.10, 0.0), bandAngle);
     let amplitude = 0.13 + shape.y * 0.04;
     let frequency = 2.55;
-    let phase = loHash(vec2f(110.0, seed + 73.0)) * 6.283185 + 1.7;
-    let slope = amplitude * frequency * cos(local.x * frequency + phase)
-      + amplitude * 0.28 * frequency * 2.17 * cos(local.x * frequency * 2.17 - phase * 0.63);
-    let worldTangent = normalize(loUnrotate(vec2f(1.0, slope), bandAngle));
-    tangent = normalize(loRotate(worldTangent, angle));
+    let phase = loHash(vec2f(110.0, seed + 73.0)) * 6.283185 + 1.7 + t * detail.y * 0.10;
+    let centerline = amplitude * sin(bandLocal.x * frequency + phase)
+      + amplitude * 0.28 * sin(bandLocal.x * frequency * 2.17 - phase * 0.63);
+    attachedLocal = vec2f(bandLocal.x, bandLocal.y - centerline);
   }
   var parent = 0.0;
   if (owner == 11) { parent = 102.0; }
@@ -316,7 +317,7 @@ fn loRegion(p: vec2f, t: f32, seed: f32, shape: vec4f, detail: vec4f) -> LoRegio
     parent,
     max(edge, 0.0),
     1.0,
-    loRotate(p - center, angle),
+    attachedLocal,
     tangent
   );
 }
