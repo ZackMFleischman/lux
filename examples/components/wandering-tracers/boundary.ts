@@ -1,4 +1,5 @@
 import { defineComponent } from '@lux/visual-sdk';
+import { ornamentBoundaryFragments } from './ornament-boundary.ts';
 
 // ABI lux/boundary-ink/v1 supplies the original boundary and paper finish.
 // The painting consumer places this block before the closing function brace.
@@ -34,18 +35,27 @@ export default defineComponent({
         label: 'Boundary ink',
         description: 'Boundary and paper-finish shader fragment with its current numeric values.',
       },
+      ornament: {
+        type: { kind: 'shader-field', version: 1, abi: 'lux/ornament-boundary-ink/v1' },
+        label: 'Ornament boundary ink',
+        description: 'Shared-boundary ornament ink helper with its current stroke values.',
+      },
     },
     controls: {
       outline: { type: 'number', group: 'Ink & paper', label: 'Boundary width', default: 0.005, min: 0.002, max: 0.03, step: 0.001 },
       inkWarmth: { type: 'number', group: 'Ink & paper', label: 'Warmth', default: 0.15, min: 0, max: 1, step: 0.01 },
       handDrawn: { type: 'number', group: 'Ink & paper', label: 'Hand-drawn character', default: 1.34, min: 0, max: 1.5, step: 0.01 },
       grain: { type: 'number', group: 'Ink & paper', label: 'Grain', default: 1.48, min: 0, max: 2, step: 0.01 },
+      ornamentWidth: { type: 'number', group: 'Ornament Ink', label: 'Boundary width', default: 0.008, min: 0.001, max: 0.025, step: 0.001 },
+      ornamentAccent: { type: 'number', group: 'Ornament Ink', label: 'Secondary edge', default: 0.55, min: 0, max: 1, step: 0.01 },
     },
     controlDescriptions: {
       outline: 'outline setting for the painting.',
       inkWarmth: 'inkWarmth setting for the painting.',
       handDrawn: 'handDrawn setting for the painting.',
       grain: 'grain setting for the painting.',
+      ornamentWidth: 'Boundary width for Living Ornament shared visible edges.',
+      ornamentAccent: 'Teal and purple secondary-edge strength for Living Ornament.',
     },
     lifecycle: { state: 'stateless', reset: 'seed' },
   },
@@ -54,12 +64,16 @@ export default defineComponent({
     let inkWarmth = 0.15;
     let handDrawn = 1.34;
     let grain = 1.48;
+    let ornamentWidth = 0.008;
+    let ornamentAccent = 0.55;
     return {
       update(frame) {
         outline = frame.controls.outline;
         inkWarmth = frame.controls.inkWarmth;
         handDrawn = frame.controls.handDrawn;
         grain = frame.controls.grain;
+        ornamentWidth = frame.controls.ornamentWidth;
+        ornamentAccent = frame.controls.ornamentAccent;
       },
       async evaluate(_inputs, evaluation) {
         return {
@@ -68,6 +82,12 @@ export default defineComponent({
             abi: 'lux/boundary-ink/v1',
             fragments: boundaryFragments,
             values: { outline, inkWarmth, handDrawn, grain },
+          }),
+          ornament: evaluation.shaderField('ornament', {
+            version: 1,
+            abi: 'lux/ornament-boundary-ink/v1',
+            fragments: ornamentBoundaryFragments,
+            values: { width: ornamentWidth, accent: ornamentAccent, handDrawn, grain },
           }),
         };
       },
