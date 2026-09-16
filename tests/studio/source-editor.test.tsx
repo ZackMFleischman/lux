@@ -295,7 +295,7 @@ test('source shortcuts apply all drafts with Ctrl/Cmd+S and save the scene only 
   await act(async () => { finish(); await pending; });
 });
 
-test('authoring source shortcut compiles the complete edited bundle, exposes errors, and keeps explicit scene save', async () => {
+test('authoring source shortcut compiles the complete edited bundle, exposes errors, and keeps explicit scene save', async t => {
   // Only the compiler/file IPC boundary is replaced; authoring/session/workspace/editor stay real.
   Object.assign(globalThis, {
     requestAnimationFrame: dom.window.requestAnimationFrame.bind(dom.window),
@@ -324,17 +324,18 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
       clockEpoch: 0, controlSequence: 0, intensity: this.init.controls.intensity, playback: 'playing', ...extra } }); }
     terminate() { if (this.timer) clearInterval(this.timer); }
   }
+  t.after(()=>AuthoringWorker.all.forEach(worker=>worker.terminate()));
   Object.defineProperty(globalThis, 'Worker', { configurable: true, value: AuthoringWorker });
   (dom.window.HTMLCanvasElement.prototype as any).transferControlToOffscreen = () => ({});
   const sceneName = 'A deliberately long scene title.lux-scene';
   window.luxAuthoring = {
     example: async () => source,
     compile: async bundle => { builds.push(structuredClone(bundle));
-      if (!compileSucceeds) {
+      if (builds.length > 1 && !compileSucceeds) {
         await new Promise<void>(resolve => { finish = resolve; });
         return { ok: false, diagnostics: [{ file: 'lib/color.ts', line: 1, column: 8, message: 'Shortcut compile error' }] };
       }
-      return { ok: true, linked: { code: '' }, sourceHash: 'resolved-source' }; },
+      return { ok: true, linked: { code: '' }, sourceHash: 'a'.repeat(64) }; },
     save: async request => { saves.push(request);
       if (holdSave) await new Promise<void>(resolve => { finishSave = resolve; });
       return { token: 'scene-token', name: sceneName }; },
@@ -344,6 +345,8 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
   const { AuthoringApp } = await import('../../apps/studio/src/authoring.tsx');
   await act(async () => { render(<AuthoringApp />); });
   assert.deepEqual([...document.querySelectorAll<HTMLButtonElement>('header [data-studio-menu]')].map(button => button.textContent), ['File', 'View', 'Preview']);
+  await waitFor(() => assert.equal(builds.length, 1));
+  assert.equal(AuthoringWorker.all[0]!.init.playing, true, 'normal startup builds and plays the loaded example');
   await click(screen.getByRole('button', { name: 'View' }));
   await click(screen.getByRole('menuitem', { name: 'Source' }));
   await waitFor(() => assert.ok(screen.queryByRole('button', { name: 'View' })));
@@ -355,11 +358,19 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
     fireEvent.keyDown(editor.contentDOM, { key: 's', ctrlKey: true });
     fireEvent.keyDown(editor.contentDOM, { key: 's', metaKey: true, shiftKey: true });
   });
-  assert.deepEqual(builds, [{ sdkVersion: '0.1.0', entry: 'main.ts', files: {
+  assert.deepEqual(builds, [source, { sdkVersion: '0.1.0', entry: 'main.ts', files: {
     'main.ts': 'export const main = 1', 'lib/color.ts': 'export const color = 42', 'other/color.ts': 'export const color = 2',
   } }]);
   assert.equal(saves.length, 0);
   assert.equal(screen.queryByText(/Studio is busy/), null);
+  await click(screen.getByRole('button', { name: 'View' }));
+  await click(screen.getByRole('menuitem', { name: 'Inspector' }));
+  await waitFor(() => assert.ok(screen.queryByRole('slider', { name: 'Intensity' })));
+  assert.equal((screen.getByRole('slider', { name: 'Intensity' }) as HTMLInputElement).disabled, false,
+    'the current preview controls remain editable during background compilation');
+  await click(screen.getByRole('button', { name: 'View' }));
+  await click(screen.getByRole('menuitem', { name: 'Source' }));
+  await waitFor(() => assert.ok(screen.queryByRole('button', { name: 'Open lib/color.ts' })));
   await act(async () => { finish(); });
   await click(screen.getByRole('button', { name: /Problems: 1/ }));
   await waitFor(() => assert.ok(screen.queryByRole('button', { name: /Shortcut compile error/ })));
@@ -376,11 +387,12 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
   assert.equal(view().state.selection.main.head, 0, 'consumed navigation does not replay when returning to the file');
   const activeEditor = view();
   fireEvent.click(screen.getByText('File'));
+  await waitFor(() => assert.equal(screen.getByRole('menuitem', { name: 'Save' }).getAttribute('aria-disabled'), null));
   await click(screen.getByRole('menuitem', { name: 'Save' }));
-  assert.equal(builds.length, 1); assert.equal(saves.length, 1);
+  assert.equal(builds.length, 2); await waitFor(() => assert.equal(saves.length, 1));
   assert.equal(screen.queryByText(/Studio is busy/), null);
   await act(async () => { holdSave = false; finishSave(); });
-  assert.equal(saves[0].saveAs, false); assert.deepEqual(saves[0].document.source, builds[0]);
+  assert.equal(saves[0].saveAs, false); assert.deepEqual(saves[0].document.source, builds[1]);
   const title = document.querySelector('.document-name')!;
   assert.equal(title.getAttribute('title'), sceneName);
   assert.ok(title.textContent?.includes(sceneName));
@@ -389,17 +401,17 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
   assert.ok(title.textContent?.endsWith(' *'));
   fireEvent.click(screen.getByText('File'));
   await click(screen.getByRole('menuitem', { name: 'Save' }));
-  assert.equal(saves.length, 2); assert.equal(saves[1].saveAs, false);
+  await waitFor(() => assert.equal(saves.length, 2)); assert.equal(saves[1].saveAs, false);
   assert.equal(title.textContent?.endsWith(' *'), false);
   fireEvent.click(screen.getByText('File'));
   await click(screen.getByRole('menuitem', { name: 'Save as' }));
-  assert.equal(saves.length, 3); assert.equal(saves[2].saveAs, true);
+  await waitFor(() => assert.equal(saves.length, 3)); assert.equal(saves[2].saveAs, true);
   compileSucceeds = true;
   const current = await agentCommand({ method: 'read', params: {} });
   await act(async () => { await agentCommand({ method: 'build', params: { source: current.source, expectedDraftVersion: current.draftVersion } }); });
   assert.equal(screen.queryByText(/Shortcut compile error/), null);
   assert.ok(screen.getByRole('button', { name: /Problems: 0/ }));
-  assert.equal(builds.length, 2);
+  assert.equal(builds.length, 3);
   await act(async () => {
     AuthoringWorker.all.at(-1)!.reply({ type: 'failure', message: 'test cleanup' });
     await new Promise(resolve => setTimeout(resolve, 350));

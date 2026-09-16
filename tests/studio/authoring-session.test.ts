@@ -44,6 +44,19 @@ test('cancelled/failed saves preserve dirty and an in-flight save excludes open/
   const failing = createAuthoringSession(w, { submit: async () => {}, save: async () => { throw Error('disk'); }, getControls: () => ({ intensity: 0.5 }) });
   await assert.rejects(failing.save(false), /disk/); assert.equal(w.getSnapshot().dirty, true);
 });
+
+test('background builds keep runtime controls available while scene file operations protect them', async () => {
+  const w=createSourceWorkspace(source());let finishBuild!:(value?:void)=>void,finishSave!:(value:any)=>void;
+  const session=createAuthoringSession(w,{submit:()=>new Promise<void>(resolve=>{finishBuild=resolve;}),
+    save:()=>new Promise(resolve=>{finishSave=resolve;}),getControls:()=>({intensity:.5})});
+  const building=session.build(session.read().source,session.read().draftVersion);
+  while(!finishBuild)await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(session.getSnapshot().busy,true);assert.equal(session.getSnapshot().runtimeControlsAvailable,true);
+  finishBuild();await building;
+  const saving=session.save();while(!finishSave)await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(session.getSnapshot().busy,true);assert.equal(session.getSnapshot().runtimeControlsAvailable,false);
+  finishSave(null);await saving;assert.equal(session.getSnapshot().runtimeControlsAvailable,true);
+});
 test('stale build cannot submit and opening invalid code preserves the previous running identity', async () => {
   const w = createSourceWorkspace(source()); await w.submit(source(), 0, async () => {});
   let count = 0;
