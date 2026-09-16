@@ -28,8 +28,10 @@ export interface ComponentInstance<C extends ControlDeclarations=ControlDeclarat
 export interface CodeComponentDefinition<C extends ControlDeclarations=ControlDeclarations,I extends PortDeclarations=LegacyImageInputs,O extends PortDeclarations=LegacyImageOutputs>{readonly kind:'component';readonly sdkVersion:'0.4.0';readonly metadata:Omit<ComponentMetadata,'inputs'|'outputs'>&{readonly inputs:I;readonly outputs:O};create(context:ComponentContext):Promise<ComponentInstance<C,I,O>>}
 type CodeDeclaration<C extends ControlDeclarations,I extends PortDeclarations,O extends PortDeclarations>={readonly metadata:Omit<ComponentDeclaration,'inputs'|'outputs'|'controls'|'controlDescriptions'>&{readonly inputs:I;readonly outputs:O;readonly controls:C;readonly controlDescriptions:{readonly [K in keyof C]:string}};create(context:ComponentContext):Promise<ComponentInstance<NoInfer<C>,NoInfer<I>,NoInfer<O>>>};
 type Node={readonly id:string;readonly definition:string};type Ref={readonly nodeId:string;readonly portId:string};type Edge={readonly id:string;readonly from:Ref;readonly to:Ref;readonly delay:'none'};type Exposure={readonly id:string;readonly nodeId:string;readonly controlId:string};
-export interface GraphComponentDefinition{readonly kind:'composition';readonly sdkVersion:'0.4.0';readonly label?:string;readonly definitions:Readonly<Record<string,ComponentDefinition<any,any,any>>>;readonly nodes:readonly Node[];readonly edges:readonly Edge[];readonly input?:Ref;readonly output:Ref;readonly expose:readonly Exposure[]}
-export type ComponentDefinition<C extends ControlDeclarations=ControlDeclarations,I extends PortDeclarations=LegacyImageInputs,O extends PortDeclarations=LegacyImageOutputs>=CodeComponentDefinition<C,I,O>|GraphComponentDefinition;
+export interface GraphComponentDefinition{readonly kind:'composition';readonly sdkVersion:'0.4.0';readonly label?:string;readonly definitions:Readonly<Record<string,AnyComponentDefinition<any,any,any>>>;readonly nodes:readonly Node[];readonly edges:readonly Edge[];readonly input?:Ref;readonly output:Ref;readonly expose:readonly Exposure[]}
+/** Compatibility name: existing SDK 0.4 source can access its code factory directly. */
+export type ComponentDefinition<C extends ControlDeclarations=ControlDeclarations,I extends PortDeclarations=LegacyImageInputs,O extends PortDeclarations=LegacyImageOutputs>=CodeComponentDefinition<C,I,O>;
+export type AnyComponentDefinition<C extends ControlDeclarations=ControlDeclarations,I extends PortDeclarations=LegacyImageInputs,O extends PortDeclarations=LegacyImageOutputs>=CodeComponentDefinition<C,I,O>|GraphComponentDefinition;
 /** Compatibility name for the existing sealed graph representation. */
 export type CompositionDefinition=GraphComponentDefinition;
 export type VisualDefinition=Omit<GraphComponentDefinition,'input'>&{readonly input?:never};
@@ -38,7 +40,7 @@ type VisualDeclaration=Omit<GraphDeclaration,'input'>&{readonly input?:never};
 
 export function defineComponent<const C extends ControlDeclarations,const I extends PortDeclarations,const O extends PortDeclarations>(definition:CodeDeclaration<C,I,O>):CodeComponentDefinition<C,I,O>;
 export function defineComponent(definition:GraphDeclaration):GraphComponentDefinition;
-export function defineComponent(definition:CodeDeclaration<any,any,any>|GraphDeclaration):ComponentDefinition<any,any,any>{
+export function defineComponent(definition:CodeDeclaration<any,any,any>|GraphDeclaration):AnyComponentDefinition<any,any,any>{
  if(!definition||![Object.prototype,null].includes(Object.getPrototypeOf(definition)))throw Error('Expected plain component definition');
  if(Object.hasOwn(definition,'definitions'))return defineComposition(definition as GraphDeclaration);
  const keys=Reflect.ownKeys(definition),metadata=Object.getOwnPropertyDescriptor(definition,'metadata'),create=Object.getOwnPropertyDescriptor(definition,'create');

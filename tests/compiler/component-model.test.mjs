@@ -56,12 +56,12 @@ test('ambiguous recognized author calls are rejected before declaration extracti
 test('shipped component/visual templates compile and link through the existing image-chain runtime',async()=>{
  const files={'source.ts':ballSource};
  files['source.ts']=files['source.ts'].replace('update(){}','update(frame){const value:number=frame.controls.intensity;}');
- files['author-types.ts']=`import type {CodeComponentDefinition,GraphComponentDefinition,ComponentDefinition,CompositionDefinition,VisualDefinition} from '@lux/visual-sdk';
+ files['author-types.ts']=`import type {CodeComponentDefinition,GraphComponentDefinition,AnyComponentDefinition,CompositionDefinition,VisualDefinition} from '@lux/visual-sdk';
  import group from './component-group.ts';
  const graph:GraphComponentDefinition=group;
  const oldName:CompositionDefinition=graph;
- const component:ComponentDefinition=oldName;
- function factory(value:ComponentDefinition){if(value.kind==='component'){const leaf:CodeComponentDefinition=value;return leaf.create;}return undefined;}
+ const component:AnyComponentDefinition=oldName;
+ function factory(value:AnyComponentDefinition){if(value.kind==='component'){const leaf:CodeComponentDefinition=value;return leaf.create;}return undefined;}
  export {component};`;
  for(const name of ['component-group.ts','component-visual.ts'])files[name]=await readFile(new URL(`../../skills/lux-visual-creation/assets/${name}`,import.meta.url),'utf8');
  const options={dependencyRoot:process.env.LUX_COMPILER_DEPENDENCIES||resolve('node_modules')};

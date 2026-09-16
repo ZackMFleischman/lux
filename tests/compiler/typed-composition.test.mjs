@@ -82,12 +82,14 @@ test('SDK 0.4 preserves ImageInputs and default two-argument render for image ch
   const source = compositionSourceBundle();
   source.files['ball.ts'] = source.files['ball.ts'].replace(
     "import {defineComponent} from '@lux/visual-sdk';",
-    "import {defineComponent,type ImageInputs,type EvaluationContext,type ComponentInstance,type ComponentDefinition} from '@lux/visual-sdk';\nconst legacy=(inputs:ImageInputs,context:EvaluationContext)=>context.render({}, {});void legacy;\nconst instance:ComponentInstance={update(){},async evaluate(inputs,context){void inputs.image!.texture;return {image:await context.render({}, {})};},reset(){},dispose(){}};\nconst annotation=(definition:ComponentDefinition)=>definition.kind==='component'?definition.create:undefined;void annotation;void instance;",
+    "import {defineComponent,type ImageInputs,type EvaluationContext,type ComponentInstance,type ComponentDefinition} from '@lux/visual-sdk';\nconst legacy=(inputs:ImageInputs,context:EvaluationContext)=>context.render({}, {});void legacy;\nconst instance:ComponentInstance={update(){},async evaluate(inputs,context){void inputs.image!.texture;return {image:await context.render({}, {})};},reset(){},dispose(){}};\nconst annotation=(definition:ComponentDefinition)=>definition.create;void annotation;void instance;",
   );
   const result = await compileVisual({ source }, options);
   assert.equal(result.ok, true, JSON.stringify(result));
   assert.equal(result.artifact.executionModel, 'image-chain-v1');
   assert.equal(result.artifact.composition.version, 1);
+  const linked = await linkRuntime(result.artifact, options);
+  assert.equal(linked.executionModel, 'image-chain-v1');
 });
 
 test('typed composition admission rejects cycles and unreachable nodes', async () => {
