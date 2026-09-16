@@ -31,11 +31,16 @@ import { assertAgentCaptureSize } from './preview-capture-client.ts';
 import type { PreviewRecorderSnapshot } from './preview-recorder.ts';
 import './preview-capture-client.ts';
 import { createRendererSnapshot } from './renderer-snapshot.ts';
+import { shortcutHint } from './studio-shortcuts.ts';
+import type { StudioShortcutActions, StudioShortcutCommand } from './studio-shortcuts.ts';
 const client = new StandaloneClient(window.luxAuthoring, { codeDeclaredParameters: true });
 const agentStatus = () => ({ ...client.getSnapshot(), capabilities: studioCapabilities });
 const idleRecording = Object.freeze({ phase: 'idle' }) as PreviewRecorderSnapshot;
 const subscribeIdle = () => () => {};
 const getIdleRecording = () => idleRecording;
+function ShortcutLabel({ command }: { command: StudioShortcutCommand }) {
+  return <span className="studio-shortcut-hint" aria-hidden="true">{shortcutHint[command]}</span>;
+}
 export function AuthoringApp() {
   const confirmation = useDiscardConfirmation();
   const windows = useMemo(() => window.luxStudioWindows ? { ...window.luxStudioWindows,
@@ -270,21 +275,31 @@ export function AuthoringApp() {
       await session.loadLook(id); clearDiagnostics(); setError(''); return true;
     });
   }
+  const previewAvailable = !!previewRecorder && !!runtimeSnapshot.authoring && runtimeSnapshot.authoring.playback !== 'failed';
+  const exportUnavailable = window.luxExport?.unavailableReason;
+  const shortcutActions: StudioShortcutActions = {
+    build: { run: build, disabled: busy },
+    save: { run: save, disabled: busy },
+    'save-as': { run: () => save(true), disabled: busy },
+    export: { run: () => setExportOpen(true), disabled: busy || composing.current || !!exportUnavailable, disabledReason: exportUnavailable },
+    'save-frame': { run: savePreviewFrame, disabled: !previewAvailable || recording.phase !== 'idle' },
+    'toggle-recording': { run: recording.phase === 'idle' ? startPreviewRecording : stopPreviewRecording, disabled: !previewAvailable || recording.phase === 'stopping' },
+  };
   const fileMenu = <>
     <StudioMenu label="File" buttonRef={fileSummary} className="file-tools">
       <MenuItem disabled={busy} onClick={() => void open()}>Open</MenuItem>
-      <MenuItem disabled={busy} onClick={() => void save()}>Save</MenuItem>
-      <MenuItem disabled={busy} onClick={() => void save(true)}>Save as</MenuItem>
+      <MenuItem disabled={shortcutActions.save!.disabled} onClick={() => void shortcutActions.save!.run()}><span>Save</span><ShortcutLabel command="save" /></MenuItem>
+      <MenuItem disabled={shortcutActions['save-as']!.disabled} onClick={() => void shortcutActions['save-as']!.run()}><span>Save as</span><ShortcutLabel command="save-as" /></MenuItem>
       <MenuItem disabled={busy} onClick={() => setLooksOpen(true)}>Looks…</MenuItem>
-      <MenuItem disabled={busy || composing.current || !!window.luxExport?.unavailableReason} title={window.luxExport?.unavailableReason} onClick={() => setExportOpen(true)}>
-        Export for Resolume{window.luxExport?.unavailableReason ? ' (not included)' : ''}</MenuItem>
+      <MenuItem disabled={shortcutActions.export!.disabled} title={shortcutActions.export!.disabledReason} onClick={() => void shortcutActions.export!.run()}>
+        <span>Export for Resolume{exportUnavailable ? ' (not included)' : ''}</span><ShortcutLabel command="export" /></MenuItem>
     </StudioMenu>
   </>;
   const commands = <>
-    <PreviewCaptureMenu available={!!previewRecorder && !!runtime && runtime.playback !== 'failed'} status={recording}
+    <PreviewCaptureMenu available={previewAvailable} status={recording}
       onSaveFrame={savePreviewFrame} onStart={startPreviewRecording} onStop={stopPreviewRecording} />
     <span className="document-name" title={io.name}><span className="document-label">Scene</span><span className="document-title">{io.name}</span>{dirty && <span aria-label="Unsaved changes"> *</span>}</span>
-    <Button className="studio-build-button" variant="outlined" color="inherit" disabled={busy} aria-label="Build" aria-busy={busy} title="Build preview (Ctrl/Cmd+S in source)" onClick={() => void build()}>
+    <Button className="studio-build-button" variant="outlined" color="inherit" disabled={busy} aria-label="Build" aria-busy={busy} title={`Build preview (${shortcutHint.build})`} onClick={() => void shortcutActions.build!.run()}>
       {busy && <span className="status-spinner" aria-hidden="true" />}Build
     </Button>
   </>;
@@ -296,10 +311,10 @@ export function AuthoringApp() {
     {confirmation.dialog}
     <ExportDialog disabled={busy || composing.current} open={exportOpen} onClose={() => setExportOpen(false)} onClosed={() => fileSummary.current?.focus()} defaultName={io.name} create={async name => { if (pendingControlWrites.current.size) await finishControlWrites(); return session.exportSource(name); }} />
     <LooksDialog open={looksOpen} onClose={() => setLooksOpen(false)} onClosed={() => fileSummary.current?.focus()} client={window.luxLooks} onSave={saveLook} onLoad={loadLook} />
-    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} previewActions={<PreviewCaptureActions available={!!previewRecorder && !!runtime && runtime.playback !== 'failed'} status={recording}
+    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} shortcutActions={shortcutActions} previewActions={<PreviewCaptureActions available={previewAvailable} status={recording}
       onSaveFrame={savePreviewFrame} onStart={startPreviewRecording} onStop={stopPreviewRecording} />} sourceChanged={draft.hasRunningSource && !draft.runningMatchesDraft} appCommands={commands} appError={error} controlEdits={controlEdits} controlsAvailable={!io.busy} libraryPanel={libraryPanel}
       sourceDiagnostics={{ items: diagnostics, snapshot: draft, onNavigate: target => setDiagnosticTarget(previous => ({ ...target, request: (previous?.request ?? 0) + 1, documentKey: draft.documentKey, draftVersion: draft.version })) }}
-      sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onApply={() => void build()} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnosticTarget={diagnosticTarget}
+      sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onApply={() => void shortcutActions.build!.run()} onCompositionChange={value => { composing.current = value; }} diagnosticTarget={diagnosticTarget}
         onDiagnosticTargetHandled={request => setDiagnosticTarget(current => current?.request === request ? null : current)} />} />
   </div></StudioMenuProvider></ThemeProvider>;
 }

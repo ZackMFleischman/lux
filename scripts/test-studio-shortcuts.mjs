@@ -1,0 +1,137 @@
+import assert from 'node:assert/strict';
+import { mkdir, readFile, stat, unlink, writeFile } from 'node:fs/promises';
+import { join, resolve } from 'node:path';
+import { _electron } from 'playwright';
+import { installedElectron } from './studio-electron.mjs';
+import { studioTestEnvironment } from './studio-session.mjs';
+
+const root = resolve(import.meta.dirname, '..');
+const output = join(root, 'artifacts/studio-ui/shortcuts');
+const scenePath = join(output, 'shortcut-save.lux-scene');
+const saveAsPath = join(output, 'shortcut-save-as.lux-scene');
+const framePath = join(output, 'shortcut-frame.png');
+const videoPath = join(output, 'shortcut-recording.webm');
+const screenshotPath = join(output, 'diagnostics-maximized.png');
+const resultPath = join(output, 'result.json');
+const report = { ok: false, checks: [], errors: [] };
+const env = { ...studioTestEnvironment(), LUX_NODE_EXECUTABLE: process.execPath };
+delete env.ELECTRON_RUN_AS_NODE;
+await mkdir(output, { recursive: true });
+await Promise.all([scenePath, saveAsPath, framePath, videoPath, screenshotPath, resultPath].map(path => unlink(path).catch(() => {})));
+
+let app, page;
+async function waitForFile(path, minimum = 1) {
+  for (let attempt = 0; attempt < 120; attempt++) {
+    try { if ((await stat(path)).size >= minimum) return; } catch {}
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  throw Error(`Timed out waiting for ${path}`);
+}
+async function openMenu(name) { await page.getByRole('button', { name, exact: true }).click(); }
+
+try {
+  app = await _electron.launch({ executablePath: installedElectron(root), args: [join(root, 'apps/studio/dist/main.cjs')],
+    cwd: root, env, timeout: 30000, chromiumSandbox: true });
+  page = await app.firstWindow(); page.setDefaultTimeout(20000);
+  page.on('pageerror', error => report.errors.push(error.message));
+  page.on('console', message => { if (message.type() === 'error') report.errors.push(message.text()); });
+
+  const native = await app.evaluate(({ BrowserWindow, Menu }) => {
+    const window = BrowserWindow.getAllWindows()[0];
+    return { applicationMenu: Menu.getApplicationMenu() !== null, minimizable: window.isMinimizable(),
+      maximizable: window.isMaximizable(), closable: window.isClosable() };
+  });
+  assert.deepEqual(native, { applicationMenu: false, minimizable: true, maximizable: true, closable: true });
+  report.nativeWindow = native;
+  report.checks.push('Electron accelerator menu is disabled while native minimize, maximize, and close controls remain enabled');
+
+  await openMenu('File');
+  const fileMenu = await page.getByRole('menu', { name: 'File' }).innerText();
+  for (const hint of ['Ctrl+S', 'Ctrl+Shift+S', 'Ctrl+Shift+E']) assert.match(fileMenu, new RegExp(hint.replaceAll('+', '\\+')));
+  await page.keyboard.press('Escape');
+  await openMenu('Preview');
+  const previewMenu = await page.getByRole('menu', { name: 'Preview' }).innerText();
+  assert.match(previewMenu, /Ctrl\+Shift\+P/); assert.match(previewMenu, /Ctrl\+Shift\+R/);
+  await page.keyboard.press('Escape');
+  await openMenu('View');
+  assert.match(await page.getByRole('menu', { name: 'View' }).innerText(), /Ctrl\+Shift\+I/);
+  await page.keyboard.press('Escape');
+  report.checks.push('File, Preview, View, Build, panel, and fullscreen controls expose their assigned shortcut hints');
+
+  await app.evaluate(({ dialog }, paths) => {
+    const scenePaths = [paths.scene, paths.saveAs];
+    dialog.showSaveDialog = async (_window, options) => {
+      const extensions = options?.filters?.flatMap(filter => filter.extensions ?? []) ?? [];
+      if (extensions.includes('lux-scene')) return { canceled: false, filePath: scenePaths.shift() };
+      if (extensions.includes('png')) return { canceled: false, filePath: paths.frame };
+      if (extensions.includes('webm')) return { canceled: false, filePath: paths.video };
+      return { canceled: true };
+    };
+  }, { scene: scenePath, saveAs: saveAsPath, frame: framePath, video: videoPath });
+
+  const editor = page.locator('.cm-content');
+  await editor.waitFor(); await editor.focus();
+  await page.keyboard.press('Control+Enter');
+  await page.waitForFunction(() => document.querySelector('.status-build')?.textContent?.includes('Build ready'));
+  const canvas = page.locator('.preview-surface canvas'); await canvas.waitFor({ state: 'visible' });
+  await page.keyboard.press('Control+S'); await waitForFile(scenePath);
+  await page.keyboard.press('Control+Shift+S'); await waitForFile(saveAsPath);
+  report.savedScenes = { saveBytes: (await stat(scenePath)).size, saveAsBytes: (await stat(saveAsPath)).size };
+  report.checks.push('Ctrl+Enter builds from Source; Ctrl+S and Ctrl+Shift+S save through the same scene actions while Source has focus');
+
+  await page.keyboard.press('Control+Shift+E');
+  await page.getByRole('dialog', { name: 'Export for Resolume' }).waitFor();
+  await page.keyboard.press('Control+Shift+E');
+  assert.equal(await page.getByRole('dialog', { name: 'Export for Resolume' }).count(), 1);
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  report.checks.push('Ctrl+Shift+E opens one export dialog and further dialog shortcuts are suppressed');
+
+  await page.getByRole('button', { name: 'View', exact: true }).focus();
+  await page.keyboard.press('Control+Shift+P'); await waitForFile(framePath);
+  const png = await readFile(framePath);
+  assert.deepEqual(await app.evaluate(({ nativeImage }, bytes) => nativeImage.createFromBuffer(Buffer.from(bytes)).getSize(), [...png]), { width: 1920, height: 1080 });
+  await page.keyboard.press('Control+Shift+R');
+  await page.getByRole('status').filter({ hasText: 'Recording 1920 × 1080' }).waitFor();
+  await page.waitForTimeout(1200); await page.keyboard.press('Control+Shift+R');
+  await page.getByRole('button', { name: 'Preview', exact: true }).waitFor(); await waitForFile(videoPath, 1024);
+  report.capture = { pngBytes: png.length, videoBytes: (await stat(videoPath)).size };
+  report.checks.push('Ctrl+Shift+P saves a decoded 1920×1080 PNG and Ctrl+Shift+R starts and finishes a WebM recording');
+
+  await page.getByRole('button', { name: 'View', exact: true }).focus();
+  const inspector = page.locator('.studio-pane-inspector');
+  assert.equal(await inspector.count(), 1); await page.keyboard.press('Control+Shift+I'); await inspector.waitFor({ state: 'detached' });
+  await page.keyboard.press('Control+Shift+I'); await inspector.waitFor();
+  await editor.focus(); await page.keyboard.press('Control+Shift+I'); assert.equal(await inspector.count(), 1);
+  await page.keyboard.press('Control+Shift+M'); assert.equal(await page.locator('.studio-expanded-pane:not([hidden])').count(), 0);
+  report.checks.push('Ctrl+Shift+I toggles Inspector outside text entry; Inspector and panel maximize remain suppressed inside Source');
+
+  const diagnosticsTab = page.locator('.dv-tab').filter({ hasText: /^Diagnostics$/ });
+  await diagnosticsTab.focus(); await diagnosticsTab.click();
+  await page.evaluate(() => { window.__shortcutCanvas = document.querySelector('.preview-surface canvas'); });
+  const beforeFrame = await canvas.evaluate(element => element.toDataURL());
+  await page.keyboard.press('Control+Shift+M');
+  const diagnostics = page.locator('.studio-pane-diagnostics');
+  await diagnostics.waitFor();
+  assert.equal(await diagnostics.evaluate(element => !!element.closest('.studio-expanded-pane:not([hidden])')), true);
+  assert.equal(await page.evaluate(() => window.__shortcutCanvas === document.querySelector('.preview-surface canvas')), true);
+  await page.waitForTimeout(500);
+  const afterFrame = await canvas.evaluate(element => element.toDataURL());
+  assert.notEqual(afterFrame, beforeFrame, 'hidden live Preview must continue rendering while Diagnostics is maximized');
+  await page.screenshot({ path: screenshotPath });
+  await page.keyboard.press('F11'); await page.locator('.studio-preview-fullscreen').waitFor();
+  assert.equal(await page.evaluate(() => window.__shortcutCanvas === document.querySelector('.preview-surface canvas')), true);
+  await page.keyboard.press('Escape'); await diagnostics.waitFor();
+  assert.equal(await diagnostics.evaluate(element => !!element.closest('.studio-expanded-pane:not([hidden])')), true);
+  await page.keyboard.press('Escape'); await page.locator('.studio-dock-grid:not([hidden])').waitFor();
+  assert.equal(await diagnosticsTab.evaluate(element => element === document.activeElement), true);
+  report.checks.push('Focused Diagnostics maximizes with the same advancing Preview canvas; F11 shows Preview and Escape restores Diagnostics, then its dock focus');
+
+  assert.deepEqual(report.errors, []); report.ok = true;
+} catch (error) {
+  report.failure = String(error?.stack ?? error); process.exitCode = 1;
+  if (page && !page.isClosed()) await page.screenshot({ path: join(output, 'failure.png') }).catch(() => {});
+} finally {
+  if (app) { await app.evaluate(({ app }) => app.exit(0)).catch(() => {}); await app.close().catch(() => {}); }
+  await writeFile(resultPath, JSON.stringify(report, null, 2));
+}
+console.log(JSON.stringify(report, null, 2));
