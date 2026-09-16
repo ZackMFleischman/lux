@@ -124,6 +124,5 @@ export function GraphPanel({runtime,selected,onSelect}:{runtime:RuntimeView|null
         </button>)}
       </div>
     </div>}
-    <p className="graph-hint">Select Scene or a node for its controls. Click the background for Scene controls. Drag to pan. Scroll to zoom. Double-click a component to view inside.</p>
   </section>;
 }
