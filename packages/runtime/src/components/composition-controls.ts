@@ -7,7 +7,13 @@ export type SavedNodeControls=Readonly<{nodes:readonly Readonly<{nodePath:NodePa
 const key=(path:NodePath)=>JSON.stringify(path);
 const migrationId=(path:NodePath,id:string)=>`${path.join('/')}:${id}`;
 export function createCompositionControlState(input:ImageCompositionProfile,saved?:SavedNodeControls){
- const profile=normalizeImageCompositionProfile(input),values=new Map<string,ControlValues>(),changes:ControlMigration[]=[];
+ return prepareCompositionControlState(input)(saved);
+}
+/** Admit and snapshot the immutable graph once; each state still validates its values. */
+export function prepareCompositionControlState(input:ImageCompositionProfile){
+ const profile=normalizeImageCompositionProfile(input);
+ return (saved?:SavedNodeControls)=>{
+ const values=new Map<string,ControlValues>(),changes:ControlMigration[]=[];
  for(const node of profile.nodes)values.set(key(node.nodePath),defaultControlValues(node.schema));
  if(saved){
   if(!saved||typeof saved!=='object'||!Array.isArray(saved.nodes))throw Error('Invalid saved composition controls');
@@ -39,4 +45,5 @@ export function createCompositionControlState(input:ImageCompositionProfile,save
   changes(){return Object.freeze([...changes]);},
   snapshot():SavedNodeControls{return Object.freeze({nodes:Object.freeze(profile.nodes.map(node=>Object.freeze({nodePath:Object.freeze([...node.nodePath]),definitionHash:node.definitionHash,schema:node.schema,schemaHash:node.schemaHash,values:Object.freeze({...find(node.nodePath)})})))});},
  });
+ };
 }

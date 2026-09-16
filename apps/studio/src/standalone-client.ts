@@ -16,7 +16,7 @@ import { verifyLinked } from '../../build-worker/src/artifact-identity.mjs';
 import { PerformanceReceiver } from './performance/performance-state.ts';
 import { collectionMode } from '../../../packages/performance/collection-mode.mjs';
 import type { CollectionMode } from '../../../packages/performance/collection-mode.mjs';
-import { createCompositionControlState } from '../../../packages/runtime/src/components/composition-controls.ts';
+import { createCompositionControlState, prepareCompositionControlState } from '../../../packages/runtime/src/components/composition-controls.ts';
 import type { SavedNodeControlSnapshot } from '../../../packages/core/src/scene-document.ts';
 import {validateControlAnimationBindings} from '../../../packages/runtime-contracts/src/control-animation.mjs';
 import type {ControlAnimationBinding,ControlAnimationIssue} from '../../../packages/runtime-contracts/src/control-animation.mjs';
@@ -133,6 +133,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     finally { if(this.replacementPlayback===playbackIntent)this.replacementPlayback=null;this.busy = false; this.scheduleAutomaticRetry(); }
   }
   private async start(linked: LinkedEnvelope, revisionId: string, state:RuntimeControlState, migration:readonly ControlMigration[]=[],retryPolicy:RetryPolicy={lastFaultAt:null},playingOverride?:boolean, output:Readonly<Pick<OutputSettings,'width'|'height'>>=this.previewOutput,playbackIntent?:ReplacementPlaybackIntent): Promise<void> {
+    const compositionState='linkedVersion' in linked&&linked.linkedVersion===5?prepareCompositionControlState(linked.composition):undefined;
     const playing = playingOverride ?? this.snapshot.authoring?.playback === 'playing';
     const canvas = document.createElement('canvas'); canvas.width = output.width; canvas.height = output.height;
     canvas.style.cssText = 'width:100%;height:100%;position:absolute;inset:0;object-fit:contain';
@@ -235,11 +236,11 @@ export class StandaloneClient implements StudioClient, PresentationPort {
             if(state.sdkVersion==='0.4.0'){
               if(!('linkedVersion' in linked)||linked.linkedVersion!==5)throw Error('Invalid composition linked payload');
               const nodeControls=message.nodeControls as SavedNodeControlSnapshot;
-              const composition=createCompositionControlState(linked.composition,nodeControls);
+              const composition=compositionState!(nodeControls);
               if(JSON.stringify(composition.values())!==JSON.stringify(applied))throw Error('Composition public controls do not match canonical node values');
               compositionNodeControls=Object.freeze({sourceHash:revisionId,nodes:composition.snapshot().nodes});
               if(!message.effectiveNodeControls)throw Error('Missing effective animation values');
-              const effective=createCompositionControlState(linked.composition,message.effectiveNodeControls);
+              const effective=compositionState!(message.effectiveNodeControls);
               effectiveNodeControls=Object.freeze({sourceHash:revisionId,nodes:effective.snapshot().nodes});
             }
             if(message.type==='ready'&&(message.controlSequence!==0||animationSequence!==0||JSON.stringify(applied)!==JSON.stringify(state.controls)||JSON.stringify(controlAnimations)!==JSON.stringify(state.controlAnimations??[])))throw Error('Initial control snapshot mismatch');

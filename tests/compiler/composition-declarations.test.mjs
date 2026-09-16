@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {parse} from '@babel/parser';
 import {createHash} from 'node:crypto';
 import {extractCompositionDeclaration} from '../../apps/build-worker/src/composition-declarations.mjs';
+import {prepareCompositionControlState} from '../../packages/runtime/src/components/composition-controls.ts';
 import {compositionSourceBundle,nestedCompositionSourceBundle,ballId,kaleidoscopeAId,kaleidoscopeBId,compositeAId,compositeBId,wrapperNodeId,wrappedEffectId,directEffectId} from './composition-fixture.mjs';
 const hash=value=>createHash('sha256').update(value).digest('hex');
 test('composition exposes 64 controls without a cardinality ceiling',()=>{
@@ -15,6 +16,13 @@ test('composition exposes 64 controls without a cardinality ceiling',()=>{
  const profile=extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash});
  assert.equal(profile.publicControls.length,64);
  assert.equal(profile.declaration.expose.length,64);
+ const mutable=structuredClone(profile),prepare=prepareCompositionControlState(mutable);
+ mutable.declaration.expose=[];
+ const first=prepare(),saved=first.snapshot();
+ const second=prepare(saved);second.applyNode([ballId],{control63:.8},profile.nodes[0].schemaHash);
+ assert.equal(second.values().control63,.8);assert.equal(first.values().control63,0);
+ const invalid=structuredClone(saved);invalid.nodes[0].values.control63=99;
+ assert.throws(()=>prepare(invalid));
 });
 test('static composition extraction derives canonical controls and distinct same-named leaf bindings without executing source',()=>{
  const source=compositionSourceBundle(),asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));

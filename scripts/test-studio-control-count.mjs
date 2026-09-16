@@ -54,8 +54,13 @@ try{
  const cleanPath=join(output,'component-start.lux-scene');await writeFile(cleanPath,JSON.stringify(clean));
  current=await call('read');await call('scene.open',{path:cleanPath,expectedDraftVersion:current.draftVersion,discardDirty:true});
  const controls=Object.fromEntries(Array.from({length:64},(_,i)=>[i?'control'+i:'intensity',{type:'number',label:`Component control ${i+1}`,group:`Motion ${Math.floor(i/8)+1}`,min:0,max:1,default:.5}]));
- let component=await readFile(join(root,'library/components/93a7215f-4df1-4e1e-9d34-3f7f0f27ad84/revisions/1/source/component.ts'),'utf8');
- component=component.replace(/    controls: \{[\s\S]*?\n    lifecycle:/,`    controls:${JSON.stringify(controls)},\n    controlDescriptions:${JSON.stringify(Object.fromEntries(Object.keys(controls).map(id=>[id,'Live value'])))},\n    lifecycle:`).replace('frame.controls.intensity','frame.controls.control63').replace('IcosahedronGeometry(1, 24)','IcosahedronGeometry(1, 4)');
+ const component=`import {defineComponent} from '@lux/visual-sdk';
+ import {Scene,Mesh,PlaneGeometry,MeshBasicNodeMaterial,OrthographicCamera} from 'three/webgpu';
+ import {uniform,vec3} from 'three/tsl';
+ export default defineComponent({metadata:{declarationVersion:1,key:'test/many-controls',label:'Many controls',description:'Control-count test',tags:[],inputs:{},outputs:{image:{type:{kind:'image',colorSpace:'linear-srgb',alphaMode:'premultiplied'},label:'Image',description:'Preview'}},controls:${JSON.stringify(controls)},controlDescriptions:${JSON.stringify(Object.fromEntries(Object.keys(controls).map(id=>[id,'Live value'])))},lifecycle:{state:'stateless',reset:'seed'}},async create(){
+ const value=uniform(.5),material=new MeshBasicNodeMaterial();material.colorNode=vec3(value,.25,.75);
+ const geometry=new PlaneGeometry(2,2),scene=new Scene();scene.add(new Mesh(geometry,material));const camera=new OrthographicCamera(-1,1,1,-1,.1,10);camera.position.z=1;
+ return {update(frame){value.value=frame.controls.control63;},async evaluate(_inputs,evaluation){return {image:await evaluation.render(scene,camera)};},reset(){},dispose(){geometry.dispose();material.dispose();}};}});`;
  const nodeId='11111111-1111-4111-8111-111111111111',expose=Object.keys(controls).map(id=>({id,nodeId,controlId:id}));
  const composition=`import {defineComposition} from '@lux/visual-sdk';import ball from './ball.ts';export default defineComposition({definitions:{ball},nodes:[{id:'${nodeId}',definition:'ball'}],edges:[],output:{nodeId:'${nodeId}',portId:'image'},expose:${JSON.stringify(expose)}});`;
  current=await call('read');await call('build',{source:{sdkVersion:'0.4.0',entry:'composition.ts',files:{'composition.ts':composition,'ball.ts':component}},expectedDraftVersion:current.draftVersion});
