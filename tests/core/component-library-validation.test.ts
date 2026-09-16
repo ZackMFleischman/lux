@@ -127,7 +127,7 @@ test('library validation rejects standalone typed leaves with unsupported signal
   const source = pathGeneratorLeaf();
   source.files[source.entry] = source.files[source.entry]!.replace(pathsPort, signalPort);
 
-  assert.throws(() => libraryValidationSource(source), /only image and paths2d ports/i);
+  assert.throws(() => libraryValidationSource(source), /only image, paths2d and shader-field ports/i);
 });
 
 test('library validation reserves two source-file slots for a composition image boundary', () => {
@@ -135,4 +135,28 @@ test('library validation reserves two source-file slots for a composition image 
   for (let index = 0; index < 28; index++) source.files[`extra-${index}.ts`] = '';
 
   assert.throws(() => libraryValidationSource(source), /two free source files/i);
+});
+
+const shaderFieldPort = "{type:{kind:'shader-field',version:1,abi:'lux/test-field/v1'},label:'Field',description:'Reusable shader field'}";
+function fieldLeaf(consumer=false): SourceBundle {
+  const source=pathGeneratorLeaf();
+  let text=source.files[source.entry]!.replace(pathsPort,shaderFieldPort).replace("context.paths('paths',{version:1,paths:[]})","context.shaderField('paths',{version:1,abi:'lux/test-field/v1',fragments:{body:'let field = 1.0;'},values:{scale:1}})");
+  if(consumer) text=text.replace('inputs:{},outputs:{paths:'+shaderFieldPort+'}', 'inputs:{field:'+shaderFieldPort+'},outputs:{image:'+imagePort+'}').replace("paths:context.shaderField('paths',{version:1,abi:'lux/test-field/v1',fragments:{body:'let field = 1.0;'},values:{scale:1}})","image:await context.render({}, {}, 'image')");
+  if(consumer) text=text.replace('async evaluate(_inputs,context){return', 'async evaluate(inputs,context){void inputs.field.data.abi;void inputs.field.data.fragments;return');
+  source.files[source.entry]=text;return source;
+}
+test('Library shader-field producer compiles with a typed sink and unchanged source',async()=>{
+  const source=fieldLeaf(),before=structuredClone(source);await validateLibraryCandidate(source,compileForLibrary);assert.deepEqual(source,before);
+});
+test('Library shader-field consumer compiles with an ABI-matched provider',async()=>{
+  await validateLibraryCandidate(fieldLeaf(true),compileForLibrary);
+});
+
+test('Library shader-field consumers retain typed resource diagnostics',async()=>{
+  const source=fieldLeaf(true);source.files[source.entry]=source.files[source.entry]!.replace('inputs.field.data.abi','inputs.field.texture');
+  await assert.rejects(validateLibraryCandidate(source,compileForLibrary),/texture.*ShaderFieldResource|ShaderFieldResource.*texture/i);
+});
+test('Library shader-field producers reject fabricated unbranded resources',async()=>{
+  const source=fieldLeaf();source.files[source.entry]=source.files[source.entry]!.replace("context.shaderField('paths',{version:1,abi:'lux/test-field/v1',fragments:{body:'let field = 1.0;'},values:{scale:1}})","{data:{version:1,abi:'lux/test-field/v1',fragments:{},values:{}}}");
+  await assert.rejects(validateLibraryCandidate(source,compileForLibrary),/shaderFieldResourceBrand|ShaderFieldResource/i);
 });

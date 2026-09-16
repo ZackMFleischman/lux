@@ -10,6 +10,7 @@ export async function discoverVisualSdk() {
     example: await readFile(new URL('../examples/parameters.ts', import.meta.url), 'utf8'),
     composition: { sdkVersion: '0.4.0', executionModel: 'image-chain-v1', supportedExecutionModels: ['image-chain-v1', 'typed-image-graph-v1'],
       contractSource: await readFile(new URL('./sdk-composition.ts', import.meta.url), 'utf8'),
+      shaderFieldContractSource: await readFile(new URL('../../runtime-contracts/src/shader-field.d.mts', import.meta.url), 'utf8'),
       pathsContractSource: await readFile(new URL('../../runtime-contracts/src/paths2d.d.mts', import.meta.url), 'utf8'),
       profileContractSource: await readFile(new URL('../../runtime-contracts/src/composition-profile.d.mts', import.meta.url), 'utf8') },
     legacy: { sdkVersion: '0.1.0', contractSource: await readFile(new URL('./index.ts', import.meta.url), 'utf8'),

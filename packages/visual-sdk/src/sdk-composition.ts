@@ -2,10 +2,13 @@ import {normalizeComponentDeclaration} from '../../runtime-contracts/src/compone
 import type {ComponentDeclaration,ComponentMetadata} from '../../runtime-contracts/src/components.mjs';
 import type {ControlDeclarations,ControlsOf} from '../../runtime-contracts/src/parameters.mjs';
 import type {Paths2DSnapshot} from '../../runtime-contracts/src/paths2d.mjs';
+import type {ShaderFieldSnapshot} from '../../runtime-contracts/src/shader-field.mjs';
 import type {OutputSettings} from '../../runtime-contracts/src/index.ts';
 export const sdkVersion='0.4.0' as const;
 declare const imageResourceBrand:unique symbol;
 declare const paths2dResourceBrand:unique symbol;
+declare const shaderFieldResourceBrand:unique symbol;
+export interface ShaderFieldResource {readonly [shaderFieldResourceBrand]:true;readonly data:ShaderFieldSnapshot}
 export interface ImageResource {readonly [imageResourceBrand]:true;readonly width:number;readonly height:number;readonly colorSpace:'linear-srgb';readonly alphaMode:'premultiplied';readonly texture:unknown}
 export interface Paths2DResource {readonly [paths2dResourceBrand]:true;readonly data:Paths2DSnapshot}
 export interface ComponentFrame<C extends ControlDeclarations=ControlDeclarations>{readonly tick:number;readonly timeSeconds:number;readonly deltaSeconds:number;readonly controls:ControlsOf<C>;readonly events:readonly never[]}
@@ -15,12 +18,12 @@ type PortDeclarations=ComponentDeclaration['inputs'];
 type LegacyImagePort={readonly type:{readonly kind:'image';readonly colorSpace:'linear-srgb';readonly alphaMode:'premultiplied'};readonly label:string;readonly description:string};
 type LegacyImageInputs=Readonly<Record<string,LegacyImagePort>>;
 type LegacyImageOutputs={readonly image:LegacyImagePort};
-export type ResourceForPort<P extends PortDeclarations[string]['type']>=P extends {readonly kind:'image'}?ImageResource:P extends {readonly kind:'paths2d'}?Paths2DResource:never;
+export type ResourceForPort<P extends PortDeclarations[string]['type']>=P extends {readonly kind:'image'}?ImageResource:P extends {readonly kind:'paths2d'}?Paths2DResource:P extends {readonly kind:'shader-field'}?ShaderFieldResource:never;
 export type PortResources<P extends PortDeclarations>=Readonly<{readonly [K in keyof P]:ResourceForPort<P[K]['type']>}>;
 type PortIdsOfKind<P extends PortDeclarations,K extends string>={[I in keyof P]:P[I]['type']['kind'] extends K?I:never}[keyof P]&string;
 type IsAny<T>=0 extends (1&T)?true:false;
 type RenderArguments<O extends PortDeclarations>=IsAny<O> extends true?[scene:unknown,camera:unknown,portId?:string]:'image' extends PortIdsOfKind<O,'image'>?[scene:unknown,camera:unknown,portId?:PortIdsOfKind<O,'image'>]:[scene:unknown,camera:unknown,portId:PortIdsOfKind<O,'image'>];
-export interface EvaluationContext<O extends PortDeclarations=any>{render(...arguments_:RenderArguments<O>):Promise<ImageResource>;paths(portId:PortIdsOfKind<O,'paths2d'>,snapshot:Paths2DSnapshot):Paths2DResource}
+export interface EvaluationContext<O extends PortDeclarations=any>{render(...arguments_:RenderArguments<O>):Promise<ImageResource>;paths(portId:PortIdsOfKind<O,'paths2d'>,snapshot:Paths2DSnapshot):Paths2DResource;shaderField(portId:PortIdsOfKind<O,'shader-field'>,snapshot:ShaderFieldSnapshot):ShaderFieldResource}
 export interface ComponentInstance<C extends ControlDeclarations=ControlDeclarations,I extends PortDeclarations=LegacyImageInputs,O extends PortDeclarations=LegacyImageOutputs>{update(frame:ComponentFrame<C>):void;evaluate(inputs:PortResources<I>,context:EvaluationContext<O>):Promise<PortResources<O>>;reset(seed:number):void|Promise<void>;dispose():void|Promise<void>}
 export interface ComponentDefinition<C extends ControlDeclarations=ControlDeclarations,I extends PortDeclarations=LegacyImageInputs,O extends PortDeclarations=LegacyImageOutputs>{readonly kind:'component';readonly sdkVersion:'0.4.0';readonly metadata:Omit<ComponentMetadata,'inputs'|'outputs'>&{readonly inputs:I;readonly outputs:O};create(context:ComponentContext):Promise<ComponentInstance<C,I,O>>}
 export function defineComponent<const C extends ControlDeclarations,const I extends PortDeclarations,const O extends PortDeclarations>(definition:{readonly metadata:Omit<ComponentDeclaration,'inputs'|'outputs'|'controls'|'controlDescriptions'>&{readonly inputs:I;readonly outputs:O;readonly controls:C;readonly controlDescriptions:{readonly [K in keyof C]:string}};create(context:ComponentContext):Promise<ComponentInstance<NoInfer<C>,NoInfer<I>,NoInfer<O>>>}):ComponentDefinition<C,I,O>{

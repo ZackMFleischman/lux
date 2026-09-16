@@ -87,6 +87,7 @@ export function snapshot(values:readonly unknown[], names:readonly string[], byt
 function matches(a:InitialPortType,b:InitialPortType):boolean{
   if(a.kind==='signal')return b.kind==='signal'&&a.unit===b.unit&&a.clock===b.clock&&a.value===b.value;
   if(a.kind==='image')return b.kind==='image'&&a.colorSpace===b.colorSpace&&a.alphaMode===b.alphaMode;
+  if(a.kind==='shader-field')return b.kind==='shader-field'&&a.version===b.version&&a.abi===b.abi;
   return b.kind==='paths2d'&&a.version===b.version&&a.coordinateSpace===b.coordinateSpace;
 }
 function ref(v:unknown,p:string):PortRef{const r=record(v,p,['nodeId','portId']);if(typeof r.portId!=='string')invalid(p,'expected port ID');return {nodeId:checked(()=>nodeIdSchema.parse(r.nodeId),p),portId:r.portId};}

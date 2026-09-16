@@ -118,6 +118,7 @@ function portRef(value:unknown,path:string): PortRef {
 function matches(a:InitialPortType,b:InitialPortType): boolean {
   if(a.kind==='signal')return b.kind==='signal'&&a.value===b.value&&a.clock===b.clock&&a.unit===b.unit;
   if(a.kind==='image')return b.kind==='image'&&a.colorSpace===b.colorSpace&&a.alphaMode===b.alphaMode;
+  if(a.kind==='shader-field')return b.kind==='shader-field'&&a.version===b.version&&a.abi===b.abi;
   return b.kind==='paths2d'&&a.version===b.version&&a.coordinateSpace===b.coordinateSpace;
 }
 

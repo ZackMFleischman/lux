@@ -1,15 +1,16 @@
-import type {ComponentDefinition,ComponentFrame,ComponentContext,ImageResource,Paths2DResource} from '../../../visual-sdk/src/sdk-composition.ts';
+import type {ComponentDefinition,ComponentFrame,ComponentContext,ImageResource,Paths2DResource,ShaderFieldResource} from '../../../visual-sdk/src/sdk-composition.ts';
+import type {ShaderFieldSnapshot} from '../../../runtime-contracts/src/shader-field.mjs';
 import type {Paths2DSnapshot} from '../../../runtime-contracts/src/paths2d.mjs';
 import type {GraphRuntimePlan} from '../graph/runtime-plan.ts';
 import {readGraphRuntimePlan} from '../graph/runtime-plan.ts';
 import type {BackendImage,CpuResourceBackend,FrameOutput,InputView,OutputToken,ResourceHost} from '../graph/resources.ts';
-import {createResourceHost,attachResourceHost,beginResourceFrame,openResourceNode,completeResourceNode,failResourceNode,releaseResourceCache,finishResourceFrame,disposeResourceHost,readResourceInputImage,readResourceOutputImage,readResourceOutputPaths} from '../graph/resources.ts';
+import {createResourceHost,attachResourceHost,beginResourceFrame,openResourceNode,completeResourceNode,failResourceNode,releaseResourceCache,finishResourceFrame,disposeResourceHost,readResourceInputImage,readResourceOutputImage,readResourceOutputPaths,readResourceOutputShaderField} from '../graph/resources.ts';
 import {SeededRandom} from '../seed.ts';
 
 type Backend=Readonly<{resources:CpuResourceBackend;stage(scene:unknown,camera:unknown):void;texture(image:BackendImage):unknown;present(image:BackendImage):void|Promise<void>;drain():Promise<void>}>;
 type AnyComponent=ComponentDefinition<any,any,any>;
 type Options=Readonly<{plan:GraphRuntimePlan;definitions:Readonly<Record<string,AnyComponent>>;context:ComponentContext;backend:Backend;nodeControls?:(nodePath:readonly string[],frame:ComponentFrame)=>Readonly<Record<string,number>>}>;
-type WrappedResource={output:OutputToken|InputView;kind:'image'|'paths2d';image?:BackendImage;paths?:Paths2DSnapshot};
+type WrappedResource={output:OutputToken|InputView;kind:'image'|'paths2d'|'shader-field';image?:BackendImage;paths?:Paths2DSnapshot;shaderField?:ShaderFieldSnapshot};
 const pathKey=(path:readonly string[])=>JSON.stringify(path);
 
 function outputResources(value:unknown,ports:Readonly<Record<string,{type:{kind:string}}>>,tokens:WeakMap<object,WrappedResource>):{tokens:Record<string,OutputToken>;resources:Record<string,WrappedResource>} {
@@ -30,6 +31,7 @@ export async function createImageCompositionVisual(options:Options){
  const host:ResourceHost=createResourceHost({generation:1,sceneSeed:options.context.settings.seed,initialClockEpoch:0,width:options.context.settings.width,height:options.context.settings.height,format:'rgba8unorm',colorSpace:'linear-srgb',alphaMode:'premultiplied'},options.backend.resources);attachResourceHost(host,options.plan);
  const tokens=new WeakMap<object,WrappedResource>();
  const image=(output:OutputToken|InputView,backendImage:BackendImage):ImageResource=>{const value=Object.freeze({width:options.context.settings.width,height:options.context.settings.height,colorSpace:'linear-srgb' as const,alphaMode:'premultiplied' as const,texture:options.backend.texture(backendImage)}) as ImageResource;tokens.set(value,{output,kind:'image',image:backendImage});return value;};
+ const shaderField=(output:OutputToken|InputView,data:ShaderFieldSnapshot):ShaderFieldResource=>{const value=Object.freeze({data}) as ShaderFieldResource;tokens.set(value,{output,kind:'shader-field',shaderField:data});return value;};
  const paths=(output:OutputToken|InputView,data:Paths2DSnapshot):Paths2DResource=>{const value=Object.freeze({data}) as Paths2DResource;tokens.set(value,{output,kind:'paths2d',paths:data});return value;};
  return Object.freeze({
   update(next:ComponentFrame){if(disposed)throw Error('Composition disposed');frame=next;},
@@ -39,10 +41,11 @@ export async function createImageCompositionVisual(options:Options){
      const controls:any=options.nodeControls?{...options.nodeControls(node.nodePath,frame)}:{...node.initialControls};
      if(!options.nodeControls)for(const [publicId,targets] of Object.entries(dto.publicControlBindings))for(const target of targets)if(target.active&&pathKey(target.nodePath)===key)controls[target.controlId]=(frame.controls as any)[publicId];
      const inputs:any={},imageInputs:InputView[]=[];
-     for(const [portId,view] of Object.entries(evaluation.inputs)){const kind=definition.metadata.inputs[portId]!.type.kind;if(kind==='image'){const backendImage=readResourceInputImage(host,evaluation.scope,view);inputs[portId]=image(view,backendImage);imageInputs.push(view);}else if(kind==='paths2d'){const data=evaluation.resources.readPaths(view);inputs[portId]=paths(view,data);}else throw Error('Unsupported authored signal input');}
+     for(const [portId,view] of Object.entries(evaluation.inputs)){const kind=definition.metadata.inputs[portId]!.type.kind;if(kind==='image'){const backendImage=readResourceInputImage(host,evaluation.scope,view);inputs[portId]=image(view,backendImage);imageInputs.push(view);}else if(kind==='paths2d'){const data=evaluation.resources.readPaths(view);inputs[portId]=paths(view,data);}else if(kind==='shader-field'){const data=evaluation.resources.readShaderField(view);inputs[portId]=shaderField(view,data);}else throw Error('Unsupported authored signal input');}
      instance.update(Object.freeze({...frame,controls:Object.freeze(controls)}));
      let renderPending=false;
      const context=Object.freeze({
+      shaderField:(portId:string,snapshot:unknown)=>{const token=evaluation.resources.shaderField(portId,snapshot),data=readResourceOutputShaderField(host,evaluation.scope,token);return shaderField(token,data);},
       paths:(portId:string,snapshot:unknown)=>{const token=evaluation.resources.paths(portId,snapshot),data=readResourceOutputPaths(host,evaluation.scope,token);return paths(token,data);},
       render:async(scene:unknown,camera:unknown,portId='image')=>{if(renderPending)throw Error('Concurrent component render calls are unsupported');renderPending=true;try{options.backend.stage(scene,camera);const token=await evaluation.resources.image(portId,{kind:'image',width:options.context.settings.width,height:options.context.settings.height,format:'rgba8unorm',colorSpace:'linear-srgb',alphaMode:'premultiplied'},imageInputs);const backendImage=readResourceOutputImage(host,evaluation.scope,token);return image(token,backendImage);}finally{renderPending=false;}},
      });

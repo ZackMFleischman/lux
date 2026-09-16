@@ -37,3 +37,14 @@ Await each `evaluation.render` before starting another render in the same evalua
 `node --test examples/components/wandering-tracers/*.test.ts` checks geometry/data behavior. `node scripts/test-wandering-tracers.mjs painting` (or `overlay`, `library`, `independent-wrapper`, `independent-direct`) launches an isolated actual Studio instance, captures it, and checks save/open and invalid-edit preservation. Build Studio first with `node apps/studio/build.mjs`. These are separate bounded scenarios to fit the test host's lifetime.
 
 Known prototype limit: if a tracer exits and later re-enters the same region, its style transition can soften again while the head is inside. Cuts use the sampled polyline, while the visible ribbon is spline-smoothed.
+
+## Organic Regions shader field
+
+`regions.ts` is an independent Library leaf. It exposes Scale, Flowing bends, Region growth, Variation and Drift. Its output port is `shader-field` version 1, ABI `lux/organic-regions/v1`. A compatible consumer receives exactly:
+
+- Fragments `regionGeometry` and `lpRegion` (source stays fixed for an instance).
+- Values `growth`, `motion`, `scale`, `seed`, `warp` (live finite scalars).
+
+`regionGeometry` is inserted in a fragment shader body after `p`, `seed`, and `t` are defined. It uses the original `form`, `music`, and `character` vectors, plus `lpPhrase`, `lpNoise`, `lpHash2` and `lpRegion`. It declares the region coordinates, owner/center, random identity, weighted cell planes, distance to edge and derivative-based pixel size used by subsequent paint and hatch code. `lpRegion` is the weighted moving-site helper; it relies on the original noise/hash/phrase basis. The complete consumer and vector packing are shown in `painting.ts`.
+
+This is shader composition, so no region image is quantized or rendered in an extra pass. The exact ABI is deliberate: another renderer must provide the documented painting basis and insertion context. It is not a generic pre-rendered mask. Scene graph controls remain separate and the scene-wide aliases keep their earlier names.

@@ -146,12 +146,14 @@ function typedProvider(outputs: Readonly<Record<string, PortDeclaration>>): stri
   const declared = Object.entries(outputs).map(([id, port]) => `${JSON.stringify(id)}:${portSource(port)}`).join(',');
   const evaluated = Object.entries(outputs).map(([id, port]) => `${JSON.stringify(id)}:${port.type.kind === 'image'
     ? `await context.render({}, {}, ${JSON.stringify(id)})`
-    : `context.paths(${JSON.stringify(id)},{version:1,paths:[]})`}`).join(',');
+    : port.type.kind === 'shader-field'
+      ? `context.shaderField(${JSON.stringify(id)},{version:1,abi:${JSON.stringify(port.type.abi)},fragments:{},values:{}})`
+      : `context.paths(${JSON.stringify(id)},{version:1,paths:[]})`}`).join(',');
   return `import {defineComponent} from '@lux/visual-sdk';export default defineComponent({metadata:{declarationVersion:1,key:'lux/library-validation-provider',label:'Validation provider',description:'Provides closed compile-only typed inputs.',tags:['internal'],inputs:{},outputs:{${declared}},controls:{},controlDescriptions:{},lifecycle:{state:'stateless',reset:'seed'}},async create(){return {update(){},async evaluate(_inputs,context){return {${evaluated}}},reset(){},dispose(){}}}});`;
 }
 
 function typedSink(inputId: string, input: PortDeclaration): string {
-  return `import {defineComponent} from '@lux/visual-sdk';export default defineComponent({metadata:{declarationVersion:1,key:'lux/library-validation-sink',label:'Validation sink',description:'Closes a typed component output as an image.',tags:['internal'],inputs:{${JSON.stringify(inputId)}:${portSource(input)}},outputs:{image:${imagePortSource()}},controls:{},controlDescriptions:{},lifecycle:{state:'stateless',reset:'seed'}},async create(){return {update(){},async evaluate(inputs,context){void inputs[${JSON.stringify(inputId)}].data.paths.length;return {image:await context.render({}, {}, 'image')}},reset(){},dispose(){}}}});`;
+  return `import {defineComponent} from '@lux/visual-sdk';export default defineComponent({metadata:{declarationVersion:1,key:'lux/library-validation-sink',label:'Validation sink',description:'Closes a typed component output as an image.',tags:['internal'],inputs:{${JSON.stringify(inputId)}:${portSource(input)}},outputs:{image:${imagePortSource()}},controls:{},controlDescriptions:{},lifecycle:{state:'stateless',reset:'seed'}},async create(){return {update(){},async evaluate(inputs,context){void inputs[${JSON.stringify(inputId)}].data;return {image:await context.render({}, {}, 'image')}},reset(){},dispose(){}}}});`;
 }
 
 function imagePortSource(): string {
@@ -166,7 +168,7 @@ function typedLeafHarness(entry: string, metadata: ComponentMetadata, providerPa
   const inputPorts = Object.entries(metadata.inputs);
   const imageOutput = Object.entries(metadata.outputs).find(([, port]) => port.type.kind === 'image');
   const finalOutput = imageOutput ?? Object.entries(metadata.outputs)[0];
-  if (!finalOutput) throw Error('Library typed component requires at least one image or paths2d output');
+  if (!finalOutput) throw Error('Library typed component requires at least one image, paths2d or shader-field output');
   const imports = [`import candidate from ${JSON.stringify(`./${entry}`)};`];
   if (providerPath) imports.push(`import provider from ${JSON.stringify(`./${providerPath}`)};`);
   if (sinkPath) imports.push(`import sink from ${JSON.stringify(`./${sinkPath}`)};`);
@@ -187,8 +189,8 @@ function typedLeafHarness(entry: string, metadata: ComponentMetadata, providerPa
 function validateTypedPorts(metadata: ComponentMetadata): void {
   for (const [direction, ports] of [['input', metadata.inputs], ['output', metadata.outputs]] as const) {
     for (const [id, port] of Object.entries(ports)) {
-      if (port.type.kind !== 'image' && port.type.kind !== 'paths2d') {
-        throw Error(`Library component ${direction} ${id} uses ${port.type.kind}; only image and paths2d ports are supported`);
+      if (port.type.kind !== 'image' && port.type.kind !== 'paths2d' && port.type.kind !== 'shader-field') {
+        throw Error(`Library component ${direction} ${id} uses ${port.type.kind}; only image, paths2d and shader-field ports are supported`);
       }
     }
   }
@@ -202,9 +204,9 @@ function isLegacyImageLeaf(metadata: ComponentMetadata): boolean {
 function typedLeafValidationSource(source: SourceBundle, metadata: ComponentMetadata): SourceBundle {
   validateTypedPorts(metadata);
   const output = Object.entries(metadata.outputs).find(([, port]) => port.type.kind === 'image') ?? Object.entries(metadata.outputs)[0];
-  if (!output) throw Error('Library typed component requires at least one image or paths2d output');
+  if (!output) throw Error('Library typed component requires at least one image, paths2d or shader-field output');
   const needsProvider = Object.keys(metadata.inputs).length > 0;
-  const needsSink = output[1].type.kind === 'paths2d';
+  const needsSink = output[1].type.kind !== 'image';
   const helperKinds = [...(needsProvider ? ['provider'] : []), ...(needsSink ? ['sink'] : [])];
   const paths = harnessPaths(source, helperKinds, 'typed component');
   let helperIndex = 0;

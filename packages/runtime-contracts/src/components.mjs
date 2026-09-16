@@ -64,6 +64,11 @@ function portType(input, path) {
     if (raw.version !== 1 || raw.coordinateSpace !== 'canvas-height') invalid(path, 'expected paths2d version 1 in canvas-height coordinates');
     return Object.freeze({ kind: 'paths2d', version: 1, coordinateSpace: 'canvas-height' });
   }
+  if (raw.kind === 'shader-field') {
+    record(raw, path, ['kind', 'version', 'abi']);
+    if (raw.version !== 1 || typeof raw.abi !== 'string' || raw.abi.length > 96 || !/^[a-z][a-z0-9-]*(?:\/[a-z0-9][a-z0-9-]*)+$/.test(raw.abi)) invalid(path, 'expected shader-field version 1 with a bounded slash-separated ABI identifier');
+    return Object.freeze({ kind: 'shader-field', version: 1, abi: raw.abi });
+  }
   invalid(path, 'unsupported port type');
 }
 

@@ -1,4 +1,4 @@
-import { defineComponent, type Paths2DResource } from '@lux/visual-sdk';
+import { defineComponent, type Paths2DResource, type ShaderFieldResource } from '@lux/visual-sdk';
 import {
   Scene,
   DataTexture,
@@ -14,70 +14,14 @@ import { uniform, texture, uv, vec4, wgslFn } from 'three/tsl';
 
 // A deliberately self-contained painting study. All pattern coordinates share
 // the same slowly deforming sheet; region identities never reseed each frame.
-const painting = wgslFn(`
+const paintingBeforeRegions = `
 fn livingPainting(st: vec2f, view: vec4f, form: vec4f, hatch: vec4f, pigment: vec4f, ink: vec4f, character: vec4f, music: vec4f, variety: vec4f, tracers: vec4f, trailData: texture_2d<f32>) -> vec4f {
   let t = view.x;
   let p = (st - 0.5) * vec2f(view.y, 1.0) * form.x;
   let seed = vec2f(view.z * 3.17, view.z * 7.31);
-  // Compact regions: a gentle turning current and bounded local perturbations.
-  // Avoid stacked directional shears, which stretched the earlier study.
-  var q = p;
-  let phrase = lpPhrase(p, t);
-  let energy = music.x * (1.0 + music.y * (phrase - 0.5) * 0.85);
-  let turn = form.y * 0.075 * sin(t * 0.055) * exp(-dot(p, p) * 0.035);
-  q += vec2f(-p.y, p.x) * turn;
-  let drift = vec2f(t * 0.009, -t * 0.007);
-  q += form.y * 0.19 * (vec2f(lpNoise(p * 1.25 + seed + drift), lpNoise(p * 1.25 + seed + 48.9 - drift)) - 0.5);
-  q += form.y * 0.065 * (0.65 + energy * 0.35)
-    * (vec2f(lpNoise(p * 3.2 + seed + drift), lpNoise(p * 3.2 + seed + 17.8 - drift)) - 0.5);
-  q += character.y * 0.022 * (vec2f(lpNoise(p * 7.0 + seed), lpNoise(p * 7.0 + seed + 13.8)) - 0.5);
-  let cell = floor(q);
-  var first = 1000.0;
-  var owner = vec2f(0.0);
-  var center = vec2f(0.0);
-  // Nearby weighted seeds trade territory continuously. No frame-wise randomness.
-  for (var y = -2; y <= 2; y++) {
-    for (var x = -2; x <= 2; x++) {
-      let id = cell + vec2f(f32(x), f32(y));
-      let region = lpRegion(id, seed, t, form, music);
-      let site = region.xy;
-      let weight = region.z;
-      let d = dot(q - site, q - site) - weight;
-      if (d < first) {
-        first = d;
-        owner = id;
-        center = site;
-      }
-    }
-  }
-  let r = lpHash2(owner + seed + 7.0);
-  let local = q - center;
-  // True minimum distance to the competing weighted bisectors. The original
-  // first/second shortcut changed denominator abruptly, creating stray arcs.
-  // Reuse the weighted cell's half planes for every tracer.
-  var cellPlanes: array<vec3f, 25>;
-  var planeCount = 0;
-  let ownerWeight = lpRegion(owner, seed, t, form, music).z;
-  var edge = 1000.0;
-  for (var y = -2; y <= 2; y++) {
-    for (var x = -2; x <= 2; x++) {
-      let id = cell + vec2f(f32(x), f32(y));
-      if (any(id != owner)) {
-        let region = lpRegion(id, seed, t, form, music);
-        let site = region.xy;
-        let weight = region.z;
-        let d = dot(q - site, q - site) - weight;
-        let normal = 2.0 * (site - center);
-        let plane = dot(site, site) - weight - dot(center, center) + ownerWeight;
-        cellPlanes[planeCount] = vec3f(normal, plane);
-        planeCount += 1;
-        edge = min(edge, max(0.0, d - first) / max(2.0 * length(site - center), 0.01));
-      }
-    }
-  }
-  let pixelSize = max(length(dpdx(q)), length(dpdy(q)));
-  let edgeAA = clamp(fwidth(edge), 0.0001, pixelSize * 1.4);
+`;
 
+const paintingAfterRegions = `
   // Broad translucent washes cross region boundaries; local tints add identity.
   // Pigment has its own gentle movement, so a changing boundary cannot drag
   // the wash into ribbons. The color phrase answers the shape phrase later.
@@ -330,26 +274,9 @@ fn lpPhrase(position: vec2f, time: f32) -> f32 {
   return smoothstep(0.10, 0.58, phase) * (1.0 - smoothstep(0.66, 0.91, phase));
 }
 
-fn lpRegion(id: vec2f, seed: vec2f, time: f32, form: vec4f, music: vec4f) -> vec3f {
-  let random = lpHash2(id + seed);
-  let group = floor(id * 0.5);
-  let slot = id - group * 2.0;
-  let anchorSlot = floor(lpHash(group + seed + 137.0) * 4.0);
-  let anchor = select(0.0, 1.0, slot.x + slot.y * 2.0 == anchorSlot);
-  let phrase = lpPhrase(id + 0.5, time);
-  let groupAngle = lpHash(group + seed + 51.0) * 6.283185;
-  let localAngle = lpHash(id + seed + 87.0) * 6.283185;
-  let motionGate = 0.42 + music.y * 0.58 * phrase;
-  let movement = vec2f(sin(time * 0.10 + groupAngle), cos(time * 0.085 + groupAngle)) * 0.10
-    + vec2f(cos(time * 0.13 + localAngle), sin(time * 0.11 + localAngle)) * 0.045;
-  let site = id + 0.5 + (random - 0.5) * 0.83 + form.z * motionGate * movement;
-  let hierarchy = music.w * (anchor * 0.86 - 0.17);
-  let staticWeight = (lpHash(id + seed + 13.0) - 0.5) * 0.72 + hierarchy;
-  let response = mix(-0.65, 1.0, anchor);
-  let growth = form.w * music.x * 0.37 * response * music.y * (phrase - 0.45);
-  return vec3f(site, staticWeight + growth);
-}
+`;
 
+const paintingAfterRegionHelper = `
 fn lpHash(p: vec2f) -> f32 {
   var p3 = fract(vec3f(p.x, p.y, p.x) * 0.1031);
   p3 += dot(p3, p3.yzx + 33.33);
@@ -371,24 +298,30 @@ fn lpNoise(p: vec2f) -> f32 {
 fn lpFbm(p: vec2f) -> f32 {
   return lpNoise(p) * 0.56 + lpNoise(p * 2.03 + 7.1) * 0.27 + lpNoise(p * 4.09 + 19.3) * 0.12 + lpNoise(p * 8.13 + 31.7) * 0.05;
 }
-`);
+`;
+
+const regionAbi = 'lux/organic-regions/v1';
+const regionFragmentKeys = ['lpRegion', 'regionGeometry'] as const;
+const regionValueKeys = ['growth', 'motion', 'scale', 'seed', 'warp'] as const;
+
+function hasExactKeys(record: Readonly<Record<string, unknown>>, expected: readonly string[]): boolean {
+  const keys = Object.keys(record).sort();
+  return keys.length === expected.length && keys.every((key, index) => key === expected[index]);
+}
 
 export default defineComponent({
   metadata: {
     declarationVersion: 1, key: 'lux/living-painting', label: 'Living Painting',
     description: 'Organic watercolor regions that adopt new colors and hatch styles when shared tracer paths cross them.',
     tags: ['painting', 'regions', 'watercolor'],
-    inputs: { paths: { type: { kind: 'paths2d', version: 1, coordinateSpace: 'canvas-height' }, label: 'Paths', description: 'Shared tracer geometry used to carve the regions.' } },
+    inputs: {
+      paths: { type: { kind: 'paths2d', version: 1, coordinateSpace: 'canvas-height' }, label: 'Paths', description: 'Shared tracer geometry used to carve the regions.' },
+      regions: { type: { kind: 'shader-field', version: 1, abi: 'lux/organic-regions/v1' }, label: 'Regions', description: 'Organic region geometry and motion shader field.' },
+    },
     outputs: { image: { type: { kind: 'image', colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }, label: 'Image', description: 'The painting before tracer ink is composited.' } },
   controls: {
     pace: { type: 'number', group: 'Motion', label: 'Pace', default: 1.24, min: 0, max: 3, step: 0.01 },
-    motion: { type: 'number', group: 'Motion', label: 'Drift', default: 1.08, min: 0, max: 1.5, step: 0.01 },
     phrasing: { type: 'number', group: 'Motion', label: 'Tension and release', default: 1, min: 0, max: 1, step: 0.01, description: 'Slow build, crest, release, and rest. Shapes lead; linework and color follow.' },
-
-    scale: { type: 'number', group: 'Regions', label: 'Scale', default: 6.2, min: 2, max: 10, step: 0.01 },
-    warp: { type: 'number', group: 'Regions', label: 'Flowing bends', default: 2.65, min: 0, max: 3, step: 0.01 },
-    growth: { type: 'number', group: 'Regions', label: 'Region growth', default: 0.88, min: 0, max: 1.5, step: 0.01 },
-    seed: { type: 'number', group: 'Regions', label: 'Variation', default: 7, min: 0, max: 100, step: 1 },
 
     composition: { type: 'number', group: 'Composition', label: 'Quiet to intricate', default: 0.44, min: 0, max: 1.5, step: 0.01 },
     tension: { type: 'number', group: 'Composition', label: 'Tension', default: 0.72, min: 0, max: 1.5, step: 0.01, description: 'Strength of local pressure, contrasting line directions, and rhythmic compression.' },
@@ -419,12 +352,7 @@ export default defineComponent({
 
   },
     controlDescriptions: {pace: 'pace setting for the painting.',
-      motion: 'motion setting for the painting.',
       phrasing: 'phrasing setting for the painting.',
-      scale: 'scale setting for the painting.',
-      warp: 'warp setting for the painting.',
-      growth: 'growth setting for the painting.',
-      seed: 'seed setting for the painting.',
       composition: 'composition setting for the painting.',
       tension: 'tension setting for the painting.',
       hierarchy: 'hierarchy setting for the painting.',
@@ -485,26 +413,61 @@ export default defineComponent({
     const pathTexture = new DataTexture(pathData, 260, 1, RGBAFormat, FloatType);
     pathTexture.minFilter = pathTexture.magFilter = NearestFilter;
     pathTexture.generateMipmaps = false;
-    const material = new MeshBasicNodeMaterial({ depthTest: false, depthWrite: false });
-    material.fragmentNode = painting(
-      uv(),
-      vec4(time, aspect, seed, 0),
-      vec4(scale, warp, motion, growth),
-      vec4(coverage, spacing, curvature, angle),
-      vec4(palette, warmth, contrast, pooling),
-      vec4(outline, hatchWidth, inkWarmth, grain),
-      vec4(composition, handDrawn, blooms, 0),
-      vec4(tension, phrasing, relation, hierarchy),
-      vec4(spacingVar, curvatureVar, angleVar, widthVar),
-      vec4(4, 0, 0, 0),
-      texture(pathTexture),
-    );
     const geometry = new PlaneGeometry(2, 2);
-    const scene = new Scene();
-    const mesh = new Mesh(geometry, material);
-    mesh.frustumCulled = false;
-    scene.add(mesh);
     const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    let material: MeshBasicNodeMaterial | undefined;
+    let scene: Scene | undefined;
+    let regionShaderSource: string | undefined;
+
+    function prepareRegions(field: ShaderFieldResource): Scene {
+      const { data } = field;
+      if (data.version !== 1 || data.abi !== regionAbi) {
+        throw Error(`Living Painting requires shader field ${regionAbi}.`);
+      }
+      if (!hasExactKeys(data.fragments, regionFragmentKeys)) {
+        throw Error(`Living Painting ${regionAbi} requires exactly the lpRegion and regionGeometry fragments.`);
+      }
+      if (!hasExactKeys(data.values, regionValueKeys)) {
+        throw Error(`Living Painting ${regionAbi} requires exactly the growth, motion, scale, seed, and warp values.`);
+      }
+
+      const source = paintingBeforeRegions
+        + data.fragments.regionGeometry
+        + paintingAfterRegions
+        + data.fragments.lpRegion
+        + paintingAfterRegionHelper;
+      if (regionShaderSource !== undefined && source !== regionShaderSource) {
+        throw Error('Living Painting region shader source changed; rebuild the component to apply it.');
+      }
+      if (regionShaderSource === undefined) {
+        regionShaderSource = source;
+        material = new MeshBasicNodeMaterial({ depthTest: false, depthWrite: false });
+        material.fragmentNode = wgslFn(source)(
+          uv(),
+          vec4(time, aspect, seed, 0),
+          vec4(scale, warp, motion, growth),
+          vec4(coverage, spacing, curvature, angle),
+          vec4(palette, warmth, contrast, pooling),
+          vec4(outline, hatchWidth, inkWarmth, grain),
+          vec4(composition, handDrawn, blooms, 0),
+          vec4(tension, phrasing, relation, hierarchy),
+          vec4(spacingVar, curvatureVar, angleVar, widthVar),
+          vec4(4, 0, 0, 0),
+          texture(pathTexture),
+        );
+        scene = new Scene();
+        const mesh = new Mesh(geometry, material);
+        mesh.frustumCulled = false;
+        scene.add(mesh);
+      }
+
+      scale.value = data.values.scale;
+      warp.value = data.values.warp;
+      growth.value = data.values.growth;
+      seed.value = data.values.seed;
+      motion.value = data.values.motion;
+      return scene!;
+    }
     let artisticTime = 0;
     let previousTime = 0;
     return {
@@ -513,11 +476,6 @@ export default defineComponent({
         artisticTime += Math.max(0, frame.timeSeconds - previousTime) * c.pace;
         previousTime = frame.timeSeconds;
         time.value = artisticTime;
-        seed.value = c.seed;
-        scale.value = c.scale;
-        warp.value = c.warp;
-        motion.value = c.motion;
-        growth.value = c.growth;
         coverage.value = c.coverage;
         spacing.value = c.spacing;
         curvature.value = c.curvature;
@@ -542,6 +500,7 @@ export default defineComponent({
         angleVar.value = c.angleVar;
       },
       async evaluate(inputs, evaluation) {
+        const scene = prepareRegions(inputs.regions as ShaderFieldResource);
         const paths = (inputs.paths as Paths2DResource).data.paths;
         if (paths.length > 4 || paths.some(path => path.points.length > 64)) {
           throw Error('Living Painting supports at most four paths of 64 points.');
@@ -560,7 +519,7 @@ export default defineComponent({
       },
       dispose() {
         geometry.dispose();
-        material.dispose();
+        material?.dispose();
         pathTexture.dispose();
       },
     };

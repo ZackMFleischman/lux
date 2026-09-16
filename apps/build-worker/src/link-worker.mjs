@@ -32,7 +32,7 @@ async function link() {
   const known = {
     ...(artifact.artifactVersion>=4 ? Object.fromEntries(['components.mjs','components.d.mts','component-profile.mjs'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
     ...(artifact.artifactVersion>=4 ? {'compiler/component-declarations.mjs':join(root,'apps/build-worker/src/component-declarations.mjs')} : {}),
-    ...(artifact.artifactVersion===5 ? Object.fromEntries(['composition-profile.mjs','composition-profile.d.mts','paths2d.mjs','paths2d.d.mts'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
+    ...(artifact.artifactVersion===5 ? Object.fromEntries(['composition-profile.mjs','composition-profile.d.mts','paths2d.mjs','paths2d.d.mts','shader-field.mjs','shader-field.d.mts'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
     ...(artifact.artifactVersion===5 ? {'compiler/composition-declarations.mjs':join(root,'apps/build-worker/src/composition-declarations.mjs')} : {}),
     ...(artifact.artifactVersion===5 ? {
       'runtime/nested-validate.ts':join(root,'packages/runtime/src/graph/nested-validate.ts'),

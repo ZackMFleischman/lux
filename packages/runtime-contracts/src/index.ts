@@ -65,6 +65,7 @@ const componentPortSchema = z.object({
     z.object({kind:z.literal('image'),colorSpace:z.literal('linear-srgb'),alphaMode:z.literal('premultiplied')}).strict(),
     z.object({kind:z.literal('signal'),value:z.literal('number'),unit:z.string().nullable(),clock:z.literal('frame')}).strict(),
     z.object({kind:z.literal('paths2d'),version:z.literal(1),coordinateSpace:z.literal('canvas-height')}).strict(),
+    z.object({kind:z.literal('shader-field'),version:z.literal(1),abi:z.string().max(96).regex(/^[a-z][a-z0-9-]*(?:\/[a-z0-9][a-z0-9-]*)+$/)}).strict(),
   ]),label:z.string(),description:z.string(),
 }).strict();
 const componentMetadataDtoSchema = z.object({

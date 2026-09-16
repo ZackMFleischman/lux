@@ -23,7 +23,8 @@ try{
  app.process().stderr.on('data',data=>void appendFile(join(output,'stderr.log'),data));const page=await app.firstWindow();
  let current;for(let i=0;i<100;i++){try{current=await call('read');if(current.source)break;}catch{}await page.waitForTimeout(100);}
  assert.ok(current?.source);
- for(let readyTry=0;readyTry<100;readyTry++){const status=await call('status');if(status.authoring?.revisionId&&status.authoring?.frameId)break;await page.waitForTimeout(100);}
+ let ready=false;for(let readyTry=0;readyTry<600;readyTry++){const status=await call('status');if(status.authoring?.revisionId&&status.authoring?.frameId&&await page.getByRole('button',{name:'Build',exact:true}).isEnabled()){ready=true;break;}await page.waitForTimeout(100);}
+ assert.ok(ready,'Initial Studio preview did not become ready');
  current=await call('read');await call('build',{source,expectedDraftVersion:current.draftVersion});await page.waitForTimeout(750);
  const capture=await call('capture');await writeFile(join(output,'frame.png'),Buffer.from(capture.base64,'base64'));await writeFile(join(output,'capture.json'),JSON.stringify(capture.metadata,null,2));
  await page.getByRole('button',{name:'Fit',exact:true}).click();await page.screenshot({path:join(output,'window.png')});
