@@ -49,3 +49,9 @@ The five new providers output `pattern`; existing Region Hatching adds `ornament
 The eleven field agreements remain unchanged. Ornament geometry evaluates its contour and attached pattern frame through the same local deformation. Parent and island anchors share a stable phrase basis; geometry leads mark pressure by three artistic seconds, pigment by five, and mark release by eight. No identity or family is reseeded during animation.
 
 The renderer uses view.w for Tension and material.w for Phrasing. Pattern settings retain density/width/variation/motion; density is never animated because fan counts are discrete. Pattern Style z/w hold deliberate local flow and drawing/release strengths. Attached-to-flowing zero keeps the local motif frame attached; Drawing-and-release zero keeps full motif coverage. These apply to every connected motif field. Watercolor retains stable warm/cool/rest families while attached warm blooms migrate continuously.
+
+## Structural events (LUX-174)
+
+Organic Regions adds loRegionEvolving(p,t,seed,shape,detail,activity) alongside the unchanged loRegion. Activity zero returns the old geometry exactly. The wrapper reuses the base traversal and original front-to-back ownership. Within parent102 or107 it grows a finite curved cut, opens a thin background gap, and assigns stable daughters117/118. A delayed bud119 grows within parent104. Existing foreground ribbons/islands remain above these events.
+
+The shared LoRegion age field carries spatially tapered transition strength; parent names the original owner. Renderer styles blend the full parent/daughter appearance in identical attached coordinates. New families are117tealspirals,118yellowrings,119violetcontours. Parent identities are never reseeded. The activity control bounds a100-artistic-second grow/hold/release/quiet schedule with staggered offsets. The scene still uses eleven independent nodes and one paint pass.

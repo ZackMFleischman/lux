@@ -58,6 +58,7 @@ try{
   await writeFile('artifacts/living-ornament/live-renderer-publication.json',JSON.stringify(result,null,2));
  }
  if(action==='save')await call('save',{path:base+'Living Ornament - Pattern Prototype.lux-scene',expectedDraftVersion:current.draftVersion,overwrite:true});
+ if(action==='save-final')await call('save',{path:base+'Living Ornament - Finished.lux-scene',expectedDraftVersion:current.draftVersion,overwrite:false});
  if(action==='parameters'){
   const s=json(await call('status')).authoring;
   await call('parameters',{instanceId:s.instanceId,expectedGeneration:s.generation,expectedRevisionId:s.revisionId,expectedControlSchemaHash:s.controlSchemaHash,values:JSON.parse(process.argv[3]),mode:'live'});

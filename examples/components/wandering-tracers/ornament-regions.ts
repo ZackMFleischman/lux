@@ -339,5 +339,103 @@ fn loRegion(p: vec2f, t: f32, seed: f32, shape: vec4f, detail: vec4f) -> LoRegio
     tangent
   );
 }
+
+// A hundred-second clock leaves a quiet opening, then prepares, grows, holds,
+// and releases each structural event before returning to quiet. Offsets keep
+// the two bisections and island birth from occurring in lockstep.
+fn loStructuralAge(t: f32, offset: f32, activity: f32) -> f32 {
+  let phase = fract(t / 100.0 - offset);
+  let prepare = smoothstep(0.10, 0.22, phase);
+  let release = 1.0 - smoothstep(0.46, 0.68, phase);
+  return prepare * release * clamp(activity, 0.0, 1.0);
+}
+
+// This wrapper is opt-in so the published loRegion path remains exact. It
+// performs one base traversal, then derives temporary ownership from that
+// result in the same owner-attached coordinates used by paint and patterns.
+fn loRegionEvolving(p: vec2f, t: f32, seed: f32, shape: vec4f, detail: vec4f,
+  activity: f32) -> LoRegion {
+  let region = loRegion(p, t, seed, shape, detail);
+  if (activity <= 0.0) { return region; }
+
+  // 102 and 107 each divide along a curved local half-plane. The finite cut
+  // begins as a small central neck and reaches the outer form as it grows;
+  // cutStrength keeps its edge distance broad and quiet during preparation.
+  var daughterIdentity = 0.0;
+  var parentIdentity = 0.0;
+  var age = 0.0;
+  if (region.identity == 102.0) {
+    daughterIdentity = 117.0;
+    parentIdentity = 102.0;
+    age = loStructuralAge(t, 0.0, activity);
+  }
+  if (region.identity == 107.0) {
+    daughterIdentity = 118.0;
+    parentIdentity = 107.0;
+    age = loStructuralAge(t, 0.10, activity);
+  }
+  if (daughterIdentity > 0.0 && age > 0.0) {
+    let cut = region.local.x + select(0.0, 0.13, parentIdentity == 102.0)
+      + sin(region.local.y * 5.0 + seed * 0.13 + parentIdentity) * 0.055;
+    let span = mix(0.045, 0.72, smoothstep(0.0, 0.78, age));
+    let cutDistance = length(vec2f(cut, max(abs(region.local.y) - span, 0.0)));
+    let cutStrength = smoothstep(0.04, 0.34, age);
+    let gap = 0.025 * smoothstep(0.60, 0.95, age);
+    if (cutDistance < gap) {
+      return LoRegion(
+        101.0,
+        0.0,
+        gap - cutDistance,
+        1.0,
+        loAttachedLocal(0, p, t, seed, detail.y),
+        vec2f(1.0, 0.0)
+      );
+    }
+    let splitEdge = min(region.edge, (cutDistance - gap) / max(cutStrength, 0.001));
+    let daughterSide = cut > 0.0;
+    let daughterAge = age * (1.0 - smoothstep(span - 0.06, span + 0.06,
+      abs(region.local.y)));
+    return LoRegion(
+      select(parentIdentity, daughterIdentity, daughterSide),
+      select(0.0, parentIdentity, daughterSide),
+      splitEdge,
+      select(age, daughterAge, daughterSide),
+      region.local,
+      region.tangent
+    );
+  }
+
+  // 119 is a known child of 104. Its rounded bud grows from a point inside
+  // the parent, while the shared edge and age allow paint to inherit smoothly.
+  let islandAge = loStructuralAge(t, 0.20, activity);
+  if (region.identity == 104.0 && islandAge > 0.0) {
+    let islandCenter = vec2f(-0.15, 0.13);
+    let growth = smoothstep(0.0, 0.72, islandAge);
+    let islandRadius = vec2f(0.18, 0.125) * growth;
+    let islandLocal = region.local - islandCenter;
+    let islandBody = loEllipse(islandLocal, islandRadius);
+    let islandBud = loEllipse(islandLocal - vec2f(0.07, 0.035) * growth, islandRadius * 0.62);
+    let islandDistance = loSmoothUnion(islandBody, islandBud, 0.026 * growth);
+    if (islandDistance <= 0.0) {
+      return LoRegion(
+        119.0,
+        104.0,
+        min(region.edge, -islandDistance / max(smoothstep(0.04, 0.34, islandAge), 0.001)),
+        islandAge,
+        region.local,
+        region.tangent
+      );
+    }
+    return LoRegion(
+      region.identity,
+      region.parent,
+      min(region.edge, islandDistance / max(smoothstep(0.04, 0.34, islandAge), 0.001)),
+      islandAge,
+      region.local,
+      region.tangent
+    );
+  }
+  return region;
+}
 `,
 });

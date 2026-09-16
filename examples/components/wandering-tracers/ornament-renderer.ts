@@ -12,11 +12,22 @@ import { uniform, uv, wgslFn } from 'three/tsl';
 // wgslFn selects the first function as its entry. Keep the paint pass before
 // the supplied helpers, including the LoRegion declaration and noise basis.
 const paintPass = `
-fn livingOrnament(st: vec2f, view: vec4f, shape: vec4f, detail: vec4f,
-  pigment: vec4f, material: vec4f, ink: vec4f, pattern: vec4f, patternStyle: vec4f,
-  spirals: vec4f, rings: vec4f, membranes: vec4f, contours: vec4f, hatching: vec4f, ribbons: vec4f) -> vec4f {
+fn livingOrnament(st: vec2f, view: vec4f, shape: vec4f, detail: vec4f, pigment: vec4f, material: vec4f, ink: vec4f, pattern: vec4f, patternStyle: vec4f, spirals: vec4f, rings: vec4f, membranes: vec4f, contours: vec4f, hatching: vec4f, ribbons: vec4f, structuralActivity: f32) -> vec4f {
   let p = (st - 0.5) * vec2f(view.y, 1.0) * 2.0;
-  let region = loRegion(p, view.x, view.z, shape, detail);
+  let region = loRegionEvolving(p, view.x, view.z, shape, detail, structuralActivity);
+  var color = loOrnamentStyle(region, p, view, shape, detail, pigment, material, ink, pattern, patternStyle, spirals, rings, membranes, contours, hatching, ribbons);
+  if (region.identity >= 117.0 && region.parent > 0.0) {
+    var inherited = region;
+    inherited.identity = region.parent;
+    inherited.parent = 0.0;
+    inherited.age = 1.0;
+    let parentColor = loOrnamentStyle(inherited, p, view, shape, detail, pigment, material, ink, pattern, patternStyle, spirals, rings, membranes, contours, hatching, ribbons);
+    color = mix(parentColor, color, smoothstep(0.06, 0.92, region.age));
+  }
+  return vec4f(color, 1.0);
+}
+
+fn loOrnamentStyle(region: LoRegion, p: vec2f, view: vec4f, shape: vec4f, detail: vec4f, pigment: vec4f, material: vec4f, ink: vec4f, pattern: vec4f, patternStyle: vec4f, spirals: vec4f, rings: vec4f, membranes: vec4f, contours: vec4f, hatching: vec4f, ribbons: vec4f) -> vec3f {
   var wash = loWash(region, p, view.x, pigment, material);
   let id = i32(region.identity + 0.5);
   if (id == 110) { wash = mix(wash, vec3f(0.56, 0.78, 0.84), 0.78); }
@@ -35,10 +46,10 @@ fn livingOrnament(st: vec2f, view: vec4f, shape: vec4f, detail: vec4f,
     1.0, 0.35 + pressure * material.w * 1.25);
   var marks = 0.0;
   switch id {
-    case 101, 105, 109, 113: { marks = loSpirals(motifRegion, p, view.x, expressive * spirals); }
-    case 103, 112, 114: { marks = loRings(motifRegion, p, view.x, expressive * rings); }
+    case 101, 105, 109, 113, 117: { marks = loSpirals(motifRegion, p, view.x, expressive * spirals); }
+    case 103, 112, 114, 118: { marks = loRings(motifRegion, p, view.x, expressive * rings); }
     case 102, 104, 107, 108: { marks = loMembranes(motifRegion, p, view.x, expressive * membranes); }
-    case 115: { marks = loContours(motifRegion, p, view.x, expressive * contours); }
+    case 115, 119: { marks = loContours(motifRegion, p, view.x, expressive * contours); }
     case 110, 111: { marks = loRibbonMarks(motifRegion, p, view.x, expressive * ribbons); }
     default: { marks = loHatchMarks(motifRegion, p, view.x, expressive * hatching); }
   }
@@ -59,7 +70,7 @@ fn livingOrnament(st: vec2f, view: vec4f, shape: vec4f, detail: vec4f,
   if (id == 110 || id == 111) { motifInk = vec3f(0.015, 0.19, 0.25); }
   let patterned = mix(wash, motifInk, clamp(marks * patternStyle.x * rest * inset, 0.0, 1.0));
   let color = loFinish(patterned, region, p, ink);
-  return vec4f(color, 1.0);
+  return color;
 }
 `;
 
@@ -125,6 +136,7 @@ export default defineComponent({
       },
     },
     controls: {
+      structuralActivity: { type: 'number', group: 'Structural Changes', label: 'Split and island activity', default: 1, min: 0, max: 1, step: 0.01 },
       patternDensity: { type: 'number', group: 'Patterns', label: 'Density', default: 1, min: 0.3, max: 2, step: 0.01 },
       patternWidth: { type: 'number', group: 'Patterns', label: 'Line width', default: 1, min: 0.3, max: 2, step: 0.01 },
       patternVariation: { type: 'number', group: 'Patterns', label: 'Variation', default: 0.7, min: 0, max: 1, step: 0.01 },
@@ -135,6 +147,7 @@ export default defineComponent({
       patternGrowth: { type: 'number', group: 'Pattern Motion', label: 'Drawing and release', default: 0.48, min: 0, max: 1, step: 0.01 },
     },
     controlDescriptions: {
+      structuralActivity: 'Zero preserves the previous scene. Higher values grow curved splits, close narrow connections, and birth islands with gradual inherited styles.',
       patternDensity: 'Sets the scale and spacing of region motifs.',
       patternWidth: 'Sets motif stroke thickness.',
       patternVariation: 'Varies motif size and curvature within each family.',
@@ -154,6 +167,7 @@ export default defineComponent({
     const pigment = uniform(new Vector4(0.07, 1.3, 1.05, 0.74));
     const materialSettings = uniform(new Vector4(0.94, 1, 0.44, 0));
     const ink = uniform(new Vector4(0.008, 0.55, 1.34, 1.48));
+    const structuralActivity = uniform(1);
     const pattern = uniform(new Vector4(1, 1, 0.7, 0.2));
     const patternStyle = uniform(new Vector4(1, 0.9, 0, 0));
     const motifSettings = patternPorts.map(() => uniform(new Vector4(1, 1, 1, 1)));
@@ -167,6 +181,7 @@ export default defineComponent({
 
     return {
       update(frame) {
+        structuralActivity.value = frame.controls.structuralActivity;
         pattern.value.set(frame.controls.patternDensity, frame.controls.patternWidth, frame.controls.patternVariation, frame.controls.patternMotion);
         patternStyle.value.set(frame.controls.patternStrength, frame.controls.patternRest, frame.controls.patternTravel, frame.controls.patternGrowth);
       },
@@ -186,7 +201,7 @@ export default defineComponent({
           material = new MeshBasicNodeMaterial({ depthTest: false, depthWrite: false });
           material.fragmentNode = wgslFn(paintPass + '\n' + helpers.join('\n'))(
             uv(), view, shape, detail, pigment, materialSettings, ink, pattern, patternStyle,
-            motifSettings[0]!, motifSettings[1]!, motifSettings[2]!, motifSettings[3]!, motifSettings[4]!, motifSettings[5]!,
+            motifSettings[0]!, motifSettings[1]!, motifSettings[2]!, motifSettings[3]!, motifSettings[4]!, motifSettings[5]!, structuralActivity,
           );
           scene = new Scene();
           const mesh = new Mesh(geometry, material);
