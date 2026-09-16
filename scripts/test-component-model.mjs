@@ -26,6 +26,10 @@ try {
   async function capture(name){const path=join(output,`${name}.png`);await page.screenshot({path});report.screenshots.push(path);}
   await statusWhen(runtime=>runtime?.playback==='playing',60000);
   await page.getByRole('button',{name:'Pause',exact:true}).waitFor();
+  await page.getByRole('slider',{name:'Preview resolution scale',exact:true}).focus();
+  await page.keyboard.press('Home');
+  await statusWhen(runtime=>runtime?.playback==='playing'&&runtime.output.width===640&&runtime.output.height===360);
+  report.previewOutput={width:640,height:360};
   const plain={sdkVersion:'0.2.0',entry:'visual.ts',files:{'visual.ts':await readFile(join(root,'skills/lux-visual-creation/assets/noise-sphere.ts'),'utf8')}};
   const legacy=nestedPrismaticCompositionSource(),modern=structuredClone(legacy);
   for(const path of ['composition.ts','double-mirror.ts','wrapped-mirror.ts'])modern.files[path]=modern.files[path].replaceAll('defineComposition',path===modern.entry?'defineVisual':'defineComponent');
@@ -34,7 +38,7 @@ try {
     report.stage=name;await writeFile(join(output,'result.json'),JSON.stringify(report,null,2));
     await page.setViewportSize({width:1360,height:900});
     let draft=await call('read');await call('build',{source,expectedDraftVersion:draft.draftVersion});
-    await statusWhen(runtime=>runtime?.playback==='playing');
+    await statusWhen(runtime=>runtime?.playback==='playing'&&runtime.output.width===640&&runtime.output.height===360);
     await page.getByRole('button',{name:'View',exact:true}).click();await page.getByRole('menuitem',{name:'Graph',exact:true}).click();
     if(name==='legacy-graph'&&!graphsOnly){
       assert.equal(await page.locator('.graph-scene-root').getAttribute('aria-pressed'),'true','direct-only selection returns to Scene after representation change');
