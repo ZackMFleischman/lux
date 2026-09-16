@@ -55,7 +55,7 @@ test('animation operation schema admits the empty scene path',()=>{
   assert.equal(studioOperationSchema.safeParse({name:'lux.node.animation.set',input:{...target,nodePath:['not valid']}}).success,false);
 });
 
-test('animation operation schema accepts exact audio bindings without widening legacy LFOs',()=>{
+test('animation operation schema accepts exact audio and kick bindings without widening legacy LFOs',()=>{
   const audio={kind:'audio' as const,nodePath:[] as const,definitionHash:schemaHash,schemaHash,controlId:'height',
     source:{kind:'audio-band' as const,logicalInputId:'primary-audio' as const,band:'bass' as const,
       analyzer:{version:1 as const,fftSize:2048 as const,minDecibels:-100,maxDecibels:-30}},
@@ -67,6 +67,11 @@ test('animation operation schema accepts exact audio bindings without widening l
   assert.equal(studioOperationSchema.safeParse({name:'lux.node.animation.set',input:{...input,animation:{...binding(),kind:'audio'}}}).success,false);
   assert.equal(studioOperationSchema.safeParse({name:'lux.node.animation.set',input:{...input,animation:{...audio,
     source:{...audio.source,analyzer:{...audio.source.analyzer,maxDecibels:-95}}}}}).success,false);
+  const kick={kind:'kick' as const,nodePath:[] as const,definitionHash:schemaHash,schemaHash,controlId:'height',
+    source:{kind:'audio-kick' as const,logicalInputId:'primary-audio' as const,analyzer:audio.source.analyzer},amount:.5,
+    attackMs:0,releaseMs:300,sensitivity:.5,retriggerMs:120,envelope:'exponential' as const,enabled:true};
+  assert.equal(studioOperationSchema.safeParse({name:'lux.node.animation.set',input:{...input,animation:kick}}).success,true);
+  assert.equal(studioOperationSchema.safeParse({name:'lux.node.animation.set',input:{...input,animation:{...kick,band:'bass'}}}).success,false);
 });
 
 test('flat runtime keeps base controls while accepting guarded animation state and rejecting stale or forged targets',async t=>{

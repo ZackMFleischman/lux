@@ -38,6 +38,21 @@ test('portable audio source rejects extra fields and unsupported identity or ana
   assert.throws(() => normalizeAudioBandSource({ ...valid, analyzer: { ...valid.analyzer, minDecibels: -40, maxDecibels: -35 } }), /Invalid audio analyzer/);
 });
 
+test('portable kick source reuses the exact shared analyzer configuration', async () => {
+  const { normalizeAudioKickSource } = await contract();
+  const source = normalizeAudioKickSource({kind:'audio-kick',logicalInputId:'primary-audio',analyzer:{version:1,fftSize:2048,minDecibels:-100,maxDecibels:-30}});
+  assert.deepEqual(source,{kind:'audio-kick',logicalInputId:'primary-audio',analyzer:{version:1,fftSize:2048,minDecibels:-100,maxDecibels:-30}});
+  assert.throws(()=>normalizeAudioKickSource({...source,deviceId:'private'}),/Invalid audio kick source/);
+});
+
+test('audio snapshots require bounded latched kick identity and clear it when unavailable', async () => {
+  const { normalizeAudioBandSnapshot } = await contract();
+  const snapshot={generation:2,sequence:4,available:true,level:.1,bass:.2,mids:.3,highs:.4,kickSequence:1,kickStrength:.8};
+  assert.deepEqual(normalizeAudioBandSnapshot(snapshot),snapshot);
+  assert.throws(()=>normalizeAudioBandSnapshot({...snapshot,kickSequence:Number.MAX_SAFE_INTEGER+1}),/Invalid audio band snapshot/);
+  assert.throws(()=>normalizeAudioBandSnapshot({...snapshot,available:false,level:0,bass:0,mids:0,highs:0}),/Invalid audio band snapshot/);
+});
+
 test('local device identity is validated separately from portable configuration', async () => {
   const { normalizeLocalAudioDeviceId } = await contract();
 

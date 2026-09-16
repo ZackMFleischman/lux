@@ -157,10 +157,10 @@ test('actual worker applies complete initial/live controls and captures exact me
 });
 test('audio snapshots update the evaluator cache and acknowledge without drawing',async()=>{
   const f=await fixture();
-  const initialAudio={generation:1,sequence:0,available:true,level:0,bass:0,mids:0,highs:0};
+  const initialAudio={generation:1,sequence:0,available:true,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0};
   assert.equal((await f.send({...f.initial,audioSnapshot:initialAudio})).type,'ready');
   const frameCount=f.frames.length;
-  const snapshot={generation:1,sequence:1,available:true,level:.1,bass:.2,mids:.3,highs:.4};
+  const snapshot={generation:1,sequence:1,available:true,level:.1,bass:.2,mids:.3,highs:.4,kickSequence:1,kickStrength:.8};
   const ack=await f.send({type:'audio',audioSnapshot:snapshot});
   assert.deepEqual(ack,{type:'audio-ack',instanceId:'instance',generation:1,revisionId:'revision',providerGeneration:1,sampleSequence:1});
   assert.equal(f.frames.length,frameCount);

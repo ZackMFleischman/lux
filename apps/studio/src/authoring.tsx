@@ -157,7 +157,7 @@ export function AuthoringApp() {
   }), [confirmation.confirm]);
   useEffect(() => { void window.luxAuthoring.dirty(dirty); }, [dirty]);
   const runtime = runtimeSnapshot.authoring;
-  const audioSource=runtime?.controlAnimations?.find(binding=>binding.kind==='audio')?.source;
+  const audioSource=runtime?.controlAnimations?.find(binding=>binding.kind==='audio'||binding.kind==='kick')?.source;
   const audioConfiguration=audioSource?{logicalInputId:audioSource.logicalInputId,analyzer:audioSource.analyzer}:undefined;
   const runtimeKey = runtime ? `${runtime.instanceId}:${runtime.generation}:${runtime.output.width}x${runtime.output.height}` : null;
   useEffect(() => {

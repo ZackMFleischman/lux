@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {StandaloneClient} from '../../apps/studio/src/standalone-client.ts';
 import {runtimeEditSignature} from '../../apps/studio/src/service-client.ts';
 
-const zero=Object.freeze({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0});
+const zero=Object.freeze({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0});
 
 class AudioProviderFixture {
   snapshot:any=zero;
@@ -48,9 +48,9 @@ test('runtime audio transport keeps one in-flight sample and one latest overwrit
   assert.deepEqual(worker.init.audioSnapshot,zero);
   const before=runtimeEditSignature(client.getSnapshot().authoring);
 
-  const first={generation:1,sequence:1,available:true,level:.1,bass:.2,mids:.3,highs:.4};
-  const middle={...first,sequence:2,bass:.5};
-  const latest={...first,sequence:3,bass:.9};
+  const first={generation:1,sequence:1,available:true,level:.1,bass:.2,mids:.3,highs:.4,kickSequence:0,kickStrength:0};
+  const middle={...first,sequence:2,bass:.9,kickSequence:1,kickStrength:.9};
+  const latest={...middle,sequence:3,bass:.5};
   audio.publish(first);audio.publish(middle);audio.publish(latest);
   assert.deepEqual(worker.messages.filter(row=>row.type==='audio').map(row=>row.audioSnapshot),[first]);
 
@@ -58,5 +58,6 @@ test('runtime audio transport keeps one in-flight sample and one latest overwrit
   assert.equal(worker.messages.filter(row=>row.type==='audio').length,1,'stale acknowledgement is ignored');
   worker.reply({type:'audio-ack',providerGeneration:1,sampleSequence:1});
   assert.deepEqual(worker.messages.filter(row=>row.type==='audio').map(row=>row.audioSnapshot),[first,latest]);
+  assert.equal(latest.kickStrength,.9,'ordinary tail samples retain the onset peak through latest overwrite');
   assert.equal(runtimeEditSignature(client.getSnapshot().authoring),before);
 });

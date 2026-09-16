@@ -21,11 +21,18 @@ export function normalizeAudioBandSource(input){
  const configuration=normalizeAudioInputConfiguration({logicalInputId:raw.logicalInputId,analyzer:raw.analyzer});
  return freeze({kind:'audio-band',logicalInputId:configuration.logicalInputId,band:raw.band,analyzer:configuration.analyzer});
 }
+export function normalizeAudioKickSource(input){
+ const raw=plain(input,['kind','logicalInputId','analyzer'],'Invalid audio kick source');if(raw.kind!=='audio-kick')invalid('Invalid audio kick source');
+ if(raw.logicalInputId!=='primary-audio')invalid('Invalid logical audio input');
+ const configuration=normalizeAudioInputConfiguration({logicalInputId:raw.logicalInputId,analyzer:raw.analyzer});
+ return freeze({kind:'audio-kick',logicalInputId:configuration.logicalInputId,analyzer:configuration.analyzer});
+}
 export function normalizeAudioBandSnapshot(input){
- const raw=plain(input,['generation','sequence','available','level','bass','mids','highs'],'Invalid audio band snapshot');
- if(!safe(raw.generation)||raw.generation<0||!safe(raw.sequence)||raw.sequence<0||typeof raw.available!=='boolean')invalid('Invalid audio band snapshot');
+ const raw=plain(input,['generation','sequence','available','level','bass','mids','highs','kickSequence','kickStrength'],'Invalid audio band snapshot');
+ if(!safe(raw.generation)||raw.generation<0||!safe(raw.sequence)||raw.sequence<0||!safe(raw.kickSequence)||raw.kickSequence<0||typeof raw.available!=='boolean')invalid('Invalid audio band snapshot');
  const result={generation:raw.generation,sequence:raw.sequence,available:raw.available};
  for(const band of bands){const value=raw[band];if(!finite(value)||value<0||value>1||(!raw.available&&value!==0))invalid('Invalid audio band snapshot');result[band]=value===0?0:value;}
+ if(!finite(raw.kickStrength)||raw.kickStrength<0||raw.kickStrength>1||(!raw.available&&(raw.kickSequence!==0||raw.kickStrength!==0))||(raw.kickSequence===0&&raw.kickStrength!==0))invalid('Invalid audio band snapshot');
+ result.kickSequence=raw.kickSequence;result.kickStrength=raw.kickStrength===0?0:raw.kickStrength;
  return freeze(result);
 }
-

@@ -5,15 +5,15 @@ const freeze = Object.freeze;
 const finite = Number.isFinite;
 
 function zero(generation) {
-  return freeze({ generation, sequence: 0, available: false, level: 0, bass: 0, mids: 0, highs: 0 });
+  return freeze({ generation, sequence: 0, available: false, level: 0, bass: 0, mids: 0, highs: 0, kickSequence:0, kickStrength:0 });
 }
 
 function normalizeBands(input) {
-  if (!input || typeof input !== 'object' || Array.isArray(input) || Reflect.ownKeys(input).length !== 4) {
+  if (!input || typeof input !== 'object' || Array.isArray(input) || Reflect.ownKeys(input).length !== 5) {
     throw new Error('Invalid audio band sample');
   }
   const result = {};
-  for (const name of ['level', 'bass', 'mids', 'highs']) {
+  for (const name of ['level', 'bass', 'mids', 'highs','kickStrength']) {
     const value = Object.getOwnPropertyDescriptor(input, name);
     if (!value?.enumerable || !Object.hasOwn(value, 'value') || !finite(value.value) || value.value < 0 || value.value > 1) {
       throw new Error('Invalid audio band sample');
@@ -61,14 +61,19 @@ export function createStudioAudioProvider(options) {
 
   function scheduleSampling() {
     if (scheduled !== undefined || !active || listeners.size === 0) return;
-    scheduled = scheduler.request(() => {
+    scheduled = scheduler.request(timeMs => {
       scheduled = undefined;
       const owner = active;
       if (!owner || listeners.size === 0) return;
       try {
-        const bands = normalizeBands(owner.analyzer.sample());
+        const bands = normalizeBands(owner.analyzer.sample(timeMs));
         if (active !== owner) return;
-        publish(freeze({ generation: owner.generation, sequence: snapshot.sequence + 1, available: true, ...bands }));
+        const rollover=snapshot.sequence===Number.MAX_SAFE_INTEGER||(bands.kickStrength>0&&snapshot.kickSequence===Number.MAX_SAFE_INTEGER);
+        if(rollover)owner.generation=snapshot.generation+1;
+        const kickSequence=rollover?(bands.kickStrength>0?1:0):(bands.kickStrength>0?snapshot.kickSequence+1:snapshot.kickSequence);
+        const kickStrength=bands.kickStrength>0?bands.kickStrength:(rollover?0:snapshot.kickStrength);
+        publish(freeze({ generation: owner.generation, sequence: rollover?1:snapshot.sequence + 1, available: true,
+          level:bands.level,bass:bands.bass,mids:bands.mids,highs:bands.highs,kickSequence,kickStrength }));
         scheduleSampling();
       } catch {
         void fail(owner);
@@ -167,7 +172,7 @@ export function createStudioAudioProvider(options) {
       owner.detach = attachFailureHandlers(owner);
       active = owner;
       connecting = false;
-      publish(freeze({ generation, sequence: 0, available: true, level: 0, bass: 0, mids: 0, highs: 0 }));
+      publish(freeze({ generation, sequence: 0, available: true, level: 0, bass: 0, mids: 0, highs: 0,kickSequence:0,kickStrength:0 }));
       scheduleSampling();
     },
     async disconnect() {
@@ -185,4 +190,3 @@ export function createStudioAudioProvider(options) {
     },
   });
 }
-

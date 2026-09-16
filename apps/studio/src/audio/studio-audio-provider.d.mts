@@ -3,7 +3,7 @@ import type { AudioBandAnalyzer } from './audio-analysis.mjs';
 
 export type AudioBandSnapshot = Readonly<{
   generation: number; sequence: number; available: boolean;
-  level: number; bass: number; mids: number; highs: number;
+  level: number; bass: number; mids: number; highs: number;kickSequence:number;kickStrength:number;
 }>;
 export type StudioAudioProvider = Readonly<{
   connect(configuration: AudioInputConfiguration, localDeviceId?: string): Promise<void>;

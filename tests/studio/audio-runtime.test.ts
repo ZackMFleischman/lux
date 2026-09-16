@@ -13,7 +13,7 @@ test('audio runtime arms one request, activates its token, and revokes on discon
     permissions:{arm:async()=>{calls.push('arm');return {token:'token-token-token-1',expiresAtMs:1};},activate:async token=>{calls.push(`activate:${token}`);return true;},cancel:async()=>false,disconnect:async()=>{calls.push('revoke');return true;}},
     mediaDevices:{getUserMedia:async (constraints:any)=>{calls.push(`capture:${JSON.stringify(constraints)}`);return stream;}} as any,
     createContext:()=>context,
-    createAnalyzer:()=>({sample:()=>({level:0,bass:0,mids:0,highs:0}),dispose(){}}),
+    createAnalyzer:()=>({sample:()=>({level:0,bass:0,mids:0,highs:0,kickStrength:0}),dispose(){}}),
     scheduler:{request:()=>1,cancel(){}},
   });
   await runtime.connect(configuration,'device-local');
@@ -28,7 +28,7 @@ test('failed permission activation stops the acquired stream and cancels the exa
   const runtime=createStudioAudioRuntime({
     permissions:{arm:async()=>({token:'token-token-token-2',expiresAtMs:1}),activate:async()=>false,cancel:async token=>{calls.push(`cancel:${token}`);return true;},disconnect:async()=>false},
     mediaDevices:{getUserMedia:async()=>stream} as any,createContext:()=>{throw Error('must not create');},
-    createAnalyzer:()=>({sample:()=>({level:0,bass:0,mids:0,highs:0}),dispose(){}}),scheduler:{request:()=>1,cancel(){}},
+    createAnalyzer:()=>({sample:()=>({level:0,bass:0,mids:0,highs:0,kickStrength:0}),dispose(){}}),scheduler:{request:()=>1,cancel(){}},
   });
   await assert.rejects(runtime.connect(configuration),/activation failed/);
   assert.deepEqual(calls,['stop','cancel:token-token-token-2']);

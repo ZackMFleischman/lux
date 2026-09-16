@@ -65,10 +65,48 @@ test('Web Audio analyzer disables built-in smoothing and disconnects only owned 
   assert.equal(analyzerNode.maxDecibels, -20);
   assert.equal(analyzerNode.smoothingTimeConstant, 0);
   assert.equal(sourceNode.connected, analyzerNode);
-  assert.deepEqual(analyzer.sample(), { level: 0.5, bass: 0, mids: 0, highs: 0 });
+  assert.deepEqual(analyzer.sample(0), { level: 0.5, bass: 0, mids: 0, highs: 0, kickStrength: 0 });
 
   analyzer.dispose();
   analyzer.dispose();
   assert.equal(sourceDisconnects, 1);
   assert.equal(analyzerDisconnects, 1);
+});
+
+test('kick detector emits one local peak for a sustained onset and ignores silence and steady noise', async () => {
+  const { createKickTransientDetector } = await analysis();
+  const detector = createKickTransientDetector();
+  assert.equal(detector.sample(0, 0), 0);
+  assert.equal(detector.sample(0, 16), 0);
+  assert.equal(detector.sample(.8, 32), 0);
+  assert.ok(Math.abs(detector.sample(.8, 48) - .8) < 1e-12);
+  assert.equal(detector.sample(.8, 64), 0);
+  assert.equal(detector.sample(.7, 80), 0);
+  detector.reset();
+  assert.equal(detector.sample(.1, 0), 0);
+  assert.equal(detector.sample(.11, 16), 0);
+  assert.equal(detector.sample(.09, 32), 0);
+  assert.equal(detector.sample(.1, 48), 0);
+});
+
+test('kick detector rearms below hysteresis and emits two separated onsets', async () => {
+  const { createKickTransientDetector } = await analysis();
+  const detector = createKickTransientDetector();
+  const emitted = [];
+  for (const [bass, time] of [[0,0],[.9,16],[.8,32],[0,48],[0,64],[.7,80],[.5,96]]) {
+    const value = detector.sample(bass, time);
+    if (value) emitted.push(value);
+  }
+  assert.equal(emitted.length, 2);
+  assert.ok(emitted[0] > emitted[1]);
+  assert.throws(() => detector.sample(.2, 95), /Invalid kick detector time/);
+});
+
+test('kick detector retains an equal-score plateau and emits its strong peak before a weaker tail', async () => {
+  const { createKickTransientDetector } = await analysis();
+  const detector = createKickTransientDetector();
+  assert.equal(detector.sample(0, 0), 0);
+  assert.equal(detector.sample(.9, 0), 0);
+  assert.equal(detector.sample(.9, 0), 0, 'equal score keeps tracking the same episode');
+  assert.ok(Math.abs(detector.sample(.5, 16) - .9) < 1e-12);
 });
