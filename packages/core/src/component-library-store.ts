@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { lstat, mkdir, open, readFile, realpath, rename, rm, unlink } from 'node:fs/promises';
+import { lstat, mkdir, open, readFile, readdir, realpath, rename, rm, unlink } from 'node:fs/promises';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { componentIdSchema } from '../../runtime-contracts/src/identities.ts';
@@ -144,6 +144,25 @@ async function readComponentDirectory(root: string, directory: string, reference
 
 async function readStoredComponent(root: string, reference: CatalogReference): Promise<LibraryComponent> {
   return readComponentDirectory(root, revisionDirectory(root, reference), reference);
+}
+
+async function availableSeedRevisions(root: string, component: LibraryComponent): Promise<number[]> {
+  const directory = dirname(revisionDirectory(root, component));
+  await assertStoredPath(root, directory);
+  const entries = await readdir(directory, { withFileTypes: true });
+  const revisions = entries.map(entry => {
+    const revision = Number(entry.name);
+    if (!entry.isDirectory() || entry.isSymbolicLink() || !/^[1-9][0-9]*$/.test(entry.name) || !Number.isSafeInteger(revision)) {
+      throw Error('Invalid library revision directory');
+    }
+    return revision;
+  }).filter(revision => revision <= component.revision).sort((a, b) => a - b);
+  // Legacy profiles retain only their latest revision. Preserve that available
+  // suffix and any later updates; never invent missing historical source.
+  if (revisions.at(-1) !== component.revision || revisions.some((revision, index) => revision !== revisions[0]! + index)) {
+    throw Error(`Library component revision is missing: ${component.id}`);
+  }
+  return revisions;
 }
 
 async function loadCatalog(root: string, missing = false): Promise<LibraryCatalog> {
@@ -298,7 +317,7 @@ export class ComponentLibraryStore {
         if (kind === 'seed' && sourceRoot) {
           const revisions: LibraryComponent[] = [];
           try {
-            for (let revision = 1; revision <= candidate.revision; revision++) {
+            for (const revision of await availableSeedRevisions(sourceRoot, candidate)) {
               revisions.push(await readStoredComponent(sourceRoot, { id: candidate.id, revision }));
             }
           } catch (error) {

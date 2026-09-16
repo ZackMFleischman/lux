@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { cp, mkdir, mkdtemp, readFile, readdir, stat, writeFile } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -238,6 +238,31 @@ test('a new fallback component imports its complete immutable revision history',
     'export const color = "orange";');
 });
 
+test('legacy revision suffix seeds a standalone library without inventing earlier history', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'lux-library-legacy-seed-'));
+  const seedRoot = join(directory, 'seed'), root = join(directory, 'standalone'), legacyPath = join(directory, 'legacy.json');
+  const original = record('11111111-1111-4111-8111-111111111111', 'export const color = "green";', 2);
+  await writeFile(legacyPath, JSON.stringify({ format: 'lux-component-library', version: 1, components: [original] }));
+  const seed = new ComponentLibraryStore(seedRoot, { legacyPath });
+  assert.deepEqual(await seed.read(original.id), original);
+  await seed.update({id: original.id, expectedRevision: 2, source: component('export const color = "blue";')});
+  const target = new ComponentLibraryStore(root, { seedRoots: [seedRoot] });
+  assert.deepEqual(await target.read(original.id), await seed.read(original.id));
+  assert.deepEqual((await readdir(join(root, 'components', original.id, 'revisions'))).sort(), ['2', '3']);
+  assert.equal(await readFile(join(root, 'components', original.id, 'revisions', '2', 'source', 'component.ts'), 'utf8'), original.source.files['component.ts']);
+});
+
+test('seeding rejects gaps within available history without activating a partial component', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'lux-library-seed-gap-'));
+  const seedRoot = join(directory, 'seed'), root = join(directory, 'target');
+  const seed = new ComponentLibraryStore(seedRoot), first = await seed.create({name:'History',description:'History test.',source:component()});
+  await seed.update({id:first.id,expectedRevision:1,source:component('export const version = 2;')});
+  await seed.update({id:first.id,expectedRevision:2,source:component('export const version = 3;')});
+  await rm(join(seedRoot,'components',first.id,'revisions','2'),{recursive:true});
+  await assert.rejects(new ComponentLibraryStore(root,{seedRoots:[seedRoot]}).list(),/history.*incomplete/i);
+  assert.deepEqual(await new ComponentLibraryStore(root).list(),[]);
+});
+
 test('a higher fallback revision without matching history is preserved as a conflict', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'lux-library-no-fast-forward-'));
   const canonicalRoot = join(directory, 'canonical'), fallbackRoot = join(directory, 'fallback'), legacyPath = join(directory, 'fallback.json');
@@ -283,10 +308,12 @@ test('the repository seed exposes a useful Prismatic Ball component from an isol
 
   const store = new ComponentLibraryStore(root);
   const summaries = await store.list();
-  assert.deepEqual(summaries.map(({ name, description, revision }) => ({ name, description, revision })), [{
-    name: 'Prismatic Ball', description: 'Animated iridescent spike image source.', revision: 1,
-  }]);
-  const seeded = await store.read(summaries[0]!.id);
+  const ball = summaries.find(row => row.id === '93a7215f-4df1-4e1e-9d34-3f7f0f27ad84');
+  assert.ok(ball);
+  assert.equal(ball.name, 'Prismatic Ball');
+  assert.equal(ball.description, 'Animated iridescent spike image source.');
+  assert.equal(ball.revision, 1);
+  const seeded = await store.read(ball.id);
   assert.equal(seeded.source.entry, 'component.ts');
   assert.match(seeded.source.files['component.ts'] ?? '', /export default defineComponent/);
   assert.match(seeded.source.files['component.ts'] ?? '', /label: 'Prismatic Ball'/);

@@ -1,0 +1,17 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "78a8f505-dde8-4ec4-9e25-934a14ccd31a",
+  "revision": 1,
+  "name": "Metallic Cube Fan",
+  "description": "The complete six-arm, 168-cube metallic cascade as a reusable image-source component. Uses the shared cube primitive, with spin, spread, cascade speed and size controls.",
+  "updatedAt": "2026-09-15T05:24:11.043Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "component.ts",
+    "files": [
+      "component.ts",
+      "cube-kit.ts"
+    ]
+  }
+}
