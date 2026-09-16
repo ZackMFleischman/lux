@@ -8,7 +8,21 @@ export const shortcutHint = Object.freeze({
   'save-as': 'Ctrl+Shift+S',
   export: 'Ctrl+Shift+E',
   build: 'Ctrl+Enter',
+  'shortcut-reference': '?',
 } as const);
+
+export const shortcutReference: readonly Readonly<{ command: StudioShortcutCommand; label: string }>[] = [
+  { command: 'build', label: 'Build preview' },
+  { command: 'save', label: 'Save scene' },
+  { command: 'save-as', label: 'Save scene as' },
+  { command: 'export', label: 'Export for Resolume' },
+  { command: 'save-frame', label: 'Save frame PNG' },
+  { command: 'toggle-recording', label: 'Start or stop recording' },
+  { command: 'toggle-inspector', label: 'Toggle Inspector' },
+  { command: 'maximize-panel', label: 'Maximize or restore focused panel' },
+  { command: 'fullscreen', label: 'Toggle Preview fullscreen' },
+  { command: 'shortcut-reference', label: 'Show keyboard shortcuts' },
+];
 
 export type StudioShortcutCommand = keyof typeof shortcutHint;
 export type StudioShortcutAction = Readonly<{
@@ -24,6 +38,7 @@ export function shortcutCommand(event: ShortcutEvent): StudioShortcutCommand | n
   const key = event.key.toLowerCase();
   const primary = event.ctrlKey !== event.metaKey && (event.ctrlKey || event.metaKey);
   if (event.altKey) return null;
+  if ((event.key === '?' || event.key === '/') && event.shiftKey && !event.ctrlKey && !event.metaKey) return 'shortcut-reference';
   if (event.key === 'F11' && !event.ctrlKey && !event.metaKey && !event.shiftKey) return 'fullscreen';
   if (!primary) return null;
   if (event.shiftKey) {
@@ -46,5 +61,5 @@ export function isTextEntryTarget(target: EventTarget | null): boolean {
 }
 
 export function blocksTextEntry(command: StudioShortcutCommand): boolean {
-  return command === 'maximize-panel' || command === 'toggle-inspector' || command === 'fullscreen';
+  return command === 'maximize-panel' || command === 'toggle-inspector' || command === 'fullscreen' || command === 'shortcut-reference';
 }

@@ -12,16 +12,17 @@ const saveAsPath = join(output, 'shortcut-save-as.lux-scene');
 const framePath = join(output, 'shortcut-frame.png');
 const videoPath = join(output, 'shortcut-recording.webm');
 const screenshotPath = join(output, 'diagnostics-maximized.png');
+const helpScreenshotPath = join(output, 'shortcut-reference.png');
 const resultPath = join(output, 'result.json');
 const report = { ok: false, checks: [], errors: [] };
 const env = { ...studioTestEnvironment(), LUX_NODE_EXECUTABLE: process.execPath };
 delete env.ELECTRON_RUN_AS_NODE;
 await mkdir(output, { recursive: true });
-await Promise.all([scenePath, saveAsPath, framePath, videoPath, screenshotPath, resultPath].map(path => unlink(path).catch(() => {})));
+await Promise.all([scenePath, saveAsPath, framePath, videoPath, screenshotPath, helpScreenshotPath, resultPath].map(path => unlink(path).catch(() => {})));
 
 let app, page;
-async function waitForFile(path, minimum = 1) {
-  for (let attempt = 0; attempt < 120; attempt++) {
+async function waitForFile(path, minimum = 1, attempts = 120) {
+  for (let attempt = 0; attempt < attempts; attempt++) {
     try { if ((await stat(path)).size >= minimum) return; } catch {}
     await new Promise(resolve => setTimeout(resolve, 100));
   }
@@ -54,7 +55,8 @@ try {
   assert.match(previewMenu, /Ctrl\+Shift\+P/); assert.match(previewMenu, /Ctrl\+Shift\+R/);
   await page.keyboard.press('Escape');
   await openMenu('View');
-  assert.match(await page.getByRole('menu', { name: 'View' }).innerText(), /Ctrl\+Shift\+I/);
+  const viewMenu = await page.getByRole('menu', { name: 'View' }).innerText();
+  assert.match(viewMenu, /Ctrl\+Shift\+I/); assert.match(viewMenu, /Keyboard shortcuts[\s\S]*\?/);
   await page.keyboard.press('Escape');
   report.checks.push('File, Preview, View, Build, panel, and fullscreen controls expose their assigned shortcut hints');
 
@@ -71,10 +73,18 @@ try {
 
   const editor = page.locator('.cm-content');
   await editor.waitFor(); await editor.focus();
+  const sourceBeforeQuestionMark = await editor.textContent();
+  await page.keyboard.type('?');
+  assert.equal(await page.getByRole('dialog', { name: 'Keyboard shortcuts' }).count(), 0);
+  await page.waitForFunction(before => document.querySelector('.cm-content')?.textContent !== before, sourceBeforeQuestionMark);
+  assert.match(await editor.textContent(), /\?/);
+  await page.keyboard.press('Backspace');
+  await page.waitForFunction(before => document.querySelector('.cm-content')?.textContent === before, sourceBeforeQuestionMark);
+  report.checks.push('? types in Source without opening the shortcut reference or suppressing text input');
   await page.keyboard.press('Control+Enter');
   await page.waitForFunction(() => document.querySelector('.status-build')?.textContent?.includes('Build ready'));
   const canvas = page.locator('.preview-surface canvas'); await canvas.waitFor({ state: 'visible' });
-  await page.keyboard.press('Control+S'); await waitForFile(scenePath);
+  await page.keyboard.press('Control+S'); await waitForFile(scenePath); await page.waitForTimeout(300);
   await page.keyboard.press('Control+Shift+S'); await waitForFile(saveAsPath);
   report.savedScenes = { saveBytes: (await stat(scenePath)).size, saveAsBytes: (await stat(saveAsPath)).size };
   report.checks.push('Ctrl+Enter builds from Source; Ctrl+S and Ctrl+Shift+S save through the same scene actions while Source has focus');
@@ -92,12 +102,25 @@ try {
   assert.deepEqual(await app.evaluate(({ nativeImage }, bytes) => nativeImage.createFromBuffer(Buffer.from(bytes)).getSize(), [...png]), { width: 1920, height: 1080 });
   await page.keyboard.press('Control+Shift+R');
   await page.getByRole('status').filter({ hasText: 'Recording 1920 × 1080' }).waitFor();
+  await page.getByRole('button', { name: 'Stop recording', exact: true }).waitFor();
   await page.waitForTimeout(1200); await page.keyboard.press('Control+Shift+R');
-  await page.getByRole('button', { name: 'Preview', exact: true }).waitFor(); await waitForFile(videoPath, 1024);
+  await page.getByRole('button', { name: 'Record video', exact: true }).waitFor(); await waitForFile(videoPath, 1024, 300);
   report.capture = { pngBytes: png.length, videoBytes: (await stat(videoPath)).size };
   report.checks.push('Ctrl+Shift+P saves a decoded 1920×1080 PNG and Ctrl+Shift+R starts and finishes a WebM recording');
 
-  await page.getByRole('button', { name: 'View', exact: true }).focus();
+  const viewButton = page.getByRole('button', { name: 'View', exact: true }); await viewButton.focus();
+  await page.keyboard.press('Shift+/');
+  const shortcutDialog = page.getByRole('dialog', { name: 'Keyboard shortcuts' }); await shortcutDialog.waitFor();
+  for (const text of ['Build preview', 'Save scene', 'Start or stop recording', 'Maximize or restore focused panel', 'Show keyboard shortcuts', 'Shift+/']) {
+    assert.equal(await shortcutDialog.getByText(text, { exact: true }).count(), 1, text);
+  }
+  await page.keyboard.press('Shift+/'); assert.equal(await page.getByRole('dialog', { name: 'Keyboard shortcuts' }).count(), 1);
+  await page.screenshot({ path: helpScreenshotPath });
+  await page.keyboard.press('Escape'); await shortcutDialog.waitFor({ state: 'detached' });
+  assert.equal(await viewButton.evaluate(element => element === document.activeElement), true);
+  report.checks.push('? opens one complete shortcut reference outside Source; Escape closes it and restores focus');
+
+  await viewButton.focus();
   const inspector = page.locator('.studio-pane-inspector');
   assert.equal(await inspector.count(), 1); await page.keyboard.press('Control+Shift+I'); await inspector.waitFor({ state: 'detached' });
   await page.keyboard.press('Control+Shift+I'); await inspector.waitFor();
@@ -113,10 +136,17 @@ try {
   const diagnostics = page.locator('.studio-pane-diagnostics');
   await diagnostics.waitFor();
   assert.equal(await diagnostics.evaluate(element => !!element.closest('.studio-expanded-pane:not([hidden])')), true);
+  const restoreWorkspace = page.getByRole('button', { name: 'Restore workspace', exact: true });
+  assert.match(await restoreWorkspace.getAttribute('title'), /Ctrl\+Shift\+M/);
+  assert.match(await restoreWorkspace.innerText(), /Ctrl\+Shift\+M/);
   assert.equal(await page.evaluate(() => window.__shortcutCanvas === document.querySelector('.preview-surface canvas')), true);
   await page.waitForTimeout(500);
   const afterFrame = await canvas.evaluate(element => element.toDataURL());
   assert.notEqual(afterFrame, beforeFrame, 'hidden live Preview must continue rendering while Diagnostics is maximized');
+  await diagnostics.getByText('Performance', { exact: true }).click();
+  await diagnostics.getByText('Runtime', { exact: true }).click();
+  await diagnostics.getByLabel('Live performance').waitFor();
+  await diagnostics.getByText('Authoring revision', { exact: true }).waitFor();
   await page.screenshot({ path: screenshotPath });
   await page.keyboard.press('F11'); await page.locator('.studio-preview-fullscreen').waitFor();
   assert.equal(await page.evaluate(() => window.__shortcutCanvas === document.querySelector('.preview-surface canvas')), true);
@@ -124,7 +154,7 @@ try {
   assert.equal(await diagnostics.evaluate(element => !!element.closest('.studio-expanded-pane:not([hidden])')), true);
   await page.keyboard.press('Escape'); await page.locator('.studio-dock-grid:not([hidden])').waitFor();
   assert.equal(await diagnosticsTab.evaluate(element => element === document.activeElement), true);
-  report.checks.push('Focused Diagnostics maximizes with the same advancing Preview canvas; F11 shows Preview and Escape restores Diagnostics, then its dock focus');
+  report.checks.push('Focused Diagnostics exposes Restore workspace with its hint and keeps the same advancing Preview canvas; F11 shows Preview and Escape restores Diagnostics, then its dock focus');
 
   assert.deepEqual(report.errors, []); report.ok = true;
 } catch (error) {

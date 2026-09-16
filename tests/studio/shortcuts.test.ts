@@ -16,6 +16,8 @@ test('Studio shortcut map uses the approved Windows bindings and accepts Command
     [{ key: 'S', metaKey: true, shiftKey: true }, 'save-as'],
     [{ key: 'e', ctrlKey: true, shiftKey: true }, 'export'],
     [{ key: 'Enter', ctrlKey: true }, 'build'],
+    [{ key: '?', shiftKey: true }, 'shortcut-reference'],
+    [{ key: '/', shiftKey: true }, 'shortcut-reference'],
   ] as const;
   for (const [event, command] of expected) assert.equal(shortcutCommand(key(event)), command);
   assert.equal(shortcutCommand(key({ key: 's', ctrlKey: true, altKey: true })), null);
@@ -28,5 +30,6 @@ test('shortcut hints expose the exact commands shown by menus and buttons', () =
     'maximize-panel': 'Ctrl+Shift+M', fullscreen: 'F11', 'toggle-inspector': 'Ctrl+Shift+I',
     'save-frame': 'Ctrl+Shift+P', 'toggle-recording': 'Ctrl+Shift+R', save: 'Ctrl+S',
     'save-as': 'Ctrl+Shift+S', export: 'Ctrl+Shift+E', build: 'Ctrl+Enter',
+    'shortcut-reference': '?',
   });
 });

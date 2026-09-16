@@ -156,10 +156,14 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   await act(async () => { diagnosticsTab.focus(); fireEvent.click(diagnosticsTab); });
   await act(async () => { fireEvent.keyDown(window, { key: 'm', ctrlKey: true, shiftKey: true }); });
   assert.equal(document.querySelector('.studio-pane-diagnostics')?.closest('.studio-expanded-pane')?.hasAttribute('hidden'), false, 'focused Diagnostics panel is maximized');
+  const restoreWorkspace = screen.getByRole('button', { name: 'Restore workspace' });
+  assert.match(restoreWorkspace.getAttribute('title') ?? '', /Ctrl\+Shift\+M/);
+  assert.match(restoreWorkspace.textContent ?? '', /Ctrl\+Shift\+M/, 'Restore workspace prints its shortcut hint');
   assert.equal(document.querySelector('.preview-surface canvas'), canvas, 'maximizing Diagnostics preserves the live Preview canvas');
   assert.equal(canvas.isConnected, true);
-  await act(async () => { fireEvent.keyDown(window, { key: 'Escape' }); });
+  await act(async () => { fireEvent.click(restoreWorkspace); });
   assert.ok(document.querySelector('.studio-dock-grid .studio-pane-diagnostics'));
+  assert.equal(document.activeElement, diagnosticsTab, 'visible Restore workspace returns focus to the prior panel tab');
   await act(async () => { editor.contentDOM.focus(); fireEvent.keyDown(editor.contentDOM, { key: 'm', ctrlKey: true, shiftKey: true }); });
   assert.ok(editorNode.closest('.studio-dock-grid'), 'panel shortcuts do not hijack source text input');
   await act(async () => { fireEvent.keyDown(editor.contentDOM, { key: 'i', ctrlKey: true, shiftKey: true }); });
