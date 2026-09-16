@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "909bf033-22df-4ccc-afdb-431b6a83f9d4",
+  "revision": 1,
+  "name": "Organic Regions",
+  "description": "Slowly flowing weighted regions with varied size and density. Supplies shader fragments and controls to a compatible painting renderer without an extra image pass.",
+  "updatedAt": "2026-09-16T07:49:15.220Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "regions.ts",
+    "files": [
+      "regions.ts"
+    ]
+  }
+}
