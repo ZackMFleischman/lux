@@ -29,6 +29,17 @@ async function waitForFile(path, minimum = 1, attempts = 120) {
   throw Error(`Timed out waiting for ${path}`);
 }
 async function openMenu(name) { await page.getByRole('button', { name, exact: true }).click(); }
+async function assertPreviewSize(width, height) {
+  await page.waitForFunction(({ width, height }) => {
+    const canvas = document.querySelector('.preview-surface canvas');
+    return canvas?.width === width && canvas?.height === height && document.querySelector('.preview-resolution-value')?.textContent === `${width} × ${height}`;
+  }, { width, height });
+  (report.previewSizes ??= []).push({ width, height });
+}
+async function useSmallPreview() {
+  await page.getByRole('slider', { name: 'Preview resolution scale', exact: true }).press('Home');
+  await assertPreviewSize(640, 360);
+}
 
 try {
   app = await _electron.launch({ executablePath: installedElectron(root), args: [join(root, 'apps/studio/dist/main.cjs')],
@@ -72,7 +83,9 @@ try {
   }, { scene: scenePath, saveAs: saveAsPath, frame: framePath, video: videoPath });
 
   const editor = page.locator('.cm-content');
-  await editor.waitFor(); await editor.focus();
+  await editor.waitFor();
+  await page.waitForFunction(() => document.querySelector('.cm-content')?.getAttribute('contenteditable') === 'true', undefined, { timeout: 60000 });
+  await editor.focus();
   const sourceBeforeQuestionMark = await editor.textContent();
   await page.keyboard.type('?');
   assert.equal(await page.getByRole('dialog', { name: 'Keyboard shortcuts' }).count(), 0);
@@ -84,6 +97,8 @@ try {
   await page.keyboard.press('Control+Enter');
   await page.waitForFunction(() => document.querySelector('.status-build')?.textContent?.includes('Build ready'));
   const canvas = page.locator('.preview-surface canvas'); await canvas.waitFor({ state: 'visible' });
+  await useSmallPreview();
+  await editor.focus();
   await page.keyboard.press('Control+S'); await waitForFile(scenePath); await page.waitForTimeout(300);
   await page.keyboard.press('Control+Shift+S'); await waitForFile(saveAsPath);
   report.savedScenes = { saveBytes: (await stat(scenePath)).size, saveAsBytes: (await stat(saveAsPath)).size };
@@ -96,6 +111,8 @@ try {
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();
   report.checks.push('Ctrl+Shift+E opens one export dialog and further dialog shortcuts are suppressed');
 
+  await page.getByLabel('Preview resolution preset', { exact: true }).selectOption('1920x1080');
+  await assertPreviewSize(1920, 1080);
   await page.getByRole('button', { name: 'View', exact: true }).focus();
   await page.keyboard.press('Control+Shift+P'); await waitForFile(framePath);
   const png = await readFile(framePath);
@@ -107,6 +124,7 @@ try {
   await page.getByRole('button', { name: 'Record video', exact: true }).waitFor(); await waitForFile(videoPath, 1024, 300);
   report.capture = { pngBytes: png.length, videoBytes: (await stat(videoPath)).size };
   report.checks.push('Ctrl+Shift+P saves a decoded 1920×1080 PNG and Ctrl+Shift+R starts and finishes a WebM recording');
+  await useSmallPreview();
 
   const viewButton = page.getByRole('button', { name: 'View', exact: true }); await viewButton.focus();
   await page.keyboard.press('Shift+/');

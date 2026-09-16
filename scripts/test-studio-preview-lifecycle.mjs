@@ -28,6 +28,14 @@ try{
   assert.equal(await page.locator('.preview-surface canvas').count(),1);
   await page.screenshot({path:join(output,'startup-playing.png')});
   report.checks.push('Normal startup built and played the initial visual without a Build action');
+  await page.getByRole('slider',{name:'Preview resolution scale',exact:true}).press('Home');
+  await page.waitForFunction(()=>{
+    const canvas=document.querySelector('.preview-surface canvas');
+    return canvas?.width===640&&canvas?.height===360&&document.querySelector('.preview-resolution-value')?.textContent==='640 × 360';
+  });
+  const lowResolution=(await call('status')).authoring.output;
+  assert.equal(lowResolution.width,640);assert.equal(lowResolution.height,360);
+  report.interactionOutput=lowResolution;
 
   const code=await readFile(join(root,'skills/lux-visual-creation/assets/noise-sphere.ts'),'utf8');
   const source={sdkVersion:'0.2.0',entry:'visual.ts',files:{'visual.ts':code}};
