@@ -49,7 +49,7 @@ async function click(name: string) {
   }
   if (name === 'Close selected panel') {
     await closeLayouts();
-    const titles: Record<string, string> = { source: 'Source', preview: 'Preview', library: 'Library', inspector: 'Inspector', jobs: 'Jobs', graph: 'Graph' };
+    const titles: Record<string, string> = { source: 'Source', preview: 'Preview', library: 'Library', inspector: 'Inspector', diagnostics: 'Diagnostics', jobs: 'Jobs', graph: 'Graph' };
     const tab = [...document.querySelectorAll('.dv-tab')].find(node => node.textContent?.trim() === titles[selectedPanel]);
     assert.ok(tab, `Expected ${selectedPanel} tab`);
     const close = tab.querySelector('.dv-default-tab-action');
@@ -180,7 +180,7 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   assert.ok(reopenedJobsTab?.closest('.dv-groupview')?.contains(document.activeElement), 'Focus moves into the Jobs group');
   assert.equal(document.querySelector('.cm-editor'), editorNode);
   assert.equal(attaches, 1); assert.equal(detaches, 0); assert.equal(subscriptions, 1);
-  for (const kind of ['preview', 'source', 'graph', 'library', 'inspector', 'jobs']) {
+  for (const kind of ['preview', 'source', 'graph', 'library', 'inspector', 'diagnostics', 'jobs']) {
     selectedPanel = kind;
     await click('Close selected panel');
   }
@@ -219,7 +219,7 @@ test('group menu targets its owning group, cancels with focus and rejects a vani
   await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: 'Open Source' })); });
   assert.ok(groups(adapter.capture('check').dock.grid.root).find((g: any) => g.id === 'preview-group').views.includes('source'));
   const target = adapter.groupTarget('jobs-group');
-  await act(async () => { adapter.close('jobs'); adapter.close('graph'); });
+  await act(async () => { adapter.close('jobs'); adapter.close('graph'); adapter.close('diagnostics'); });
   const before = adapter.capture('check');
   assert.throws(() => adapter.openInGroup('source', target), /no longer exists/);
   assert.deepEqual(adapter.capture('check'), before);
@@ -348,7 +348,7 @@ test('Graph enters nested components one level at a time and edits an exposed co
   assert.equal(calls.length,writes,'Navigation does not write control values');
   assert.ok(!inspector.queryByRole('navigation',{name:'Inspector controls path'}));
   assert.ok(document.activeElement===document.querySelector('.inspector summary'));
-  assert.equal(document.querySelectorAll('.dv-tab').length,5,'Inspector navigation does not reopen Graph');
+  assert.equal(document.querySelectorAll('.dv-tab').length,6,'Inspector navigation does not reopen Graph');
   await click('Open Graph');
 
   await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Back to Double mirror 1'}));});
@@ -361,9 +361,9 @@ test('Graph enters nested components one level at a time and edits an exposed co
 test('View is a compact keyboard menu with recoverable panes and a separate layout dialog', async () => { const { StudioDockShell } = await import('../../apps/studio/src/layout/StudioDockShell.tsx');
   const ui = render(<StudioDockShell compact={false} showInspector={false}
     preview={<p>Preview content</p>} source={<p>Source content</p>} library={<p>Library content</p>}
-    inspector={<p>Inspector content</p>} jobs={<p>Jobs content</p>} graph={<p>Graph content</p>} />);
+    inspector={<p>Inspector content</p>} diagnostics={<p>Diagnostics content</p>} jobs={<p>Jobs content</p>} graph={<p>Graph content</p>} />);
   await click('View'); const menu = screen.getByRole('menu', { name: 'View' });
-  assert.equal(within(menu).getAllByRole('menuitem').length, 7); assert.equal(screen.queryByLabelText('Move panel'), null);
+  assert.equal(within(menu).getAllByRole('menuitem').length, 8); assert.ok(within(menu).getByRole('menuitem', { name: 'Diagnostics' })); assert.equal(screen.queryByLabelText('Move panel'), null);
   assert.equal(screen.queryByLabelText('Layout name'), null); const first = within(menu).getByRole('menuitem', { name: 'Preview' }); assert.ok(document.activeElement === first, 'View focuses its first pane item');
   fireEvent.keyDown(first, { key: 'ArrowDown' }); assert.ok(document.activeElement === within(menu).getByRole('menuitem', { name: 'Source' }), 'ArrowDown focuses Source');
   fireEvent.keyDown(document.activeElement!, { key: 'Escape' }); await waitFor(() => assert.ok(document.activeElement === screen.getByRole('button', { name: 'View' }), 'Restore focus to View')); await click('View'); await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: 'Layouts…' })); });
@@ -371,6 +371,8 @@ test('View is a compact keyboard menu with recoverable panes and a separate layo
   assert.ok(within(dialog).getByLabelText('Layout name'));
   await click('Done');
   await waitFor(() => assert.ok(!screen.queryByRole('dialog')));
+  selectedPanel = 'diagnostics'; await click('Close selected panel'); await click('Open Diagnostics');
+  assert.ok([...document.querySelectorAll('.dv-tab')].some(tab => tab.textContent?.trim() === 'Diagnostics'));
   ui.unmount();
 });
 
