@@ -109,7 +109,7 @@ async function initialize(message) {
       !Number.isInteger(settings.seed) || settings.seed < 0 || settings.seed > 0xffffffff) throw Error('Unsupported output settings');
   const prepared=await prepareAuthoredModule(message);
   controlState=prepared.admission.kind==='composition'?await prepareWorkerCompositionState(message,prepared.admission):await prepareWorkerControlState(message,prepared.admission);
-  controlState.applyAudioSnapshot(message.audioSnapshot??{generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0});
+  controlState.applyAudioSnapshot(message.audioSnapshot??{generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0},{playing:false,timeSeconds:0});
   clock = new RuntimeClock(() => performance.now(), 'paused'); random = new SeededRandom(settings.seed);
   /*! lux-worker-liveness-v2: heartbeat starts before authored import/create. */
   let workerHeartbeat=0;
@@ -211,13 +211,13 @@ onmessage = event => {
       if(message.restart)controlState.restartAnimation(message.restart.nodePath,message.restart.controlId,clock.snapshot().timeSeconds);
       await draw(message.requestId,'status');schedule();
     } else if(message.type==='audio'){
-      controlState.applyAudioSnapshot(message.audioSnapshot);
+      const audioClock=clock.snapshot();controlState.applyAudioSnapshot(message.audioSnapshot,{playing:audioClock.playback==='playing',timeSeconds:audioClock.timeSeconds});
       send('audio-ack',{providerGeneration:message.audioSnapshot.generation,sampleSequence:message.audioSnapshot.sequence});
     } else if (message.type === 'playback') {
       if (!['play', 'pause', 'reset'].includes(message.action)) throw Error('Invalid playback command');
       clearTimeout(timer);
       if (message.action === 'reset') { clock.reset(); controlState.resetAnimations?.(0); random.reset(settings.seed); await visual.reset(settings.seed); lastTime = 0; tick = 0; }
-      else clock[message.action]();
+      else {if(message.action==='pause')controlState.fenceAudioEvents?.();clock[message.action]();}
       await draw(message.requestId, 'status'); schedule();
     } else if (message.type === 'capture') {
       try {

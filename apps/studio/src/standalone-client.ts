@@ -61,7 +61,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private audioSnapshot:AudioBandSnapshot;
   constructor(api: AuthoringApi, options:{codeDeclaredParameters?:boolean;performanceMode?:CollectionMode;audioProvider?:Pick<StudioAudioProvider,'getSnapshot'|'subscribe'>}={}) {
     this.api = api; this.codeDeclaredParameters=options.codeDeclaredParameters===true; this.performanceMode=collectionMode(options.performanceMode);
-    this.audioSnapshot=normalizeAudioBandSnapshot(options.audioProvider?.getSnapshot()??{generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0});
+    this.audioSnapshot=normalizeAudioBandSnapshot(options.audioProvider?.getSnapshot()??{generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0});
     options.audioProvider?.subscribe(()=>{
       this.audioSnapshot=normalizeAudioBandSnapshot(options.audioProvider!.getSnapshot());
       for(const runtime of this.audioRuntimes)this.queueAudio(runtime,this.audioSnapshot);

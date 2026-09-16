@@ -1,6 +1,6 @@
 import {validateControlAnimationBindings} from '../../../../packages/runtime-contracts/src/control-animation.mjs';
 import {normalizeAudioBandSnapshot} from '../../../../packages/runtime-contracts/src/audio-input.mjs';
-const freeze=Object.freeze,stringify=JSON.stringify,isFiniteNumber=Number.isFinite,sin=Math.sin,abs=Math.abs,min=Math.min,max=Math.max,PI=Math.PI,RuntimeError=Error;
+const freeze=Object.freeze,stringify=JSON.stringify,isFiniteNumber=Number.isFinite,sin=Math.sin,abs=Math.abs,min=Math.min,max=Math.max,exp=Math.exp,PI=Math.PI,RuntimeError=Error;
 const RuntimeMap=Map,RuntimeSet=Set,call=Function.prototype.call;
 const arrayFind=call.bind(Array.prototype.find),arraySome=call.bind(Array.prototype.some),arrayPush=call.bind(Array.prototype.push);
 const mapGet=call.bind(Map.prototype.get),mapSet=call.bind(Map.prototype.set),setAdd=call.bind(Set.prototype.add),setHas=call.bind(Set.prototype.has);
@@ -16,7 +16,7 @@ export function normalizeControlAnimations(input,profile){
   if(!node)issue='Animation target is no longer available.';
   else if(node.definitionHash!==raw.definitionHash||node.schemaHash!==raw.schemaHash)issue='Animated control changed and is incompatible with this binding.';
   else if(!arraySome(node.schema,control=>control.id===raw.controlId))issue='Animated control is no longer available.';
-  if(raw.kind==='audio'){
+  if(raw.kind==='audio'||raw.kind==='kick'){
    const configuration=stringify([raw.source.logicalInputId,raw.source.analyzer]);
    if(audioConfiguration===undefined)audioConfiguration=configuration;else if(audioConfiguration!==configuration&&!issue)issue='Audio binding uses an unavailable input configuration.';
   }
@@ -41,8 +41,8 @@ export function animatedControlValue(base,definition,binding,timeSeconds){
 export function createControlAnimationEvaluator(profile,base,normalized){
  let current=normalized;
  let entries=new RuntimeMap();
- let audioSnapshot=normalizeAudioBandSnapshot({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0});
- const createEntry=binding=>binding.kind==='audio'?{binding,filtered:0,lastTime:undefined}:{binding,anchorTime:0,frozenElapsed:0};
+ let audioSnapshot=normalizeAudioBandSnapshot({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0});
+ const createEntry=binding=>binding.kind==='audio'?{binding,filtered:0,lastTime:undefined}:binding.kind==='kick'?{binding,phase:'idle',phaseStart:0,startValue:0,peak:0,lastTrigger:undefined,observedGeneration:audioSnapshot.generation,observedKickSequence:audioSnapshot.kickSequence,wasAvailable:audioSnapshot.available}:{binding,anchorTime:0,frozenElapsed:0};
  for(let index=0;index<normalized.bindings.length;index++){const binding=normalized.bindings[index];mapSet(entries,`${key(binding.nodePath)}:${binding.controlId}`,createEntry(binding));}
  const elapsed=(entry,timeSeconds)=>entry.frozenElapsed+(entry.binding.enabled?max(0,timeSeconds-entry.anchorTime):0);
  function replace(next,timeSeconds){
@@ -51,23 +51,59 @@ export function createControlAnimationEvaluator(profile,base,normalized){
    if(binding.kind==='audio'){
     mapSet(nextEntries,id,before?.binding.kind==='audio'?{binding,filtered:before.filtered,lastTime:before.lastTime}:createEntry(binding));continue;
    }
-   if(before&&before.binding.kind!=='audio'){const atChange=elapsed(before,timeSeconds);if(binding.enabled){if(before.binding.enabled){anchorTime=before.anchorTime;frozenElapsed=before.frozenElapsed;}else frozenElapsed=before.frozenElapsed;}else frozenElapsed=atChange;}
+   if(binding.kind==='kick'){
+    const entry=before?.binding.kind==='kick'?{...before,binding}:createEntry(binding);
+    if(!binding.enabled||!before?.binding.enabled){entry.phase='idle';entry.startValue=0;entry.peak=0;entry.observedGeneration=audioSnapshot.generation;entry.observedKickSequence=audioSnapshot.kickSequence;}
+    mapSet(nextEntries,id,entry);continue;
+   }
+   if(before&&before.binding.kind!=='audio'&&before.binding.kind!=='kick'){const atChange=elapsed(before,timeSeconds);if(binding.enabled){if(before.binding.enabled){anchorTime=before.anchorTime;frozenElapsed=before.frozenElapsed;}else frozenElapsed=before.frozenElapsed;}else frozenElapsed=atChange;}
    mapSet(nextEntries,id,{binding,anchorTime,frozenElapsed});
   }
   current=next;entries=nextEntries;
  }
- function restart(path,controlId,timeSeconds){const id=`${key(path)}:${controlId}`,entry=mapGet(entries,id);if(entry){finite(timeSeconds,'time');mapSet(entries,id,entry.binding.kind==='audio'?{binding:entry.binding,filtered:0,lastTime:timeSeconds}:{binding:entry.binding,anchorTime:timeSeconds,frozenElapsed:0});}}
+ function restart(path,controlId,timeSeconds){const id=`${key(path)}:${controlId}`,entry=mapGet(entries,id);if(entry){finite(timeSeconds,'time');mapSet(entries,id,entry.binding.kind==='audio'?{binding:entry.binding,filtered:0,lastTime:timeSeconds}:entry.binding.kind==='kick'?{...createEntry(entry.binding),observedGeneration:audioSnapshot.generation,observedKickSequence:audioSnapshot.kickSequence}:{binding:entry.binding,anchorTime:timeSeconds,frozenElapsed:0});}}
  function audioValue(entry,timeSeconds){
   const time=finite(timeSeconds,'time'),target=audioSnapshot.available?audioSnapshot[entry.binding.source.band]:0,previous=entry.filtered;
   const deltaMs=entry.lastTime===undefined?0:min(60000,max(0,(time-entry.lastTime)*1000));
   const tau=target>previous?entry.binding.attackMs:entry.binding.releaseMs,alpha=tau===0?1:-Math.expm1(-deltaMs/tau),filtered=previous+(target-previous)*alpha;
   entry.filtered=filtered;entry.lastTime=entry.lastTime===undefined?time:max(entry.lastTime,time);return filtered;
  }
+ const exponentialSpan=1-exp(-5);
+ function envelopeProgress(value,shape){const bounded=min(1,max(0,value));return shape==='linear'?bounded:(1-exp(-5*bounded))/exponentialSpan;}
+ function envelopeAt(entry,timeSeconds){
+  if(entry.phase==='idle')return 0;
+  const elapsedMs=max(0,(timeSeconds-entry.phaseStart)*1000);
+  if(entry.phase==='release'){
+   if(entry.binding.releaseMs===0||elapsedMs>=entry.binding.releaseMs){entry.phase='idle';return 0;}
+   return entry.startValue*(1-envelopeProgress(elapsedMs/entry.binding.releaseMs,entry.binding.envelope));
+  }
+  if(elapsedMs<=entry.binding.attackMs){if(entry.binding.attackMs===0)return entry.peak;return entry.startValue+(entry.peak-entry.startValue)*envelopeProgress(elapsedMs/entry.binding.attackMs,entry.binding.envelope);}
+  const releaseElapsed=elapsedMs-entry.binding.attackMs;
+  if(entry.binding.releaseMs===0||releaseElapsed>=entry.binding.releaseMs){entry.phase='idle';return 0;}
+  return entry.peak*(1-envelopeProgress(releaseElapsed/entry.binding.releaseMs,entry.binding.envelope));
+ }
+ function kickValue(entry,timeSeconds){
+  const time=finite(timeSeconds,'time');let value=envelopeAt(entry,time);
+  if(!audioSnapshot.available){
+   if(entry.wasAvailable&&value>0){entry.phase='release';entry.phaseStart=time;entry.startValue=value;value=envelopeAt(entry,time);}
+   entry.wasAvailable=false;entry.observedGeneration=audioSnapshot.generation;entry.observedKickSequence=audioSnapshot.kickSequence;return value;
+  }
+  entry.wasAvailable=true;
+  const unseen=audioSnapshot.generation>entry.observedGeneration||(audioSnapshot.generation===entry.observedGeneration&&audioSnapshot.kickSequence>entry.observedKickSequence);
+  if(unseen){
+   entry.observedGeneration=audioSnapshot.generation;entry.observedKickSequence=audioSnapshot.kickSequence;
+   const threshold=.5-.45*entry.binding.sensitivity,lastTrigger=entry.lastTrigger;
+   if(audioSnapshot.kickSequence>0&&audioSnapshot.kickStrength>=threshold&&(lastTrigger===undefined||(time-lastTrigger)*1000>=entry.binding.retriggerMs)){
+    value=envelopeAt(entry,time);entry.phase='trigger';entry.phaseStart=time;entry.startValue=value;entry.peak=audioSnapshot.kickStrength;entry.lastTrigger=time;value=envelopeAt(entry,time);
+   }
+  }
+  return value;
+ }
   function nodeValues(path,timeSeconds){
    const values={...base.nodeValues(path)},node=arrayFind(profile.nodes,row=>key(row.nodePath)===key(path));
    if(!node)return freeze(values);
   const issueKeys=new RuntimeSet();for(let index=0;index<current.issues.length;index++){const issue=current.issues[index];setAdd(issueKeys,`${key(issue.nodePath)}:${issue.controlId}`);}
-  for(let index=0;index<node.schema.length;index++){const definition=node.schema[index],id=`${key(path)}:${definition.id}`,entry=mapGet(entries,id);if(entry&&!setHas(issueKeys,id))values[definition.id]=entry.binding.kind==='audio'?(entry.binding.enabled?min(definition.max,max(definition.min,values[definition.id]+entry.binding.amount*audioValue(entry,timeSeconds))):values[definition.id]):animatedControlValue(values[definition.id],definition,entry.binding,elapsed(entry,timeSeconds));}
+  for(let index=0;index<node.schema.length;index++){const definition=node.schema[index],id=`${key(path)}:${definition.id}`,entry=mapGet(entries,id);if(entry&&!setHas(issueKeys,id))values[definition.id]=entry.binding.kind==='audio'?(entry.binding.enabled?min(definition.max,max(definition.min,values[definition.id]+entry.binding.amount*audioValue(entry,timeSeconds))):values[definition.id]):entry.binding.kind==='kick'?(entry.binding.enabled?min(definition.max,max(definition.min,values[definition.id]+entry.binding.amount*kickValue(entry,timeSeconds))):values[definition.id]):animatedControlValue(values[definition.id],definition,entry.binding,elapsed(entry,timeSeconds));}
   return freeze(values);
  }
  function values(timeSeconds){
@@ -75,6 +111,8 @@ export function createControlAnimationEvaluator(profile,base,normalized){
   for(let index=0;index<profile.publicControls.length;index++){const definition=profile.publicControls[index],targets=profile.publicControlBindings[definition.id],target=targets?.length===1&&targets[0]?.active?targets[0]:undefined;if(target)values[definition.id]=nodeValues(target.nodePath,timeSeconds)[target.controlId];}
   return freeze(values);
  }
- function applyAudioSnapshot(input){const next=normalizeAudioBandSnapshot(input);if(next.generation<audioSnapshot.generation||(next.generation===audioSnapshot.generation&&next.sequence<=audioSnapshot.sequence))return false;audioSnapshot=next;return true;}
- return freeze({nodeValues,values,replace,restart,applyAudioSnapshot,bindings:()=>current.bindings,issues:()=>current.issues});
+ function forEachKickEntry(visit){for(let index=0;index<current.bindings.length;index++){const binding=current.bindings[index];if(binding.kind==='kick'){const entry=mapGet(entries,`${key(binding.nodePath)}:${binding.controlId}`);if(entry)visit(entry);}}}
+ function fenceAudioEvents(){forEachKickEntry(entry=>{entry.observedGeneration=audioSnapshot.generation;entry.observedKickSequence=audioSnapshot.kickSequence;});}
+ function applyAudioSnapshot(input,state){const next=normalizeAudioBandSnapshot(input);if(next.generation<audioSnapshot.generation||(next.generation===audioSnapshot.generation&&next.sequence<=audioSnapshot.sequence))return false;audioSnapshot=next;if(state?.playing===false)fenceAudioEvents();forEachKickEntry(entry=>{if(!entry.binding.enabled){entry.observedGeneration=next.generation;entry.observedKickSequence=next.kickSequence;}});return true;}
+ return freeze({nodeValues,values,replace,restart,applyAudioSnapshot,fenceAudioEvents,bindings:()=>current.bindings,issues:()=>current.issues});
 }

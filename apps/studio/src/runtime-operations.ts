@@ -14,9 +14,13 @@ const lfoAnimationBindingSchema=z.object({...animationTarget,...animationAmount,
 const audioAnalyzerSchema=z.object({version:z.literal(1),fftSize:z.literal(2048),minDecibels:z.number().finite().min(-120).max(-40),maxDecibels:z.number().finite().min(-80).max(0)}).strict()
   .refine(analyzer=>analyzer.maxDecibels-analyzer.minDecibels>=10,{message:'Audio analyzer range must span at least 10 decibels'});
 const audioSourceSchema=z.object({kind:z.literal('audio-band'),logicalInputId:z.literal('primary-audio'),band:z.enum(['level','bass','mids','highs']),analyzer:audioAnalyzerSchema}).strict();
+const kickSourceSchema=z.object({kind:z.literal('audio-kick'),logicalInputId:z.literal('primary-audio'),analyzer:audioAnalyzerSchema}).strict();
 const audioAnimationBindingSchema=z.object({...animationTarget,...animationAmount,kind:z.literal('audio'),source:audioSourceSchema,
   attackMs:z.number().int().safe().min(0).max(60000),releaseMs:z.number().int().safe().min(0).max(60000)}).strict();
-const animationBindingSchema=z.union([lfoAnimationBindingSchema,audioAnimationBindingSchema]);
+const kickAnimationBindingSchema=z.object({...animationTarget,...animationAmount,kind:z.literal('kick'),source:kickSourceSchema,
+  attackMs:z.number().int().safe().min(0).max(60000),releaseMs:z.number().int().safe().min(0).max(60000),
+  sensitivity:z.number().finite().min(0).max(1),retriggerMs:z.number().int().safe().min(0).max(2000),envelope:z.enum(['linear','exponential'])}).strict();
+const animationBindingSchema=z.union([lfoAnimationBindingSchema,audioAnimationBindingSchema,kickAnimationBindingSchema]);
 export const nodeAnimationInputSchema=z.object({...target,expectedRevisionId:z.string().min(1),expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/),nodePath:z.array(nodeIdSchema).max(8),controlId:z.string().min(1).max(64),animation:animationBindingSchema.nullable(),restart:z.boolean().optional()}).strict();
 export const restartInputSchema = z.object(target).strict();
 export const previewResizeInputSchema = z.object({ ...target, width: z.number().int().min(1).max(3840), height: z.number().int().min(1).max(2160) }).strict();

@@ -6,6 +6,7 @@ const sqrt = Math.sqrt;
 const pow = Math.pow;
 const min = Math.min;
 const max = Math.max;
+const exp = Math.exp;
 
 function rms(sum, count) {
   return count === 0 ? 0 : sqrt(sum / count);
@@ -51,6 +52,29 @@ export function analyzeAudioFrame(timeDomain, frequencyDecibels, sampleRate, inp
     mids: rms(midsSum, midsCount), highs: rms(highsSum, highsCount) });
 }
 
+export function createKickTransientDetector() {
+  let initialized=false,baseline=0,lastSampleMs=0,armed=true,tracking=false,episodePeak=0;
+  return freeze({
+    sample(bass,timeMs) {
+      if(!finite(bass)||bass<0||bass>1)throw new Error('Invalid kick detector sample');
+      if(!finite(timeMs)||timeMs<0||(initialized&&timeMs<lastSampleMs))throw new Error('Invalid kick detector time');
+      if(!initialized){initialized=true;baseline=bass;lastSampleMs=timeMs;return 0;}
+      const deltaMs=min(250,max(0,timeMs-lastSampleMs));
+      const score=min(1,max(0,(bass-baseline)/max(.25,1-baseline)));
+      const tau=bass>baseline?500:1500,alpha=deltaMs===0?0:1-exp(-deltaMs/tau);
+      baseline+= (bass-baseline)*alpha;lastSampleMs=timeMs;
+      if(tracking){
+        if(score>=episodePeak){episodePeak=score;return 0;}
+        const emitted=episodePeak;tracking=false;episodePeak=0;armed=false;return emitted;
+      }
+      if(!armed){if(score<.025)armed=true;return 0;}
+      if(score>=.05){tracking=true;episodePeak=score;}
+      return 0;
+    },
+    reset(){initialized=false;baseline=0;lastSampleMs=0;armed=true;tracking=false;episodePeak=0;},
+  });
+}
+
 export function createWebAudioBandAnalyzer(context, stream, inputConfig) {
   const config = normalizeAudioAnalyzerConfig(inputConfig);
   if (!context || !finite(context.sampleRate) || typeof context.createMediaStreamSource !== 'function' ||
@@ -66,17 +90,20 @@ export function createWebAudioBandAnalyzer(context, stream, inputConfig) {
   source.connect(analyzer);
   const timeDomain = new Float32Array(config.fftSize);
   const frequency = new Float32Array(config.fftSize / 2);
+  const kick=createKickTransientDetector();
   let disposed = false;
   return freeze({
-    sample() {
+    sample(timeMs) {
       if (disposed) throw new Error('Audio analyzer is disposed');
       analyzer.getFloatTimeDomainData(timeDomain);
       analyzer.getFloatFrequencyData(frequency);
-      return analyzeAudioFrame(timeDomain, frequency, context.sampleRate, config);
+      const bands=analyzeAudioFrame(timeDomain, frequency, context.sampleRate, config);
+      return freeze({...bands,kickStrength:kick.sample(bands.bass,timeMs)});
     },
     dispose() {
       if (disposed) return;
       disposed = true;
+      kick.reset();
       source.disconnect();
       analyzer.disconnect();
     },
