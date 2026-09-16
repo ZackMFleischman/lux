@@ -125,11 +125,18 @@ test('resolution rejects overlapping mounts, authored-file collisions, and expan
   await assert.rejects(resolveLibraryComponent(overFiles, async () => largeLeaf), /32 source files|quota/i);
 });
 
-test('resolution enforces the eight-instance graph limit', async () => {
+test('resolution accepts more than eight sibling dependencies within source quotas', async () => {
+  const leaves = Array.from({ length: 11 }, (_, index) => component(index + 1, `export default ${index + 1};`));
+  const root = component(0, 'export default 0;', leaves.map((leaf, index) => ({ componentId: leaf.id, revision: 1, mountPath: `child-${index}` })));
+  const resolved = await resolveLibraryComponent(root, async id => leaves.find(item => item.id === id)!);
+  assert.equal(Object.keys(resolved.source.files).length, 12);
+});
+
+test('resolution retains the eight-level dependency nesting limit', async () => {
   const chain = Array.from({ length: 9 }, (_, index) => component(index, `export default ${index};`, index < 8
     ? [{ componentId: ids[index + 1]!, revision: 1, mountPath: `child-${index}` }]
     : undefined));
-  await assert.rejects(resolveLibraryComponent(chain[0]!, async id => chain.find(item => item.id === id)!), /8.*instance|limit/i);
+  await assert.rejects(resolveLibraryComponent(chain[0]!, async id => chain.find(item => item.id === id)!), /depth limit/i);
 });
 
 test('failed expanded validation leaves the existing catalog revision active', async () => {

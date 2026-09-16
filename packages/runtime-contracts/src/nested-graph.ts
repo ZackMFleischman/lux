@@ -5,9 +5,7 @@ import type { DefinitionHash, NodePath, PortRef, GraphEdge, PlannedInput, Resolv
 export type { DefinitionHash, NodePath } from './graph.ts';
 
 // Internal admission/planning DTOs, not persisted identities or execution authority.
-export const nestedGraphLimits = Object.freeze({definitions:128, nodesPerBody:128, edgesPerBody:512,
-  bindingTargetsPerBody:2048, graphLevels:8, expandedPlacements:2048, expandedLeaves:512,
-  expandedEdges:4096, expandedControlTargets:16384, resolutionSteps:65536, overrides:512,
+export const nestedGraphLimits = Object.freeze({graphLevels:8, resolutionSteps:65536,
   rawBytes:2097152, rawValues:100000, rawDepth:16, metadataBytes:1048576, bodyBytes:262144,
   allBodyBytes:1048576, overrideBytes:262144, outputBytes:4194304} as const);
 export type NestedNode = Readonly<{id:NodeId; definitionHash:DefinitionHash; controlDefaults:ControlValues}>;

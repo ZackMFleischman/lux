@@ -3,8 +3,7 @@ import type { ComponentMetadata } from './components.mjs';
 
 // Internal resolved metadata only: these contracts convey no execution capability,
 // persisted project identity, source-byte provenance or resource ownership.
-export const graphLimits = Object.freeze({ nodes:128, edges:512, definitions:128,
-  graphBytes:262144, definitionMetadataBytes:1048576, rawBytes:2097152,
+export const graphLimits = Object.freeze({ graphBytes:262144, definitionMetadataBytes:1048576, rawBytes:2097152,
   rawValues:100000, rawDepth:16 });
 export type DefinitionHash = string;
 export type NodePath = readonly NodeId[];

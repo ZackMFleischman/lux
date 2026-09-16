@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { validateNestedGraph, workCounter, publish, snapshot } from '../../packages/runtime/src/graph/nested-validate.ts';
 import { validateGraph } from '../../packages/runtime/src/graph/validate.ts';
+import { planNestedGraph } from '../../packages/runtime/src/graph/nested-plan.ts';
 import { basic, twins, chain, leaves, fanout, placements, controlFanout, sizedBody, clone, hash, node, ref, cref, meta, graphDef, signal, image, edge, uuid, control } from './nested-graph-fixtures.ts';
 import { sizedMetadata, fanout512 } from './graph-fixtures.ts';
 const admit=(v:any)=>validateNestedGraph(v.graph,v.definitions);
@@ -16,11 +17,11 @@ test('all catalog recursion, missing writers, binding shape and lifecycle reject
  v=basic();v.definitions[hash(1)].body.outputBindings.extra=ref(1);bad(v,/binding/);
  v=basic();v.definitions[hash(2)].metadata.lifecycle.state='stateful';bad(v,/lifecycle/);
 });
-test('depth 8 and pre-pruning 512 leaves pass, their +1 boundaries reject',()=>{
- assert.ok(admit(chain(8)));bad(chain(9),/level|depth/);assert.ok(admit(leaves(512)));bad(leaves(513),/leaf/);
+test('depth 8 remains bounded while flat graphs may exceed 512 leaves',()=>{
+ assert.ok(admit(chain(8)));bad(chain(9),/level|depth/);assert.ok(admit(leaves(513)));
 });
-test('legal nested fanout accounts for 4096 leaf inputs before allocation and rejects 4097',()=>{
- assert.ok(admit(fanout()));bad(fanout(true),/edge/);
+test('expanded fanout is admitted beyond the former 4096-edge threshold',()=>{
+ assert.ok(admit(fanout()));assert.ok(admit(fanout(true)));
 });
 test('hostile raw data rejects without getter invocation, including unused definitions',()=>{
  let calls=0;const v=basic();Object.defineProperty(v.definitions[hash(2)].metadata,'label',{get(){calls++;throw Error('executed');},enumerable:true});bad(v,/own data/);assert.equal(calls,0);
@@ -30,16 +31,16 @@ test('hostile raw data rejects without getter invocation, including unused defin
 test('control interface mismatch and expanded aliases reject but parent chains pass',()=>{
  assert.ok(admit(twins()));const v=twins();v.definitions[hash(2)].metadata.controls[0].max=9;bad(v,/control/);
 });
-test('2048 graph-plus-code placements admit before pruning and 2049 rejects despite only512 leaves',()=>{
- assert.ok(admit(placements()));bad(placements(true),/placement/);
+test('expanded placements are admitted beyond the former 2048 threshold',()=>{
+ assert.ok(admit(placements()));assert.ok(admit(placements(true)));
 });
-test('16384 expanded public control targets admit with every boundary alias counted',()=>{
- assert.ok(admit(controlFanout()));bad(controlFanout(true),/control target/);
+test('expanded public control targets are admitted beyond the former 16384 threshold',()=>{
+ assert.ok(admit(controlFanout()));assert.ok(admit(controlFanout(true)));
 });
-test('raw malformed-hash body counts reject before any descendant descriptor traversal',()=>{
- const v=basic();let reads=0;const guarded=new Proxy({}, {ownKeys(){reads++;throw Error('descendant traversed');}});
- v.definitions['bad.hash']={kind:'graph',metadata:guarded,body:{nodes:Array(129).fill(null),edges:[],inputBindings:{},outputBindings:{},controlBindings:{}}};
- bad(v,/128/);assert.equal(reads,0);
+test('a 600-component connected graph validates and plans within byte and work budgets',()=>{
+ const count=600,v=basic();v.definitions[hash(3)]={kind:'code',metadata:meta({image},{image})};
+ v.definitions[hash(1)]=graphDef(Array.from({length:count},(_,i)=>node(i+1,i?3:2)),Array.from({length:count-1},(_,i)=>edge(i+1,uuid(i+1),'image',uuid(i+2),'image')),{},{image:ref(count)});
+ const accepted=admit(v),root=accepted.definitions[hash(1)];assert.equal(root?.kind,'graph');if(!root||root.kind!=='graph')assert.fail('Expected graph root');assert.equal(root.body.nodes.length,count);assert.equal(planNestedGraph(accepted).nodes.length,count);
 });
 test('each public interface is explicit; signals may be nested but cannot be source roots',()=>{
  for(const mutate of [(v:any)=>delete v.definitions[hash(1)].body.outputBindings.image,(v:any)=>v.definitions[hash(1)].body.outputBindings.image=ref(9),(v:any)=>v.definitions[hash(1)].body.outputBindings.image=ref(1,'missing'),(v:any)=>v.definitions[hash(1)].body.inputBindings.x=[],(v:any)=>v.graph.outputPort='missing',(v:any)=>v.graph.rootDefinitionHash=hash(2)]){const v=basic();mutate(v);bad(v);}
@@ -67,10 +68,8 @@ test('all metadata retains 64KiB per entry and1MiB aggregate bounds',()=>{
  for(let i=0;i<16;i++)w.definitions[hash(i+3)]={kind:'code',metadata:sizedMetadata(i===15?65536-initial:65536)};
  assert.ok(admit(w));w.definitions[hash(18)].metadata=sizedMetadata(65537-initial);bad(w,/aggregate metadata/);
 });
-test('definition/body raw quotas and invalid extra array keys fail before descendants',()=>{
- const v=basic();for(let i=3;i<=128;i++)v.definitions[hash(i)]={kind:'code',metadata:meta()};assert.ok(admit(v));v.definitions[hash(129)]={kind:'code',metadata:meta()};bad(v,/128/);
- for(const [field,count] of [['nodes',129],['edges',513]] as const){const v=basic();v.definitions[hash(1)].body[field]=Array(count).fill(null);bad(v,/raw array/);}
- const b=basic();b.definitions[hash(1)].body.inputBindings={x:Array(2049).fill(null)};bad(b,/2048/);
+test('definition catalogs exceed 128 while invalid extra array keys still fail',()=>{
+ const v=basic();for(let i=3;i<=129;i++)v.definitions[hash(i)]={kind:'code',metadata:meta()};assert.equal(Object.keys(admit(v).definitions).length,129);
  const a=basic();a.definitions[hash(1)].body.nodes.extra=0;bad(a,/property|dense/);
 });
 test('independent catalog work exhausts a finite global budget even when every standalone graph fits',()=>{
@@ -99,11 +98,11 @@ test('C03a stays closed to version2 and exact UUID spellings remain separate',()
  const upper='ABCDEFAB-CDEF-ABCD-EFAB-CDEFABCDEFAB',lower=upper.toLowerCase();v.definitions[hash(1)].body.nodes=[{...node(1,2),id:upper},{...node(2,2),id:lower}];v.definitions[hash(1)].body.outputBindings.image={nodeId:upper,portId:'image'};
  const admitted=admit(v);const root=admitted.definitions[hash(1)]!;assert.equal(root.kind,'graph');if(root.kind==='graph')assert.deepEqual(root.body.nodes.map(n=>n.id),[upper,lower]);
 });
-test('2048 local binding targets and512 ordinary local edges are legal equality fixtures',()=>{
+test('local binding targets exceed 2048 and 512 ordinary local edges remain legal',()=>{
  const v=basic(),ports=Object.fromEntries(Array.from({length:16},(_,i)=>[`p${i}`,signal]));
  v.definitions[hash(4)]={kind:'code',metadata:meta(ports,ports)};
  v.definitions[hash(3)]=graphDef(Array.from({length:127},(_,i)=>node(i+1,4)),[],Object.fromEntries(Object.keys(ports).map(id=>[id,Array.from({length:127},(_,i)=>ref(i+1,id))])),Object.fromEntries(Object.keys(ports).map(id=>[id,ref(1,id)])),{},meta(ports,ports));assert.ok(admit(v));
- v.definitions[hash(5)]={kind:'code',metadata:meta({p0:signal})};v.definitions[hash(3)].body.nodes.push(node(128,5));v.definitions[hash(3)].body.inputBindings.p0.push(ref(128,'p0'));bad(v,/binding target/);
+ v.definitions[hash(5)]={kind:'code',metadata:meta({p0:signal})};v.definitions[hash(3)].body.nodes.push(node(128,5));v.definitions[hash(3)].body.inputBindings.p0.push(ref(128,'p0'));assert.ok(admit(v));
  const flat=fanout512(),s=basic();s.definitions=clone(flat.definitions);s.definitions[hash(99)]=graphDef(flat.graph.nodes.map(n=>({...n,controlDefaults:{}})),flat.graph.edges,{},{image:flat.graph.finalOutput},{},clone({...meta(),lifecycle:{state:'stateful',reset:'seed'}}));s.graph.rootDefinitionHash=hash(99);assert.ok(admit(s));
 });
 test('deep malformed locations retain bounded path and violated rule together',()=>{

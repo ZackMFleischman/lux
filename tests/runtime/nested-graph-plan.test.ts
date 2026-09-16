@@ -50,7 +50,7 @@ test('overrides validate inactive targets, unique paths, numeric values and boun
  for(const values of [{gain:NaN},{gain:Infinity},{gain:11},{other:1}] as Record<string,number>[])assert.throws(()=>planNestedGraph(v,[{nodePath:path,values}]),(e:any)=>e.code==='INVALID_NESTED_GRAPH');
  assert.throws(()=>planNestedGraph(v,[{nodePath:path,values:{gain:8}},{nodePath:[...path],values:{gain:9}}]),/duplicate override path/);
  let reads=0;const values=Object.defineProperty({},'gain',{enumerable:true,get(){reads++;return 2;}});assert.throws(()=>planNestedGraph(v,[{nodePath:path,values}]),/own data/);assert.equal(reads,0);
- const tooMany=Array.from({length:513},()=>({nodePath:[],values:{gain:1}}));assert.throws(()=>planNestedGraph(v,tooMany),/512/);
+ const duplicate=Array.from({length:513},()=>({nodePath:[],values:{gain:1}}));assert.throws(()=>planNestedGraph(v,duplicate),/duplicate override path/);
 });
 test('large public control fanout preserves every inactive address without sharing snapshots',()=>{
  const p=planNestedGraph(admitted(controlFanout()));assert.equal(p.nodes.length,1);assert.equal(p.prunedNodePaths.length,511);assert.equal(p.publicControlBindings.c0!.length,512);assert.equal(p.publicControlBindings.c0!.filter(t=>t.active).length,1);
@@ -66,7 +66,7 @@ test('override byte quota applies to the actual array at equality, including pun
 test('512 unique scene patches validate before pruning with no shared leaf values',()=>{
  const v=admitted(controlFanout());const overrides=Array.from({length:512},(_,i)=>({nodePath:[uuid(1+Math.floor(i/64)),uuid(1+i%64)] as any,values:{c0:6.25}}));
  const p=planNestedGraph(v,overrides);assert.equal(p.nodes[0]!.initialControls.c0,6.25);assert.equal(p.nodes[0]!.initialControls.c1,1);assert.equal(p.prunedNodePaths.length,511);
- assert.throws(()=>planNestedGraph(v,[...overrides,{nodePath:[],values:{c0:6}}]),/512/);
+ assert.throws(()=>planNestedGraph(v,[...overrides,{nodePath:[],values:{c0:6}}]),/overlap/);
 });
 test('reordered complete definitions and binding targets preserve canonical admission and plan',()=>{
  const v=controlFanout(),first=admitted(v),shuffled=clone(v);shuffled.definitions=Object.fromEntries(Object.entries(shuffled.definitions).reverse());

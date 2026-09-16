@@ -47,38 +47,19 @@ export function snapshot(values:readonly unknown[], names:readonly string[], byt
     if(!Array.isArray(v)||Object.getPrototypeOf(v)!==Array.prototype)invalid(p,'expected plain dense array');
     const d=Object.getOwnPropertyDescriptor(v,'length');if(!d||!Object.hasOwn(d,'value')||!Number.isSafeInteger(d.value)||d.value<0)invalid(p,'expected own array length');if(d.value>max)invalid(p,`at most ${max} raw array values`);return d.value;
   }
-  // Check every raw body count ahead of its descendants, even an unused body.
-  function bodyCounts(v:unknown,p:string){
-    if(v===null||typeof v!=='object')return;
-    for(const [key,max] of [['nodes',limits.nodesPerBody],['edges',limits.edgesPerBody]] as const){const d=Object.getOwnPropertyDescriptor(v,key);if(d&&Object.hasOwn(d,'value'))length(d.value,`${p}.${key}`,max);}
-    let targets=0;
-    for(const key of ['inputBindings','controlBindings','outputBindings']){
-      const d=Object.getOwnPropertyDescriptor(v,key);if(!d||!Object.hasOwn(d,'value')||d.value===null||typeof d.value!=='object')continue;
-      const keys=Reflect.ownKeys(d.value);if(keys.length>limits.bindingTargetsPerBody)invalid(p,'raw binding target budget exceeded');
-      for(const k of keys){const t=Object.getOwnPropertyDescriptor(d.value,k);if(!t||!Object.hasOwn(t,'value'))continue;targets+=key==='outputBindings'?1:length(t.value,`${p}.${key}`,limits.bindingTargetsPerBody);if(targets>limits.bindingTargetsPerBody)invalid(p,'raw binding target budget exceeded');}
-    }
-  }
   function inspect(v:unknown,p:string,depth:number):void{
     if(depth>limits.rawDepth)invalid(p,'raw depth exceeds 16');if(++count>limits.rawValues)invalid(p,'raw value budget exceeded');
     if(v===null){add(4,p);return;}if(typeof v==='string'){add(stringBytes(v,p),p);return;}if(typeof v==='boolean'){add(v?4:5,p);return;}if(typeof v==='number'){if(!Number.isFinite(v))invalid(p,'expected finite number');add(stringify(v).length,p);return;}if(typeof v!=='object')invalid(p,'expected JSON data');
     if(seen.has(v))invalid(p,'cycles and repeated aliases unsupported');seen.add(v);
     const array=Array.isArray(v), proto=Object.getPrototypeOf(v);if(array?proto!==Array.prototype:proto!==null&&proto!==Object.prototype)invalid(p,'expected plain data container');
-    const n=array?length(v,p,p==='overrides'?limits.overrides:limits.rawValues):0,keys=Reflect.ownKeys(v);
-    if(keys.length>(array?n+1:p==='definitions'?limits.definitions:limits.rawValues))invalid(p,'raw property count exceeded');if(array&&keys.length!==n+1)invalid(p,'expected dense array');
+    const n=array?length(v,p,limits.rawValues):0,keys=Reflect.ownKeys(v);
+    if(keys.length>(array?n+1:limits.rawValues))invalid(p,'raw property count exceeded');if(array&&keys.length!==n+1)invalid(p,'expected dense array');
     const entries:[string,unknown][]=[];add(2,p);
     for(const k of array?Array.from({length:n},(_,i)=>String(i)):keys){
       if(typeof k!=='string')invalid(p,'expected string data key');const d=Object.getOwnPropertyDescriptor(v,k);if(!d?.enumerable||!Object.hasOwn(d,'value'))invalid(p,'expected enumerable own data property');
       if(entries.length)add(1,p);if(!array)add(stringBytes(k,p)+1,p);entries.push([k,d.value]);inspect(d.value,`${p}.${k.length<=96?k:'[field]'}`,depth+1);
     }
     inspected.set(v,{array,entries});
-  }
-  for(let i=0;i<values.length;i++)if(names[i]==='definitions'){
-    const catalog=values[i];if(catalog===null||typeof catalog!=='object')continue;
-    const keys=Reflect.ownKeys(catalog);if(keys.length>limits.definitions)invalid('definitions','at most128 raw definitions');
-    for(const key of keys){
-      const d=Object.getOwnPropertyDescriptor(catalog,key);if(!d||!Object.hasOwn(d,'value')||d.value===null||typeof d.value!=='object')continue;
-      const body=Object.getOwnPropertyDescriptor(d.value,'body');if(body&&Object.hasOwn(body,'value'))bodyCounts(body.value,'definitions.[body]');
-    }
   }
   values.forEach((v,i)=>inspect(v,names[i]!,0));
   function copy(v:unknown):unknown{if(v===null||typeof v!=='object')return v;const r=inspected.get(v)!;return r.array?r.entries.map(([,x])=>copy(x)):Object.fromEntries(r.entries.map(([k,x])=>[k,copy(x)]));}
@@ -133,19 +114,18 @@ export function topological(keys:readonly string[],links:readonly (readonly [str
   while(ready.length){ready.sort(compare);const k=ready.shift()!;result.push(k);for(const t of outgoing.get(k)!){const d=degrees.get(t)!-1;degrees.set(t,d);if(!d)ready.push(t);}}
   if(result.length!==keys.length)invalid(p,'same-step cycle');return result;
 }
-type Summary={levels:number;placements:number;leaves:number;edges:number;targets:number;controls:Record<string,number>;stateful:boolean};
+type Summary={levels:number;controls:Record<string,number>;stateful:boolean};
 function cardinalities(defs:NestedDefinitions):void{
   const done=new Map<string,Summary>(),active=new Set<string>();
-  const add=(a:number,b:number,max:number)=>Math.min(max+1,a+b);
   function visit(hash:string):Summary{
     const cached=done.get(hash);if(cached)return cached;if(active.has(hash))invalid(hash,'recursive graph definition');active.add(hash);
     const d=defs[hash]!;let s:Summary;
-    if(d.kind==='code')s={levels:0,placements:0,leaves:1,edges:Object.keys(d.metadata.inputs).length,targets:0,controls:Object.fromEntries(d.metadata.controls.map(c=>[c.id,1])),stateful:d.metadata.lifecycle.state==='stateful'};
+    if(d.kind==='code')s={levels:0,controls:Object.fromEntries(d.metadata.controls.map(c=>[c.id,1])),stateful:d.metadata.lifecycle.state==='stateful'};
     else{
-      s={levels:1,placements:0,leaves:0,edges:0,targets:0,controls:{},stateful:false};const children=new Map(d.body.nodes.map(n=>[n.id,visit(n.definitionHash)]));
-      for(const c of children.values()){s.levels=Math.max(s.levels,c.levels+1);s.placements=add(s.placements,c.placements+1,limits.expandedPlacements);s.leaves=add(s.leaves,c.leaves,limits.expandedLeaves);s.edges=add(s.edges,c.edges,limits.expandedEdges);s.targets=add(s.targets,c.targets,limits.expandedControlTargets);s.stateful ||= c.stateful;}
-      for(const [id,refs] of Object.entries(d.body.controlBindings)){let count=0;for(const r of refs)count=add(count,children.get(r.nodeId)!.controls[r.controlId]!,limits.expandedControlTargets);s.controls[id]=count;s.targets=add(s.targets,count,limits.expandedControlTargets);}
-      if(s.levels>limits.graphLevels)invalid(hash,'graph level budget exceeded');if(s.placements>limits.expandedPlacements)invalid(hash,'expanded placement budget exceeded');if(s.leaves>limits.expandedLeaves)invalid(hash,'expanded leaf budget exceeded');if(s.edges>limits.expandedEdges)invalid(hash,'expanded edge budget exceeded');if(s.targets>limits.expandedControlTargets)invalid(hash,'expanded control target budget exceeded');
+      s={levels:1,controls:{},stateful:false};const children=new Map(d.body.nodes.map(n=>[n.id,visit(n.definitionHash)]));
+      for(const c of children.values()){s.levels=Math.max(s.levels,c.levels+1);s.stateful ||= c.stateful;}
+      for(const [id,refs] of Object.entries(d.body.controlBindings)){let count=0;for(const r of refs)count+=children.get(r.nodeId)!.controls[r.controlId]!;s.controls[id]=count;}
+      if(s.levels>limits.graphLevels)invalid(hash,'graph level budget exceeded');
       if(d.metadata.lifecycle.state!==(s.stateful?'stateful':'stateless'))invalid(hash,'graph lifecycle must match all descendant code');
     }
     active.delete(hash);done.set(hash,s);return s;
