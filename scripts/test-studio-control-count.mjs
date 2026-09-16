@@ -10,17 +10,21 @@ const root=resolve(import.meta.dirname,'..');
 const installation=process.argv[2]?JSON.parse(await readFile(process.argv[2],'utf8')):null;
 const output=join(root,'artifacts','control-count',`run-${Date.now()}`);
 await mkdir(output,{recursive:true});
-const env={...studioTestEnvironment(),LUX_NODE_EXECUTABLE:process.execPath};
-const session=resolveStudioSession({workspace:installation?.workspace??root,env});
-const report={ok:false,source:installation?.sourceCommit??execFileSync('git',['-C',root,'-c',`safe.directory=${root}`,'rev-parse','HEAD'],{encoding:'utf8'}).trim(),installation,profile:session.profile,checks:[],errors:[]};
-let app,page,child;
-try{
+let env,session,call,app,page,child;
+const report={ok:false,source:installation?.sourceCommit??execFileSync('git',['-C',root,'-c',`safe.directory=${root}`,'rev-parse','HEAD'],{encoding:'utf8'}).trim(),installation,processes:[],checks:[],errors:[]};
+async function launch(){
+ env={...studioTestEnvironment(),LUX_NODE_EXECUTABLE:process.execPath};session=resolveStudioSession({workspace:installation?.workspace??root,env});
  app=await _electron.launch({executablePath:installation?.executable??installedElectron(root),args:installation?[]:[join(root,'apps/studio/dist/main.cjs')],cwd:installation?.directory??root,env,timeout:30000,chromiumSandbox:true});
  child=app.process();report.pid=child.pid;child.stderr?.on('data',data=>void appendFile(join(output,'stderr.log'),data));page=await app.firstWindow();page.setDefaultTimeout(20000);
  page.on('pageerror',error=>report.errors.push(error.stack??error.message));
- const call=createStudioConnection(session,{timeoutMs:60000});
+ call=createStudioConnection(session,{timeoutMs:60000});
  let current;for(let i=0;i<100;i++){try{current=await call('read');if(current.source)break;}catch{}await page.waitForTimeout(100);}
  assert.ok(current?.source);
+ return current;
+}
+async function close(){if(!app)return;await app.evaluate(({app})=>app.exit(0)).catch(()=>{});await app.close().catch(()=>{});report.processes.push({pid:child.pid,profile:session.profile,exitCode:child.exitCode});app=null;}
+try{
+ let current=await launch();
  const declarations=Array.from({length:59},(_,n)=>{const i=n+5;return `control${i}:{type:'number',label:'Control ${i+1}',group:'Motion ${Math.floor(i/8)+1}',min:0,max:2,default:.5},`;}).join('\n');
  const sphere=(await readFile(join(root,'skills/lux-visual-creation/assets/noise-sphere.ts'),'utf8')).replace('  controls: {',`  controls: {\n${declarations}`).replace('spikeHeight.value = frame.controls.spikeHeight','spikeHeight.value = frame.controls.control63');
  await call('build',{source:{sdkVersion:'0.2.0',entry:'visual.ts',files:{'visual.ts':sphere}},expectedDraftVersion:current.draftVersion});
@@ -49,10 +53,8 @@ try{
  await call('scene.open',{path:roundtripPath,expectedDraftVersion:current.draftVersion,discardDirty:true});
  assert.equal((await call('status')).authoring.controlAnimations.length,64);
  report.checks.push('64 simultaneous animation bindings and all base values survive save/reopen');
- // Start the independent component scenario without stale scene-animation diagnostics.
- const clean=JSON.parse(await readFile(roundtripPath,'utf8'));clean.controlAnimations=[];
- const cleanPath=join(output,'component-start.lux-scene');await writeFile(cleanPath,JSON.stringify(clean));
- current=await call('read');await call('scene.open',{path:cleanPath,expectedDraftVersion:current.draftVersion,discardDirty:true});
+ // Separate scenarios and verify saved component data across an actual process boundary.
+ await close();current=await launch();
  const controls=Object.fromEntries(Array.from({length:64},(_,i)=>[i?'control'+i:'intensity',{type:'number',label:`Component control ${i+1}`,group:`Motion ${Math.floor(i/8)+1}`,min:0,max:1,default:.5}]));
  const component=`import {defineComponent} from '@lux/visual-sdk';
  import {Scene,Mesh,PlaneGeometry,MeshBasicNodeMaterial,OrthographicCamera} from 'three/webgpu';
@@ -74,9 +76,9 @@ try{
  assert.ok(status.authoring.controlAnimations.some(row=>row.nodePath.length&&row.controlId==='control63'));
  const sampled=status.authoring.effectiveNodeControls.nodes[0].values.control63;await page.waitForTimeout(300);status=await call('status');assert.notEqual(status.authoring.effectiveNodeControls.nodes[0].values.control63,sampled);assert.equal(status.authoring.controls.control63,.7);
  await page.screenshot({path:join(output,'component-64-controls.png')});
- await page.keyboard.press('Escape');current=await call('read');const componentPath=join(output,'component.lux-scene');await call('scene.save',{path:componentPath,expectedDraftVersion:current.draftVersion,overwrite:false});await call('scene.open',{path:componentPath,expectedDraftVersion:current.draftVersion,discardDirty:true});
+ await page.keyboard.press('Escape');current=await call('read');const componentPath=join(output,'component.lux-scene');await call('scene.save',{path:componentPath,expectedDraftVersion:current.draftVersion,overwrite:false});await close();current=await launch();await call('scene.open',{path:componentPath,expectedDraftVersion:current.draftVersion,discardDirty:true});
  status=await call('status');assert.equal(status.authoring.controls.control63,.7);assert.ok(status.authoring.controlAnimations.some(row=>row.nodePath.length&&row.controlId==='control63'));
  report.checks.push('64-control component compiles and exposes64 aliases;late component control animates');
  assert.deepEqual(report.errors,[]);report.ok=true;
 }catch(error){report.failure=error.stack??String(error);process.exitCode=1;if(page&&!page.isClosed())await page.screenshot({path:join(output,'failure.png')}).catch(()=>{});}
-finally{if(app){await app.evaluate(({app})=>app.exit(0)).catch(()=>{});await app.close().catch(()=>{});report.exitCode=child.exitCode;}await writeFile(join(output,'result.json'),JSON.stringify(report,null,2));console.log(JSON.stringify({output,...report},null,2));}
+finally{await close();await writeFile(join(output,'result.json'),JSON.stringify(report,null,2));console.log(JSON.stringify({output,...report},null,2));}
