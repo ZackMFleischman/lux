@@ -107,6 +107,30 @@ test('RTL: a flat control can add the strict shared-audio binding',async()=>{
   }finally{globalThis.requestAnimationFrame=priorAnimationFrame;}
 });
 
+test('RTL: a flat control can add and tune the strict kick binding',async()=>{
+  const fixture=service(),priorAnimationFrame=globalThis.requestAnimationFrame;
+  globalThis.requestAnimationFrame=callback=>{callback(0);return 0;};
+  try{
+    render(<StudioApp client={fixture.client} nowMs={1000}/>);
+    fireEvent.click(screen.getByRole('button',{name:'Animate Intensity'}));
+    fireEvent.click(screen.getByRole('button',{name:'Add Kick'}));
+    await waitFor(()=>assert.equal(fixture.calls.length,1));
+    const animation=(fixture.calls[0] as any).input.animation;
+    assert.deepEqual(animation,{kind:'kick',nodePath:[],definitionHash:(fixture.calls[0] as any).input.expectedControlSchemaHash,
+      schemaHash:(fixture.calls[0] as any).input.expectedControlSchemaHash,controlId:'intensity',
+      source:{kind:'audio-kick',logicalInputId:'primary-audio',analyzer:{version:1,fftSize:2048,minDecibels:-100,maxDecibels:-30}},
+      amount:.1,attackMs:0,releaseMs:300,sensitivity:.5,retriggerMs:120,envelope:'exponential',enabled:true});
+    const sensitivity=screen.getByRole('spinbutton',{name:'Kick sensitivity'});
+    fireEvent.focus(sensitivity);fireEvent.change(sensitivity,{target:{value:'.8'}});fireEvent.blur(sensitivity);
+    await waitFor(()=>assert.equal(fixture.calls.length,2));
+    assert.equal((fixture.calls[1] as any).input.animation.sensitivity,.8);
+    assert.ok(screen.getByRole('combobox',{name:'Kick envelope'}));
+    assert.ok(screen.getByRole('spinbutton',{name:'Kick retrigger milliseconds'}));
+    fireEvent.keyDown(screen.getByRole('dialog',{name:'Animate Intensity'}),{key:'Escape'});
+    await waitFor(()=>assert.equal(screen.queryByRole('dialog',{name:'Animate Intensity'}),null));
+  }finally{globalThis.requestAnimationFrame=priorAnimationFrame;}
+});
+
 test('RTL: audio configuration changes cancel an in-flight connection and ignore its stale completion',async()=>{
   const {AudioInputControl}=await import('../../apps/studio/src/audio/AudioInputControl.tsx');
   let resolveConnect!:()=>void;
@@ -114,7 +138,7 @@ test('RTL: audio configuration changes cancel an in-flight connection and ignore
   const provider={
     connect:async()=>{calls.push('connect');await new Promise<void>(resolve=>{resolveConnect=resolve;});},
     disconnect:async()=>{calls.push('disconnect');},dispose:async()=>{},
-    getSnapshot:()=>({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0}),subscribe:()=>()=>{},
+    getSnapshot:()=>({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0}),subscribe:()=>()=>{},
   } as any;
   const first={logicalInputId:'primary-audio' as const,analyzer:{version:1 as const,fftSize:2048 as const,minDecibels:-100,maxDecibels:-30}};
   const second={logicalInputId:'primary-audio' as const,analyzer:{version:1 as const,fftSize:2048 as const,minDecibels:-90,maxDecibels:-20}};

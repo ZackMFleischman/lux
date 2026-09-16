@@ -264,13 +264,15 @@ test('Scene and component controls expose real animation plus independent reset 
   const source=compositionSourceBundle(),asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));
   const composition=extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash:(value:string)=>createHash('sha256').update(value).digest('hex')})!;
   const state=createCompositionControlState(composition);
-  let runtime:any={instanceId:'graph-instance',generation:1,revisionId:'graph-revision',sceneName:'Graph fixture',authority:'studio',playback:'paused',clockEpoch:0,frameId:'1',output:{width:1280,height:720},fault:null,sdkVersion:'0.4.0',controlSchema:composition.publicControls,controlSchemaHash:'a'.repeat(64),controls:state.values(),controlSequence:0,nodeControls:{sourceHash:'graph-revision',nodes:state.snapshot().nodes},controlAnimations:[],controlAnimationIssues:[],animationSequence:0,composition};
+  let runtime:any={instanceId:'graph-instance',generation:1,revisionId:'graph-revision',sceneName:'Graph fixture',authority:'studio',playback:'paused',clockEpoch:0,frameId:'1',tempo:{bpm:120,beatPosition:0,beatPhase:0,tempoSequence:0},tempoSequence:0,output:{width:1280,height:720},fault:null,sdkVersion:'0.4.0',controlSchema:composition.publicControls,controlSchemaHash:'a'.repeat(64),controls:state.values(),controlSequence:0,nodeControls:{sourceHash:'graph-revision',nodes:state.snapshot().nodes},controlAnimations:[],controlAnimationIssues:[],animationSequence:0,composition};
   let snapshot:any={connection:'connected',message:null,receivedAtMs:1000,authoring:runtime,host:null,jobs:[],visualFps:null,uiFps:null};
   const calls:any[]=[],listeners=new Set<()=>void>();let rejectNext:string|null=null;
   const client={getSnapshot:()=>snapshot,subscribe:(fn:()=>void)=>{listeners.add(fn);return()=>{listeners.delete(fn);};},invoke:async(op:any)=>{
     calls.push(op);if(rejectNext){const message=rejectNext;rejectNext=null;throw Error(message);}if(op.name==='lux.node.parameters.set'){state.applyNode(op.input.nodePath,op.input.values,op.input.expectedControlSchemaHash);
       runtime={...runtime,controls:state.values(),nodeControls:{sourceHash:runtime.revisionId,nodes:state.snapshot().nodes},controlSequence:runtime.controlSequence+1};}
     else if(op.name==='lux.node.animation.set'){runtime={...runtime,controlAnimations:op.input.animation?[op.input.animation]:[],animationSequence:runtime.animationSequence+1};}
+    else if(op.name==='lux.tempo.set'){runtime={...runtime,tempo:{bpm:op.input.bpm,beatPosition:0,beatPhase:0,tempoSequence:runtime.tempoSequence+1},tempoSequence:runtime.tempoSequence+1};}
+    else if(op.name==='lux.tempo.tap'){runtime={...runtime,tempo:{...runtime.tempo,beatPosition:0,beatPhase:0,tempoSequence:runtime.tempoSequence+1},tempoSequence:runtime.tempoSequence+1};}
     else assert.fail(`Unexpected operation ${op.name}`);snapshot={...snapshot,authoring:runtime};listeners.forEach(fn=>fn());
   }};
   window.localStorage.clear();
@@ -279,8 +281,9 @@ test('Scene and component controls expose real animation plus independent reset 
   const sceneAnimate=await screen.findByRole('button',{name:'Animate Intensity'});
   assert.ok(screen.getByRole('button',{name:'Reset Intensity to default'}));
   await act(async()=>{fireEvent.click(sceneAnimate);});
-  await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Add LFO'}));});
-  assert.equal(calls[0].name,'lux.node.animation.set');assert.deepEqual(calls[0].input.nodePath,[ballId]);assert.equal(calls[0].input.controlId,'intensity');
+  await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Add Tempo'}));});
+  assert.equal(calls[0].name,'lux.node.animation.set');assert.deepEqual(calls[0].input.nodePath,[ballId]);assert.equal(calls[0].input.controlId,'intensity');assert.equal(calls[0].input.animation.kind,'tempo');assert.equal(calls[0].input.animation.beatsPerCycle,1);
+  assert.ok(screen.getByRole('spinbutton',{name:'Tempo beats per cycle'}));fireEvent.click(screen.getByText('More'));assert.equal(screen.queryByRole('button',{name:'Restart animation'}),null);
   await act(async()=>{fireEvent.keyDown(screen.getByRole('dialog',{name:'Animate Intensity'}),{key:'Escape'});});
   await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Reset Intensity to default'}));});
   assert.equal(calls[1].name,'lux.node.parameters.set');assert.deepEqual(calls[1].input.nodePath,[ballId]);assert.deepEqual(calls[1].input.values,{intensity:.6});
@@ -536,13 +539,18 @@ test('Graph connections point from output to input with reversed node declaratio
 });
 
 test('workspace chrome omits redundant connection and playback labels', async () => {
-  const runtime = { instanceId: '44ff55f0-8ea6-4fbf-89d5-665923f65cad', generation: 2, revisionId: 'revision-2', sceneName: 'Fixture', authority: 'studio', playback: 'playing', clockEpoch: 1, frameId: '10', intensity: 0.5, output: { width: 1280, height: 720 }, fault: null };
-  const snapshot = { connection: 'connected', message: null, receivedAtMs: 1000, authoring: runtime, host: null, jobs: [], visualFps: null, uiFps: null };
-  render(<StudioApp client={{ getSnapshot: () => snapshot, subscribe: () => () => {}, invoke: async () => {} } as any} nowMs={1000} />);
+  let runtime:any = { instanceId: '44ff55f0-8ea6-4fbf-89d5-665923f65cad', generation: 2, revisionId: 'revision-2', sceneName: 'Fixture', authority: 'studio', playback: 'playing', clockEpoch: 1, frameId: '10', intensity: 0.5,tempo:{bpm:120,beatPosition:0,beatPhase:0,tempoSequence:0},tempoSequence:0, output: { width: 1280, height: 720 }, fault: null };
+  let snapshot:any = { connection: 'connected', message: null, receivedAtMs: 1000, authoring: runtime, host: null, jobs: [], visualFps: null, uiFps: null };const calls:any[]=[],listeners=new Set<()=>void>();let dirty=0,reject=false;
+  render(<StudioApp client={{ getSnapshot: () => snapshot, subscribe: (listener:()=>void) => {listeners.add(listener);return()=>listeners.delete(listener);}, invoke: async (operation:any) => {calls.push(operation);if(reject)throw Error('Tempo rejected');runtime={...runtime,tempo:{bpm:operation.input.bpm??runtime.tempo.bpm,beatPosition:0,beatPhase:0,tempoSequence:runtime.tempoSequence+1},tempoSequence:runtime.tempoSequence+1};snapshot={...snapshot,authoring:runtime};listeners.forEach(listener=>listener());return runtime;} } as any} nowMs={1000} controlEdits={{changed:()=>{dirty++;},track:()=>{}}} />);
   assert.equal(document.querySelector('.connection'), null);
   assert.equal(document.querySelector('.playback-state'), null);
   assert.equal(document.querySelector('.status-runtime'), null);
   assert.ok(screen.getByRole('button', { name: 'Pause' }));
+  const bpm=screen.getByRole('spinbutton',{name:'Tempo BPM'}) as HTMLInputElement;
+  await act(async()=>{fireEvent.focus(bpm);fireEvent.change(bpm,{target:{value:'128'}});fireEvent.keyDown(bpm,{key:'Enter'});});
+  assert.equal(calls[0].name,'lux.tempo.set');assert.equal(runtime.tempo.bpm,128);
+  await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Tap tempo'}));});assert.equal(calls[1].name,'lux.tempo.tap');assert.equal(dirty,0,'tap acknowledgement without a BPM change is not a persisted edit');
+  reject=true;await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Tap tempo'}));});assert.equal(dirty,0,'a rejected tap is not a persisted edit');
 });
 
 test('File and View share one menu and restore keyboard focus', async () => {

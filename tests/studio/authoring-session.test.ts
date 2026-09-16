@@ -13,7 +13,7 @@ const source = () => ({ sdkVersion: '0.1.0' as const, entry: 'main.ts', files: {
 test('session reads, builds and saves a complete isolated draft', async () => {
   const w = createSourceWorkspace(source()), submitted: unknown[] = [], saved: any[] = [];
   const session = createAuthoringSession(w, { submit: async s => { submitted.push(s); },
-    save: async request => { saved.push(request); return { token: 'saved', name: 'test.lux-scene' }; }, getControls: () => ({ intensity: 0.4 }) });
+    save: async request => { saved.push(request); return { token: 'saved', name: 'test.lux-scene' }; }, getControls: () => ({ intensity: 0.4 }),getTempo:()=>({bpm:136}) });
   w.edit('lib/color.ts', 'helper edit');
   const read = session.read(); read.source.files['main.ts'] = 'caller edit';
   assert.equal(w.getSnapshot().source.files['main.ts'], 'export {}');
@@ -23,6 +23,7 @@ test('session reads, builds and saves a complete isolated draft', async () => {
   await session.save(false);
   assert.equal(saved[0].document.source.files['lib/color.ts'], 'helper edit');
   assert.equal(saved[0].document.controls.intensity, 0.4);
+  assert.deepEqual(saved[0].document.tempo,{bpm:136});
   assert.equal(w.getSnapshot().dirty, false);
   assert.equal(session.getSnapshot().name, 'test.lux-scene');
 });
@@ -36,6 +37,7 @@ test('path save and reopen preserve the accepted preview resolution',async()=>{
   assert.deepEqual(saved.settings,output);
   await session.openPath('audio.lux-scene',session.read().draftVersion);
   assert.deepEqual(submitted.output,output);
+  assert.deepEqual(submitted.savedTempo,{bpm:120});
 });
 test('cancelled/failed saves preserve dirty and an in-flight save excludes open/build/save', async () => {
   const w = createSourceWorkspace(source()); w.edit('main.ts', 'draft');

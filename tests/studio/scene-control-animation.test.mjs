@@ -10,6 +10,7 @@ const schema=normalizeControlDeclarations({height:{type:'number',label:'Height',
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const schemaHash=hash(canonicalControlSchemaJson(schema));
 const binding=(overrides={})=>({nodePath:[],definitionHash:schemaHash,schemaHash,controlId:'height',shape:'sine',periodSeconds:2,amount:1,phase:.25,enabled:true,...overrides});
+const tempoBinding=(overrides={})=>({kind:'tempo',nodePath:[],definitionHash:schemaHash,schemaHash,controlId:'height',shape:'sine',beatsPerCycle:2,amount:1,phase:.25,enabled:true,...overrides});
 
 test('scene animation bindings use the empty path as a distinct validated target',()=>{
  const scene=validateControlAnimationBindings([binding()]);
@@ -31,6 +32,19 @@ test('SDK 0.2 worker animates effective scene controls while retaining authored 
  assert.equal(state.values(10).height,3);
  state.resetAnimations(11);
  assert.equal(state.values(11).height,3);
+});
+
+test('tempo bindings use injected beat position and preserve the exact target identity',async()=>{
+ const parsed=validateControlAnimationBindings([tempoBinding()]);
+ assert.deepEqual(parsed,[tempoBinding()]);
+ const state=await prepareWorkerControlState({sdkVersion:'0.2.0',controlSchema:schema,controlSchemaHash:schemaHash,controls:{height:1,speed:.5},controlAnimations:parsed});
+ assert.deepEqual(state.values(0,0),{height:2,speed:.5});
+ assert.deepEqual(state.values(99,0),state.values(0,0),'visual seconds do not drive tempo modulation');
+ assert.deepEqual(state.values(99,1),{height:0,speed:.5});
+ assert.deepEqual(state.values(0,2),{height:2,speed:.5});
+ assert.throws(()=>validateControlAnimationBindings([tempoBinding({beatsPerCycle:.249})]),/range/i);
+ assert.throws(()=>validateControlAnimationBindings([tempoBinding({beatsPerCycle:64.001})]),/range/i);
+ assert.throws(()=>validateControlAnimationBindings([tempoBinding({periodSeconds:2})]),/binding/i);
 });
 
 test('legacy intensity uses the same scene animation evaluator',async()=>{

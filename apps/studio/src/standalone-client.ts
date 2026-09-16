@@ -23,6 +23,8 @@ import type {ControlAnimationBinding,ControlAnimationIssue} from '../../../packa
 import {normalizeAudioBandSnapshot} from '../../../packages/runtime-contracts/src/audio-input.mjs';
 import type {AudioBandSnapshot} from '../../../packages/runtime-contracts/src/audio-input.mjs';
 import type {StudioAudioProvider} from './audio/studio-audio-provider.mjs';
+import {normalizeTempoSettings} from '../../../packages/runtime-contracts/src/tempo.mjs';
+import type {SceneTempoSettings} from '../../../packages/runtime-contracts/src/tempo.mjs';
 export interface AuthoringApi {
   example(): Promise<SourceBundle>;
   compile(source: SourceBundle): Promise<any>;
@@ -40,7 +42,7 @@ declare global { interface Window { luxAuthoring: AuthoringApi } }
 type RetryPolicy={lastFaultAt:number|null};
 type ReplacementPlaybackIntent={playing:boolean;settling:number;pending:Set<string>;synchronize?:()=>void};
 type Running = { worker: Worker; canvas: HTMLCanvasElement; instanceId: string; generation: number; revisionId: string; performance:PerformanceReceiver;retryPolicy:RetryPolicy;autoRetry:boolean;playback:'playing'|'paused';
-  lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; animations:number; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>>; desiredControls?:ControlValues; desiredNodeControls?:SavedNodeControlSnapshot;desiredControlAnimations?:readonly ControlAnimationBinding[];audioInFlight?:AudioBandSnapshot;audioLatest?:AudioBandSnapshot; };
+  lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; animations:number; tempoCommands:number;tempoSequence:number;tempo:SceneTempoSettings; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>>; desiredControls?:ControlValues; desiredNodeControls?:SavedNodeControlSnapshot;desiredControlAnimations?:readonly ControlAnimationBinding[];audioInFlight?:AudioBandSnapshot;audioLatest?:AudioBandSnapshot; };
 export class StandaloneClient implements StudioClient, PresentationPort {
   private snapshot: StudioSnapshot = { connection: 'connected', message: 'Open an example or write a visual, then Build & preview.', receivedAtMs: Date.now(), authoring: null, host: null, jobs: [], visualFps: null, uiFps: null };
   private listeners = new Set<() => void>();
@@ -53,7 +55,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private busy = false;
   private replacementPlayback:ReplacementPlaybackIntent|null=null;
   private automaticRetry:ReturnType<typeof setTimeout>|undefined;
-  private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; playback?:boolean; expectedControlSequence?:number; expectedControls?:ControlValues; expectedNodeControls?:SavedNodeControlSnapshot;expectedAnimationSequence?:number;expectedControlAnimations?:readonly ControlAnimationBinding[]; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
+  private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; playback?:boolean; expectedControlSequence?:number; expectedControls?:ControlValues; expectedNodeControls?:SavedNodeControlSnapshot;expectedAnimationSequence?:number;expectedControlAnimations?:readonly ControlAnimationBinding[];expectedTempoSequence?:number; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
   private api: AuthoringApi;
   private codeDeclaredParameters:boolean;
   private readonly performanceMode:CollectionMode;
@@ -61,7 +63,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private audioSnapshot:AudioBandSnapshot;
   constructor(api: AuthoringApi, options:{codeDeclaredParameters?:boolean;performanceMode?:CollectionMode;audioProvider?:Pick<StudioAudioProvider,'getSnapshot'|'subscribe'>}={}) {
     this.api = api; this.codeDeclaredParameters=options.codeDeclaredParameters===true; this.performanceMode=collectionMode(options.performanceMode);
-    this.audioSnapshot=normalizeAudioBandSnapshot(options.audioProvider?.getSnapshot()??{generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0});
+    this.audioSnapshot=normalizeAudioBandSnapshot(options.audioProvider?.getSnapshot()??{generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0});
     options.audioProvider?.subscribe(()=>{
       this.audioSnapshot=normalizeAudioBandSnapshot(options.audioProvider!.getSnapshot());
       for(const runtime of this.audioRuntimes)this.queueAudio(runtime,this.audioSnapshot);
@@ -95,9 +97,9 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       ? {sourceHash: runtime.revisionId, nodes: state.nodeControls!.nodes}
       : state.sdkVersion === '0.1.0' ? {intensity: runtime.intensity ?? 0.5}
       : {sourceHash: runtime.revisionId, schema: state.controlSchema, schemaHash: state.controlSchemaHash, values: state.controls};
-    return createSceneDocument(structuredClone(this.source), {...DEFAULT_OUTPUT, ...runtime.output}, controls, [], state.controlAnimations ?? []);
+    return createSceneDocument(structuredClone(this.source), {...DEFAULT_OUTPUT, ...runtime.output}, controls, [], state.controlAnimations ?? [],normalizeTempoSettings({bpm:runtime.tempo?.bpm??120}));
   }
-  async submit(source: SourceBundle, options:{savedControls?:SavedControlSnapshot;savedControlAnimations?:readonly ControlAnimationBinding[];output?:OutputSettings}={}): Promise<void> {
+  async submit(source: SourceBundle, options:{savedControls?:SavedControlSnapshot;savedControlAnimations?:readonly ControlAnimationBinding[];savedTempo?:SceneTempoSettings;output?:OutputSettings}={}): Promise<void> {
     if(source.sdkVersion!=='0.1.0'&&source.sdkVersion!=='0.2.0'&&source.sdkVersion!=='0.4.0')throw Error('Unsupported Studio SDK');
     const supportedSdkVersion=source.sdkVersion;
     if(source.sdkVersion==='0.2.0'&&!this.codeDeclaredParameters)throw Error('Code-declared parameters are not enabled in this Studio UI yet');
@@ -150,8 +152,10 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           controlAnimations:validateControlAnimationBindings(options.savedControlAnimations??previous?.controlAnimations),controlAnimationIssues:Object.freeze([]),animationSequence:0};
       }
       this.publish({ jobs: [{ jobId, state: 'initializing', summary: 'Preparing preview…' }] });
+      const tempo=normalizeTempoSettings(options.savedTempo??{bpm:this.snapshot.authoring?.tempo?.bpm??120});
+      const tempoSequence=options.savedTempo?0:this.snapshot.authoring?.tempoSequence??0;
       await this.start(linked, result.sourceHash,state,migration, {lastFaultAt:null}, playbackIntent.playing, requestedOutput,playbackIntent,
-        options.savedControls===undefined&&options.savedControlAnimations===undefined);
+        options.savedControls===undefined&&options.savedControlAnimations===undefined,tempo,tempoSequence);
       this.previewOutput = requestedOutput;
       this.source = submittedSource;
       let acceptedState=state;const running=this.running;
@@ -161,20 +165,21 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     } catch (error) { this.publish({ jobs: [{ jobId, state: 'failed', summary: 'Build failed; previous preview retained.', fault: String(error) }] }); throw error; }
     finally { if(this.replacementPlayback===playbackIntent)this.replacementPlayback=null;this.busy = false; this.scheduleAutomaticRetry(); }
   }
-  private async start(linked: LinkedEnvelope, revisionId: string, state:RuntimeControlState, migration:readonly ControlMigration[]=[],retryPolicy:RetryPolicy={lastFaultAt:null},playingOverride?:boolean, output:Readonly<Pick<OutputSettings,'width'|'height'>>=this.previewOutput,playbackIntent?:ReplacementPlaybackIntent,reconcileRuntime=false): Promise<void> {
+  private async start(linked: LinkedEnvelope, revisionId: string, state:RuntimeControlState, migration:readonly ControlMigration[]=[],retryPolicy:RetryPolicy={lastFaultAt:null},playingOverride?:boolean, output:Readonly<Pick<OutputSettings,'width'|'height'>>=this.previewOutput,playbackIntent?:ReplacementPlaybackIntent,reconcileRuntime=false,tempo:SceneTempoSettings=normalizeTempoSettings({bpm:this.snapshot.authoring?.tempo?.bpm??120}),tempoSequence=this.snapshot.authoring?.tempoSequence??0): Promise<void> {
     const compositionState='linkedVersion' in linked&&linked.linkedVersion===5?prepareCompositionControlState(linked.composition):undefined;
     const playing = playingOverride ?? this.snapshot.authoring?.playback === 'playing';
     const canvas = document.createElement('canvas'); canvas.width = output.width; canvas.height = output.height;
     canvas.style.cssText = 'width:100%;height:100%;position:absolute;inset:0;object-fit:contain';
     const worker = new Worker(new URL('./visual-worker.js', import.meta.url), { type: 'module' });
     const candidate: Running = { worker, canvas, instanceId: this.running?.instanceId ?? crypto.randomUUID(), generation: ++this.generation,
-      revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0,animations:0,state,output,performance:undefined as any,retryPolicy,autoRetry:false,playback:playing?'playing':'paused' };
+      revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0,animations:0,tempoCommands:tempoSequence,tempoSequence,tempo,state,output,performance:undefined as any,retryPolicy,autoRetry:false,playback:playing?'playing':'paused' };
     candidate.performance=new PerformanceReceiver({instanceId:candidate.instanceId,generation:candidate.generation,revisionId},performance.now());
     this.audioRuntimes.add(candidate);
     const previous = this.running;
     let ready = false,initialized=false,latestStatus:any;
-    let synchronization:Readonly<{requestId:string;kind:'controls'|'animations'|'playback';animationSourceSequence?:number;animationSequence?:number;expectedControlAnimations?:readonly ControlAnimationBinding[]}>|undefined;
+    let synchronization:Readonly<{requestId:string;kind:'controls'|'animations'|'playback'|'tempo';animationSourceSequence?:number;animationSequence?:number;expectedControlAnimations?:readonly ControlAnimationBinding[];tempoSequence?:number}>|undefined;
     let reconciledAnimationSequence=previous?.state.animationSequence??0;
+    let reconciledTempoSequence=tempoSequence;
     let synchronizeCandidate:()=>void=()=>{};
     try {
       await new Promise<void>((resolve, reject) => {
@@ -185,7 +190,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
         const publishRuntime=(message:any)=>this.publish({ authoring: { instanceId: candidate.instanceId, generation: candidate.generation, revisionId,
           ...('linkedVersion' in linked&&linked.linkedVersion===5?{composition:linked.composition}:{}),
           sceneName: 'Untitled visual', authority: 'studio', playback: message.playback,
-          ...candidate.state,controlMigration:migration,clockEpoch: message.clockEpoch,timeSeconds:message.timeSeconds, frameId: message.frameId,
+          ...candidate.state,controlMigration:migration,clockEpoch: message.clockEpoch,timeSeconds:message.timeSeconds,tempo:message.tempo,tempoSequence:message.tempoSequence, frameId: message.frameId,
           ...(state.sdkVersion==='0.1.0'?{intensity:candidate.state.controls.intensity}:{}),
           output: candidate.output, fault: null } as RuntimeView });
         const promote=()=>{
@@ -196,9 +201,10 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           if(previous){this.stop(previous,'Runtime changed before command completed');previous.canvas.remove();}
           this.target?.appendChild(canvas);this.publish({performance:candidate.performance.snapshot});publishRuntime(latestStatus);resolve();
         };
-        const postSynchronization=(kind:'controls'|'animations'|'playback',message:Record<string,unknown>,animationSourceSequence?:number)=>{
+        const postSynchronization=(kind:'controls'|'animations'|'playback'|'tempo',message:Record<string,unknown>,animationSourceSequence?:number)=>{
           const requestId=crypto.randomUUID();synchronization={requestId,kind,...(animationSourceSequence===undefined?{}:{animationSourceSequence}),
-            ...(kind==='animations'?{animationSequence:message.animationSequence as number,expectedControlAnimations:message.controlAnimations as readonly ControlAnimationBinding[]}:{})};
+            ...(kind==='animations'?{animationSequence:message.animationSequence as number,expectedControlAnimations:message.controlAnimations as readonly ControlAnimationBinding[]}:{}),
+            ...(kind==='tempo'?{tempoSequence:message.tempoSequence as number}:{})};
           try{worker.postMessage({...message,requestId,instanceId:candidate.instanceId,generation:candidate.generation});}
           catch(error){fail(String(error));}
         };
@@ -227,6 +233,11 @@ export class StandaloneClient implements StudioClient, PresentationPort {
             if(sourceAnimationSequence!==reconciledAnimationSequence){
               candidate.desiredControlAnimations=validateControlAnimationBindings(previous.state.controlAnimations??[]);
               postSynchronization('animations',{type:'animations',animationSequence:++candidate.animations,controlAnimations:candidate.desiredControlAnimations},sourceAnimationSequence);return;
+            }
+            const sourceTempoSequence=previous.tempoSequence;
+            if(sourceTempoSequence!==reconciledTempoSequence){
+              candidate.tempo=previous.tempo;candidate.tempoCommands=sourceTempoSequence;
+              postSynchronization('tempo',{type:'tempo',action:'synchronize',bpm:previous.tempo.bpm,tempoSequence:sourceTempoSequence});return;
             }
           }
           if(!playbackIntent){promote();return;}
@@ -283,6 +294,9 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           if (!['ready', 'frame', 'status'].includes(message.type) || !/^\d{1,20}$/.test(message.frameId) ||
               !Number.isFinite(message.timeSeconds) || !Number.isSafeInteger(message.clockEpoch) ||
               !['playing', 'paused'].includes(message.playback) || !Number.isSafeInteger(message.controlSequence) || message.controlSequence < 0) return;
+          let receivedTempo:SceneTempoSettings;
+          try{receivedTempo=normalizeTempoSettings({bpm:message.tempo?.bpm});if(!Number.isFinite(message.tempo?.beatPosition)||!Number.isFinite(message.tempo?.beatPhase)||message.tempo.beatPhase<0||message.tempo.beatPhase>=1||message.tempo.tempoSequence!==message.tempoSequence||!Number.isSafeInteger(message.tempoSequence)||message.tempoSequence<0||message.tempoSequence>candidate.tempoCommands)throw Error('Invalid tempo state');}
+          catch(error){if(message.type==='ready')fail(String(error));return;}
           const animationSequence=message.animationSequence??0;
           if(!Number.isSafeInteger(animationSequence)||animationSequence<0||animationSequence>candidate.animations)return;
           let applied:ControlValues,effectiveControls:ControlValues,compositionNodeControls:SavedNodeControlSnapshot|undefined,effectiveNodeControls:SavedNodeControlSnapshot|undefined,controlAnimations:readonly ControlAnimationBinding[]=Object.freeze([]),controlAnimationIssues:readonly ControlAnimationIssue[]=Object.freeze([]);
@@ -328,6 +342,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           candidate.state={...state,controls:applied,effectiveControls,controlSequence:message.controlSequence,controlAnimations,controlAnimationIssues,animationSequence,
             ...(compositionNodeControls?{nodeControls:compositionNodeControls,effectiveNodeControls}:{} )};
           candidate.playback=message.playback;
+          candidate.tempo=receivedTempo;candidate.tempoSequence=message.tempoSequence;
           candidate.lastHeartbeat = performance.now();
           if (BigInt(message.frameId) > BigInt(candidate.frameId)) { candidate.frameId = message.frameId; candidate.lastFrame = performance.now(); }
           latestStatus=message;
@@ -335,6 +350,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           const acknowledgedSynchronization=synchronization;
           if(acknowledgedSynchronization&&message.requestId===acknowledgedSynchronization.requestId){
             if(acknowledgedSynchronization.kind==='animations')reconciledAnimationSequence=acknowledgedSynchronization.animationSourceSequence??reconciledAnimationSequence;
+            if(acknowledgedSynchronization.kind==='tempo')reconciledTempoSequence=acknowledgedSynchronization.tempoSequence??reconciledTempoSequence;
             synchronization=undefined;
           }
           if(initialized&&!ready){synchronizeCandidate();if(!ready)return;}
@@ -345,12 +361,13 @@ export class StandaloneClient implements StudioClient, PresentationPort {
               (wait.expectedControlSequence === undefined ||
                 (message.controlSequence === wait.expectedControlSequence && JSON.stringify(applied) === JSON.stringify(wait.expectedControls) && (!wait.expectedNodeControls || JSON.stringify(compositionNodeControls)===JSON.stringify(wait.expectedNodeControls)))) &&
               (wait.expectedAnimationSequence===undefined || (animationSequence===wait.expectedAnimationSequence&&JSON.stringify(controlAnimations)===JSON.stringify(wait.expectedControlAnimations)))) {
+            if(wait.expectedTempoSequence!==undefined&&message.tempoSequence!==wait.expectedTempoSequence)return;
             clearTimeout(wait.timer); this.pending.delete(message.requestId);this.settleReplacementCommand(message.requestId);wait.resolve(message);
           }
         };
         const offscreen = canvas.transferControlToOffscreen();
         worker.postMessage({ type: 'init', requestId: crypto.randomUUID(), instanceId: candidate.instanceId, generation: candidate.generation,
-          revisionId, linked: structuredClone(linked), canvas: offscreen,...state,audioSnapshot:this.audioSnapshot,settings: {...DEFAULT_OUTPUT,...output}, playing, performanceMode:this.performanceMode }, [offscreen]);
+          revisionId, linked: structuredClone(linked), canvas: offscreen,...state,tempo:{bpm:tempo.bpm,beatPosition:0,beatPhase:0,tempoSequence},tempoSequence,audioSnapshot:this.audioSnapshot,settings: {...DEFAULT_OUTPUT,...output}, playing, performanceMode:this.performanceMode }, [offscreen]);
       });
     } catch (error) { this.stop(candidate, String(error)); canvas.remove(); throw error; }
     finally{if(playbackIntent?.synchronize===synchronizeCandidate)playbackIntent.synchronize=undefined;}
@@ -402,7 +419,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     const runtime = this.running, input = operation.input;
     if (this.snapshot.authoring?.authority !== 'studio') throw Error('Authority conflict: Studio cannot control this instance');
     const replacementWrite=this.busy&&this.replacementPlayback&&(
-      operation.name==='lux.parameters.set'||operation.name==='lux.node.parameters.set'||operation.name==='lux.node.animation.set'||
+      operation.name==='lux.parameters.set'||operation.name==='lux.node.parameters.set'||operation.name==='lux.node.animation.set'||operation.name==='lux.tempo.set'||operation.name==='lux.tempo.tap'||
       (operation.name==='lux.playback'&&operation.input.action!=='reset'))?this.replacementPlayback:null;
     if (this.busy&&!replacementWrite) throw Error('A visual build is already running');
     if (!runtime || input.instanceId !== runtime.instanceId || input.expectedGeneration !== runtime.generation) throw Error('Runtime changed; retry using its current state');
@@ -466,6 +483,11 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       if(index>=0)current.splice(index,1,...(operation.input.animation?[operation.input.animation]:[]));else if(operation.input.animation)current.push(operation.input.animation);
       runtime.desiredControlAnimations=validateControlAnimationBindings(current);
       message={type:'animations',animationSequence:++runtime.animations,controlAnimations:runtime.desiredControlAnimations,...(operation.input.restart?{restart:{nodePath:operation.input.nodePath,controlId:operation.input.controlId}}:{})};
+    } else if(operation.name==='lux.tempo.set'||operation.name==='lux.tempo.tap'){
+      if(operation.input.expectedRevisionId!==runtime.revisionId)throw Error('Revision changed; read current runtime state');
+      if(runtime.tempoCommands>=Number.MAX_SAFE_INTEGER)throw Error('Tempo sequence exhausted; restart runtime');
+      runtime.tempoCommands++;
+      message={type:'tempo',action:operation.name==='lux.tempo.set'?'set':'tap',...(operation.name==='lux.tempo.set'?{bpm:operation.input.bpm}:{})};
     } else {
       message = { type: 'playback', action: operation.input.action };
       if(replacementWrite){replacementPlaybackPrevious=replacementWrite.playing;replacementWrite.playing=operation.input.action==='play';}
@@ -476,6 +498,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       this.pending.set(input.requestId, { runtime, kind: 'command', playback: message.type === 'playback', resolve, reject, timer,
         ...('controlSequence' in message ? { expectedControlSequence: message.controlSequence, expectedControls: runtime.desiredControls,expectedNodeControls:runtime.desiredNodeControls } : {}),
         ...('animationSequence' in message?{expectedAnimationSequence:message.animationSequence,expectedControlAnimations:runtime.desiredControlAnimations}:{}) });
+      const wait=this.pending.get(input.requestId);if(wait&&message.type==='tempo')wait.expectedTempoSequence=runtime.tempoCommands;
       try { runtime.worker.postMessage({ ...message, requestId: input.requestId, instanceId: runtime.instanceId, generation: runtime.generation }); }
       catch (error) { this.fault(runtime, String(error)); }
     });

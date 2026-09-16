@@ -7,7 +7,8 @@ function urgentState(snapshot: StudioSnapshot): string {
   // Animation time and effective values advance with the render clock. They are
   // display-only observations, so keep them on the same bounded UI cadence as
   // frame/FPS updates. Base values, bindings, issues and transport remain urgent.
-  const runtime = authoring ? (({ frameId, timeSeconds, effectiveControls, effectiveNodeControls, ...rest }) => rest)(authoring) : null;
+  const runtime = authoring ? (({ frameId, timeSeconds, effectiveControls, effectiveNodeControls, tempo, ...rest }) => ({...rest,
+    ...(tempo?{tempo:{bpm:tempo.bpm,tempoSequence:tempo.tempoSequence}}:{})}))(authoring) : null;
   return JSON.stringify({ ...state, authoring: runtime });
 }
 

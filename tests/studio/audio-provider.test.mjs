@@ -6,7 +6,7 @@ const configuration = Object.freeze({
   logicalInputId: 'primary-audio',
   analyzer: Object.freeze({ version: 1, fftSize: 2048, minDecibels: -100, maxDecibels: -30 }),
 });
-const zero = generation => ({ generation, sequence: 0, available: false, level: 0, bass: 0, mids: 0, highs: 0 });
+const zero = generation => ({ generation, sequence: 0, available: false, level: 0, bass: 0, mids: 0, highs: 0, kickSequence:0, kickStrength:0 });
 
 function eventResource(properties = {}) {
   const target = new EventTarget();
@@ -42,7 +42,7 @@ test('explicit connect owns one capture while subscriptions only control samplin
   const provider = createStudioAudioProvider({
     openCapture: async request => { opens++; assert.deepEqual(request, { configuration, localDeviceId: 'device-1' }); return capture; },
     createAnalyzer: () => ({
-      sample: () => ({ level: ++sample / 10, bass: 0.2, mids: 0.3, highs: 0.4 }),
+      sample: () => ({ level: ++sample / 10, bass: 0.2, mids: 0.3, highs: 0.4, kickStrength:0 }),
       dispose: () => { analyzerDisposals++; },
     }),
     scheduler,
@@ -55,14 +55,14 @@ test('explicit connect owns one capture while subscriptions only control samplin
 
   await provider.connect(configuration, 'device-1');
   assert.equal(opens, 1);
-  assert.deepEqual(provider.getSnapshot(), { generation: 1, sequence: 0, available: true, level: 0, bass: 0, mids: 0, highs: 0 });
+  assert.deepEqual(provider.getSnapshot(), { generation: 1, sequence: 0, available: true, level: 0, bass: 0, mids: 0, highs: 0, kickSequence:0, kickStrength:0 });
   await provider.connect(configuration, 'device-1');
   assert.equal(opens, 1, 'the exact active connection is reused');
 
   const unsubscribe = provider.subscribe(() => {});
   assert.equal(scheduler.size(), 1);
   scheduler.tick();
-  assert.deepEqual(provider.getSnapshot(), { generation: 1, sequence: 1, available: true, level: 0.1, bass: 0.2, mids: 0.3, highs: 0.4 });
+  assert.deepEqual(provider.getSnapshot(), { generation: 1, sequence: 1, available: true, level: 0.1, bass: 0.2, mids: 0.3, highs: 0.4, kickSequence:0, kickStrength:0 });
   assert.equal(scheduler.size(), 1);
   unsubscribe();
   assert.equal(scheduler.size(), 0);
@@ -104,7 +104,7 @@ test('track end publishes unavailable zero before idempotent owned cleanup', asy
   let analyzerDisposals = 0;
   const provider = createStudioAudioProvider({
     openCapture: async () => capture,
-    createAnalyzer: () => ({ sample: () => ({ level: 1, bass: 1, mids: 1, highs: 1 }), dispose: () => { analyzerDisposals++; } }),
+    createAnalyzer: () => ({ sample: () => ({ level: 1, bass: 1, mids: 1, highs: 1, kickStrength:0 }), dispose: () => { analyzerDisposals++; } }),
     scheduler,
   });
   await provider.connect(configuration);
@@ -129,7 +129,7 @@ test('interrupted audio context publishes unavailable zero and requires a new co
   let opens = 0;
   const provider = createStudioAudioProvider({
     openCapture: async () => { opens++; return capture; },
-    createAnalyzer: () => ({ sample: () => ({ level: 0, bass: 0, mids: 0, highs: 0 }), dispose() {} }),
+    createAnalyzer: () => ({ sample: () => ({ level: 0, bass: 0, mids: 0, highs: 0, kickStrength:0 }), dispose() {} }),
     scheduler: manualScheduler(),
   });
   await provider.connect(configuration);
@@ -151,7 +151,7 @@ test('switching analyzer configuration closes the old capture before opening the
   let attempt = 0;
   const provider = createStudioAudioProvider({
     openCapture: async () => { order.push(`open-${++attempt}`); return attempt === 1 ? first : second; },
-    createAnalyzer: (_context, stream) => ({ sample: () => ({ level: 0, bass: 0, mids: 0, highs: 0 }),
+    createAnalyzer: (_context, stream) => ({ sample: () => ({ level: 0, bass: 0, mids: 0, highs: 0, kickStrength:0 }),
       dispose: () => order.push(stream === first.stream ? 'dispose-1' : 'dispose-2') }),
     scheduler: manualScheduler(),
   });
@@ -165,4 +165,20 @@ test('switching analyzer configuration closes the old capture before opening the
   assert.equal(second.stops(), 0);
   assert.equal(provider.getSnapshot().generation, 2);
   await provider.dispose();
+});
+
+test('kick peak increments once and remains latched through weaker tail samples', async()=>{
+  const {createStudioAudioProvider}=await providerModule();
+  const capture=captureFixture(),scheduler=manualScheduler();
+  const samples=[
+    {level:.2,bass:.8,mids:0,highs:0,kickStrength:.9},
+    {level:.2,bass:.6,mids:0,highs:0,kickStrength:0},
+    {level:.1,bass:.3,mids:0,highs:0,kickStrength:0},
+  ];
+  const provider=createStudioAudioProvider({openCapture:async()=>capture,createAnalyzer:()=>({sample:()=>samples.shift(),dispose(){}}),scheduler});
+  await provider.connect(configuration);const off=provider.subscribe(()=>{});
+  scheduler.tick();assert.equal(provider.getSnapshot().kickSequence,1);assert.equal(provider.getSnapshot().kickStrength,.9);
+  scheduler.tick();scheduler.tick();
+  assert.equal(provider.getSnapshot().kickSequence,1);assert.equal(provider.getSnapshot().kickStrength,.9);
+  off();await provider.dispose();
 });

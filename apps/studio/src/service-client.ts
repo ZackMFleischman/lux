@@ -7,6 +7,7 @@ import type { PerformanceSnapshot } from './performance/performance-state.ts';
 import type { ImageCompositionProfile } from '../../../packages/runtime-contracts/src/composition-profile.mjs';
 import type { NodePath } from '../../../packages/runtime-contracts/src/graph.ts';
 import type {ControlAnimationBinding} from '../../../packages/runtime-contracts/src/control-animation.mjs';
+import type {TempoSnapshot} from './controls/tempo-clock.mjs';
 export type { RuntimeKey } from '../../../packages/runtime-contracts/src/index.ts';
 /** Provisional Studio view port over canonical runtime identity/output/control
  * DTOs. This is not a competing application service or frozen core API. */
@@ -17,6 +18,7 @@ export type RuntimeView = RuntimeKey & Readonly<{
   revisionId: string; sceneName: string; authority: 'studio' | 'host';
   playback: 'playing' | 'paused' | 'starting' | 'failed';
   clockEpoch: number; timeSeconds?:number; frameId: string | null; controlMigration?: readonly ControlMigration[];
+  tempo?:TempoSnapshot;tempoSequence?:number;
   output: Readonly<Pick<OutputSettings, 'width' | 'height'>>;
   fault: Readonly<{ code: string; message: string }> | null;
   composition?: ImageCompositionProfile;
@@ -37,7 +39,7 @@ export function runtimeEditSignature(runtime: RuntimeView | null): string | null
   if (!runtime) return null;
   const state = getRuntimeControlState(runtime);
   return JSON.stringify({controls: state.controls, nodes: state.nodeControls?.nodes,
-    animations: state.controlAnimations ?? [], output: runtime.output});
+    animations: state.controlAnimations ?? [],tempo:{bpm:runtime.tempo?.bpm??120}, output: runtime.output});
 }
 export type StudioSnapshot = Readonly<{
   connection: 'disconnected' | 'connecting' | 'connected'; message: string | null;
@@ -58,7 +60,9 @@ export type StudioOperation =
       expectedControlSchemaHash:string;nodePath:NodePath;controlId:string;animation:ControlAnimationBinding|null;restart?:boolean } }
   | { name: 'lux.playback'; input: { requestId: string; instanceId: string; expectedGeneration: number; action: 'play' | 'pause' | 'reset' } }
   | { name: 'lux.runtime.restart'; input: { requestId: string; instanceId: string; expectedGeneration: number } }
-  | { name: 'lux.preview.resize'; input: { requestId: string; instanceId: string; expectedGeneration: number; width: number; height: number } };
+  | { name: 'lux.preview.resize'; input: { requestId: string; instanceId: string; expectedGeneration: number; width: number; height: number } }
+  | { name:'lux.tempo.set';input:{requestId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string;bpm:number} }
+  | { name:'lux.tempo.tap';input:{requestId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string} };
 export interface StudioClient {
   getSnapshot(): StudioSnapshot;
   subscribe(listener: () => void): () => void;
@@ -144,6 +148,15 @@ export class StudioController {
     return this.client.invoke({ name: 'lux.playback', input: {
       requestId: this.requestId(), instanceId: target.instanceId, expectedGeneration: target.generation, action,
     } });
+  }
+  async setTempoBpm(bpm:number):Promise<unknown>{
+    if(!Number.isFinite(bpm)||bpm<20||bpm>300)throw Error('Tempo BPM must be from 20 through 300');
+    const target=this.target();
+    return this.client.invoke({name:'lux.tempo.set',input:{requestId:this.requestId(),instanceId:target.instanceId,expectedGeneration:target.generation,expectedRevisionId:target.revisionId,bpm}});
+  }
+  async tapTempo():Promise<unknown>{
+    const target=this.target();
+    return this.client.invoke({name:'lux.tempo.tap',input:{requestId:this.requestId(),instanceId:target.instanceId,expectedGeneration:target.generation,expectedRevisionId:target.revisionId}});
   }
   async restart(): Promise<unknown> {
     const target = this.target();

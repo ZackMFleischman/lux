@@ -70,6 +70,8 @@ Read live tool schemas if available; these are the checked adapter's contracts. 
 | `status` | `{}` → snapshot containing `authoring`, which is null before a working runtime exists. |
 | `capture` | `{}` → PNG image block plus JSON metadata. Captures the current completed frame; it does not advance paused playback. Agent results retain the 8 MiB encoded limit. |
 | `playback` | `{ instanceId, expectedGeneration, action: 'play' | 'pause' | 'reset' }` → `{ applied, status }`. Reset preserves playing/paused state. |
+| `tempo.set` | `{ instanceId, expectedGeneration, expectedRevisionId, bpm }` → acknowledged runtime state. BPM is 20–300; manual changes preserve current beat phase. Requires running Studio protocol 3 tempo capability. |
+| `tempo.tap` | `{ instanceId, expectedGeneration, expectedRevisionId }` → acknowledged runtime state with `tempoResult: 'accepted' | 'restarted' | 'ignored-short'`. Requires running Studio protocol 3 tempo capability. |
 | `parameters` | `{ instanceId, expectedGeneration, expectedRevisionId, expectedControlSchemaHash, values: { spikeHeight: 0.5 }, mode: 'live' }` → `{ applied, status }`. Use actual runtime `controlSchema` IDs/ranges and `controlSchemaHash`; the patch can change several keys atomically. Unknown keys and stale schemas are rejected. |
 | `restart` | `{ instanceId, expectedGeneration }` → replacement runtime status; source and controls retained. Use for recovery when needed, not every edit. |
 
@@ -83,7 +85,7 @@ For source edits, `structuredClone(current.source)` is a useful starting point. 
 
 Current tools do not expose export, resolution changes or audio inputs. Numeric visual-defined controls are available; color/Boolean/enum controls are not yet supported. Do not claim a tool result performed those actions. Inspect updated discovery for newer capabilities before concluding they remain unavailable.
 
-Studio's Inspector also supports local audio modulation through **Animate → Add Audio**. The user explicitly connects an input in the audio controls; all bindings share that analyzer and can select Level, Bass, Mids or Highs with independent amount, attack and release. Base control values remain editable. Scene files retain the logical input and binding settings, not device IDs or microphone permission; reopening requires an explicit connection. Disconnect before choosing another device; changing the shared analyzer configuration also disconnects the current input. Disconnect releases modulation back to the manual base. This UI capability does not grant agents an MCP audio-capture command. Kick detection and tempo synchronization remain planned.
+Studio's Inspector also supports local audio modulation through **Animate → Add Audio**. The user explicitly connects an input in the audio controls; all bindings share that analyzer and can select Level, Bass, Mids or Highs with independent amount, attack and release. Base control values remain editable. Scene files retain the logical input and binding settings, not device IDs or microphone permission; reopening requires an explicit connection. Disconnect before choosing another device; changing the shared analyzer configuration also disconnects the current input. Disconnect releases modulation back to the manual base. This UI capability does not grant agents an MCP audio-capture command. Kick detection drives transient envelopes only. Manual/tap tempo is separate and never inferred from audio.
 
 ## Editor and scene commands
 
