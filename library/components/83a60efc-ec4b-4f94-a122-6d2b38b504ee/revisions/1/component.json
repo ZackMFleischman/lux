@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "83a60efc-ec4b-4f94-a122-6d2b38b504ee",
+  "revision": 1,
+  "name": "Composition Phrasing",
+  "description": "Shared artistic clock, slow tension and release, scale hierarchy, and the painting noise basis. Shader-field for compatible painting renderers.",
+  "updatedAt": "2026-09-16T08:30:32.649Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "phrasing.ts",
+    "files": [
+      "phrasing.ts"
+    ]
+  }
+}
