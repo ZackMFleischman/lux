@@ -52,15 +52,8 @@ try{
     return value;
   }
   async function pointerClick(target,options={}){const box=await target.boundingBox();assert.ok(box);await target.click({...options,position:{x:box.width/2,y:box.height-3}});}
-  // Replay only the old stacking rule as a negative control. No source or saved
-  // file is changed. Removing this style restores the exact candidate CSS.
-  await align(animate,'baseline Animate');
-  const baselineStyle=await page.addStyleTag({content:'.parameter-heading{position:static!important;z-index:auto!important}'});
-  await assert.rejects(pointerClick(animate,{timeout:1600}),error=>/intercepts pointer events/.test(String(error))&&/MuiSlider-thumb/.test(String(error)));
-  await capture('before-stacking-replay');
-  await baselineStyle.evaluate(style=>style.remove());
-  report.checks.push('Negative control: replay of pre-fix heading stacking blocks ordinary Animate click through the slider thumb; candidate stylesheet restored before positive checks');
-
+  // The original failure is preserved in the LUX-150 native receipt. Keep this
+  // positive regression on the unmodified candidate stylesheet and its CSP.
   for(const [size,width,height] of [['wide',1360,900],['narrow',820,720]]){
     report.stage=size;await page.setViewportSize({width,height});
     await align(animate,`${size} Animate`);await pointerClick(animate);
