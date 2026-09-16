@@ -120,7 +120,8 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       }else{
         const flatSaved=saved&&'schema' in saved?saved:undefined;
         const initial=initialControlValues(schema,flatSaved??(previous?{schema:previous.controlSchema,values:previous.controls}:undefined));
-        migration=initial.changes;state={sdkVersion:supportedSdkVersion,controlSchema:schema,controlSchemaHash:schemaHash,controls:initial.values,controlSequence:0};
+        migration=initial.changes;state={sdkVersion:supportedSdkVersion,controlSchema:schema,controlSchemaHash:schemaHash,controls:initial.values,controlSequence:0,
+          controlAnimations:validateControlAnimationBindings(options.savedControlAnimations??previous?.controlAnimations),controlAnimationIssues:Object.freeze([]),animationSequence:0};
       }
       this.publish({ jobs: [{ jobId, state: 'initializing', summary: 'Preparing preview…' }] });
       await this.start(linked, result.sourceHash,state,migration, {lastFaultAt:null}, playbackIntent.playing, requestedOutput,playbackIntent);
@@ -215,10 +216,22 @@ export class StandaloneClient implements StudioClient, PresentationPort {
               !['playing', 'paused'].includes(message.playback) || !Number.isSafeInteger(message.controlSequence) || message.controlSequence < 0) return;
           const animationSequence=message.animationSequence??0;
           if(!Number.isSafeInteger(animationSequence)||animationSequence<0||animationSequence>candidate.animations)return;
-          let applied:ControlValues,compositionNodeControls:SavedNodeControlSnapshot|undefined,effectiveNodeControls:SavedNodeControlSnapshot|undefined,controlAnimations:readonly ControlAnimationBinding[]=Object.freeze([]),controlAnimationIssues:readonly ControlAnimationIssue[]=Object.freeze([]);
+          let applied:ControlValues,effectiveControls:ControlValues,compositionNodeControls:SavedNodeControlSnapshot|undefined,effectiveNodeControls:SavedNodeControlSnapshot|undefined,controlAnimations:readonly ControlAnimationBinding[]=Object.freeze([]),controlAnimationIssues:readonly ControlAnimationIssue[]=Object.freeze([]);
           try {
             applied=validateControlSnapshot(state.controlSchema,state.sdkVersion==='0.1.0'?{intensity:message.intensity}:message.controls);
+            effectiveControls=validateControlSnapshot(state.controlSchema,message.effectiveControls??applied);
             if(state.sdkVersion!=='0.1.0'&&(message.controlSchemaHash!==state.controlSchemaHash||message.sdkVersion!==state.sdkVersion||message.controlSequence>candidate.controls))throw Error('Invalid runtime schema identity');
+            const parsedAnimations=validateControlAnimationBindings(message.controlAnimations);
+            controlAnimations=JSON.stringify(parsedAnimations)===JSON.stringify(candidate.state.controlAnimations??[])
+              ? candidate.state.controlAnimations??Object.freeze([]):parsedAnimations;
+            const animationIssues=message.controlAnimationIssues??[];
+            if(!Array.isArray(animationIssues))throw Error('Invalid animation issues');
+            const parsedIssues=Object.freeze(animationIssues.map((issue:any)=>{
+              if(!issue||!Number.isSafeInteger(issue.index)||issue.index<0||!Array.isArray(issue.nodePath)||issue.nodePath.some((id:unknown)=>typeof id!=='string')||typeof issue.controlId!=='string'||typeof issue.message!=='string')throw Error('Invalid animation issue');
+              return Object.freeze({index:issue.index,nodePath:Object.freeze([...issue.nodePath]),controlId:issue.controlId,message:issue.message});
+            }));
+            controlAnimationIssues=JSON.stringify(parsedIssues)===JSON.stringify(candidate.state.controlAnimationIssues??[])
+              ? candidate.state.controlAnimationIssues??Object.freeze([]):parsedIssues;
             if(state.sdkVersion==='0.4.0'){
               if(!('linkedVersion' in linked)||linked.linkedVersion!==5)throw Error('Invalid composition linked payload');
               const nodeControls=message.nodeControls as SavedNodeControlSnapshot;
@@ -228,22 +241,12 @@ export class StandaloneClient implements StudioClient, PresentationPort {
               if(!message.effectiveNodeControls)throw Error('Missing effective animation values');
               const effective=createCompositionControlState(linked.composition,message.effectiveNodeControls);
               effectiveNodeControls=Object.freeze({sourceHash:revisionId,nodes:effective.snapshot().nodes});
-              const parsedAnimations=validateControlAnimationBindings(message.controlAnimations);
-              controlAnimations=JSON.stringify(parsedAnimations)===JSON.stringify(candidate.state.controlAnimations??[])
-                ? candidate.state.controlAnimations??Object.freeze([]):parsedAnimations;
-              if(!Array.isArray(message.controlAnimationIssues))throw Error('Invalid animation issues');
-              const parsedIssues=Object.freeze(message.controlAnimationIssues.map((issue:any)=>{
-                if(!issue||!Number.isSafeInteger(issue.index)||issue.index<0||!Array.isArray(issue.nodePath)||issue.nodePath.some((id:unknown)=>typeof id!=='string')||typeof issue.controlId!=='string'||typeof issue.message!=='string')throw Error('Invalid animation issue');
-                return Object.freeze({index:issue.index,nodePath:Object.freeze([...issue.nodePath]),controlId:issue.controlId,message:issue.message});
-              }));
-              controlAnimationIssues=JSON.stringify(parsedIssues)===JSON.stringify(candidate.state.controlAnimationIssues??[])
-                ? candidate.state.controlAnimationIssues??Object.freeze([]):parsedIssues;
             }
             if(message.type==='ready'&&(message.controlSequence!==0||animationSequence!==0||JSON.stringify(applied)!==JSON.stringify(state.controls)||JSON.stringify(controlAnimations)!==JSON.stringify(state.controlAnimations??[])))throw Error('Initial control snapshot mismatch');
           } catch(error) {if(message.type==='ready')fail(String(error));return;}
           if(ready&&(message.controlSequence<candidate.state.controlSequence||animationSequence<(candidate.state.animationSequence??0)))return;
-          candidate.state={...state,controls:applied,controlSequence:message.controlSequence,
-            ...(compositionNodeControls?{nodeControls:compositionNodeControls,effectiveNodeControls,controlAnimations,controlAnimationIssues,animationSequence}:{} )};
+          candidate.state={...state,controls:applied,effectiveControls,controlSequence:message.controlSequence,controlAnimations,controlAnimationIssues,animationSequence,
+            ...(compositionNodeControls?{nodeControls:compositionNodeControls,effectiveNodeControls}:{} )};
           candidate.playback=message.playback;
           candidate.lastHeartbeat = performance.now();
           if (BigInt(message.frameId) > BigInt(candidate.frameId)) { candidate.frameId = message.frameId; candidate.lastFrame = performance.now(); }
@@ -363,14 +366,16 @@ export class StandaloneClient implements StudioClient, PresentationPort {
         controlSchemaHash:operation.input.expectedControlSchemaHash,controlSequence:++runtime.controls};
     } else if(operation.name==='lux.node.animation.set'){
       const linked=this.accepted?.linked,node=runtime.state.nodeControls?.nodes.find(row=>JSON.stringify(row.nodePath)===JSON.stringify(operation.input.nodePath));
-      if(!linked||!('linkedVersion' in linked)||linked.linkedVersion!==5||!node)throw Error('This visual has no matching composition node');
+      const flat=operation.input.nodePath.length===0&&runtime.state.sdkVersion!=='0.4.0';
+      if(!flat&&(!linked||!('linkedVersion' in linked)||linked.linkedVersion!==5||!node))throw Error('This visual has no matching composition node');
       if(operation.input.expectedRevisionId!==runtime.revisionId)throw Error('Revision changed; read current runtime state');
-      if(operation.input.expectedControlSchemaHash!==node.schemaHash)throw Error('Composition node control schema changed');
-      if(!node.schema.some(row=>row.id===operation.input.controlId))throw Error('Composition node control is unavailable');
+      const definitionHash=flat?runtime.state.controlSchemaHash:node!.definitionHash,schemaHash=flat?runtime.state.controlSchemaHash:node!.schemaHash,schema=flat?runtime.state.controlSchema:node!.schema;
+      if(operation.input.expectedControlSchemaHash!==schemaHash)throw Error(flat?'Scene control schema changed':'Composition node control schema changed');
+      if(!schema.some(row=>row.id===operation.input.controlId))throw Error(flat?'Scene control is unavailable':'Composition node control is unavailable');
       if(runtime.animations>=Number.MAX_SAFE_INTEGER)throw Error('Animation sequence exhausted; restart runtime');
       if(operation.input.animation){const animation=validateControlAnimationBindings([operation.input.animation])[0]!;
-        if(JSON.stringify(animation.nodePath)!==JSON.stringify(node.nodePath)||animation.controlId!==operation.input.controlId||animation.definitionHash!==node.definitionHash||animation.schemaHash!==node.schemaHash)throw Error('Animation target identity changed');}
-      const current=[...(runtime.desiredControlAnimations??runtime.state.controlAnimations??[])],index=current.findIndex(row=>JSON.stringify(row.nodePath)===JSON.stringify(node.nodePath)&&row.controlId===operation.input.controlId);
+        if(JSON.stringify(animation.nodePath)!==JSON.stringify(operation.input.nodePath)||animation.controlId!==operation.input.controlId||animation.definitionHash!==definitionHash||animation.schemaHash!==schemaHash)throw Error('Animation target identity changed');}
+      const current=[...(runtime.desiredControlAnimations??runtime.state.controlAnimations??[])],index=current.findIndex(row=>JSON.stringify(row.nodePath)===JSON.stringify(operation.input.nodePath)&&row.controlId===operation.input.controlId);
       if(index>=0)current.splice(index,1,...(operation.input.animation?[operation.input.animation]:[]));else if(operation.input.animation)current.push(operation.input.animation);
       runtime.desiredControlAnimations=validateControlAnimationBindings(current);
       message={type:'animations',animationSequence:++runtime.animations,controlAnimations:runtime.desiredControlAnimations,...(operation.input.restart?{restart:{nodePath:operation.input.nodePath,controlId:operation.input.controlId}}:{})};

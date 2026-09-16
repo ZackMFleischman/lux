@@ -12,10 +12,14 @@ for (const args of [
     join(tests, 'source-admission.test.mjs'), join(tests, 'source-admission-browser.test.mjs'),
     join(tests, 'image-preview.test.mjs'),
     join(tests, 'capture-alpha.test.mjs'),
+    join(tests, 'scene-control-animation.test.mjs'),
     join(tests, 'session-isolation.test.mjs'),
     join(tests, 'creative-checkout.test.mjs'),
     join(tests, 'electron-setup.test.mjs'),
-    join(directory, 'dist/view.test.cjs'), join(directory, 'dist/interactions.test.mjs')],
+    join(directory, 'dist/view.test.cjs')],
+  // Each DOM suite owns its document and Emotion cache. Sharing module state
+  // across documents can leave tooltip styles attached to an earlier document.
+  ['--test', '--test-isolation=none', join(directory, 'dist/interactions.test.mjs')],
   ['--test', '--test-isolation=none', join(directory, 'dist/source-editor.test.mjs')],
   ['--test', '--test-isolation=none', join(directory, 'dist/library-panel.test.mjs')],
   ['--test', '--test-isolation=none', join(directory, 'dist/dock-shell.test.mjs')],

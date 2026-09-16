@@ -200,7 +200,7 @@ onmessage = event => {
       controlState.applyNode(message.nodePath,message.values,message.controlSequence,message.controlSchemaHash);
       await draw(message.requestId, 'status'); schedule();
     } else if(message.type==='animations'){
-      if(!controlState.applyAnimations)throw Error('This visual cannot animate node controls');
+      if(!controlState.applyAnimations)throw Error('This visual cannot animate controls');
       controlState.applyAnimations(message.controlAnimations,message.animationSequence,clock.snapshot().timeSeconds);
       if(message.restart)controlState.restartAnimation(message.restart.nodePath,message.restart.controlId,clock.snapshot().timeSeconds);
       await draw(message.requestId,'status');schedule();

@@ -10,12 +10,16 @@ for (const name of ['window', 'document', 'navigator', 'HTMLElement', 'Element',
   Object.defineProperty(globalThis, name, { configurable: true, value: dom.window[name] });
 }
 Object.defineProperty(globalThis, 'IS_REACT_ACT_ENVIRONMENT', { configurable: true, writable: true, value: true });
-const { render, screen, cleanup, waitFor, fireEvent, act, within } = await import('@testing-library/react');
+const { render: renderUI, screen, cleanup, waitFor, fireEvent, act, within } = await import('@testing-library/react');
+const { CacheProvider } = await import('@emotion/react');
+const { default: createCache } = await import('@emotion/cache');
+let styleCache = createCache({key:'studio-test'});
+const render = (ui: Parameters<typeof renderUI>[0]) => renderUI(<CacheProvider value={styleCache}>{ui}</CacheProvider>);
 const { userEvent } = await import('@testing-library/user-event');
 const { StudioApp } = await import('../../apps/studio/src/renderer.tsx');
 const { createDisconnectedClient } = await import('../../apps/studio/src/service-client.ts');
 const { useDiscardConfirmation } = await import('../../apps/studio/src/Confirmation.tsx');
-afterEach(() => cleanup());
+afterEach(() => { cleanup(); styleCache.sheet.flush(); styleCache = createCache({key:'studio-test'}); });
 after(() => dom.window.close());
 
 test('RTL: frame bursts leave Performance responsive and applied controls publish immediately', async context => {
@@ -69,13 +73,9 @@ test('RTL: code-defined controls expose independent values, numeric entry and de
   assert.equal(within(document.querySelector('.inspector')!).getAllByRole('slider').length, 2);
   for (const label of ['Spike height', 'Noise scale']) {
     const animate = screen.getByRole('button', { name: `Animate ${label}` }) as HTMLButtonElement;
-    assert.equal(animate.getAttribute('aria-disabled'), 'true', 'legacy controls expose animation honestly without fabricating a node target');
+    assert.equal(animate.disabled, false, 'scene controls support animation without a component target');
     assert.equal((screen.getByRole('button', { name: `Reset ${label} to default` }) as HTMLButtonElement).disabled, false);
   }
-  const unavailableAnimation=screen.getByRole('button',{name:'Animate Spike height',description:'Animation requires a component-based scene.'});await act(async()=>{unavailableAnimation.focus();});
-  assert.ok(document.activeElement===unavailableAnimation,'unavailable animation reason must be keyboard reachable');
-  assert.ok(await screen.findByRole('tooltip',{name:'Animation requires a component-based scene.'}),'keyboard focus displays the unavailable reason');
-  fireEvent.click(unavailableAnimation);assert.ok(!screen.queryByRole('dialog',{name:'Animate Spike height'}),'unavailable animation cannot open an editor');
   fireEvent.change(screen.getByRole('spinbutton', { name: 'Noise scale value' }), { target: { value: '12' } });
   fireEvent.keyDown(screen.getByRole('spinbutton', { name: 'Noise scale value' }), { key: 'Enter' });
   await waitFor(() => assert.equal(fixture.calls.length, 1));

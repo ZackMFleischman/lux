@@ -1,17 +1,21 @@
 import {validateControlAnimationBindings} from '../../../../packages/runtime-contracts/src/control-animation.mjs';
-const freeze=Object.freeze,stringify=JSON.stringify,isFiniteNumber=Number.isFinite,sin=Math.sin,abs=Math.abs,min=Math.min,max=Math.max,PI=Math.PI;
+const freeze=Object.freeze,stringify=JSON.stringify,isFiniteNumber=Number.isFinite,sin=Math.sin,abs=Math.abs,min=Math.min,max=Math.max,PI=Math.PI,RuntimeError=Error;
+const RuntimeMap=Map,RuntimeSet=Set,call=Function.prototype.call;
+const arrayFind=call.bind(Array.prototype.find),arraySome=call.bind(Array.prototype.some),arrayPush=call.bind(Array.prototype.push);
+const mapGet=call.bind(Map.prototype.get),mapSet=call.bind(Map.prototype.set),setAdd=call.bind(Set.prototype.add),setHas=call.bind(Set.prototype.has);
 const key=path=>stringify(path);
-const finite=(value,label)=>{if(!isFiniteNumber(value))throw Error(`Invalid animation ${label}`);return value;};
+const finite=(value,label)=>{if(!isFiniteNumber(value))throw new RuntimeError(`Invalid animation ${label}`);return value;};
 
 export function normalizeControlAnimations(input,profile){
- const bindings=validateControlAnimationBindings(input),nodes=new Map(profile.nodes.map(node=>[key(node.nodePath),node])),issues=[];
- bindings.forEach((raw,index)=>{
-  const node=nodes.get(key(raw.nodePath));let issue;
+ const bindings=validateControlAnimationBindings(input),nodes=new RuntimeMap(),issues=[];
+ for(let index=0;index<profile.nodes.length;index++){const node=profile.nodes[index];mapSet(nodes,key(node.nodePath),node);}
+ for(let index=0;index<bindings.length;index++){
+  const raw=bindings[index],node=mapGet(nodes,key(raw.nodePath));let issue;
   if(!node)issue='Animation target is no longer available.';
   else if(node.definitionHash!==raw.definitionHash||node.schemaHash!==raw.schemaHash)issue='Animated control changed and is incompatible with this binding.';
-  else if(!node.schema.some(control=>control.id===raw.controlId))issue='Animated control is no longer available.';
-  if(issue)issues.push(freeze({index,nodePath:freeze([...raw.nodePath]),controlId:raw.controlId,message:issue}));
- });
+  else if(!arraySome(node.schema,control=>control.id===raw.controlId))issue='Animated control is no longer available.';
+  if(issue){const nodePath=[];for(let pathIndex=0;pathIndex<raw.nodePath.length;pathIndex++)arrayPush(nodePath,raw.nodePath[pathIndex]);arrayPush(issues,freeze({index,nodePath:freeze(nodePath),controlId:raw.controlId,message:issue}));}
+ }
  return freeze({bindings,issues:freeze(issues)});
 }
 
@@ -30,27 +34,28 @@ export function animatedControlValue(base,definition,binding,timeSeconds){
 
 export function createControlAnimationEvaluator(profile,base,normalized){
  let current=normalized;
- let entries=new Map(normalized.bindings.map(binding=>[`${key(binding.nodePath)}:${binding.controlId}`,{binding,anchorTime:0,frozenElapsed:0}]));
+ let entries=new RuntimeMap();
+ for(let index=0;index<normalized.bindings.length;index++){const binding=normalized.bindings[index];mapSet(entries,`${key(binding.nodePath)}:${binding.controlId}`,{binding,anchorTime:0,frozenElapsed:0});}
  const elapsed=(entry,timeSeconds)=>entry.frozenElapsed+(entry.binding.enabled?max(0,timeSeconds-entry.anchorTime):0);
  function replace(next,timeSeconds){
-  finite(timeSeconds,'time');const previous=entries,nextEntries=new Map();
-  for(const binding of next.bindings){const id=`${key(binding.nodePath)}:${binding.controlId}`,before=previous.get(id);let anchorTime=timeSeconds,frozenElapsed=0;
+  finite(timeSeconds,'time');const previous=entries,nextEntries=new RuntimeMap();
+  for(let index=0;index<next.bindings.length;index++){const binding=next.bindings[index],id=`${key(binding.nodePath)}:${binding.controlId}`,before=mapGet(previous,id);let anchorTime=timeSeconds,frozenElapsed=0;
    if(before){const atChange=elapsed(before,timeSeconds);if(binding.enabled){if(before.binding.enabled){anchorTime=before.anchorTime;frozenElapsed=before.frozenElapsed;}else frozenElapsed=before.frozenElapsed;}else frozenElapsed=atChange;}
-   nextEntries.set(id,{binding,anchorTime,frozenElapsed});
+   mapSet(nextEntries,id,{binding,anchorTime,frozenElapsed});
   }
   current=next;entries=nextEntries;
  }
- function restart(path,controlId,timeSeconds){const id=`${key(path)}:${controlId}`,entry=entries.get(id);if(entry){finite(timeSeconds,'time');entries.set(id,{binding:entry.binding,anchorTime:timeSeconds,frozenElapsed:0});}}
+ function restart(path,controlId,timeSeconds){const id=`${key(path)}:${controlId}`,entry=mapGet(entries,id);if(entry){finite(timeSeconds,'time');mapSet(entries,id,{binding:entry.binding,anchorTime:timeSeconds,frozenElapsed:0});}}
   function nodeValues(path,timeSeconds){
-   const values={...base.nodeValues(path)},node=profile.nodes.find(row=>key(row.nodePath)===key(path));
+   const values={...base.nodeValues(path)},node=arrayFind(profile.nodes,row=>key(row.nodePath)===key(path));
    if(!node)return freeze(values);
-  const issueKeys=new Set(current.issues.map(issue=>`${key(issue.nodePath)}:${issue.controlId}`));
-  for(const definition of node.schema){const id=`${key(path)}:${definition.id}`,entry=entries.get(id);if(entry&&!issueKeys.has(id))values[definition.id]=animatedControlValue(values[definition.id],definition,entry.binding,elapsed(entry,timeSeconds));}
+  const issueKeys=new RuntimeSet();for(let index=0;index<current.issues.length;index++){const issue=current.issues[index];setAdd(issueKeys,`${key(issue.nodePath)}:${issue.controlId}`);}
+  for(let index=0;index<node.schema.length;index++){const definition=node.schema[index],id=`${key(path)}:${definition.id}`,entry=mapGet(entries,id);if(entry&&!setHas(issueKeys,id))values[definition.id]=animatedControlValue(values[definition.id],definition,entry.binding,elapsed(entry,timeSeconds));}
   return freeze(values);
  }
  function values(timeSeconds){
   const values={...base.values()};
-  for(const definition of profile.publicControls){const targets=profile.publicControlBindings[definition.id],target=targets?.length===1&&targets[0]?.active?targets[0]:undefined;if(target)values[definition.id]=nodeValues(target.nodePath,timeSeconds)[target.controlId];}
+  for(let index=0;index<profile.publicControls.length;index++){const definition=profile.publicControls[index],targets=profile.publicControlBindings[definition.id],target=targets?.length===1&&targets[0]?.active?targets[0]:undefined;if(target)values[definition.id]=nodeValues(target.nodePath,timeSeconds)[target.controlId];}
   return freeze(values);
  }
  return freeze({nodeValues,values,replace,restart,bindings:()=>current.bindings,issues:()=>current.issues});

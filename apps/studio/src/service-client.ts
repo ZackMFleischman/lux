@@ -24,12 +24,13 @@ export type RuntimeView = RuntimeKey & Readonly<{
   Partial<RuntimeControlState> & Readonly<{sdkVersion?:'0.1.0';intensity:number}>);
 export function getRuntimeControlState(runtime:RuntimeView):RuntimeControlState {
   const schema=normalizeControlSchema(runtime.controlSchema??LEGACY_CONTROL_SCHEMA);
+  const controls=validateControlSnapshot(schema,runtime.controls??{intensity:runtime.intensity});
   return Object.freeze({sdkVersion:runtime.sdkVersion??'0.1.0',controlSchema:schema,
     controlSchemaHash:runtime.controlSchemaHash??LEGACY_CONTROL_SCHEMA_HASH,
-    controls:validateControlSnapshot(schema,runtime.controls??{intensity:runtime.intensity}),controlSequence:runtime.controlSequence??0,
+    controls,...(runtime.effectiveControls?{effectiveControls:validateControlSnapshot(schema,runtime.effectiveControls)}:{}),controlSequence:runtime.controlSequence??0,
+    controlAnimations:runtime.controlAnimations??Object.freeze([]),controlAnimationIssues:runtime.controlAnimationIssues??Object.freeze([]),animationSequence:runtime.animationSequence??0,
     ...(runtime.sdkVersion==='0.4.0'&&runtime.nodeControls?{nodeControls:runtime.nodeControls,
-      ...(runtime.effectiveNodeControls?{effectiveNodeControls:runtime.effectiveNodeControls}:{}),
-      controlAnimations:runtime.controlAnimations??Object.freeze([]),controlAnimationIssues:runtime.controlAnimationIssues??Object.freeze([]),animationSequence:runtime.animationSequence??0}:{})});
+      ...(runtime.effectiveNodeControls?{effectiveNodeControls:runtime.effectiveNodeControls}:{})}:{} )});
 }
 /** Saved visual edits exclude playback and sampled animation values. */
 export function runtimeEditSignature(runtime: RuntimeView | null): string | null {
@@ -99,10 +100,14 @@ export class StudioController {
       nodePath:[...node.nodePath],values:patch,mode:'live'}});
   }
   async setNodeAnimation(nodePath:NodePath,controlId:string,animation:ControlAnimationBinding|null,restart=false):Promise<unknown>{
-    const target=this.target(),node=target.nodeControls?.nodes.find(row=>JSON.stringify(row.nodePath)===JSON.stringify(nodePath));
-    if(target.sdkVersion!=='0.4.0'||!node||!node.schema.some(row=>row.id===controlId))throw Error('Composition node control is unavailable');
+    const target=this.target(),state=getRuntimeControlState(target),node=target.nodeControls?.nodes.find(row=>JSON.stringify(row.nodePath)===JSON.stringify(nodePath));
+    const flat=nodePath.length===0&&state.sdkVersion!=='0.4.0';
+    if(!flat&&(target.sdkVersion!=='0.4.0'||!node||!node.schema.some(row=>row.id===controlId)))throw Error('Composition node control is unavailable');
+    if(flat&&!state.controlSchema.some(row=>row.id===controlId))throw Error('Scene control is unavailable');
+    const definitionHash=flat?state.controlSchemaHash:node!.definitionHash,schemaHash=flat?state.controlSchemaHash:node!.schemaHash;
+    if(animation&&(JSON.stringify(animation.nodePath)!==JSON.stringify(nodePath)||animation.controlId!==controlId||animation.definitionHash!==definitionHash||animation.schemaHash!==schemaHash))throw Error('Animation target identity changed');
     return this.client.invoke({name:'lux.node.animation.set',input:{requestId:this.requestId(),instanceId:target.instanceId,expectedGeneration:target.generation,
-      expectedRevisionId:target.revisionId,expectedControlSchemaHash:node.schemaHash,nodePath:[...node.nodePath],controlId,animation,...(restart?{restart:true}:{})}});
+      expectedRevisionId:target.revisionId,expectedControlSchemaHash:schemaHash,nodePath:[...nodePath],controlId,animation,...(restart?{restart:true}:{})}});
   }
   async setParameters(values:ControlValues):Promise<unknown> {
     const target = this.target();

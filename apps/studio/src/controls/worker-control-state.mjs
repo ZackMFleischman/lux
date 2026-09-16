@@ -3,6 +3,7 @@ import {LEGACY_CONTROL_SCHEMA,LEGACY_CONTROL_SCHEMA_HASH,sha256} from './control
 // Capture the operations used AFTER generated module evaluation. Holding the
 // Object/JSON/Map objects is insufficient: their properties remain mutable.
 import {prepareComponentDefinition} from './worker-component-definition.mjs';
+import {createControlAnimationEvaluator,normalizeControlAnimations} from './control-animation.mjs';
 const ownKeys=Reflect.ownKeys, getDescriptor=Object.getOwnPropertyDescriptor;
 const getPrototype=Object.getPrototypeOf, defineProperty=Object.defineProperty;
 const freeze=Object.freeze, createObject=Object.create, isArray=Array.isArray;
@@ -25,6 +26,13 @@ export async function prepareWorkerControlState(message,admission){
   }
   const componentCheck=sdkVersion==='0.3.0'?prepareComponentDefinition(admission.component):undefined;
   let values=validateControlSnapshot(schema,message.controls), sequence=0;
+  const scenePath=freeze([]),sceneNode=freeze({nodePath:scenePath,definitionHash:schemaHash,schemaHash,schema});
+  const publicControlBindings=createObject(objectPrototype);
+  for(const control of schema)defineProperty(publicControlBindings,control.id,{value:freeze([freeze({nodePath:scenePath,controlId:control.id,active:true})]),enumerable:true});
+  const profile=freeze({nodes:freeze([sceneNode]),publicControls:schema,publicControlBindings:freeze(publicControlBindings)});
+  let animations=normalizeControlAnimations(message.controlAnimations??[],profile),animationSequence=0;
+  const base=freeze({values:()=>values,nodeValues:path=>isArray(path)&&path.length===0?values:freeze(createObject(objectPrototype))});
+  const animated=createControlAnimationEvaluator(profile,base,animations);
   const fields=schema.map(row=>ownKeys(row));
   function validateValues(input){
     if(record(input).length!==schema.length)bad('Invalid full control snapshot');
@@ -49,11 +57,18 @@ export async function prepareWorkerControlState(message,admission){
     }
     const create=own(definition,'create');if(typeof create!=='function')bad('Invalid visual create function');return create;
   }
-  return freeze({checkDefinition,values:()=>values,
+  return freeze({checkDefinition,values:(timeSeconds=0)=>animated.values(timeSeconds),
     apply(input,nextSequence,hash){
       if(!isSafeInteger(nextSequence)||nextSequence<=sequence||(sdkVersion!=='0.1.0'&&hash!==schemaHash))bad('Invalid control snapshot sequence or schema');
       const next=validateValues(input);values=next;sequence=nextSequence;
     },
-    state:()=>({sdkVersion,controlSchemaHash:schemaHash,controls:values,controlSequence:sequence,...(sdkVersion==='0.1.0'?{intensity:values.intensity}:{})}),
+    applyAnimations(input,nextSequence,timeSeconds){
+      if(!isSafeInteger(nextSequence)||nextSequence<=animationSequence)bad('Invalid animation snapshot sequence');
+      animations=normalizeControlAnimations(input,profile);animated.replace(animations,timeSeconds);animationSequence=nextSequence;
+    },
+    restartAnimation(path,controlId,timeSeconds){animated.restart(path,controlId,timeSeconds);},
+    resetAnimations(timeSeconds){for(let index=0;index<animations.bindings.length;index++){const binding=animations.bindings[index];animated.restart(binding.nodePath,binding.controlId,timeSeconds);}},
+    state:(timeSeconds=0)=>({sdkVersion,controlSchemaHash:schemaHash,controls:values,controlSequence:sequence,effectiveControls:animated.values(timeSeconds),
+      controlAnimations:animated.bindings(),controlAnimationIssues:animated.issues(),animationSequence,...(sdkVersion==='0.1.0'?{intensity:values.intensity}:{})}),
   });
 }

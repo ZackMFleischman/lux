@@ -28,7 +28,7 @@ Studio can attach one compact LFO to a numeric control on the currently selected
 
 The LFO follows the scene clock: pause freezes it, Play resumes it, and scene Reset or **Restart animation** returns it to the configured start phase. Turning it off outputs the base value and retains the frozen oscillator phase for later resume. Editing the base moves the animation center immediately. The Inspector shows clamped extrema and reports when the declared control range limits them.
 
-Scene Save/Open stores the base values and compatible per-instance bindings. Bindings include node, component definition and control schema identity. When a linked component update removes or changes the target incompatibly, Lux keeps the affected binding disabled with a visible issue and never retargets it by list position. Removing the animation deletes the binding. Control animation currently applies only to eligible numeric controls on selected SDK 0.4 Graph nodes; it is not a shared modulation source, graph editor feature or MIDI mapping.
+Scene Save/Open stores the base values and compatible per-instance bindings. Component bindings include node, component definition and control schema identity. Flat scene bindings use the declared control schema identity and survive compatible source edits. When a linked component update removes or changes the target incompatibly, Lux keeps the affected binding disabled with a visible issue and never retargets it by list position. Removing the animation deletes the binding. Control animation applies to declared numeric scene controls (SDK 0.2 and legacy 0.1) and SDK 0.4 Scene exposures or selected Graph controls; it is not a shared modulation source, graph editor feature or MIDI mapping.
 
 ## Shared components
 

@@ -134,7 +134,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         const document = await verifySceneDocument(look.document);
         if (document.version === 5 && document.libraryLinks.length) throw Error('This look is not a frozen snapshot');
         const savedControls = await sceneControlSnapshot(document);
-        const savedControlAnimations = document.version === 4 || document.version === 5 ? document.controlAnimations : [];
+        const savedControlAnimations = document.controlAnimations ?? [];
         await workspace.submit(document.source, workspace.getSnapshot().version, source => ports.submit(source, {savedControls, savedControlAnimations, output: document.settings}));
         token = undefined;
         libraryLinks = Object.freeze([]);
@@ -185,7 +185,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         const result=await ports.openPath(path);if(!result)return null;
         const document=await verifySceneDocument(result.document);
         if(document.settings.width!==1920||document.settings.height!==1080||document.settings.fps!==60||document.settings.seed!==0)throw Error('This build supports 1920×1080 at 60 fps with seed 0');
-        const savedControls=await sceneControlSnapshot(document),savedAnimations=document.version===4||document.version===5?document.controlAnimations:Object.freeze([]),savedLinks=document.version===5?document.libraryLinks:Object.freeze([]);
+        const savedControls=await sceneControlSnapshot(document),savedAnimations=document.controlAnimations??Object.freeze([]),savedLinks=document.version===5?document.libraryLinks:Object.freeze([]);
         const resolution=await resolveLinked(document.source,savedLinks);
         await ports.submit(resolution.source,{savedControls,savedControlAnimations:savedAnimations,output:document.settings});
         workspace.replaceDocument(resolution.source);await workspace.submit(resolution.source,workspace.getSnapshot().version,async()=>{});
@@ -202,7 +202,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         if (document.settings.width !== 1920 || document.settings.height !== 1080 || document.settings.fps !== 60 || document.settings.seed !== 0)
           throw Error('This build supports 1920×1080 at 60 fps with seed 0');
         const savedControls=await sceneControlSnapshot(document);
-        const savedAnimations=document.version===4||document.version===5?document.controlAnimations:Object.freeze([]);
+        const savedAnimations=document.controlAnimations??Object.freeze([]);
         const savedLinks=document.version===5?document.libraryLinks:Object.freeze([]);
         const resolution=await resolveLinked(document.source,savedLinks);
         const libraryChanged=JSON.stringify(resolution.links)!==JSON.stringify(savedLinks);
