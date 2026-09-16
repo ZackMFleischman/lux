@@ -107,105 +107,9 @@ const paintingAfterRegions = `
 }
 
 
-fn lpRegionMarks(baseColor: vec3f, owner: vec2f, center: vec2f, local: vec2f,
-  edge: f32, seed: vec2f, t: f32, form: vec4f, hatch: vec4f, ink: vec4f,
-  character: vec4f, music: vec4f, variety: vec4f) -> vec3f {
-  var color = baseColor;
-  let r = lpHash2(owner + seed + 7.0);
-  // Each region has a durable line family. Angles, fans and wave amplitudes
-  // vary across regions; adjacent strokes inside one family bend together.
-  let linePhrase = lpPhrase(center, t - 3.5);
-  let lineEnergy = music.x * (1.0 + music.y * (linePhrase - 0.5) * 0.85);
-  // Persistent region styles: restrained parallel marks, broad sweeps, fans,
-  // and occasional contours. Shared family traits relate spacing and weight;
-  // independent small variations prevent adjacent regions feeling stamped.
-  let style = lpHash(owner + seed + 211.0);
-  let detail = lpHash2(owner + seed + 317.0);
-  let quietStyle = 1.0 - step(0.25, style);
-  let fanStyle = step(0.65, style) * (1.0 - step(0.90, style));
-  let contourStyle = step(0.90, style);
-  let intrinsicBend = mix(0.72 + detail.x * 0.55, 0.12 + detail.x * 0.22, quietStyle)
-    + fanStyle * 0.43;
-  let regionCurvature = hatch.z * mix(1.0, intrinsicBend, variety.y);
-  let sharedAngle = (lpNoise(center * 0.34 + seed * 0.01) - 0.5) * 2.5;
-  let counterpoint = step(0.77, lpHash(owner + seed + 203.0));
-  let localDirection = (r.x - 0.5) * mix(4.9, 1.35, music.z)
-    + counterpoint * (1.05 + lineEnergy * 0.32) + (detail.y - 0.5) * 0.65;
-  let angle = sharedAngle + localDirection * variety.z + hatch.w
-    + music.y * 0.09 * (linePhrase - 0.5);
-  let axis = vec2f(cos(angle), sin(angle));
-  let along = dot(local, vec2f(-axis.y, axis.x));
-  let across = dot(local, axis);
-  let bend = 0.18 * sin(along * (1.3 + r.y) + r.y * 8.0 + t * 0.10)
-    + 0.16 * (lpNoise(vec2f(along * 2.1 + t * 0.016, r.x * 21.0)) - 0.5)
-    + 0.02 * sin(along * 6.1 - t * 0.07 + r.x * 13.0);
-  let fan = (r.y - 0.5) * (0.28 + fanStyle * 0.85) * along * along;
-  var path = across + regionCurvature * (bend + fan) * (0.82 + lineEnergy * 0.18);
-  if (contourStyle > 0.5) {
-    path = length(local + vec2f(0.68, -0.60)) + regionCurvature * bend * 0.45;
-  }
-  // Three related spacing bands create dense phrases, ordinary passages, rests.
-  let intrinsicSpacing = select(select(0.58, 1.0, detail.x > 0.30), 1.55, detail.x > 0.75)
-    * (0.90 + r.y * 0.20);
-  let spacingBand = mix(1.0, intrinsicSpacing, variety.x);
-  let spacing = hatch.y * spacingBand
-    * (1.0 - music.y * music.x * 0.14 * (linePhrase - 0.5));
-  let phase = path / spacing;
-  let lineId = floor(phase + 0.5);
-  let lineJitter = (lpHash(vec2f(lineId, r.x * 79.0)) - 0.5) * 0.17
-    + character.y * 0.065 * (lpNoise(vec2f(along * 10.0, lineId + r.y * 91.0)) - 0.5);
-  let stripeDistance = abs(fract(phase + 0.5 + lineJitter) - 0.5);
-  let stripeAA = max(fwidth(phase), 0.001);
-  let pressure = 0.73 + 0.36 * lpNoise(vec2f(along * 5.0, lineId * 1.7 + r.y * 4.0))
-    + character.y * 0.20 * sin(along * 18.0 + lineId * 1.9);
-  let intrinsicWeight = clamp(sqrt(intrinsicSpacing) * (0.68 + detail.y * 0.66)
-    * (1.0 + quietStyle * 0.12), 0.48, 1.65);
-  let regionWeight = ink.y * mix(1.0, intrinsicWeight, variety.w);
-  let halfWidth = min(0.28, regionWeight * 4.0 * pressure * stripeAA);
-  let stripe = 1.0 - smoothstep(halfWidth - stripeAA * 0.5, halfWidth + stripeAA * 0.5, stripeDistance);
-  // Dense at lower/right, breathing room upper/left, slowly shifting overall.
-  let position = center / form.x;
-  let activity = smoothstep(-0.28, 0.30, position.x * 0.67 - position.y * 0.9 + 0.035 + 0.055 * sin(t * 0.045));
-  let quiet = exp(-dot(center - vec2f(-0.8, 0.65), center - vec2f(-0.8, 0.65)) * 0.40);
-  let eligibility = lpHash(owner + seed + 103.0);
-  let score = hatch.x + character.x * ((activity - 0.5) * 0.92 - quiet * 0.29)
-    + music.y * 0.07 * (linePhrase - 0.5);
-  var coverage = smoothstep(eligibility - 0.045, eligibility + 0.045, score);
-  coverage *= smoothstep(0.0, 0.1, hatch.x);
-  coverage = mix(coverage, 1.0, smoothstep(0.94, 1.0, hatch.x));
-  let growth = 0.80 + music.y * 0.23 * linePhrase + 0.05 * r.y;
-  let reveal = 1.0 - smoothstep(growth - 0.08, growth + 0.08, along * 0.31 + 0.40);
-  let inset = smoothstep(0.003, 0.012, edge);
-  // A few small empty islands give the drawing secondary scale and punctuation.
-  let islandDistance = length((local - vec2f(0.08, -0.05)) * vec2f(0.9, 1.3)) - (0.045 + r.x * 0.055);
-  let islandAA = max(fwidth(islandDistance), 0.001);
-  let islandActive = step(0.89, r.y) * smoothstep(0.025, 0.065, edge);
-  let island = (1.0 - smoothstep(-islandAA, islandAA, islandDistance)) * islandActive;
-  // A sparse, stable second family runs perpendicular to the primary axis.
-  // Keep it lighter and more open so crosshatched regions remain accents.
-  let crossStyle = lpHash(owner + seed + 509.0);
-  let crossEligible = step(0.81, crossStyle) * (1.0 - contourStyle);
-  let crossBend = regionCurvature * 0.065
-    * sin(across * (1.5 + detail.y) + r.x * 9.0 + t * 0.08);
-  let crossPhase = (along + crossBend) / (spacing * (1.18 + detail.y * 0.40));
-  let crossId = floor(crossPhase + 0.5);
-  let crossJitter = (lpHash(vec2f(crossId, r.y * 91.0)) - 0.5) * 0.12;
-  let crossDistance = abs(fract(crossPhase + crossJitter + 0.5) - 0.5);
-  let crossAA = max(fwidth(crossPhase), 0.001);
-  let crossWidth = min(0.24, regionWeight * 3.2 * pressure * crossAA);
-  let crossStripe = 1.0 - smoothstep(crossWidth - crossAA * 0.5,
-    crossWidth + crossAA * 0.5, crossDistance);
-  let drawing = 1.0 - (1.0 - stripe) * (1.0 - crossStripe * crossEligible * 0.72);
-  let hatchAlpha = drawing * coverage * reveal * inset * (1.0 - island) * 0.92;
-  let cream = mix(vec3f(0.89, 0.86, 0.70), vec3f(0.94, 0.79, 0.75), ink.z);
-  color = mix(color, cream, hatchAlpha);
-  color = mix(color, color * 0.78, island * 0.38);
-  let islandLine = (1.0 - smoothstep(ink.x, ink.x + islandAA, abs(islandDistance))) * islandActive;
-  color = mix(color, cream, islandLine * 0.70);
+`;
 
-  return color;
-}
-
+const paintingAfterHatching = `
 
 // Consume the exact geometry published by Tracer Paths. The region transition
 // intentionally retains the uneven per-pixel wash behavior of the saved study.
@@ -303,6 +207,9 @@ fn lpFbm(p: vec2f) -> f32 {
 const regionAbi = 'lux/organic-regions/v1';
 const regionFragmentKeys = ['lpRegion', 'regionGeometry'] as const;
 const regionValueKeys = ['growth', 'motion', 'scale', 'seed', 'warp'] as const;
+const hatchingAbi = 'lux/region-hatching/v1';
+const hatchingFragmentKeys = ['lpRegionMarks'] as const;
+const hatchingValueKeys = ['angle', 'angleVar', 'coverage', 'curvature', 'curvatureVar', 'hatchWidth', 'relation', 'spacing', 'spacingVar', 'widthVar'] as const;
 
 function hasExactKeys(record: Readonly<Record<string, unknown>>, expected: readonly string[]): boolean {
   const keys = Object.keys(record).sort();
@@ -317,6 +224,7 @@ export default defineComponent({
     inputs: {
       paths: { type: { kind: 'paths2d', version: 1, coordinateSpace: 'canvas-height' }, label: 'Paths', description: 'Shared tracer geometry used to carve the regions.' },
       regions: { type: { kind: 'shader-field', version: 1, abi: 'lux/organic-regions/v1' }, label: 'Regions', description: 'Organic region geometry and motion shader field.' },
+      hatching: { type: { kind: 'shader-field', version: 1, abi: 'lux/region-hatching/v1' }, label: 'Hatching', description: 'Per-region line families, crosshatching, contours, and drawing coverage.' },
     },
     outputs: { image: { type: { kind: 'image', colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }, label: 'Image', description: 'The painting before tracer ink is composited.' } },
   controls: {
@@ -326,17 +234,6 @@ export default defineComponent({
     composition: { type: 'number', group: 'Composition', label: 'Quiet to intricate', default: 0.44, min: 0, max: 1.5, step: 0.01 },
     tension: { type: 'number', group: 'Composition', label: 'Tension', default: 0.72, min: 0, max: 1.5, step: 0.01, description: 'Strength of local pressure, contrasting line directions, and rhythmic compression.' },
     hierarchy: { type: 'number', group: 'Composition', label: 'Large and small rhythm', default: 0.99, min: 0, max: 1.5, step: 0.01, description: 'Large anchor regions alternate with smaller supporting regions.' },
-
-    coverage: { type: 'number', group: 'Hatching', label: 'Coverage', default: 0.23, min: 0, max: 1, step: 0.01 },
-    spacing: { type: 'number', group: 'Hatching', label: 'Average spacing', default: 0.096, min: 0.015, max: 0.12, step: 0.001, description: 'Overall spacing scale. Each region keeps its own spacing ratio.' },
-    curvature: { type: 'number', group: 'Hatching', label: 'Overall bend', default: 1.52, min: 0, max: 3, step: 0.01, description: 'Strength of distinct regional styles: restrained lines, sweeping curves, fans, and contours.' },
-    angle: { type: 'number', group: 'Hatching', label: 'Direction bias', default: 2.31, min: -3.1416, max: 3.1416, step: 0.01, description: 'Shifts the overall direction while preserving regional relationships.' },
-    hatchWidth: { type: 'number', group: 'Hatching', label: 'Average ink weight', default: 0.12, min: 0.035, max: 0.4, step: 0.005, description: 'Overall stroke weight. Dense patterns tend toward finer strokes; open patterns can carry heavier marks.' },
-    relation: { type: 'number', group: 'Hatching', label: 'Neighboring harmony', default: 0.54, min: 0, max: 1, step: 0.01, description: 'Neighboring patterns share direction, with occasional opposing accents.' },
-
-    spacingVar: { type: 'number', group: 'Regional variety', label: 'Spacing variety', default: 1, min: 0, max: 1, step: 0.01 },
-    curvatureVar: { type: 'number', group: 'Regional variety', label: 'Bend variety', default: 1, min: 0, max: 1, step: 0.01 },
-    angleVar: { type: 'number', group: 'Regional variety', label: 'Direction variety', default: 1.19, min: 0, max: 1.5, step: 0.01 },
 
     palette: { type: 'number', group: 'Color & watercolor', label: 'Wash lightness', default: 0.07, min: -1, max: 1, step: 0.01 },
     warmth: { type: 'number', group: 'Color & watercolor', label: 'Warm pools', default: 1.3, min: 0, max: 2, step: 0.01 },
@@ -356,15 +253,6 @@ export default defineComponent({
       composition: 'composition setting for the painting.',
       tension: 'tension setting for the painting.',
       hierarchy: 'hierarchy setting for the painting.',
-      coverage: 'coverage setting for the painting.',
-      spacing: 'spacing setting for the painting.',
-      curvature: 'curvature setting for the painting.',
-      angle: 'angle setting for the painting.',
-      hatchWidth: 'hatchWidth setting for the painting.',
-      relation: 'relation setting for the painting.',
-      spacingVar: 'spacingVar setting for the painting.',
-      curvatureVar: 'curvatureVar setting for the painting.',
-      angleVar: 'angleVar setting for the painting.',
       palette: 'palette setting for the painting.',
       warmth: 'warmth setting for the painting.',
       contrast: 'contrast setting for the painting.',
@@ -417,30 +305,42 @@ export default defineComponent({
     const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
     let material: MeshBasicNodeMaterial | undefined;
     let scene: Scene | undefined;
-    let regionShaderSource: string | undefined;
+    let assembledShaderSource: string | undefined;
 
-    function prepareRegions(field: ShaderFieldResource): Scene {
-      const { data } = field;
-      if (data.version !== 1 || data.abi !== regionAbi) {
+    function preparePainting(regions: ShaderFieldResource, hatching: ShaderFieldResource): Scene {
+      const regionData = regions.data;
+      if (regionData.version !== 1 || regionData.abi !== regionAbi) {
         throw Error(`Living Painting requires shader field ${regionAbi}.`);
       }
-      if (!hasExactKeys(data.fragments, regionFragmentKeys)) {
+      if (!hasExactKeys(regionData.fragments, regionFragmentKeys)) {
         throw Error(`Living Painting ${regionAbi} requires exactly the lpRegion and regionGeometry fragments.`);
       }
-      if (!hasExactKeys(data.values, regionValueKeys)) {
+      if (!hasExactKeys(regionData.values, regionValueKeys)) {
         throw Error(`Living Painting ${regionAbi} requires exactly the growth, motion, scale, seed, and warp values.`);
+      }
+      const hatchingData = hatching.data;
+      if (hatchingData.version !== 1 || hatchingData.abi !== hatchingAbi) {
+        throw Error(`Living Painting requires shader field ${hatchingAbi}.`);
+      }
+      if (!hasExactKeys(hatchingData.fragments, hatchingFragmentKeys)) {
+        throw Error(`Living Painting ${hatchingAbi} requires exactly the lpRegionMarks fragment.`);
+      }
+      if (!hasExactKeys(hatchingData.values, hatchingValueKeys)) {
+        throw Error(`Living Painting ${hatchingAbi} requires exactly its nine control values and widthVar.`);
       }
 
       const source = paintingBeforeRegions
-        + data.fragments.regionGeometry
+        + regionData.fragments.regionGeometry
         + paintingAfterRegions
-        + data.fragments.lpRegion
+        + hatchingData.fragments.lpRegionMarks
+        + paintingAfterHatching
+        + regionData.fragments.lpRegion
         + paintingAfterRegionHelper;
-      if (regionShaderSource !== undefined && source !== regionShaderSource) {
-        throw Error('Living Painting region shader source changed; rebuild the component to apply it.');
+      if (assembledShaderSource !== undefined && source !== assembledShaderSource) {
+        throw Error('Living Painting shader field source changed; rebuild the component to apply it.');
       }
-      if (regionShaderSource === undefined) {
-        regionShaderSource = source;
+      if (assembledShaderSource === undefined) {
+        assembledShaderSource = source;
         material = new MeshBasicNodeMaterial({ depthTest: false, depthWrite: false });
         material.fragmentNode = wgslFn(source)(
           uv(),
@@ -461,11 +361,21 @@ export default defineComponent({
         scene.add(mesh);
       }
 
-      scale.value = data.values.scale;
-      warp.value = data.values.warp;
-      growth.value = data.values.growth;
-      seed.value = data.values.seed;
-      motion.value = data.values.motion;
+      scale.value = regionData.values.scale;
+      warp.value = regionData.values.warp;
+      growth.value = regionData.values.growth;
+      seed.value = regionData.values.seed;
+      motion.value = regionData.values.motion;
+      coverage.value = hatchingData.values.coverage;
+      spacing.value = hatchingData.values.spacing;
+      curvature.value = hatchingData.values.curvature;
+      angle.value = hatchingData.values.angle;
+      hatchWidth.value = hatchingData.values.hatchWidth;
+      relation.value = hatchingData.values.relation;
+      spacingVar.value = hatchingData.values.spacingVar;
+      curvatureVar.value = hatchingData.values.curvatureVar;
+      angleVar.value = hatchingData.values.angleVar;
+      widthVar.value = hatchingData.values.widthVar;
       return scene!;
     }
     let artisticTime = 0;
@@ -476,16 +386,11 @@ export default defineComponent({
         artisticTime += Math.max(0, frame.timeSeconds - previousTime) * c.pace;
         previousTime = frame.timeSeconds;
         time.value = artisticTime;
-        coverage.value = c.coverage;
-        spacing.value = c.spacing;
-        curvature.value = c.curvature;
-        angle.value = c.angle;
         palette.value = c.palette;
         warmth.value = c.warmth;
         contrast.value = c.contrast;
         pooling.value = c.pooling;
         outline.value = c.outline;
-        hatchWidth.value = c.hatchWidth;
         inkWarmth.value = c.inkWarmth;
         grain.value = c.grain;
         composition.value = c.composition;
@@ -493,14 +398,13 @@ export default defineComponent({
         blooms.value = c.blooms;
         tension.value = c.tension;
         phrasing.value = c.phrasing;
-        relation.value = c.relation;
         hierarchy.value = c.hierarchy;
-        spacingVar.value = c.spacingVar;
-        curvatureVar.value = c.curvatureVar;
-        angleVar.value = c.angleVar;
       },
       async evaluate(inputs, evaluation) {
-        const scene = prepareRegions(inputs.regions as ShaderFieldResource);
+        const scene = preparePainting(
+          inputs.regions as ShaderFieldResource,
+          inputs.hatching as ShaderFieldResource,
+        );
         const paths = (inputs.paths as Paths2DResource).data.paths;
         if (paths.length > 4 || paths.some(path => path.points.length > 64)) {
           throw Error('Living Painting supports at most four paths of 64 points.');

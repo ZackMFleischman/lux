@@ -48,3 +48,9 @@ Known prototype limit: if a tracer exits and later re-enters the same region, it
 `regionGeometry` is inserted in a fragment shader body after `p`, `seed`, and `t` are defined. It uses the original `form`, `music`, and `character` vectors, plus `lpPhrase`, `lpNoise`, `lpHash2` and `lpRegion`. It declares the region coordinates, owner/center, random identity, weighted cell planes, distance to edge and derivative-based pixel size used by subsequent paint and hatch code. `lpRegion` is the weighted moving-site helper; it relies on the original noise/hash/phrase basis. The complete consumer and vector packing are shown in `painting.ts`.
 
 This is shader composition, so no region image is quantized or rendered in an extra pass. The exact ABI is deliberate: another renderer must provide the documented painting basis and insertion context. It is not a generic pre-rendered mask. Scene graph controls remain separate and the scene-wide aliases keep their earlier names.
+
+## Region Hatching shader field
+
+`hatching.ts` owns the unchanged `lpRegionMarks` function. ABI `lux/region-hatching/v1` supplies fragment `lpRegionMarks`, the nine original hatch control values, and the fixed `widthVar: 0.81` character value. The consumer retains the original vector packing shown in `painting.ts`.
+
+The function uses the consumer's region owner, center, local coordinates, edge distance, seed, time, paint color, ink and composition vectors, and hash/noise/phrase helpers. It returns the color with the selected region's line family applied. Coverage determines where marks are absent; regional identity determines angle, spacing, width, curve family and occasional perpendicular crosshatching. This field can be reused by another compatible shader consumer with its own region data; it does not create regions itself.

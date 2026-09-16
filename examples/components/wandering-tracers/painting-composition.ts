@@ -1,21 +1,24 @@
 import { defineComposition } from '@lux/visual-sdk';
 import paths from './paths.ts';
 import regions from './regions.ts';
+import hatching from './hatching.ts';
 import painting from './painting.ts';
 import renderer from './renderer.ts';
 
 // One immutable snapshot drives both region carving and the visible tracer ink.
 export default defineComposition({
   label: 'Living Painting — Shared Tracers',
-  definitions: { paths, regions, painting, renderer },
+  definitions: { paths, regions, hatching, painting, renderer },
   nodes: [
     { id: 'd10d1010-63ac-49c7-8ad7-8cf6458b5101', definition: 'paths' },
     { id: 'd10d1515-63ac-49c7-8ad7-8cf6458b5115', definition: 'regions' },
+    { id: 'd10d1717-63ac-49c7-8ad7-8cf6458b5117', definition: 'hatching' },
     { id: 'd10d2020-63ac-49c7-8ad7-8cf6458b5102', definition: 'painting' },
     { id: 'd10d3030-63ac-49c7-8ad7-8cf6458b5103', definition: 'renderer' },
   ],
   edges: [
     { id: 'd10d4040-63ac-49c7-8ad7-8cf6458b5107', from: { nodeId: 'd10d1515-63ac-49c7-8ad7-8cf6458b5115', portId: 'field' }, to: { nodeId: 'd10d2020-63ac-49c7-8ad7-8cf6458b5102', portId: 'regions' }, delay: 'none' },
+    { id: 'd10d4050-63ac-49c7-8ad7-8cf6458b5108', from: { nodeId: 'd10d1717-63ac-49c7-8ad7-8cf6458b5117', portId: 'field' }, to: { nodeId: 'd10d2020-63ac-49c7-8ad7-8cf6458b5102', portId: 'hatching' }, delay: 'none' },
     { id: 'd10d4010-63ac-49c7-8ad7-8cf6458b5104', from: { nodeId: 'd10d1010-63ac-49c7-8ad7-8cf6458b5101', portId: 'paths' }, to: { nodeId: 'd10d2020-63ac-49c7-8ad7-8cf6458b5102', portId: 'paths' }, delay: 'none' },
     { id: 'd10d4020-63ac-49c7-8ad7-8cf6458b5105', from: { nodeId: 'd10d1010-63ac-49c7-8ad7-8cf6458b5101', portId: 'paths' }, to: { nodeId: 'd10d3030-63ac-49c7-8ad7-8cf6458b5103', portId: 'paths' }, delay: 'none' },
     { id: 'd10d4030-63ac-49c7-8ad7-8cf6458b5106', from: { nodeId: 'd10d2020-63ac-49c7-8ad7-8cf6458b5102', portId: 'image' }, to: { nodeId: 'd10d3030-63ac-49c7-8ad7-8cf6458b5103', portId: 'image' }, delay: 'none' },
@@ -74,47 +77,47 @@ export default defineComposition({
   },
   {
     "id": "coverage",
-    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "nodeId": "d10d1717-63ac-49c7-8ad7-8cf6458b5117",
     "controlId": "coverage"
   },
   {
     "id": "spacing",
-    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "nodeId": "d10d1717-63ac-49c7-8ad7-8cf6458b5117",
     "controlId": "spacing"
   },
   {
     "id": "curvature",
-    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "nodeId": "d10d1717-63ac-49c7-8ad7-8cf6458b5117",
     "controlId": "curvature"
   },
   {
     "id": "angle",
-    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "nodeId": "d10d1717-63ac-49c7-8ad7-8cf6458b5117",
     "controlId": "angle"
   },
   {
     "id": "hatchWidth",
-    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "nodeId": "d10d1717-63ac-49c7-8ad7-8cf6458b5117",
     "controlId": "hatchWidth"
   },
   {
     "id": "relation",
-    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "nodeId": "d10d1717-63ac-49c7-8ad7-8cf6458b5117",
     "controlId": "relation"
   },
   {
     "id": "spacingVar",
-    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "nodeId": "d10d1717-63ac-49c7-8ad7-8cf6458b5117",
     "controlId": "spacingVar"
   },
   {
     "id": "curvatureVar",
-    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "nodeId": "d10d1717-63ac-49c7-8ad7-8cf6458b5117",
     "controlId": "curvatureVar"
   },
   {
     "id": "angleVar",
-    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "nodeId": "d10d1717-63ac-49c7-8ad7-8cf6458b5117",
     "controlId": "angleVar"
   },
   {

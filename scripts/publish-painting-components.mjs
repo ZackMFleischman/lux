@@ -52,10 +52,13 @@ try{
  assert.equal((await call('status')).authoring.fault,null);
  const capture=await call('capture');await writeFile(join(output,'frame.png'),Buffer.from(capture.base64,'base64'));
  await page.getByRole('button',{name:'Fit',exact:true}).click();await page.screenshot({path:join(output,'window.png')});
+ const inspected=page.locator('.graph-node').filter({hasText:manifest.inspectLabel??parts.at(-1).name});
+ assert.equal(await inspected.count(),1,'Published component must be selectable in the graph');
+ await inspected.click();assert.equal(await inspected.getAttribute('aria-pressed'),'true','Published graph node is selected');await page.screenshot({path:join(output,'component-controls.png')});
  current=await call('read');const before=(await call('status')).authoring.revisionId;
  const invalid=structuredClone(current.source);invalid.files[invalid.entry]='invalid syntax !';
  await assert.rejects(()=>call('build',{source:invalid,expectedDraftVersion:current.draftVersion}));
  assert.equal((await call('status')).authoring.revisionId,before);
- const report={ok:true,parts:parts.map(({id,revision,name})=>({id,revision,name})),scenePath,checks:['Library readback exact','Linked painting rendered','Saved and reopened','Invalid edit retained last accepted preview'],profile:env.LUX_STUDIO_PROFILE};
+ const report={ok:true,parts:parts.map(({id,revision,name})=>({id,revision,name})),scenePath,checks:['Library readback exact','Linked painting rendered','Saved and reopened','Invalid edit retained last accepted preview','Published graph node selected with own controls'],profile:env.LUX_STUDIO_PROFILE};
  await writeFile(join(output,'result.json'),JSON.stringify(report,null,2));console.log(JSON.stringify({output,...report}));
 }finally{await app?.evaluate(({app})=>app.exit(0)).catch(()=>{});await app?.close().catch(()=>{});}
