@@ -40,7 +40,7 @@ function MetricView({ label, metric, nowMs }: { label: string; metric: Metric | 
 }
 export type StudioProps = {
   controlEdits?: ControlEdits;
-  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; sourceDiagnostics?: SourceDiagnosticsView; libraryPanel?:ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; appError?: string; sourceChanged?: boolean; controlsAvailable?: boolean;
+  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; sourceDiagnostics?: SourceDiagnosticsView; libraryPanel?:ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; previewActions?: ReactNode; appError?: string; sourceChanged?: boolean; controlsAvailable?: boolean;
 };
 export function StudioApp(props: StudioProps) {
   return <ThemeProvider theme={studioTheme}><CssBaseline /><StudioLayout {...props} /></ThemeProvider>;
@@ -68,7 +68,7 @@ export function studioStatus(snapshot: StudioSnapshot, sourceProblemCount = 0): 
     : snapshot.authoring ? sentenceCase(snapshot.authoring.playback) : 'No runtime';
   return { build, building: !!active, problems, runtime };
 }
-function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel,sourceDiagnostics,libraryPanel, appCommands, fileMenu, appError, controlEdits, sourceChanged, controlsAvailable }: StudioProps) {
+function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel,sourceDiagnostics,libraryPanel, appCommands, fileMenu, previewActions, appError, controlEdits, sourceChanged, controlsAvailable }: StudioProps) {
   const [toolsHost, setToolsHost] = useState<HTMLElement | null>(null);
   const [transportMenu, setTransportMenu] = useState<HTMLElement | null>(null);
   const view = useMemo(() => createRendererSnapshot(client), [client]);
@@ -152,6 +152,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const previewPane = <Paper component="main" square className="preview-panel">
         <div className="panel-toolbar" hidden={windowState.fullscreen}>
           <div className="preview-actions">
+            {previewActions}
             {!previewOnly && <Button aria-pressed={maximized} onClick={() => setMaximized(value => !value)}>{maximized ? 'Restore workspace' : 'Maximize'}</Button>}
             {maximized && !windowState.fullscreen && <Button aria-pressed={maximizedInspector} onClick={() => setMaximizedInspector(value => !value)}>{maximizedInspector ? 'Hide Inspector' : 'Show Inspector'}</Button>}
             {(previewOnly || windowState.detached || windows?.popout) && <Button disabled={!windows} onClick={() => windows && windowAction(() => previewOnly || windowState.detached ? windows.dock() : windows.popout!())}>{previewOnly || windowState.detached ? 'Dock preview' : 'Pop out'}</Button>}
