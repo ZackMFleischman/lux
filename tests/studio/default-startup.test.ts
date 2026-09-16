@@ -5,6 +5,8 @@ import { resolve } from 'node:path';
 
 test('fresh Studio startup loads the checked-in noise sphere source', async () => {
   const main = await readFile(resolve('apps/studio/src/main.ts'), 'utf8');
+  const authoring = await readFile(resolve('apps/studio/src/authoring.tsx'), 'utf8');
   assert.match(main, /skills\/lux-visual-creation\/assets\/noise-sphere\.ts/);
   assert.doesNotMatch(main, /packages\/visual-sdk\/examples\/intensity\.ts/);
+  assert.doesNotMatch(authoring, /smokeSave\(createSceneDocument\(source, DEFAULT_OUTPUT, \{ intensity:/);
 });

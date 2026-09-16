@@ -9,6 +9,7 @@ import { ComponentLibraryStore } from '../packages/core/src/component-library-st
 const within = (root, path) => { const rel=relative(root,path); return rel==='' || (!isAbsolute(rel)&&rel!=='..'&&!rel.startsWith('..'+sep)); };
 export function desktopSourceFile(path) {
  return /^(library\/|packages\/|apps\/build-worker\/src\/|apps\/studio\/src\/|apps\/render-host\/src\/|apps\/installed-runtime\/src\/|scripts\/|tools\/gpu-spike\/)/.test(path)
+  || path === 'skills/lux-visual-creation/assets/noise-sphere.ts'
   || /^(package\.json|tsconfig[^/]*\.json|apps\/studio\/build\.mjs|apps\/(studio|build-worker)\/package\.json)$/.test(path);
 }
 export function repositoryLibraryRootFromCommonDirectory(commonDirectory) {
