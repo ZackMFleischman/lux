@@ -23,6 +23,8 @@ try {
   const call=createStudioConnection({...session,expectedSessionId:endpoint.sessionId});
   async function statusWhen(predicate){for(let attempt=0;attempt<100;attempt++){const state=await call('status');if(predicate(state.authoring))return state.authoring;await page.waitForTimeout(100);}throw Error('Runtime state did not settle');}
   async function capture(name){const path=join(output,`${name}.png`);await page.screenshot({path});report.screenshots.push(path);}
+  await statusWhen(runtime=>runtime?.playback==='playing');
+  await page.getByRole('button',{name:'Pause',exact:true}).waitFor();
   const plain={sdkVersion:'0.2.0',entry:'visual.ts',files:{'visual.ts':await readFile(join(root,'skills/lux-visual-creation/assets/noise-sphere.ts'),'utf8')}};
   const legacy=nestedPrismaticCompositionSource(),modern=structuredClone(legacy);
   for(const path of ['composition.ts','double-mirror.ts','wrapped-mirror.ts'])modern.files[path]=modern.files[path].replaceAll('defineComposition',path===modern.entry?'defineVisual':'defineComponent');
