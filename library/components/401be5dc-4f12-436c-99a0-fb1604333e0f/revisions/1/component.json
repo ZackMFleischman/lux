@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "401be5dc-4f12-436c-99a0-fb1604333e0f",
+  "revision": 1,
+  "name": "Decorated Ribbons",
+  "description": "Attached ladders, pearl beads, and transverse ribbon stripes with independent live multipliers.",
+  "updatedAt": "2026-09-16T11:19:26.093Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "ribbons.ts",
+    "files": [
+      "ribbons.ts"
+    ]
+  }
+}

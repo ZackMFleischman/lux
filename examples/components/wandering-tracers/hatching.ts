@@ -1,4 +1,5 @@
 import { defineComponent } from '@lux/visual-sdk';
+import { ornamentHatchingFragments } from './ornament-hatching.ts';
 
 // ABI lux/region-hatching/v1 supplies the original regional drawing function.
 // The painting consumer inserts it at the original helper position. Fragment
@@ -114,6 +115,11 @@ export default defineComponent({
     tags: ['painting', 'hatching', 'drawing'],
     inputs: {},
     outputs: {
+      ornament: {
+        type: { kind: 'shader-field', version: 1, abi: 'lux/ornament-hatching/v1' },
+        label: 'Ornament hatching',
+        description: 'Attached wavy hatching and crosshatching with live pattern multipliers.',
+      },
       field: {
         type: { kind: 'shader-field', version: 1, abi: 'lux/region-hatching/v1' },
         label: 'Hatching',
@@ -121,6 +127,10 @@ export default defineComponent({
       },
     },
     controls: {
+      ornamentDensity: { type: 'number', group: 'Ornament Hatching', label: 'Density', default: 1, min: 0.3, max: 2, step: 0.01 },
+      ornamentWidth: { type: 'number', group: 'Ornament Hatching', label: 'Width', default: 1, min: 0.3, max: 2, step: 0.01 },
+      ornamentVariation: { type: 'number', group: 'Ornament Hatching', label: 'Variation', default: 1, min: 0, max: 1.5, step: 0.01 },
+      ornamentMotion: { type: 'number', group: 'Ornament Hatching', label: 'Motion', default: 1, min: 0, max: 2, step: 0.01 },
       coverage: { type: 'number', group: 'Hatching', label: 'Coverage', default: 0.23, min: 0, max: 1, step: 0.01 },
       spacing: { type: 'number', group: 'Hatching', label: 'Average spacing', default: 0.096, min: 0.015, max: 0.12, step: 0.001, description: 'Overall spacing scale. Each region keeps its own spacing ratio.' },
       curvature: { type: 'number', group: 'Hatching', label: 'Overall bend', default: 1.52, min: 0, max: 3, step: 0.01, description: 'Strength of distinct regional styles: restrained lines, sweeping curves, fans, and contours.' },
@@ -132,6 +142,10 @@ export default defineComponent({
       angleVar: { type: 'number', group: 'Regional variety', label: 'Direction variety', default: 1.19, min: 0, max: 1.5, step: 0.01 },
     },
     controlDescriptions: {
+      ornamentDensity: 'Multiplies the shared ornament density for regional hatching.',
+      ornamentWidth: 'Multiplies the shared ornament stroke width for regional hatching.',
+      ornamentVariation: 'Multiplies the shared variation in regional hatch angles, spacing, and curvature.',
+      ornamentMotion: 'Multiplies the shared slow motion of the attached hatching.',
       coverage: 'coverage setting for the painting.',
       spacing: 'spacing setting for the painting.',
       curvature: 'curvature setting for the painting.',
@@ -145,6 +159,10 @@ export default defineComponent({
     lifecycle: { state: 'stateless', reset: 'seed' },
   },
   async create() {
+    let ornamentDensity = 1;
+    let ornamentWidth = 1;
+    let ornamentVariation = 1;
+    let ornamentMotion = 1;
     let coverage = 0.23;
     let spacing = 0.096;
     let curvature = 1.52;
@@ -156,6 +174,10 @@ export default defineComponent({
     let angleVar = 1.19;
     return {
       update(frame) {
+        ornamentDensity = frame.controls.ornamentDensity;
+        ornamentWidth = frame.controls.ornamentWidth;
+        ornamentVariation = frame.controls.ornamentVariation;
+        ornamentMotion = frame.controls.ornamentMotion;
         coverage = frame.controls.coverage;
         spacing = frame.controls.spacing;
         curvature = frame.controls.curvature;
@@ -168,6 +190,12 @@ export default defineComponent({
       },
       async evaluate(_inputs, evaluation) {
         return {
+          ornament: evaluation.shaderField('ornament', {
+            version: 1,
+            abi: 'lux/ornament-hatching/v1',
+            fragments: ornamentHatchingFragments,
+            values: { density: ornamentDensity, width: ornamentWidth, variation: ornamentVariation, motion: ornamentMotion },
+          }),
           field: evaluation.shaderField('field', {
             version: 1,
             abi: 'lux/region-hatching/v1',

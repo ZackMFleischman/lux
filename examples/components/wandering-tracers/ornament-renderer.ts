@@ -8,15 +8,13 @@ import {
   Vector4,
 } from 'three/webgpu';
 import { uniform, uv, wgslFn } from 'three/tsl';
-import { ornamentPackedPatterns } from './ornament-packed-patterns.ts';
-import { ornamentLinePatternHelpers } from './ornament-line-patterns.ts';
-import { ornamentRibbonPatternHelpers } from './ornament-ribbon-patterns.ts';
 
 // wgslFn selects the first function as its entry. Keep the paint pass before
 // the supplied helpers, including the LoRegion declaration and noise basis.
 const paintPass = `
 fn livingOrnament(st: vec2f, view: vec4f, shape: vec4f, detail: vec4f,
-  pigment: vec4f, material: vec4f, ink: vec4f, pattern: vec4f, patternStyle: vec4f) -> vec4f {
+  pigment: vec4f, material: vec4f, ink: vec4f, pattern: vec4f, patternStyle: vec4f,
+  spirals: vec4f, rings: vec4f, membranes: vec4f, contours: vec4f, hatching: vec4f, ribbons: vec4f) -> vec4f {
   let p = (st - 0.5) * vec2f(view.y, 1.0) * 2.0;
   let region = loRegion(p, view.x, view.z, shape, detail);
   var wash = loWash(region, p, view.x, pigment, material);
@@ -24,12 +22,12 @@ fn livingOrnament(st: vec2f, view: vec4f, shape: vec4f, detail: vec4f,
   if (id == 110) { wash = mix(wash, vec3f(0.56, 0.78, 0.84), 0.78); }
   var marks = 0.0;
   switch id {
-    case 101, 105, 109, 113: { marks = loSpirals(region, p, view.x, pattern); }
-    case 103, 112, 114: { marks = loRings(region, p, view.x, pattern); }
-    case 102, 104, 107, 108: { marks = loMembranes(region, p, view.x, pattern); }
-    case 115: { marks = loContours(region, p, view.x, pattern); }
-    case 110, 111: { marks = loRibbonMarks(region, p, view.x, pattern); }
-    default: { marks = loHatchMarks(region, p, view.x, pattern); }
+    case 101, 105, 109, 113: { marks = loSpirals(region, p, view.x, pattern * spirals); }
+    case 103, 112, 114: { marks = loRings(region, p, view.x, pattern * rings); }
+    case 102, 104, 107, 108: { marks = loMembranes(region, p, view.x, pattern * membranes); }
+    case 115: { marks = loContours(region, p, view.x, pattern * contours); }
+    case 110, 111: { marks = loRibbonMarks(region, p, view.x, pattern * ribbons); }
+    default: { marks = loHatchMarks(region, p, view.x, pattern * hatching); }
   }
   var rest = select(1.0, 1.0 - patternStyle.y, id == 115);
   if (id == 101) {
@@ -45,6 +43,9 @@ fn livingOrnament(st: vec2f, view: vec4f, shape: vec4f, detail: vec4f,
   return vec4f(color, 1.0);
 }
 `;
+
+const patternValues = ['density', 'motion', 'variation', 'width'] as const;
+const patternPorts = ['spirals', 'rings', 'membranes', 'contours', 'hatching', 'ribbons'] as const;
 
 const regionValues = ['complexity', 'concavity', 'corridorWidth', 'growth', 'motion', 'nesting', 'seed', 'size'] as const;
 const watercolorValues = ['blooms', 'contrast', 'palette', 'pooling', 'saturation', 'warmth'] as const;
@@ -75,6 +76,12 @@ export default defineComponent({
     description: 'Paints fitted organic silhouettes with animated watercolor, bold boundaries, and a shared artistic clock.',
     tags: ['ornament', 'regions', 'watercolor'],
     inputs: {
+      spirals: { type: { kind: 'shader-field', version: 1, abi: 'lux/ornament-spirals/v1' }, label: 'Spirals', description: 'Independent spirals motif field and local controls.' },
+      rings: { type: { kind: 'shader-field', version: 1, abi: 'lux/ornament-rings/v1' }, label: 'Rings', description: 'Independent rings motif field and local controls.' },
+      membranes: { type: { kind: 'shader-field', version: 1, abi: 'lux/ornament-membranes/v1' }, label: 'Membranes', description: 'Independent membranes motif field and local controls.' },
+      contours: { type: { kind: 'shader-field', version: 1, abi: 'lux/ornament-contours/v1' }, label: 'Contours', description: 'Independent contours motif field and local controls.' },
+      hatching: { type: { kind: 'shader-field', version: 1, abi: 'lux/ornament-hatching/v1' }, label: 'Hatching', description: 'Independent hatching motif field and local controls.' },
+      ribbons: { type: { kind: 'shader-field', version: 1, abi: 'lux/ornament-ribbons/v1' }, label: 'Ribbons', description: 'Independent ribbons motif field and local controls.' },
       regions: {
         type: { kind: 'shader-field', version: 1, abi: 'lux/ornament-regions/v1' },
         label: 'Regions', description: 'Fitted organic region geometry, local coordinates, and visible boundary distance.',
@@ -126,6 +133,7 @@ export default defineComponent({
     const ink = uniform(new Vector4(0.008, 0.55, 1.34, 1.48));
     const pattern = uniform(new Vector4(1, 1, 0.7, 0.2));
     const patternStyle = uniform(new Vector4(1, 0.9, 0, 0));
+    const motifSettings = patternPorts.map(() => uniform(new Vector4(1, 1, 1, 1)));
     const geometry = new PlaneGeometry(2, 2);
     // Match the existing painting plane and uv orientation. This component
     // creates an image directly; it does not resample a render-target texture.
@@ -144,15 +152,18 @@ export default defineComponent({
         const watercolor = fieldData(inputs.watercolor, 'lux/ornament-watercolor/v1', watercolorValues);
         const boundary = fieldData(inputs.boundary, 'lux/ornament-boundary-ink/v1', boundaryValues);
         const phrasing = fieldData(inputs.phrasing, 'lux/ornament-phrasing/v1', phrasingValues);
-        const helpers = [phrasing.fragments.helpers!, regions.fragments.helpers!, watercolor.fragments.helpers!, boundary.fragments.helpers!];
+        const motifFields = patternPorts.map(port => fieldData(inputs[port], 'lux/ornament-' + port + '/v1', patternValues));
+        const helpers = [phrasing.fragments.helpers!, regions.fragments.helpers!, watercolor.fragments.helpers!, boundary.fragments.helpers!, ...motifFields.map(field => field.fragments.helpers!)];
+        motifFields.forEach((field, index) => motifSettings[index]!.value.set(field.values.density!, field.values.width!, field.values.variation!, field.values.motion!));
         if (capturedHelpers && helpers.some((source, index) => source !== capturedHelpers![index])) {
           throw Error('Living Ornament shader field source changed; rebuild the component to apply it.');
         }
         if (!capturedHelpers) {
           capturedHelpers = Object.freeze(helpers);
           material = new MeshBasicNodeMaterial({ depthTest: false, depthWrite: false });
-          material.fragmentNode = wgslFn(paintPass + '\n' + helpers.join('\n') + '\n' + ornamentPackedPatterns + '\n' + ornamentLinePatternHelpers + '\n' + ornamentRibbonPatternHelpers)(
+          material.fragmentNode = wgslFn(paintPass + '\n' + helpers.join('\n'))(
             uv(), view, shape, detail, pigment, materialSettings, ink, pattern, patternStyle,
+            motifSettings[0]!, motifSettings[1]!, motifSettings[2]!, motifSettings[3]!, motifSettings[4]!, motifSettings[5]!,
           );
           scene = new Scene();
           const mesh = new Mesh(geometry, material);

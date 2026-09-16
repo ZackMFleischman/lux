@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "3e0d8827-3ba0-4689-8636-81348f9d8564",
+  "revision": 1,
+  "name": "Membrane Divisions",
+  "description": "Region-attached membrane divisions with independent live pattern controls.",
+  "updatedAt": "2026-09-16T11:19:07.171Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "membranes.ts",
+    "files": [
+      "membranes.ts"
+    ]
+  }
+}

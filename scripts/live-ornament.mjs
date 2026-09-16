@@ -5,16 +5,19 @@ const installation=JSON.parse(await readFile(process.env.LOCALAPPDATA+'/Programs
 const client=new Client({name:'living-ornament-live',version:'1.0.0'});
 const base='C:/Users/zFlei/.codex/visualizations/2026/09/15/01a0a5cb-03be-7ee2-a6cf-daf659f7ebac/';
 try{
- await client.connect(new StdioClientTransport({command:installation.node,args:[installation.adapter],cwd:installation.workspace,env:{...process.env,LUX_STUDIO_PROFILE:'desktop',LUX_STUDIO_DESKTOP:'1',LUX_STUDIO_SESSION_ID:'aacb6fbd574770a366ede77bd537a1c0c230'}}));
+ await client.connect(new StdioClientTransport({command:installation.node,args:[installation.adapter],cwd:installation.workspace,env:{...process.env,LUX_STUDIO_PROFILE:'desktop',LUX_STUDIO_DESKTOP:'1',LUX_STUDIO_SESSION_ID:'552d95c4d5fed7e01d911575b0d6a37fd86a'}}));
  const call=async(name,args={})=>{const r=await client.callTool({name:'lux.studio.'+name,arguments:args},undefined,{timeout:75000});if(r.isError)throw Error(JSON.stringify(r.content));return r;};
  const json=r=>JSON.parse(r.content.find(c=>c.type==='text').text);
  const action=process.argv[2]??'capture';const current=json(await call('read'));
+ if(['pause','play','reset'].includes(action)){const s=json(await call('status')).authoring;await call('playback',{action,instanceId:s.instanceId,expectedGeneration:s.generation});}
  if(action==='open')await call('open',{path:base+'Living Ornament - Pattern Prototype.lux-scene',expectedDraftVersion:current.draftVersion,discardDirty:false});
  if(action==='build'){
   if(current.source.entry!=='ornament-composition.ts')throw Error('Live scene changed; refusing replacement');
   const source=structuredClone(current.source),dir='examples/components/wandering-tracers/';
-  for(const f of await readdir(dir))if(f.endsWith('.ts')&&!f.endsWith('.test.ts'))source.files[f]=await readFile(dir+f,'utf8');
-  await call('build',{source,expectedDraftVersion:current.draftVersion,libraryLinks:current.libraryLinks});
+  source.files={};
+  const visit=async f=>{if(source.files[f])return;const text=await readFile(dir+f,'utf8');source.files[f]=text;for(const match of text.matchAll(/from\s+['"]\.\/([^'"]+)['"]/g))await visit(match[1]);};
+  await visit('ornament-composition.ts');
+  await call('build',{source,expectedDraftVersion:current.draftVersion,libraryLinks:[]});
  }
  if(action==='link-foundation'){
   const parts=JSON.parse(await readFile('artifacts/living-ornament/live-foundation-publication.json'));

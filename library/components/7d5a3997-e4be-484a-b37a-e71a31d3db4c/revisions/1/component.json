@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "7d5a3997-e4be-484a-b37a-e71a31d3db4c",
+  "revision": 1,
+  "name": "Spiral Fill",
+  "description": "Attached regional spiral motifs with independent density, width, variation, and motion.",
+  "updatedAt": "2026-09-16T11:18:48.614Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "spirals.ts",
+    "files": [
+      "spirals.ts"
+    ]
+  }
+}
