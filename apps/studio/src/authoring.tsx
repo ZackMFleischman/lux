@@ -102,7 +102,7 @@ export function AuthoringApp() {
     if (lookOperation.current && !['read', 'status'].includes(command.method)) throw Error('Wait for the look operation to finish');
     if (confirmation.isPending() && !['read', 'status', 'capture','library.list','library.read'].includes(command.method)) throw Error('Studio is waiting for a user confirmation');
     if (['parameters', 'playback', 'restart'].includes(command.method)) {
-      if(session.getSnapshot().busy)throw Error('Studio is busy with a scene file operation');
+      if(!session.getSnapshot().runtimeControlsAvailable)throw Error('Studio is busy with a scene file operation');
       const write = dispatchRuntimeCommand(client, command.method, command.params);
       if (command.method === 'parameters') {
         pendingControlWrites.current.add(write);
@@ -162,9 +162,12 @@ export function AuthoringApp() {
     // Do not overwrite a draft edited while the initial example was loading.
     if (workspace.getSnapshot().version !== 0 || session.getSnapshot().busy) return;
     workspace.replaceDocument(source);
-    if (await window.luxAuthoring.smokeEnabled?.()) {
-      try {
-        await session.build(source, workspace.getSnapshot().version);
+    let smoke=false;
+    try {
+      await session.build(source, workspace.getSnapshot().version);
+      clearDiagnostics();
+      smoke=await window.luxAuthoring.smokeEnabled?.()===true;
+      if(smoke){
         const initial = client.getSnapshot().authoring!;
         await client.invoke({ name: 'lux.parameters.set', input: { requestId: crypto.randomUUID(), instanceId: initial.instanceId,
           expectedGeneration: initial.generation, expectedRevisionId: initial.revisionId, values: { intensity: 0.8 }, mode: 'live' } });
@@ -181,8 +184,8 @@ export function AuthoringApp() {
             roundtrip.document.source.files[source.entry] !== source.files[source.entry] || ('intensity' in roundtrip.document.controls ? roundtrip.document.controls.intensity : undefined) !== 0.8) throw Error('Save/reopen did not preserve the visual');
         await new Promise(resolve => setTimeout(resolve, 500));
         await window.luxAuthoring.smokeResult?.({ ok: true, initial, applied, invalidRejected, capture, savedAndReopened: true });
-      } catch (error) { setError(String(error)); await window.luxAuthoring.smokeResult?.({ ok: false, error: String(error), snapshot: client.getSnapshot() }); }
-    }
+      }
+    } catch (error) { reportError(error,workspace.getSnapshot().version,source);if(smoke)await window.luxAuthoring.smokeResult?.({ ok: false, error: String(error), snapshot: client.getSnapshot() }); }
   }).catch(reason => setError(String(reason))); }, [session, workspace]);
   async function build() { if (composing.current || session.getSnapshot().busy || workspace.getSnapshot().busy) return; setError(''); const current = session.read();
     try { if (pendingControlWrites.current.size) await finishControlWrites(); await session.build(current.source, current.draftVersion); clearDiagnostics(); } catch (reason) { reportError(reason, current.draftVersion, current.source); } }
@@ -296,7 +299,7 @@ export function AuthoringApp() {
     {confirmation.dialog}
     <ExportDialog disabled={busy || composing.current} open={exportOpen} onClose={() => setExportOpen(false)} onClosed={() => fileSummary.current?.focus()} defaultName={io.name} create={async name => { if (pendingControlWrites.current.size) await finishControlWrites(); return session.exportSource(name); }} />
     <LooksDialog open={looksOpen} onClose={() => setLooksOpen(false)} onClosed={() => fileSummary.current?.focus()} client={window.luxLooks} onSave={saveLook} onLoad={loadLook} />
-    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} sourceChanged={draft.hasRunningSource && !draft.runningMatchesDraft} appCommands={commands} appError={error} controlEdits={controlEdits} controlsAvailable={!io.busy} libraryPanel={libraryPanel}
+    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} sourceChanged={draft.hasRunningSource && !draft.runningMatchesDraft} appCommands={commands} appError={error} controlEdits={controlEdits} controlsAvailable={io.runtimeControlsAvailable} libraryPanel={libraryPanel}
       sourceDiagnostics={{ items: diagnostics, snapshot: draft, onNavigate: target => setDiagnosticTarget(previous => ({ ...target, request: (previous?.request ?? 0) + 1, documentKey: draft.documentKey, draftVersion: draft.version })) }}
       sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onApply={() => void build()} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnosticTarget={diagnosticTarget}
         onDiagnosticTargetHandled={request => setDiagnosticTarget(current => current?.request === request ? null : current)} />} />
