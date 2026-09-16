@@ -1,0 +1,17 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "998130df-ca1f-4b58-9917-1ee7045275cb",
+  "revision": 3,
+  "name": "Animated Watercolor",
+  "description": "Slowly shifting blue-green washes and moving warm pools, with regional color contrast, pigment pooling and watercolor blooms. Shader-field for compatible painting renderers.",
+  "updatedAt": "2026-09-16T10:43:55.221Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "watercolor.ts",
+    "files": [
+      "ornament-watercolor.ts",
+      "watercolor.ts"
+    ]
+  }
+}
