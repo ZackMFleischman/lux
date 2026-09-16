@@ -43,6 +43,10 @@ export default defineComposition({
   ],
   output: { nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', portId: 'image' },
   expose: [
+    { id: 'birdSize', nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', controlId: 'birdSize' },
+    { id: 'birdSpeed', nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', controlId: 'birdSpeed' },
+    { id: 'birdOrbit', nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', controlId: 'birdOrbit' },
+    { id: 'birdVisits', nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', controlId: 'birdVisits' },
     { id: 'structuralActivity', nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', controlId: 'structuralActivity' },
     { id: 'spiralsDensity', nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5101', controlId: 'density' },
     { id: 'spiralsWidth', nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5101', controlId: 'width' },

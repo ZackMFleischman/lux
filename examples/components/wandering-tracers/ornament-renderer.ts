@@ -1,3 +1,4 @@
+import { createOrnamentBirds } from './ornament-birds.ts';
 import { defineComponent, type ShaderFieldResource } from '@lux/visual-sdk';
 import {
   Scene,
@@ -136,6 +137,10 @@ export default defineComponent({
       },
     },
     controls: {
+      birdSize: { type: 'number', group: 'Birds', label: 'Subject size', default: 1, min: 0, max: 2, step: 0.01 },
+      birdSpeed: { type: 'number', group: 'Birds', label: 'Flight speed', default: 1, min: 0, max: 2, step: 0.01 },
+      birdOrbit: { type: 'number', group: 'Birds', label: 'Spiral radius', default: 1, min: 0, max: 2, step: 0.01 },
+      birdVisits: { type: 'number', group: 'Birds', label: 'Perching excursions', default: 1, min: 0, max: 1, step: 0.01 },
       structuralActivity: { type: 'number', group: 'Structural Changes', label: 'Split and island activity', default: 1, min: 0, max: 1, step: 0.01 },
       patternDensity: { type: 'number', group: 'Patterns', label: 'Density', default: 1, min: 0.3, max: 2, step: 0.01 },
       patternWidth: { type: 'number', group: 'Patterns', label: 'Line width', default: 1, min: 0.3, max: 2, step: 0.01 },
@@ -147,6 +152,10 @@ export default defineComponent({
       patternGrowth: { type: 'number', group: 'Pattern Motion', label: 'Drawing and release', default: 0.48, min: 0, max: 1, step: 0.01 },
     },
     controlDescriptions: {
+      birdSize: 'Size of the five companion birds; zero hides them.',
+      birdSpeed: 'Flight, wingbeat and visit tempo relative to the painting clock.',
+      birdOrbit: 'Depth and width of the spiral around each ribbon.',
+      birdVisits: 'Blend from uninterrupted ribbon flight to occasional landing and departure.',
       structuralActivity: 'Zero preserves the previous scene. Higher values grow curved splits, close narrow connections, and birth islands with gradual inherited styles.',
       patternDensity: 'Sets the scale and spacing of region motifs.',
       patternWidth: 'Sets motif stroke thickness.',
@@ -175,12 +184,16 @@ export default defineComponent({
     // Match the existing painting plane and uv orientation. This component
     // creates an image directly; it does not resample a render-target texture.
     const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    let birds: ReturnType<typeof createOrnamentBirds> | undefined;
+    let birdControls = [1, 1, 1, 1];
     let material: MeshBasicNodeMaterial | undefined;
     let scene: Scene | undefined;
     let capturedHelpers: readonly string[] | undefined;
 
     return {
       update(frame) {
+        birdControls = [frame.controls.birdSize, frame.controls.birdSpeed, frame.controls.birdOrbit, frame.controls.birdVisits];
+        birds?.update(birdControls[0]!, birdControls[1]!, birdControls[2]!, birdControls[3]!);
         structuralActivity.value = frame.controls.structuralActivity;
         pattern.value.set(frame.controls.patternDensity, frame.controls.patternWidth, frame.controls.patternVariation, frame.controls.patternMotion);
         patternStyle.value.set(frame.controls.patternStrength, frame.controls.patternRest, frame.controls.patternTravel, frame.controls.patternGrowth);
@@ -207,11 +220,15 @@ export default defineComponent({
           const mesh = new Mesh(geometry, material);
           mesh.frustumCulled = false;
           scene.add(mesh);
+          birds = createOrnamentBirds(view, shape, detail, helpers.slice(0, 2).join('\n'));
+          scene.add(...birds.meshes);
+          birds.update(birdControls[0]!, birdControls[1]!, birdControls[2]!, birdControls[3]!);
         }
 
         // The four producers remain the sole owners of their live controls.
         // Reuse the uniform nodes and material as their scalar snapshots change.
         view.value.set(phrasing.values.time!, aspect, regions.values.seed!, phrasing.values.tension!);
+        birds?.advance(view.value.x);
         shape.value.set(regions.values.size!, regions.values.complexity!, regions.values.concavity!, regions.values.corridorWidth!);
         const pressureAmount = 0.35 + phrasing.values.tension! * 0.90;
         detail.value.set(regions.values.nesting!, regions.values.motion! * pressureAmount, regions.values.growth! * pressureAmount, phrasing.values.hierarchy!);
@@ -220,8 +237,9 @@ export default defineComponent({
         ink.value.set(boundary.values.width!, boundary.values.accent!, boundary.values.handDrawn!, boundary.values.grain!);
         return { image: await evaluation.render(scene!, camera) };
       },
-      reset() {},
+      reset() { birds?.reset(); },
       dispose() {
+        birds?.dispose();
         geometry.dispose();
         material?.dispose();
       },
