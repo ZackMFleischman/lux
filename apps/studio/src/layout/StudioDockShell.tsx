@@ -19,11 +19,12 @@ const storage: LayoutStorage = {
 };
 /** The portals own real panes above Dockview mounts. Reparenting their host preserves
  * the same canvas, editor/undo, subscriptions and React state even through closure. */
-export function StudioDockShell({ compact, expandedPanel = 'preview', showInspector, toolsHost, onOpenPanelReady, onTogglePanelReady, onActivePanelChange, ...content }: {
+export function StudioDockShell({ compact, expandedPanel = 'preview', showInspector, toolsHost, onOpenPanelReady, onTogglePanelReady, onActivePanelChange, onShortcutsHelp, ...content }: {
   compact: boolean; expandedPanel?: Kind; showInspector: boolean; toolsHost?: HTMLElement | null;
   onOpenPanelReady?: (action:null|((kind:Kind)=>void))=>void;
   onTogglePanelReady?: (action:null|((kind:Kind)=>void))=>void;
   onActivePanelChange?: (kind:Kind)=>void;
+  onShortcutsHelp?: (returnFocus?: HTMLElement | null)=>void;
 } & Record<Exclude<Kind,'graph'>, ReactNode> & {graph?:ReactNode}) {
   const [mode] = useState<'desktop' | 'laptop'>(() => window.innerWidth < 1100 ? 'laptop' : 'desktop');
   const [name, setName] = useState('Default'), [message, setMessage] = useState('');
@@ -76,6 +77,7 @@ export function StudioDockShell({ compact, expandedPanel = 'preview', showInspec
       </MenuItem>)}
       <Divider />
       <MenuItem onClick={() => setLayoutsOpen(true)}>Layouts…</MenuItem>
+      <MenuItem onClick={() => onShortcutsHelp?.(viewButton.current)}><span>Keyboard shortcuts</span><span className="studio-shortcut-hint" aria-hidden="true">{shortcutHint['shortcut-reference']}</span></MenuItem>
     </StudioMenu>
     <Dialog open={layoutsOpen} onClose={() => setLayoutsOpen(false)} aria-labelledby="workspace-layouts-title"
       maxWidth="xs" fullWidth slotProps={{ transition: { onExited: () => viewButton.current?.focus() } }}

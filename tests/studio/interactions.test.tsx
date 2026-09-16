@@ -423,3 +423,24 @@ test('RTL: global authoring shortcuts dispatch one shared action and suppress re
   dialog.remove();
   assert.deepEqual(calls, ['save', 'save-as', 'export', 'build', 'record']);
 });
+
+test('RTL: question mark opens the shortcut reference without intercepting text entry or repeats', async () => {
+  render(<StudioApp client={createDisconnectedClient()} nowMs={1000} />);
+  const input = document.createElement('input'); document.body.append(input); input.focus();
+  const questionMark = new KeyboardEvent('keydown', { key: '?', shiftKey: true, bubbles: true, cancelable: true });
+  input.dispatchEvent(questionMark);
+  assert.equal(questionMark.defaultPrevented, false, 'question-mark typing remains available to text inputs');
+  assert.equal(screen.queryByRole('dialog', { name: 'Keyboard shortcuts' }), null);
+  input.remove();
+  const fullscreen = screen.getByRole('button', { name: 'Fullscreen' });
+  await act(async () => { fullscreen.focus(); });
+  await act(async () => { fireEvent.keyDown(window, { key: '?', shiftKey: true }); });
+  const dialog = screen.getByRole('dialog', { name: 'Keyboard shortcuts' });
+  assert.ok(within(dialog).getByText('Build preview'));
+  assert.ok(within(dialog).getByText('Ctrl+Enter'));
+  assert.ok(within(dialog).getByText('Shift+/'));
+  const repeatedQuestionMark = new KeyboardEvent('keydown', { key: '?', shiftKey: true, repeat: true, bubbles: true, cancelable: true });
+  await act(async () => { window.dispatchEvent(repeatedQuestionMark); });
+  assert.equal(repeatedQuestionMark.defaultPrevented, false, 'repeated question mark is not intercepted');
+  assert.equal(screen.getAllByRole('dialog', { name: 'Keyboard shortcuts' }).length, 1);
+});
