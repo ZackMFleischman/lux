@@ -4,6 +4,8 @@ import type {NodePath} from '../../../packages/runtime-contracts/src/graph.ts';
 import type {ComponentMetadata} from '../../../packages/runtime-contracts/src/components.mjs';
 
 export const nodeKey=(path:NodePath)=>JSON.stringify(path);
+/** [] names only the direct compatibility occurrence, never a graph root selection. */
+export function visualSelection(runtime:RuntimeView|null,path:NodePath|null):NodePath|null{return path?.length===0&&runtime?.sdkVersion==='0.4.0'?null:path;}
 type Profile=NonNullable<RuntimeView['composition']>;
 function profileOccurrence(profile:Profile,path:NodePath){let definitionHash=profile.graph.rootDefinitionHash;
   for(const nodeId of path){const definition=profile.definitions[definitionHash];if(definition?.kind!=='graph')return undefined;const node=definition.body.nodes.find(row=>row.id===nodeId);if(!node)return undefined;definitionHash=node.definitionHash;}

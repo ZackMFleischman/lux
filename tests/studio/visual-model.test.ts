@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {compositionOccurrence,compositionNodes,compositionControlTarget,visualControlNode} from '../../apps/studio/src/visual-model.ts';
+import {compositionOccurrence,compositionNodes,compositionControlTarget,visualControlNode,visualSelection} from '../../apps/studio/src/visual-model.ts';
 import {getRuntimeControlState} from '../../apps/studio/src/service-client.ts';
 import type {RuntimeView} from '../../apps/studio/src/service-client.ts';
 import {nodeIdSchema} from '../../packages/runtime-contracts/src/identities.ts';
@@ -30,4 +30,12 @@ test('direct parameter visuals retain schema identity and missing graph state is
  assert.deepEqual(node?.values,{intensity:.4});
  assert.equal(compositionOccurrence({...parameters,sdkVersion:'0.4.0'},[]),undefined);
  assert.deepEqual(compositionNodes({...parameters,sdkVersion:'0.4.0'}),[]);
+});
+
+test('direct-only selection returns to Scene when a graph visual replaces it',()=>{
+ const path:import('../../packages/runtime-contracts/src/graph.ts').NodePath=[];
+ assert.equal(visualSelection(runtime,path),path);
+ assert.equal(visualSelection({...runtime,...getRuntimeControlState(runtime),sdkVersion:'0.4.0',intensity:undefined},path),null);
+ const missing=[nodeIdSchema.parse('11111111-1111-4111-8111-111111111111')];
+ assert.equal(visualSelection(runtime,missing),missing,'missing real occurrences retain the existing unavailable-node explanation');
 });
