@@ -21,7 +21,7 @@ Submit the entry with its relative TypeScript dependencies as an SDK `0.4.0` sou
 | Animated Watercolor | None | `field: shader-field` | Wash lightness, warm pools, contrast, pooling, blooms |
 | Organic Boundary Ink | None | `field: shader-field` | Boundary width, warmth, hand-drawn character, grain |
 | Composition Phrasing | None | `field: shader-field` | Pace, phrasing, tension, hierarchy, quiet-to-intricate balance |
-| Living Painting / styles consumer | `paths` and five shader fields | `image` | Uses upstream component controls |
+| Region Styles & Split Transitions | `paths` and five shader fields | `image` | Uses upstream component controls |
 
 The path generator is the single source of geometry. It produces at most four paths of 64 points. The renderer and painting support those same bounds and reject larger snapshots rather than silently losing a tracer or its head. The general SDK contract supports larger bounded snapshots for other components.
 
@@ -87,3 +87,16 @@ this state in one node lets all painting fields share the same musical phrasing.
 The six numeric values are time, pace, phrasing, composition, tension, and hierarchy.
 The compatible consumer inserts lpPhrase before lpRegion and noiseBasis after
 lpRegion. WGSL permits later declarations; all fields use the same uniforms.
+
+## Region Styles & Split Transitions
+
+`painting.ts` is the terminal painting renderer. It accepts canvas-height
+`paths2d` v1 plus the five exact field ABIs documented above. It preserves the
+original region-side tests, gradual split reveal, daughter color/hatch identity,
+and uneven pigment patches. It outputs one linear-sRGB premultiplied image.
+Connect that image and the same paths to Wandering Tracer Renderer for visible ink.
+
+This node has no duplicate controls: all 38 scene controls remain on the upstream
+components and tracer renderer. The complete composition has eight leaf nodes
+and two image passes. The fields require this compatible consumer contract;
+they are not standalone image overlays.

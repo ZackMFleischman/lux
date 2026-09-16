@@ -145,8 +145,8 @@ function hasExactKeys(record: Readonly<Record<string, unknown>>, expected: reado
 
 export default defineComponent({
   metadata: {
-    declarationVersion: 1, key: 'lux/living-painting', label: 'Living Painting',
-    description: 'Organic watercolor regions that adopt new colors and hatch styles when shared tracer paths cross them.',
+    declarationVersion: 1, key: 'lux/region-styles-split-transitions', label: 'Region Styles & Splits',
+    description: 'Combines five painting fields and shared paths into region styles with smooth daughter-region color and hatch transitions.',
     tags: ['painting', 'regions', 'watercolor'],
     inputs: {
       paths: { type: { kind: 'paths2d', version: 1, coordinateSpace: 'canvas-height' }, label: 'Paths', description: 'Shared tracer geometry used to carve the regions.' },
