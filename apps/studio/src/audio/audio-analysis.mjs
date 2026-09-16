@@ -1,0 +1,85 @@
+import { normalizeAudioAnalyzerConfig } from './audio-contract.mjs';
+
+const freeze = Object.freeze;
+const finite = Number.isFinite;
+const sqrt = Math.sqrt;
+const pow = Math.pow;
+const min = Math.min;
+const max = Math.max;
+
+function rms(sum, count) {
+  return count === 0 ? 0 : sqrt(sum / count);
+}
+
+function unitAmplitude(decibels, floorAmplitude, ceilingAmplitude, span) {
+  if (decibels === -Infinity) return 0;
+  if (!finite(decibels)) throw new Error('Invalid audio sample');
+  const amplitude = pow(10, decibels / 20);
+  return min(1, max(0, (amplitude - floorAmplitude) / span));
+}
+
+export function analyzeAudioFrame(timeDomain, frequencyDecibels, sampleRate, inputConfig) {
+  const config = normalizeAudioAnalyzerConfig(inputConfig);
+  if (!(timeDomain instanceof Float32Array) || timeDomain.length !== config.fftSize) {
+    throw new Error('Invalid audio time-domain frame');
+  }
+  if (!(frequencyDecibels instanceof Float32Array) || frequencyDecibels.length !== config.fftSize / 2) {
+    throw new Error('Invalid audio frequency frame');
+  }
+  if (!finite(sampleRate) || sampleRate < 8000 || sampleRate > 384000) throw new Error('Invalid audio sample rate');
+
+  let levelSum = 0;
+  for (const value of timeDomain) {
+    if (!finite(value)) throw new Error('Invalid audio sample');
+    const bounded = min(1, max(-1, value));
+    levelSum += bounded * bounded;
+  }
+
+  const floorAmplitude = pow(10, config.minDecibels / 20);
+  const ceilingAmplitude = pow(10, config.maxDecibels / 20);
+  const amplitudeSpan = ceilingAmplitude - floorAmplitude;
+  let bassSum = 0, bassCount = 0, midsSum = 0, midsCount = 0, highsSum = 0, highsCount = 0;
+  for (let index = 0; index < frequencyDecibels.length; index++) {
+    const frequency = index * sampleRate / config.fftSize;
+    if (frequency < 20) continue;
+    const value = unitAmplitude(frequencyDecibels[index], floorAmplitude, ceilingAmplitude, amplitudeSpan);
+    if (frequency < 250) { bassSum += value * value; bassCount++; }
+    else if (frequency < 2000) { midsSum += value * value; midsCount++; }
+    else { highsSum += value * value; highsCount++; }
+  }
+  return freeze({ level: rms(levelSum, timeDomain.length), bass: rms(bassSum, bassCount),
+    mids: rms(midsSum, midsCount), highs: rms(highsSum, highsCount) });
+}
+
+export function createWebAudioBandAnalyzer(context, stream, inputConfig) {
+  const config = normalizeAudioAnalyzerConfig(inputConfig);
+  if (!context || !finite(context.sampleRate) || typeof context.createMediaStreamSource !== 'function' ||
+      typeof context.createAnalyser !== 'function') throw new Error('Invalid Web Audio context');
+  const source = context.createMediaStreamSource(stream);
+  const analyzer = context.createAnalyser();
+  analyzer.fftSize = config.fftSize;
+  analyzer.minDecibels = config.minDecibels;
+  analyzer.maxDecibels = config.maxDecibels;
+  analyzer.smoothingTimeConstant = 0;
+  if (analyzer.frequencyBinCount !== config.fftSize / 2 || typeof analyzer.getFloatTimeDomainData !== 'function' ||
+      typeof analyzer.getFloatFrequencyData !== 'function') throw new Error('Invalid Web Audio analyzer');
+  source.connect(analyzer);
+  const timeDomain = new Float32Array(config.fftSize);
+  const frequency = new Float32Array(config.fftSize / 2);
+  let disposed = false;
+  return freeze({
+    sample() {
+      if (disposed) throw new Error('Audio analyzer is disposed');
+      analyzer.getFloatTimeDomainData(timeDomain);
+      analyzer.getFloatFrequencyData(frequency);
+      return analyzeAudioFrame(timeDomain, frequency, context.sampleRate, config);
+    },
+    dispose() {
+      if (disposed) return;
+      disposed = true;
+      source.disconnect();
+      analyzer.disconnect();
+    },
+  });
+}
+
