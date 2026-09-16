@@ -155,6 +155,16 @@ test('actual worker applies complete initial/live controls and captures exact me
   const capture=await f.send({type:'capture',requestId:'capture'});assert.equal(capture.type,'capture');assert.deepEqual(capture.metadata.controls,applied.controls);assert.equal(capture.metadata.controlSchemaHash,f.initial.controlSchemaHash);assert.equal(capture.metadata.controlSequence,1);
   assert.deepEqual(Array.from(decode(new Uint8Array(capture.bytes)).data.slice(0,4)),[255,0,0,128]);
 });
+test('audio snapshots update the evaluator cache and acknowledge without drawing',async()=>{
+  const f=await fixture();
+  const initialAudio={generation:1,sequence:0,available:true,level:0,bass:0,mids:0,highs:0};
+  assert.equal((await f.send({...f.initial,audioSnapshot:initialAudio})).type,'ready');
+  const frameCount=f.frames.length;
+  const snapshot={generation:1,sequence:1,available:true,level:.1,bass:.2,mids:.3,highs:.4};
+  const ack=await f.send({type:'audio',audioSnapshot:snapshot});
+  assert.deepEqual(ack,{type:'audio-ack',instanceId:'instance',generation:1,revisionId:'revision',providerGeneration:1,sampleSequence:1});
+  assert.equal(f.frames.length,frameCount);
+});
 test('actual worker supports empty controls and rejects mismatched metadata before create',async()=>{
   const empty=await fixture([]);assert.equal((await empty.send(empty.initial)).type,'ready');assert.deepEqual(empty.frames[0].controls,{});
   const f=await fixture(schema,[]);const result=await f.send(f.initial);assert.equal(result.type,'failure');assert.match(result.message,/schema/i);assert.equal(f.created(),0);
