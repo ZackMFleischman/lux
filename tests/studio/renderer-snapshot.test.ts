@@ -6,7 +6,7 @@ import type { StudioSnapshot } from '../../apps/studio/src/service-client.ts';
 function fixture() {
   let snapshot: StudioSnapshot = { connection: 'connected', message: null, receivedAtMs: 0,
     authoring: { instanceId: 'owner', generation: 1, revisionId: 'revision', sceneName: 'Fixture', authority: 'studio',
-      playback: 'playing', clockEpoch: 0, frameId: '0', intensity: 0.5, output: { width: 1920, height: 1080 }, fault: null },
+      playback: 'playing', clockEpoch: 0, frameId: '0', intensity: 0.5,tempo:{bpm:120,beatPosition:0,beatPhase:0,tempoSequence:0},tempoSequence:0, output: { width: 1920, height: 1080 }, fault: null },
     host: null, jobs: [], visualFps: null, uiFps: null };
   const listeners = new Set<() => void>();
   const client = { getSnapshot: () => snapshot, subscribe: (listener: () => void) => {
@@ -42,8 +42,8 @@ test('renderer bounds animation time and effective-value observations to UI cade
   const initial = view.getSnapshot(); let notifications = 0;
   const off = view.subscribe(() => { notifications++; });
   const node = {nodePath:['node'],definitionHash:'d'.repeat(64),schemaHash:'s'.repeat(64),schema:[],values:{amount:0.5}};
-  for (let frame = 1; frame <= 60; frame++) source.publish({receivedAtMs:frame,authoring:{...initial.authoring!,frameId:String(frame),timeSeconds:frame/60,effectiveControls:{intensity:frame/60},effectiveNodeControls:{sourceHash:'revision',nodes:[{...node,values:{amount:frame/60}}]}} as any});
-  assert.equal(notifications,0,'render-clock animation observations must not synchronously rerender the dock tree');
+  for (let frame = 1; frame <= 60; frame++) source.publish({receivedAtMs:frame,authoring:{...initial.authoring!,frameId:String(frame),timeSeconds:frame/60,tempo:{bpm:120,beatPosition:frame/30,beatPhase:(frame%30)/30,tempoSequence:0},tempoSequence:0,effectiveControls:{intensity:frame/60},effectiveNodeControls:{sourceHash:'revision',nodes:[{...node,values:{amount:frame/60}}]}} as any});
+  assert.equal(notifications,0,'render-clock animation and beat-phase observations must not synchronously rerender the dock tree');
   context.mock.timers.tick(100);assert.equal(notifications,1);assert.equal(view.getSnapshot(),source.client.getSnapshot());
   off();
 });
@@ -56,6 +56,7 @@ test('control, transport, owner, fault and jobs changes bypass pending frame del
     { authoring: { ...source.client.getSnapshot().authoring!, sdkVersion: '0.1.0', intensity: 0.8 } },
     { authoring: { ...source.client.getSnapshot().authoring!, playback: 'paused' } },
     { authoring: { ...source.client.getSnapshot().authoring!, generation: 2 } },
+    { authoring: { ...source.client.getSnapshot().authoring!, tempo:{bpm:128,beatPosition:0,beatPhase:0,tempoSequence:1},tempoSequence:1 } as any },
     { authoring: { ...source.client.getSnapshot().authoring!, playback: 'failed', fault: { code: 'FAULT', message: 'Lost device' } } },
     { jobs: [{ jobId: 'job', state: 'failed', summary: 'Build failed' }] },
     { connection: 'disconnected', authoring: null },
