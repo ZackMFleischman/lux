@@ -143,7 +143,11 @@ app.whenReady().then(async () => {
     if(!trusted(event)||BrowserWindow.fromWebContents(event.sender)!==mainWindow)throw Error('Untrusted library sender');
     if(action==='location')return standardLibrary;
     if(action==='list')return library.list();
-    if(action==='read')return library.read(value as string);
+    if(action==='read'){
+      if(typeof value==='string')return library.read(value);
+      const request=value as {id:string;revision?:number};
+      return library.read(request.id,request.revision);
+    }
     if(action==='create')return library.create(value as Parameters<ComponentLibraryStore['create']>[0]);
     if(action==='update')return library.update(value as Parameters<ComponentLibraryStore['update']>[0]);
     if(action==='copy-request'){

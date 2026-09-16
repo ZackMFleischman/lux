@@ -75,3 +75,6 @@ Use modest vertex counts/noise complexity first, then improve fidelity against t
 ## Where to verify newer details
 
 In a Lux checkout, the maintained sources are `packages/visual-sdk/src/{index.ts,metadata.mjs,discovery.mjs}`, `packages/runtime-contracts/src/index.ts`, `apps/build-worker/src/{source-policy.mjs,worker.mjs}`, and `apps/studio/src/visual-worker.mjs`. Read pinned Three exports/type declarations for unfamiliar TSL calls; use a real Lux build to validate source. Do not edit these infrastructure files as part of creating a visual.
+
+### Independent Library parts
+Publish typed path generators and image renderers separately. A reusable composition references them with pinned Library dependencies instead of copying their files. The composition entry imports each dependency at its declared relative mount. Scene save stores a complete resolved fallback; changing a dependency does not change a pinned composition until that composition explicitly updates its revision reference.

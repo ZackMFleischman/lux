@@ -232,3 +232,22 @@ test('Load Look commits only after activation and preserves all authoring state 
  await assert.rejects(session.loadLook('look'),/activation failed/);assert.deepEqual(w.getSnapshot(),before);assert.deepEqual(session.getSnapshot(),beforeIO);assert.deepEqual(session.read(),beforeRead);
  fail=false;await session.loadLook('look');assert.deepEqual(options.output,document.settings);assert.equal(w.getSnapshot().source.files['main.ts'],'export const replacement=1');assert.equal(w.getSnapshot().dirty,false);assert.equal(session.getSnapshot().controlsDirty,false);assert.equal(session.getSnapshot().name,'Warm');
 });
+
+test('linked composition expands pinned Library dependencies and preserves its complete saved fallback',async()=>{
+ const childId='33333333-3333-4333-8333-333333333333';
+ const child={...componentRecord(1,'violet'),id:childId};
+ const parent={...componentRecord(1,'unused'),source:{sdkVersion:'0.4.0' as const,entry:'component.ts',files:{'component.ts':'export {color} from "./generator/component.ts";'}},dependencies:[{componentId:childId,revision:1,mountPath:'generator'}]};
+ const w=createSourceWorkspace(compositionSource());let accepted=compositionCache(compositionSource()),saved:any,available=true;
+ const requests:Array<[string,number|undefined]>=[];
+ const session=createAuthoringSession(w,{readLibraryComponent:async(id,revision)=>{requests.push([id,revision]);if(!available)throw Error('Library offline');return id===childId?child:parent;},getControlSnapshot:()=>accepted,
+ submit:async s=>{accepted=compositionCache(s);},save:async r=>{saved=r.document;return {token:'saved',name:'linked.lux-scene'};},
+ open:async()=>({token:'saved',name:'linked.lux-scene',document:saved})});
+ await session.build(session.read().source,session.read().draftVersion,[{componentId:libraryId,mountPath:'library/shared'}]);
+ assert.ok(requests.some(([id,rev])=>id===childId&&rev===1));
+ assert.equal(session.read().source.files['library/shared/generator/component.ts'],child.source.files['component.ts']);
+ assert.deepEqual(session.read().libraryLinks[0]?.files,['library/shared/component.ts','library/shared/generator/component.ts']);
+ await session.save();available=false;
+ await session.open();
+ assert.equal(session.read().source.files['library/shared/generator/component.ts'],child.source.files['component.ts']);
+ assert.match(session.getSnapshot().libraryFallbacks[0]?.message??'',/offline/);
+});

@@ -5,7 +5,7 @@ import type { SceneDocument } from '../../../../packages/core/src/scene-file.ts'
 import { createSceneDocument, verifySceneDocument, verifySavedControlSnapshot, verifySavedNodeControlSnapshot, validateSavedControlSnapshot, validateSavedNodeControlSnapshot, sceneControlSnapshot, sceneSourceHash, sceneHash } from '../../../../packages/core/src/scene-document.ts';
 import type { SavedControlSnapshot, SavedNodeControlSnapshot } from '../../../../packages/core/src/scene-document.ts';
 import type { SourceWorkspace } from './workspace.ts';
-import { applyLibraryComponent, checkLibraryLinks, forkLibraryComponent as forkLink, validateSceneLibraryLinks } from '../../../../packages/core/src/component-library.ts';
+import { applyLibraryComponent, resolveLibraryComponent, checkLibraryLinks, forkLibraryComponent as forkLink, validateSceneLibraryLinks } from '../../../../packages/core/src/component-library.ts';
 import type { LibraryComponent, SceneLibraryLink } from '../../../../packages/core/src/component-library.ts';
 import {validateControlAnimationBindings} from '../../../../packages/runtime-contracts/src/control-animation.mjs';
 import type {ControlAnimationBinding} from '../../../../packages/runtime-contracts/src/control-animation.mjs';
@@ -30,7 +30,7 @@ type Ports = {
   /** Legacy port retained for fixture compatibility; controls now enter submit before activation. */
   applyControls?(controls: ControlValues): Promise<void>;
   export?(request: { name: string; document: SceneDocument }): Promise<{ path: string; releaseId: string; runtimeId: string } | null>;
-  readLibraryComponent?(id: string): Promise<LibraryComponent>;
+  readLibraryComponent?(id: string, revision?: number): Promise<LibraryComponent>;
 };
 /** Coordinates whole-document I/O. File and runtime authority remain in the injected ports. */
 export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports) {
@@ -96,7 +96,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
       const existing=next.links.find(link=>link.componentId===row.componentId);
       if(existing&&row.mountPath!==existing.mountPath)throw Error('Changing a library mount path is not supported; fork it first');
       if(!ports.readLibraryComponent){if(existing)continue;throw Error('The component library is unavailable');}
-      try{next=applyLibraryComponent(next.source,next.links,await ports.readLibraryComponent(row.componentId),row.mountPath);}
+      try{next=applyLibraryComponent(next.source,next.links,await resolveLibraryComponent(await ports.readLibraryComponent(row.componentId),(id,revision)=>ports.readLibraryComponent!(id,revision)),row.mountPath);}
       catch(error){if(!existing)throw error;fallbacks.push({componentId:existing.componentId,resolvedRevision:existing.resolvedRevision,message:error instanceof Error?error.message:String(error)});}
     }
     return {source:next.source,links:next.links,fallbacks:Object.freeze(fallbacks)};

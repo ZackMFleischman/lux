@@ -1,4 +1,5 @@
-import type { PathsSnapshot } from './tracer-state.ts';
+import type { Paths2DResource } from '@lux/visual-sdk';
+type PathsSnapshot = Paths2DResource['data'];
 
 export const TRACER_TEXTURE_WIDTH = 260;
 const MAX_PATHS = 4;

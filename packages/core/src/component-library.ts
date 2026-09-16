@@ -11,6 +11,12 @@ export type LibraryComponent = Readonly<{
   description: string;
   updatedAt: string;
   source: SourceBundle;
+  dependencies?: readonly LibraryDependency[];
+}>;
+export type LibraryDependency = Readonly<{
+  componentId: string;
+  revision: number;
+  mountPath: string;
 }>;
 export type LibraryComponentSummary = Readonly<Omit<LibraryComponent, 'source'>>;
 export type SceneLibraryLink = Readonly<{
@@ -42,14 +48,28 @@ export function validateLibrarySource(value: unknown): SourceBundle {
   if ('sourceVersion' in result) throw Error('The first local component library path does not accept image assets');
   return structuredClone(result);
 }
+export function validateLibraryDependencies(value: unknown): readonly LibraryDependency[] {
+  if (!Array.isArray(value) || value.length > 8) throw Error('Library dependencies must contain 0–8 rows');
+  return Object.freeze(value.map(item => {
+    const raw = plainLibraryRecord(item, ['componentId', 'revision', 'mountPath'], 'Library dependency');
+    const componentId = componentIdSchema.parse(raw.componentId);
+    if (!Number.isSafeInteger(raw.revision) || (raw.revision as number) < 1) throw Error('Library dependency revision must be a positive integer');
+    return Object.freeze({ componentId, revision: raw.revision as number, mountPath: mount(raw.mountPath as string) });
+  }));
+}
 export function validateLibraryComponent(value: unknown): LibraryComponent {
-  const raw = plainLibraryRecord(value, ['id', 'revision', 'name', 'description', 'updatedAt', 'source'], 'Library component');
+  const hasDependencies = !!value && typeof value === 'object' && Reflect.ownKeys(value).includes('dependencies');
+  const raw = plainLibraryRecord(value, hasDependencies
+    ? ['id', 'revision', 'name', 'description', 'updatedAt', 'source', 'dependencies']
+    : ['id', 'revision', 'name', 'description', 'updatedAt', 'source'], 'Library component');
   const id = componentIdSchema.parse(raw.id);
   if (!Number.isSafeInteger(raw.revision) || (raw.revision as number) < 1) throw Error('Library component revision must be a positive integer');
   const updatedAt = libraryText(raw.updatedAt, 'Updated time', 64);
   if (!Number.isFinite(Date.parse(updatedAt))) throw Error('Library component updated time is invalid');
+  const dependencies = hasDependencies ? validateLibraryDependencies(raw.dependencies) : undefined;
   return Object.freeze({ id, revision: raw.revision as number, name: libraryText(raw.name, 'Component name', 80),
-    description: libraryText(raw.description, 'Component description', 512), updatedAt, source: validateLibrarySource(raw.source) });
+    description: libraryText(raw.description, 'Component description', 512), updatedAt, source: validateLibrarySource(raw.source),
+    ...(dependencies?.length ? { dependencies } : {}) });
 }
 
 function mount(value: string): string {
@@ -76,6 +96,52 @@ export function validateSceneLibraryLinks(value: unknown): readonly SceneLibrary
 }
 function mounted(component: LibraryComponent, mountPath: string): Record<string, string> {
   return Object.fromEntries(Object.entries(component.source.files).map(([path, code]) => [`${mountPath}/${path}`, code]));
+}
+function overlappingMount(left: string, right: string): boolean {
+  const a = left.toLowerCase(), b = right.toLowerCase();
+  return a === b || a.startsWith(`${b}/`) || b.startsWith(`${a}/`);
+}
+export async function resolveLibraryComponent(
+  componentValue: LibraryComponent,
+  read: (id: string, revision?: number) => Promise<LibraryComponent>,
+): Promise<LibraryComponent> {
+  let visitedInstances = 0;
+  const resolveComponent = async (value: LibraryComponent, depth: number, ancestors: ReadonlySet<string>): Promise<LibraryComponent> => {
+    const component = validateLibraryComponent(value), key = `${component.id}@${component.revision}`;
+    if (ancestors.has(key)) throw Error(`Library dependency cycle includes ${key}`);
+    visitedInstances += 1;
+    if (visitedInstances > 8 || depth > 8) throw Error('Library dependency resolution exceeds the 8-instance or depth limit');
+    const dependencies = component.dependencies ?? [];
+    for (let index = 0; index < dependencies.length; index++) {
+      for (let other = index + 1; other < dependencies.length; other++) {
+        if (overlappingMount(dependencies[index]!.mountPath, dependencies[other]!.mountPath)) {
+          throw Error('Library dependency mount paths overlap');
+        }
+      }
+      const mountPath = dependencies[index]!.mountPath.toLowerCase();
+      if (Object.keys(component.source.files).some(path => path.toLowerCase().startsWith(`${mountPath}/`))) {
+        throw Error(`Library dependency mount conflicts with local source: ${dependencies[index]!.mountPath}`);
+      }
+    }
+    const files: Record<string, string> = { ...component.source.files };
+    const nextAncestors = new Set(ancestors); nextAncestors.add(key);
+    for (const dependency of dependencies) {
+      const stored = validateLibraryComponent(await read(dependency.componentId, dependency.revision));
+      if (stored.id !== dependency.componentId || stored.revision !== dependency.revision) {
+        throw Error(`Library dependency does not match pinned identity or revision: ${dependency.componentId}@${dependency.revision}`);
+      }
+      const resolved = await resolveComponent(stored, depth + 1, nextAncestors);
+      for (const [path, code] of Object.entries(resolved.source.files)) {
+        const mountedPath = `${dependency.mountPath}/${path}`;
+        const existing = Object.keys(files).find(candidate => candidate.toLowerCase() === mountedPath.toLowerCase());
+        if (existing) throw Error(`Library dependency mount conflicts with source file: ${mountedPath}`);
+        files[mountedPath] = code;
+      }
+    }
+    const { dependencies: _dependencies, ...metadata } = component;
+    return Object.freeze({ ...metadata, source: validateLibrarySource({ ...component.source, files }) });
+  };
+  return resolveComponent(componentValue, 1, new Set());
 }
 export function applyLibraryComponent(scene: SourceBundle, linksValue: readonly SceneLibraryLink[], componentValue: LibraryComponent, requestedMount: string) {
   const admitted = validateLibrarySource(scene), component = validateLibraryComponent(componentValue), links = [...validateSceneLibraryLinks(linksValue)];

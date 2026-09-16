@@ -12,8 +12,9 @@ const scenePath=z.string().min(1).max(1024).refine(path=>path.toLowerCase().ends
 export const sceneSaveInputSchema=z.object({path:scenePath,expectedDraftVersion:z.number().int().nonnegative(),overwrite:z.boolean().optional().default(false)}).strict();
 export const sceneOpenInputSchema=z.object({path:scenePath,expectedDraftVersion:z.number().int().nonnegative(),discardDirty:z.boolean().optional().default(false)}).strict();
 export const libraryComponentSourceSchema=legacySourceBundleSchema.extend({sdkVersion:z.literal('0.4.0')});
-export const libraryCreateInputSchema=z.object({name:z.string().trim().min(1).max(80),description:z.string().trim().min(1).max(512),source:libraryComponentSourceSchema}).strict();
-export const libraryReadInputSchema=z.object({id:componentId}).strict();
+const libraryDependencySchema=z.object({componentId,mountPath,revision:z.number().int().positive()}).strict();
+export const libraryCreateInputSchema=z.object({name:z.string().trim().min(1).max(80),description:z.string().trim().min(1).max(512),source:libraryComponentSourceSchema,dependencies:z.array(libraryDependencySchema).max(8).optional()}).strict();
+export const libraryReadInputSchema=z.object({id:componentId,revision:z.number().int().positive().optional()}).strict();
 export const libraryUpdateInputSchema=libraryCreateInputSchema.extend({id:componentId,expectedRevision:z.number().int().positive()}).strict();
 export function sourceReadResult(value: unknown) {
   const result = { content: [{ type: 'text' as const, text: JSON.stringify(value) }] };

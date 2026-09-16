@@ -24,7 +24,7 @@ Coordinates use a centered canvas: height 1, width equal to aspect ratio, +X rig
 
 Choose the overlay wrapper for a simple effect. Choose the separate generator and renderer when another component needs the same geometry. Graph displays those connections and exposes their individual controls. Wiring is currently declared in source.
 
-Library publication stores these six files: `overlay.ts`, `paths.ts`, `tracer-state.ts`, `renderer.ts`, `tracer-texture.ts`, and `tracer-spline.ts`. Scene builds and saves do not publish library changes automatically.
+Library publication uses three entries: **Wandering Tracer Paths** owns `paths.ts` and `tracer-state.ts`; **Wandering Tracer Renderer** owns `renderer.ts`, `tracer-texture.ts`, and `tracer-spline.ts`; **Wandering Tracers** owns only `overlay.ts` and pins the other two as dependencies mounted at `generator` and `renderer`. The published overlay imports `./generator/paths.ts` and `./renderer/renderer.ts`. A scene can link either leaf independently or use the complete composition. Scene builds and saves do not publish Library changes automatically.
 
 ## Limits
 
@@ -34,6 +34,6 @@ Await each `evaluation.render` before starting another render in the same evalua
 
 ## Verification
 
-`node --test examples/components/wandering-tracers/*.test.ts` checks geometry/data behavior. `node scripts/test-wandering-tracers.mjs painting` (or `overlay`, `library`) launches an isolated actual Studio instance, captures it, and checks save/open and invalid-edit preservation. Build Studio first with `node apps/studio/build.mjs`. These are separate bounded scenarios to fit the test host's lifetime.
+`node --test examples/components/wandering-tracers/*.test.ts` checks geometry/data behavior. `node scripts/test-wandering-tracers.mjs painting` (or `overlay`, `library`, `independent-wrapper`, `independent-direct`) launches an isolated actual Studio instance, captures it, and checks save/open and invalid-edit preservation. Build Studio first with `node apps/studio/build.mjs`. These are separate bounded scenarios to fit the test host's lifetime.
 
 Known prototype limit: if a tracer exits and later re-enters the same region, its style transition can soften again while the head is inside. Cuts use the sampled polyline, while the visible ribbon is spline-smoothed.

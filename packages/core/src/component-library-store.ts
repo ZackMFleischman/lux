@@ -4,8 +4,8 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { componentIdSchema } from '../../runtime-contracts/src/identities.ts';
 import type { SourceBundle } from '../../runtime-contracts/src/index.ts';
-import { libraryText, plainLibraryRecord, validateLibraryComponent, validateLibrarySource } from './component-library.ts';
-import type { LibraryComponent, LibraryComponentSummary } from './component-library.ts';
+import { libraryText, plainLibraryRecord, resolveLibraryComponent, validateLibraryComponent, validateLibraryDependencies, validateLibrarySource } from './component-library.ts';
+import type { LibraryComponent, LibraryComponentSummary, LibraryDependency } from './component-library.ts';
 
 const libraryBytes = 8 * 1024 * 1024;
 const componentCount = 32;
@@ -18,6 +18,7 @@ type ComponentManifest = Readonly<{
   format: 'lux-library-component'; version: 1; id: string; revision: number; name: string;
   description: string; updatedAt: string;
   source: Readonly<{ sdkVersion: string; entry: string; files: readonly string[] }>;
+  dependencies?: readonly LibraryDependency[];
 }>;
 type StoreOptions = {
   id?: () => string;
@@ -64,7 +65,10 @@ function legacyFile(value: unknown): LegacyLibraryFile {
 }
 
 function componentManifest(value: unknown): ComponentManifest {
-  const raw = plainLibraryRecord(value, ['format', 'version', 'id', 'revision', 'name', 'description', 'updatedAt', 'source'], 'Library component manifest');
+  const hasDependencies = !!value && typeof value === 'object' && Reflect.ownKeys(value).includes('dependencies');
+  const raw = plainLibraryRecord(value, hasDependencies
+    ? ['format', 'version', 'id', 'revision', 'name', 'description', 'updatedAt', 'source', 'dependencies']
+    : ['format', 'version', 'id', 'revision', 'name', 'description', 'updatedAt', 'source'], 'Library component manifest');
   if (raw.format !== 'lux-library-component' || raw.version !== 1) throw Error('Invalid library component manifest');
   const source = plainLibraryRecord(raw.source, ['sdkVersion', 'entry', 'files'], 'Library component source manifest');
   if (typeof source.sdkVersion !== 'string' || typeof source.entry !== 'string' || !Array.isArray(source.files) || source.files.length < 1 || source.files.length > 32) {
@@ -75,11 +79,13 @@ function componentManifest(value: unknown): ComponentManifest {
     return path;
   });
   if (new Set(paths.map(path => path.toLowerCase())).size !== paths.length) throw Error('Duplicate library component source path');
+  const dependencies = hasDependencies ? validateLibraryDependencies(raw.dependencies) : undefined;
   return Object.freeze({
     format: 'lux-library-component', version: 1, id: componentIdSchema.parse(raw.id),
     revision: raw.revision as number, name: raw.name as string, description: raw.description as string,
     updatedAt: raw.updatedAt as string,
     source: Object.freeze({ sdkVersion: source.sdkVersion, entry: source.entry, files: Object.freeze(paths) }),
+    ...(dependencies?.length ? { dependencies } : {}),
   });
 }
 
@@ -139,7 +145,8 @@ async function readComponentDirectory(root: string, directory: string, reference
   }
   return validateLibraryComponent({ id: manifest.id, revision: manifest.revision, name: manifest.name,
     description: manifest.description, updatedAt: manifest.updatedAt,
-    source: { sdkVersion: manifest.source.sdkVersion, entry: manifest.source.entry, files } });
+    source: { sdkVersion: manifest.source.sdkVersion, entry: manifest.source.entry, files },
+    ...(manifest.dependencies ? { dependencies: manifest.dependencies } : {}) });
 }
 
 async function readStoredComponent(root: string, reference: CatalogReference): Promise<LibraryComponent> {
@@ -196,7 +203,8 @@ function manifestFor(component: LibraryComponent): ComponentManifest {
   return { format: 'lux-library-component', version: 1, id: component.id, revision: component.revision,
     name: component.name, description: component.description, updatedAt: component.updatedAt,
     source: { sdkVersion: component.source.sdkVersion, entry: component.source.entry,
-      files: Object.freeze(Object.keys(component.source.files).sort()) } };
+      files: Object.freeze(Object.keys(component.source.files).sort()) },
+    ...(component.dependencies ? { dependencies: component.dependencies } : {}) };
 }
 
 async function writeComponentDirectory(root: string, destination: string, component: LibraryComponent): Promise<void> {
@@ -310,43 +318,70 @@ export class ComponentLibraryStore {
   private async prepareLocked(): Promise<{ catalog: LibraryCatalog; components: LibraryComponent[] }> {
     const current = await loadComponents(this.root), components = [...current.components], references = [...current.catalog.components];
     let changed = false;
+    const missingRevision = (error: unknown): boolean =>
+      (error as NodeJS.ErrnoException).code === 'ENOENT' || String(error).includes('revision is missing');
+    const readSeedHistory = async (sourceRoot: string, candidate: LibraryComponent): Promise<LibraryComponent[] | null> => {
+      const revisions: LibraryComponent[] = [];
+      try {
+        for (const revision of await availableSeedRevisions(sourceRoot, candidate)) {
+          revisions.push(await readStoredComponent(sourceRoot, { id: candidate.id, revision }));
+        }
+      } catch (error) {
+        if (missingRevision(error)) return null;
+        throw error;
+      }
+      if (!sameComponent(revisions.at(-1)!, candidate)) throw Error('Library seed current revision does not match its immutable history');
+      return revisions;
+    };
+    const backfillSeedHistory = async (revisions: readonly LibraryComponent[]): Promise<void> => {
+      const missing: LibraryComponent[] = [];
+      for (const revision of revisions) {
+        let stored: LibraryComponent;
+        try { stored = await readStoredComponent(this.root, { id: revision.id, revision: revision.revision }); }
+        catch (error) {
+          if (missingRevision(error)) { missing.push(revision); continue; }
+          throw error;
+        }
+        if (!sameComponent(stored, revision)) {
+          await archiveConflict(this.root, revision);
+          throw Error(`Component library seed history conflict for ${revision.id}@${revision.revision}; both sources were preserved`);
+        }
+      }
+      for (const revision of missing) await writeStoredComponent(this.root, revision);
+    };
     const add = async (candidate: LibraryComponent, kind: 'seed' | 'migration', sourceRoot?: string): Promise<void> => {
       const index = components.findIndex(component => component.id === candidate.id), existing = components[index];
       if (!existing) {
         if (components.length >= componentCount) throw Error('Component library supports at most 32 entries');
         if (kind === 'seed' && sourceRoot) {
-          const revisions: LibraryComponent[] = [];
-          try {
-            for (const revision of await availableSeedRevisions(sourceRoot, candidate)) {
-              revisions.push(await readStoredComponent(sourceRoot, { id: candidate.id, revision }));
-            }
-          } catch (error) {
-            if ((error as NodeJS.ErrnoException).code !== 'ENOENT' && !String(error).includes('revision is missing')) throw error;
+          const revisions = await readSeedHistory(sourceRoot, candidate);
+          if (!revisions) {
             await archiveConflict(this.root, candidate);
             throw Error(`Component library seed history is incomplete for ${candidate.id}; the current source was preserved`);
           }
-          if (!sameComponent(revisions.at(-1)!, candidate)) throw Error('Library seed current revision does not match its immutable history');
           for (const revision of revisions) await writeStoredComponent(this.root, revision);
         } else await writeStoredComponent(this.root, candidate);
         components.push(candidate); references.push({ id: candidate.id, revision: candidate.revision }); changed = true;
         return;
       }
-      if (sameComponent(existing, candidate)) return;
-      if (kind === 'seed' && sourceRoot && candidate.revision > existing.revision) {
-        try {
-          const base = await readStoredComponent(sourceRoot, { id: candidate.id, revision: existing.revision });
-          if (sameComponent(base, existing)) {
-            const revisions: LibraryComponent[] = [];
-            for (let revision = existing.revision + 1; revision <= candidate.revision; revision++) {
-              revisions.push(await readStoredComponent(sourceRoot, { id: candidate.id, revision }));
-            }
-            if (!sameComponent(revisions.at(-1)!, candidate)) throw Error('Library seed current revision does not match its immutable history');
-            for (const revision of revisions) await writeStoredComponent(this.root, revision);
-            components[index] = candidate; references[index] = { id: candidate.id, revision: candidate.revision }; changed = true;
-            return;
+      if (sameComponent(existing, candidate)) {
+        if (kind === 'seed' && sourceRoot) {
+          const revisions = await readSeedHistory(sourceRoot, candidate);
+          if (!revisions) {
+            await archiveConflict(this.root, candidate);
+            throw Error(`Component library seed history is incomplete for ${candidate.id}; the current source was preserved`);
           }
-        } catch (error) {
-          if ((error as NodeJS.ErrnoException).code !== 'ENOENT' && !String(error).includes('revision is missing')) throw error;
+          await backfillSeedHistory(revisions);
+        }
+        return;
+      }
+      if (kind === 'seed' && sourceRoot && candidate.revision > existing.revision) {
+        const revisions = await readSeedHistory(sourceRoot, candidate);
+        const base = revisions?.find(revision => revision.revision === existing.revision);
+        if (base && sameComponent(base, existing)) {
+          await backfillSeedHistory(revisions!);
+          components[index] = candidate; references[index] = { id: candidate.id, revision: candidate.revision }; changed = true;
+          return;
         }
       }
       if (existing.revision > candidate.revision) {
@@ -390,22 +425,36 @@ export class ComponentLibraryStore {
       .map(({ source: _source, ...summary }) => Object.freeze(summary))));
   }
 
-  async read(id: string): Promise<LibraryComponent> {
+  async read(id: string, revision?: number): Promise<LibraryComponent> {
     id = componentIdSchema.parse(id);
+    if (revision !== undefined && (!Number.isSafeInteger(revision) || revision < 1)) throw Error('Library component revision must be a positive integer');
     return this.exclusive(() => this.locked(async () => {
-      const result = (await this.prepareLocked()).components.find(component => component.id === id);
+      const current = await this.prepareLocked(), result = current.components.find(component => component.id === id);
       if (!result) throw Error('Library component is missing');
-      return structuredClone(result);
+      if (revision === undefined || revision === result.revision) return structuredClone(result);
+      if (revision > result.revision) throw Error(`Library component revision is missing: ${id}@${revision}`);
+      return structuredClone(await readStoredComponent(this.root, { id, revision }));
     }));
   }
 
-  create(input: { name: string; description: string; source: SourceBundle }): Promise<LibraryComponent> {
+  create(input: { name: string; description: string; source: SourceBundle; dependencies?: readonly LibraryDependency[] }): Promise<LibraryComponent> {
     return this.exclusive(async () => {
       const candidateSource = validateLibrarySource(input.source);
-      await this.validateCandidate(candidateSource);
+      const dependencies = input.dependencies === undefined ? undefined : validateLibraryDependencies(input.dependencies);
       const candidate = validateLibraryComponent({ id: componentIdSchema.parse(this.id()), revision: 1,
         name: libraryText(input.name, 'Component name', 80), description: libraryText(input.description, 'Component description', 512),
-        updatedAt: this.now(), source: candidateSource });
+        updatedAt: this.now(), source: candidateSource, ...(dependencies?.length ? { dependencies } : {}) });
+      const expanded = await this.locked(async () => {
+        const current = await this.prepareLocked();
+        if (current.components.length >= componentCount) throw Error('Component library supports at most 32 entries');
+        if (current.components.some(component => component.id === candidate.id)) throw Error('Library component ID already exists');
+        return resolveLibraryComponent(candidate, async (id, revision) => {
+          const reference = current.catalog.components.find(item => item.id === id);
+          if (!reference || revision === undefined || revision > reference.revision) throw Error('Library component is missing');
+          return readStoredComponent(this.root, { id, revision });
+        });
+      });
+      await this.validateCandidate(expanded.source);
       return this.locked(async () => {
         const current = await this.prepareLocked();
         if (current.components.length >= componentCount) throw Error('Component library supports at most 32 entries');
@@ -418,22 +467,30 @@ export class ComponentLibraryStore {
     });
   }
 
-  update(input: { id: string; expectedRevision: number; name?: string; description?: string; source?: SourceBundle }): Promise<LibraryComponent> {
+  update(input: { id: string; expectedRevision: number; name?: string; description?: string; source?: SourceBundle; dependencies?: readonly LibraryDependency[] }): Promise<LibraryComponent> {
     return this.exclusive(async () => {
       const id = componentIdSchema.parse(input.id);
       if (!Number.isSafeInteger(input.expectedRevision) || input.expectedRevision < 1) throw Error('Library revision conflict');
-      const snapshot = await this.locked(async () => {
-        const current = (await this.prepareLocked()).components.find(component => component.id === id);
+      const prepared = await this.locked(async () => {
+        const state = await this.prepareLocked(), current = state.components.find(component => component.id === id);
         if (!current) throw Error('Library component is missing');
         if (current.revision !== input.expectedRevision) throw Error(`Library revision conflict: expected ${input.expectedRevision}, current ${current.revision}`);
-        return structuredClone(current);
+        const snapshot = structuredClone(current);
+        const candidateSource = input.source === undefined ? snapshot.source : validateLibrarySource(input.source);
+        const dependencies = input.dependencies === undefined ? snapshot.dependencies : validateLibraryDependencies(input.dependencies);
+        const candidate = validateLibraryComponent({ id, revision: snapshot.revision + 1,
+          name: input.name === undefined ? snapshot.name : libraryText(input.name, 'Component name', 80),
+          description: input.description === undefined ? snapshot.description : libraryText(input.description, 'Component description', 512),
+          updatedAt: this.now(), source: candidateSource, ...(dependencies?.length ? { dependencies } : {}) });
+        const expanded = await resolveLibraryComponent(candidate, async (dependencyId, revision) => {
+          const reference = state.catalog.components.find(item => item.id === dependencyId);
+          if (!reference || revision === undefined || revision > reference.revision) throw Error('Library component is missing');
+          return readStoredComponent(this.root, { id: dependencyId, revision });
+        });
+        return { candidate, expanded };
       });
-      const candidateSource = input.source === undefined ? snapshot.source : validateLibrarySource(input.source);
-      await this.validateCandidate(candidateSource);
-      const candidate = validateLibraryComponent({ id, revision: snapshot.revision + 1,
-        name: input.name === undefined ? snapshot.name : libraryText(input.name, 'Component name', 80),
-        description: input.description === undefined ? snapshot.description : libraryText(input.description, 'Component description', 512),
-        updatedAt: this.now(), source: candidateSource });
+      await this.validateCandidate(prepared.expanded.source);
+      const candidate = prepared.candidate;
       return this.locked(async () => {
         const current = await this.prepareLocked(), index = current.components.findIndex(component => component.id === id);
         if (index < 0) throw Error('Library component is missing');

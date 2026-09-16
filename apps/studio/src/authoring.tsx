@@ -72,7 +72,7 @@ export function AuthoringApp() {
       return { sourceHash: runtime.revisionId, schema: state.controlSchema, schemaHash: state.controlSchemaHash, values: state.controls };
     },
     getControlAnimations:()=>client.getSnapshot().authoring?.controlAnimations??[],
-    readLibraryComponent:id=>window.luxLibrary.read(id),
+    readLibraryComponent:(id,revision)=>window.luxLibrary.read(id,revision),
     acceptedDocument: () => client.acceptedDocument(),
     saveLook: request => window.luxLooks.save(request),
     readLook: id => window.luxLooks.read(id),
@@ -111,7 +111,7 @@ export function AuthoringApp() {
       return write;
     }
     if(command.method==='library.list')return window.luxLibrary.list();
-    if(command.method==='library.read')return window.luxLibrary.read(command.params.id);
+    if(command.method==='library.read')return window.luxLibrary.read(command.params.id,command.params.revision);
     if(command.method==='library.create'||command.method==='library.update'){
       const result=await completeLibraryMutation(
         ()=>command.method==='library.create'?window.luxLibrary.create(command.params):window.luxLibrary.update(command.params),
