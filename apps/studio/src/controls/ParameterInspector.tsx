@@ -5,7 +5,7 @@ import {useEffect,useId,useRef,useState} from 'react';
 import {Button,Checkbox,ClickAwayListener,Divider,FormControlLabel,IconButton,MenuItem,Paper,Popper,Select,Slider,TextField,Tooltip} from '@mui/material';
 import {getRuntimeControlState} from '../service-client.ts';
 import type {RuntimeView,StudioClient,StudioController} from '../service-client.ts';
-import {compositionControlTarget,compositionOccurrence} from '../GraphPanel.tsx';
+import {compositionControlTarget,compositionOccurrence,visualControlNode} from '../visual-model.ts';
 export type ControlEdits={changed():void;track(write:Promise<unknown>):void};
 
 export function parameterOwner(runtime:RuntimeView|null,nodePath?:NodePath):string|null{return runtime?.authority==='studio'?JSON.stringify([runtime.instanceId,runtime.generation,runtime.revisionId,runtime.controlSchemaHash,nodePath??null]):null;}
@@ -50,12 +50,12 @@ function ParameterRow({definition,controlId,description,displayLabel,applied,eff
 
 export function ParameterInspector({runtime,available,client,controller,onError,edits,nodePath}:{runtime:RuntimeView|null;available:boolean;client:StudioClient;controller:StudioController;onError:(error:string|null)=>void;edits?:ControlEdits;nodePath?:NodePath}){
   const [openId,setOpenId]=useState<string|null>(null),[groupOpen,setGroupOpen]=useState<Record<string,boolean>>({}),selectionOwner=parameterOwner(runtime,nodePath);useEffect(()=>{setOpenId(null);setGroupOpen({});},[selectionOwner]);if(!runtime)return <p className="hint">Build a visual to see its controls.</p>;
-  const occurrence=nodePath?compositionOccurrence(runtime,nodePath):undefined,directNode=nodePath?runtime.nodeControls?.nodes.find(row=>samePath(row.nodePath,nodePath)):undefined;
+  const occurrence=nodePath?compositionOccurrence(runtime,nodePath):undefined;
   if(nodePath&&!occurrence){const issues=runtime.controlAnimationIssues?.filter(row=>samePath(row.nodePath,nodePath))??[];return <><p className="hint">This node is no longer available. Select another node.</p>{issues.map(row=><p key={`${row.controlId}:${row.index}`} role="alert">Animation for {row.controlId} is disabled. {row.message}</p>)}</>;}
   const publicState=getRuntimeControlState(runtime),schema=nodePath?(occurrence?.metadata.controls??[]):publicState.controlSchema,unselectedIssues=nodePath?[]:runtime.controlAnimationIssues??[];
   const counts=new Map<string,number>();for(const definition of schema)counts.set(definition.label,(counts.get(definition.label)??0)+1);const display=(d:NumberControlDefinition)=>counts.get(d.label)!>1?`${d.id} · ${d.label}`:d.label;
   const renderControl=(definition:NumberControlDefinition)=>{
-    const target=runtime.sdkVersion==='0.4.0'?(nodePath&&directNode?{nodePath,controlId:definition.id}:compositionControlTarget(runtime,nodePath??[],definition.id)):{nodePath:[],controlId:definition.id},targetNode=target?(runtime.sdkVersion!=='0.4.0'?{nodePath:[],definitionHash:publicState.controlSchemaHash as NonNullable<RuntimeView['nodeControls']>['nodes'][number]['definitionHash'],schemaHash:publicState.controlSchemaHash,schema:publicState.controlSchema,values:publicState.controls}:runtime.nodeControls?.nodes.find(row=>samePath(row.nodePath,target.nodePath))):undefined,effectiveNode=target?runtime.effectiveNodeControls?.nodes.find(row=>samePath(row.nodePath,target.nodePath)):undefined;
+    const target=compositionControlTarget(runtime,nodePath??[],definition.id),targetNode=target?visualControlNode(runtime,target.nodePath):undefined,effectiveNode=target?runtime.effectiveNodeControls?.nodes.find(row=>samePath(row.nodePath,target.nodePath)):undefined;
     if(nodePath&&(!target||!targetNode))return <p className="hint" key={definition.id}>This control is no longer available. Rebuild or select another node.</p>;
     const controlId=target?.controlId??definition.id,applied=targetNode?.values[controlId]??publicState.controls[definition.id]!,animation=runtime.controlAnimations?.find(row=>!!target&&samePath(row.nodePath,target.nodePath)&&row.controlId===controlId),issue=runtime.controlAnimationIssues?.find(row=>!!target&&samePath(row.nodePath,target.nodePath)&&row.controlId===controlId)?.message,owner=parameterOwner(runtime,target?.nodePath);
     const animationUnavailable=target?undefined:'Animation is unavailable because this control does not map to one component control.';

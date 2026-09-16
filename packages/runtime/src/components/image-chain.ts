@@ -1,14 +1,14 @@
-import type {ComponentDefinition,ComponentFrame,ComponentContext,ImageResource} from '../../../visual-sdk/src/sdk-composition.ts';
+import type {CodeComponentDefinition,ComponentFrame,ComponentContext,ImageResource} from '../../../visual-sdk/src/sdk-composition.ts';
 import type {GraphRuntimePlan} from '../graph/runtime-plan.ts';
 import {readGraphRuntimePlan} from '../graph/runtime-plan.ts';
 import type {BackendImage,CpuResourceBackend,FrameOutput,ResourceHost} from '../graph/resources.ts';
 import {createResourceHost,attachResourceHost,beginResourceFrame,openResourceNode,completeResourceNode,failResourceNode,releaseResourceCache,finishResourceFrame,disposeResourceHost,readResourceInputImage,readResourceOutputImage} from '../graph/resources.ts';
 import {SeededRandom} from '../seed.ts';
 type Backend=Readonly<{resources:CpuResourceBackend;stage(scene:unknown,camera:unknown):void;texture(image:BackendImage):unknown;present(image:BackendImage):void|Promise<void>;drain():Promise<void>}>;
-type Options=Readonly<{plan:GraphRuntimePlan;definitions:Readonly<Record<string,ComponentDefinition>>;context:ComponentContext;backend:Backend;nodeControls?:(nodePath:readonly string[],frame:ComponentFrame)=>Readonly<Record<string,number>>}>;
+type Options=Readonly<{plan:GraphRuntimePlan;definitions:Readonly<Record<string,CodeComponentDefinition>>;context:ComponentContext;backend:Backend;nodeControls?:(nodePath:readonly string[],frame:ComponentFrame)=>Readonly<Record<string,number>>}>;
 const pathKey=(path:readonly string[])=>JSON.stringify(path);
 export async function createImageCompositionVisual(options:Options){
- const dto=readGraphRuntimePlan(options.plan),instances=new Map<string,Awaited<ReturnType<ComponentDefinition['create']>>>(),randoms=new Map<string,SeededRandom>();
+ const dto=readGraphRuntimePlan(options.plan),instances=new Map<string,Awaited<ReturnType<CodeComponentDefinition['create']>>>(),randoms=new Map<string,SeededRandom>();
  try{for(const node of dto.nodes){const definition=options.definitions[node.definitionHash];if(!definition||definition.kind!=='component'||definition.sdkVersion!=='0.4.0')throw Error('Missing admitted component factory');const key=pathKey(node.nodePath),random=new SeededRandom(options.context.settings.seed);randoms.set(key,random);instances.set(key,await definition.create(Object.freeze({...options.context,random:()=>random.next()})));}}
  catch(error){for(const instance of [...instances.values()].reverse())try{await instance.dispose();}catch{}throw error;}
  let frame:ComponentFrame|undefined,current:FrameOutput|undefined,disposed=false,disposal:Promise<void>|undefined;
