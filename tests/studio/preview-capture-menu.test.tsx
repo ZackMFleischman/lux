@@ -63,8 +63,16 @@ test('Preview header actions use the shared recorder state and expose concise la
 
   rerender(<PreviewCaptureActions available status={{ phase: 'recording', width: 1920, height: 1080, mimeType: 'video/webm', path: 'C:/clip.webm' }}
     onSaveFrame={async () => { calls.push('frame'); }} onStart={async () => { calls.push('start'); }} onStop={async () => { calls.push('stop'); }} />);
-  assert.ok(screen.getByRole('status').textContent?.includes('Recording 1920 × 1080'));
+  assert.ok(screen.getByLabelText('Preview capture actions').textContent?.includes('Recording 1920 × 1080'));
   assert.equal((screen.getByRole('button', { name: 'Save frame PNG' }) as HTMLButtonElement).disabled, true);
   await user.click(screen.getByRole('button', { name: 'Stop recording' }));
   assert.deepEqual(calls, ['frame', 'start', 'stop']);
+});
+
+test('Preview header keeps recording text local while the menu provides one live announcement', () => {
+  render(<StudioMenuProvider><header><PreviewCaptureMenu available status={{ phase: 'recording', width: 1920, height: 1080, mimeType: 'video/webm', path: 'C:/clip.webm' }}
+    onSaveFrame={async () => {}} onStart={async () => {}} onStop={async () => {}} /></header><PreviewCaptureActions available status={{ phase: 'recording', width: 1920, height: 1080, mimeType: 'video/webm', path: 'C:/clip.webm' }}
+    onSaveFrame={async () => {}} onStart={async () => {}} onStop={async () => {}} /></StudioMenuProvider>);
+  assert.equal(screen.getAllByRole('status').length, 1);
+  assert.ok(screen.getByLabelText('Preview capture actions').textContent?.includes('Recording 1920 × 1080'));
 });

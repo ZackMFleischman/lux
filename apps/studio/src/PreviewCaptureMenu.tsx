@@ -24,7 +24,7 @@ export function PreviewCaptureActions({ available, status, onSaveFrame, onStart,
       {active ? <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1" fill="currentColor" /></svg>
         : <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="7" fill="currentColor" /></svg>}
     </IconButton></span></Tooltip>
-    {active && <span className="preview-recording-status" role="status"><i aria-hidden="true" />{statusText(status)}</span>}
+    {active && <span className="preview-recording-status"><i aria-hidden="true" />{statusText(status)}</span>}
   </div>;
 }
 
