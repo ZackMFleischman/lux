@@ -21,43 +21,7 @@ fn livingPainting(st: vec2f, view: vec4f, form: vec4f, hatch: vec4f, pigment: ve
   let seed = vec2f(view.z * 3.17, view.z * 7.31);
 `;
 
-const paintingAfterRegions = `
-  // Broad translucent washes cross region boundaries; local tints add identity.
-  // Pigment has its own gentle movement, so a changing boundary cannot drag
-  // the wash into ribbons. The color phrase answers the shape phrase later.
-  let colorPhrase = lpPhrase(p, t - 7.0);
-  let cloud = lpFbm(p * 1.31 + seed * 0.1 + vec2f(t * 0.008, -t * 0.006));
-  let broad = lpFbm(p * 0.46 + vec2f(3.7 + t * 0.006, 8.2 - t * 0.007));
-  let wash = clamp(broad * 0.4 + cloud * 0.6 + pigment.x * 0.2, 0.0, 1.0);
-  let palettePhase = 0.5 + 0.5 * sin(t * 0.065 + broad * 2.0);
-  let deepPigment = mix(vec3f(0.075, 0.17, 0.31), vec3f(0.065, 0.25, 0.25), palettePhase);
-  let lightPigment = mix(vec3f(0.29, 0.49, 0.68), vec3f(0.30, 0.61, 0.54), palettePhase);
-  var color = mix(deepPigment, lightPigment, smoothstep(0.27, 0.66, wash));
-  let green = smoothstep(0.50, 0.79, lpNoise(p * 0.62 + vec2f(8.0, 2.0) + t * 0.014));
-  color = mix(color, vec3f(0.31, 0.49, 0.31), green * 0.83);
-  let lightCenter = vec2f(sin(t * 0.043 - 0.65) * form.x * view.y * 0.32,
-    cos(t * 0.057 + 0.6) * form.x * 0.26);
-  let secondCenter = vec2f(cos(t * 0.037 + 0.6) * form.x * view.y * 0.34,
-    sin(t * 0.051 - 0.6) * form.x * 0.29);
-  let paleCenter = vec2f(sin(t * 0.029 + 0.1) * form.x * 0.30,
-    cos(t * 0.041 + 1.4) * form.x * 0.23);
-  let lightPool = exp(-dot(p - lightCenter, p - lightCenter) * (0.72 + colorPhrase * 0.30));
-  let secondLight = exp(-dot(p - secondCenter, p - secondCenter) * 0.90);
-  let palePool = exp(-dot(p - paleCenter, p - paleCenter) * 0.62);
-  color = mix(color, vec3f(0.67, 0.74, 0.73), palePool * 0.68);
-  let warmPigment = mix(vec3f(0.90, 0.79, 0.43), vec3f(0.82, 0.63, 0.49), 0.5 + 0.5 * sin(t * 0.033));
-  color = mix(color, warmPigment, clamp((lightPool * 0.85 + secondLight * 0.62) * pigment.y
-    * (1.0 + music.y * 0.13 * (colorPhrase - 0.5)), 0.0, 0.93));
-  let regionTone = lpHash(owner + seed + 61.0);
-  color *= 1.0 + (regionTone - 0.5) * pigment.z * 0.50;
-  color = mix(color, vec3f(0.12, 0.145, 0.30), smoothstep(0.76, 0.98, regionTone) * min(0.82, pigment.z * 0.64));
-  color += (cloud - 0.5) * 0.23;
-  let wet = lpFbm(p * 3.8 + seed * 0.13);
-  let bloomRim = exp(-abs(wet - 0.51) * 82.0);
-  color += character.z * ((wet - 0.5) * 0.18 - bloomRim * 0.023);
-  let pooling = exp(-edge * 23.0) * (0.35 + 0.65 * lpNoise(q * 3.0 + seed));
-  color *= 1.0 - pooling * pigment.w * 0.18;
-
+const paintingAfterWatercolor = `
   let baseWash = color;
   var underpainting = color;
   let cream = mix(vec3f(0.89, 0.86, 0.70), vec3f(0.94, 0.79, 0.75), ink.z);
@@ -210,6 +174,9 @@ const regionValueKeys = ['growth', 'motion', 'scale', 'seed', 'warp'] as const;
 const hatchingAbi = 'lux/region-hatching/v1';
 const hatchingFragmentKeys = ['lpRegionMarks'] as const;
 const hatchingValueKeys = ['angle', 'angleVar', 'coverage', 'curvature', 'curvatureVar', 'hatchWidth', 'relation', 'spacing', 'spacingVar', 'widthVar'] as const;
+const watercolorAbi = 'lux/watercolor/v1';
+const watercolorFragmentKeys = ['wash'] as const;
+const watercolorValueKeys = ['blooms', 'contrast', 'palette', 'pooling', 'warmth'] as const;
 
 function hasExactKeys(record: Readonly<Record<string, unknown>>, expected: readonly string[]): boolean {
   const keys = Object.keys(record).sort();
@@ -225,6 +192,7 @@ export default defineComponent({
       paths: { type: { kind: 'paths2d', version: 1, coordinateSpace: 'canvas-height' }, label: 'Paths', description: 'Shared tracer geometry used to carve the regions.' },
       regions: { type: { kind: 'shader-field', version: 1, abi: 'lux/organic-regions/v1' }, label: 'Regions', description: 'Organic region geometry and motion shader field.' },
       hatching: { type: { kind: 'shader-field', version: 1, abi: 'lux/region-hatching/v1' }, label: 'Hatching', description: 'Per-region line families, crosshatching, contours, and drawing coverage.' },
+      watercolor: { type: { kind: 'shader-field', version: 1, abi: 'lux/watercolor/v1' }, label: 'Watercolor', description: 'Animated washes, warm pools, blooms, and pigment pooling.' },
     },
     outputs: { image: { type: { kind: 'image', colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }, label: 'Image', description: 'The painting before tracer ink is composited.' } },
   controls: {
@@ -234,12 +202,6 @@ export default defineComponent({
     composition: { type: 'number', group: 'Composition', label: 'Quiet to intricate', default: 0.44, min: 0, max: 1.5, step: 0.01 },
     tension: { type: 'number', group: 'Composition', label: 'Tension', default: 0.72, min: 0, max: 1.5, step: 0.01, description: 'Strength of local pressure, contrasting line directions, and rhythmic compression.' },
     hierarchy: { type: 'number', group: 'Composition', label: 'Large and small rhythm', default: 0.99, min: 0, max: 1.5, step: 0.01, description: 'Large anchor regions alternate with smaller supporting regions.' },
-
-    palette: { type: 'number', group: 'Color & watercolor', label: 'Wash lightness', default: 0.07, min: -1, max: 1, step: 0.01 },
-    warmth: { type: 'number', group: 'Color & watercolor', label: 'Warm pools', default: 1.3, min: 0, max: 2, step: 0.01 },
-    contrast: { type: 'number', group: 'Color & watercolor', label: 'Region contrast', default: 1.05, min: 0, max: 2, step: 0.01 },
-    pooling: { type: 'number', group: 'Color & watercolor', label: 'Pigment pooling', default: 0.74, min: 0, max: 2, step: 0.01 },
-    blooms: { type: 'number', group: 'Color & watercolor', label: 'Watercolor blooms', default: 0.94, min: 0, max: 2, step: 0.01 },
 
     outline: { type: 'number', group: 'Ink & paper', label: 'Boundary width', default: 0.005, min: 0.002, max: 0.03, step: 0.001 },
     inkWarmth: { type: 'number', group: 'Ink & paper', label: 'Warmth', default: 0.15, min: 0, max: 1, step: 0.01 },
@@ -253,11 +215,6 @@ export default defineComponent({
       composition: 'composition setting for the painting.',
       tension: 'tension setting for the painting.',
       hierarchy: 'hierarchy setting for the painting.',
-      palette: 'palette setting for the painting.',
-      warmth: 'warmth setting for the painting.',
-      contrast: 'contrast setting for the painting.',
-      pooling: 'pooling setting for the painting.',
-      blooms: 'blooms setting for the painting.',
       outline: 'outline setting for the painting.',
       inkWarmth: 'inkWarmth setting for the painting.',
       handDrawn: 'handDrawn setting for the painting.',
@@ -307,7 +264,11 @@ export default defineComponent({
     let scene: Scene | undefined;
     let assembledShaderSource: string | undefined;
 
-    function preparePainting(regions: ShaderFieldResource, hatching: ShaderFieldResource): Scene {
+    function preparePainting(
+      regions: ShaderFieldResource,
+      hatching: ShaderFieldResource,
+      watercolor: ShaderFieldResource,
+    ): Scene {
       const regionData = regions.data;
       if (regionData.version !== 1 || regionData.abi !== regionAbi) {
         throw Error(`Living Painting requires shader field ${regionAbi}.`);
@@ -328,10 +289,21 @@ export default defineComponent({
       if (!hasExactKeys(hatchingData.values, hatchingValueKeys)) {
         throw Error(`Living Painting ${hatchingAbi} requires exactly its nine control values and widthVar.`);
       }
+      const watercolorData = watercolor.data;
+      if (watercolorData.version !== 1 || watercolorData.abi !== watercolorAbi) {
+        throw Error(`Living Painting requires shader field ${watercolorAbi}.`);
+      }
+      if (!hasExactKeys(watercolorData.fragments, watercolorFragmentKeys)) {
+        throw Error(`Living Painting ${watercolorAbi} requires exactly the wash fragment.`);
+      }
+      if (!hasExactKeys(watercolorData.values, watercolorValueKeys)) {
+        throw Error(`Living Painting ${watercolorAbi} requires exactly the blooms, contrast, palette, pooling, and warmth values.`);
+      }
 
       const source = paintingBeforeRegions
         + regionData.fragments.regionGeometry
-        + paintingAfterRegions
+        + watercolorData.fragments.wash
+        + paintingAfterWatercolor
         + hatchingData.fragments.lpRegionMarks
         + paintingAfterHatching
         + regionData.fragments.lpRegion
@@ -376,6 +348,11 @@ export default defineComponent({
       curvatureVar.value = hatchingData.values.curvatureVar;
       angleVar.value = hatchingData.values.angleVar;
       widthVar.value = hatchingData.values.widthVar;
+      palette.value = watercolorData.values.palette;
+      warmth.value = watercolorData.values.warmth;
+      contrast.value = watercolorData.values.contrast;
+      pooling.value = watercolorData.values.pooling;
+      blooms.value = watercolorData.values.blooms;
       return scene!;
     }
     let artisticTime = 0;
@@ -386,16 +363,11 @@ export default defineComponent({
         artisticTime += Math.max(0, frame.timeSeconds - previousTime) * c.pace;
         previousTime = frame.timeSeconds;
         time.value = artisticTime;
-        palette.value = c.palette;
-        warmth.value = c.warmth;
-        contrast.value = c.contrast;
-        pooling.value = c.pooling;
         outline.value = c.outline;
         inkWarmth.value = c.inkWarmth;
         grain.value = c.grain;
         composition.value = c.composition;
         handDrawn.value = c.handDrawn;
-        blooms.value = c.blooms;
         tension.value = c.tension;
         phrasing.value = c.phrasing;
         hierarchy.value = c.hierarchy;
@@ -404,6 +376,7 @@ export default defineComponent({
         const scene = preparePainting(
           inputs.regions as ShaderFieldResource,
           inputs.hatching as ShaderFieldResource,
+          inputs.watercolor as ShaderFieldResource,
         );
         const paths = (inputs.paths as Paths2DResource).data.paths;
         if (paths.length > 4 || paths.some(path => path.points.length > 64)) {

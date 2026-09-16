@@ -54,3 +54,9 @@ This is shader composition, so no region image is quantized or rendered in an ex
 `hatching.ts` owns the unchanged `lpRegionMarks` function. ABI `lux/region-hatching/v1` supplies fragment `lpRegionMarks`, the nine original hatch control values, and the fixed `widthVar: 0.81` character value. The consumer retains the original vector packing shown in `painting.ts`.
 
 The function uses the consumer's region owner, center, local coordinates, edge distance, seed, time, paint color, ink and composition vectors, and hash/noise/phrase helpers. It returns the color with the selected region's line family applied. Coverage determines where marks are absent; regional identity determines angle, spacing, width, curve family and occasional perpendicular crosshatching. This field can be reused by another compatible shader consumer with its own region data; it does not create regions itself.
+
+## Animated Watercolor shader field
+
+`watercolor.ts` supplies the `wash` fragment through ABI `lux/watercolor/v1`. It owns Wash lightness, Warm pools, Region contrast, Pigment pooling and Watercolor blooms. The consumer inserts the original wash code after region geometry, using the same seed, time, position, region owner/edge, noise/phrase basis and vector packing.
+
+The field supplies the broad changing paint color. The Living Painting/styles consumer retains tracer-created daughter colors and their gradual transitions; the independent Tracer Renderer retains the visible ribbon and pigment bleed. Those connections let the shared paths affect the finished painting without duplicating the path simulation or changing the original mixing order.
