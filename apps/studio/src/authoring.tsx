@@ -173,22 +173,19 @@ export function AuthoringApp() {
     // Do not overwrite a draft edited while the initial example was loading.
     if (workspace.getSnapshot().version !== 0 || session.getSnapshot().busy) return;
     workspace.replaceDocument(source);
-    let smoke=false;
+    const smoke=await window.luxAuthoring.smokeEnabled?.()===true;
     try {
       await session.build(source, workspace.getSnapshot().version);
       clearDiagnostics();
-      smoke=await window.luxAuthoring.smokeEnabled?.()===true;
       if(smoke){
         const initial = client.getSnapshot().authoring!;
-        const control = getRuntimeControlState(initial).controlSchema[0];
-        if (!control) throw Error('Fresh visual has no declared control to verify');
         await client.invoke({ name: 'lux.parameters.set', input: { requestId: crypto.randomUUID(), instanceId: initial.instanceId,
           expectedGeneration: initial.generation, expectedRevisionId: initial.revisionId, expectedControlSchemaHash: initial.controlSchemaHash,
-          values: { [control.id]: control.default }, mode: 'live' } });
+          values: { spikeHeight: 1.1 }, mode: 'live' } });
         await client.invoke({ name: 'lux.playback', input: { requestId: crypto.randomUUID(), instanceId: initial.instanceId, expectedGeneration: initial.generation, action: 'pause' } });
         await client.invoke({ name: 'lux.playback', input: { requestId: crypto.randomUUID(), instanceId: initial.instanceId, expectedGeneration: initial.generation, action: 'reset' } });
         const applied = client.getSnapshot().authoring!;
-        if (applied.playback !== 'paused' || applied.clockEpoch !== 1) throw Error('Applied control/playback/reset mismatch');
+        if (getRuntimeControlState(applied).controls.spikeHeight !== 1.1 || applied.playback !== 'paused' || applied.clockEpoch !== 1) throw Error('Applied control/playback/reset mismatch');
         let invalidRejected = false;
         try { await client.submit({ ...source, files: { [source.entry]: 'this is not valid TypeScript !!' } }); } catch { invalidRejected = true; }
         if (!invalidRejected || client.getSnapshot().authoring?.revisionId !== initial.revisionId) throw Error('Failed source changed active visual');

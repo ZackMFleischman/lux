@@ -9,4 +9,7 @@ test('fresh Studio startup loads the checked-in noise sphere source', async () =
   assert.match(main, /skills\/lux-visual-creation\/assets\/noise-sphere\.ts/);
   assert.doesNotMatch(main, /packages\/visual-sdk\/examples\/intensity\.ts/);
   assert.doesNotMatch(authoring, /smokeSave\(createSceneDocument\(source, DEFAULT_OUTPUT, \{ intensity:/);
+  assert.match(authoring, /values: \{ spikeHeight: 1\.1 \}/);
+  assert.match(authoring, /getRuntimeControlState\(applied\)\.controls\.spikeHeight !== 1\.1/);
+  assert.match(authoring, /const smoke=await window\.luxAuthoring\.smokeEnabled\?\.\(\)===true;[\s\S]{0,240}await session\.build/);
 });
