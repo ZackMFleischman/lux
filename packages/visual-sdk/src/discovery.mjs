@@ -9,6 +9,7 @@ export async function discoverVisualSdk() {
     sharedContractSource: await readFile(new URL('../../runtime-contracts/src/index.ts', import.meta.url), 'utf8'),
     example: await readFile(new URL('../examples/parameters.ts', import.meta.url), 'utf8'),
     composition: { sdkVersion: '0.4.0', executionModel: 'image-chain-v1',
+      authoring: {component:'defineComponent',visual:'defineVisual',compatibility:'defineComposition',externalImageInput:false},
       contractSource: await readFile(new URL('./sdk-composition.ts', import.meta.url), 'utf8'),
       profileContractSource: await readFile(new URL('../../runtime-contracts/src/composition-profile.d.mts', import.meta.url), 'utf8') },
     legacy: { sdkVersion: '0.1.0', contractSource: await readFile(new URL('./index.ts', import.meta.url), 'utf8'),

@@ -51,7 +51,7 @@ try {
   await page.getByRole('button', { name: 'Pause', exact: true }).waitFor({ timeout: 60000 });
   await graph();
   const rootNode = page.locator('.graph-scene-root');
-  await rootNode.waitFor(); assert.equal(await page.locator('.graph-node').count(), 1);
+  await rootNode.waitFor(); assert.equal(await page.locator('.graph-node').count(), 2);
   await rootNode.click(); assert.equal(await rootNode.getAttribute('aria-pressed'), 'true');
   assert.equal(await page.getByRole('button', { name: 'View inside', exact: true }).count(), 0);
   await rootNode.focus(); await page.keyboard.press('Enter');
@@ -61,7 +61,7 @@ try {
   const narrow = await page.getByRole('navigation', { name: 'Component breadcrumb' }).evaluate(node => ({ width: node.clientWidth, scroll: node.scrollWidth }));
   assert.ok(narrow.scroll <= narrow.width + 1, 'Scene breadcrumb fits the narrow Graph panel');
   await capture('plain-scene-narrow');
-  report.checks.push('Plain defineVisual shows one selectable Scene root, opens Scene controls, has no drill-in action, and keeps its breadcrumb within an 820px window');
+  report.checks.push('Plain defineVisual shows Scene and its direct Visual component, opens Scene controls, has no drill-in action, and keeps its breadcrumb within an 820px window');
   }
 
   if (runComposition) {

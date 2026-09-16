@@ -85,6 +85,47 @@ test('RTL: code-defined controls expose independent values, numeric entry and de
   assert.deepEqual((fixture.calls[1] as any).input.values, { spikeHeight: 1 });
 });
 
+test('RTL: direct component selection edits flat controls and keeps empty-path animation identity', async () => {
+  const {useState}=await import('react');
+  const {GraphPanel,nodeKey}=await import('../../apps/studio/src/GraphPanel.tsx');
+  const {InspectorBreadcrumb}=await import('../../apps/studio/src/InspectorBreadcrumb.tsx');
+  const {ParameterInspector}=await import('../../apps/studio/src/controls/ParameterInspector.tsx');
+  const {StudioController}=await import('../../apps/studio/src/service-client.ts');
+  const fixture=service(),runtime=fixture.client.getSnapshot().authoring!,controller=new StudioController(fixture.client);
+  const initial=JSON.stringify(runtime),priorAnimationFrame=globalThis.requestAnimationFrame;
+  globalThis.requestAnimationFrame=callback=>{callback(0);return 0;};
+  try {
+    function Fixture(){const [path,setPath]=useState<import('../../packages/runtime-contracts/src/graph.ts').NodePath|null>(null);return <>
+      <GraphPanel runtime={runtime} selected={path?nodeKey(path):null} onSelect={setPath}/>
+      <InspectorBreadcrumb runtime={runtime} path={path??undefined} onSelect={setPath}/>
+      <ParameterInspector runtime={runtime} available client={fixture.client} controller={controller} onError={()=>{}} nodePath={path??undefined}/>
+    </>;}
+    render(<Fixture/>);
+    const visual=screen.getByRole('button',{name:/^Visual Source Image Final output/});
+    fireEvent.click(visual);
+    assert.equal(visual.getAttribute('aria-pressed'),'true');
+    assert.ok(screen.getByRole('button',{name:'Controls for Visual'}));
+    assert.equal(screen.queryByRole('button',{name:'View inside'}),null);
+    fireEvent.change(screen.getByRole('spinbutton',{name:'Intensity value'}),{target:{value:'.7'}});
+    fireEvent.keyDown(screen.getByRole('spinbutton',{name:'Intensity value'}),{key:'Enter'});
+    await waitFor(()=>assert.equal(fixture.calls[0]?.name,'lux.parameters.set'));
+    assert.equal('nodePath' in fixture.calls[0]!.input,false);
+    fireEvent.click(screen.getByRole('button',{name:'Animate Intensity'}));
+    fireEvent.click(screen.getByRole('button',{name:'Add LFO'}));
+    await waitFor(()=>assert.equal(fixture.calls[1]?.name,'lux.node.animation.set'));
+    const animation=fixture.calls[1];
+    if(animation?.name==='lux.node.animation.set'){
+      assert.deepEqual(animation.input.nodePath,[]);
+      assert.equal(animation.input.animation?.definitionHash,animation.input.animation?.schemaHash);
+    }
+    assert.equal(JSON.stringify(runtime),initial);
+    assert.equal(runtime.nodeControls,undefined);
+    assert.equal(runtime.composition,undefined);
+    fireEvent.click(screen.getAllByRole('button',{name:'Scene controls'})[0]!);
+    assert.equal(visual.getAttribute('aria-pressed'),'false');
+  } finally {globalThis.requestAnimationFrame=priorAnimationFrame;}
+});
+
 test('RTL: control descriptions appear on hover and keyboard focus without creating empty help', async () => {
   const fixture = service();
   fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [
