@@ -20,20 +20,39 @@ fn livingOrnament(st: vec2f, view: vec4f, shape: vec4f, detail: vec4f,
   var wash = loWash(region, p, view.x, pigment, material);
   let id = i32(region.identity + 0.5);
   if (id == 110) { wash = mix(wash, vec3f(0.56, 0.78, 0.84), 0.78); }
+  // Each owner keeps its identity while shapes, marks and pigment phrase at
+  // different delays. Density stays fixed so integer motif counts never pop.
+  let phraseOwner = select(region.identity, region.parent, region.parent > 0.0);
+  let phrasePosition = vec2f(phraseOwner * 0.17, 0.0);
+  let pressure = loPhrase(phrasePosition, view.x - 3.0);
+  let release = loPhrase(phrasePosition, view.x - 8.0);
+  let expression = material.w * view.w;
+  let anchor = select(1.0, 0.28, id == 102 || id == 104 || id == 108);
+  var motifRegion = region;
+  motifRegion.local += region.tangent * sin(view.x * 0.085 + region.identity * 1.71)
+    * patternStyle.z * 0.20 * anchor;
+  let expressive = pattern * vec4f(1.0, 1.0 + (pressure - 0.5) * expression * 0.20,
+    1.0, 0.35 + pressure * material.w * 1.25);
   var marks = 0.0;
   switch id {
-    case 101, 105, 109, 113: { marks = loSpirals(region, p, view.x, pattern * spirals); }
-    case 103, 112, 114: { marks = loRings(region, p, view.x, pattern * rings); }
-    case 102, 104, 107, 108: { marks = loMembranes(region, p, view.x, pattern * membranes); }
-    case 115: { marks = loContours(region, p, view.x, pattern * contours); }
-    case 110, 111: { marks = loRibbonMarks(region, p, view.x, pattern * ribbons); }
-    default: { marks = loHatchMarks(region, p, view.x, pattern * hatching); }
+    case 101, 105, 109, 113: { marks = loSpirals(motifRegion, p, view.x, expressive * spirals); }
+    case 103, 112, 114: { marks = loRings(motifRegion, p, view.x, expressive * rings); }
+    case 102, 104, 107, 108: { marks = loMembranes(motifRegion, p, view.x, expressive * membranes); }
+    case 115: { marks = loContours(motifRegion, p, view.x, expressive * contours); }
+    case 110, 111: { marks = loRibbonMarks(motifRegion, p, view.x, expressive * ribbons); }
+    default: { marks = loHatchMarks(motifRegion, p, view.x, expressive * hatching); }
   }
+  let ribbon = id == 110 || id == 111;
+  let reach = select(length(region.local), region.local.x + 1.8, ribbon);
+  let front = select(0.18 + release * 0.72, 0.65 + release * 3.2, ribbon);
+  let drawn = 1.0 - smoothstep(front, front + 0.20, reach);
+  marks *= mix(1.0, 0.22 + drawn * 0.78, patternStyle.w * material.w * anchor);
   var rest = select(1.0, 1.0 - patternStyle.y, id == 115);
   if (id == 101) {
     let clusteredGround = 1.0 - smoothstep(-0.45, 0.2, p.x + p.y * 0.35);
     rest = mix(1.0, clusteredGround, min(patternStyle.y * 1.2, 1.0));
   }
+  rest *= select(1.0, mix(0.60, 1.0, clamp(material.z, 0.0, 1.0)), id == 102 || id == 115);
   let inset = smoothstep(ink.x * 1.7, ink.x * 3.2, region.edge);
   let light = dot(wash, vec3f(0.2126, 0.7152, 0.0722));
   var motifInk = select(vec3f(0.006, 0.004, 0.009), vec3f(0.86, 0.75, 0.60), light < 0.16);
@@ -112,6 +131,8 @@ export default defineComponent({
       patternStrength: { type: 'number', group: 'Patterns', label: 'Ink strength', default: 1, min: 0, max: 1, step: 0.01 },
       patternRest: { type: 'number', group: 'Patterns', label: 'Quiet areas', default: 0.9, min: 0, max: 1, step: 0.01 },
       patternMotion: { type: 'number', group: 'Pattern Motion', label: 'Flow', default: 0.2, min: 0, max: 1, step: 0.01 },
+      patternTravel: { type: 'number', group: 'Pattern Motion', label: 'Attached to flowing', default: 0.24, min: 0, max: 1, step: 0.01 },
+      patternGrowth: { type: 'number', group: 'Pattern Motion', label: 'Drawing and release', default: 0.48, min: 0, max: 1, step: 0.01 },
     },
     controlDescriptions: {
       patternDensity: 'Sets the scale and spacing of region motifs.',
@@ -120,6 +141,8 @@ export default defineComponent({
       patternStrength: 'Blends motif ink into the watercolor.',
       patternRest: 'Keeps selected regions quiet between dense patterns.',
       patternMotion: 'Adds slow movement within attached patterns.',
+      patternTravel: 'Zero keeps motifs attached; higher values add deliberate slow flow inside their region.',
+      patternGrowth: 'Reveals and releases marks through staggered local phrases, with longitudinal growth along ribbons.',
     },
     lifecycle: { state: 'stateful', reset: 'seed' },
   },
@@ -145,7 +168,7 @@ export default defineComponent({
     return {
       update(frame) {
         pattern.value.set(frame.controls.patternDensity, frame.controls.patternWidth, frame.controls.patternVariation, frame.controls.patternMotion);
-        patternStyle.value.set(frame.controls.patternStrength, frame.controls.patternRest, 0, 0);
+        patternStyle.value.set(frame.controls.patternStrength, frame.controls.patternRest, frame.controls.patternTravel, frame.controls.patternGrowth);
       },
       async evaluate(inputs, evaluation) {
         const regions = fieldData(inputs.regions, 'lux/ornament-regions/v1', regionValues);
@@ -173,11 +196,12 @@ export default defineComponent({
 
         // The four producers remain the sole owners of their live controls.
         // Reuse the uniform nodes and material as their scalar snapshots change.
-        view.value.set(phrasing.values.time!, aspect, regions.values.seed!, 0);
+        view.value.set(phrasing.values.time!, aspect, regions.values.seed!, phrasing.values.tension!);
         shape.value.set(regions.values.size!, regions.values.complexity!, regions.values.concavity!, regions.values.corridorWidth!);
-        detail.value.set(regions.values.nesting!, regions.values.motion!, regions.values.growth!, phrasing.values.hierarchy!);
+        const pressureAmount = 0.35 + phrasing.values.tension! * 0.90;
+        detail.value.set(regions.values.nesting!, regions.values.motion! * pressureAmount, regions.values.growth! * pressureAmount, phrasing.values.hierarchy!);
         pigment.value.set(watercolor.values.palette!, watercolor.values.warmth!, watercolor.values.contrast!, watercolor.values.pooling!);
-        materialSettings.value.set(watercolor.values.blooms!, watercolor.values.saturation!, phrasing.values.composition!, 0);
+        materialSettings.value.set(watercolor.values.blooms!, watercolor.values.saturation!, phrasing.values.composition!, phrasing.values.phrasing!);
         ink.value.set(boundary.values.width!, boundary.values.accent!, boundary.values.handDrawn!, boundary.values.grain!);
         return { image: await evaluation.render(scene!, camera) };
       },

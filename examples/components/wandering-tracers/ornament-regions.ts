@@ -86,7 +86,7 @@ fn loRegionCenter(index: i32, t: f32, seed: f32, motion: f32) -> vec2f {
   let jitter = (loHash2(id) - 0.5) * vec2f(0.34, 0.24);
   let phase = loHash(id + 29.0) * 6.283185;
   let drift = vec2f(sin(t * 0.071 + phase), cos(t * 0.057 + phase * 1.23));
-  return center + jitter + drift * motion * 0.028;
+  return center + jitter + drift * motion * 0.34;
 }
 
 fn loRegionAngle(index: i32, seed: f32) -> f32 {
@@ -106,6 +106,25 @@ fn loRegionAngle(index: i32, seed: f32) -> f32 {
   return base + (loHash(vec2f(f32(anchor) * 3.1, seed + 41.0)) - 0.5) * 0.42;
 }
 
+// This frame follows each shape's stable anchor. Islands inherit their parent
+// anchor phase, so their paint and line work stretch with the owning form.
+fn loAttachedLocal(index: i32, p: vec2f, t: f32, seed: f32, motion: f32) -> vec2f {
+  let center = loRegionCenter(index, t, seed, motion);
+  let angle = loRegionAngle(index, seed);
+  let local = loRotate(p - center, angle);
+  if (index == 9 || index == 10) { return local; }
+  let anchor = loAnchorIndex(index);
+  let anchorSeed = vec2f(f32(anchor) * 5.17, seed * 0.137 + 23.0);
+  let phrase = loPhrase(vec2f((101.0 + f32(anchor)) * 0.17, 0.0), t);
+  let phase = loHash(anchorSeed + 47.0) * 6.283185;
+  let tension = (phrase - 0.42) * motion * 0.11;
+  let bend = sin(local.y * 4.1 + phase) * motion * (0.006 + phrase * 0.012);
+  return vec2f(
+    local.x * (1.0 + tension) + bend * local.y,
+    local.y * (1.0 - tension * 0.72) + bend * local.x * 0.35,
+  );
+}
+
 fn loShapeSdf(index: i32, p: vec2f, t: f32, seed: f32, shape: vec4f,
   detail: vec4f, sharedNoise: f32) -> f32 {
   let size = shape.x;
@@ -122,9 +141,8 @@ fn loShapeSdf(index: i32, p: vec2f, t: f32, seed: f32, shape: vec4f,
   let broadSize = size * clamp(1.0 + hierarchyDelta * 0.22, 0.78, 1.12);
   let mediumSize = size * clamp(1.0 - hierarchyDelta * 0.16, 0.92, 1.16);
   let smallScale = clamp(1.0 + hierarchyDelta * 0.28, 0.72, 1.15);
-  let center = loRegionCenter(index, t, seed, motion);
   let angle = loRegionAngle(index, seed);
-  let q = loRotate(p - center, angle);
+  let q = loAttachedLocal(index, p, t, seed, motion);
   let identity = loHash(vec2f(f32(index) * 11.0, seed + 73.0));
   let phase = identity * 6.283185;
   let breathe = growth * sin(t * (0.031 + identity * 0.018) + phase) * 0.045;
@@ -284,7 +302,7 @@ fn loRegion(p: vec2f, t: f32, seed: f32, shape: vec4f, detail: vec4f) -> LoRegio
   let center = loRegionCenter(owner, t, seed, detail.y);
   let angle = loRegionAngle(owner, seed);
   // Tangents are expressed in the same attached frame as local coordinates.
-  var attachedLocal = loRotate(p - center, angle);
+  var attachedLocal = loAttachedLocal(owner, p, t, seed, detail.y);
   var tangent = vec2f(1.0, 0.0);
   if (owner == 9) {
     let bandAngle = -0.06;
