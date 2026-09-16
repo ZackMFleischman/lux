@@ -120,38 +120,6 @@ fn lpTracerSplit(p: vec2f, q: vec2f, center: vec2f, owner: vec2f,
   return vec4f(blend, childOwner, side);
 }
 
-// A slow rise, a short crest, then a longer release and a quiet interval.
-// Nearby regions share a phrase; its position-dependent delay prevents a pulse
-// that makes the entire image breathe in lockstep.
-fn lpPhrase(position: vec2f, time: f32) -> f32 {
-  let phase = fract(time * 0.028 + lpNoise(position * 0.28 + 19.7) * 0.32);
-  return smoothstep(0.10, 0.58, phase) * (1.0 - smoothstep(0.66, 0.91, phase));
-}
-
-`;
-
-const paintingAfterRegionHelper = `
-fn lpHash(p: vec2f) -> f32 {
-  var p3 = fract(vec3f(p.x, p.y, p.x) * 0.1031);
-  p3 += dot(p3, p3.yzx + 33.33);
-  return fract((p3.x + p3.y) * p3.z);
-}
-
-fn lpHash2(p: vec2f) -> vec2f {
-  return vec2f(lpHash(p), lpHash(p + vec2f(39.7, 17.2)));
-}
-
-fn lpNoise(p: vec2f) -> f32 {
-  let i = floor(p);
-  let f = fract(p);
-  let u = f * f * (3.0 - 2.0 * f);
-  return mix(mix(lpHash(i), lpHash(i + vec2f(1.0, 0.0)), u.x),
-    mix(lpHash(i + vec2f(0.0, 1.0)), lpHash(i + vec2f(1.0, 1.0)), u.x), u.y);
-}
-
-fn lpFbm(p: vec2f) -> f32 {
-  return lpNoise(p) * 0.56 + lpNoise(p * 2.03 + 7.1) * 0.27 + lpNoise(p * 4.09 + 19.3) * 0.12 + lpNoise(p * 8.13 + 31.7) * 0.05;
-}
 `;
 
 const regionAbi = 'lux/organic-regions/v1';
@@ -166,6 +134,9 @@ const watercolorValueKeys = ['blooms', 'contrast', 'palette', 'pooling', 'warmth
 const boundaryAbi = 'lux/boundary-ink/v1';
 const boundaryFragmentKeys = ['finish'] as const;
 const boundaryValueKeys = ['grain', 'handDrawn', 'inkWarmth', 'outline'] as const;
+const phrasingAbi = 'lux/composition-phrasing/v1';
+const phrasingFragmentKeys = ['lpPhrase', 'noiseBasis'] as const;
+const phrasingValueKeys = ['composition', 'hierarchy', 'pace', 'phrasing', 'tension', 'time'] as const;
 
 function hasExactKeys(record: Readonly<Record<string, unknown>>, expected: readonly string[]): boolean {
   const keys = Object.keys(record).sort();
@@ -183,23 +154,11 @@ export default defineComponent({
       hatching: { type: { kind: 'shader-field', version: 1, abi: 'lux/region-hatching/v1' }, label: 'Hatching', description: 'Per-region line families, crosshatching, contours, and drawing coverage.' },
       watercolor: { type: { kind: 'shader-field', version: 1, abi: 'lux/watercolor/v1' }, label: 'Watercolor', description: 'Animated washes, warm pools, blooms, and pigment pooling.' },
       boundary: { type: { kind: 'shader-field', version: 1, abi: 'lux/boundary-ink/v1' }, label: 'Boundary ink', description: 'Uneven warm outlines and stationary paper grain shader field.' },
+      phrasing: { type: { kind: 'shader-field', version: 1, abi: 'lux/composition-phrasing/v1' }, label: 'Phrasing', description: 'Shared artistic clock, phrase rhythm, spatial composition, and noise basis.' },
     },
     outputs: { image: { type: { kind: 'image', colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }, label: 'Image', description: 'The painting before tracer ink is composited.' } },
-  controls: {
-    pace: { type: 'number', group: 'Motion', label: 'Pace', default: 1.24, min: 0, max: 3, step: 0.01 },
-    phrasing: { type: 'number', group: 'Motion', label: 'Tension and release', default: 1, min: 0, max: 1, step: 0.01, description: 'Slow build, crest, release, and rest. Shapes lead; linework and color follow.' },
-
-    composition: { type: 'number', group: 'Composition', label: 'Quiet to intricate', default: 0.44, min: 0, max: 1.5, step: 0.01 },
-    tension: { type: 'number', group: 'Composition', label: 'Tension', default: 0.72, min: 0, max: 1.5, step: 0.01, description: 'Strength of local pressure, contrasting line directions, and rhythmic compression.' },
-    hierarchy: { type: 'number', group: 'Composition', label: 'Large and small rhythm', default: 0.99, min: 0, max: 1.5, step: 0.01, description: 'Large anchor regions alternate with smaller supporting regions.' },
-
-  },
-    controlDescriptions: {pace: 'pace setting for the painting.',
-      phrasing: 'phrasing setting for the painting.',
-      composition: 'composition setting for the painting.',
-      tension: 'tension setting for the painting.',
-      hierarchy: 'hierarchy setting for the painting.',
-      },
+    controls: {},
+    controlDescriptions: {},
     lifecycle: { state: 'stateful', reset: 'seed' },
   },
   async create(context) {
@@ -250,6 +209,7 @@ export default defineComponent({
       hatching: ShaderFieldResource,
       watercolor: ShaderFieldResource,
       boundary: ShaderFieldResource,
+      phrasingField: ShaderFieldResource,
     ): Scene {
       const regionData = regions.data;
       if (regionData.version !== 1 || regionData.abi !== regionAbi) {
@@ -291,6 +251,16 @@ export default defineComponent({
       if (!hasExactKeys(boundaryData.values, boundaryValueKeys)) {
         throw Error(`Living Painting ${boundaryAbi} requires exactly the grain, handDrawn, inkWarmth, and outline values.`);
       }
+      const phrasingData = phrasingField.data;
+      if (phrasingData.version !== 1 || phrasingData.abi !== phrasingAbi) {
+        throw Error(`Living Painting requires shader field ${phrasingAbi}.`);
+      }
+      if (!hasExactKeys(phrasingData.fragments, phrasingFragmentKeys)) {
+        throw Error(`Living Painting ${phrasingAbi} requires exactly the lpPhrase and noiseBasis fragments.`);
+      }
+      if (!hasExactKeys(phrasingData.values, phrasingValueKeys)) {
+        throw Error(`Living Painting ${phrasingAbi} requires exactly its artistic time and five control values.`);
+      }
 
       const source = paintingBeforeRegions
         + regionData.fragments.regionGeometry
@@ -299,8 +269,9 @@ export default defineComponent({
         + boundaryData.fragments.finish
         + hatchingData.fragments.lpRegionMarks
         + paintingAfterHatching
+        + phrasingData.fragments.lpPhrase
         + regionData.fragments.lpRegion
-        + paintingAfterRegionHelper;
+        + phrasingData.fragments.noiseBasis;
       if (assembledShaderSource !== undefined && source !== assembledShaderSource) {
         throw Error('Living Painting shader field source changed; rebuild the component to apply it.');
       }
@@ -350,27 +321,22 @@ export default defineComponent({
       inkWarmth.value = boundaryData.values.inkWarmth!;
       handDrawn.value = boundaryData.values.handDrawn!;
       grain.value = boundaryData.values.grain!;
+      time.value = phrasingData.values.time!;
+      composition.value = phrasingData.values.composition!;
+      tension.value = phrasingData.values.tension!;
+      phrasing.value = phrasingData.values.phrasing!;
+      hierarchy.value = phrasingData.values.hierarchy!;
       return scene!;
     }
-    let artisticTime = 0;
-    let previousTime = 0;
     return {
-      update(frame) {
-        const c = frame.controls;
-        artisticTime += Math.max(0, frame.timeSeconds - previousTime) * c.pace;
-        previousTime = frame.timeSeconds;
-        time.value = artisticTime;
-        composition.value = c.composition;
-        tension.value = c.tension;
-        phrasing.value = c.phrasing;
-        hierarchy.value = c.hierarchy;
-      },
+      update() {},
       async evaluate(inputs, evaluation) {
         const scene = preparePainting(
           inputs.regions as ShaderFieldResource,
           inputs.hatching as ShaderFieldResource,
           inputs.watercolor as ShaderFieldResource,
           inputs.boundary as ShaderFieldResource,
+          inputs.phrasing as ShaderFieldResource,
         );
         const paths = (inputs.paths as Paths2DResource).data.paths;
         if (paths.length > 4 || paths.some(path => path.points.length > 64)) {
@@ -384,10 +350,7 @@ export default defineComponent({
         pathTexture.needsUpdate = true;
         return { image: await evaluation.render(scene, camera) };
       },
-      reset(_seed) {
-        artisticTime = 0;
-        previousTime = 0;
-      },
+      reset() {},
       dispose() {
         geometry.dispose();
         material?.dispose();

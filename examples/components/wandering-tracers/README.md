@@ -16,7 +16,12 @@ Submit the entry with its relative TypeScript dependencies as an SDK `0.4.0` sou
 | --- | --- | --- | --- |
 | Wandering Tracer Paths | None | `paths: paths2d` | Count, speed, curl, sway, seed, width, pace |
 | Wandering Tracer Renderer | `image`, `paths` | Composited `image` | Contrast, hatching, bleed |
-| Living Painting | `paths` | `image` | Painting's existing grouped controls |
+| Organic Regions | None | `field: shader-field` | Scale, flow, growth, variation, drift |
+| Region Hatching | None | `field: shader-field` | Coverage, spacing, bend, direction, ink weight and regional variety |
+| Animated Watercolor | None | `field: shader-field` | Wash lightness, warm pools, contrast, pooling, blooms |
+| Organic Boundary Ink | None | `field: shader-field` | Boundary width, warmth, hand-drawn character, grain |
+| Composition Phrasing | None | `field: shader-field` | Pace, phrasing, tension, hierarchy, quiet-to-intricate balance |
+| Living Painting / styles consumer | `paths` and five shader fields | `image` | Uses upstream component controls |
 
 The path generator is the single source of geometry. It produces at most four paths of 64 points. The renderer and painting support those same bounds and reject larger snapshots rather than silently losing a tracer or its head. The general SDK contract supports larger bounded snapshots for other components.
 
@@ -66,3 +71,19 @@ The field supplies the broad changing paint color. The Living Painting/styles co
 `boundary.ts` supplies the original `finish` block through ABI `lux/boundary-ink/v1`. It owns Boundary width, Warmth, Hand-drawn character and Grain. The block runs after the styles consumer has mixed its region colors and hatching, then draws the uneven cream boundary and adds stationary paper detail and the original final color conversion.
 
 The consumer supplies region edge distance and derivatives, position/noise/seed, the current color and cream tone, and the original ink/character vectors. Hand-drawn character and ink warmth still feed the other region and hatching calculations through those shared vectors. No separate image pass is added.
+
+## Composition Phrasing shader field
+
+`phrasing.ts` publishes `lux/composition-phrasing/v1`. Its `lpPhrase` and
+`noiseBasis` fragments provide the phrase function and deterministic hash/noise helpers
+used by the compatible painting renderer. The renderer assembles these with the
+other fields in one shader; this is not a separate image pass.
+
+The component owns the artistic clock. Pace scales elapsed scene time, a paused
+clock adds no time, backward scene time is clamped, and reset returns the artistic
+clock to zero. It emits that time and the five live composition controls. Keeping
+this state in one node lets all painting fields share the same musical phrasing.
+
+The six numeric values are time, pace, phrasing, composition, tension, and hierarchy.
+The compatible consumer inserts lpPhrase before lpRegion and noiseBasis after
+lpRegion. WGSL permits later declarations; all fields use the same uniforms.
