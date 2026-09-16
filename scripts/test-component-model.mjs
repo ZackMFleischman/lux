@@ -33,6 +33,10 @@ try {
     let draft=await call('read');await call('build',{source,expectedDraftVersion:draft.draftVersion});
     await statusWhen(runtime=>runtime?.playback==='playing');
     await page.getByRole('button',{name:'View',exact:true}).click();await page.getByRole('menuitem',{name:'Graph',exact:true}).click();
+    if(name==='legacy-graph'){
+      assert.equal(await page.locator('.graph-scene-root').getAttribute('aria-pressed'),'true','direct-only selection returns to Scene after representation change');
+      assert.equal(await page.getByRole('button',{name:'Controls for Nested prismatic mirrors',exact:true}).count(),0);
+    }
     if(nodePath.length){
       const group=page.locator('.graph-node').filter({hasText:'Double mirror 1'});
       await group.focus();await page.keyboard.press('Enter');
