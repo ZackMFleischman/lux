@@ -55,6 +55,17 @@ test('typed component declarations enforce input resources and named resource ou
   }
 });
 
+test('defineVisual preserves named-port paths2d fan-out compilation and linking', async () => {
+  const source = typedBundle();
+  source.files['composition.ts'] = source.files['composition.ts'].replaceAll('defineComposition', 'defineVisual');
+  const result = await compileVisual({ source }, options);
+  assert.equal(result.ok, true, JSON.stringify(result));
+  assert.equal(result.artifact.executionModel, 'typed-image-graph-v1');
+  const linked = await linkRuntime(result.artifact, options);
+  assert.equal(linked.composition.version, 2);
+  assert.deepEqual(linked.composition.nodes.map(node => node.nodePath[0]), [generatorId, painterId, overlayId]);
+});
+
 test('compiler rejects authored typed graphs containing internal-only signal ports', async () => {
   const source = typedBundle();
   const signalPort = `{type:{kind:'signal',value:'number',unit:null,clock:'frame'},label:'Signal',description:'Frame signal'}`;
@@ -71,7 +82,7 @@ test('SDK 0.4 preserves ImageInputs and default two-argument render for image ch
   const source = compositionSourceBundle();
   source.files['ball.ts'] = source.files['ball.ts'].replace(
     "import {defineComponent} from '@lux/visual-sdk';",
-    "import {defineComponent,type ImageInputs,type EvaluationContext,type ComponentInstance,type ComponentDefinition} from '@lux/visual-sdk';\nconst legacy=(inputs:ImageInputs,context:EvaluationContext)=>context.render({}, {});void legacy;\nconst instance:ComponentInstance={update(){},async evaluate(inputs,context){void inputs.image!.texture;return {image:await context.render({}, {})};},reset(){},dispose(){}};\nconst annotation=(definition:ComponentDefinition)=>definition.create;void annotation;void instance;",
+    "import {defineComponent,type ImageInputs,type EvaluationContext,type ComponentInstance,type ComponentDefinition} from '@lux/visual-sdk';\nconst legacy=(inputs:ImageInputs,context:EvaluationContext)=>context.render({}, {});void legacy;\nconst instance:ComponentInstance={update(){},async evaluate(inputs,context){void inputs.image!.texture;return {image:await context.render({}, {})};},reset(){},dispose(){}};\nconst annotation=(definition:ComponentDefinition)=>definition.kind==='component'?definition.create:undefined;void annotation;void instance;",
   );
   const result = await compileVisual({ source }, options);
   assert.equal(result.ok, true, JSON.stringify(result));

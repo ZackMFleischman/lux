@@ -4,6 +4,7 @@ import type { StudioExportClient } from './export-client.ts';
 import type { ComponentLibraryClient } from './library-client.ts';
 import type { LookClient } from './look-client.ts';
 import type { PreviewCaptureClient } from './preview-capture-client.ts';
+import type { StudioAudioPermissionClient } from './audio/audio-permission-client.ts';
 const lookApi: LookClient = {
   list: () => ipcRenderer.invoke('studio:looks', 'list'),
   read: id => ipcRenderer.invoke('studio:looks', 'read', id),
@@ -72,3 +73,10 @@ const previewCaptureApi: PreviewCaptureClient = {
   cancelVideo: id => ipcRenderer.invoke('studio:capture', 'cancel-video', id),
 };
 contextBridge.exposeInMainWorld('luxPreviewCapture', Object.freeze(previewCaptureApi));
+const audioPermissionApi: StudioAudioPermissionClient = {
+  arm: () => ipcRenderer.invoke('studio:audio-permission', 'arm'),
+  activate: token => ipcRenderer.invoke('studio:audio-permission', 'activate', token),
+  cancel: token => ipcRenderer.invoke('studio:audio-permission', 'cancel', token),
+  disconnect: () => ipcRenderer.invoke('studio:audio-permission', 'disconnect'),
+};
+contextBridge.exposeInMainWorld('luxAudioPermissions', Object.freeze(audioPermissionApi));

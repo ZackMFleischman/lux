@@ -25,12 +25,35 @@ type IsAny<T>=0 extends (1&T)?true:false;
 type RenderArguments<O extends PortDeclarations>=IsAny<O> extends true?[scene:unknown,camera:unknown,portId?:string]:'image' extends PortIdsOfKind<O,'image'>?[scene:unknown,camera:unknown,portId?:PortIdsOfKind<O,'image'>]:[scene:unknown,camera:unknown,portId:PortIdsOfKind<O,'image'>];
 export interface EvaluationContext<O extends PortDeclarations=any>{render(...arguments_:RenderArguments<O>):Promise<ImageResource>;paths(portId:PortIdsOfKind<O,'paths2d'>,snapshot:Paths2DSnapshot):Paths2DResource;shaderField(portId:PortIdsOfKind<O,'shader-field'>,snapshot:ShaderFieldSnapshot):ShaderFieldResource}
 export interface ComponentInstance<C extends ControlDeclarations=ControlDeclarations,I extends PortDeclarations=LegacyImageInputs,O extends PortDeclarations=LegacyImageOutputs>{update(frame:ComponentFrame<C>):void;evaluate(inputs:PortResources<I>,context:EvaluationContext<O>):Promise<PortResources<O>>;reset(seed:number):void|Promise<void>;dispose():void|Promise<void>}
-export interface ComponentDefinition<C extends ControlDeclarations=ControlDeclarations,I extends PortDeclarations=LegacyImageInputs,O extends PortDeclarations=LegacyImageOutputs>{readonly kind:'component';readonly sdkVersion:'0.4.0';readonly metadata:Omit<ComponentMetadata,'inputs'|'outputs'>&{readonly inputs:I;readonly outputs:O};create(context:ComponentContext):Promise<ComponentInstance<C,I,O>>}
-export function defineComponent<const C extends ControlDeclarations,const I extends PortDeclarations,const O extends PortDeclarations>(definition:{readonly metadata:Omit<ComponentDeclaration,'inputs'|'outputs'|'controls'|'controlDescriptions'>&{readonly inputs:I;readonly outputs:O;readonly controls:C;readonly controlDescriptions:{readonly [K in keyof C]:string}};create(context:ComponentContext):Promise<ComponentInstance<NoInfer<C>,NoInfer<I>,NoInfer<O>>>}):ComponentDefinition<C,I,O>{
- if(!definition||![Object.prototype,null].includes(Object.getPrototypeOf(definition)))throw Error('Expected plain component definition');const keys=Reflect.ownKeys(definition),metadata=Object.getOwnPropertyDescriptor(definition,'metadata'),create=Object.getOwnPropertyDescriptor(definition,'create');if(keys.length!==2||!metadata?.enumerable||!Object.hasOwn(metadata,'value')||!create?.enumerable||!Object.hasOwn(create,'value')||typeof create.value!=='function')throw Error('Component requires only own metadata and create data properties');return Object.freeze({kind:'component',sdkVersion,metadata:normalizeComponentDeclaration(metadata.value),create:create.value}) as ComponentDefinition<C,I,O>;
-}
+export interface CodeComponentDefinition<C extends ControlDeclarations=ControlDeclarations,I extends PortDeclarations=LegacyImageInputs,O extends PortDeclarations=LegacyImageOutputs>{readonly kind:'component';readonly sdkVersion:'0.4.0';readonly metadata:Omit<ComponentMetadata,'inputs'|'outputs'>&{readonly inputs:I;readonly outputs:O};create(context:ComponentContext):Promise<ComponentInstance<C,I,O>>}
+type CodeDeclaration<C extends ControlDeclarations,I extends PortDeclarations,O extends PortDeclarations>={readonly metadata:Omit<ComponentDeclaration,'inputs'|'outputs'|'controls'|'controlDescriptions'>&{readonly inputs:I;readonly outputs:O;readonly controls:C;readonly controlDescriptions:{readonly [K in keyof C]:string}};create(context:ComponentContext):Promise<ComponentInstance<NoInfer<C>,NoInfer<I>,NoInfer<O>>>};
 type Node={readonly id:string;readonly definition:string};type Ref={readonly nodeId:string;readonly portId:string};type Edge={readonly id:string;readonly from:Ref;readonly to:Ref;readonly delay:'none'};type Exposure={readonly id:string;readonly nodeId:string;readonly controlId:string};
-export interface CompositionDefinition{readonly kind:'composition';readonly sdkVersion:'0.4.0';readonly label?:string;readonly definitions:Readonly<Record<string,ComponentDefinition<any,any,any>|CompositionDefinition>>;readonly nodes:readonly Node[];readonly edges:readonly Edge[];readonly input?:Ref;readonly output:Ref;readonly expose:readonly Exposure[]}
-export function defineComposition(definition:Omit<CompositionDefinition,'kind'|'sdkVersion'>):CompositionDefinition{
+export interface GraphComponentDefinition{readonly kind:'composition';readonly sdkVersion:'0.4.0';readonly label?:string;readonly definitions:Readonly<Record<string,ComponentDefinition<any,any,any>>>;readonly nodes:readonly Node[];readonly edges:readonly Edge[];readonly input?:Ref;readonly output:Ref;readonly expose:readonly Exposure[]}
+export type ComponentDefinition<C extends ControlDeclarations=ControlDeclarations,I extends PortDeclarations=LegacyImageInputs,O extends PortDeclarations=LegacyImageOutputs>=CodeComponentDefinition<C,I,O>|GraphComponentDefinition;
+/** Compatibility name for the existing sealed graph representation. */
+export type CompositionDefinition=GraphComponentDefinition;
+export type VisualDefinition=Omit<GraphComponentDefinition,'input'>&{readonly input?:never};
+type GraphDeclaration=Omit<GraphComponentDefinition,'kind'|'sdkVersion'>;
+type VisualDeclaration=Omit<GraphDeclaration,'input'>&{readonly input?:never};
+
+export function defineComponent<const C extends ControlDeclarations,const I extends PortDeclarations,const O extends PortDeclarations>(definition:CodeDeclaration<C,I,O>):CodeComponentDefinition<C,I,O>;
+export function defineComponent(definition:GraphDeclaration):GraphComponentDefinition;
+export function defineComponent(definition:CodeDeclaration<any,any,any>|GraphDeclaration):ComponentDefinition<any,any,any>{
+ if(!definition||![Object.prototype,null].includes(Object.getPrototypeOf(definition)))throw Error('Expected plain component definition');
+ if(Object.hasOwn(definition,'definitions'))return defineComposition(definition as GraphDeclaration);
+ const keys=Reflect.ownKeys(definition),metadata=Object.getOwnPropertyDescriptor(definition,'metadata'),create=Object.getOwnPropertyDescriptor(definition,'create');
+ if(keys.length!==2||!metadata?.enumerable||!Object.hasOwn(metadata,'value')||!create?.enumerable||!Object.hasOwn(create,'value')||typeof create.value!=='function')throw Error('Component requires only own metadata and create data properties');
+ return Object.freeze({kind:'component',sdkVersion,metadata:normalizeComponentDeclaration(metadata.value),create:create.value});
+}
+
+/** A runnable graph. External image input requires a future host provider. */
+export function defineVisual(definition:VisualDeclaration):VisualDefinition{
+ const graph=defineComposition(definition);
+ if(Object.hasOwn(graph,'input'))throw Error('Runnable visuals do not yet support external image input');
+ return graph as VisualDefinition;
+}
+
+/** Existing source remains valid; prefer defineComponent or defineVisual in new code. */
+export function defineComposition(definition:GraphDeclaration):CompositionDefinition{
  if(!definition||![Object.prototype,null].includes(Object.getPrototypeOf(definition)))throw Error('Expected plain composition definition');const required=['definitions','nodes','edges','output','expose'],allowed=[...required,'input','label'],keys=Reflect.ownKeys(definition);if(keys.some(k=>typeof k!=='string'||!allowed.includes(k))||required.some(k=>!Object.getOwnPropertyDescriptor(definition,k)?.enumerable||!Object.hasOwn(Object.getOwnPropertyDescriptor(definition,k)!,'value'))||keys.some(k=>!Object.getOwnPropertyDescriptor(definition,k)?.enumerable||!Object.hasOwn(Object.getOwnPropertyDescriptor(definition,k)!,'value')))throw Error('Composition requires literal data fields');return Object.freeze({kind:'composition',sdkVersion,...definition});
 }

@@ -46,6 +46,7 @@
 .library-panel{container:library-pane/inline-size;height:100%;overflow:auto;padding:18px;background:#171820;color:#d7d8e2}.library-heading,.library-source-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.library-heading>div{min-width:0}.library-heading p,.library-source-heading p{margin:7px 0 14px;color:#9296a8;font-size:11px;line-height:1.5}.library-heading p{overflow-wrap:anywhere}.library-content{display:grid;grid-template-columns:minmax(180px,0.34fr) minmax(0,1fr);gap:14px;min-height:260px}.library-content nav{display:flex;flex-direction:column;gap:7px}.library-entry{display:flex!important;align-items:stretch!important;flex-direction:column!important;text-align:left!important;border:1px solid #343746!important;padding:10px!important}.library-entry>span{display:flex;align-items:center;justify-content:space-between;gap:8px}.library-entry small{color:#9498aa;line-height:1.45;text-transform:none}.library-source{min-width:0;border-left:1px solid #30323d;padding-left:14px}.library-source h3,.library-links h3{font-size:12px;margin:0}.library-files{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px}.library-source pre{margin:0;min-height:180px;max-height:420px;overflow:auto;padding:13px;border:1px solid #343746;background:#111218;color:#d4d7e4;font:11px/1.55 Consolas,monospace;white-space:pre}.library-links{margin-top:16px;padding-top:14px;border-top:1px solid #30323d}.library-links>div{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:11px;padding:7px 0}.library-links>div>span{min-width:0;overflow-wrap:anywhere}.library-links>div>.MuiButton-root{flex:0 0 auto}.library-panel .MuiAlert-root{margin-bottom:10px;font-size:11px}
 @container library-pane (max-width:650px){.library-content{grid-template-columns:1fr}.library-source{border-left:0;border-top:1px solid #30323d;padding:14px 0 0}}
 .document-name{display:flex;align-items:baseline;gap:6px;border-left:1px solid #3b3d49;padding-left:12px;color:#a9adbd;font-size:12px;cursor:default}.document-label{flex-shrink:0;font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:#858b9f}.document-title{min-width:0;overflow:hidden;text-overflow:ellipsis}.document-name>[aria-label]{flex-shrink:0}
+.audio-input-control{order:4;display:flex;align-items:center;gap:6px;white-space:nowrap}.audio-input-control .MuiInputBase-root{height:28px;min-width:116px;max-width:180px;font-size:11px}.audio-input-control .MuiSelect-select{padding:4px 24px 4px 8px}.audio-input-control .MuiButton-root{height:28px;padding:0 7px;font-size:10px}.audio-input-status{font-size:9px;color:#8f96aa}.audio-input-status.connected{color:#97cbaa}.audio-input-status.unavailable{color:#e4a2b3}
 .app-bar>.MuiButton-root{order:4}.build-status{order:5;font-size:11px;white-space:nowrap}.connection{order:6;white-space:nowrap;margin-left:0}
 .file-tools,.layout-tools{position:static;padding:0;background:transparent}
 .file-tools summary,.layout-tools summary{min-height:28px;display:flex;align-items:center;cursor:pointer;padding:0 6px;list-style:none}
@@ -83,7 +84,7 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 
 .parameter-row{margin-top:5px;padding:0 1px 2px}
 .parameter-group{margin-top:8px;border-top:1px solid #2d2f3a;padding-top:4px}.parameter-group>summary{cursor:pointer;color:#b9bbca;font-size:10px;font-weight:600;letter-spacing:.04em;padding:5px 2px;user-select:none}.parameter-group>summary:focus-visible{outline:2px solid #bbb0fa;outline-offset:2px;border-radius:2px}.parameter-group-controls{padding-left:9px;border-left:1px solid #303340}
-.parameter-heading{display:flex;align-items:center;gap:4px;min-height:26px}
+.parameter-heading{position:relative;z-index:1;display:flex;align-items:center;gap:4px;min-height:26px}
 .parameter-name{font-size:11px;line-height:16px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .parameter-name:focus-visible{outline:2px solid #bbb0fa;outline-offset:2px;border-radius:2px}
 .parameter-name small{font-size:9px;color:#8c90a2}
@@ -98,7 +99,7 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 .animation-range{position:relative;height:4px;margin:-5px 5px 3px;background:#242832;border-radius:4px}
 .animation-range span{position:absolute;top:1px;height:2px;background:#786bd2;border-radius:2px}
 .animation-range i{position:absolute;top:-1px;width:2px;height:6px;background:#fff;border-radius:2px;transform:translateX(-1px)}
-.animation-popper{z-index:1400}
+.animation-popper{z-index:1200}
 .animation-editor{width:240px;padding:8px;display:flex;flex-direction:column;gap:5px;border:1px solid #4a4f60}
 .animation-editor header{display:flex;align-items:center;min-height:20px;line-height:16px}.animation-editor header strong{font-size:12px}
 .animation-editor>label,.animation-editor details label{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:11px}

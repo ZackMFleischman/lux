@@ -1,5 +1,6 @@
 import { InspectorBreadcrumb } from './InspectorBreadcrumb.tsx';
 import {GraphPanel,compositionNodeLabel,compositionOccurrence,nodeKey} from './GraphPanel.tsx';
+import {visualSelection} from './visual-model.ts';
 import type {NodePath} from '../../../packages/runtime-contracts/src/graph.ts';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { Alert, Button, Chip, CssBaseline, Paper, ThemeProvider, IconButton, Tooltip, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
@@ -108,7 +109,9 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const status = { ...baseStatus, problems: Math.max(0, baseStatus.problems - matchingSourceFaults) };
   useEffect(() => { setError(null); }, [runtime?.instanceId, runtime?.generation]);
   const [graphSelection,setGraphSelection]=useState<NodePath|null>(null);
-  const selectedNodePath=graphSelection??undefined;
+  const selectedGraphSelection=visualSelection(runtime,graphSelection);
+  const selectedNodePath=selectedGraphSelection??undefined;
+  useEffect(()=>{if(selectedGraphSelection!==graphSelection)setGraphSelection(selectedGraphSelection);},[selectedGraphSelection,graphSelection]);
   function selectGraphNode(path:NodePath|null){setGraphSelection(path?[...path]:null);openPanelRef.current?.('inspector');}
   const available = snapshot.connection === 'connected' && runtime?.authority === 'studio' && controlsAvailable !== false;
   useEffect(() => {
