@@ -34,7 +34,7 @@ export function AudioInputControl({provider,onError,configuration=defaultConfigu
   const label=phase==='connecting'?'Connecting…':phase==='connected'?'Connected':phase==='unavailable'?'Unavailable':'Disconnected';
   return <span className="audio-input-control" aria-label={`Audio input ${label}`}>
     <span className="document-label">Audio</span>
-    <Select size="small" value={device} disabled={phase==='connecting'} aria-label="Audio input device" displayEmpty onChange={event=>{const next=String(event.target.value);setDevice(next);try{if(next)localStorage.setItem(devicePreference,next);else localStorage.removeItem(devicePreference);}catch{}}}>
+    <Select size="small" value={device} disabled={phase==='connecting'||phase==='connected'} aria-label="Audio input device" displayEmpty onChange={event=>{const next=String(event.target.value);setDevice(next);try{if(next)localStorage.setItem(devicePreference,next);else localStorage.removeItem(devicePreference);}catch{}}}>
       <MenuItem value="">Default input</MenuItem>{devices.map(row=><MenuItem key={row.id} value={row.id}>{row.label}</MenuItem>)}
     </Select>
     <span className={`audio-input-status ${phase}`}>{label}</span>
