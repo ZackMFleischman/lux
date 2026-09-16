@@ -7,7 +7,7 @@ import vm from 'node:vm';
 import { copyIndependentTree, desktopSourceFile, dependencySelection, installedMainSource, repositoryLibraryRootFromCommonDirectory } from '../../scripts/studio-package.mjs';
 
 test('package source selection excludes private and development files', () => {
- for(const p of ['packages/visual-sdk/src/index.ts','scripts/studio-compile.mjs','apps/build-worker/src/worker.mjs','library/catalog.json','library/components/11111111-1111-4111-8111-111111111111/revisions/1/source/component.ts','package.json']) assert.ok(desktopSourceFile(p),p);
+ for(const p of ['packages/visual-sdk/src/index.ts','scripts/studio-compile.mjs','scripts/studio-library-context.mjs','apps/build-worker/src/worker.mjs','library/catalog.json','library/components/11111111-1111-4111-8111-111111111111/revisions/1/source/component.ts','package.json']) assert.ok(desktopSourceFile(p),p);
  for(const p of ['.env.local','visuals/private.lux','tools/live-copilot/server.ts','artifacts/scene.json','.git/config','docs/private.md']) assert.equal(desktopSourceFile(p),false,p);
 });
 

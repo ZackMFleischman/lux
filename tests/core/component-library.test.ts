@@ -9,7 +9,7 @@ import {
   checkLibraryLinks,
   forkLibraryComponent,
 } from '../../packages/core/src/component-library.ts';
-import { ComponentLibraryStore } from '../../packages/core/src/component-library-store.ts';
+import { ComponentLibraryStore, readLibraryCatalogSummaries } from '../../packages/core/src/component-library-store.ts';
 import type { SourceBundle } from '../../packages/runtime-contracts/src/index.ts';
 
 const component = (body = 'export const color = "violet";') => ({
@@ -317,4 +317,22 @@ test('the repository seed exposes a useful Prismatic Ball component from an isol
   assert.equal(seeded.source.entry, 'component.ts');
   assert.match(seeded.source.files['component.ts'] ?? '', /export default defineComponent/);
   assert.match(seeded.source.files['component.ts'] ?? '', /label: 'Prismatic Ball'/);
+});
+
+test('compact catalog summaries validate manifests without reading component source', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'lux-library-summary-'));
+  const root = join(directory, 'library');
+  await cp(fileURLToPath(new URL('../../library/', import.meta.url)), root, { recursive: true });
+  await rm(join(root, 'components', '93a7215f-4df1-4e1e-9d34-3f7f0f27ad84', 'revisions', '1', 'source'), { recursive: true });
+
+  const summaries = await readLibraryCatalogSummaries(root);
+  const expectedCount = JSON.parse(await readFile(join(root, 'catalog.json'), 'utf8')).components.length;
+  assert.equal(summaries.length, expectedCount);
+  assert.deepEqual(summaries.find(item => item.id === '93a7215f-4df1-4e1e-9d34-3f7f0f27ad84'), {
+    id: '93a7215f-4df1-4e1e-9d34-3f7f0f27ad84',
+    revision: 1,
+    name: 'Prismatic Ball',
+    description: 'Animated iridescent spike image source.',
+    updatedAt: '2026-09-16T00:00:00.000Z',
+  });
 });

@@ -42,14 +42,20 @@ export function validateLibrarySource(value: unknown): SourceBundle {
   if ('sourceVersion' in result) throw Error('The first local component library path does not accept image assets');
   return structuredClone(result);
 }
-export function validateLibraryComponent(value: unknown): LibraryComponent {
-  const raw = plainLibraryRecord(value, ['id', 'revision', 'name', 'description', 'updatedAt', 'source'], 'Library component');
+export function validateLibraryComponentSummary(value: unknown): LibraryComponentSummary {
+  const raw = plainLibraryRecord(value, ['id', 'revision', 'name', 'description', 'updatedAt'], 'Library component summary');
   const id = componentIdSchema.parse(raw.id);
   if (!Number.isSafeInteger(raw.revision) || (raw.revision as number) < 1) throw Error('Library component revision must be a positive integer');
   const updatedAt = libraryText(raw.updatedAt, 'Updated time', 64);
   if (!Number.isFinite(Date.parse(updatedAt))) throw Error('Library component updated time is invalid');
   return Object.freeze({ id, revision: raw.revision as number, name: libraryText(raw.name, 'Component name', 80),
-    description: libraryText(raw.description, 'Component description', 512), updatedAt, source: validateLibrarySource(raw.source) });
+    description: libraryText(raw.description, 'Component description', 512), updatedAt });
+}
+export function validateLibraryComponent(value: unknown): LibraryComponent {
+  const raw = plainLibraryRecord(value, ['id', 'revision', 'name', 'description', 'updatedAt', 'source'], 'Library component');
+  const summary = validateLibraryComponentSummary({ id: raw.id, revision: raw.revision, name: raw.name,
+    description: raw.description, updatedAt: raw.updatedAt });
+  return Object.freeze({ ...summary, source: validateLibrarySource(raw.source) });
 }
 
 function mount(value: string): string {

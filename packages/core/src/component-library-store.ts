@@ -4,7 +4,7 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { componentIdSchema } from '../../runtime-contracts/src/identities.ts';
 import type { SourceBundle } from '../../runtime-contracts/src/index.ts';
-import { libraryText, plainLibraryRecord, validateLibraryComponent, validateLibrarySource } from './component-library.ts';
+import { libraryText, plainLibraryRecord, validateLibraryComponent, validateLibraryComponentSummary, validateLibrarySource } from './component-library.ts';
 import type { LibraryComponent, LibraryComponentSummary } from './component-library.ts';
 
 const libraryBytes = 8 * 1024 * 1024;
@@ -66,6 +66,8 @@ function legacyFile(value: unknown): LegacyLibraryFile {
 function componentManifest(value: unknown): ComponentManifest {
   const raw = plainLibraryRecord(value, ['format', 'version', 'id', 'revision', 'name', 'description', 'updatedAt', 'source'], 'Library component manifest');
   if (raw.format !== 'lux-library-component' || raw.version !== 1) throw Error('Invalid library component manifest');
+  const summary = validateLibraryComponentSummary({ id: raw.id, revision: raw.revision, name: raw.name,
+    description: raw.description, updatedAt: raw.updatedAt });
   const source = plainLibraryRecord(raw.source, ['sdkVersion', 'entry', 'files'], 'Library component source manifest');
   if (typeof source.sdkVersion !== 'string' || typeof source.entry !== 'string' || !Array.isArray(source.files) || source.files.length < 1 || source.files.length > 32) {
     throw Error('Invalid library component source manifest');
@@ -76,9 +78,7 @@ function componentManifest(value: unknown): ComponentManifest {
   });
   if (new Set(paths.map(path => path.toLowerCase())).size !== paths.length) throw Error('Duplicate library component source path');
   return Object.freeze({
-    format: 'lux-library-component', version: 1, id: componentIdSchema.parse(raw.id),
-    revision: raw.revision as number, name: raw.name as string, description: raw.description as string,
-    updatedAt: raw.updatedAt as string,
+    format: 'lux-library-component', version: 1, ...summary,
     source: Object.freeze({ sdkVersion: source.sdkVersion, entry: source.entry, files: Object.freeze(paths) }),
   });
 }
@@ -144,6 +144,22 @@ async function readComponentDirectory(root: string, directory: string, reference
 
 async function readStoredComponent(root: string, reference: CatalogReference): Promise<LibraryComponent> {
   return readComponentDirectory(root, revisionDirectory(root, reference), reference);
+}
+
+/** Read only catalog and manifest metadata. This intentionally does not prepare,
+ * migrate, lock, or read source files. */
+export async function readLibraryCatalogSummaries(rootValue: string, missing = false): Promise<readonly LibraryComponentSummary[]> {
+  const root = resolve(rootValue), current = await loadCatalog(root, missing);
+  return Object.freeze(await Promise.all(current.components.map(async reference => {
+    const directory = revisionDirectory(root, reference);
+    await assertStoredPath(root, directory);
+    const value = await readJson(join(directory, 'component.json'), 'Library component manifest');
+    if (!value) throw Error(`Library component revision is missing: ${reference.id}@${reference.revision}`);
+    const manifest = componentManifest(value);
+    if (manifest.id !== reference.id || manifest.revision !== reference.revision) throw Error('Library component manifest does not match its catalog entry');
+    return validateLibraryComponentSummary({ id: manifest.id, revision: manifest.revision, name: manifest.name,
+      description: manifest.description, updatedAt: manifest.updatedAt });
+  })));
 }
 
 async function availableSeedRevisions(root: string, component: LibraryComponent): Promise<number[]> {
