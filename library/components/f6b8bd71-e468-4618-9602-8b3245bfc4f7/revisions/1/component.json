@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "f6b8bd71-e468-4618-9602-8b3245bfc4f7",
+  "revision": 1,
+  "name": "Region Styles & Split Transitions",
+  "description": "Combines compatible organic-region, hatch, watercolor, boundary and phrasing fields into a painting. Shared paths carve daughter regions with smooth color and hatch-style transitions; connect a tracer renderer afterward for visible ink.",
+  "updatedAt": "2026-09-16T08:52:17.532Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "painting.ts",
+    "files": [
+      "painting.ts"
+    ]
+  }
+}
