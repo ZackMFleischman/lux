@@ -48,16 +48,24 @@ function ParameterRow({definition,controlId,description,displayLabel,applied,eff
 }
 
 export function ParameterInspector({runtime,available,client,controller,onError,edits,nodePath}:{runtime:RuntimeView|null;available:boolean;client:StudioClient;controller:StudioController;onError:(error:string|null)=>void;edits?:ControlEdits;nodePath?:NodePath}){
-  const [openId,setOpenId]=useState<string|null>(null),selectionOwner=parameterOwner(runtime,nodePath);useEffect(()=>setOpenId(null),[selectionOwner]);if(!runtime)return <p className="hint">Build a visual to see its controls.</p>;
+  const [openId,setOpenId]=useState<string|null>(null),[groupOpen,setGroupOpen]=useState<Record<string,boolean>>({}),selectionOwner=parameterOwner(runtime,nodePath);useEffect(()=>{setOpenId(null);setGroupOpen({});},[selectionOwner]);if(!runtime)return <p className="hint">Build a visual to see its controls.</p>;
   const occurrence=nodePath?compositionOccurrence(runtime,nodePath):undefined,directNode=nodePath?runtime.nodeControls?.nodes.find(row=>samePath(row.nodePath,nodePath)):undefined;
   if(nodePath&&!occurrence){const issues=runtime.controlAnimationIssues?.filter(row=>samePath(row.nodePath,nodePath))??[];return <><p className="hint">This node is no longer available. Select another node.</p>{issues.map(row=><p key={`${row.controlId}:${row.index}`} role="alert">Animation for {row.controlId} is disabled. {row.message}</p>)}</>;}
   const publicState=getRuntimeControlState(runtime),schema=nodePath?(occurrence?.metadata.controls??[]):publicState.controlSchema,unselectedIssues=nodePath?[]:runtime.controlAnimationIssues??[];
   const counts=new Map<string,number>();for(const definition of schema)counts.set(definition.label,(counts.get(definition.label)??0)+1);const display=(d:NumberControlDefinition)=>counts.get(d.label)!>1?`${d.id} · ${d.label}`:d.label;
-  return <>{unselectedIssues.map(row=><p key={`${row.index}:${row.controlId}`} role="alert">Animation for {row.controlId} is disabled. {row.message}</p>)}{schema.length===0&&<p className="hint">This visual defines no live controls.</p>}{schema.map(definition=>{
+  const renderControl=(definition:NumberControlDefinition)=>{
     const target=runtime.sdkVersion==='0.4.0'?(nodePath&&directNode?{nodePath,controlId:definition.id}:compositionControlTarget(runtime,nodePath??[],definition.id)):undefined,targetNode=target?runtime.nodeControls?.nodes.find(row=>samePath(row.nodePath,target.nodePath)):undefined,effectiveNode=target?runtime.effectiveNodeControls?.nodes.find(row=>samePath(row.nodePath,target.nodePath)):undefined;
     if(nodePath&&(!target||!targetNode))return <p className="hint" key={definition.id}>This control is no longer available. Rebuild or select another node.</p>;
     const controlId=target?.controlId??definition.id,applied=targetNode?.values[controlId]??publicState.controls[definition.id]!,animation=runtime.controlAnimations?.find(row=>!!target&&samePath(row.nodePath,target.nodePath)&&row.controlId===controlId),issue=runtime.controlAnimationIssues?.find(row=>!!target&&samePath(row.nodePath,target.nodePath)&&row.controlId===controlId)?.message,owner=parameterOwner(runtime,target?.nodePath);
     const animationUnavailable=target?undefined:runtime.sdkVersion==='0.4.0'?'Animation is unavailable because this control does not map to one component control.':'Animation requires a component-based scene.';
     return <ParameterRow key={`${selectionOwner}:${definition.id}`} definition={definition} controlId={controlId} description={occurrence?.metadata.controlDescriptions[definition.id]} displayLabel={display(definition)} applied={applied} effective={effectiveNode?.values[controlId]??applied} owner={owner} available={available} client={client} controller={controller} onError={onError} edits={edits} nodePath={target?.nodePath} node={targetNode} animation={animation} issue={issue} animationUnavailable={animationUnavailable} playback={runtime.playback} open={openId===definition.id} onOpen={()=>setOpenId(current=>current===definition.id?null:definition.id)} onClose={()=>setOpenId(current=>current===definition.id?null:current)}/>;
-  })}</>;
+  };
+  const grouped=new Map<string,NumberControlDefinition[]>();for(const definition of schema)if(definition.group)grouped.set(definition.group,[...(grouped.get(definition.group)??[]),definition]);
+  const renderedGroups=new Set<string>(),content=schema.flatMap(definition=>{
+    if(!definition.group)return [renderControl(definition)];
+    if(renderedGroups.has(definition.group))return [];
+    renderedGroups.add(definition.group);const group=definition.group,definitions=grouped.get(group)!;
+    return [<details key={`${selectionOwner}:group:${group}`} className="parameter-group" open={groupOpen[group]??true} onToggle={event=>{if(event.target===event.currentTarget){const open=event.currentTarget.open;setGroupOpen(current=>({...current,[group]:open}));}}}><summary>{group}</summary><div className="parameter-group-controls">{definitions.map(renderControl)}</div></details>];
+  });
+  return <>{unselectedIssues.map(row=><p key={`${row.index}:${row.controlId}`} role="alert">Animation for {row.controlId} is disabled. {row.message}</p>)}{schema.length===0&&<p className="hint">This visual defines no live controls.</p>}{content}</>;
 }

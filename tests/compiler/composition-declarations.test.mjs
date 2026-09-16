@@ -18,6 +18,15 @@ test('composition extraction preserves authored exposure order without requiring
  const asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})])),profile=extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash});
  assert.deepEqual(profile.publicControls.map(row=>row.id),['segmentsB','ballIntensity','segmentsA']);
 });
+test('composition exposure aliases inherit control groups through nested component metadata',()=>{
+ const source=nestedCompositionSourceBundle();
+ source.files['ball.ts']=source.files['ball.ts'].replace("label:'Intensity'","label:'Intensity',group:'Spiky Ball'");
+ source.files['kaleidoscope.ts']=source.files['kaleidoscope.ts'].replace("label:'Segments'","label:'Segments',group:'Kaleidoscope'");
+ const asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));
+ const profile=extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash});
+ assert.deepEqual(profile.publicControls.map(row=>[row.id,row.group]),[['ballIntensity','Spiky Ball'],['segmentsA','Kaleidoscope'],['segmentsB','Kaleidoscope']]);
+ assert.deepEqual(profile.nodes.map(row=>row.schema.map(control=>control.group)),[['Spiky Ball'],['Kaleidoscope'],['Kaleidoscope'],['Kaleidoscope'],['Kaleidoscope']]);
+});
 test('composition extraction rejects duplicate exposure and a non-linear graph',()=>{
  const source=compositionSourceBundle();
  for(const text of [source.files['composition.ts'].replace("{id:'segmentsB'","{id:'segmentsA'"),source.files['composition.ts'].replace(`nodeId:'${kaleidoscopeBId}',portId:'image'},delay:'none'`,`nodeId:'${kaleidoscopeAId}',portId:'image'},delay:'none'`)]){

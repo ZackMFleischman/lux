@@ -119,6 +119,31 @@ test('RTL: duplicate component labels show and announce their public aliases', (
   assert.ok(screen.getByRole('spinbutton', { name: 'segmentsB · Segments value' }));
 });
 
+test('RTL: grouped controls use independent keyboard disclosures and preserve live values while collapsed', async () => {
+  const fixture = service();
+  fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [
+    { id: 'exposure', type: 'number' as const, label: 'Exposure', min: 0, max: 2, default: 1, changeCost: 'live' as const },
+    { id: 'speed', type: 'number' as const, label: 'Speed', group: 'Motion', min: 0, max: 4, default: 1, changeCost: 'live' as const },
+    { id: 'phase', type: 'number' as const, label: 'Phase', group: 'Motion', min: 0, max: 1, default: 0, changeCost: 'live' as const },
+    { id: 'segments', type: 'number' as const, label: 'Segments', group: 'Kaleidoscope', min: 2, max: 16, default: 6, changeCost: 'live' as const },
+  ], controlSchemaHash: 'e'.repeat(64), controls: { exposure: 1, speed: 1, phase: 0, segments: 6 }, controlSequence: 0 });
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+  const motion = screen.getByText('Motion').closest('summary') as HTMLElement;
+  const kaleidoscope = screen.getByText('Kaleidoscope').closest('summary') as HTMLElement;
+  assert.ok(motion); assert.ok(kaleidoscope); assert.equal(motion.tabIndex, 0);
+  const motionDetails = motion.closest('details')!;
+  const kaleidoscopeDetails = kaleidoscope.closest('details')!;
+  assert.equal(motionDetails.open, true); assert.equal(kaleidoscopeDetails.open, true);
+  assert.deepEqual([...document.querySelectorAll('.parameter-row')].map(row => row.getAttribute('data-control-id')), ['exposure', 'speed', 'phase', 'segments']);
+  fireEvent.click(motion);
+  assert.equal(motionDetails.open, false); assert.equal(kaleidoscopeDetails.open, true);
+  await act(async () => fixture.publish({ controls: { exposure: 1, speed: 3, phase: 0, segments: 6 }, playback: 'playing' }));
+  fireEvent.click(motion);
+  assert.equal((screen.getByRole('slider', { name: 'Speed' }) as HTMLInputElement).value, '3');
+  assert.ok(screen.getByRole('button', { name: 'Pause' }), 'collapsing a group must not change playback');
+  assert.ok(screen.getByRole('slider', { name: 'Exposure' }), 'ungrouped controls remain available');
+});
+
 test('RTL: an empty authored schema has no invented control', () => {
   const fixture = service();
   fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [], controlSchemaHash: 'b'.repeat(64), controls: {}, controlSequence: 0 });

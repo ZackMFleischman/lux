@@ -9,13 +9,13 @@ import { uniform, positionLocal, normalLocal, vec3, mx_noise_float } from 'three
 export default defineVisual({
   controls: {
     spikeHeight: {
-      type: 'number', label: 'Spike height', default: 0.85, min: 0, max: 2, step: 0.01,
+      type: 'number', label: 'Spike height', group: 'Shape', default: 0.85, min: 0, max: 2, step: 0.01,
     },
     noiseScale: {
-      type: 'number', label: 'Noise scale', default: 3.4, min: 0.5, max: 12, step: 0.1,
+      type: 'number', label: 'Noise scale', group: 'Shape', default: 3.4, min: 0.5, max: 12, step: 0.1,
     },
     sharpness: {
-      type: 'number', label: 'Sharpness', default: 3.2, min: 0.25, max: 8, step: 0.05,
+      type: 'number', label: 'Sharpness', group: 'Shape', default: 3.2, min: 0.25, max: 8, step: 0.05,
     },
     motionSpeed: {
       type: 'number', label: 'Motion speed', default: 0.28, min: 0, max: 2, step: 0.01,
