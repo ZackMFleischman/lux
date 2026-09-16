@@ -23,6 +23,8 @@ test('Preview menu exposes frame and recording actions and announces fixed recor
     onSaveFrame={async () => { calls.push('frame'); }} onStart={async () => { calls.push('start'); }} onStop={async () => { calls.push('stop'); }} /></header></StudioMenuProvider>);
 
   await user.click(screen.getByRole('button', { name: 'Preview' }));
+  assert.ok(screen.getByText('Ctrl+Shift+P'));
+  assert.ok(screen.getByText('Ctrl+Shift+R'));
   await user.click(screen.getByRole('menuitem', { name: 'Save frame PNG' }));
   await user.click(screen.getByRole('button', { name: 'Preview' }));
   await user.click(screen.getByRole('menuitem', { name: 'Record video' }));
@@ -55,7 +57,7 @@ test('Preview header actions use the shared recorder state and expose concise la
   const frame = screen.getByRole('button', { name: 'Save frame PNG' });
   assert.equal(frame.getAttribute('title'), null);
   await user.hover(frame);
-  assert.ok(await screen.findByRole('tooltip', { name: 'Save frame PNG' }));
+  assert.ok(await screen.findByRole('tooltip', { name: /Save frame PNG.*Ctrl\+Shift\+P/ }));
   await user.unhover(frame);
   await user.click(frame);
   await user.click(screen.getByRole('button', { name: 'Record video' }));
@@ -67,6 +69,10 @@ test('Preview header actions use the shared recorder state and expose concise la
   assert.equal((screen.getByRole('button', { name: 'Save frame PNG' }) as HTMLButtonElement).disabled, true);
   await user.click(screen.getByRole('button', { name: 'Stop recording' }));
   assert.deepEqual(calls, ['frame', 'start', 'stop']);
+
+  rerender(<PreviewCaptureActions available status={{ phase: 'stopping', width: 1920, height: 1080, mimeType: 'video/webm', path: 'C:/clip.webm' }}
+    onSaveFrame={async () => { calls.push('frame'); }} onStart={async () => { calls.push('start'); }} onStop={async () => { calls.push('stop'); }} />);
+  assert.equal((screen.getByRole('button', { name: 'Stop recording' }) as HTMLButtonElement).disabled, true);
 });
 
 test('Preview header keeps recording text local while the menu provides one live announcement', () => {
