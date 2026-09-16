@@ -227,7 +227,7 @@ app.whenReady().then(async () => {
   });
   ipcMain.handle('studio:authoring', async (event, action: unknown, value: unknown) => {
     if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted authoring sender');
-    if (action === 'example') return { sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': await readFile(join(workspace, 'packages/visual-sdk/examples/intensity.ts'), 'utf8') } };
+    if (action === 'example') return { sdkVersion: '0.2.0', entry: 'visual.ts', files: { 'visual.ts': await readFile(join(workspace, 'skills/lux-visual-creation/assets/noise-sphere.ts'), 'utf8') } };
     if (action === 'compile') return compile(value);
     if (action === 'smoke-enabled') return process.env.LUX_STUDIO_SMOKE === '1';
     if (action === 'dirty') { if (typeof value !== 'boolean') throw Error('Invalid dirty state'); dirty = value; return; }
