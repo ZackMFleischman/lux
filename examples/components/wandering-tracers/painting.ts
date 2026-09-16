@@ -57,20 +57,6 @@ const paintingAfterWatercolor = `
   color += styleDelta / max(1.0, totalSplit);
   underpainting += washDelta / max(1.0, totalSplit);
 
-  let edgePressure = 0.57 + 0.68 * lpNoise(q * 7.0 + seed)
-    + character.y * 0.13 * sin(q.x * 37.0 + q.y * 21.0);
-  let boundaryWidth = ink.x * 140.0 * pixelSize * edgePressure;
-  let boundary = 1.0 - smoothstep(boundaryWidth - edgeAA * 0.55, boundaryWidth + edgeAA * 0.55, edge);
-  color = mix(color, cream, boundary * (0.62 + 0.32 * lpNoise(q * 2.3 + seed)));
-  // Stationary paper grain avoids animated video noise.
-  let grain = lpHash(floor(st * vec2f(1920.0, 1080.0))) - 0.5;
-  let fibers = lpNoise(p * 92.0) - 0.5;
-  color += (grain * 0.026 + fibers * 0.037) * ink.w;
-  color *= 0.96 + 0.04 * smoothstep(0.0, 0.25, min(min(st.x, 1.0 - st.x), min(st.y, 1.0 - st.y)));
-  return vec4f(pow(clamp(color, vec3f(0.0), vec3f(1.0)), vec3f(2.2)), 1.0);
-}
-
-
 `;
 
 const paintingAfterHatching = `
@@ -177,6 +163,9 @@ const hatchingValueKeys = ['angle', 'angleVar', 'coverage', 'curvature', 'curvat
 const watercolorAbi = 'lux/watercolor/v1';
 const watercolorFragmentKeys = ['wash'] as const;
 const watercolorValueKeys = ['blooms', 'contrast', 'palette', 'pooling', 'warmth'] as const;
+const boundaryAbi = 'lux/boundary-ink/v1';
+const boundaryFragmentKeys = ['finish'] as const;
+const boundaryValueKeys = ['grain', 'handDrawn', 'inkWarmth', 'outline'] as const;
 
 function hasExactKeys(record: Readonly<Record<string, unknown>>, expected: readonly string[]): boolean {
   const keys = Object.keys(record).sort();
@@ -193,6 +182,7 @@ export default defineComponent({
       regions: { type: { kind: 'shader-field', version: 1, abi: 'lux/organic-regions/v1' }, label: 'Regions', description: 'Organic region geometry and motion shader field.' },
       hatching: { type: { kind: 'shader-field', version: 1, abi: 'lux/region-hatching/v1' }, label: 'Hatching', description: 'Per-region line families, crosshatching, contours, and drawing coverage.' },
       watercolor: { type: { kind: 'shader-field', version: 1, abi: 'lux/watercolor/v1' }, label: 'Watercolor', description: 'Animated washes, warm pools, blooms, and pigment pooling.' },
+      boundary: { type: { kind: 'shader-field', version: 1, abi: 'lux/boundary-ink/v1' }, label: 'Boundary ink', description: 'Uneven warm outlines and stationary paper grain shader field.' },
     },
     outputs: { image: { type: { kind: 'image', colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }, label: 'Image', description: 'The painting before tracer ink is composited.' } },
   controls: {
@@ -203,22 +193,13 @@ export default defineComponent({
     tension: { type: 'number', group: 'Composition', label: 'Tension', default: 0.72, min: 0, max: 1.5, step: 0.01, description: 'Strength of local pressure, contrasting line directions, and rhythmic compression.' },
     hierarchy: { type: 'number', group: 'Composition', label: 'Large and small rhythm', default: 0.99, min: 0, max: 1.5, step: 0.01, description: 'Large anchor regions alternate with smaller supporting regions.' },
 
-    outline: { type: 'number', group: 'Ink & paper', label: 'Boundary width', default: 0.005, min: 0.002, max: 0.03, step: 0.001 },
-    inkWarmth: { type: 'number', group: 'Ink & paper', label: 'Warmth', default: 0.15, min: 0, max: 1, step: 0.01 },
-    handDrawn: { type: 'number', group: 'Ink & paper', label: 'Hand-drawn character', default: 1.34, min: 0, max: 1.5, step: 0.01 },
-    grain: { type: 'number', group: 'Ink & paper', label: 'Grain', default: 1.48, min: 0, max: 2, step: 0.01 },
-
-
   },
     controlDescriptions: {pace: 'pace setting for the painting.',
       phrasing: 'phrasing setting for the painting.',
       composition: 'composition setting for the painting.',
       tension: 'tension setting for the painting.',
       hierarchy: 'hierarchy setting for the painting.',
-      outline: 'outline setting for the painting.',
-      inkWarmth: 'inkWarmth setting for the painting.',
-      handDrawn: 'handDrawn setting for the painting.',
-      grain: 'grain setting for the painting.'},
+      },
     lifecycle: { state: 'stateful', reset: 'seed' },
   },
   async create(context) {
@@ -268,6 +249,7 @@ export default defineComponent({
       regions: ShaderFieldResource,
       hatching: ShaderFieldResource,
       watercolor: ShaderFieldResource,
+      boundary: ShaderFieldResource,
     ): Scene {
       const regionData = regions.data;
       if (regionData.version !== 1 || regionData.abi !== regionAbi) {
@@ -299,11 +281,22 @@ export default defineComponent({
       if (!hasExactKeys(watercolorData.values, watercolorValueKeys)) {
         throw Error(`Living Painting ${watercolorAbi} requires exactly the blooms, contrast, palette, pooling, and warmth values.`);
       }
+      const boundaryData = boundary.data;
+      if (boundaryData.version !== 1 || boundaryData.abi !== boundaryAbi) {
+        throw Error(`Living Painting requires shader field ${boundaryAbi}.`);
+      }
+      if (!hasExactKeys(boundaryData.fragments, boundaryFragmentKeys)) {
+        throw Error(`Living Painting ${boundaryAbi} requires exactly the finish fragment.`);
+      }
+      if (!hasExactKeys(boundaryData.values, boundaryValueKeys)) {
+        throw Error(`Living Painting ${boundaryAbi} requires exactly the grain, handDrawn, inkWarmth, and outline values.`);
+      }
 
       const source = paintingBeforeRegions
         + regionData.fragments.regionGeometry
         + watercolorData.fragments.wash
         + paintingAfterWatercolor
+        + boundaryData.fragments.finish
         + hatchingData.fragments.lpRegionMarks
         + paintingAfterHatching
         + regionData.fragments.lpRegion
@@ -333,26 +326,30 @@ export default defineComponent({
         scene.add(mesh);
       }
 
-      scale.value = regionData.values.scale;
-      warp.value = regionData.values.warp;
-      growth.value = regionData.values.growth;
-      seed.value = regionData.values.seed;
-      motion.value = regionData.values.motion;
-      coverage.value = hatchingData.values.coverage;
-      spacing.value = hatchingData.values.spacing;
-      curvature.value = hatchingData.values.curvature;
-      angle.value = hatchingData.values.angle;
-      hatchWidth.value = hatchingData.values.hatchWidth;
-      relation.value = hatchingData.values.relation;
-      spacingVar.value = hatchingData.values.spacingVar;
-      curvatureVar.value = hatchingData.values.curvatureVar;
-      angleVar.value = hatchingData.values.angleVar;
-      widthVar.value = hatchingData.values.widthVar;
-      palette.value = watercolorData.values.palette;
-      warmth.value = watercolorData.values.warmth;
-      contrast.value = watercolorData.values.contrast;
-      pooling.value = watercolorData.values.pooling;
-      blooms.value = watercolorData.values.blooms;
+      scale.value = regionData.values.scale!;
+      warp.value = regionData.values.warp!;
+      growth.value = regionData.values.growth!;
+      seed.value = regionData.values.seed!;
+      motion.value = regionData.values.motion!;
+      coverage.value = hatchingData.values.coverage!;
+      spacing.value = hatchingData.values.spacing!;
+      curvature.value = hatchingData.values.curvature!;
+      angle.value = hatchingData.values.angle!;
+      hatchWidth.value = hatchingData.values.hatchWidth!;
+      relation.value = hatchingData.values.relation!;
+      spacingVar.value = hatchingData.values.spacingVar!;
+      curvatureVar.value = hatchingData.values.curvatureVar!;
+      angleVar.value = hatchingData.values.angleVar!;
+      widthVar.value = hatchingData.values.widthVar!;
+      palette.value = watercolorData.values.palette!;
+      warmth.value = watercolorData.values.warmth!;
+      contrast.value = watercolorData.values.contrast!;
+      pooling.value = watercolorData.values.pooling!;
+      blooms.value = watercolorData.values.blooms!;
+      outline.value = boundaryData.values.outline!;
+      inkWarmth.value = boundaryData.values.inkWarmth!;
+      handDrawn.value = boundaryData.values.handDrawn!;
+      grain.value = boundaryData.values.grain!;
       return scene!;
     }
     let artisticTime = 0;
@@ -363,11 +360,7 @@ export default defineComponent({
         artisticTime += Math.max(0, frame.timeSeconds - previousTime) * c.pace;
         previousTime = frame.timeSeconds;
         time.value = artisticTime;
-        outline.value = c.outline;
-        inkWarmth.value = c.inkWarmth;
-        grain.value = c.grain;
         composition.value = c.composition;
-        handDrawn.value = c.handDrawn;
         tension.value = c.tension;
         phrasing.value = c.phrasing;
         hierarchy.value = c.hierarchy;
@@ -377,6 +370,7 @@ export default defineComponent({
           inputs.regions as ShaderFieldResource,
           inputs.hatching as ShaderFieldResource,
           inputs.watercolor as ShaderFieldResource,
+          inputs.boundary as ShaderFieldResource,
         );
         const paths = (inputs.paths as Paths2DResource).data.paths;
         if (paths.length > 4 || paths.some(path => path.points.length > 64)) {

@@ -60,3 +60,9 @@ The function uses the consumer's region owner, center, local coordinates, edge d
 `watercolor.ts` supplies the `wash` fragment through ABI `lux/watercolor/v1`. It owns Wash lightness, Warm pools, Region contrast, Pigment pooling and Watercolor blooms. The consumer inserts the original wash code after region geometry, using the same seed, time, position, region owner/edge, noise/phrase basis and vector packing.
 
 The field supplies the broad changing paint color. The Living Painting/styles consumer retains tracer-created daughter colors and their gradual transitions; the independent Tracer Renderer retains the visible ribbon and pigment bleed. Those connections let the shared paths affect the finished painting without duplicating the path simulation or changing the original mixing order.
+
+## Organic Boundary Ink shader field
+
+`boundary.ts` supplies the original `finish` block through ABI `lux/boundary-ink/v1`. It owns Boundary width, Warmth, Hand-drawn character and Grain. The block runs after the styles consumer has mixed its region colors and hatching, then draws the uneven cream boundary and adds stationary paper detail and the original final color conversion.
+
+The consumer supplies region edge distance and derivatives, position/noise/seed, the current color and cream tone, and the original ink/character vectors. Hand-drawn character and ink warmth still feed the other region and hatching calculations through those shared vectors. No separate image pass is added.
