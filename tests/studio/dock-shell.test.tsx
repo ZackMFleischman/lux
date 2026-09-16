@@ -257,7 +257,8 @@ test('Scene and component controls expose real animation plus independent reset 
   assert.equal(calls[1].name,'lux.node.parameters.set');assert.deepEqual(calls[1].input.nodePath,[ballId]);assert.deepEqual(calls[1].input.values,{intensity:.6});
   calls.splice(0);
   await click('Open Graph');
-  const nodes=[...document.querySelectorAll<HTMLButtonElement>('.graph-node')];assert.equal(nodes.length,3);
+  const graphNodes=[...document.querySelectorAll<HTMLButtonElement>('.graph-node')];assert.equal(graphNodes.length,4);
+  const nodes=graphNodes.slice(1);
   assert.equal(document.querySelectorAll('.graph-wires path').length,2);
   assert.equal(document.querySelectorAll('.graph-final-output').length,1);
   selectedPanel = 'inspector';await click('Close selected panel');
@@ -329,10 +330,10 @@ test('Graph enters nested components one level at a time and edits an exposed co
   const alias=within(document.querySelector('.inspector')!).getByLabelText('firstSegments · Segments value');
   await act(async()=>{fireEvent.change(alias,{target:{value:'9'}});fireEvent.keyDown(alias,{key:'Enter'});});
   assert.deepEqual(calls[0].input.nodePath,[compositeAId,wrapperNodeId,wrappedEffectId]);assert.deepEqual(calls[0].input.values,{segments:9});
-  await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Open component'}));});
-  assert.equal(document.querySelectorAll('.graph-node').length,2);assert.ok(screen.getByRole('navigation',{name:'Component breadcrumb'}));
+  await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'View inside'}));});
+  assert.equal(document.querySelectorAll('.graph-node').length,3);assert.ok(screen.getByRole('navigation',{name:'Component breadcrumb'}));
   const wrapper=screen.getByRole('button',{name:/Wrapped mirror/});await act(async()=>{fireEvent.click(wrapper);fireEvent.dblClick(wrapper);});
-  assert.equal(document.querySelectorAll('.graph-node').length,1);assert.ok(screen.getByRole('button',{name:'Back to Double mirror 1'}));
+  assert.equal(document.querySelectorAll('.graph-node').length,2);assert.ok(screen.getByRole('button',{name:'Back to Double mirror 1'}));
   await act(async()=>{runtime={...runtime,revisionId:'nested-r2'};snapshot={...snapshot,authoring:runtime};listeners.forEach(fn=>fn());});
   assert.ok(within(document.querySelector('.inspector')!).getByText('Wrapped mirror'),'selection survives an accepted rebuild when the full path remains');
   selectedPanel='graph'; await click('Close selected panel');
@@ -441,6 +442,39 @@ test('Graph wheel zoom anchors at the pointer and background gestures keep selec
   assert.equal(transform().zoom, .2);
   await click('Scene controls');
   assert.deepEqual(selections, [null, null]);
+});
+
+test('Graph keeps Scene available for plain visuals and compositions', async () => {
+  const { GraphPanel } = await import('../../apps/studio/src/GraphPanel.tsx');
+  const selections: unknown[] = [];
+  const { unmount } = render(<GraphPanel runtime={{ sceneName: 'Plain visual' } as any} selected={null} onSelect={path => selections.push(path)} />);
+  assert.ok(within(screen.getByRole('navigation', { name: 'Component breadcrumb' })).getByRole('button', { name: 'Scene' }));
+  assert.equal(document.querySelectorAll('.graph-node').length, 1);
+  assert.ok(screen.getByRole('button', { name: 'Scene' }));
+  assert.equal(screen.queryByRole('button', { name: 'View inside' }), null);
+  await act(async () => { fireEvent.click(document.querySelector<HTMLButtonElement>('.graph-scene-root')!); });
+  assert.deepEqual(selections, [null]);
+  unmount();
+
+  const { parse } = await import('@babel/parser');
+  const { createHash } = await import('node:crypto');
+  const { useState } = await import('react');
+  const { extractCompositionDeclaration } = await import('../../apps/build-worker/src/composition-declarations.mjs');
+  const { nestedCompositionSourceBundle } = await import('../compiler/composition-fixture.mjs');
+  const source = nestedCompositionSourceBundle();
+  const asts = Object.fromEntries(Object.entries(source.files).map(([path, text]) => [path, parse(text as string, { sourceType: 'module', plugins: ['typescript'] })]));
+  const composition = extractCompositionDeclaration({ entry: source.entry, files: source.files, asts, hash: (text: string) => createHash('sha256').update(text).digest('hex') });
+  assert.ok(composition);
+  function CompositionGraph() {
+    const [selected, setSelected] = useState<string | null>(null);
+    return <GraphPanel runtime={{ composition } as any} selected={selected} onSelect={path => setSelected(path ? JSON.stringify(path) : null)} />;
+  }
+  render(<CompositionGraph />);
+  assert.equal(document.querySelectorAll('.graph-node').length, 4);
+  assert.equal(screen.queryByRole('button', { name: 'View inside' }), null);
+  const component = [...document.querySelectorAll<HTMLButtonElement>('.graph-node')].find(node => node.textContent?.includes('Double mirror'))!;
+  await act(async () => { fireEvent.click(component); });
+  assert.ok(screen.getByRole('button', { name: 'View inside' }));
 });
 
 test('Graph connections point from output to input with reversed node declarations', async () => {
