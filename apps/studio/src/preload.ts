@@ -3,6 +3,7 @@ import type { StudioWindowClient, WindowState } from './window-client.ts';
 import type { StudioExportClient } from './export-client.ts';
 import type { ComponentLibraryClient } from './library-client.ts';
 import type { LookClient } from './look-client.ts';
+import type { PreviewCaptureClient } from './preview-capture-client.ts';
 const lookApi: LookClient = {
   list: () => ipcRenderer.invoke('studio:looks', 'list'),
   read: id => ipcRenderer.invoke('studio:looks', 'read', id),
@@ -62,3 +63,11 @@ const libraryApi:ComponentLibraryClient={
   copyRequest:id=>ipcRenderer.invoke('studio:library','copy-request',id),
 };
 contextBridge.exposeInMainWorld('luxLibrary',Object.freeze(libraryApi));
+const previewCaptureApi: PreviewCaptureClient = {
+  saveFrame: bytes => ipcRenderer.invoke('studio:capture', 'save-frame', bytes),
+  beginVideo: settings => ipcRenderer.invoke('studio:capture', 'begin-video', settings),
+  appendVideo: (id, bytes) => ipcRenderer.invoke('studio:capture', 'append-video', { id, bytes }),
+  finishVideo: (id, durationMs) => ipcRenderer.invoke('studio:capture', 'finish-video', { id, durationMs }),
+  cancelVideo: id => ipcRenderer.invoke('studio:capture', 'cancel-video', id),
+};
+contextBridge.exposeInMainWorld('luxPreviewCapture', Object.freeze(previewCaptureApi));

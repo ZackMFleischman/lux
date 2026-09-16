@@ -17,6 +17,8 @@ import { resolveStudioSession } from '../../../scripts/studio-session.mjs';
 import { ComponentLibraryStore } from '../../../packages/core/src/component-library-store.ts';
 import { LookStore } from '../../../packages/core/src/look-store.ts';
 import type { SourceBundle } from '../../../packages/runtime-contracts/src/index.ts';
+import { PreviewCaptureFileStore } from './preview-capture-files.ts';
+import type { VideoCaptureSettings } from './preview-capture-files.ts';
 
 // This process owns presentation windows only. It never creates a render service,
 // starts an authoring instance, or terminates a host-owned process.
@@ -36,6 +38,8 @@ const owned = new Set<BrowserWindow>();
 const fullscreenStates = new Map<BrowserWindow, () => boolean>();
 let mainWindow: BrowserWindow | null = null;
 let closing = false;
+let captureShutdown: Promise<void> | null = null;
+let closeReady = false;
 let compiling = false;
 const files = new SceneFileStore();
 const library = new ComponentLibraryStore(join(studioProfile.directory,'component-library.json'),{validateCandidate:async source=>{
@@ -47,6 +51,7 @@ let dirty = false;
 const closeConfirmation = createCloseConfirmation(() => randomBytes(16).toString('hex'), id => mainWindow?.webContents.send('studio:close-request', id));
 const agentRequests = new Map<string, { resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
 const exportShutdown = new AbortController();
+const previewCaptures = new PreviewCaptureFileStore();
 const exportService = createExportService({
   chooseDirectory: async () => {
     if (!mainWindow || mainWindow.isDestroyed() || closing) throw Error('Studio is closing');
@@ -59,7 +64,7 @@ const exportService = createExportService({
     return runExportChild(request, { workspace, executable, signal: exportShutdown.signal });
   },
 });
-app.once('will-quit', () => exportShutdown.abort());
+app.once('will-quit', () => { exportShutdown.abort(); void previewCaptures.cancelAll(); });
 function trusted(event: Electron.IpcMainInvokeEvent): boolean {
   const window = BrowserWindow.fromWebContents(event.sender);
   return !!window && owned.has(window) && event.senderFrame === event.sender.mainFrame && isTrustedStudioUrl(event.senderFrame.url, pageUrl);
@@ -154,6 +159,39 @@ app.whenReady().then(async () => {
     if (action === 'save') return looks.save(value as Parameters<LookStore['save']>[0]);
     throw Error('Unsupported Looks operation');
   });
+  ipcMain.handle('studio:capture', async (event, action: unknown, value: unknown) => {
+    if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted preview capture sender');
+    if (action === 'cancel-video') {
+      if (typeof value !== 'string') throw Error('Invalid recording identifier');
+      await previewCaptures.cancelVideo(value); return;
+    }
+    if (closing) throw Error('Studio is closing');
+    if (action === 'save-frame') {
+      if (!(value instanceof ArrayBuffer)) throw Error('Invalid PNG capture');
+      const selection = await dialog.showSaveDialog(mainWindow!, { defaultPath: 'Lux frame.png', filters: [{ name: 'PNG image', extensions: ['png'] }] });
+      if (selection.canceled || !selection.filePath) return null;
+      if (closing) throw Error('Studio closed before the frame destination was ready');
+      return previewCaptures.saveFrame(selection.filePath, value);
+    }
+    if (action === 'begin-video') {
+      const settings = value as VideoCaptureSettings;
+      const selection = await dialog.showSaveDialog(mainWindow!, { defaultPath: 'Lux clip.webm', filters: [{ name: 'WebM video', extensions: ['webm'] }] });
+      if (selection.canceled || !selection.filePath) return null;
+      if (closing) throw Error('Studio closed before the video destination was ready');
+      return previewCaptures.beginVideo(selection.filePath, settings);
+    }
+    if (action === 'append-video') {
+      const request = value as { id?: unknown; bytes?: unknown };
+      if (typeof request?.id !== 'string' || !(request.bytes instanceof ArrayBuffer)) throw Error('Invalid video chunk');
+      await previewCaptures.appendVideo(request.id, request.bytes); return;
+    }
+    if (action === 'finish-video') {
+      const request = value as { id?: unknown; durationMs?: unknown };
+      if (typeof request?.id !== 'string' || typeof request.durationMs !== 'number') throw Error('Invalid recording finish request');
+      return previewCaptures.finishVideo(request.id, request.durationMs);
+    }
+    throw Error('Unsupported preview capture action');
+  });
   ipcMain.handle('studio:authoring', async (event, action: unknown, value: unknown) => {
     if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted authoring sender');
     if (action === 'example') return { sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': await readFile(join(workspace, 'packages/visual-sdk/examples/intensity.ts'), 'utf8') } };
@@ -194,7 +232,7 @@ app.whenReady().then(async () => {
     if (action === 'smoke-result' && process.env.LUX_STUDIO_SMOKE === '1') {
       const directory = join(workspace, 'artifacts/studio-smoke'); await mkdir(directory, { recursive: true });
       const capture = (value as { capture?: { bytes: ArrayBuffer } })?.capture;
-      if (capture?.bytes instanceof ArrayBuffer && capture.bytes.byteLength <= 8388608) await writeFile(join(directory, 'output.png'), Buffer.from(capture.bytes));
+      if (capture?.bytes instanceof ArrayBuffer && capture.bytes.byteLength <= 40 * 1024 * 1024) await writeFile(join(directory, 'output.png'), Buffer.from(capture.bytes));
       await writeFile(join(directory, 'result.json'), JSON.stringify(value, null, 2));
       await writeFile(join(directory, 'studio.png'), (await mainWindow!.webContents.capturePage()).toPNG());
       setTimeout(() => app.exit((value as { ok?: boolean })?.ok ? 0 : 2), 100); return;
@@ -234,7 +272,14 @@ app.whenReady().then(async () => {
   app.once('will-quit', () => { bridge.close(); for (const pending of agentRequests.values()) { clearTimeout(pending.timer); pending.reject(Error('Studio closed')); } agentRequests.clear(); });
   mainWindow.on('close', event => {
     if (process.env.LUX_STUDIO_SMOKE !== '1' && !closeConfirmation.allowClose(dirty)) { event.preventDefault(); return; }
+    if (closeReady) return;
+    event.preventDefault();
+    if (captureShutdown) return;
     closing = true; coordinator.dock();
+    captureShutdown = previewCaptures.cancelAll().finally(() => {
+      closeReady = true;
+      if (mainWindow && !mainWindow.isDestroyed()) mainWindow.close();
+    });
   });
   if (process.env.LUX_STUDIO_SMOKE === '1') setTimeout(() => { console.error('Studio smoke timeout'); app.exit(3); }, 90000);
   if (process.env.LUX_STUDIO_MCP_TEST === '1') setTimeout(() => { console.error('Studio MCP test timeout'); app.exit(3); }, 120000);

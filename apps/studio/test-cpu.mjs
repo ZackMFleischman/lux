@@ -23,6 +23,7 @@ for (const args of [
   ['--test', '--test-isolation=none', join(directory, 'dist/source-editor.test.mjs')],
   ['--test', '--test-isolation=none', join(directory, 'dist/library-panel.test.mjs')],
   ['--test', '--test-isolation=none', join(directory, 'dist/dock-shell.test.mjs')],
+  ['--test', '--test-isolation=none', join(directory, 'dist/preview-capture-menu.test.mjs')],
   ['--experimental-vm-modules', '--test', join(tests, 'visual-worker.test.mjs'), join(tests, 'component-worker.test.mjs')],
   ['--test','--test-isolation=none',join(root,'tests/performance/live.test.mjs'),join(root,'tests/performance/recovery.test.ts'),join(root,'tests/performance/gpu-pass.test.mjs')],
 ]) {

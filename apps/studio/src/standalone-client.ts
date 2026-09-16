@@ -199,7 +199,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           }
           if (message.type === 'capture') {
             const wait = this.pending.get(message.requestId);
-            if (wait?.runtime === candidate && wait.kind === 'capture' && message.bytes instanceof ArrayBuffer && message.bytes.byteLength <= 8388608) {
+            if (wait?.runtime === candidate && wait.kind === 'capture' && message.bytes instanceof ArrayBuffer && message.bytes.byteLength <= 40 * 1024 * 1024) {
               if(state.sdkVersion!=='0.1.0') {
                 try {validateControlSnapshot(state.controlSchema,message.metadata?.controls);
                   if(message.metadata.controlSchemaHash!==state.controlSchemaHash||!Number.isSafeInteger(message.metadata.controlSequence)||message.metadata.controlSequence<0||message.metadata.controlSequence>candidate.controls||!/^\d{1,20}$/.test(message.metadata.frameId))throw Error('Invalid capture parameter metadata');
