@@ -104,12 +104,23 @@ try {
   report.savedScenes = { saveBytes: (await stat(scenePath)).size, saveAsBytes: (await stat(saveAsPath)).size };
   report.checks.push('Ctrl+Enter builds from Source; Ctrl+S and Ctrl+Shift+S save through the same scene actions while Source has focus');
 
+  await openMenu('File');
+  const exportItem = page.getByRole('menuitem', { name: /Export for Resolume/ });
+  const exportDisabled = await exportItem.getAttribute('aria-disabled') === 'true';
+  const exportReason = await exportItem.getAttribute('title');
+  await page.keyboard.press('Escape');
   await page.keyboard.press('Control+Shift+E');
-  await page.getByRole('dialog', { name: 'Export for Resolume' }).waitFor();
-  await page.keyboard.press('Control+Shift+E');
-  assert.equal(await page.getByRole('dialog', { name: 'Export for Resolume' }).count(), 1);
-  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
-  report.checks.push('Ctrl+Shift+E opens one export dialog and further dialog shortcuts are suppressed');
+  if (exportDisabled) {
+    assert.equal(exportReason, 'Resolume export is not included in this desktop build.');
+    assert.equal(await page.getByRole('dialog', { name: 'Export for Resolume' }).count(), 0);
+    report.checks.push('Installed export shortcut stays unavailable with the explicit desktop-build reason');
+  } else {
+    await page.getByRole('dialog', { name: 'Export for Resolume' }).waitFor();
+    await page.keyboard.press('Control+Shift+E');
+    assert.equal(await page.getByRole('dialog', { name: 'Export for Resolume' }).count(), 1);
+    await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+    report.checks.push('Ctrl+Shift+E opens one export dialog and further dialog shortcuts are suppressed');
+  }
 
   await page.getByLabel('Preview resolution preset', { exact: true }).selectOption('1920x1080');
   await assertPreviewSize(1920, 1080);

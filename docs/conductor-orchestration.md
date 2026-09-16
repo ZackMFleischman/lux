@@ -11,6 +11,8 @@ tracker record the transition from the old immutable profile to its successor.
 
 ## Next usable milestones
 
+Current dispatch order (16 September 2026): finish reviewed component model150 and shared Studio audio151 integration, including the active Inspector pointer regression166. Then prioritize kick response152 and manual/tap tempo153 ahead of Library164/165. Automatic audio beat estimation is not in153; Resolume host/audio/export verification109/111/154 remains deferred. Retain the fresh-start noise-sphere default and Graph instructional-footer removal as bounded polish; preserve saved-scene reopening. Routine native UI checks use640×360 after default startup, with normal window sizes; explicit capture-resolution checks retain1920×1080. Only one native GPU test may run at a time, coordinated directly with the tracer task.
+
 The user's latest priority is QA and iteration on the normal creative workflow
 before additive features. Exercise start, create/edit, build, inspect, controls,
 save/reopen and invalid-edit preservation. MIDI ticket LUX-91 is paused for user

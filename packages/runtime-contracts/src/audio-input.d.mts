@@ -7,4 +7,3 @@ export function normalizeAudioAnalyzerConfig(input:unknown):AudioAnalyzerConfig;
 export function normalizeAudioInputConfiguration(input:unknown):AudioInputConfiguration;
 export function normalizeAudioBandSource(input:unknown):AudioBandSource;
 export function normalizeAudioBandSnapshot(input:unknown):AudioBandSnapshot;
-
