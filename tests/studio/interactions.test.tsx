@@ -377,16 +377,18 @@ test('RTL: fullscreen shows only preview, ignores stale initial state, and exits
   };
   const { container } = render(<StudioApp client={service().client} windows={windows} nowMs={1000} />);
   const surface = container.querySelector('.preview-surface');
-  fireEvent.click(screen.getByRole('button', { name: 'Fullscreen' }));
+  await act(async () => { fireEvent.keyDown(window, { key: 'F11' }); await Promise.resolve(); });
   assert.ok(container.querySelector('.studio-preview-fullscreen'));
   assert.equal(screen.queryByRole('button', { name: 'Play' }), null);
   assert.equal(screen.queryByRole('slider'), null);
   assert.ok(screen.getByText('Press Escape to exit fullscreen'));
-  await act(async () => initial({ detached: false, fullscreen: false }));
+  await act(async () => { initial({ detached: false, fullscreen: false }); await Promise.resolve(); });
   assert.ok(container.querySelector('.studio-preview-fullscreen'));
+  await act(async () => { fireEvent.keyDown(window, { key: 'F11', repeat: true }); await Promise.resolve(); });
+  assert.ok(container.querySelector('.studio-preview-fullscreen'), 'repeat does not toggle fullscreen');
   await act(async () => { await new Promise(resolve => setTimeout(resolve, 3600)); });
   assert.equal(screen.queryByText('Press Escape to exit fullscreen'), null);
-  fireEvent.keyDown(window, { key: 'Escape' });
+  await act(async () => { fireEvent.keyDown(window, { key: 'Escape' }); await Promise.resolve(); });
   assert.equal(container.querySelector('.studio-preview-fullscreen'), null);
   assert.ok(screen.getByRole('button', { name: 'Fullscreen' }));
   assert.equal(container.querySelector('.preview-surface'), surface);
@@ -399,4 +401,25 @@ test('RTL: unavailable popout is absent while fullscreen remains available', asy
   render(<StudioApp client={service().client} windows={windows} nowMs={1000} />);
   assert.equal(screen.queryByRole('button', { name: 'Pop out' }), null);
   assert.equal((screen.getByRole('button', { name: 'Fullscreen' }) as HTMLButtonElement).disabled, false);
+});
+
+test('RTL: global authoring shortcuts dispatch one shared action and suppress repeats', async () => {
+  const calls: string[] = [];
+  const action = (name: string, disabled = false) => ({ disabled, run: () => { calls.push(name); } });
+  render(<StudioApp client={createDisconnectedClient()} nowMs={1000} shortcutActions={{
+    save: action('save'), 'save-as': action('save-as'), export: action('export'), build: action('build'),
+    'save-frame': action('frame', true), 'toggle-recording': action('record'),
+  }} />);
+  for (const event of [
+    { key: 's', ctrlKey: true }, { key: 's', ctrlKey: true, shiftKey: true },
+    { key: 'e', ctrlKey: true, shiftKey: true }, { key: 'Enter', ctrlKey: true },
+    { key: 'p', ctrlKey: true, shiftKey: true }, { key: 'r', ctrlKey: true, shiftKey: true },
+  ]) fireEvent.keyDown(window, event);
+  fireEvent.keyDown(window, { key: 'r', ctrlKey: true, shiftKey: true, repeat: true });
+  const handled = new KeyboardEvent('keydown', { key: 's', ctrlKey: true, bubbles: true, cancelable: true });
+  handled.preventDefault(); window.dispatchEvent(handled);
+  const dialog = document.createElement('div'); dialog.setAttribute('role', 'dialog'); document.body.append(dialog);
+  fireEvent.keyDown(window, { key: 's', ctrlKey: true, shiftKey: true });
+  dialog.remove();
+  assert.deepEqual(calls, ['save', 'save-as', 'export', 'build', 'record']);
 });

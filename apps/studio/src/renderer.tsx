@@ -11,6 +11,7 @@ import { Preview } from './preview.tsx';
 import { StudioController } from './service-client.ts';
 import type { ReactNode } from 'react';
 import { StudioDockShell } from './layout/StudioDockShell.tsx';
+import type { StudioPanelKind } from './layout/StudioDockShell.tsx';
 import type { StudioClient, StudioSnapshot, Metric } from './service-client.ts';
 import type { PresentationPort } from './presentation.ts';
 import type { StudioWindowClient, WindowState } from './window-client.ts';
@@ -19,6 +20,8 @@ import { Disclosure } from './Disclosure.tsx';
 import { ProblemsPanel } from './source/ProblemsPanel.tsx';
 import type { SourceDiagnostic } from './source/diagnostics.ts';
 import type { SourceSnapshot } from './source/workspace.ts';
+import { blocksTextEntry, isTextEntryTarget, shortcutCommand, shortcutHint } from './studio-shortcuts.ts';
+import type { StudioShortcutActions } from './studio-shortcuts.ts';
 
 type SourceDiagnosticsView = {
   items: readonly SourceDiagnostic[];
@@ -40,7 +43,7 @@ function MetricView({ label, metric, nowMs }: { label: string; metric: Metric | 
 }
 export type StudioProps = {
   controlEdits?: ControlEdits;
-  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; sourceDiagnostics?: SourceDiagnosticsView; libraryPanel?:ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; previewActions?: ReactNode; appError?: string; sourceChanged?: boolean; controlsAvailable?: boolean;
+  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; sourceDiagnostics?: SourceDiagnosticsView; libraryPanel?:ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; previewActions?: ReactNode; shortcutActions?: StudioShortcutActions; appError?: string; sourceChanged?: boolean; controlsAvailable?: boolean;
 };
 export function StudioApp(props: StudioProps) {
   return <ThemeProvider theme={studioTheme}><CssBaseline /><StudioLayout {...props} /></ThemeProvider>;
@@ -68,7 +71,7 @@ export function studioStatus(snapshot: StudioSnapshot, sourceProblemCount = 0): 
     : snapshot.authoring ? sentenceCase(snapshot.authoring.playback) : 'No runtime';
   return { build, building: !!active, problems, runtime };
 }
-function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel,sourceDiagnostics,libraryPanel, appCommands, fileMenu, previewActions, appError, controlEdits, sourceChanged, controlsAvailable }: StudioProps) {
+function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel,sourceDiagnostics,libraryPanel, appCommands, fileMenu, previewActions, shortcutActions, appError, controlEdits, sourceChanged, controlsAvailable }: StudioProps) {
   const [toolsHost, setToolsHost] = useState<HTMLElement | null>(null);
   const [transportMenu, setTransportMenu] = useState<HTMLElement | null>(null);
   const view = useMemo(() => createRendererSnapshot(client), [client]);
@@ -77,12 +80,15 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   // A rejected old-target write must not discard a new runtime's queued input.
   const controller = useMemo(() => new StudioController(client), [client, owner]);
   const [windowState, setWindowState] = useState<WindowState>({ detached: false, fullscreen: false });
-  const [maximized, setMaximized] = useState(false);
+  const [focusedPanel, setFocusedPanel] = useState<StudioPanelKind>('preview');
+  const [maximizedPanel, setMaximizedPanel] = useState<StudioPanelKind | null>(null);
   const [maximizedInspector, setMaximizedInspector] = useState(false);
   const [pendingCommands, setPendingCommands] = useState(0);
   const transportPending = useRef(false);
-  const jobsRef = useRef<HTMLElement>(null), openPanelRef = useRef<null | ((kind: 'preview' | 'source' | 'library' | 'inspector' | 'jobs' | 'graph') => void)>(null);
-  const bindOpenPanel = useCallback((action: null | ((kind: 'preview' | 'source' | 'library' | 'inspector' | 'jobs' | 'graph') => void)) => { openPanelRef.current = action; }, []);
+  const jobsRef = useRef<HTMLElement>(null), openPanelRef = useRef<null | ((kind: StudioPanelKind) => void)>(null), togglePanelRef = useRef<null | ((kind: StudioPanelKind) => void)>(null);
+  const bindOpenPanel = useCallback((action: null | ((kind: StudioPanelKind) => void)) => { openPanelRef.current = action; }, []);
+  const bindTogglePanel = useCallback((action: null | ((kind: StudioPanelKind) => void)) => { togglePanelRef.current = action; }, []);
+  const panelFocus = useRef<HTMLElement | null>(null), fullscreenFocus = useRef<HTMLElement | null>(null), previousFullscreen = useRef(false);
   const [jobsRequest, setJobsRequest] = useState(0);
   useEffect(() => {
     if (!jobsRequest) return;
@@ -115,15 +121,59 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
     void windows.getState().then(state => { if (active && !receivedEvent) setWindowState(state); }).catch(reason => { if (active) setError(String(reason)); });
     return () => { active = false; unsubscribe(); };
   }, [windows]);
+  function rememberFocus(target: { current: HTMLElement | null }): void {
+    target.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  }
+  function restoreFocus(target: { current: HTMLElement | null }): void {
+    const element = target.current; target.current = null;
+    queueMicrotask(() => { if (element?.isConnected) element.focus(); });
+  }
+  function toggleMaximized(panel = focusedPanel): void {
+    if (maximizedPanel) { setMaximizedPanel(null); restoreFocus(panelFocus); return; }
+    rememberFocus(panelFocus); setMaximizedPanel(panel);
+  }
+  function toggleFullscreen(): void {
+    if (!windows) return;
+    if (!windowState.fullscreen) rememberFocus(fullscreenFocus);
+    windowAction(() => windows.fullscreen(!windowState.fullscreen));
+  }
+  function toggleInspector(): void {
+    if (maximizedPanel === 'preview' && !windowState.fullscreen) { setMaximizedInspector(value => !value); return; }
+    if (maximizedPanel === 'inspector') { setMaximizedPanel(null); restoreFocus(panelFocus); }
+    togglePanelRef.current?.('inspector');
+  }
   useEffect(() => {
     const escape = (event: KeyboardEvent) => {
       if (event.key !== 'Escape' || event.defaultPrevented) return;
       if (windows) void windows.fullscreen(false).catch(reason => setError(String(reason)));
-      if (!windowState.fullscreen) setMaximized(false);
+      if (!windowState.fullscreen && maximizedPanel) { setMaximizedPanel(null); restoreFocus(panelFocus); }
     };
     window.addEventListener('keydown', escape);
     return () => window.removeEventListener('keydown', escape);
-  }, [windows, windowState.fullscreen]);
+  }, [windows, windowState.fullscreen, maximizedPanel]);
+  useEffect(() => {
+    if (previousFullscreen.current && !windowState.fullscreen) restoreFocus(fullscreenFocus);
+    previousFullscreen.current = windowState.fullscreen;
+  }, [windowState.fullscreen]);
+  const shortcutActionsRef = useRef(shortcutActions); shortcutActionsRef.current = shortcutActions;
+  useEffect(() => {
+    const keydown = (event: KeyboardEvent) => {
+      const shortcut = shortcutCommand(event);
+      if (!shortcut || event.defaultPrevented || event.isComposing) return;
+      if (document.querySelector('[role="dialog"], [role="alertdialog"]')) { event.preventDefault(); return; }
+      if (blocksTextEntry(shortcut) && isTextEntryTarget(event.target)) { event.preventDefault(); return; }
+      event.preventDefault();
+      if (event.repeat) return;
+      if (shortcut === 'maximize-panel') { if (!previewOnly) toggleMaximized(); return; }
+      if (shortcut === 'fullscreen') { toggleFullscreen(); return; }
+      if (shortcut === 'toggle-inspector') { if (!previewOnly) toggleInspector(); return; }
+      const action = shortcutActionsRef.current?.[shortcut];
+      if (!action || action.disabled) return;
+      void action.run();
+    };
+    window.addEventListener('keydown', keydown);
+    return () => window.removeEventListener('keydown', keydown);
+  }, [focusedPanel, maximizedPanel, previewOnly, windowState.fullscreen, windows]);
   useEffect(() => {
     setFullscreenHint(windowState.fullscreen);
     if (!windowState.fullscreen) return;
@@ -139,8 +189,9 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
     finally { if (transport) { transportPending.current = false; setPendingCommands(count => count - 1); } }
   }
   function windowAction(action: () => Promise<void>): void { void action().catch(reason => setError(String(reason))); }
-  const compact = previewOnly || maximized || windowState.fullscreen;
-  const showMaximizedInspector = maximized && maximizedInspector && !windowState.fullscreen;
+  const compact = previewOnly || maximizedPanel !== null || windowState.fullscreen;
+  const expandedPanel: StudioPanelKind = previewOnly || windowState.fullscreen ? 'preview' : maximizedPanel ?? 'preview';
+  const showMaximizedInspector = maximizedPanel === 'preview' && maximizedInspector && !windowState.fullscreen;
   const previewOutput = runtime?.output;
   const presetValue = previewOutput && [[1280,720],[1920,1080],[2560,1440]].some(([width,height]) => width === previewOutput.width && height === previewOutput.height)
     ? `${previewOutput.width}x${previewOutput.height}` : 'custom';
@@ -153,10 +204,10 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
         <div className="panel-toolbar" hidden={windowState.fullscreen}>
           <div className="preview-actions">
             {previewActions}
-            {!previewOnly && <Button aria-pressed={maximized} onClick={() => setMaximized(value => !value)}>{maximized ? 'Restore workspace' : 'Maximize'}</Button>}
-            {maximized && !windowState.fullscreen && <Button aria-pressed={maximizedInspector} onClick={() => setMaximizedInspector(value => !value)}>{maximizedInspector ? 'Hide Inspector' : 'Show Inspector'}</Button>}
+            {!previewOnly && <Button aria-pressed={maximizedPanel === 'preview'} title={`${maximizedPanel === 'preview' ? 'Restore workspace' : 'Maximize preview'} (${shortcutHint['maximize-panel']})`} onClick={() => toggleMaximized('preview')}>{maximizedPanel === 'preview' ? 'Restore workspace' : 'Maximize'}</Button>}
+            {maximizedPanel === 'preview' && !windowState.fullscreen && <Button aria-pressed={maximizedInspector} title={`${maximizedInspector ? 'Hide Inspector' : 'Show Inspector'} (${shortcutHint['toggle-inspector']})`} onClick={toggleInspector}>{maximizedInspector ? 'Hide Inspector' : 'Show Inspector'}</Button>}
             {(previewOnly || windowState.detached || windows?.popout) && <Button disabled={!windows} onClick={() => windows && windowAction(() => previewOnly || windowState.detached ? windows.dock() : windows.popout!())}>{previewOnly || windowState.detached ? 'Dock preview' : 'Pop out'}</Button>}
-            <Button disabled={!windows} onClick={() => windows && windowAction(() => windows.fullscreen(!windowState.fullscreen))}>{windowState.fullscreen ? 'Exit fullscreen' : 'Fullscreen'}</Button>
+            <Button disabled={!windows} title={`${windowState.fullscreen ? 'Exit fullscreen' : 'Fullscreen'} (${shortcutHint.fullscreen})`} onClick={toggleFullscreen}>{windowState.fullscreen ? 'Exit fullscreen' : 'Fullscreen'}</Button>
           </div>
           <div className="preview-resolution-controls">
             <label className="preview-resolution">Resolution
@@ -197,7 +248,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
         <section><Disclosure title="Runtime"><dl className="identity"><dt>Authoring revision</dt><dd>{runtime?.revisionId ?? 'Unavailable'}</dd><dt>Instance</dt><dd>{runtime?.instanceId ?? 'Unavailable'}</dd><dt>Generation / clock epoch</dt><dd>{runtime ? `${runtime.generation} / ${runtime.clockEpoch}` : 'Unavailable'}</dd><dt>Completed frame</dt><dd>{runtime?.frameId ?? 'Unavailable'}</dd></dl></Disclosure></section>
         <section><Disclosure title="Host output"><p className="host-revision">{snapshot.host?.revisionId ?? 'No host status available'}</p><p className="hint">Authoring changes do not update a pinned host revision.</p></Disclosure></section>
       </Paper>;
-  const openJobs = () => { setMaximized(false); setJobsRequest(value => value + 1); };
+  const openJobs = () => { setMaximizedPanel(null); setJobsRequest(value => value + 1); };
   const jobsPane = <section ref={jobsRef} tabIndex={-1} className="diagnostics" aria-label="Jobs and diagnostics"><div className="section-heading"><h2>Jobs & diagnostics</h2><span className="subtle">{snapshot.jobs.length} jobs · {sourceProblemCount} diagnostics</span></div>
       {runtime?.fault && <p className="error" role="alert"><strong>{runtime.fault.code}</strong> · {runtime.fault.message}</p>}
       {snapshot.jobs.map(job => <p key={job.jobId} className={job.fault ? 'error' : ''}><span className="tag">{job.state}</span> {job.summary}{job.fault && !sourceDiagnosticFault(job.fault, sourceDiagnostics?.items ?? []) && ` · ${job.fault}`}</p>)}
@@ -216,7 +267,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
     </header>
     {appError && <Alert severity="error">{appError}</Alert>}
     <div className="workspace">
-      {sourcePanel ? <StudioDockShell onOpenPanelReady={bindOpenPanel} toolsHost={toolsHost} compact={compact} showInspector={showMaximizedInspector} preview={previewPane} source={sourcePanel} library={libraryPanel??<section aria-label="Shared component library">Library unavailable.</section>} inspector={inspectorPane} diagnostics={diagnosticsPane} jobs={jobsPane} graph={<GraphPanel runtime={runtime} selected={selectedNodePath?nodeKey(selectedNodePath):null} onSelect={selectGraphNode}/>} /> : <>{previewPane}{(!compact || showMaximizedInspector) && inspectorPane}{(!compact || showMaximizedInspector) && diagnosticsPane}</>}
+      {sourcePanel ? <StudioDockShell onOpenPanelReady={bindOpenPanel} onTogglePanelReady={bindTogglePanel} onActivePanelChange={setFocusedPanel} toolsHost={toolsHost} compact={compact} expandedPanel={expandedPanel} showInspector={showMaximizedInspector} preview={previewPane} source={sourcePanel} library={libraryPanel??<section aria-label="Shared component library">Library unavailable.</section>} inspector={inspectorPane} diagnostics={diagnosticsPane} jobs={jobsPane} graph={<GraphPanel runtime={runtime} selected={selectedNodePath?nodeKey(selectedNodePath):null} onSelect={selectGraphNode}/>} /> : <>{previewPane}{(!compact || showMaximizedInspector) && inspectorPane}{(!compact || showMaximizedInspector) && diagnosticsPane}</>}
     </div>
     {!sourcePanel && !compact && jobsPane}
     <footer className="status-bar" hidden={windowState.fullscreen || previewOnly} aria-label="Studio status">

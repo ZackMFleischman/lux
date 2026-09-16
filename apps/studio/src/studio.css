@@ -147,7 +147,8 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 .studio-menu-trigger:hover, .studio-menu-trigger[aria-expanded="true"] { background:#30323d; }
 .studio-menu-paper { min-width:200px; max-width:calc(100vw - 16px); border:1px solid #3b3e4b; box-shadow:0 8px 24px #0006; }
 .studio-menu-paper .MuiMenu-list { padding:4px; }
-.studio-menu-paper .MuiMenuItem-root { min-height:30px; padding:5px 10px; border-radius:3px; font:400 12px/1.5 Inter,"Segoe UI",sans-serif; color:#d2d4df; }
+.studio-menu-paper .MuiMenuItem-root { min-height:30px; padding:5px 10px; border-radius:3px; gap:20px; font:400 12px/1.5 Inter,"Segoe UI",sans-serif; color:#d2d4df; }
+.studio-shortcut-hint { margin-left:auto; color:#8f93a5; font-size:10px; white-space:nowrap; }
 .studio-menu-paper .MuiMenuItem-root:hover, .studio-menu-paper .MuiMenuItem-root.Mui-focusVisible { background:#30323d; }
 .app-bar .document-name { flex:0 1 auto; max-width:55vw; }
 .app-bar .studio-build-button { height:28px; gap:6px; padding:0 10px; border-color:#494d5d; color:#e1e2ec; font-size:12px; margin-left:4px; }
