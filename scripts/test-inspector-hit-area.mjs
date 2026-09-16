@@ -45,28 +45,30 @@ try{
     const targetBox=await target.boundingBox(),trackBox=await track.boundingBox();assert.ok(targetBox&&trackBox);
     const center=targetBox.x+targetBox.width/2,fraction=Math.max(0,Math.min(1,(center-trackBox.x)/trackBox.width));
     const value=Number((definition.min+Math.round(fraction*(definition.max-definition.min)/step)*step).toFixed(6));
-    await setValue(value);const thumbBox=await thumb.boundingBox();assert.ok(thumbBox);
-    const distance=Math.abs(thumbBox.x+thumbBox.width/2-center);assert.ok(distance<10,`${label} is horizontally aligned with thumb (${distance}px)`);
+    await setValue(value);let thumbBox,distance=Infinity;
+    for(let attempt=0;attempt<40;attempt++){thumbBox=await thumb.boundingBox();assert.ok(thumbBox);distance=Math.abs(thumbBox.x+thumbBox.width/2-center);if(distance<2)break;await page.waitForTimeout(50);}
+    assert.ok(distance<2,`${label} is horizontally aligned with thumb (${distance}px)`);
     report.alignments.push({label,value,targetX:center,thumbX:thumbBox.x+thumbBox.width/2,distance});
     return value;
   }
+  async function pointerClick(target,options={}){const box=await target.boundingBox();assert.ok(box);await target.click({...options,position:{x:box.width/2,y:box.height-3}});}
   // Replay only the old stacking rule as a negative control. No source or saved
   // file is changed. Removing this style restores the exact candidate CSS.
   await align(animate,'baseline Animate');
   const baselineStyle=await page.addStyleTag({content:'.parameter-heading{position:static!important;z-index:auto!important}'});
-  await assert.rejects(animate.click({timeout:1600}),error=>/intercepts pointer events/.test(String(error))&&/MuiSlider-thumb/.test(String(error)));
+  await assert.rejects(pointerClick(animate,{timeout:1600}),error=>/intercepts pointer events/.test(String(error))&&/MuiSlider-thumb/.test(String(error)));
   await capture('before-stacking-replay');
   await baselineStyle.evaluate(style=>style.remove());
   report.checks.push('Negative control: replay of pre-fix heading stacking blocks ordinary Animate click through the slider thumb; candidate stylesheet restored before positive checks');
 
   for(const [size,width,height] of [['wide',1360,900],['narrow',820,720]]){
     report.stage=size;await page.setViewportSize({width,height});
-    await align(animate,`${size} Animate`);await animate.click();
+    await align(animate,`${size} Animate`);await pointerClick(animate);
     const dialog=page.getByRole('dialog',{name:'Animate Spike height',exact:true});await dialog.waitFor();
     await capture(`${size}-animate`);await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
-    await align(reset,`${size} Reset`);await reset.click();
+    await align(reset,`${size} Reset`);await pointerClick(reset);
     await statusWhen(state=>state.controls.spikeHeight===definition.default,`${size} reset default`);
-    await align(number,`${size} numeric`);await number.click();assert.equal(await number.evaluate(input=>input===document.activeElement),true);
+    await align(number,`${size} numeric`);await pointerClick(number);assert.equal(await number.evaluate(input=>input===document.activeElement),true);
     await page.keyboard.press('ControlOrMeta+A');await page.keyboard.type('1.2');await page.keyboard.press('Enter');
     await statusWhen(state=>state.controls.spikeHeight===1.2,`${size} pointer-selected numeric edit`);
     const box=await track.boundingBox(),start=await thumb.boundingBox();assert.ok(box&&start);
