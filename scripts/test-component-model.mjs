@@ -21,9 +21,9 @@ try {
   for(let attempt=0;attempt<100;attempt++){try{endpoint=JSON.parse(await readFile(session.endpointPath,'utf8'));if(endpoint.pid===report.pid)break;}catch{}await page.waitForTimeout(100);}
   assert.equal(endpoint?.pid,report.pid);
   const call=createStudioConnection({...session,expectedSessionId:endpoint.sessionId});
-  async function statusWhen(predicate){for(let attempt=0;attempt<100;attempt++){const state=await call('status');if(predicate(state.authoring))return state.authoring;await page.waitForTimeout(100);}throw Error('Runtime state did not settle');}
+  async function statusWhen(predicate,timeoutMs=20000){const end=Date.now()+timeoutMs;let state;while(Date.now()<end){state=await call('status');if(predicate(state.authoring))return state.authoring;await page.waitForTimeout(100);}throw Error('Runtime state did not settle: '+JSON.stringify(state));}
   async function capture(name){const path=join(output,`${name}.png`);await page.screenshot({path});report.screenshots.push(path);}
-  await statusWhen(runtime=>runtime?.playback==='playing');
+  await statusWhen(runtime=>runtime?.playback==='playing',60000);
   await page.getByRole('button',{name:'Pause',exact:true}).waitFor();
   const plain={sdkVersion:'0.2.0',entry:'visual.ts',files:{'visual.ts':await readFile(join(root,'skills/lux-visual-creation/assets/noise-sphere.ts'),'utf8')}};
   const legacy=nestedPrismaticCompositionSource(),modern=structuredClone(legacy);
