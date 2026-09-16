@@ -343,6 +343,7 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
   };
   const { AuthoringApp } = await import('../../apps/studio/src/authoring.tsx');
   await act(async () => { render(<AuthoringApp />); });
+  assert.deepEqual([...document.querySelectorAll<HTMLButtonElement>('header [data-studio-menu]')].map(button => button.textContent), ['File', 'View', 'Preview']);
   await click(screen.getByRole('button', { name: 'View' }));
   await click(screen.getByRole('menuitem', { name: 'Source' }));
   await waitFor(() => assert.ok(screen.queryByRole('button', { name: 'View' })));

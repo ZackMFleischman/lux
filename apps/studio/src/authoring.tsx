@@ -25,7 +25,7 @@ import { completeLibraryMutation } from './library/library-mutation.ts';
 import './library-client.ts';
 import './look-client.ts';
 import { LooksDialog } from './LooksDialog.tsx';
-import { PreviewCaptureMenu } from './PreviewCaptureMenu.tsx';
+import { PreviewCaptureActions, PreviewCaptureMenu } from './PreviewCaptureMenu.tsx';
 import { PreviewRecorder } from './preview-recorder.ts';
 import { assertAgentCaptureSize } from './preview-capture-client.ts';
 import type { PreviewRecorderSnapshot } from './preview-recorder.ts';
@@ -279,10 +279,10 @@ export function AuthoringApp() {
       <MenuItem disabled={busy || composing.current || !!window.luxExport?.unavailableReason} title={window.luxExport?.unavailableReason} onClick={() => setExportOpen(true)}>
         Export for Resolume{window.luxExport?.unavailableReason ? ' (not included)' : ''}</MenuItem>
     </StudioMenu>
-    <PreviewCaptureMenu available={!!previewRecorder && !!runtime && runtime.playback !== 'failed'} status={recording}
-      onSaveFrame={savePreviewFrame} onStart={startPreviewRecording} onStop={stopPreviewRecording} />
   </>;
   const commands = <>
+    <PreviewCaptureMenu available={!!previewRecorder && !!runtime && runtime.playback !== 'failed'} status={recording}
+      onSaveFrame={savePreviewFrame} onStart={startPreviewRecording} onStop={stopPreviewRecording} />
     <span className="document-name" title={io.name}><span className="document-label">Scene</span><span className="document-title">{io.name}</span>{dirty && <span aria-label="Unsaved changes"> *</span>}</span>
     <Button className="studio-build-button" variant="outlined" color="inherit" disabled={busy} aria-label="Build" aria-busy={busy} title="Build preview (Ctrl/Cmd+S in source)" onClick={() => void build()}>
       {busy && <span className="status-spinner" aria-hidden="true" />}Build
@@ -296,7 +296,8 @@ export function AuthoringApp() {
     {confirmation.dialog}
     <ExportDialog disabled={busy || composing.current} open={exportOpen} onClose={() => setExportOpen(false)} onClosed={() => fileSummary.current?.focus()} defaultName={io.name} create={async name => { if (pendingControlWrites.current.size) await finishControlWrites(); return session.exportSource(name); }} />
     <LooksDialog open={looksOpen} onClose={() => setLooksOpen(false)} onClosed={() => fileSummary.current?.focus()} client={window.luxLooks} onSave={saveLook} onLoad={loadLook} />
-    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} sourceChanged={draft.hasRunningSource && !draft.runningMatchesDraft} appCommands={commands} appError={error} controlEdits={controlEdits} controlsAvailable={!io.busy} libraryPanel={libraryPanel}
+    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} previewActions={<PreviewCaptureActions available={!!previewRecorder && !!runtime && runtime.playback !== 'failed'} status={recording}
+      onSaveFrame={savePreviewFrame} onStart={startPreviewRecording} onStop={stopPreviewRecording} />} sourceChanged={draft.hasRunningSource && !draft.runningMatchesDraft} appCommands={commands} appError={error} controlEdits={controlEdits} controlsAvailable={!io.busy} libraryPanel={libraryPanel}
       sourceDiagnostics={{ items: diagnostics, snapshot: draft, onNavigate: target => setDiagnosticTarget(previous => ({ ...target, request: (previous?.request ?? 0) + 1, documentKey: draft.documentKey, draftVersion: draft.version })) }}
       sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onApply={() => void build()} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnosticTarget={diagnosticTarget}
         onDiagnosticTargetHandled={request => setDiagnosticTarget(current => current?.request === request ? null : current)} />} />
