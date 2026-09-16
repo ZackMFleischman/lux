@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {mkdir,readFile,writeFile} from 'node:fs/promises';
+import {mkdir,readFile,writeFile,appendFile} from 'node:fs/promises';
 import {execFileSync} from 'node:child_process';
 import {join,resolve} from 'node:path';
 import {_electron} from 'playwright';
@@ -16,7 +16,7 @@ const report={ok:false,source:installation?.sourceCommit??execFileSync('git',['-
 let app,page,child;
 try{
  app=await _electron.launch({executablePath:installation?.executable??installedElectron(root),args:installation?[]:[join(root,'apps/studio/dist/main.cjs')],cwd:installation?.directory??root,env,timeout:30000,chromiumSandbox:true});
- child=app.process();report.pid=child.pid;page=await app.firstWindow();page.setDefaultTimeout(20000);
+ child=app.process();report.pid=child.pid;child.stderr?.on('data',data=>void appendFile(join(output,'stderr.log'),data));page=await app.firstWindow();page.setDefaultTimeout(20000);
  page.on('pageerror',error=>report.errors.push(error.stack??error.message));
  const call=createStudioConnection(session,{timeoutMs:60000});
  let current;for(let i=0;i<100;i++){try{current=await call('read');if(current.source)break;}catch{}await page.waitForTimeout(100);}
@@ -49,6 +49,10 @@ try{
  await call('scene.open',{path:roundtripPath,expectedDraftVersion:current.draftVersion,discardDirty:true});
  assert.equal((await call('status')).authoring.controlAnimations.length,64);
  report.checks.push('64 simultaneous animation bindings and all base values survive save/reopen');
+ // Start the independent component scenario without stale scene-animation diagnostics.
+ const clean=JSON.parse(await readFile(roundtripPath,'utf8'));clean.controlAnimations=[];
+ const cleanPath=join(output,'component-start.lux-scene');await writeFile(cleanPath,JSON.stringify(clean));
+ current=await call('read');await call('scene.open',{path:cleanPath,expectedDraftVersion:current.draftVersion,discardDirty:true});
  const controls=Object.fromEntries(Array.from({length:64},(_,i)=>[i?'control'+i:'intensity',{type:'number',label:`Component control ${i+1}`,group:`Motion ${Math.floor(i/8)+1}`,min:0,max:1,default:.5}]));
  let component=await readFile(join(root,'library/components/93a7215f-4df1-4e1e-9d34-3f7f0f27ad84/revisions/1/source/component.ts'),'utf8');
  component=component.replace(/    controls: \{[\s\S]*?\n    lifecycle:/,`    controls:${JSON.stringify(controls)},\n    controlDescriptions:${JSON.stringify(Object.fromEntries(Object.keys(controls).map(id=>[id,'Live value'])))},\n    lifecycle:`).replace('frame.controls.intensity','frame.controls.control63').replace('IcosahedronGeometry(1, 24)','IcosahedronGeometry(1, 4)');
@@ -56,6 +60,7 @@ try{
  const composition=`import {defineComposition} from '@lux/visual-sdk';import ball from './ball.ts';export default defineComposition({definitions:{ball},nodes:[{id:'${nodeId}',definition:'ball'}],edges:[],output:{nodeId:'${nodeId}',portId:'image'},expose:${JSON.stringify(expose)}});`;
  current=await call('read');await call('build',{source:{sdkVersion:'0.4.0',entry:'composition.ts',files:{'composition.ts':composition,'ball.ts':component}},expectedDraftVersion:current.draftVersion});
  status=await call('status');assert.equal(status.authoring.controlSchema.length,64);assert.equal(status.authoring.nodeControls.nodes[0].schema.length,64);
+ await page.getByRole('button',{name:'View',exact:true}).click();await page.getByRole('menuitem',{name:'Inspector',exact:true}).click();
  await page.getByRole('button',{name:'Animate Component control 64',exact:true}).click();await page.getByRole('button',{name:'Add LFO',exact:true}).click();
  for(let i=0;i<100;i++){status=await call('status');if(status.authoring.controlAnimations.some(row=>row.nodePath.length&&row.controlId==='control63'))break;await page.waitForTimeout(100);}
  assert.ok(status.authoring.controlAnimations.some(row=>row.nodePath.length&&row.controlId==='control63'));
