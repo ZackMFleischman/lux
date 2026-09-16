@@ -43,6 +43,7 @@ export default defineComposition({
   ],
   output: { nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', portId: 'image' },
   expose: [
+    { id: 'structuralActivity', nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', controlId: 'structuralActivity' },
     { id: 'spiralsDensity', nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5101', controlId: 'density' },
     { id: 'spiralsWidth', nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5101', controlId: 'width' },
     { id: 'ringsDensity', nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5102', controlId: 'density' },

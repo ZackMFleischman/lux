@@ -20,10 +20,10 @@ export const ornamentWatercolorFragments = Object.freeze({
   // with their parents, while three deliberately quiet regions remain ivory.
   let id = i32(abs(floor(r.identity + 0.5)));
   let quietFamily = id == 101 || id == 113 || id == 116;
-  let yellowFamily = id == 102 || id == 106 || id == 111 || id == 114;
+  let yellowFamily = id == 102 || id == 106 || id == 111 || id == 114 || id == 118;
   let blushFamily = id == 104 || id == 108;
-  let tealFamily = id == 103 || id == 107 || id == 110;
-  let violetFamily = id == 105 || id == 112;
+  let tealFamily = id == 103 || id == 107 || id == 110 || id == 117;
+  let violetFamily = id == 105 || id == 112 || id == 119;
   let darkFamily = id == 109 || id == 115;
   var color = ivory;
   if (yellowFamily) {

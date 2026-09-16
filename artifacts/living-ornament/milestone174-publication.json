@@ -1,0 +1,122 @@
+{
+  "ok": true,
+  "milestone": "174",
+  "runId": "2026-09-16T12-07-48-374Z-3614d29a",
+  "sessionId": "552d95c4d5fed7e01d911575b0d6a37fd86a",
+  "scenePath": "C:\\Users\\zFlei\\.codex\\visualizations\\2026\\09\\15\\01a0a5cb-03be-7ee2-a6cf-daf659f7ebac\\Living Ornament - Structural Transformations - 2026-09-16T12-07-48-374Z-3614d29a.lux-scene",
+  "parts": [
+    {
+      "name": "Organic Regions",
+      "id": "909bf033-22df-4ccc-afdb-431b6a83f9d4",
+      "entry": "regions.ts",
+      "mountPath": "components/regions",
+      "revision": 5,
+      "previousRevision": 4,
+      "action": "updated"
+    },
+    {
+      "name": "Animated Watercolor",
+      "id": "998130df-ca1f-4b58-9917-1ee7045275cb",
+      "entry": "watercolor.ts",
+      "mountPath": "components/watercolor",
+      "revision": 5,
+      "previousRevision": 4,
+      "action": "updated"
+    },
+    {
+      "name": "Organic Boundary Ink",
+      "id": "d5718a1e-de84-477c-8330-4633fd91df85",
+      "entry": "boundary.ts",
+      "mountPath": "components/boundary",
+      "revision": 2,
+      "previousRevision": 2,
+      "action": "unchanged"
+    },
+    {
+      "name": "Composition Phrasing",
+      "id": "83a60efc-ec4b-4f94-a122-6d2b38b504ee",
+      "entry": "phrasing.ts",
+      "mountPath": "components/phrasing",
+      "revision": 2,
+      "previousRevision": 2,
+      "action": "unchanged"
+    },
+    {
+      "name": "Spiral Fill",
+      "id": "7d5a3997-e4be-484a-b37a-e71a31d3db4c",
+      "entry": "spirals.ts",
+      "mountPath": "components/spirals",
+      "revision": 1,
+      "previousRevision": 1,
+      "action": "unchanged"
+    },
+    {
+      "name": "Packed Circles & Rings",
+      "id": "c6c36ef5-7e45-4e40-864b-a7332c15455e",
+      "entry": "rings.ts",
+      "mountPath": "components/rings",
+      "revision": 1,
+      "previousRevision": 1,
+      "action": "unchanged"
+    },
+    {
+      "name": "Membrane Divisions",
+      "id": "3e0d8827-3ba0-4689-8636-81348f9d8564",
+      "entry": "membranes.ts",
+      "mountPath": "components/membranes",
+      "revision": 1,
+      "previousRevision": 1,
+      "action": "unchanged"
+    },
+    {
+      "name": "Nested Contours",
+      "id": "74665565-8e4c-49de-a1cc-0050edd27da3",
+      "entry": "contours.ts",
+      "mountPath": "components/contours",
+      "revision": 1,
+      "previousRevision": 1,
+      "action": "unchanged"
+    },
+    {
+      "name": "Decorated Ribbons",
+      "id": "401be5dc-4f12-436c-99a0-fb1604333e0f",
+      "entry": "ribbons.ts",
+      "mountPath": "components/ribbons",
+      "revision": 1,
+      "previousRevision": 1,
+      "action": "unchanged"
+    },
+    {
+      "name": "Region Hatching",
+      "id": "f564a771-028a-4031-abaa-e64a1cfc8bec",
+      "entry": "hatching.ts",
+      "mountPath": "components/hatching",
+      "revision": 2,
+      "previousRevision": 2,
+      "action": "unchanged"
+    },
+    {
+      "name": "Ornament Region Styles",
+      "id": "0b92b112-f315-4479-9331-7a815deec27e",
+      "entry": "ornament-renderer.ts",
+      "mountPath": "components/renderer",
+      "revision": 5,
+      "previousRevision": 4,
+      "action": "updated"
+    }
+  ],
+  "captures": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\living-ornament\\artifacts\\living-ornament\\milestone174-2026-09-16T12-07-48-374Z-3614d29a-before.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\living-ornament\\artifacts\\living-ornament\\milestone174-2026-09-16T12-07-48-374Z-3614d29a-linked.png"
+  ],
+  "checks": [
+    "Session-bound live eleven-node scene matches every reachable publication source",
+    "Changed sources received guarded revisions; unchanged entries retained their revisions and all history remains readable",
+    "Linked build requested after pause preserved public and node controls; final playback verified playing",
+    "Unique persistent milestone scene saved; desktop preview remains playing and open"
+  ],
+  "beforeRevision": "fbe0ae90966c069fff2c1470eb542f072b0d234ea334e0c0f6a65ea5ba386166",
+  "afterRevision": "79ca79c3b1ef8b58dc940229454bb1f27bdcee56bb5d772a30a05a2059ccb843",
+  "playback": "playing",
+  "nodeCount": 11
+}

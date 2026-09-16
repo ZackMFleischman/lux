@@ -13,6 +13,8 @@ import {readDesktopInstallation} from './studio-desktop.mjs';
 const [milestone,sceneDirectory,...extra]=process.argv.slice(2);
 assert.ok(['173','174'].includes(milestone)&&sceneDirectory&&isAbsolute(sceneDirectory)&&!extra.length,
   'Usage: node scripts/qa-ornament-motion.mjs <173|174> <absolute-persistent-scene-directory>');
+const checkpointSeconds=process.env.LUX_QA_CHECKPOINTS?JSON.parse(process.env.LUX_QA_CHECKPOINTS):(milestone==='174'?[0,20,40,70]:[0,20,40]);
+assert.ok(Array.isArray(checkpointSeconds)&&checkpointSeconds.length>0&&checkpointSeconds.every(t=>Number.isFinite(t)&&t>=0&&t<=120));
 const sessionId=process.env.LUX_STUDIO_SESSION_ID;assert.ok(sessionId,'LUX_STUDIO_SESSION_ID is required');
 assert.ok((await stat(sceneDirectory)).isDirectory());
 const root=resolve(import.meta.dirname,'..'),folder=join(root,'examples/components/wandering-tracers');
@@ -24,9 +26,9 @@ const candidate={sdkVersion:'0.4.0',entry:'ornament-composition.ts',files:{}};
 async function visit(file){if(Object.hasOwn(candidate.files,file))return;const text=await readFile(join(folder,file),'utf8');candidate.files[file]=text;for(const match of text.matchAll(/from\s+['"]\.\/([^'"]+)['"]/g))await visit(match[1]);}
 await visit(candidate.entry);
 const hash=value=>createHash('sha256').update(value).digest('hex');
-const report={ok:false,milestone,sessionId,scenePath,checks:[],captures:{},
+const report={ok:false,milestone,sessionId,scenePath,checkpointSeconds,checks:[],captures:{},
   sourceHashes:{candidate:hash(JSON.stringify(candidate))},
-  provenance:'Live installed Studio MCP capture and scripted controls. No native-input provenance claim. Diagnostic sources freeze every update(frame) at 0/20/40 seconds with deltaSeconds zero. Phrasing accumulates fixed time times pace on its first update after reset. Restoration resets the animation clock.'};
+  provenance:`Live installed Studio MCP capture and scripted controls. No native-input provenance claim. Diagnostic sources freeze every update(frame) at ${checkpointSeconds.join('/')} seconds with deltaSeconds zero. Phrasing accumulates fixed time times pace on its first update after reset. Restoration resets the animation clock.`};
 await writeFile(join(output,'candidate-source.json'),JSON.stringify(candidate,null,2));
 function freeze(seconds){
   const source=structuredClone(candidate);let updates=0;
@@ -84,16 +86,17 @@ try{
 
   let zeroPixels;
   report.checkpointControls=initial.authoring.controls;report.motionComparisons={};
-  for(const seconds of [0,20,40]){
+  for(const seconds of checkpointSeconds){
     const diagnostic=freeze(seconds);await writeFile(join(output,`source-${seconds}s.json`),JSON.stringify(diagnostic,null,2));
     await build(diagnostic);await patch(initial.authoring.controls);await reset();await status(11);
     const pixels=await capture(`checkpoint-${seconds}s`);
-    if(seconds===0)zeroPixels=pixels;else report.motionComparisons[seconds]=compare(zeroPixels,pixels);
+    if(!zeroPixels)zeroPixels=pixels;else report.motionComparisons[seconds]=compare(zeroPixels,pixels);
   }
-  report.checks.push('Frozen source checkpoints captured at 0, 20 and 40 seconds with the initial public controls');
-  for(const seed of [7,19,43]){await patch({seed});await reset();await capture('seed-'+seed+'-40s');}
-  await patch({seed:7,ornamentSize:1.5});await reset();await capture('detail-large-regions');
-  report.detailControls={seed:7,ornamentSize:1.5,diagnosticSeconds:40};
+  report.checks.push(`Frozen source checkpoints captured at ${checkpointSeconds.join(', ')} seconds with the initial public controls`);
+  const lastSeconds=checkpointSeconds.at(-1);
+  for(const seed of [7,19,43]){await patch({seed});await reset();await capture(`seed-${seed}-${lastSeconds}s`);}
+  await patch({seed:7,ornamentSize:1.5});await reset();await capture(`detail-large-regions-${lastSeconds}s`);
+  report.detailControls={seed:7,ornamentSize:1.5,diagnosticSeconds:lastSeconds};
 
   await reopen();await reset();const reopened=(await status(11)).authoring;
   assert.deepEqual(reopened.controls,initial.authoring.controls);

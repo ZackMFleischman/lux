@@ -57,3 +57,9 @@ Keep eleven nodes and the existing shader-field agreements. Three disjoint edits
 Shapes lead local pressure; marks and pigment respond with delayed envelopes. Never reseed identities during playback. Deform the owner-local coordinates with the same transform used for its contour so marks remain attached. Keep density variation bounded and avoid changing integer motif counts during animation. Preserve original Living Painting outputs and prior saved scenes.
 
 One integrated live loop, then three seeds and time checkpoints, a 20-second FPS sample, save/reopen, independent review, Library revisions and merge.
+
+## LUX-174 event agreement
+
+Keep the original loRegion helper for compatibility. Add loRegionEvolving(p,t,seed,shape,detail,activity) returning the existing LoRegion. Stable daughter IDs117/118 inherit102/107; island119 inherits104. The age field controls smooth daughter color/motif inheritance. Derive seam distance in the same attached coordinates as the owning region, and let its width/gap grow continuously. Keep foreground ribbon/island ownership intact. Activity zero returns the unmodified173 scene. Use a bounded, staggered preparation/hold/release cycle with a quiet interval.
+
+The renderer owns a Structural activity control for this composition and passes it explicitly into the reusable geometry helper. It blends parent/daughter styles using age, retaining the same local coordinates for inheritance. This avoids a new field ABI or app change. Root owns renderer/composition; geometry worker owns ornament-regions.ts; color worker owns ornament-watercolor.ts.
