@@ -15,11 +15,11 @@ const report={ok:false,root,profile:session.profile,commit:execFileSync('git',['
 let app,page,child;
 try {
   app=await _electron.launch({executablePath:installedElectron(root),args:[join(root,'apps/studio/dist/main.cjs')],cwd:root,env,timeout:30000,chromiumSandbox:true});
-  child=app.process();report.pid=child.pid;page=await app.firstWindow();page.setDefaultTimeout(20000);
+  child=app.process();report.launcherPid=child.pid;report.pid=await app.evaluate(()=>process.pid);page=await app.firstWindow();page.setDefaultTimeout(20000);
   page.on('pageerror',error=>report.errors.push(error.stack??error.message));
   let endpoint;
-  for(let attempt=0;attempt<100;attempt++){try{endpoint=JSON.parse(await readFile(session.endpointPath,'utf8'));if(endpoint.pid===child.pid)break;}catch{}await page.waitForTimeout(100);}
-  assert.equal(endpoint?.pid,child.pid);
+  for(let attempt=0;attempt<100;attempt++){try{endpoint=JSON.parse(await readFile(session.endpointPath,'utf8'));if(endpoint.pid===report.pid)break;}catch{}await page.waitForTimeout(100);}
+  assert.equal(endpoint?.pid,report.pid);
   const call=createStudioConnection({...session,expectedSessionId:endpoint.sessionId});
   async function statusWhen(predicate){for(let attempt=0;attempt<100;attempt++){const state=await call('status');if(predicate(state.authoring))return state.authoring;await page.waitForTimeout(100);}throw Error('Runtime state did not settle');}
   async function capture(name){const path=join(output,`${name}.png`);await page.screenshot({path});report.screenshots.push(path);}
@@ -72,5 +72,6 @@ try {
 }catch(error){report.error=error.stack??String(error);process.exitCode=1;if(page&&!page.isClosed())await page.screenshot({path:join(output,'failure.png')}).catch(()=>{});}
 finally{
   if(app){await app.evaluate(({app})=>app.exit(0)).catch(()=>{});await app.close().catch(()=>{});report.exitCode=child.exitCode;}
+  if(report.pid){try{process.kill(report.pid,0);report.processExited=false;}catch{report.processExited=true;}}
   await writeFile(join(output,'result.json'),JSON.stringify(report,null,2));console.log(JSON.stringify({output,...report},null,2));
 }
