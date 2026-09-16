@@ -540,8 +540,8 @@ test('Graph connections point from output to input with reversed node declaratio
 
 test('workspace chrome omits redundant connection and playback labels', async () => {
   let runtime:any = { instanceId: '44ff55f0-8ea6-4fbf-89d5-665923f65cad', generation: 2, revisionId: 'revision-2', sceneName: 'Fixture', authority: 'studio', playback: 'playing', clockEpoch: 1, frameId: '10', intensity: 0.5,tempo:{bpm:120,beatPosition:0,beatPhase:0,tempoSequence:0},tempoSequence:0, output: { width: 1280, height: 720 }, fault: null };
-  let snapshot:any = { connection: 'connected', message: null, receivedAtMs: 1000, authoring: runtime, host: null, jobs: [], visualFps: null, uiFps: null };const calls:any[]=[],listeners=new Set<()=>void>();
-  render(<StudioApp client={{ getSnapshot: () => snapshot, subscribe: (listener:()=>void) => {listeners.add(listener);return()=>listeners.delete(listener);}, invoke: async (operation:any) => {calls.push(operation);runtime={...runtime,tempo:{bpm:operation.input.bpm??runtime.tempo.bpm,beatPosition:0,beatPhase:0,tempoSequence:runtime.tempoSequence+1},tempoSequence:runtime.tempoSequence+1};snapshot={...snapshot,authoring:runtime};listeners.forEach(listener=>listener());return runtime;} } as any} nowMs={1000} />);
+  let snapshot:any = { connection: 'connected', message: null, receivedAtMs: 1000, authoring: runtime, host: null, jobs: [], visualFps: null, uiFps: null };const calls:any[]=[],listeners=new Set<()=>void>();let dirty=0,reject=false;
+  render(<StudioApp client={{ getSnapshot: () => snapshot, subscribe: (listener:()=>void) => {listeners.add(listener);return()=>listeners.delete(listener);}, invoke: async (operation:any) => {calls.push(operation);if(reject)throw Error('Tempo rejected');runtime={...runtime,tempo:{bpm:operation.input.bpm??runtime.tempo.bpm,beatPosition:0,beatPhase:0,tempoSequence:runtime.tempoSequence+1},tempoSequence:runtime.tempoSequence+1};snapshot={...snapshot,authoring:runtime};listeners.forEach(listener=>listener());return runtime;} } as any} nowMs={1000} controlEdits={{changed:()=>{dirty++;},track:()=>{}}} />);
   assert.equal(document.querySelector('.connection'), null);
   assert.equal(document.querySelector('.playback-state'), null);
   assert.equal(document.querySelector('.status-runtime'), null);
@@ -549,7 +549,8 @@ test('workspace chrome omits redundant connection and playback labels', async ()
   const bpm=screen.getByRole('spinbutton',{name:'Tempo BPM'}) as HTMLInputElement;
   await act(async()=>{fireEvent.focus(bpm);fireEvent.change(bpm,{target:{value:'128'}});fireEvent.keyDown(bpm,{key:'Enter'});});
   assert.equal(calls[0].name,'lux.tempo.set');assert.equal(runtime.tempo.bpm,128);
-  await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Tap'}));});assert.equal(calls[1].name,'lux.tempo.tap');
+  await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Tap tempo'}));});assert.equal(calls[1].name,'lux.tempo.tap');assert.equal(dirty,0,'tap acknowledgement without a BPM change is not a persisted edit');
+  reject=true;await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Tap tempo'}));});assert.equal(dirty,0,'a rejected tap is not a persisted edit');
 });
 
 test('File and View share one menu and restore keyboard focus', async () => {

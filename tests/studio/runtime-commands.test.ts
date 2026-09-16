@@ -80,7 +80,7 @@ test('saved edit signature tracks output and base controls but ignores playback 
  assert.equal(runtimeEditSignature({...base,playback:'playing',frameId:'50',clockEpoch:3,timeSeconds:2,controlSequence:4}),prior);
  const withTempo={...base,tempo:{bpm:120,beatPosition:0,beatPhase:.1,tempoSequence:1},tempoSequence:1};
  const tempoPrior=runtimeEditSignature(withTempo);
- assert.equal(runtimeEditSignature({...withTempo,tempo:{...withTempo.tempo,beatPosition:8,beatPhase:.9,tempoSequence:2},tempoSequence:2}),tempoPrior);
+ for(const tempoResult of ['restarted','ignored-short','same-bpm','rejected'])assert.equal(runtimeEditSignature({...withTempo,tempo:{...withTempo.tempo,beatPosition:8,beatPhase:.9,tempoSequence:2},tempoSequence:2,tempoResult} as any),tempoPrior);
  assert.notEqual(runtimeEditSignature({...withTempo,tempo:{...withTempo.tempo,bpm:121}}),tempoPrior);
  assert.notEqual(runtimeEditSignature({...base,output:{width:1920,height:1080}}),prior);
  assert.notEqual(runtimeEditSignature({...base,intensity:.7}),prior);

@@ -6,3 +6,9 @@ export const studioCapabilities = Object.freeze({ protocolVersion: 3,
   imageFormats: Object.freeze(['image/bmp', 'image/png', 'image/jpeg']), assetExport: true,
   sceneVersions: Object.freeze([1, 2, 3, 4,5]),tempo:Object.freeze({manual:true,tap:true,bpm:Object.freeze({min:20,max:300})}),
 });
+
+export function supportsManualTapTempoCapability(value:unknown):boolean{
+  const capabilities=value as {protocolVersion?:unknown;tempo?:{manual?:unknown;tap?:unknown;bpm?:{min?:unknown;max?:unknown}}}|null;
+  return Number.isSafeInteger(capabilities?.protocolVersion)&&Number(capabilities?.protocolVersion)>=3&&capabilities?.tempo?.manual===true&&capabilities.tempo.tap===true&&
+    Number.isFinite(capabilities.tempo.bpm?.min)&&capabilities.tempo.bpm?.min===20&&Number.isFinite(capabilities.tempo.bpm?.max)&&capabilities.tempo.bpm?.max===300;
+}

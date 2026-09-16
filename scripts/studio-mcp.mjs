@@ -7,6 +7,7 @@ import { createStudioConnection, resolveStudioSession, studioAppData } from './s
 import { createLibraryContext, resolveMcpStandardLibrary } from './studio-library-context.mjs';
 import { discoverVisualSdk } from '../packages/visual-sdk/src/discovery.mjs';
 import { parameterInputSchema, playbackInputSchema, restartInputSchema,tempoSetInputSchema,tempoTapInputSchema } from '../apps/studio/src/runtime-operations.ts';
+import {supportsManualTapTempoCapability} from '../apps/studio/src/capabilities.ts';
 const selectedSession = resolveStudioSession({ workspace: resolve(import.meta.dirname, '..') });
 let libraryContext;
 try { libraryContext = createLibraryContext(await resolveMcpStandardLibrary({ workspace: selectedSession.workspace,
@@ -16,7 +17,7 @@ const server = new McpServer({ name: 'lux-studio', version: '0.1.0' },
   { instructions: libraryContext.instructions(await libraryContext.catalog()) });
 const call = createStudioConnection(selectedSession);
 const text = value => ({ content: [{ type: 'text', text: JSON.stringify(value) }] });
-async function requireTempoCapability(){const status=await call('status'),capabilities=status.capabilities;if(!Number.isSafeInteger(capabilities?.protocolVersion)||capabilities.protocolVersion<3||capabilities?.tempo?.manual!==true||capabilities?.tempo?.tap!==true)throw Error('Running Studio does not support manual/tap tempo; restart from the matching checkout before sending tempo operations.');}
+async function requireTempoCapability(){const status=await call('status');if(!supportsManualTapTempoCapability(status.capabilities))throw Error('Running Studio does not support manual/tap tempo from 20 through 300 BPM; restart from the matching checkout before sending tempo operations.');}
 async function runningStudio() {
   try { const status = await call('status'); return { connected: true, studioSession: status.studioSession, capabilities: status.capabilities ?? null,
     compatible: status.capabilities?.codeDeclaredParameters === true && status.capabilities?.supportedSdkVersions?.includes('0.4.0'),

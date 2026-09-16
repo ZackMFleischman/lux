@@ -8,9 +8,13 @@ import {parameterCompiledArtifactSchema,componentCompiledArtifactSchema,DEFAULT_
 import {parameterInputSchema,nodeParameterInputSchema} from '../../apps/studio/src/runtime-operations.ts';
 import {prepareWorkerControlState} from '../../apps/studio/src/controls/worker-control-state.mjs';
 import {createSceneDocument,verifySceneDocument} from '../../packages/core/src/scene-document.ts';
-import {studioCapabilities} from '../../apps/studio/src/capabilities.ts';
+import {studioCapabilities,supportsManualTapTempoCapability} from '../../apps/studio/src/capabilities.ts';
 
 const declarations=Object.fromEntries(Array.from({length:64},(_,i)=>[`control${i}`,{type:'number',label:`Control ${i}`,group:'Motion',description:'A live parameter.',min:0,max:4,default:1}]));
+test('manual/tap adapter guard requires protocol 3 and exact 20 through 300 BPM capability',()=>{
+ assert.equal(supportsManualTapTempoCapability(studioCapabilities),true);
+ for(const value of [undefined,{...studioCapabilities,protocolVersion:2},{...studioCapabilities,tempo:{...studioCapabilities.tempo,manual:false}},{...studioCapabilities,tempo:{...studioCapabilities.tempo,tap:false}},{...studioCapabilities,tempo:{...studioCapabilities.tempo,bpm:{min:10,max:300}}},{...studioCapabilities,tempo:{...studioCapabilities.tempo,bpm:{min:20,max:400}}}])assert.equal(supportsManualTapTempoCapability(value),false);
+});
 test('64 scene and component controls pass normalization and compiled DTOs',()=>{
  assert.equal(Object.hasOwn(studioCapabilities,'maxParameters'),false);
  assert.equal(studioCapabilities.maxParameterMetadataBytes,32768);
