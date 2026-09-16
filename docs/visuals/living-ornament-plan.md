@@ -50,3 +50,10 @@ Print actual Lux screenshots inline in chat for each visual iteration, with a sh
 ## User cadence correction, 16 September
 
 LUX-P113: Build the integrated pattern prototype now and do QA at milestone boundaries. The first usable visual includes all six pattern helper families inside its five-node renderer. Separate reusable pattern-node extraction remains LUX-172. Stop repeated per-helper review/publication cycles. One end-of-milestone visual/FPS/save-open check is sufficient unless a concrete defect requires a fix. Four compatible producer revisions have been published; renderer publication recovery is deferred until the integrated visual is saved.
+## LUX-173 live implementation slice
+
+Keep eleven nodes and the existing shader-field agreements. Three disjoint edits: Organic Regions gains coherent owner-attached deformation; Ornament Region Styles applies stable family-dependent attached/flow/growing behavior and meaningful local phrasing; Animated Watercolor gains delayed migrating warmth and deliberate warm/cool/rest assignments. The scene exposes the existing Composition, Tension and Phrasing controls, plus separate flow/growth amounts where useful. No SDK or app architecture change.
+
+Shapes lead local pressure; marks and pigment respond with delayed envelopes. Never reseed identities during playback. Deform the owner-local coordinates with the same transform used for its contour so marks remain attached. Keep density variation bounded and avoid changing integer motif counts during animation. Preserve original Living Painting outputs and prior saved scenes.
+
+One integrated live loop, then three seeds and time checkpoints, a 20-second FPS sample, save/reopen, independent review, Library revisions and merge.

@@ -43,3 +43,9 @@ Six fields use `lux/ornament-spirals/v1`, `lux/ornament-rings/v1`, `lux/ornament
 Each helper defines one entry (`loSpirals`, `loRings`, `loMembranes`, `loContours`, `loHatchMarks`, or `loRibbonMarks`) with `(r:LoRegion,p:vec2f,t:f32,settings:vec4f)->f32`, returning ink coverage. The host supplies LoRegion and deterministic noise functions. Region local/tangent share an attached frame; curved ribbons use intrinsic longitudinal position and signed transverse distance. Internal helper symbols are unique per field.
 
 The five new providers output `pattern`; existing Region Hatching adds `ornament` while preserving its original `field`. All six are data-only graph nodes; the renderer still uses one paint pass. The scene has11 nodes. Existing self-contained Pattern Prototype remains the saved pre-extraction version; renderer Library history retains its former inline-helper source.
+
+## Expressive orchestration (LUX-173)
+
+The eleven field agreements remain unchanged. Ornament geometry evaluates its contour and attached pattern frame through the same local deformation. Parent and island anchors share a stable phrase basis; geometry leads mark pressure by three artistic seconds, pigment by five, and mark release by eight. No identity or family is reseeded during animation.
+
+The renderer uses view.w for Tension and material.w for Phrasing. Pattern settings retain density/width/variation/motion; density is never animated because fan counts are discrete. Pattern Style z/w hold deliberate local flow and drawing/release strengths. Attached-to-flowing zero keeps the local motif frame attached; Drawing-and-release zero keeps full motif coverage. These apply to every connected motif field. Watercolor retains stable warm/cool/rest families while attached warm blooms migrate continuously.

@@ -13,6 +13,8 @@ try{
  if(action==='open')await call('open',{path:base+'Living Ornament - Pattern Prototype.lux-scene',expectedDraftVersion:current.draftVersion,discardDirty:false});
  if(action==='build'){
   if(current.source.entry!=='ornament-composition.ts')throw Error('Live scene changed; refusing replacement');
+  const runtime=json(await call('status')).authoring;
+  if(runtime.playback==='playing')await call('playback',{action:'pause',instanceId:runtime.instanceId,expectedGeneration:runtime.generation});
   const source=structuredClone(current.source),dir='examples/components/wandering-tracers/';
   source.files={};
   const visit=async f=>{if(source.files[f])return;const text=await readFile(dir+f,'utf8');source.files[f]=text;for(const match of text.matchAll(/from\s+['"]\.\/([^'"]+)['"]/g))await visit(match[1]);};
