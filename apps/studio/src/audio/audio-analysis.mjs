@@ -82,4 +82,3 @@ export function createWebAudioBandAnalyzer(context, stream, inputConfig) {
     },
   });
 }
-

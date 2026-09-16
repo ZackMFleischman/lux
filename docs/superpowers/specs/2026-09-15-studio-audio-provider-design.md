@@ -49,7 +49,7 @@ type AudioControlBinding = Readonly<{
   attackMs: number;
   releaseMs: number;
   enabled: boolean;
-}>; 
+}>;
 ```
 
 The first slice accepts the single literal logical input ID `primary-audio`. `fftSize` is exactly `2048`. `minDecibels` is finite in `[-120, -40]`; `maxDecibels` is finite in `[-80, 0]`; and `maxDecibels - minDecibels` is at least `10`. The analyzer always sets `smoothingTimeConstant` to `0`; binding attack and release are the only smoothing owners. Source records are strict plain data with no extra fields.

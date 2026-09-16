@@ -28,4 +28,3 @@ export function normalizeAudioBandSnapshot(input){
  for(const band of bands){const value=raw[band];if(!finite(value)||value<0||value>1||(!raw.available&&value!==0))invalid('Invalid audio band snapshot');result[band]=value===0?0:value;}
  return freeze(result);
 }
-
