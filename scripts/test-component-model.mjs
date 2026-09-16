@@ -12,6 +12,7 @@ await mkdir(output,{recursive:true});
 const env={...studioTestEnvironment(),LUX_NODE_EXECUTABLE:process.execPath};
 const session=resolveStudioSession({workspace:root,env});
 const graphsOnly=process.argv.includes('--graphs-only');
+const modernOnly=process.argv.includes('--modern-only');
 const report={ok:false,root,profile:session.profile,commit:execFileSync('git',['-C',root,'-c',`safe.directory=${root}`,'-c','core.excludesFile=','rev-parse','HEAD'],{encoding:'utf8'}).trim(),checks:[],screenshots:[],errors:[],limitations:['Animate uses real keyboard activation. The pre-existing slider thumb mouse-hit overlap remains a separate UI defect.']};
 let app,page,child;
 try {
@@ -24,21 +25,23 @@ try {
   const call=createStudioConnection({...session,expectedSessionId:endpoint.sessionId});
   async function statusWhen(predicate,timeoutMs=20000){const end=Date.now()+timeoutMs;let state;while(Date.now()<end){state=await call('status');if(predicate(state.authoring))return state.authoring;await page.waitForTimeout(100);}throw Error('Runtime state did not settle: '+JSON.stringify(state));}
   async function capture(name){const path=join(output,`${name}.png`);await page.screenshot({path});report.screenshots.push(path);}
+  async function useSmallPreview(){
+    await page.getByRole('slider',{name:'Preview resolution scale',exact:true}).focus();await page.keyboard.press('Home');
+    await statusWhen(runtime=>runtime?.playback==='playing'&&runtime.output.width===640&&runtime.output.height===360);
+  }
   await statusWhen(runtime=>runtime?.playback==='playing',60000);
   await page.getByRole('button',{name:'Pause',exact:true}).waitFor();
-  await page.getByRole('slider',{name:'Preview resolution scale',exact:true}).focus();
-  await page.keyboard.press('Home');
-  await statusWhen(runtime=>runtime?.playback==='playing'&&runtime.output.width===640&&runtime.output.height===360);
+  await useSmallPreview();
   report.previewOutput={width:640,height:360};
   const plain={sdkVersion:'0.2.0',entry:'visual.ts',files:{'visual.ts':await readFile(join(root,'skills/lux-visual-creation/assets/noise-sphere.ts'),'utf8')}};
   const legacy=nestedPrismaticCompositionSource(),modern=structuredClone(legacy);
   for(const path of ['composition.ts','double-mirror.ts','wrapped-mirror.ts'])modern.files[path]=modern.files[path].replaceAll('defineComposition',path===modern.entry?'defineVisual':'defineComponent');
   const cases=[['legacy-direct',plain,'Spike height',1.2,'spikeHeight',[]],['legacy-graph',legacy,'Spike amount',.8,'intensity',['11111111-1111-4111-8111-111111111111']],['component-graph',modern,'Spike amount',.8,'intensity',['11111111-1111-4111-8111-111111111111']]];
-  for(const [name,source,label,value,controlId,nodePath] of cases.filter(([name])=>!graphsOnly||name!=='legacy-direct')){
+  for(const [name,source,label,value,controlId,nodePath] of cases.filter(([name])=>modernOnly?name==='component-graph':!graphsOnly||name!=='legacy-direct')){
     report.stage=name;await writeFile(join(output,'result.json'),JSON.stringify(report,null,2));
     await page.setViewportSize({width:1360,height:900});
     let draft=await call('read');await call('build',{source,expectedDraftVersion:draft.draftVersion});
-    await statusWhen(runtime=>runtime?.playback==='playing'&&runtime.output.width===640&&runtime.output.height===360);
+    await statusWhen(runtime=>runtime?.playback==='playing');await useSmallPreview();
     await page.getByRole('button',{name:'View',exact:true}).click();await page.getByRole('menuitem',{name:'Graph',exact:true}).click();
     if(name==='legacy-graph'&&!graphsOnly){
       assert.equal(await page.locator('.graph-scene-root').getAttribute('aria-pressed'),'true','direct-only selection returns to Scene after representation change');
@@ -69,6 +72,8 @@ try {
     assert.equal(document.version,nodePath.length?4:3);assert.deepEqual(document.source,source);
     draft=await call('read');await call('scene.open',{path,expectedDraftVersion:draft.draftVersion,discardDirty:true});
     runtime=await statusWhen(runtime=>base(runtime)===value);assert.deepEqual(runtime.controlAnimations,document.controlAnimations);
+    report.checks.push(`${name}: reopened output ${runtime.output.width}x${runtime.output.height}; routine test preview restored to 640x360`);
+    await useSmallPreview();runtime=(await call('status')).authoring;
     const revision=runtime.revisionId;draft=await call('read');
     await assert.rejects(call('build',{source:{...source,files:{...source.files,[source.entry]:'not valid TypeScript !!!'}},expectedDraftVersion:draft.draftVersion}));
     runtime=(await call('status')).authoring;assert.equal(runtime.revisionId,revision);assert.equal(base(runtime),value);assert.deepEqual(runtime.controlAnimations,document.controlAnimations);
