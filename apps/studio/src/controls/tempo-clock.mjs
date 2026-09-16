@@ -39,5 +39,6 @@ export function createTempoClock({nowMs,bpm=120,tempoSequence=0}={}){
   tempoSequence++;return freeze({...snapshot(timeSeconds),tempoResult});
  }
  function reset(timeSeconds){timeSeconds=visualTime(timeSeconds);rephase(timeSeconds);clearTaps();return snapshot(timeSeconds);}
- return freeze({snapshot,setBpm,tap,reset});
+ function synchronize(nextBpm,nextTempoSequence,timeSeconds){bpm=bpmValue(nextBpm);tempoSequence=sequenceValue(nextTempoSequence);timeSeconds=visualTime(timeSeconds);rephase(timeSeconds);clearTaps();return snapshot(timeSeconds);}
+ return freeze({snapshot,setBpm,tap,reset,synchronize});
 }

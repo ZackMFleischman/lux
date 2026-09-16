@@ -6,5 +6,6 @@ export type TempoClock=Readonly<{
  setBpm(bpm:number,timeSeconds:number):TempoSetAcknowledgement;
  tap(timeSeconds:number):TempoTapAcknowledgement;
  reset(timeSeconds:number):TempoSnapshot;
+ synchronize(bpm:number,tempoSequence:number,timeSeconds:number):TempoSnapshot;
 }>;
 export function createTempoClock(options:{nowMs:()=>number;bpm?:number;tempoSequence?:number}):TempoClock;

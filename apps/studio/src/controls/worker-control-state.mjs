@@ -57,7 +57,7 @@ export async function prepareWorkerControlState(message,admission){
     }
     const create=own(definition,'create');if(typeof create!=='function')bad('Invalid visual create function');return create;
   }
-  return freeze({checkDefinition,values:(timeSeconds=0)=>animated.values(timeSeconds),
+  return freeze({checkDefinition,values:(timeSeconds=0,beatPosition=0)=>animated.values(timeSeconds,beatPosition),
     apply(input,nextSequence,hash){
       if(!isSafeInteger(nextSequence)||nextSequence<=sequence||(sdkVersion!=='0.1.0'&&hash!==schemaHash))bad('Invalid control snapshot sequence or schema');
       const next=validateValues(input);values=next;sequence=nextSequence;
@@ -70,7 +70,7 @@ export async function prepareWorkerControlState(message,admission){
     resetAnimations(timeSeconds){for(let index=0;index<animations.bindings.length;index++){const binding=animations.bindings[index];animated.restart(binding.nodePath,binding.controlId,timeSeconds);}},
     applyAudioSnapshot(input,context){return animated.applyAudioSnapshot(input,context);},
     fenceAudioEvents(){animated.fenceAudioEvents();},
-    state:(timeSeconds=0)=>({sdkVersion,controlSchemaHash:schemaHash,controls:values,controlSequence:sequence,effectiveControls:animated.values(timeSeconds),
+    state:(timeSeconds=0,beatPosition=0)=>({sdkVersion,controlSchemaHash:schemaHash,controls:values,controlSequence:sequence,effectiveControls:animated.values(timeSeconds,beatPosition),
       controlAnimations:animated.bindings(),controlAnimationIssues:animated.issues(),animationSequence,...(sdkVersion==='0.1.0'?{intensity:values.intensity}:{})}),
   });
 }

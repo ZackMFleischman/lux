@@ -43,3 +43,14 @@ test('audio animation persists only portable source identity and smoothing setti
   assert.deepEqual(reopened.controlAnimations,animations);
   assert.deepEqual(reopened.controls,controls);
 });
+
+test('all scene versions normalize and persist a bounded manual tempo',async()=>{
+ const source={sdkVersion:'0.1.0' as const,entry:'visual.ts',files:{'visual.ts':'export {}'}};
+ const withoutTempo:any={format:'lux-scene',version:1,source,settings:DEFAULT_OUTPUT,controls:{intensity:.5}};
+ const normalized=await verifySceneDocument(withoutTempo);
+ assert.deepEqual(normalized.tempo,{bpm:120});
+ const saved=createSceneDocument(source,DEFAULT_OUTPUT,{intensity:.5},[],[],{bpm:137.5});
+ assert.deepEqual(saved.tempo,{bpm:137.5});
+ assert.deepEqual((await verifySceneDocument(JSON.parse(JSON.stringify(saved)))).tempo,{bpm:137.5});
+ assert.throws(()=>createSceneDocument(source,DEFAULT_OUTPUT,{intensity:.5},[],[],{bpm:19.99}),/tempo/i);
+});

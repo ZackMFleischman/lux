@@ -33,8 +33,8 @@ export async function prepareWorkerCompositionState(message,admission){
   resetAnimations(timeSeconds){for(const binding of animations.bindings)animated.restart(binding.nodePath,binding.controlId,timeSeconds);},
   applyAudioSnapshot(input,context){return animated.applyAudioSnapshot(input,context);},
   fenceAudioEvents(){animated.fenceAudioEvents();},
-  state:(timeSeconds=0)=>{const base=state.snapshot();return {sdkVersion:'0.4.0',controlSchemaHash:admission.controlSchemaHash,controls:state.values(),controlSequence:sequence,nodeControls:base,
-    effectiveNodeControls:freeze({...base,nodes:freeze(base.nodes.map(node=>freeze({...node,values:animated.nodeValues(node.nodePath,timeSeconds)})))}),
+  state:(timeSeconds=0,beatPosition=0)=>{const base=state.snapshot();return {sdkVersion:'0.4.0',controlSchemaHash:admission.controlSchemaHash,controls:state.values(),controlSequence:sequence,nodeControls:base,
+    effectiveNodeControls:freeze({...base,nodes:freeze(base.nodes.map(node=>freeze({...node,values:animated.nodeValues(node.nodePath,timeSeconds,beatPosition)})))}),
     controlAnimations:animated.bindings(),controlAnimationIssues:animated.issues(),animationSequence};},
  });
 }

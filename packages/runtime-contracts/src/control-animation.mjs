@@ -15,8 +15,8 @@ export function validateControlAnimationBindings(input){
  const seen=new RuntimeSet(),result=[];let bytes=2;
  for(let index=0;index<input.length;index++){
   const element=descriptor(input,runtimeString(index));if(!element?.enumerable||!hasOwn(element,'value'))throw new RuntimeError('Invalid control animation binding');
-  const tagged=element.value&&typeof element.value==='object'&&hasOwn(element.value,'kind'),kind=tagged?field(element.value,'kind'):undefined,audio=kind==='audio',kick=kind==='kick';
-  const raw=record(element.value,audio?['kind','nodePath','definitionHash','schemaHash','controlId','source','amount','attackMs','releaseMs','enabled']:kick?['kind','nodePath','definitionHash','schemaHash','controlId','source','amount','attackMs','releaseMs','sensitivity','retriggerMs','envelope','enabled']:['nodePath','definitionHash','schemaHash','controlId','shape','periodSeconds','amount','phase','enabled']);
+  const tagged=element.value&&typeof element.value==='object'&&hasOwn(element.value,'kind'),kind=tagged?field(element.value,'kind'):undefined,audio=kind==='audio',kick=kind==='kick',tempo=kind==='tempo';
+  const raw=record(element.value,audio?['kind','nodePath','definitionHash','schemaHash','controlId','source','amount','attackMs','releaseMs','enabled']:kick?['kind','nodePath','definitionHash','schemaHash','controlId','source','amount','attackMs','releaseMs','sensitivity','retriggerMs','envelope','enabled']:tempo?['kind','nodePath','definitionHash','schemaHash','controlId','shape','beatsPerCycle','amount','phase','enabled']:['nodePath','definitionHash','schemaHash','controlId','shape','periodSeconds','amount','phase','enabled']);
   const nodePath=path(field(raw,'nodePath')),definitionHash=field(raw,'definitionHash'),schemaHash=field(raw,'schemaHash'),controlId=field(raw,'controlId'),amount=field(raw,'amount'),enabled=field(raw,'enabled');
   if(typeof definitionHash!=='string'||!regexTest(hash,definitionHash)||typeof schemaHash!=='string'||!regexTest(hash,schemaHash)||typeof controlId!=='string'||!controlId||controlId.length>64||typeof enabled!=='boolean'||!finite(amount)||amount<0)throw new RuntimeError('Invalid control animation binding');
   let binding;
@@ -28,6 +28,10 @@ export function validateControlAnimationBindings(input){
    const source=normalizeAudioKickSource(field(raw,'source')),attackMs=field(raw,'attackMs'),releaseMs=field(raw,'releaseMs'),sensitivity=field(raw,'sensitivity'),retriggerMs=field(raw,'retriggerMs'),envelope=field(raw,'envelope');
    if(!Number.isSafeInteger(attackMs)||attackMs<0||attackMs>60000||!Number.isSafeInteger(releaseMs)||releaseMs<0||releaseMs>60000||!finite(sensitivity)||sensitivity<0||sensitivity>1||!Number.isSafeInteger(retriggerMs)||retriggerMs<0||retriggerMs>2000||!setHas(envelopes,envelope))throw new RuntimeError('Control animation is outside its supported range');
    binding=freeze({kind:'kick',nodePath,definitionHash,schemaHash,controlId,source,amount,attackMs,releaseMs,sensitivity,retriggerMs,envelope,enabled});
+  }else if(tempo){
+   const shape=field(raw,'shape'),beatsPerCycle=field(raw,'beatsPerCycle'),phase=field(raw,'phase');if(!setHas(shapes,shape))throw new RuntimeError('Invalid control animation binding');
+   if(!finite(beatsPerCycle)||beatsPerCycle<.25||beatsPerCycle>64||!finite(phase)||phase<0||phase>1)throw new RuntimeError('Control animation is outside its supported range');
+   binding=freeze({kind:'tempo',nodePath,definitionHash,schemaHash,controlId,shape,beatsPerCycle,amount,phase,enabled});
   }else{
    if(tagged)throw new RuntimeError('Invalid control animation binding');
    const shape=field(raw,'shape'),periodSeconds=field(raw,'periodSeconds'),phase=field(raw,'phase');if(!setHas(shapes,shape))throw new RuntimeError('Invalid control animation binding');

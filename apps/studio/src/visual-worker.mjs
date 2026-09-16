@@ -11,6 +11,7 @@ import {prepareGraphRuntimePlan} from '../../../packages/runtime/src/graph/runti
 import { prepareAuthoredModule } from './authored-worker-assets.mjs';
 import { prepareWorkerControlState } from './controls/worker-control-state.mjs';
 import {prepareWorkerCompositionState} from './controls/worker-composition-state.mjs';
+import {createTempoClock} from './controls/tempo-clock.mjs';
 import { createFrameCollector } from '../../../packages/performance/live.mjs';
 import { createGpuPassTimer } from '../../../packages/performance/gpu-pass.mjs';
 import { collectionMode } from '../../../packages/performance/collection-mode.mjs';
@@ -18,7 +19,7 @@ const freeze=Object.freeze, RuntimeError=Error;
 const createURL=URL.createObjectURL.bind(URL),revokeURL=URL.revokeObjectURL.bind(URL),RuntimeBlob=Blob;
 const now=performance.now.bind(performance);
 const post=postMessage.bind(globalThis);
-let identity, renderer, device, visual, clock, random, settings, outputTarget, presentation;
+let identity, renderer, device, visual, clock, tempoClock, random, settings, outputTarget, presentation;
 let initializationProbe, material, componentBridge, compositionBridge, authoredCleanup, cleanupPromise, activeOperation;
 let authoredDisposalAttempted=false,terminalError;
 let controlState, frame = 0, tick = 0, lastTime = 0;
@@ -26,7 +27,7 @@ let drawStarted=0,scheduleEpoch=0;
 let performanceMode='routine';
 let stopped = false, externallyDriven=false, timer, heartbeat, telemetryTimer, collector, gpuTimer, gpuCapability, chain = Promise.resolve();
 const send = (type, extra = {}) => post({ type, ...identity, ...extra });
-function state() { const clockState=clock.snapshot();return { ...clockState, frameId: String(frame),...controlState.state(clockState.timeSeconds) }; }
+function state() { const clockState=clock.snapshot(),tempo=tempoClock.snapshot(clockState.timeSeconds);return { ...clockState, tempo,tempoSequence:tempo.tempoSequence, frameId: String(frame),...controlState.state(clockState.timeSeconds,tempo.beatPosition) }; }
 function runOperation(operation) {
   // Device loss bypasses the command queue. Keep the current command's lifetime
   // separate from terminal cleanup so teardown can await it without awaiting itself.
@@ -61,15 +62,15 @@ function failure(error, requestId) {
   if(!terminalError){terminalError=error;send('failure',{requestId,code:'RUNTIME_FAILED',message:String(error?.message||error).slice(0,2000)});}
   void terminalCleanup();
 }
-async function draw(requestId, type = 'frame') {
+async function draw(requestId, type = 'frame',extra = {}) {
   requireRunning();
   drawStarted=now();
-  const time = clock.snapshot();
+  const time = clock.snapshot(),tempo=tempoClock.snapshot(time.timeSeconds);
   const profiling=performanceMode==='routine';
   if(profiling)gpuTimer.begin(frame+1);
   const updateStart=profiling?now():0;
   await visual.update(freeze({ tick: tick++, timeSeconds: time.timeSeconds,
-    deltaSeconds: Math.max(0, time.timeSeconds - lastTime), controls: controlState.values(time.timeSeconds), events: freeze([]) }));
+    deltaSeconds: Math.max(0, time.timeSeconds - lastTime), controls: controlState.values(time.timeSeconds,tempo.beatPosition), events: freeze([]) }));
   requireRunning();
   const updateEnd=profiling?now():0;
   const renderResult=visual.render(freeze({ width: settings.width, height: settings.height, colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }));
@@ -85,7 +86,7 @@ async function draw(requestId, type = 'frame') {
   lastTime = time.timeSeconds; frame++;
   if(profiling){collector.record(completed,frame,updateEnd-updateStart,renderCallEnd-updateEnd,completed-renderEnd,asynchronous,renderEnd-renderCallEnd);gpuTimer.end();}
   else collector.record(completed,frame);
-  send(type, { requestId, ...state(), timeSeconds: time.timeSeconds });
+  send(type, { requestId, ...state(), timeSeconds: time.timeSeconds,...extra });
 }
 function schedule() {
   clearTimeout(timer);
@@ -110,7 +111,7 @@ async function initialize(message) {
   const prepared=await prepareAuthoredModule(message);
   controlState=prepared.admission.kind==='composition'?await prepareWorkerCompositionState(message,prepared.admission):await prepareWorkerControlState(message,prepared.admission);
   controlState.applyAudioSnapshot(message.audioSnapshot??{generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0},{playing:false,timeSeconds:0});
-  clock = new RuntimeClock(() => performance.now(), 'paused'); random = new SeededRandom(settings.seed);
+  clock = new RuntimeClock(() => performance.now(), 'paused');tempoClock=createTempoClock({nowMs:now,bpm:message.tempo?.bpm??120,tempoSequence:message.tempoSequence??0}); random = new SeededRandom(settings.seed);
   /*! lux-worker-liveness-v2: heartbeat starts before authored import/create. */
   let workerHeartbeat=0;
   const beat=()=>send('heartbeat', { frameId: String(frame),workerHeartbeat:++workerHeartbeat });
@@ -160,7 +161,7 @@ async function initialize(message) {
     const backend=freeze({resources,stage(scene,camera){if(staged)throw new RuntimeError('Component render already staged');staged={scene,camera};},texture(image){const target=targets.get(image);if(!target)throw new RuntimeError('Missing component input image');return target.texture;},async present(image){const target=targets.get(image);if(!target)throw new RuntimeError('Missing final component image');const copyMaterial=new module.MeshBasicNodeMaterial();copyMaterial.fragmentNode=module.sampleTexture(target.texture);const copy=new module.QuadMesh(copyMaterial);renderer.setRenderTarget(outputTarget);try{copy.render(renderer);}finally{renderer.setRenderTarget(null);copyMaterial.dispose();}},async drain(){while(settlements.size)await Promise.allSettled([...settlements]);if(settlementFailure)throw settlementFailure;}});
     const plan=prepareGraphRuntimePlan(validateNestedGraph(profile.graph,profile.definitions));
     compositionBridge=await createImageCompositionVisual({plan,definitions:create,context:freeze(context),backend,
-      nodeControls:(path,frame)=>controlState.nodeValues(path,frame.timeSeconds)});visual=compositionBridge;authoredCleanup=()=>compositionBridge.dispose();
+      nodeControls:(path,frame)=>controlState.nodeValues(path,frame.timeSeconds,tempoClock.snapshot(frame.timeSeconds).beatPosition)});visual=compositionBridge;authoredCleanup=()=>compositionBridge.dispose();
   }else if(prepared.admission.kind==='component'){
     const instance=await create(freeze(context));
     authoredCleanup=componentDisposer(instance);
@@ -213,10 +214,15 @@ onmessage = event => {
     } else if(message.type==='audio'){
       const audioClock=clock.snapshot();controlState.applyAudioSnapshot(message.audioSnapshot,{playing:audioClock.playback==='playing',timeSeconds:audioClock.timeSeconds});
       send('audio-ack',{providerGeneration:message.audioSnapshot.generation,sampleSequence:message.audioSnapshot.sequence});
+    } else if(message.type==='tempo'){
+      const time=clock.snapshot().timeSeconds;
+      const acknowledgement=message.action==='set'?tempoClock.setBpm(message.bpm,time):message.action==='tap'?tempoClock.tap(time):message.action==='synchronize'?tempoClock.synchronize(message.bpm,message.tempoSequence,time):undefined;
+      if(!acknowledgement)throw Error('Invalid tempo command');
+      await draw(message.requestId,'status',acknowledgement.tempoResult?{tempoResult:acknowledgement.tempoResult}:{});schedule();
     } else if (message.type === 'playback') {
       if (!['play', 'pause', 'reset'].includes(message.action)) throw Error('Invalid playback command');
       clearTimeout(timer);
-      if (message.action === 'reset') { clock.reset(); controlState.resetAnimations?.(0); random.reset(settings.seed); await visual.reset(settings.seed); lastTime = 0; tick = 0; }
+      if (message.action === 'reset') { clock.reset();tempoClock.reset(0); controlState.resetAnimations?.(0); random.reset(settings.seed); await visual.reset(settings.seed); lastTime = 0; tick = 0; }
       else {if(message.action==='pause')controlState.fenceAudioEvents?.();clock[message.action]();}
       await draw(message.requestId, 'status'); schedule();
     } else if (message.type === 'capture') {

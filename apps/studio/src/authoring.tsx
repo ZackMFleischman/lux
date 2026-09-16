@@ -80,6 +80,7 @@ export function AuthoringApp() {
       return { sourceHash: runtime.revisionId, schema: state.controlSchema, schemaHash: state.controlSchemaHash, values: state.controls };
     },
     getControlAnimations:()=>client.getSnapshot().authoring?.controlAnimations??[],
+    getTempo:()=>({bpm:client.getSnapshot().authoring?.tempo?.bpm??120}),
     getOutput:()=>({...DEFAULT_OUTPUT,...client.getSnapshot().authoring?.output}),
     readLibraryComponent:(id,revision)=>window.luxLibrary.read(id,revision),
     acceptedDocument: () => client.acceptedDocument(),
@@ -110,10 +111,10 @@ export function AuthoringApp() {
   useEffect(() => window.luxAuthoring.onAgentCommand(async command => {
     if (lookOperation.current && !['read', 'status'].includes(command.method)) throw Error('Wait for the look operation to finish');
     if (confirmation.isPending() && !['read', 'status', 'capture','library.list','library.read'].includes(command.method)) throw Error('Studio is waiting for a user confirmation');
-    if (['parameters', 'playback', 'restart'].includes(command.method)) {
+    if (['parameters', 'playback', 'restart','tempo.set','tempo.tap'].includes(command.method)) {
       if(!session.getSnapshot().runtimeControlsAvailable)throw Error('Studio is busy with a scene file operation');
       const write = dispatchRuntimeCommand(client, command.method, command.params);
-      if (command.method === 'parameters') {
+      if (command.method === 'parameters'||command.method==='tempo.set'||command.method==='tempo.tap') {
         pendingControlWrites.current.add(write);
         void write.then(() => pendingControlWrites.current.delete(write), () => pendingControlWrites.current.delete(write));
       }

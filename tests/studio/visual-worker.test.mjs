@@ -149,10 +149,13 @@ test('actual worker reports separate CPU calls, asynchronous render wait, queue 
 test('actual worker applies complete initial/live controls and captures exact metadata; reset preserves values',async()=>{
   const f=await fixture();const ready=await f.send({...f.initial,controls:{height:3,speed:1}});
   assert.equal(ready.type,'ready',JSON.stringify(ready));assert.deepEqual(ready.controls,{height:3,speed:1});assert.equal('intensity' in ready,false);
+  assert.deepEqual(ready.tempo,{bpm:120,beatPosition:0,beatPhase:0,tempoSequence:0});
   const applied=await f.send({type:'controls',requestId:'set',controlSequence:1,controlSchemaHash:f.initial.controlSchemaHash,values:{height:2,speed:1.5}});
   assert.equal(applied.type,'status');assert.deepEqual(f.frames.at(-1).controls,{height:2,speed:1.5});
-  const reset=await f.send({type:'playback',requestId:'reset',action:'reset'});assert.deepEqual(reset.controls,applied.controls);assert.equal(reset.clockEpoch,1);
-  const capture=await f.send({type:'capture',requestId:'capture'});assert.equal(capture.type,'capture');assert.deepEqual(capture.metadata.controls,applied.controls);assert.equal(capture.metadata.controlSchemaHash,f.initial.controlSchemaHash);assert.equal(capture.metadata.controlSequence,1);
+  const tempo=await f.send({type:'tempo',requestId:'tempo-set',action:'set',bpm:150});assert.equal(tempo.tempoResult,'applied');assert.equal(tempo.tempo.bpm,150);assert.equal(tempo.tempoSequence,1);
+  const tap=await f.send({type:'tempo',requestId:'tempo-tap',action:'tap'});assert.equal(tap.tempoResult,'restarted');assert.equal(tap.tempoSequence,2);assert.equal(tap.tempo.beatPhase,0);
+  const reset=await f.send({type:'playback',requestId:'reset',action:'reset'});assert.deepEqual(reset.controls,applied.controls);assert.equal(reset.clockEpoch,1);assert.equal(reset.tempo.bpm,150);assert.equal(reset.tempoSequence,2);assert.equal(reset.tempo.beatPhase,0);
+  const capture=await f.send({type:'capture',requestId:'capture'});assert.equal(capture.type,'capture');assert.deepEqual(capture.metadata.controls,applied.controls);assert.equal(capture.metadata.controlSchemaHash,f.initial.controlSchemaHash);assert.equal(capture.metadata.controlSequence,1);assert.equal(capture.metadata.tempo.bpm,150);
   assert.deepEqual(Array.from(decode(new Uint8Array(capture.bytes)).data.slice(0,4)),[255,0,0,128]);
 });
 test('audio snapshots update the evaluator cache and acknowledge without drawing',async()=>{

@@ -6,7 +6,7 @@ import { resolve } from 'node:path';
 import { createStudioConnection, resolveStudioSession, studioAppData } from './studio-session.mjs';
 import { createLibraryContext, resolveMcpStandardLibrary } from './studio-library-context.mjs';
 import { discoverVisualSdk } from '../packages/visual-sdk/src/discovery.mjs';
-import { parameterInputSchema, playbackInputSchema, restartInputSchema } from '../apps/studio/src/runtime-operations.ts';
+import { parameterInputSchema, playbackInputSchema, restartInputSchema,tempoSetInputSchema,tempoTapInputSchema } from '../apps/studio/src/runtime-operations.ts';
 const selectedSession = resolveStudioSession({ workspace: resolve(import.meta.dirname, '..') });
 let libraryContext;
 try { libraryContext = createLibraryContext(await resolveMcpStandardLibrary({ workspace: selectedSession.workspace,
@@ -16,6 +16,7 @@ const server = new McpServer({ name: 'lux-studio', version: '0.1.0' },
   { instructions: libraryContext.instructions(await libraryContext.catalog()) });
 const call = createStudioConnection(selectedSession);
 const text = value => ({ content: [{ type: 'text', text: JSON.stringify(value) }] });
+async function requireTempoCapability(){const status=await call('status'),capabilities=status.capabilities;if(!Number.isSafeInteger(capabilities?.protocolVersion)||capabilities.protocolVersion<3||capabilities?.tempo?.manual!==true||capabilities?.tempo?.tap!==true)throw Error('Running Studio does not support manual/tap tempo; restart from the matching checkout before sending tempo operations.');}
 async function runningStudio() {
   try { const status = await call('status'); return { connected: true, studioSession: status.studioSession, capabilities: status.capabilities ?? null,
     compatible: status.capabilities?.codeDeclaredParameters === true && status.capabilities?.supportedSdkVersions?.includes('0.4.0'),
@@ -24,7 +25,7 @@ async function runningStudio() {
     selectedSession: { profile: selectedSession.profile, workspace: selectedSession.workspace },
     advice: `Use the same Studio profile and checkout; reconnect the adapter after replacing Studio. ${error.message}` }; }
 }
-server.registerTool('lux.studio.discover', { description: 'Read the exact visual SDK, example and standalone Lux capabilities. Start Lux Studio separately.', inputSchema: {} }, async () => text({ ...await discoverVisualSdk(), scope: 'standalone-studio', tools: ['read', 'build', 'save', 'open', 'capture', 'status', 'parameters', 'playback', 'restart','library.list','library.read','library.create','library.update'], resolume: false,
+server.registerTool('lux.studio.discover', { description: 'Read the exact visual SDK, example and standalone Lux capabilities. Start Lux Studio separately.', inputSchema: {} }, async () => text({ ...await discoverVisualSdk(), scope: 'standalone-studio', tools: ['read', 'build', 'save', 'open', 'capture', 'status', 'parameters', 'playback', 'restart','tempo.set','tempo.tap','library.list','library.read','library.create','library.update'], resolume: false,
   libraryCatalog: await libraryContext.catalog(),
   runningStudio: await runningStudio(),
   parameters: { kinds: ['number'], declaredInCode: true, requiredGuard: 'expectedControlSchemaHash from current runtime status', implicitControls: false,
@@ -51,4 +52,6 @@ for (const [method, schema, description] of [
   ['playback', playbackInputSchema, 'Play, pause or reset the Studio runtime using current instance and generation guards. Reset preserves playing/paused state. Returns applied state.'],
   ['restart', restartInputSchema, 'Restart the Studio runtime using current instance and generation guards. Retains source and controls; returns replacement runtime state.'],
 ]) server.registerTool(`lux.studio.${method}`, { description, inputSchema: schema.shape }, async input => text(await call(method, input)));
+server.registerTool('lux.studio.tempo.set',{description:'Set manual scene tempo from 20 through 300 BPM using current runtime identity and revision guards. Preserves beat phase and returns the acknowledged tempo result.',inputSchema:tempoSetInputSchema.shape},async input=>{await requireTempoCapability();return text(await call('tempo.set',input));});
+server.registerTool('lux.studio.tempo.tap',{description:'Tap scene tempo using the running Studio monotonic clock and current runtime identity and revision guards. Returns accepted, restarted, or ignored-short.',inputSchema:tempoTapInputSchema.shape},async input=>{await requireTempoCapability();return text(await call('tempo.tap',input));});
 await server.connect(new StdioServerTransport());

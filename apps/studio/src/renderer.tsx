@@ -3,7 +3,7 @@ import {GraphPanel,compositionNodeLabel,compositionOccurrence,nodeKey} from './G
 import {visualSelection} from './visual-model.ts';
 import type {NodePath} from '../../../packages/runtime-contracts/src/graph.ts';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
-import { Alert, Button, Chip, CssBaseline, Paper, ThemeProvider, IconButton, Tooltip, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Alert, Button, Chip, CssBaseline, Paper, ThemeProvider, IconButton, Tooltip, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions,TextField } from '@mui/material';
 import { studioTheme } from './theme.ts';
 import { ParameterInspector, parameterOwner } from './controls/ParameterInspector.tsx';
 import type { ControlEdits } from './controls/ParameterInspector.tsx';
@@ -103,6 +103,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const [error, setError] = useState<string | null>(null);
   const [clock, setClock] = useState(() => nowMs ?? Date.now());
   const runtime = snapshot.authoring;
+  const [tempoDraft,setTempoDraft]=useState('120'),tempoEditing=useRef(false);
+  useEffect(()=>{if(!tempoEditing.current)setTempoDraft(String(runtime?.tempo?.bpm??120));},[runtime?.tempo?.bpm,runtime?.instanceId,runtime?.generation]);
   const sourceProblemCount = sourceDiagnostics?.items.length ?? 0;
   const matchingSourceFaults = snapshot.jobs.filter(job => sourceDiagnosticFault(job.fault, sourceDiagnostics?.items ?? [])).length;
   const baseStatus = studioStatus(snapshot, sourceProblemCount);
@@ -205,6 +207,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
     catch (reason) { setError(reason instanceof Error ? reason.message : String(reason)); }
     finally { if (transport) { transportPending.current = false; setPendingCommands(count => count - 1); } }
   }
+  function commitTempo(){tempoEditing.current=false;const bpm=Number(tempoDraft);if(!Number.isFinite(bpm)||bpm<20||bpm>300){setTempoDraft(String(runtime?.tempo?.bpm??120));setError('Tempo must be between 20 and 300 BPM.');return;}if(bpm===(runtime?.tempo?.bpm??120))return;controlEdits?.changed();const write=controller.setTempoBpm(bpm);controlEdits?.track(write);void command(()=>write);}
+  function tapTempo(){controlEdits?.changed();const write=controller.tapTempo();controlEdits?.track(write);void command(()=>write);}
   function windowAction(action: () => Promise<void>): void { void action().catch(reason => setError(String(reason))); }
   const compact = previewOnly || maximizedPanel !== null || windowState.fullscreen;
   const expandedPanel: StudioPanelKind = previewOnly || windowState.fullscreen ? 'preview' : maximizedPanel ?? 'preview';
@@ -247,6 +251,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
           <Tooltip title="Reset"><span><IconButton aria-label="Reset" disabled={!available} onClick={() => void command(() => controller.playback('reset'))}>
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" strokeWidth="2" d="M4 10a8 8 0 1 1 0 5M4 4v6h6" /></svg>
           </IconButton></span></Tooltip>
+          <span className="tempo-label">BPM</span><TextField className="tempo-bpm" size="small" type="number" value={tempoDraft} disabled={!available} onFocus={()=>{tempoEditing.current=true;}} onChange={event=>{tempoEditing.current=true;setTempoDraft(event.target.value);}} onBlur={commitTempo} onKeyDown={event=>{if(event.key==='Enter'){event.preventDefault();commitTempo();}else if(event.key==='Escape'){tempoEditing.current=false;setTempoDraft(String(runtime?.tempo?.bpm??120));}}} slotProps={{htmlInput:{min:20,max:300,step:.1,'aria-label':'Tempo BPM'}}}/>
+          <Button size="small" disabled={!available} onClick={tapTempo}>Tap</Button>
           <Tooltip title="More playback actions"><IconButton aria-label="More playback actions" aria-haspopup="menu" aria-expanded={!!transportMenu} onClick={event => setTransportMenu(event.currentTarget)}>...</IconButton></Tooltip>
           <Menu anchorEl={transportMenu} open={!!transportMenu} onClose={() => setTransportMenu(null)} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); setTransportMenu(null); } }}>
             <MenuItem disabled={!available} onClick={() => { setTransportMenu(null); void command(() => controller.restart()); }}>Restart runtime</MenuItem>

@@ -14,7 +14,7 @@ test('export child validates and prepares the full saved document before packagi
   const result = await exportSceneDocument({ name: 'Test', document, outputDirectory: tmpdir() }, {
     prepare: async (scenePath: string, output?: string) => {
       calls.push('prepare'); temporary = dirname(scenePath);
-      assert.deepEqual(JSON.parse(await readFile(scenePath, 'utf8')), document);
+      assert.deepEqual(JSON.parse(await readFile(scenePath, 'utf8')), {...document,tempo:{bpm:120}});
       assert.equal(output, join(temporary, 'prepared')); return { path: join(output!, 'prepared.json'), sourceHash: 'source', linkedHash: 'linked', settings: document.settings, savedControls: document.controls };
     },
     exporter: async (request: any) => { calls.push('package'); assert.equal(request.preparedPath, join(temporary, 'prepared/prepared.json'));

@@ -158,7 +158,7 @@ export function createCodex({ root, apiKey, env = process.env, log = (_s: string
       let answer: { success?: boolean; summary?: string; operation?: string; applied_tools?: string[] };
       try { answer = JSON.parse(final); } catch { throw Error('Codex returned an invalid result. Work is not confirmed.'); }
       if (typeof answer.summary !== 'string' || !answer.summary.trim()) throw Error('Codex returned no usable result.');
-      const mutations = new Set(['lux.studio.parameters', 'lux.studio.build', 'lux.studio.playback', 'lux.studio.restart', 'lux.library.create', 'lux.library.update']);
+      const mutations = new Set(['lux.studio.parameters', 'lux.studio.build', 'lux.studio.playback', 'lux.studio.restart','lux.studio.tempo.set','lux.studio.tempo.tap', 'lux.library.create', 'lux.library.update']);
       const evidence = Array.isArray(answer.applied_tools) && answer.applied_tools.length > 0 &&
         answer.applied_tools.every(tool => successfulTools.has(tool));
       const applied = answer.operation === 'inspect' || (answer.operation === 'change' && answer.applied_tools?.some(tool => mutations.has(tool)));

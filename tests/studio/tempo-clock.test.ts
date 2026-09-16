@@ -125,3 +125,9 @@ test('replacement initialization accepts acknowledged BPM and sequence with fres
   assert.equal(clock.tap(0).tempoResult,'restarted');
   assert.equal(clock.snapshot(0).tempoSequence,10);
 });
+
+test('candidate synchronization adopts the acknowledged sequence with fresh beat and tap history',()=>{
+  let now=1000;const clock=createTempoClock({nowMs:()=>now,bpm:120,tempoSequence:2});clock.tap(1);now=1500;clock.tap(1.5);
+  assert.deepEqual(clock.synchronize(137.5,9,3),{bpm:137.5,beatPosition:0,beatPhase:0,tempoSequence:9});
+  now=2000;assert.equal(clock.tap(3).tempoResult,'restarted');assert.equal(clock.snapshot(3).tempoSequence,10);
+});

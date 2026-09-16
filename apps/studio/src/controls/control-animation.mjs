@@ -37,12 +37,17 @@ export function animatedControlValue(base,definition,binding,timeSeconds){
  const cycle=((finite(timeSeconds,'time')/binding.periodSeconds+binding.phase)%1+1)%1;
  return min(definition.max,max(definition.min,base+binding.amount*wave(binding.shape,cycle)));
 }
+export function tempoControlValue(base,definition,binding,beatPosition){
+ if(!binding?.enabled)return base;
+ const cycle=((finite(beatPosition,'beat position')/binding.beatsPerCycle+binding.phase)%1+1)%1;
+ return min(definition.max,max(definition.min,base+binding.amount*wave(binding.shape,cycle)));
+}
 
 export function createControlAnimationEvaluator(profile,base,normalized){
  let current=normalized;
  let entries=new RuntimeMap();
  let audioSnapshot=normalizeAudioBandSnapshot({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0});
- const createEntry=binding=>binding.kind==='audio'?{binding,filtered:0,lastTime:undefined}:binding.kind==='kick'?{binding,phase:'idle',phaseStart:0,startValue:0,peak:0,lastTrigger:undefined,observedGeneration:audioSnapshot.generation,observedKickSequence:audioSnapshot.kickSequence,wasAvailable:audioSnapshot.available}:{binding,anchorTime:0,frozenElapsed:0};
+ const createEntry=binding=>binding.kind==='audio'?{binding,filtered:0,lastTime:undefined}:binding.kind==='kick'?{binding,phase:'idle',phaseStart:0,startValue:0,peak:0,lastTrigger:undefined,observedGeneration:audioSnapshot.generation,observedKickSequence:audioSnapshot.kickSequence,wasAvailable:audioSnapshot.available}:binding.kind==='tempo'?{binding}:{binding,anchorTime:0,frozenElapsed:0};
  for(let index=0;index<normalized.bindings.length;index++){const binding=normalized.bindings[index];mapSet(entries,`${key(binding.nodePath)}:${binding.controlId}`,createEntry(binding));}
  const elapsed=(entry,timeSeconds)=>entry.frozenElapsed+(entry.binding.enabled?max(0,timeSeconds-entry.anchorTime):0);
  function replace(next,timeSeconds){
@@ -56,12 +61,13 @@ export function createControlAnimationEvaluator(profile,base,normalized){
     if(!binding.enabled||!before?.binding.enabled){entry.phase='idle';entry.startValue=0;entry.peak=0;entry.observedGeneration=audioSnapshot.generation;entry.observedKickSequence=audioSnapshot.kickSequence;}
     mapSet(nextEntries,id,entry);continue;
    }
-   if(before&&before.binding.kind!=='audio'&&before.binding.kind!=='kick'){const atChange=elapsed(before,timeSeconds);if(binding.enabled){if(before.binding.enabled){anchorTime=before.anchorTime;frozenElapsed=before.frozenElapsed;}else frozenElapsed=before.frozenElapsed;}else frozenElapsed=atChange;}
+   if(binding.kind==='tempo'){mapSet(nextEntries,id,{binding});continue;}
+   if(before&&before.binding.kind!=='audio'&&before.binding.kind!=='kick'&&before.binding.kind!=='tempo'){const atChange=elapsed(before,timeSeconds);if(binding.enabled){if(before.binding.enabled){anchorTime=before.anchorTime;frozenElapsed=before.frozenElapsed;}else frozenElapsed=before.frozenElapsed;}else frozenElapsed=atChange;}
    mapSet(nextEntries,id,{binding,anchorTime,frozenElapsed});
   }
   current=next;entries=nextEntries;
  }
- function restart(path,controlId,timeSeconds){const id=`${key(path)}:${controlId}`,entry=mapGet(entries,id);if(entry){finite(timeSeconds,'time');mapSet(entries,id,entry.binding.kind==='audio'?{binding:entry.binding,filtered:0,lastTime:timeSeconds}:entry.binding.kind==='kick'?{...createEntry(entry.binding),observedGeneration:audioSnapshot.generation,observedKickSequence:audioSnapshot.kickSequence}:{binding:entry.binding,anchorTime:timeSeconds,frozenElapsed:0});}}
+ function restart(path,controlId,timeSeconds){const id=`${key(path)}:${controlId}`,entry=mapGet(entries,id);if(entry){finite(timeSeconds,'time');if(entry.binding.kind==='tempo')return;mapSet(entries,id,entry.binding.kind==='audio'?{binding:entry.binding,filtered:0,lastTime:timeSeconds}:entry.binding.kind==='kick'?{...createEntry(entry.binding),observedGeneration:audioSnapshot.generation,observedKickSequence:audioSnapshot.kickSequence}:{binding:entry.binding,anchorTime:timeSeconds,frozenElapsed:0});}}
  function audioValue(entry,timeSeconds){
   const time=finite(timeSeconds,'time'),target=audioSnapshot.available?audioSnapshot[entry.binding.source.band]:0,previous=entry.filtered;
   const deltaMs=entry.lastTime===undefined?0:min(60000,max(0,(time-entry.lastTime)*1000));
@@ -99,16 +105,16 @@ export function createControlAnimationEvaluator(profile,base,normalized){
   }
   return value;
  }
-  function nodeValues(path,timeSeconds){
+  function nodeValues(path,timeSeconds,beatPosition=0){
    const values={...base.nodeValues(path)},node=arrayFind(profile.nodes,row=>key(row.nodePath)===key(path));
    if(!node)return freeze(values);
   const issueKeys=new RuntimeSet();for(let index=0;index<current.issues.length;index++){const issue=current.issues[index];setAdd(issueKeys,`${key(issue.nodePath)}:${issue.controlId}`);}
-  for(let index=0;index<node.schema.length;index++){const definition=node.schema[index],id=`${key(path)}:${definition.id}`,entry=mapGet(entries,id);if(entry&&!setHas(issueKeys,id))values[definition.id]=entry.binding.kind==='audio'?(entry.binding.enabled?min(definition.max,max(definition.min,values[definition.id]+entry.binding.amount*audioValue(entry,timeSeconds))):values[definition.id]):entry.binding.kind==='kick'?(entry.binding.enabled?min(definition.max,max(definition.min,values[definition.id]+entry.binding.amount*kickValue(entry,timeSeconds))):values[definition.id]):animatedControlValue(values[definition.id],definition,entry.binding,elapsed(entry,timeSeconds));}
+  for(let index=0;index<node.schema.length;index++){const definition=node.schema[index],id=`${key(path)}:${definition.id}`,entry=mapGet(entries,id);if(entry&&!setHas(issueKeys,id))values[definition.id]=entry.binding.kind==='audio'?(entry.binding.enabled?min(definition.max,max(definition.min,values[definition.id]+entry.binding.amount*audioValue(entry,timeSeconds))):values[definition.id]):entry.binding.kind==='kick'?(entry.binding.enabled?min(definition.max,max(definition.min,values[definition.id]+entry.binding.amount*kickValue(entry,timeSeconds))):values[definition.id]):entry.binding.kind==='tempo'?tempoControlValue(values[definition.id],definition,entry.binding,beatPosition):animatedControlValue(values[definition.id],definition,entry.binding,elapsed(entry,timeSeconds));}
   return freeze(values);
  }
- function values(timeSeconds){
+ function values(timeSeconds,beatPosition=0){
   const values={...base.values()};
-  for(let index=0;index<profile.publicControls.length;index++){const definition=profile.publicControls[index],targets=profile.publicControlBindings[definition.id],target=targets?.length===1&&targets[0]?.active?targets[0]:undefined;if(target)values[definition.id]=nodeValues(target.nodePath,timeSeconds)[target.controlId];}
+  for(let index=0;index<profile.publicControls.length;index++){const definition=profile.publicControls[index],targets=profile.publicControlBindings[definition.id],target=targets?.length===1&&targets[0]?.active?targets[0]:undefined;if(target)values[definition.id]=nodeValues(target.nodePath,timeSeconds,beatPosition)[target.controlId];}
   return freeze(values);
  }
  function forEachKickEntry(visit){for(let index=0;index<current.bindings.length;index++){const binding=current.bindings[index];if(binding.kind==='kick'){const entry=mapGet(entries,`${key(binding.nodePath)}:${binding.controlId}`);if(entry)visit(entry);}}}
