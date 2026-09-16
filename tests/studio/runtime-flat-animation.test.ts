@@ -61,25 +61,46 @@ test('flat runtime keeps base controls while accepting guarded animation state a
   assert.deepEqual(getRuntimeControlState(initial).controlAnimations,[saved]);
   assert.deepEqual(getRuntimeControlState(initial).effectiveControls,{height:2,speed:.5});
 
-  const controller=new StudioController(client,()=> 'animation-write'),next=binding(2);
-  const write=controller.setNodeAnimation([],'height',next);
-  assert.deepEqual(worker.messages.at(-1),{type:'animations',requestId:'animation-write',instanceId:initial.instanceId,generation:initial.generation,animationSequence:1,controlAnimations:[next]});
-  worker.reply({requestId:'animation-write',effectiveControls:{height:3,speed:.5},controlAnimations:[next],animationSequence:1});
+  let request=0;const controller=new StudioController(client,()=> `animation-${++request}`),next=binding(2),latest=binding(3);
+  let firstSettled=false,secondSettled=false;
+  const write=controller.setNodeAnimation([],'height',next).then(()=>{firstSettled=true;});
+  const secondWrite=controller.setNodeAnimation([],'height',latest).then(()=>{secondSettled=true;});
+  assert.deepEqual(worker.messages.at(-2),{type:'animations',requestId:'animation-1',instanceId:initial.instanceId,generation:initial.generation,animationSequence:1,controlAnimations:[next]});
+  assert.deepEqual(worker.messages.at(-1),{type:'animations',requestId:'animation-2',instanceId:initial.instanceId,generation:initial.generation,animationSequence:2,controlAnimations:[latest]});
+  worker.reply({requestId:'animation-1',effectiveControls:{height:1.25,speed:.5},controlAnimations:[binding(.25)],animationSequence:1});
+  await Promise.resolve();
+  assert.equal(firstSettled,false,'a mismatched pending acknowledgement cannot resolve its write');
+  assert.equal(secondSettled,false);
+  assert.deepEqual(getRuntimeControlState(client.getSnapshot().authoring!).controlAnimations,[saved],'a mismatched pending acknowledgement cannot publish');
+  worker.reply({requestId:'animation-1',effectiveControls:{height:3,speed:.5},controlAnimations:[next],animationSequence:1});
   await write;
   assert.deepEqual(getRuntimeControlState(client.getSnapshot().authoring!).controls,{height:1,speed:.5});
   assert.deepEqual(getRuntimeControlState(client.getSnapshot().authoring!).effectiveControls,{height:3,speed:.5});
 
+  worker.reply({effectiveControls:{height:2.5,speed:.5},controlAnimations:[next],animationSequence:1});
+  assert.deepEqual(getRuntimeControlState(client.getSnapshot().authoring!).effectiveControls,{height:2.5,speed:.5},'render frames may resample the accepted binding');
+  worker.reply({effectiveControls:{height:1.25,speed:.5},controlAnimations:[binding(.25)],animationSequence:1});
+  assert.deepEqual(getRuntimeControlState(client.getSnapshot().authoring!).effectiveControls,{height:2.5,speed:.5},'equal animation sequences cannot substitute different bindings');
+
+  worker.reply({requestId:'animation-2',effectiveControls:{height:1.25,speed:.5},controlAnimations:[binding(.25)],animationSequence:2});
+  await Promise.resolve();
+  assert.equal(secondSettled,false,'a mismatched pending acknowledgement cannot resolve the write');
+  assert.deepEqual(getRuntimeControlState(client.getSnapshot().authoring!).controlAnimations,[next],'a mismatched pending acknowledgement cannot publish');
+  worker.reply({requestId:'animation-2',effectiveControls:{height:4,speed:.5},controlAnimations:[latest],animationSequence:2});
+  await secondWrite;
+  assert.deepEqual(getRuntimeControlState(client.getSnapshot().authoring!).controlAnimations,[latest]);
+
   worker.reply({effectiveControls:{height:2,speed:.5},controlAnimations:[saved],animationSequence:0});
-  assert.deepEqual(getRuntimeControlState(client.getSnapshot().authoring!).controlAnimations,[next]);
-  worker.reply({effectiveControls:{height:99,speed:.5},controlAnimations:[next],animationSequence:1});
-  assert.deepEqual(getRuntimeControlState(client.getSnapshot().authoring!).effectiveControls,{height:3,speed:.5});
-  worker.reply({effectiveControls:{height:4,speed:.5},controlAnimations:[{...next,nodePath:['forged']}],animationSequence:2});
-  assert.deepEqual(getRuntimeControlState(client.getSnapshot().authoring!).effectiveControls,{height:3,speed:.5});
-  await assert.rejects(controller.setNodeAnimation([],'height',{...next,schemaHash:'0'.repeat(64)}),/identity/i);
+  assert.deepEqual(getRuntimeControlState(client.getSnapshot().authoring!).controlAnimations,[latest]);
+  worker.reply({effectiveControls:{height:99,speed:.5},controlAnimations:[latest],animationSequence:2});
+  assert.deepEqual(getRuntimeControlState(client.getSnapshot().authoring!).effectiveControls,{height:4,speed:.5});
+  worker.reply({effectiveControls:{height:4,speed:.5},controlAnimations:[{...latest,nodePath:['forged']}],animationSequence:3});
+  assert.deepEqual(getRuntimeControlState(client.getSnapshot().authoring!).effectiveControls,{height:4,speed:.5});
+  await assert.rejects(controller.setNodeAnimation([],'height',{...latest,schemaHash:'0'.repeat(64)}),/identity/i);
 
   const document:any=client.acceptedDocument();
   assert.deepEqual(document.controls.values,{height:1,speed:.5},'saved controls must exclude the sampled animation value');
-  assert.deepEqual(document.controlAnimations,[next]);
+  assert.deepEqual(document.controlAnimations,[latest]);
 });
 
 test('legacy runtime state preserves scene animation fields',()=>{

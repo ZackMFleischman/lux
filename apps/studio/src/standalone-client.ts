@@ -244,7 +244,16 @@ export class StandaloneClient implements StudioClient, PresentationPort {
             }
             if(message.type==='ready'&&(message.controlSequence!==0||animationSequence!==0||JSON.stringify(applied)!==JSON.stringify(state.controls)||JSON.stringify(controlAnimations)!==JSON.stringify(state.controlAnimations??[])))throw Error('Initial control snapshot mismatch');
           } catch(error) {if(message.type==='ready')fail(String(error));return;}
-          if(ready&&(message.controlSequence<candidate.state.controlSequence||animationSequence<(candidate.state.animationSequence??0)))return;
+          const currentAnimationSequence=candidate.state.animationSequence??0;
+          if(animationSequence<currentAnimationSequence)return;
+          const receivedAnimations=JSON.stringify(controlAnimations);
+          if(animationSequence===currentAnimationSequence){
+            if(receivedAnimations!==JSON.stringify(candidate.state.controlAnimations??[]))return;
+          }else{
+            const animationWait=this.pending.get(message.requestId);
+            if(animationWait?.runtime!==candidate||animationWait.kind!=='command'||animationWait.expectedAnimationSequence!==animationSequence||receivedAnimations!==JSON.stringify(animationWait.expectedControlAnimations))return;
+          }
+          if(ready&&message.controlSequence<candidate.state.controlSequence)return;
           candidate.state={...state,controls:applied,effectiveControls,controlSequence:message.controlSequence,controlAnimations,controlAnimationIssues,animationSequence,
             ...(compositionNodeControls?{nodeControls:compositionNodeControls,effectiveNodeControls}:{} )};
           candidate.playback=message.playback;
