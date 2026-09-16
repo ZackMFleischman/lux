@@ -66,10 +66,16 @@ try{
  current=await call('read');await call('build',{source:{sdkVersion:'0.4.0',entry:'composition.ts',files:{'composition.ts':composition,'ball.ts':component}},expectedDraftVersion:current.draftVersion});
  status=await call('status');assert.equal(status.authoring.controlSchema.length,64);assert.equal(status.authoring.nodeControls.nodes[0].schema.length,64);
  await page.getByRole('button',{name:'View',exact:true}).click();await page.getByRole('menuitem',{name:'Inspector',exact:true}).click();
+ const lateValue=page.getByRole('spinbutton',{name:'Component control 64 value',exact:true});await lateValue.fill('.7');await lateValue.press('Enter');
+ for(let i=0;i<100;i++){status=await call('status');if(status.authoring.controls.control63===.7)break;await page.waitForTimeout(100);}
+ assert.equal(status.authoring.controls.control63,.7);
  await page.getByRole('button',{name:'Animate Component control 64',exact:true}).click();await page.getByRole('button',{name:'Add LFO',exact:true}).click();
  for(let i=0;i<100;i++){status=await call('status');if(status.authoring.controlAnimations.some(row=>row.nodePath.length&&row.controlId==='control63'))break;await page.waitForTimeout(100);}
  assert.ok(status.authoring.controlAnimations.some(row=>row.nodePath.length&&row.controlId==='control63'));
+ const sampled=status.authoring.effectiveControls.control63;await page.waitForTimeout(300);status=await call('status');assert.notEqual(status.authoring.effectiveControls.control63,sampled);assert.equal(status.authoring.controls.control63,.7);
  await page.screenshot({path:join(output,'component-64-controls.png')});
+ await page.keyboard.press('Escape');current=await call('read');const componentPath=join(output,'component.lux-scene');await call('scene.save',{path:componentPath,expectedDraftVersion:current.draftVersion,overwrite:false});await call('scene.open',{path:componentPath,expectedDraftVersion:current.draftVersion,discardDirty:true});
+ status=await call('status');assert.equal(status.authoring.controls.control63,.7);assert.ok(status.authoring.controlAnimations.some(row=>row.nodePath.length&&row.controlId==='control63'));
  report.checks.push('64-control component compiles and exposes64 aliases;late component control animates');
  assert.deepEqual(report.errors,[]);report.ok=true;
 }catch(error){report.failure=error.stack??String(error);process.exitCode=1;if(page&&!page.isClosed())await page.screenshot({path:join(output,'failure.png')}).catch(()=>{});}
