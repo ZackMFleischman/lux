@@ -13,13 +13,14 @@ Object.defineProperty(globalThis, 'IS_REACT_ACT_ENVIRONMENT', { configurable: tr
 const { render: renderUI, screen, cleanup, waitFor, fireEvent, act, within } = await import('@testing-library/react');
 const { CacheProvider } = await import('@emotion/react');
 const { default: createCache } = await import('@emotion/cache');
-let styleCache = createCache({key:'studio-test'});
+const createStyleCache=()=>createCache({key:'studio-test',container:document.head,speedy:false});
+let styleCache = createStyleCache();
 const render = (ui: Parameters<typeof renderUI>[0]) => renderUI(<CacheProvider value={styleCache}>{ui}</CacheProvider>);
 const { userEvent } = await import('@testing-library/user-event');
 const { StudioApp } = await import('../../apps/studio/src/renderer.tsx');
 const { createDisconnectedClient } = await import('../../apps/studio/src/service-client.ts');
 const { useDiscardConfirmation } = await import('../../apps/studio/src/Confirmation.tsx');
-afterEach(() => { cleanup(); styleCache.sheet.flush(); styleCache = createCache({key:'studio-test'}); });
+afterEach(() => { cleanup(); styleCache.sheet.flush(); styleCache = createStyleCache(); });
 after(() => dom.window.close());
 
 test('RTL: frame bursts leave Performance responsive and applied controls publish immediately', async context => {
@@ -205,7 +206,7 @@ test('RTL: control descriptions appear on hover and keyboard focus without creat
   fireEvent.mouseOver(described);
   const tooltip = await screen.findByRole('tooltip', { name: /Expands the area sampled/ });
   assert.ok(tooltip.querySelector('.MuiTooltip-tooltipPlacementLeft'), 'help must open toward Preview');
-  assert.equal(getComputedStyle(tooltip.querySelector('.MuiTooltip-tooltip')!).fontSize, '12px');
+  await waitFor(() => assert.equal(getComputedStyle(tooltip.querySelector('.MuiTooltip-tooltip')!).fontSize, '12px'));
   fireEvent.change(screen.getByRole('slider', { name: 'Source sampling radius' }), { target: { value: '2' } });
   await waitFor(() => assert.deepEqual((fixture.calls[0] as any).input.values, { samplingRadius: 2 }));
   fireEvent.mouseOut(described);
