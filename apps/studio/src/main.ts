@@ -135,7 +135,7 @@ app.whenReady().then(async () => {
     session: session.defaultSession,
     getMainWebContents: () => mainWindow?.webContents ?? null,
     pageUrl,
-    securityOrigin: 'file://',
+    securityOrigin: 'file:///',
     now: () => performance.now(),
     createToken: () => randomBytes(24).toString('base64url'),
     setExpiry: (callback, milliseconds) => setTimeout(callback, milliseconds),

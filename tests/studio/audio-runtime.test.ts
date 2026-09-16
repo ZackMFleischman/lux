@@ -8,7 +8,7 @@ test('audio runtime arms one request, activates its token, and revokes on discon
   const calls:string[]=[];
   const track={stop(){calls.push('stop');},addEventListener(){},removeEventListener(){}};
   const stream={getTracks:()=>[track]} as any;
-  const context={state:'running',close:async()=>{calls.push('close');},addEventListener(){},removeEventListener(){}} as any;
+  const context={state:'suspended',resume:async()=>{calls.push('resume');context.state='running';},close:async()=>{calls.push('close');},addEventListener(){},removeEventListener(){}} as any;
   const runtime=createStudioAudioRuntime({
     permissions:{arm:async()=>{calls.push('arm');return {token:'token-token-token-1',expiresAtMs:1};},activate:async token=>{calls.push(`activate:${token}`);return true;},cancel:async()=>false,disconnect:async()=>{calls.push('revoke');return true;}},
     mediaDevices:{getUserMedia:async (constraints:any)=>{calls.push(`capture:${JSON.stringify(constraints)}`);return stream;}} as any,
@@ -17,9 +17,9 @@ test('audio runtime arms one request, activates its token, and revokes on discon
     scheduler:{request:()=>1,cancel(){}},
   });
   await runtime.connect(configuration,'device-local');
-  assert.deepEqual(calls.slice(0,3),['arm','capture:{"audio":{"deviceId":{"exact":"device-local"}},"video":false}','activate:token-token-token-1']);
+  assert.deepEqual(calls.slice(0,4),['arm','capture:{"audio":{"deviceId":{"exact":"device-local"}},"video":false}','activate:token-token-token-1','resume']);
   await runtime.disconnect();
-  assert.deepEqual(calls.slice(3),['stop','close','revoke']);
+  assert.deepEqual(calls.slice(4),['stop','close','revoke']);
 });
 
 test('failed permission activation stops the acquired stream and cancels the exact arm',async()=>{
@@ -32,4 +32,17 @@ test('failed permission activation stops the acquired stream and cancels the exa
   });
   await assert.rejects(runtime.connect(configuration),/activation failed/);
   assert.deepEqual(calls,['stop','cancel:token-token-token-2']);
+});
+
+test('audio runtime fails closed when its context cannot enter running state',async()=>{
+  const calls:string[]=[];
+  const stream={getTracks:()=>[{stop(){calls.push('stop');}}]} as any;
+  const context={state:'suspended',resume:async()=>{calls.push('resume');},close:async()=>{calls.push('close');}} as any;
+  const runtime=createStudioAudioRuntime({
+    permissions:{arm:async()=>({token:'token-token-token-3',expiresAtMs:1}),activate:async()=>true,cancel:async token=>{calls.push(`cancel:${token}`);return true;},disconnect:async()=>false},
+    mediaDevices:{getUserMedia:async()=>stream} as any,createContext:()=>context,
+    createAnalyzer:()=>{throw Error('must not analyze');},scheduler:{request:()=>1,cancel(){}},
+  });
+  await assert.rejects(runtime.connect(configuration),/running/);
+  assert.deepEqual(calls,['resume','stop','close','cancel:token-token-token-3']);
 });

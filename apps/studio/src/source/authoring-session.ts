@@ -22,6 +22,7 @@ type Ports = {
   save(request: { token?: string; saveAs: boolean; document: SceneDocument }): Promise<SavedFile | null>;
   savePath?(request:{path:string;document:SceneDocument;overwrite:boolean}):Promise<SavedFile|null>;
   getControls?(): ControlValues;
+  getOutput?(): OutputSettings;
   getControlSnapshot?(): SavedControls | null;
   getControlAnimations?():readonly ControlAnimationBinding[];
   settleControls?():Promise<void>;
@@ -71,10 +72,10 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
     if(source.sdkVersion==='0.4.0')throw Error('Accepted composition controls are unavailable for this source');
     return Object.freeze({sourceHash:await sceneSourceHash(source),schema:Object.freeze([]),schemaHash:await sceneHash('[]'),values:Object.freeze({})});
   }
-  async function activate(source: SourceBundle, expectedVersion: number,nextLinks:readonly SceneLibraryLink[]=libraryLinks) {
+  async function activate(source: SourceBundle, expectedVersion: number,nextLinks:readonly SceneLibraryLink[]=libraryLinks,output?:OutputSettings) {
     const openedControls=pendingDocumentControls;
     await workspace.submit(source, expectedVersion, admitted => ports.submit(admitted,
-      pendingDocumentControls ? {savedControls:pendingDocumentControls,...(pendingDocumentAnimations?{savedControlAnimations:pendingDocumentAnimations}:{})} : undefined));
+      pendingDocumentControls||pendingDocumentAnimations||output ? {...(pendingDocumentControls?{savedControls:pendingDocumentControls}:{}),...(pendingDocumentAnimations?{savedControlAnimations:pendingDocumentAnimations}:{}),...(output?{output}:{})} : undefined));
     libraryLinks=validateSceneLibraryLinks(nextLinks);
     pendingDocumentControls = null;
     pendingDocumentAnimations=null;
@@ -157,7 +158,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
       return exclusive(async () => {
         const snapshot = workspace.getSnapshot(), controlVersion = controlsVersion;
         const source=structuredClone(snapshot.source);
-        const document = createSceneDocument(source, { ...DEFAULT_OUTPUT }, await documentControls(source),libraryLinks,validateControlAnimationBindings(pendingDocumentAnimations??ports.getControlAnimations?.()??[]));
+        const document = createSceneDocument(source, ports.getOutput?.()??{ ...DEFAULT_OUTPUT }, await documentControls(source),libraryLinks,validateControlAnimationBindings(pendingDocumentAnimations??ports.getControlAnimations?.()??[]));
         const result = await ports.save({ token, saveAs, document });
         if (result) { token = result.token; workspace.markSaved(snapshot.version);
           update({ name: result.name, controlsDirty: controlsVersion !== controlVersion,libraryDirty:false }); }
@@ -170,7 +171,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         await ports.settleControls?.();
         const snapshot=workspace.getSnapshot();if(snapshot.version!==expectedVersion)throw Error('Editor changed; read its source again before saving');
         const controlVersion=controlsVersion,source=structuredClone(snapshot.source);
-        const document=createSceneDocument(source,{...DEFAULT_OUTPUT},await documentControls(source),libraryLinks,validateControlAnimationBindings(pendingDocumentAnimations??ports.getControlAnimations?.()??[]));
+        const document=createSceneDocument(source,ports.getOutput?.()??{...DEFAULT_OUTPUT},await documentControls(source),libraryLinks,validateControlAnimationBindings(pendingDocumentAnimations??ports.getControlAnimations?.()??[]));
         const result=await ports.savePath({path,document,overwrite});
         if(!result)return null;
         token=result.token;workspace.markSaved(snapshot.version);update({name:result.name,controlsDirty:controlsVersion!==controlVersion,libraryDirty:false});
@@ -184,7 +185,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         if(workspace.getSnapshot().version!==expectedVersion)throw Error('Editor changed; read its source again before opening');
         const result=await ports.openPath(path);if(!result)return null;
         const document=await verifySceneDocument(result.document);
-        if(document.settings.width!==1920||document.settings.height!==1080||document.settings.fps!==60||document.settings.seed!==0)throw Error('This build supports 1920×1080 at 60 fps with seed 0');
+        if(document.settings.fps!==60||document.settings.seed!==0)throw Error('This build supports 60 fps with seed 0');
         const savedControls=await sceneControlSnapshot(document),savedAnimations=document.controlAnimations??Object.freeze([]),savedLinks=document.version===5?document.libraryLinks:Object.freeze([]);
         const resolution=await resolveLinked(document.source,savedLinks);
         await ports.submit(resolution.source,{savedControls,savedControlAnimations:savedAnimations,output:document.settings});
@@ -199,8 +200,8 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         if (!ports.open) throw Error('Open is unavailable');
         const result = await ports.open(); if (!result) return null;
         const document = await verifySceneDocument(result.document);
-        if (document.settings.width !== 1920 || document.settings.height !== 1080 || document.settings.fps !== 60 || document.settings.seed !== 0)
-          throw Error('This build supports 1920×1080 at 60 fps with seed 0');
+        if (document.settings.fps !== 60 || document.settings.seed !== 0)
+          throw Error('This build supports 60 fps with seed 0');
         const savedControls=await sceneControlSnapshot(document);
         const savedAnimations=document.controlAnimations??Object.freeze([]);
         const savedLinks=document.version===5?document.libraryLinks:Object.freeze([]);
@@ -210,11 +211,11 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         pendingDocumentControls = savedControls;
         pendingDocumentAnimations=savedAnimations;
         token = result.token; update({ name: result.name, controlsDirty: false,libraryDirty:libraryChanged,libraryUpdates:Object.freeze([]),libraryFallbacks:resolution.fallbacks });
-        try{await activate(resolution.source, workspace.getSnapshot().version,resolution.links);}
+        try{await activate(resolution.source, workspace.getSnapshot().version,resolution.links,document.settings);}
         catch(error){
           if(!libraryChanged)throw error;
           workspace.replaceDocument(document.source);pendingDocumentControls=savedControls;pendingDocumentAnimations=savedAnimations;
-          await activate(document.source,workspace.getSnapshot().version,savedLinks);
+          await activate(document.source,workspace.getSnapshot().version,savedLinks,document.settings);
           update({libraryDirty:false,libraryFallbacks:Object.freeze([...resolution.fallbacks,...savedLinks.map(link=>({componentId:link.componentId,resolvedRevision:link.resolvedRevision,message:`Update failed; using saved revision. ${error instanceof Error?error.message:String(error)}`}))])});
         }
         return result;

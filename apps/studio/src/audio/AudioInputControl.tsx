@@ -11,10 +11,13 @@ export function AudioInputControl({provider,onError,configuration=defaultConfigu
   const [phase,setPhase]=useState<'disconnected'|'connecting'|'connected'|'unavailable'>('disconnected');
   const [devices,setDevices]=useState<readonly DeviceChoice[]>([]);
   const [device,setDevice]=useState(()=>{try{return localStorage.getItem(devicePreference)??'';}catch{return '';}});
-  const configurationKey=JSON.stringify(configuration),priorConfiguration=useRef(configurationKey);
+  const configurationKey=JSON.stringify(configuration),priorConfiguration=useRef(configurationKey),currentConfiguration=useRef(configurationKey),operation=useRef(0);
+  currentConfiguration.current=configurationKey;
   useEffect(()=>provider.subscribe(()=>{const snapshot=provider.getSnapshot();setPhase(current=>snapshot.available?(current==='connecting'?'connected':current):(current==='connected'?'unavailable':current));}),[provider]);
-  useEffect(()=>()=>{void provider.dispose();},[provider]);
-  useEffect(()=>{if(priorConfiguration.current===configurationKey)return;priorConfiguration.current=configurationKey;if(phase==='connected'){void provider.disconnect().then(()=>setPhase('disconnected')).catch(error=>{setPhase('unavailable');onError(String(error));});}},[configurationKey,phase,provider,onError]);
+  useEffect(()=>()=>{operation.current++;void provider.dispose();},[provider]);
+  useEffect(()=>{if(priorConfiguration.current===configurationKey)return;priorConfiguration.current=configurationKey;const token=++operation.current;
+    void provider.disconnect().then(()=>{if(token===operation.current)setPhase('disconnected');}).catch(error=>{if(token===operation.current){setPhase('unavailable');onError(String(error));}});
+  },[configurationKey,provider,onError]);
   async function refreshDevices(){
     const rows=await navigator.mediaDevices.enumerateDevices();
     const inputs=rows.filter(row=>row.kind==='audioinput').map((row,index)=>({id:row.deviceId,label:row.label||`Audio input ${index+1}`}));
@@ -22,14 +25,16 @@ export function AudioInputControl({provider,onError,configuration=defaultConfigu
     if(device&&!inputs.some(row=>row.id===device)){setDevice('');try{localStorage.removeItem(devicePreference);}catch{}}
   }
   async function connect(){
+    const token=++operation.current,key=configurationKey;
     setPhase('connecting');onError('');
-    try{await provider.connect(configuration,device||undefined);setPhase('connected');try{await refreshDevices();}catch(error){onError(`Audio connected, but input names are unavailable. ${String(error)}`);}}
-    catch(error){setPhase('unavailable');onError(String(error));}
+    try{await provider.connect(configuration,device||undefined);if(token!==operation.current||key!==currentConfiguration.current)return;setPhase('connected');try{await refreshDevices();}catch(error){onError(`Audio connected, but input names are unavailable. ${String(error)}`);}}
+    catch(error){if(token===operation.current){setPhase('unavailable');onError(String(error));}}
   }
   async function disconnect(){
+    const token=++operation.current;
     onError('');
-    try{await provider.disconnect();setPhase('disconnected');}
-    catch(error){setPhase('unavailable');onError(String(error));}
+    try{await provider.disconnect();if(token===operation.current)setPhase('disconnected');}
+    catch(error){if(token===operation.current){setPhase('unavailable');onError(String(error));}}
   }
   const label=phase==='connecting'?'Connecting…':phase==='connected'?'Connected':phase==='unavailable'?'Unavailable':'Disconnected';
   return <span className="audio-input-control" aria-label={`Audio input ${label}`}>
@@ -37,7 +42,7 @@ export function AudioInputControl({provider,onError,configuration=defaultConfigu
     <Select size="small" value={device} disabled={phase==='connecting'||phase==='connected'} aria-label="Audio input device" displayEmpty onChange={event=>{const next=String(event.target.value);setDevice(next);try{if(next)localStorage.setItem(devicePreference,next);else localStorage.removeItem(devicePreference);}catch{}}}>
       <MenuItem value="">Default input</MenuItem>{devices.map(row=><MenuItem key={row.id} value={row.id}>{row.label}</MenuItem>)}
     </Select>
-    <span className={`audio-input-status ${phase}`}>{label}</span>
+    <span className={`audio-input-status ${phase}`} role="status" aria-live="polite" aria-label="Audio input status">{label}</span>
     {phase==='connected'?<Button size="small" color="inherit" onClick={()=>void disconnect()}>Disconnect</Button>:<Button size="small" color="inherit" disabled={phase==='connecting'} onClick={()=>void connect()}>{devices.length?'Connect':'Connect audio'}</Button>}
   </span>;
 }

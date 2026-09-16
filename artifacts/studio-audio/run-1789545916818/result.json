@@ -1,0 +1,107 @@
+{
+  "ok": true,
+  "profile": "test-0985ed6a-d537-49bb-aa79-70e96de31b84",
+  "source": "6cd2671d07fba8ab8c270402a59c07f1cb5294cb",
+  "checks": [
+    "Real preview resized through Scale Home and rendered at 640×360",
+    "Bass and Highs bindings share one portable analyzer configuration",
+    "Explicit permission connected the enumerated Windows audio input; Chromium withheld its friendly hardware label",
+    "Actual microphone samples drive both bound effective controls while bases remain unchanged",
+    "Save/reopen preserves 640×360, manual base, both bindings, and excludes the local device",
+    "Invalid replacement retains the connected accepted preview and two audio bindings",
+    "Disconnect releases both contributions smoothly to their manual bases"
+  ],
+  "errors": [],
+  "pid": 23988,
+  "audioInput": "Audio input 1",
+  "connectedRanges": {
+    "spike": [
+      0.85,
+      1.4029258250305472
+    ],
+    "noise": [
+      3.4,
+      3.4174547110085722
+    ]
+  },
+  "release": {
+    "before": {
+      "spikeHeight": 1.1161407934013379,
+      "noiseScale": 3.4386746165769346,
+      "sharpness": 3.2,
+      "motionSpeed": 0.28,
+      "roughness": 0.38
+    },
+    "samples": [
+      {
+        "spike": 1.2063602327539176,
+        "noise": 3.426352924777469
+      },
+      {
+        "spike": 1.1611963753288899,
+        "noise": 3.4205853419370222
+      },
+      {
+        "spike": 1.1140199398731077,
+        "noise": 3.414560745830282
+      },
+      {
+        "spike": 1.09258464843548,
+        "noise": 3.4118233840077035
+      },
+      {
+        "spike": 1.0661135252723248,
+        "noise": 3.408442928828989
+      },
+      {
+        "spike": 1.053697870448615,
+        "noise": 3.4068574062054395
+      },
+      {
+        "spike": 1.0401199350530201,
+        "noise": 3.4051234562804065
+      },
+      {
+        "spike": 1.032683597425543,
+        "noise": 3.4041738099095844
+      },
+      {
+        "spike": 1.025511347272679,
+        "noise": 3.4032578884345925
+      },
+      {
+        "spike": 1.0189560538383915,
+        "noise": 3.402420754494285
+      },
+      {
+        "spike": 1.0154850237050452,
+        "noise": 3.4019774917842964
+      },
+      {
+        "spike": 1.0109887645281386,
+        "noise": 3.4014033037331988
+      },
+      {
+        "spike": 1.0089318482492904,
+        "noise": 3.4011406283172687
+      },
+      {
+        "spike": 1.0062004591408078,
+        "noise": 3.4007918203577447
+      },
+      {
+        "spike": 1.0046326235277088,
+        "noise": 3.400591602256495
+      },
+      {
+        "spike": 1.0033014882256237,
+        "noise": 3.4004216116143233
+      }
+    ],
+    "after": {
+      "spike": 1.0033014882256237,
+      "noise": 3.4004216116143233
+    }
+  },
+  "exitCode": 0
+}

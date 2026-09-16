@@ -2,6 +2,7 @@ export type AudioPermissionArm = Readonly<{ token: string; expiresAtMs: number }
 
 type PermissionWebContents = Readonly<{
   isDestroyed(): boolean;
+  getURL(): string;
   on(event: 'did-start-navigation' | 'render-process-gone' | 'destroyed', listener: () => void): unknown;
   removeListener(event: 'did-start-navigation' | 'render-process-gone' | 'destroyed', listener: () => void): unknown;
 }>;
@@ -14,6 +15,7 @@ type PermissionRequestDetails = Readonly<{
 }>;
 
 type PermissionCheckDetails = Readonly<{
+  embeddingOrigin?: string;
   isMainFrame?: boolean;
   requestingUrl?: string;
   securityOrigin?: string;
@@ -65,7 +67,7 @@ export function createAudioPermissionBroker(options: Readonly<{
 
   function exactWebContents(webContents: PermissionWebContents | null) {
     const main = options.getMainWebContents();
-    return !!webContents && !!main && webContents === main && !webContents.isDestroyed();
+    return !!webContents && !!main && webContents === main && !webContents.isDestroyed() && webContents.getURL() === options.pageUrl;
   }
 
   function exactRequest(webContents: PermissionWebContents, permission: string, details: PermissionRequestDetails) {
@@ -76,9 +78,9 @@ export function createAudioPermissionBroker(options: Readonly<{
 
   function exactCheck(webContents: PermissionWebContents | null, permission: string,
     requestingOrigin: string, details: PermissionCheckDetails) {
-    return exactWebContents(webContents) && permission === 'media' && requestingOrigin === options.securityOrigin &&
-      details?.isMainFrame === true && details.requestingUrl === options.pageUrl &&
-      details.securityOrigin === options.securityOrigin && details.mediaType === 'audio';
+    return exactWebContents(webContents) && permission === 'media' && requestingOrigin === '' &&
+      details?.isMainFrame === true && details.requestingUrl === '' && details.securityOrigin === undefined &&
+      details.embeddingOrigin === options.securityOrigin && details.mediaType === 'audio';
   }
 
   function observe(webContents: PermissionWebContents) {
@@ -95,7 +97,6 @@ export function createAudioPermissionBroker(options: Readonly<{
       return;
     }
     const fresh = options.now() <= current.expiresAtMs;
-    clearExpiry();
     const allowed = fresh && exactRequest(webContents, permission, details);
     if (allowed) current.phase = 'attempting';
     else clearState();
@@ -104,7 +105,7 @@ export function createAudioPermissionBroker(options: Readonly<{
   options.session.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
     const current = state;
     if (!current || current.webContents !== webContents || !exactCheck(webContents, permission, requestingOrigin, details)) return false;
-    if (current.phase !== 'armed') return true;
+    if (current.phase === 'active') return true;
     if (options.now() <= current.expiresAtMs) return true;
     clearState();
     return false;
@@ -120,12 +121,17 @@ export function createAudioPermissionBroker(options: Readonly<{
       const expiresAtMs = options.now() + armLifetimeMs;
       state = { phase: 'armed', webContents, token, expiresAtMs, detach: observe(webContents) };
       expiry = options.setExpiry(() => {
-        if (state?.phase === 'armed' && state.token === token) clearState();
+        if (state?.phase !== 'active' && state?.token === token) clearState();
       }, armLifetimeMs);
       return Object.freeze({ token, expiresAtMs });
     },
     activate(webContents: PermissionWebContents, token: string) {
       if (!state || state.phase !== 'attempting' || state.webContents !== webContents || state.token !== token) return false;
+      if (options.now() > state.expiresAtMs) {
+        clearState();
+        return false;
+      }
+      clearExpiry();
       state.phase = 'active';
       return true;
     },

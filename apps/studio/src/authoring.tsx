@@ -81,6 +81,7 @@ export function AuthoringApp() {
       return { sourceHash: runtime.revisionId, schema: state.controlSchema, schemaHash: state.controlSchemaHash, values: state.controls };
     },
     getControlAnimations:()=>client.getSnapshot().authoring?.controlAnimations??[],
+    getOutput:()=>({...DEFAULT_OUTPUT,...client.getSnapshot().authoring?.output}),
     readLibraryComponent:id=>window.luxLibrary.read(id),
     acceptedDocument: () => client.acceptedDocument(),
     saveLook: request => window.luxLooks.save(request),

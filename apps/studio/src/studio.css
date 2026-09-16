@@ -99,7 +99,7 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 .animation-range{position:relative;height:4px;margin:-5px 5px 3px;background:#242832;border-radius:4px}
 .animation-range span{position:absolute;top:1px;height:2px;background:#786bd2;border-radius:2px}
 .animation-range i{position:absolute;top:-1px;width:2px;height:6px;background:#fff;border-radius:2px;transform:translateX(-1px)}
-.animation-popper{z-index:1400}
+.animation-popper{z-index:1200}
 .animation-editor{width:240px;padding:8px;display:flex;flex-direction:column;gap:5px;border:1px solid #4a4f60}
 .animation-editor header{display:flex;align-items:center;min-height:20px;line-height:16px}.animation-editor header strong{font-size:12px}
 .animation-editor>label,.animation-editor details label{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:11px}

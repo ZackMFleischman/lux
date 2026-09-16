@@ -4,9 +4,9 @@ import { EventEmitter } from 'node:events';
 import { createAudioPermissionBroker } from '../../apps/studio/src/audio/audio-permission-broker.ts';
 
 const pageUrl = 'file:///C:/profile/studio-shell.html';
-const securityOrigin = 'file://';
+const securityOrigin = 'file:///';
 const requestDetails = Object.freeze({ isMainFrame: true, requestingUrl: pageUrl, securityOrigin, mediaTypes: ['audio'] });
-const checkDetails = Object.freeze({ isMainFrame: true, requestingUrl: pageUrl, securityOrigin, mediaType: 'audio' });
+const checkDetails = Object.freeze({ isMainFrame: true, requestingUrl: '', embeddingOrigin: securityOrigin, mediaType: 'audio' });
 
 function fixture() {
   let requestHandler: any, checkHandler: any, now = 1000, timer: (() => void) | undefined;
@@ -15,9 +15,9 @@ function fixture() {
     setPermissionCheckHandler(handler: any) { checkHandler = handler; },
   };
   const main = new EventEmitter() as EventEmitter & { id: number; isDestroyed(): boolean };
-  main.id = 1; main.isDestroyed = () => false;
+  main.id = 1; main.isDestroyed = () => false; (main as any).getURL = () => pageUrl;
   const other = new EventEmitter() as EventEmitter & { id: number; isDestroyed(): boolean };
-  other.id = 2; other.isDestroyed = () => false;
+  other.id = 2; other.isDestroyed = () => false; (other as any).getURL = () => pageUrl;
   const broker = createAudioPermissionBroker({
     session, getMainWebContents: () => main, pageUrl, securityOrigin,
     now: () => now, createToken: () => 'arm-token-000001',
@@ -31,7 +31,7 @@ function fixture() {
       requestHandler(webContents, permission, (allowed: boolean) => { decision = allowed; }, details);
       return decision;
     },
-    check(webContents: any, permission = 'media', origin = securityOrigin, details: any = checkDetails) {
+    check(webContents: any, permission = 'media', origin = '', details: any = checkDetails) {
       return checkHandler(webContents, permission, origin, details);
     },
     expire() { assert.ok(timer); now = 6001; const callback = timer; timer = undefined; callback(); },
@@ -54,6 +54,15 @@ test('fresh arm permits one exact audio request and active capture only satisfie
   assert.equal(f.check(f.main), false);
 });
 
+test('an allowed request must activate before the original arm deadline', () => {
+  const f = fixture();
+  const arm = f.broker.arm(f.main as any);
+  assert.equal(f.request(f.main), true);
+  f.expire();
+  assert.equal(f.broker.activate(f.main as any, arm.token), false);
+  assert.equal(f.check(f.main), false);
+});
+
 test('first malformed main-window request consumes the arm and every foreign context is denied', () => {
   const f = fixture();
   f.broker.arm(f.main as any);
@@ -65,9 +74,10 @@ test('first malformed main-window request consumes the arm and every foreign con
   assert.equal(f.request(f.other), false);
   assert.equal(f.check(f.other), false);
   assert.equal(f.check(null), false);
-  assert.equal(f.check(f.main, 'media', securityOrigin, { ...checkDetails, isMainFrame: false }), false);
-  assert.equal(f.check(f.main, 'media', securityOrigin, { ...checkDetails, requestingUrl: undefined }), false);
-  assert.equal(f.check(f.main, 'media', securityOrigin, { ...checkDetails, mediaType: 'video' }), false);
+  assert.equal(f.check(f.main, 'media', '', { ...checkDetails, isMainFrame: false }), false);
+  assert.equal(f.check(f.main, 'media', '', { ...checkDetails, requestingUrl: undefined }), false);
+  assert.equal(f.check(f.main, 'media', '', { ...checkDetails, embeddingOrigin: 'file://wrong' }), false);
+  assert.equal(f.check(f.main, 'media', '', { ...checkDetails, mediaType: 'video' }), false);
   assert.equal(f.check(f.main, 'midi'), false);
 });
 

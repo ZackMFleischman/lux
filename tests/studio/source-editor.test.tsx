@@ -326,6 +326,7 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
   (dom.window.HTMLCanvasElement.prototype as any).transferControlToOffscreen = () => ({});
   const sceneName = 'A deliberately long scene title.lux-scene';
   window.luxExport = { unavailableReason: 'Resolume export is not included in this installation', create: async () => null };
+  window.luxAudioPermissions = {arm:async()=>({token:'test-audio-permission-token',expiresAtMs:5000}),activate:async()=>true,cancel:async()=>true,disconnect:async()=>true};
   window.luxAuthoring = {
     example: async () => source,
     compile: async bundle => { builds.push(structuredClone(bundle));

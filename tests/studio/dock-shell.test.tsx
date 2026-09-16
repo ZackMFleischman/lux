@@ -393,7 +393,7 @@ test('View is a compact keyboard menu with recoverable panes and a separate layo
     preview={<p>Preview content</p>} source={<p>Source content</p>} library={<p>Library content</p>}
     inspector={<p>Inspector content</p>} diagnostics={<p>Diagnostics content</p>} jobs={<p>Jobs content</p>} graph={<p>Graph content</p>} />);
   await click('View'); const menu = screen.getByRole('menu', { name: 'View' });
-  assert.equal(within(menu).getAllByRole('menuitem').length, 8); assert.ok(within(menu).getByRole('menuitem', { name: 'Diagnostics' })); assert.equal(screen.queryByLabelText('Move panel'), null);
+  assert.equal(within(menu).getAllByRole('menuitem').length, 9); assert.ok(within(menu).getByRole('menuitem', { name: 'Diagnostics' })); assert.ok(within(menu).getByRole('menuitem',{name:/Keyboard shortcuts/})); assert.equal(screen.queryByLabelText('Move panel'), null);
   assert.equal(screen.queryByLabelText('Layout name'), null); const first = within(menu).getByRole('menuitem', { name: 'Preview' }); assert.ok(document.activeElement === first, 'View focuses its first pane item');
   fireEvent.keyDown(first, { key: 'ArrowDown' }); assert.ok(document.activeElement === within(menu).getByRole('menuitem', { name: 'Source' }), 'ArrowDown focuses Source');
   fireEvent.keyDown(document.activeElement!, { key: 'Escape' }); await waitFor(() => assert.ok(document.activeElement === screen.getByRole('button', { name: 'View' }), 'Restore focus to View')); await click('View'); await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: 'Layouts…' })); });
@@ -480,7 +480,7 @@ test('Graph keeps Scene available for plain visuals and compositions', async () 
   const selections: unknown[] = [];
   const { unmount } = render(<GraphPanel runtime={{ sceneName: 'Plain visual' } as any} selected={null} onSelect={path => selections.push(path)} />);
   assert.ok(within(screen.getByRole('navigation', { name: 'Component breadcrumb' })).getByRole('button', { name: 'Scene' }));
-  assert.equal(document.querySelectorAll('.graph-node').length, 1);
+  assert.equal(document.querySelectorAll('.graph-node').length, 2,'plain visual graph includes Scene and its visual source occurrence');
   assert.ok(screen.getByRole('button', { name: 'Scene' }));
   assert.equal(screen.queryByRole('button', { name: 'View inside' }), null);
   await act(async () => { fireEvent.click(document.querySelector<HTMLButtonElement>('.graph-scene-root')!); });
