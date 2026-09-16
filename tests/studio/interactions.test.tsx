@@ -85,6 +85,22 @@ test('RTL: code-defined controls expose independent values, numeric entry and de
   assert.deepEqual((fixture.calls[1] as any).input.values, { spikeHeight: 1 });
 });
 
+test('RTL: a flat control can add the strict shared-audio binding',async()=>{
+  const fixture=service(),priorAnimationFrame=globalThis.requestAnimationFrame;
+  globalThis.requestAnimationFrame=callback=>{callback(0);return 0;};
+  try{
+    render(<StudioApp client={fixture.client} nowMs={1000}/>);
+    fireEvent.click(screen.getByRole('button',{name:'Animate Intensity'}));
+    fireEvent.click(screen.getByRole('button',{name:'Add Audio'}));
+    await waitFor(()=>assert.equal(fixture.calls[0]?.name,'lux.node.animation.set'));
+    const operation=fixture.calls[0];
+    if(operation?.name!=='lux.node.animation.set')assert.fail('expected animation write');
+    assert.deepEqual(operation.input.animation,{kind:'audio',nodePath:[],definitionHash:operation.input.expectedControlSchemaHash,
+      schemaHash:operation.input.expectedControlSchemaHash,controlId:'intensity',source:{kind:'audio-band',logicalInputId:'primary-audio',band:'bass',
+        analyzer:{version:1,fftSize:2048,minDecibels:-100,maxDecibels:-30}},amount:.1,attackMs:50,releaseMs:400,enabled:true});
+  }finally{globalThis.requestAnimationFrame=priorAnimationFrame;}
+});
+
 test('RTL: direct component selection edits flat controls and keeps empty-path animation identity', async () => {
   const {useState}=await import('react');
   const {GraphPanel,nodeKey}=await import('../../apps/studio/src/GraphPanel.tsx');

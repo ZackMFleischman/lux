@@ -33,7 +33,11 @@ import './preview-capture-client.ts';
 import { createRendererSnapshot } from './renderer-snapshot.ts';
 import { shortcutHint } from './studio-shortcuts.ts';
 import type { StudioShortcutActions, StudioShortcutCommand } from './studio-shortcuts.ts';
-const client = new StandaloneClient(window.luxAuthoring, { codeDeclaredParameters: true });
+import {createStudioAudioRuntime} from './audio/studio-audio-runtime.ts';
+import {AudioInputControl} from './audio/AudioInputControl.tsx';
+const audioProvider=createStudioAudioRuntime({permissions:window.luxAudioPermissions,mediaDevices:navigator.mediaDevices,
+  createContext:()=>new AudioContext(),scheduler:{request:callback=>requestAnimationFrame(callback),cancel:id=>cancelAnimationFrame(id)}});
+const client = new StandaloneClient(window.luxAuthoring, { codeDeclaredParameters: true,audioProvider });
 const agentStatus = () => ({ ...client.getSnapshot(), capabilities: studioCapabilities });
 const idleRecording = Object.freeze({ phase: 'idle' }) as PreviewRecorderSnapshot;
 const subscribeIdle = () => () => {};
@@ -152,6 +156,8 @@ export function AuthoringApp() {
   }), [confirmation.confirm]);
   useEffect(() => { void window.luxAuthoring.dirty(dirty); }, [dirty]);
   const runtime = runtimeSnapshot.authoring;
+  const audioSource=runtime?.controlAnimations?.find(binding=>binding.kind==='audio')?.source;
+  const audioConfiguration=audioSource?{logicalInputId:audioSource.logicalInputId,analyzer:audioSource.analyzer}:undefined;
   const runtimeKey = runtime ? `${runtime.instanceId}:${runtime.generation}:${runtime.output.width}x${runtime.output.height}` : null;
   useEffect(() => {
     if (recording.phase === 'idle' || recordingRuntime.current === runtimeKey) return;
@@ -301,6 +307,7 @@ export function AuthoringApp() {
   const commands = <>
     <PreviewCaptureMenu available={previewAvailable} status={recording}
       onSaveFrame={savePreviewFrame} onStart={startPreviewRecording} onStop={stopPreviewRecording} />
+    <AudioInputControl provider={audioProvider} onError={setError} configuration={audioConfiguration}/>
     <span className="document-name" title={io.name}><span className="document-label">Scene</span><span className="document-title">{io.name}</span>{dirty && <span aria-label="Unsaved changes"> *</span>}</span>
     <Button className="studio-build-button" variant="outlined" color="inherit" disabled={busy} aria-label="Build" aria-busy={busy} title={`Build preview (${shortcutHint.build})`} onClick={() => void shortcutActions.build!.run()}>
       {busy && <span className="status-spinner" aria-hidden="true" />}Build
