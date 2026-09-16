@@ -3,11 +3,17 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { sourceBuildInputSchema, sourceReadResult,libraryCreateInputSchema,libraryReadInputSchema,libraryUpdateInputSchema,sceneSaveInputSchema,sceneOpenInputSchema } from '../apps/studio/src/source/agent-contract.ts';
 import { assetLimits } from '../packages/assets/src/index.mjs';
 import { resolve } from 'node:path';
-import { createStudioConnection, resolveStudioSession } from './studio-session.mjs';
+import { createStudioConnection, resolveStudioSession, studioAppData } from './studio-session.mjs';
+import { createLibraryContext, resolveMcpStandardLibrary } from './studio-library-context.mjs';
 import { discoverVisualSdk } from '../packages/visual-sdk/src/discovery.mjs';
 import { parameterInputSchema, playbackInputSchema, restartInputSchema } from '../apps/studio/src/runtime-operations.ts';
-const server = new McpServer({ name: 'lux-studio', version: '0.1.0' });
 const selectedSession = resolveStudioSession({ workspace: resolve(import.meta.dirname, '..') });
+let libraryContext;
+try { libraryContext = createLibraryContext(await resolveMcpStandardLibrary({ workspace: selectedSession.workspace,
+  profile: selectedSession.profile, env: process.env, appData: studioAppData(process.env) })); }
+catch (error) { libraryContext = createLibraryContext(null, error); }
+const server = new McpServer({ name: 'lux-studio', version: '0.1.0' },
+  { instructions: libraryContext.instructions(await libraryContext.catalog()) });
 const call = createStudioConnection(selectedSession);
 const text = value => ({ content: [{ type: 'text', text: JSON.stringify(value) }] });
 async function runningStudio() {
@@ -19,8 +25,9 @@ async function runningStudio() {
     advice: `Use the same Studio profile and checkout; reconnect the adapter after replacing Studio. ${error.message}` }; }
 }
 server.registerTool('lux.studio.discover', { description: 'Read the exact visual SDK, example and standalone Lux capabilities. Start Lux Studio separately.', inputSchema: {} }, async () => text({ ...await discoverVisualSdk(), scope: 'standalone-studio', tools: ['read', 'build', 'save', 'open', 'capture', 'status', 'parameters', 'playback', 'restart','library.list','library.read','library.create','library.update'], resolume: false,
+  libraryCatalog: await libraryContext.catalog(),
   runningStudio: await runningStudio(),
-  parameters: { kinds: ['number'], maxCount: 32, declaredInCode: true, requiredGuard: 'expectedControlSchemaHash from current runtime status', implicitControls: false,
+  parameters: { kinds: ['number'], declaredInCode: true, requiredGuard: 'expectedControlSchemaHash from current runtime status', implicitControls: false,
     composition: 'SDK 0.4 image-chain-v1 exposes selected leaf controls as independent public aliases; values remain owned by stable node identity.' },
   sourceDocuments: { versions: [1, 2], replacement: 'complete source; preserve sourceVersion and assets when editing v2',
     assetPlayback: true, assetExport: true, assetFormats: ['image/bmp', 'image/png', 'image/jpeg'], decodedImages: 'context.images: top-down sRGB straight-alpha RGBA' , assetDimension: assetLimits.dimension, assetCount: assetLimits.count,
@@ -32,10 +39,10 @@ server.registerTool('lux.studio.build', { description: 'Compile and preview repl
   inputSchema: sourceBuildInputSchema.shape }, async input => text(await call('build', input)));
 server.registerTool('lux.studio.save',{description:'Save the current scene to an explicit .lux-scene path. Read first and pass expectedDraftVersion. Existing paths require overwrite:true; external file changes remain protected.',inputSchema:sceneSaveInputSchema.shape},async input=>text(await call('scene.save',input)));
 server.registerTool('lux.studio.open',{description:'Open an explicit .lux-scene path. Read first and pass expectedDraftVersion. Dirty source, controls, or library links require discardDirty:true; invalid scenes retain the current draft and preview.',inputSchema:sceneOpenInputSchema.shape},async input=>text(await call('scene.open',input)));
-server.registerTool('lux.library.list',{description:'List standard shared components with stable IDs, names, descriptions, and current revisions.',inputSchema:{}},async()=>text(await call('library.list')));
+server.registerTool('lux.library.list',{description:'Explicitly refresh standard shared component metadata. The same compact catalog is already supplied in server instructions and discovery.',inputSchema:{}},async()=>text(await call('library.list')));
 server.registerTool('lux.library.read',{description:'Read one standard shared component and its complete current source bundle.',inputSchema:libraryReadInputSchema.shape},async input=>text(await call('library.read',input)));
-server.registerTool('lux.library.create',{description:'Validate and build a zero-input image-source candidate, then explicitly add it to the standard shared library at revision 1.',inputSchema:libraryCreateInputSchema.shape},async input=>text(await call('library.create',input)));
-server.registerTool('lux.library.update',{description:'Validate and build a complete replacement, then update one standard shared entry only when expectedRevision matches.',inputSchema:libraryUpdateInputSchema.shape},async input=>text(await call('library.update',input)));
+server.registerTool('lux.library.create',{description:'Validate and build a zero-input image-source candidate, then explicitly add it to the standard shared library at revision 1.',inputSchema:libraryCreateInputSchema.shape},async input=>text(await libraryContext.attach(await call('library.create',input))));
+server.registerTool('lux.library.update',{description:'Validate and build a complete replacement, then update one standard shared entry only when expectedRevision matches.',inputSchema:libraryUpdateInputSchema.shape},async input=>text(await libraryContext.attach(await call('library.update',input))));
 server.registerTool('lux.studio.capture', { description: 'Return an actual PNG at the current Preview render size, with frame, controls and revision metadata. MCP does not change Preview resolution.', inputSchema: {} }, async () => {
   const result = await call('capture'); return { content: [{ type: 'image', mimeType: 'image/png', data: result.base64 }, { type: 'text', text: JSON.stringify(result.metadata) }] };
 });
