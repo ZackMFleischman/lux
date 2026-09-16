@@ -9,7 +9,7 @@ No blocking source, visual, lifecycle, or performance finding remains in the bou
 - `examples/components/wandering-tracers/ornament-birds.ts`
 - bird integration in `ornament-renderer.ts`
 - four exposed bird controls in `ornament-composition.ts`
-- actual 1920×1080 flight-cycle captures and the save/reopen/performance receipt in `birds-1789574954078`
+- actual 1920×1080 flight-cycle captures in `birds-1789574954078` and the final speed-control/save/reopen/performance receipt in `birds-1789575134015`
 
 ## Findings resolved during review
 
@@ -30,7 +30,8 @@ No blocking source, visual, lifecycle, or performance finding remains in the bou
 
 - `artifacts/living-ornament/birds-1789574954078/result.json`: `ok: true`; five checkpoints across the cycle; 20.02-second observed rate of 60.785 FPS at 1920×1080; save/reopen and normal playing restoration completed without a fault.
 - `flight-6.png`, `flight-15.png`, `flight-25.png`, `flight-32.png`, and `flight-40.png`: the two flocks enter and leave naturally, change apparent depth around both ribbons, remain inside their patches, and include a legible perch without obscuring the painting's focal shapes.
-- The final speed-predictor patch adds one uniform and preserves the captured default-speed image path; it does not change default composition or shader silhouettes.
+- `artifacts/living-ornament/birds-1789575134015/result.json`: `ok: true`; final source ran for 20.06 seconds at 61.501 observed FPS, exercised Flight speed at 0× and 2×, saved and reopened the ten-link scene, restored normal playback, and reported no fault.
+- The final 0× and 2× captures show stable silhouettes and headings at both control limits. Straight-alpha edges remain clean against light ground, dark motifs, and ribbon ink.
 
 ## Residual limits
 
