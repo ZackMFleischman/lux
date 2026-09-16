@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "c6c36ef5-7e45-4e40-864b-a7332c15455e",
+  "revision": 1,
+  "name": "Packed Circles & Rings",
+  "description": "Packed regional circle and ring motifs with independent live pattern controls.",
+  "updatedAt": "2026-09-16T11:18:57.593Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "rings.ts",
+    "files": [
+      "rings.ts"
+    ]
+  }
+}

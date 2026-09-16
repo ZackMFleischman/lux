@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "74665565-8e4c-49de-a1cc-0050edd27da3",
+  "revision": 1,
+  "name": "Nested Contours",
+  "description": "Nested regional contour marks with independent live pattern controls.",
+  "updatedAt": "2026-09-16T11:19:17.328Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "contours.ts",
+    "files": [
+      "contours.ts"
+    ]
+  }
+}
