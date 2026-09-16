@@ -9,7 +9,7 @@ import {SeededRandom} from '../seed.ts';
 
 type Backend=Readonly<{resources:CpuResourceBackend;stage(scene:unknown,camera:unknown):void;texture(image:BackendImage):unknown;present(image:BackendImage):void|Promise<void>;drain():Promise<void>}>;
 type AnyComponent=CodeComponentDefinition<any,any,any>;
-type Options=Readonly<{plan:GraphRuntimePlan;definitions:Readonly<Record<string,AnyComponent>>;context:ComponentContext;backend:Backend;nodeControls?:(nodePath:readonly string[],frame:ComponentFrame)=>Readonly<Record<string,number>>}>;
+type Options=Readonly<{plan:GraphRuntimePlan;definitions:Readonly<Record<string,AnyComponent>>;context:ComponentContext;backend:Backend;nodeControls?:(nodePath:readonly string[],frame:ComponentFrame)=>Readonly<Record<string,number>>;nodeSampleControl?:(nodePath:readonly string[],controlId:string,instanceKey:string|number,frame:ComponentFrame)=>number}>;
 type WrappedResource={output:OutputToken|InputView;kind:'image'|'paths2d'|'shader-field';image?:BackendImage;paths?:Paths2DSnapshot;shaderField?:ShaderFieldSnapshot};
 const pathKey=(path:readonly string[])=>JSON.stringify(path);
 
@@ -42,7 +42,7 @@ export async function createImageCompositionVisual(options:Options){
      if(!options.nodeControls)for(const [publicId,targets] of Object.entries(dto.publicControlBindings))for(const target of targets)if(target.active&&pathKey(target.nodePath)===key)controls[target.controlId]=(frame.controls as any)[publicId];
      const inputs:any={},imageInputs:InputView[]=[];
      for(const [portId,view] of Object.entries(evaluation.inputs)){const kind=definition.metadata.inputs[portId]!.type.kind;if(kind==='image'){const backendImage=readResourceInputImage(host,evaluation.scope,view);inputs[portId]=image(view,backendImage);imageInputs.push(view);}else if(kind==='paths2d'){const data=evaluation.resources.readPaths(view);inputs[portId]=paths(view,data);}else if(kind==='shader-field'){const data=evaluation.resources.readShaderField(view);inputs[portId]=shaderField(view,data);}else throw Error('Unsupported authored signal input');}
-     instance.update(Object.freeze({...frame,controls:Object.freeze(controls)}));
+     instance.update(Object.freeze({...frame,controls:Object.freeze(controls),sampleControl:options.nodeSampleControl?(controlId:string,instanceKey:string|number)=>options.nodeSampleControl!(node.nodePath,controlId,instanceKey,frame!):undefined}));
      let renderPending=false;
      const context=Object.freeze({
       shaderField:(portId:string,snapshot:unknown)=>{const token=evaluation.resources.shaderField(portId,snapshot),data=readResourceOutputShaderField(host,evaluation.scope,token);return shaderField(token,data);},

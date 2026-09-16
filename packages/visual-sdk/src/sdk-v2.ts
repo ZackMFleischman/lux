@@ -13,6 +13,7 @@ export interface OutputTarget {
 export interface FrameContext<C extends ControlDeclarations = ControlDeclarations> {
   readonly tick: number; readonly timeSeconds: number; readonly deltaSeconds: number;
   readonly controls: ControlsOf<C>; readonly events: readonly never[];
+  readonly sampleControl?: (controlId: keyof C & string, instanceKey: string | number) => number;
 }
 export interface VisualContext {
   readonly settings: Readonly<OutputSettings>;

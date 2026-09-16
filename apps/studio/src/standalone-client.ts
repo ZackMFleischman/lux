@@ -419,7 +419,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     const runtime = this.running, input = operation.input;
     if (this.snapshot.authoring?.authority !== 'studio') throw Error('Authority conflict: Studio cannot control this instance');
     const replacementWrite=this.busy&&this.replacementPlayback&&(
-      operation.name==='lux.parameters.set'||operation.name==='lux.node.parameters.set'||operation.name==='lux.node.animation.set'||operation.name==='lux.tempo.set'||operation.name==='lux.tempo.tap'||
+      operation.name==='lux.parameters.set'||operation.name==='lux.node.parameters.set'||operation.name==='lux.node.animation.set'||operation.name==='lux.node.variation.set'||operation.name==='lux.tempo.set'||operation.name==='lux.tempo.tap'||
       (operation.name==='lux.playback'&&operation.input.action!=='reset'))?this.replacementPlayback:null;
     if (this.busy&&!replacementWrite) throw Error('A visual build is already running');
     if (!runtime || input.instanceId !== runtime.instanceId || input.expectedGeneration !== runtime.generation) throw Error('Runtime changed; retry using its current state');
@@ -468,7 +468,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       runtime.desiredControls=state.values();
       message={type:'node-controls',nodePath:operation.input.nodePath,values:operation.input.values,
         controlSchemaHash:operation.input.expectedControlSchemaHash,controlSequence:++runtime.controls};
-    } else if(operation.name==='lux.node.animation.set'){
+    } else if(operation.name==='lux.node.animation.set'||operation.name==='lux.node.variation.set'){
       const linked=this.accepted?.linked,node=runtime.state.nodeControls?.nodes.find(row=>JSON.stringify(row.nodePath)===JSON.stringify(operation.input.nodePath));
       const flat=operation.input.nodePath.length===0&&runtime.state.sdkVersion!=='0.4.0';
       if(!flat&&(!linked||!('linkedVersion' in linked)||linked.linkedVersion!==5||!node))throw Error('This visual has no matching composition node');
@@ -477,12 +477,13 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       if(operation.input.expectedControlSchemaHash!==schemaHash)throw Error(flat?'Scene control schema changed':'Composition node control schema changed');
       if(!schema.some(row=>row.id===operation.input.controlId))throw Error(flat?'Scene control is unavailable':'Composition node control is unavailable');
       if(runtime.animations>=Number.MAX_SAFE_INTEGER)throw Error('Animation sequence exhausted; restart runtime');
-      if(operation.input.animation){const animation=validateControlAnimationBindings([operation.input.animation])[0]!;
+      const requested=operation.name==='lux.node.animation.set'?operation.input.animation:operation.input.variation?{kind:'variation' as const,nodePath:[...operation.input.nodePath],definitionHash,schemaHash,controlId:operation.input.controlId,...operation.input.variation}:null;
+      if(requested){const animation=validateControlAnimationBindings([requested])[0]!;
         if(JSON.stringify(animation.nodePath)!==JSON.stringify(operation.input.nodePath)||animation.controlId!==operation.input.controlId||animation.definitionHash!==definitionHash||animation.schemaHash!==schemaHash)throw Error('Animation target identity changed');}
       const current=[...(runtime.desiredControlAnimations??runtime.state.controlAnimations??[])],index=current.findIndex(row=>JSON.stringify(row.nodePath)===JSON.stringify(operation.input.nodePath)&&row.controlId===operation.input.controlId);
-      if(index>=0)current.splice(index,1,...(operation.input.animation?[operation.input.animation]:[]));else if(operation.input.animation)current.push(operation.input.animation);
+      if(index>=0)current.splice(index,1,...(requested?[requested]:[]));else if(requested)current.push(requested);
       runtime.desiredControlAnimations=validateControlAnimationBindings(current);
-      message={type:'animations',animationSequence:++runtime.animations,controlAnimations:runtime.desiredControlAnimations,...(operation.input.restart?{restart:{nodePath:operation.input.nodePath,controlId:operation.input.controlId}}:{})};
+      message={type:'animations',animationSequence:++runtime.animations,controlAnimations:runtime.desiredControlAnimations,...(operation.name==='lux.node.animation.set'&&operation.input.restart?{restart:{nodePath:operation.input.nodePath,controlId:operation.input.controlId}}:{})};
     } else if(operation.name==='lux.tempo.set'||operation.name==='lux.tempo.tap'){
       if(operation.input.expectedRevisionId!==runtime.revisionId)throw Error('Revision changed; read current runtime state');
       if(runtime.tempoCommands>=Number.MAX_SAFE_INTEGER)throw Error('Tempo sequence exhausted; restart runtime');

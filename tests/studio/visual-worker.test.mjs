@@ -20,7 +20,7 @@ async function fixture(controls=schema,declared=controls,mutation='',sdkVersion=
     URL:{createObjectURL:()=> 'memory:visual',revokeObjectURL(){}},
     navigator:{gpu:{requestAdapter:async()=>({features:new Set(['timestamp-query']),requestDevice:async options=>{requested.push(options);return device;}})}},
     gpuDraw(){const e=device.createCommandEncoder();e.beginRenderPass({}).end();device.queue.submit([e.finish()]);},
-    recordLifecycle:(...event)=>events.push(event),recordCreate:()=>created++,recordFrame:frame=>{frames.push(structuredClone(frame));if(timed)now+=3;},advanceClock:ms=>{now+=ms;},
+    recordLifecycle:(...event)=>events.push(event),recordCreate:()=>created++,recordFrame:frame=>{const hasSampler=typeof frame.sampleControl==='function',sample=hasSampler&&Object.hasOwn(frame.controls,'height')?frame.sampleControl('height',0):undefined;frames.push(structuredClone({...frame,sampleControl:undefined,hasSampler,sample}));if(timed)now+=3;},advanceClock:ms=>{now+=ms;},
     ImageData:class{},OffscreenCanvas:class{getContext(){return {putImageData(){}}}async convertToBlob(){return new Blob(['png']);}},
   });
   vm.runInContext('const parseForHarness=JSON.parse; globalThis.deliver=raw=>onmessage({data:parseForHarness(raw)});',context);
@@ -157,6 +157,17 @@ test('actual worker applies complete initial/live controls and captures exact me
   const reset=await f.send({type:'playback',requestId:'reset',action:'reset'});assert.deepEqual(reset.controls,applied.controls);assert.equal(reset.clockEpoch,1);assert.equal(reset.tempo.bpm,150);assert.equal(reset.tempoSequence,2);assert.equal(reset.tempo.beatPhase,0);
   const capture=await f.send({type:'capture',requestId:'capture'});assert.equal(capture.type,'capture');assert.deepEqual(capture.metadata.controls,applied.controls);assert.equal(capture.metadata.controlSchemaHash,f.initial.controlSchemaHash);assert.equal(capture.metadata.controlSequence,1);assert.equal(capture.metadata.tempo.bpm,150);
   assert.deepEqual(Array.from(decode(new Uint8Array(capture.bytes)).data.slice(0,4)),[255,0,0,128]);
+});
+
+test('actual worker exposes stable per-instance samples without changing the base control',async()=>{
+  const f=await fixture(),schemaHash=f.initial.controlSchemaHash;
+  const variation={kind:'variation',nodePath:[],definitionHash:schemaHash,schemaHash,controlId:'height',distribution:'spread',amount:.5,enabled:true};
+  await f.send({...f.initial,controlAnimations:[variation]});
+  await f.send({type:'frame',requestId:'again'});
+  assert.equal(f.frames[0].hasSampler,true);
+  assert.equal(f.frames[0].controls.height,1);
+  assert.notEqual(f.frames[0].sample,1);
+  assert.equal(f.frames[1].sample,f.frames[0].sample);
 });
 test('audio snapshots update the evaluator cache and acknowledge without drawing',async()=>{
   const f=await fixture();

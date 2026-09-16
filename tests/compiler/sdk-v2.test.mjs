@@ -49,6 +49,12 @@ export default defineVisual({
   },
 });`;
 
+test('SDK 0.2 exposes an optional per-instance control sampler with a base-value fallback', async () => {
+  const dependencies=process.env.LUX_COMPILER_DEPENDENCIES||resolve('node_modules');
+  const result=await import('../../apps/build-worker/src/compile.mjs').then(({compileVisual})=>compileVisual({source:{sdkVersion:'0.2.0',entry:'visual.ts',files:{'visual.ts':source("const size: number = frame.sampleControl?.('spikeHeight', 3) ?? frame.controls.spikeHeight; const pace: number = frame.sampleControl?.('roughness', 'flock-a') ?? frame.controls.roughness;")}}},{dependencyRoot:dependencies}));
+  assert.equal(result.ok,true,JSON.stringify(result));
+});
+
 test('real pinned TypeScript infers declared numeric keys through async create and rejects absent/readonly/literal misuse', async () => {
   const dependencies = process.env.LUX_COMPILER_DEPENDENCIES || resolve('node_modules');
   assert.equal(JSON.parse(await readFile(join(dependencies, 'typescript/package.json'), 'utf8')).version, '7.0.2');

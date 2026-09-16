@@ -8,6 +8,7 @@ export interface OutputTarget {
 export interface FrameContext {
   readonly tick: number; readonly timeSeconds: number; readonly deltaSeconds: number;
   readonly controls: Readonly<ControlValues>; readonly events: readonly never[];
+  readonly sampleControl?: (controlId: string, instanceKey: string | number) => number;
 }
 export interface VisualContext {
   readonly settings: Readonly<OutputSettings>;

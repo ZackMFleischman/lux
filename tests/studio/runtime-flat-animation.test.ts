@@ -56,6 +56,26 @@ test('animation operation schema admits the empty scene path',()=>{
   assert.equal(studioOperationSchema.safeParse({name:'lux.node.animation.set',input:{...target,nodePath:['not valid']}}).success,false);
 });
 
+test('variation operation schema accepts guarded per-instance settings',()=>{
+  const input={requestId:'variation',instanceId:'instance',expectedGeneration:1,expectedRevisionId:'revision',expectedControlSchemaHash:schemaHash,nodePath:[],controlId:'height',variation:{distribution:'centered',amount:.5,enabled:true}};
+  assert.equal(studioOperationSchema.safeParse({name:'lux.node.variation.set',input}).success,true);
+  assert.equal(studioOperationSchema.safeParse({name:'lux.node.variation.set',input:{...input,variation:{...input.variation,distribution:'clustered'}}}).success,false);
+  const animation={kind:'variation',nodePath:[],definitionHash:schemaHash,schemaHash,controlId:'height',...input.variation};
+  const {variation:_variation,...animationTarget}=input;
+  assert.equal(studioOperationSchema.safeParse({name:'lux.node.animation.set',input:{...animationTarget,animation}}).success,true);
+});
+
+test('variation write reaches the worker and publishes inspectable runtime state',async t=>{
+  const client=await fixture(t);await client.submit(source);const worker=FlatWorker.all.at(-1)!,runtime=client.getSnapshot().authoring!;
+  const controller=new StudioController(client,()=> 'variation-write'),config={distribution:'spread' as const,amount:.5,enabled:true};
+  const write=controller.setNodeVariation([],'height',config),message=worker.messages.at(-1);
+  const expected={kind:'variation' as const,nodePath:[],definitionHash:schemaHash,schemaHash,controlId:'height',...config};
+  assert.deepEqual(message,{type:'animations',animationSequence:1,controlAnimations:[expected],requestId:'variation-write',instanceId:runtime.instanceId,generation:runtime.generation});
+  worker.reply({requestId:'variation-write',controlAnimations:[expected],animationSequence:1});await write;
+  assert.deepEqual(client.getSnapshot().authoring!.controlAnimations,[expected]);
+  assert.deepEqual((client.acceptedDocument() as any).controlAnimations,[expected]);
+});
+
 test('animation operation schema accepts exact audio and kick bindings without widening legacy LFOs',()=>{
   const audio={kind:'audio' as const,nodePath:[] as const,definitionHash:schemaHash,schemaHash,controlId:'height',
     source:{kind:'audio-band' as const,logicalInputId:'primary-audio' as const,band:'bass' as const,

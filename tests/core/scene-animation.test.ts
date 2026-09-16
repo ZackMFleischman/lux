@@ -10,7 +10,7 @@ test('flat scene saves animation separately from its base value and reopens it',
   const schemaHash=createHash('sha256').update(canonicalControlSchemaJson(schema)).digest('hex');
   const controls={sourceHash:'a'.repeat(64),schema,schemaHash,values:{speed:3}};
   const source={sdkVersion:'0.2.0' as const,entry:'visual.ts',files:{'visual.ts':'export {}'}};
-  const animations=[{nodePath:[],definitionHash:schemaHash,schemaHash,controlId:'speed',shape:'sine' as const,periodSeconds:2,amount:1,phase:0,enabled:true}];
+  const animations=[{kind:'variation' as const,nodePath:[],definitionHash:schemaHash,schemaHash,controlId:'speed',distribution:'centered' as const,amount:1,enabled:true}];
   const saved=createSceneDocument(source,DEFAULT_OUTPUT,controls,[],animations);
   const reopened=await verifySceneDocument(JSON.parse(JSON.stringify(saved)));
   assert.deepEqual(reopened.controlAnimations,animations);

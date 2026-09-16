@@ -58,6 +58,8 @@ export type StudioOperation =
       expectedRevisionId: string; expectedControlSchemaHash?:string; values: ControlValues; mode: 'live' } }
   | { name: 'lux.node.animation.set'; input: { requestId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string;
       expectedControlSchemaHash:string;nodePath:NodePath;controlId:string;animation:ControlAnimationBinding|null;restart?:boolean } }
+  | { name: 'lux.node.variation.set'; input: { requestId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string;
+      expectedControlSchemaHash:string;nodePath:NodePath;controlId:string;variation:Readonly<{distribution:'random'|'centered'|'spread';amount:number;enabled:boolean}>|null } }
   | { name: 'lux.playback'; input: { requestId: string; instanceId: string; expectedGeneration: number; action: 'play' | 'pause' | 'reset' } }
   | { name: 'lux.runtime.restart'; input: { requestId: string; instanceId: string; expectedGeneration: number } }
   | { name: 'lux.preview.resize'; input: { requestId: string; instanceId: string; expectedGeneration: number; width: number; height: number } }
@@ -112,6 +114,15 @@ export class StudioController {
     if(animation&&(JSON.stringify(animation.nodePath)!==JSON.stringify(nodePath)||animation.controlId!==controlId||animation.definitionHash!==definitionHash||animation.schemaHash!==schemaHash))throw Error('Animation target identity changed');
     return this.client.invoke({name:'lux.node.animation.set',input:{requestId:this.requestId(),instanceId:target.instanceId,expectedGeneration:target.generation,
       expectedRevisionId:target.revisionId,expectedControlSchemaHash:schemaHash,nodePath:[...nodePath],controlId,animation,...(restart?{restart:true}:{})}});
+  }
+  async setNodeVariation(nodePath:NodePath,controlId:string,variation:Readonly<{distribution:'random'|'centered'|'spread';amount:number;enabled:boolean}>|null):Promise<unknown>{
+    const target=this.target(),state=getRuntimeControlState(target),node=target.nodeControls?.nodes.find(row=>JSON.stringify(row.nodePath)===JSON.stringify(nodePath));
+    const flat=nodePath.length===0&&state.sdkVersion!=='0.4.0';
+    if(!flat&&(target.sdkVersion!=='0.4.0'||!node||!node.schema.some(row=>row.id===controlId)))throw Error('Composition node control is unavailable');
+    if(flat&&!state.controlSchema.some(row=>row.id===controlId))throw Error('Scene control is unavailable');
+    const schemaHash=flat?state.controlSchemaHash:node!.schemaHash;
+    return this.client.invoke({name:'lux.node.variation.set',input:{requestId:this.requestId(),instanceId:target.instanceId,expectedGeneration:target.generation,
+      expectedRevisionId:target.revisionId,expectedControlSchemaHash:schemaHash,nodePath:[...nodePath],controlId,variation}});
   }
   async setParameters(values:ControlValues):Promise<unknown> {
     const target = this.target();
