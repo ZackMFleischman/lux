@@ -43,10 +43,10 @@ try{
   async function setValue(value){await number.fill(String(value));await number.press('Enter');return statusWhen(state=>state.controls.spikeHeight===value,`base ${value}`);}
   async function align(target,label){
     const targetBox=await target.boundingBox(),trackBox=await track.boundingBox();assert.ok(targetBox&&trackBox);
-    const center=targetBox.x+targetBox.width/2,fraction=Math.max(0,Math.min(1,(center-trackBox.x)/trackBox.width));
+    let center=targetBox.x+targetBox.width/2;const fraction=Math.max(0,Math.min(1,(center-trackBox.x)/trackBox.width));
     const value=Number((definition.min+Math.round(fraction*(definition.max-definition.min)/step)*step).toFixed(6));
     await setValue(value);let thumbBox,distance=Infinity;
-    for(let attempt=0;attempt<40;attempt++){thumbBox=await thumb.boundingBox();assert.ok(thumbBox);distance=Math.abs(thumbBox.x+thumbBox.width/2-center);if(distance<2)break;await page.waitForTimeout(50);}
+    for(let attempt=0;attempt<40;attempt++){const current=await target.boundingBox();assert.ok(current);center=current.x+current.width/2;thumbBox=await thumb.boundingBox();assert.ok(thumbBox);distance=Math.abs(thumbBox.x+thumbBox.width/2-center);if(distance<2)break;await page.waitForTimeout(50);}
     assert.ok(distance<2,`${label} is horizontally aligned with thumb (${distance}px)`);
     report.alignments.push({label,value,targetX:center,thumbX:thumbBox.x+thumbBox.width/2,distance});
     return value;
