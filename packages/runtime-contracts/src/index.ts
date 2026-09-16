@@ -52,11 +52,11 @@ export const assetCompiledArtifactSchema = legacyCompiledArtifactSchema.extend({
 export const parameterControlDefinitionSchema = z.object({
   id:z.string().regex(/^[a-z][A-Za-z0-9_]{0,63}$/),type:z.literal('number'),label:z.string().min(1),
   default:z.number().finite(),min:z.number().finite(),max:z.number().finite(),
-  step:z.number().finite().positive().optional(),unit:z.string().min(1).optional(),changeCost:z.literal('live'),
+  step:z.number().finite().positive().optional(),unit:z.string().min(1).optional(),description:z.string().min(1).optional(),group:z.string().min(1).optional(),changeCost:z.literal('live'),
 }).strict();
 export const parameterCompiledArtifactSchema = assetCompiledArtifactSchema.extend({
   artifactVersion:z.literal(3),sdkVersion:z.literal('0.2.0'),
-  controls:z.array(parameterControlDefinitionSchema).max(32),controlSchemaHash:hashSchema,
+  controls:z.array(parameterControlDefinitionSchema),controlSchemaHash:hashSchema,
 }).strict();
 // Structural DTO only. The pure C01 policy and identity verifier additionally
 // enforce text/count/canonical-byte bounds, descriptions and control agreement.
@@ -69,7 +69,7 @@ const componentPortSchema = z.object({
 const componentMetadataDtoSchema = z.object({
   declarationVersion:z.literal(1),key:z.string(),label:z.string(),description:z.string(),tags:z.array(z.string()),
   inputs:z.record(componentPortSchema),outputs:z.record(componentPortSchema),
-  controls:z.array(parameterControlDefinitionSchema).max(32),controlDescriptions:z.record(z.string()),
+  controls:z.array(parameterControlDefinitionSchema),controlDescriptions:z.record(z.string()),
   lifecycle:z.object({state:z.enum(['stateless','stateful']),reset:z.literal('seed')}).strict(),
 }).strict();
 export const componentCompiledArtifactSchema = parameterCompiledArtifactSchema.extend({

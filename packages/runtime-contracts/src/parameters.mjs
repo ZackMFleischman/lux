@@ -1,6 +1,6 @@
 // Pure browser-compatible parameter policy. No visual execution, hashing,
 // environment access, or legacy Intensity fallback belongs at this boundary.
-export const parameterLimits = Object.freeze({ count: 32, metadataBytes: 32768, id: 64, label: 80, unit: 24, description: 512, group: 80 });
+export const parameterLimits = Object.freeze({ metadataBytes: 32768, id: 64, label: 80, unit: 24, description: 512, group: 80 });
 const requiredFields = ['type', 'label', 'default', 'min', 'max'];
 const optionalFields = ['step', 'unit', 'description', 'group'];
 const reservedIds = new Set(['constructor', 'prototype', '__proto__']);
@@ -72,14 +72,12 @@ function finishSchema(rows) {
 
 export function normalizeControlDeclarations(input) {
   const raw = record(input, 'controls'), ids = Object.keys(raw);
-  if (ids.length > parameterLimits.count) invalid('controls', 'at most 32 controls are supported');
   return finishSchema(ids.map(id => definition(id, raw[id], false)));
 }
 
 export function normalizeControlSchema(input) {
   if (!Array.isArray(input) || Object.getPrototypeOf(input) !== Array.prototype) invalid('controls', 'expected a plain array of control definitions');
   const length = Object.getOwnPropertyDescriptor(input, 'length').value;
-  if (length > parameterLimits.count) invalid('controls', 'at most 32 controls are supported');
   if (Reflect.ownKeys(input).length !== length + 1) invalid('controls', 'unexpected array properties');
   const rows = [], ids = new Set();
   for (let i = 0; i < length; i++) {

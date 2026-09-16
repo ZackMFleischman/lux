@@ -2,7 +2,7 @@
 import { normalizeControlDeclarations, normalizeControlSchema, canonicalControlSchemaJson, parameterLimits } from './parameters.mjs';
 
 export const componentMetadataLimits = Object.freeze({
-  registryEntries: 128, inputs: 16, outputs: 16, controls: parameterLimits.count,
+  registryEntries: 128, inputs: 16, outputs: 16,
   tags: 16, tag: 32, key: 96, portId: parameterLimits.id, label: 80,
   description: 512, signalUnit: 24, metadataBytes: 65536, registryBytes: 1048576,
 });

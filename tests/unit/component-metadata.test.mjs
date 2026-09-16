@@ -159,7 +159,7 @@ test('keys and port IDs admit exact ASCII boundaries', () => {
   assert.throws(() => normalizeComponentDeclaration(source));
 });
 
-test('port, control and raw tag count caps are checked before deduplication', () => {
+test('port and raw tag caps remain independent of the number of controls', () => {
   for (const side of ['inputs', 'outputs']) {
     const source = declaration(); source[side] = Object.fromEntries(Array.from({ length: 16 }, (_, i) => [`p${i}`, port()]));
     assert.doesNotThrow(() => normalizeComponentDeclaration(source));
@@ -172,7 +172,7 @@ test('port, control and raw tag count caps are checked before deduplication', ()
   assert.deepEqual(normalizeComponentDeclaration(source).tags, ['effect']);
   source.tags.push('effect'); assert.throws(() => normalizeComponentDeclaration(source));
   source.tags = []; source.controls.extra = number(); source.controlDescriptions.extra = 'Extra';
-  assert.throws(() => normalizeComponentDeclaration(source));
+  assert.equal(normalizeComponentDeclaration(source).controls.length, 33);
 });
 
 test('canonical metadata accepts exactly 64 KiB UTF-8 and rejects one byte beyond', () => {

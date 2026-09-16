@@ -5,6 +5,8 @@ function schemaHash(schema){return createHash('sha256').update(policy().canonica
 function parameterMapping(schema,values,expectedHash){
  const p=policy(),rows=p.normalizeControlSchema(schema);p.validateControlSnapshot(rows,values);
  if(schemaHash(rows)!==expectedHash)throw Error('Control schema hash mismatch');
+ // This is the existing native ring-v4 capacity, not a Studio authoring limit.
+ if(rows.length>32)throw Error('The current Resolume plug-in transport supports at most 32 exposed controls; this scene can still be edited and captured in Studio.');
  const used=new Set();
  return rows.map((row,index)=>{
   let label=row.label.normalize('NFKD').replace(/[^\x20-\x7e]/g,'').trim()||row.id;

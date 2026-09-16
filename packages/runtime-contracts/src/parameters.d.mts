@@ -12,7 +12,7 @@ export type ControlMigration = Readonly<
   | { id: string; reason: 'removed'; previousValue: number }
   | { id: string; reason: 'unit-changed' | 'out-of-range'; previousValue: number; value: number }
 >;
-export const parameterLimits: Readonly<{ count: 32; metadataBytes: 32768; id: 64; label: 80; unit: 24; description: 512; group: 80 }>;
+export const parameterLimits: Readonly<{ metadataBytes: 32768; id: 64; label: 80; unit: 24; description: 512; group: 80 }>;
 export function normalizeControlDeclarations(input: unknown): ControlSchema;
 export function normalizeControlSchema(input: unknown): ControlSchema;
 /** Canonical UTF-8 JSON input for SHA-256; hashing is owned by the caller. */

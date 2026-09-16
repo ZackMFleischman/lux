@@ -17,6 +17,13 @@ const controls = normalizeControlDeclarations({height:{type:'number',label:'Long
 const schemaHash = hash(canonicalControlSchemaJson(controls));
 const release = {version:2,releaseId:'a'.repeat(64),runtimeId:'b'.repeat(64),name:'Parameters',controls,controlSchemaHash:schemaHash,savedControls:{height:1,speed:15}};
 
+test('larger Studio schemas are rejected explicitly at the fixed native export boundary',()=>{
+ const schema=normalizeControlDeclarations(Object.fromEntries(Array.from({length:64},(_,i)=>[`control${i}`,{type:'number',label:`Control ${i}`,min:0,max:1,default:.5}])));
+ const values=Object.fromEntries(schema.map(row=>[row.id,row.default]));
+ assert.equal(schema.length,64);
+ assert.throws(()=>mapping.parameterMapping(schema,values,hash(canonicalControlSchemaJson(schema))),/Resolume.*32 exposed controls/);
+});
+
 test('v2 installed descriptor preserves ordered mapping, adapted unique labels and saved normalized defaults',()=>{
   const identity=registration.sourceIdentity(release);
   assert.match(identity.sidecar,/^lux-installed-source-v2\n/);

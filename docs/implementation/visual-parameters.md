@@ -1,5 +1,7 @@
 # Visual parameters implementation design
 
+> Control-count update (September 2026): Studio scenes, components, parameter updates, and animations no longer have a fixed 32-control ceiling. Existing metadata byte bounds still apply. Older count references below describe the original design; only the native Resolume ring-v4 transport retains 32 exposed controls, enforced explicitly at export.
+
 Status: proposed implementation at `ce14d1c`, 12 September 2026. This document changes no running Studio, SDK, or installed release. It supersedes the intended *future* fixed-control assumption in [tracer contracts](../design/tracer-contracts.md), not the existing v1 export format.
 
 **Goal:** A visual declares its own controls in code; Studio and MCP expose exactly those controls. `intensity` has no special meaning in the new SDK.
@@ -84,7 +86,7 @@ declare function defineVisual<const C extends ControlDeclarations>(definition: {
 
 Validation policy:
 
-- 0–32 controls, IDs matching `^[a-z][A-Za-z0-9_]{0,63}$`; camelCase supports the brief. Reject `constructor`, `prototype`, `__proto__`, duplicate keys, inherited/accessor/symbol properties. IDs are case-sensitive and stable semantic identities, not labels or UUIDs. Update the old lowercase-only design text when implementing.
+- No fixed control-count ceiling; IDs matching `^[a-z][A-Za-z0-9_]{0,63}$`; camelCase supports the brief. Reject `constructor`, `prototype`, `__proto__`, duplicate keys, inherited/accessor/symbol properties. IDs are case-sensitive and stable semantic identities, not labels or UUIDs. Update the old lowercase-only design text when implementing.
 - Labels are trimmed nonempty strings, at most 80 code points, without control characters; optional units at most 24. Numeric fields are finite, `min < max`, and `min <= default <= max`; normalize negative zero to zero. Optional `step` is finite, positive and no greater than `max - min`.
 - `step` is a UI gesture increment, **not** a wire quantization rule. A valid finite in-range MCP/host value need not lie on a step grid. Without step, Inspector uses `(max - min) / 1000`; numeric entry permits finer values.
 - All controls are live in this slice; normalization inserts `changeCost: 'live'`. Do not accept reset/rebuild controls with misleading live semantics. Expensive topology changes stay in source.

@@ -17,7 +17,7 @@ export type ComponentDeclaration = {
 };
 export type ComponentMetadata = Omit<ComponentDeclaration, 'controls'> & { readonly controls: ControlSchema };
 export const componentMetadataLimits: Readonly<{
-  registryEntries: 128; inputs: 16; outputs: 16; controls: 32; tags: 16; tag: 32;
+  registryEntries: 128; inputs: 16; outputs: 16; tags: 16; tag: 32;
   key: 96; portId: 64; label: 80; description: 512; signalUnit: 24;
   metadataBytes: 65536; registryBytes: 1048576;
 }>;

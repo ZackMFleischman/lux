@@ -8,6 +8,12 @@ const source = controls => `import { defineVisual as visual } from '@lux/visual-
 export default visual({ controls: ${controls}, async create() { throw Error('never execute metadata'); } });`;
 const extract = text => extractControlDeclarations(parse(text, { sourceType: 'module', plugins: ['typescript'] }));
 
+test('static extraction admits more than 32 declared controls in source order', () => {
+  const controls = Array.from({ length: 64 }, (_, i) => `control${i}: ${descriptor}`).join(',');
+  const schema = extract(source(`{${controls}}`));
+  assert.equal(schema.length, 64); assert.equal(schema[63].id, 'control63');
+});
+
 test('static extraction accepts aliases, literal keys, negative numbers and TS wrappers', () => {
   assert.deepEqual(extract(source(`({ spikeHeight: (${descriptor} as const) } satisfies Record<string, unknown>)`)), [
     { id: 'spikeHeight', type: 'number', label: 'Height', default: 1, min: -2, max: 4, changeCost: 'live' },

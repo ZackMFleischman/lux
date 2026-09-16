@@ -101,11 +101,11 @@ test('all raw descriptors are admitted before metadata normalization or caller c
   const g=basic();Object.defineProperty(g.graph.nodes,'0',{enumerable:true,get(){reads++;throw Error('getter executed');}});g.graph.nodes.length=129;
   invalid(g.graph,g.definitions,/graph.nodes/,/128/);assert.equal(reads,0);
 });
-test('existing C01 port, control, tag and text limits remain authoritative',()=>{
+test('existing C01 port, tag and text limits remain authoritative without a control-count cap',()=>{
   const f=basic();f.definitions[h2]={kind:'code',metadata:sizedMetadata(20000)};
   assert.equal(Object.keys(validateGraph(f.graph,f.definitions).definitions[h2]!.metadata.inputs).length,16);
   for(const side of ['inputs','outputs'] as const){const g=clone(f);(g.definitions[h2]!.metadata[side] as any).extra=clone(g.definitions[h2]!.metadata[side].port0);invalid(g.graph,g.definitions,/definitions/,/16 ports/);}
-  const control=clone(f);(control.definitions[h2]!.metadata.controls as any).push({...control.definitions[h2]!.metadata.controls[0],id:'extra'});(control.definitions[h2]!.metadata.controlDescriptions as any).extra='Extra';invalid(control.graph,control.definitions,/definitions/,/32 controls/);
+  const control=clone(f);(control.definitions[h2]!.metadata.controls as any).push({...control.definitions[h2]!.metadata.controls[0],id:'extra'});(control.definitions[h2]!.metadata.controlDescriptions as any).extra='Extra';assert.equal(validateGraph(control.graph,control.definitions).definitions[h2]!.metadata.controls.length,33);
   for(const [field,value] of [['tags',Array.from({length:17},()=> 'tag')],['label','x'.repeat(81)],['description','x'.repeat(513)]] as const){const g=clone(f);(g.definitions[h2]!.metadata as any)[field]=value;invalid(g.graph,g.definitions,/definitions/,/16|80|512/);}
 });
 test('legal Unicode metadata straddles exact per-entry and aggregate canonical byte limits',()=>{

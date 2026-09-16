@@ -1,5 +1,7 @@
 # Creative Controls and Inputs Implementation Plan
 
+> Control-count update (September 2026): Studio scenes, components, parameter updates, and animations no longer have a fixed 32-control ceiling. Existing metadata byte bounds still apply. Older count references below describe the original design; only the native Resolume ring-v4 transport retains 32 exposed controls, enforced explicitly at export.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development or superpowers:executing-plans when the coordinator dispatches an approved implementation slice. This document authorizes no worker launch itself. Steps use checkboxes for execution tracking.
 
 **Goal:** Let authors experiment through declared controls, audio/MIDI response, modulation, macros and named Looks while preserving independent Studio and host execution.

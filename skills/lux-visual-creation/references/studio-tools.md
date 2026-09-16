@@ -94,3 +94,5 @@ The Preview menu saves the current completed output as a straight-alpha PNG thro
 ### Saved looks in Studio
 
 Use File → Looks… to save and recall a named working preview. A look includes the accepted source and assets, control values, control animation bindings, and preview resolution. Build edits before saving them in a look. Save as new creates a separate look; Update explicitly replaces the selected look. Loading confirms dirty work and retains the previous source and preview if activation fails. Library source is frozen in each look. Looks are profile-local; no dedicated Looks MCP command is shipped. Do not claim that an agent saved a look unless the actual UI operation succeeded.
+
+Studio does not impose a fixed control-count ceiling. Discovery reports `maxParameterMetadataBytes` for schema metadata. The current native Resolume plug-in transport still accepts at most 32 exposed controls; export reports that compatibility limit explicitly without restricting Studio editing, animation, scene saves, or Preview capture.

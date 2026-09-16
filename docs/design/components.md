@@ -1,5 +1,7 @@
 # Components, graph execution and library reuse
 
+> Control-count update (September 2026): Studio scenes, components, parameter updates, and animations no longer have a fixed 32-control ceiling. Existing metadata byte bounds still apply. Older count references below describe the original design; only the native Resolume ring-v4 transport retains 32 exposed controls, enforced explicitly at export.
+
 Status: proposed architecture for the authorized component workstream, 13 September
 2026 UTC. This document and [the staged plan](../implementation/components-plan.md)
 are preparation for independent review, not evidence of delivered graph support.
@@ -137,8 +139,7 @@ presentation order from `canonicalControlSchemaJson`, including its optional
 fields. This is the C01 canonical byte contract; it does not create public
 metadata pins or executable identity.
 
-Bounds: 128 registry entries, 16 inputs and 16 outputs per component, existing
-32 controls, 16 tags of at most 32 Unicode code points, keys at most 96 ASCII characters matching
+Bounds: 128 registry entries, 16 inputs and 16 outputs per component, control schemas within 32 KiB of canonical UTF-8 metadata with no fixed count ceiling, 16 tags of at most 32 Unicode code points, keys at most 96 ASCII characters matching
 `^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$`, local port IDs use the existing control-ID
 grammar and exclude `constructor`, `prototype` and `__proto__`, labels at most
 80 Unicode code points, descriptions at most 512 Unicode code points,
