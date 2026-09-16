@@ -4,6 +4,8 @@ For a brief like “a sphere manipulated by 3D noise over time so it looks spiky
 
 The intended model is **parameters declared by each visual's code**, with Inspector and generic MCP control consuming that discovered schema. Intensity is an optional, visual-specific parameter if that visual declares it; it is not a permanent global control or a required macro. The checked template declares spikeHeight, noiseScale, sharpness, motionSpeed and roughness. Use SDK 0.2 and verify the running app reports compatibility.
 
+When several controls support one editing task, give them the same optional `group` label. Studio keeps the declared control order and shows that set as a collapsible subsection inside **Controls**. The sphere template groups its three shape controls and leaves the two unrelated single controls ungrouped, avoiding one-control sections.
+
 The checked [sphere template](../assets/noise-sphere.ts) uses `SphereGeometry`, `MeshStandardNodeMaterial.positionNode`, and `mx_noise_float` from pinned Three.js 0.186.0. It is CPU-compiled against Lux, with no GPU appearance or performance claim. Use the user's palette/motion preferences rather than treating these defaults as a prescribed style.
 
 The node graph samples noise at `positionLocal * noiseScale + timeDrift`. A moving 3D sample position makes the field evolve coherently instead of choosing unrelated random positions each frame. Remap/clamp signed noise into 0–1 and raise it to a power to concentrate peaks, then displace outward along `normalLocal`. More vertices can resolve sharper peaks, but also cost more. Higher noise frequency than the mesh can resolve produces a poor silhouette; improve them together and inspect the actual result.

@@ -42,6 +42,16 @@ try {
   assert.notEqual(status.authoring.effectiveControls.spikeHeight,before);
   await page.screenshot({path:join(output,'scene-animation.png')});
   report.checks.push('Flat SDK 0.2 scene animation changes effective output while preserving base');
+  const group=page.locator('details.parameter-group').filter({has:page.locator('summary',{hasText:'Shape'})});
+  await group.locator('summary').focus();
+  await page.keyboard.press('Space');
+  await page.getByRole('dialog',{name:'Animate Spike height',exact:true}).waitFor({state:'hidden'});
+  assert.equal(await group.getAttribute('open'),null);
+  await page.screenshot({path:join(output,'group-collapsed.png')});
+  await page.keyboard.press('Enter');
+  await page.getByRole('button',{name:'Animate Spike height',exact:true}).waitFor();
+  status=await call('status');assert.equal(status.authoring.controlAnimations.length,1);
+  report.checks.push('Keyboard group collapse closes its animation popup and preserves the binding');
   await page.keyboard.press('Escape');
   current=await call('read');
   const path=join(output,'animated.lux-scene');

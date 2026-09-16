@@ -16,6 +16,12 @@ test('static extraction accepts aliases, literal keys, negative numbers and TS w
   assert.deepEqual(extract(source(`{ 'spikeHeight': ${descriptor} }`)), extract(source(`{ spikeHeight: ${descriptor} }`)));
 });
 
+test('static extraction preserves optional literal control groups', () => {
+  assert.deepEqual(extract(source(`{ speed: { ${descriptor.slice(1, -1)}, group: 'Motion' } }`)), [
+    { id: 'speed', type: 'number', label: 'Height', default: 1, min: -2, max: 4, group: 'Motion', changeCost: 'live' },
+  ]);
+});
+
 test('static extraction rejects executable/reference metadata, spreads, duplicate and computed keys', () => {
   for (const controls of [
     'settings', 'makeControls()', `{ ...settings }`, `{ height: settings }`, `{ height: makeControl() }`,

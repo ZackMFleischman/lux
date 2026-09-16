@@ -1,8 +1,8 @@
 // Pure browser-compatible parameter policy. No visual execution, hashing,
 // environment access, or legacy Intensity fallback belongs at this boundary.
-export const parameterLimits = Object.freeze({ count: 32, metadataBytes: 32768, id: 64, label: 80, unit: 24, description: 512 });
+export const parameterLimits = Object.freeze({ count: 32, metadataBytes: 32768, id: 64, label: 80, unit: 24, description: 512, group: 80 });
 const requiredFields = ['type', 'label', 'default', 'min', 'max'];
-const optionalFields = ['step', 'unit', 'description'];
+const optionalFields = ['step', 'unit', 'description', 'group'];
 const reservedIds = new Set(['constructor', 'prototype', '__proto__']);
 const encoder = new TextEncoder();
 
@@ -61,6 +61,7 @@ function definition(id, input, normalizedRow) {
   }
   if (Object.hasOwn(raw, 'unit')) result.unit = text(raw.unit, `${path}.unit`, parameterLimits.unit);
   if (Object.hasOwn(raw, 'description')) result.description = text(raw.description, `${path}.description`, parameterLimits.description);
+  if (Object.hasOwn(raw, 'group')) result.group = text(raw.group, `${path}.group`, parameterLimits.group);
   result.changeCost = 'live';
   return Object.freeze(result);
 }

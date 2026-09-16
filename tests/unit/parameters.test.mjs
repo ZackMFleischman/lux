@@ -41,6 +41,17 @@ test('schema canonicalization ignores input field order, preserves control order
   assert.deepEqual(normalizeControlSchema(b), a);
 });
 
+test('optional groups preserve declared order while legacy schemas keep their canonical shape', () => {
+  const legacy = normalizeControlDeclarations({ height: number() });
+  assert.equal(canonicalControlSchemaJson(legacy), '[{"id":"height","type":"number","label":"Height","default":1,"min":0,"max":4,"changeCost":"live"}]');
+  const grouped = normalizeControlDeclarations({
+    speed: number({ label: 'Speed', group: '  Motion  ' }),
+    height: number({ group: 'Shape' }),
+  });
+  assert.deepEqual(grouped.map(({ id, group }) => [id, group]), [['speed', 'Motion'], ['height', 'Shape']]);
+  assert.deepEqual(normalizeControlSchema(grouped), grouped);
+});
+
 test('invalid IDs, duplicate normalized IDs and unsupported descriptor fields are rejected', () => {
   for (const id of ['1abc', 'A', 'a-b', '__proto__', 'constructor', 'prototype', 'a'.repeat(65)]) {
     assert.throws(() => normalizeControlDeclarations(Object.fromEntries([[id, number()]])), /control|id/i, id);
@@ -70,6 +81,9 @@ test('metadata enforces Unicode validity, code-point lengths, controls, and UTF-
   }
   for (const unit of ['', '\udfff', 'a'.repeat(25), 'm\t']) {
     assert.throws(() => normalizeControlDeclarations({ height: number({ unit }) }), /unit/i);
+  }
+  for (const group of ['', '\udfff', 'a'.repeat(81), 'Motion\t']) {
+    assert.throws(() => normalizeControlDeclarations({ height: number({ group }) }), /group/i);
   }
   const maximum = Object.fromEntries(Array.from({ length: 32 }, (_, i) => [`control${i}`, number({ label: '😀'.repeat(80), unit: '😀'.repeat(24) })]));
   const schema = normalizeControlDeclarations(maximum);
