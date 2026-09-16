@@ -11,7 +11,7 @@ declare const shaderFieldResourceBrand:unique symbol;
 export interface ShaderFieldResource {readonly [shaderFieldResourceBrand]:true;readonly data:ShaderFieldSnapshot}
 export interface ImageResource {readonly [imageResourceBrand]:true;readonly width:number;readonly height:number;readonly colorSpace:'linear-srgb';readonly alphaMode:'premultiplied';readonly texture:unknown}
 export interface Paths2DResource {readonly [paths2dResourceBrand]:true;readonly data:Paths2DSnapshot}
-export interface ComponentFrame<C extends ControlDeclarations=ControlDeclarations>{readonly tick:number;readonly timeSeconds:number;readonly deltaSeconds:number;readonly controls:ControlsOf<C>;readonly events:readonly never[]}
+export interface ComponentFrame<C extends ControlDeclarations=ControlDeclarations>{readonly tick:number;readonly timeSeconds:number;readonly deltaSeconds:number;readonly controls:ControlsOf<C>;readonly events:readonly never[];readonly sampleControl?:(controlId:keyof C & string,instanceKey:string|number)=>number}
 export interface ComponentContext {readonly settings:Readonly<OutputSettings>;readonly assets:ReadonlyMap<string,Readonly<Uint8Array>>;readonly images:ReadonlyMap<string,Readonly<{width:number;height:number;colorSpace:'srgb';alphaMode:'straight';data:Uint8Array}>>;random():number;reportError(message:string):void}
 export type ImageInputs=Readonly<Record<string,ImageResource>>;
 type PortDeclarations=ComponentDeclaration['inputs'];

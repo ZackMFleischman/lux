@@ -108,6 +108,23 @@ test('RTL: a flat control can add the strict shared-audio binding',async()=>{
   }finally{globalThis.requestAnimationFrame=priorAnimationFrame;}
 });
 
+test('RTL: a flat control can configure stable per-instance variation',async()=>{
+  const fixture=service(),priorAnimationFrame=globalThis.requestAnimationFrame,user=userEvent.setup({document});
+  globalThis.requestAnimationFrame=callback=>{callback(0);return 0;};
+  try{
+    render(<StudioApp client={fixture.client} nowMs={1000}/>);
+    fireEvent.click(screen.getByRole('button',{name:'Animate Intensity'}));
+    fireEvent.click(screen.getByRole('button',{name:'Vary instances'}));
+    await waitFor(()=>assert.equal(fixture.calls[0]?.name,'lux.node.animation.set'));
+    const variation=(fixture.calls[0] as any).input.animation;
+    assert.equal(variation.kind,'variation');assert.equal(variation.distribution,'spread');assert.equal(variation.amount,.1);
+    await user.click(screen.getByRole('combobox',{name:'Instance variation distribution'}));
+    await user.click(screen.getByRole('option',{name:'Center-weighted'}));
+    await waitFor(()=>assert.equal(fixture.calls.length,2));
+    assert.equal((fixture.calls[1] as any).input.animation.distribution,'centered');
+  }finally{globalThis.requestAnimationFrame=priorAnimationFrame;}
+});
+
 test('RTL: a flat control can add and tune the strict kick binding',async()=>{
   const fixture=service(),priorAnimationFrame=globalThis.requestAnimationFrame;
   globalThis.requestAnimationFrame=callback=>{callback(0);return 0;};

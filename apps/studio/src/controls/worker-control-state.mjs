@@ -58,6 +58,7 @@ export async function prepareWorkerControlState(message,admission){
     const create=own(definition,'create');if(typeof create!=='function')bad('Invalid visual create function');return create;
   }
   return freeze({checkDefinition,values:(timeSeconds=0,beatPosition=0)=>animated.values(timeSeconds,beatPosition),
+    sample:(path,controlId,instanceKey,timeSeconds=0,beatPosition=0)=>animated.sample(path,controlId,instanceKey,timeSeconds,beatPosition),
     apply(input,nextSequence,hash){
       if(!isSafeInteger(nextSequence)||nextSequence<=sequence||(sdkVersion!=='0.1.0'&&hash!==schemaHash))bad('Invalid control snapshot sequence or schema');
       const next=validateValues(input);values=next;sequence=nextSequence;

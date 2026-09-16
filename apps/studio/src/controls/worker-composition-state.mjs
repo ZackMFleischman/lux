@@ -25,7 +25,7 @@ export async function prepareWorkerCompositionState(message,admission){
   }
   visit(own(module,'default'),profile.graph.rootDefinitionHash);return freeze(byHash);
  }
- return freeze({checkDefinition,values:animated.values,nodeValues:animated.nodeValues,
+ return freeze({checkDefinition,values:animated.values,nodeValues:animated.nodeValues,sample:animated.sample,
   apply(input,nextSequence,hash){if(!safe(nextSequence)||nextSequence<=sequence||hash!==admission.controlSchemaHash)bad();state.apply(validateControlSnapshot(schema,input));sequence=nextSequence;},
   applyNode(path,input,nextSequence,hash){if(!safe(nextSequence)||nextSequence<=sequence)bad();state.applyNode(path,input,hash);sequence=nextSequence;},
   applyAnimations(input,nextSequence,timeSeconds){if(!safe(nextSequence)||nextSequence<=animationSequence)bad();animations=normalizeControlAnimations(input,profile);animated.replace(animations,timeSeconds);animationSequence=nextSequence;},

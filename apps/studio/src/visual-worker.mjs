@@ -16,6 +16,7 @@ import { createFrameCollector } from '../../../packages/performance/live.mjs';
 import { createGpuPassTimer } from '../../../packages/performance/gpu-pass.mjs';
 import { collectionMode } from '../../../packages/performance/collection-mode.mjs';
 const freeze=Object.freeze, RuntimeError=Error;
+const scenePath=freeze([]);
 const createURL=URL.createObjectURL.bind(URL),revokeURL=URL.revokeObjectURL.bind(URL),RuntimeBlob=Blob;
 const now=performance.now.bind(performance);
 const post=postMessage.bind(globalThis);
@@ -70,7 +71,8 @@ async function draw(requestId, type = 'frame',extra = {}) {
   if(profiling)gpuTimer.begin(frame+1);
   const updateStart=profiling?now():0;
   await visual.update(freeze({ tick: tick++, timeSeconds: time.timeSeconds,
-    deltaSeconds: Math.max(0, time.timeSeconds - lastTime), controls: controlState.values(time.timeSeconds,tempo.beatPosition), events: freeze([]) }));
+    deltaSeconds: Math.max(0, time.timeSeconds - lastTime), controls: controlState.values(time.timeSeconds,tempo.beatPosition), events: freeze([]),
+    sampleControl:(controlId,instanceKey)=>controlState.sample(scenePath,controlId,instanceKey,time.timeSeconds,tempo.beatPosition) }));
   requireRunning();
   const updateEnd=profiling?now():0;
   const renderResult=visual.render(freeze({ width: settings.width, height: settings.height, colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }));
@@ -161,7 +163,8 @@ async function initialize(message) {
     const backend=freeze({resources,stage(scene,camera){if(staged)throw new RuntimeError('Component render already staged');staged={scene,camera};},texture(image){const target=targets.get(image);if(!target)throw new RuntimeError('Missing component input image');return target.texture;},async present(image){const target=targets.get(image);if(!target)throw new RuntimeError('Missing final component image');const copyMaterial=new module.MeshBasicNodeMaterial();copyMaterial.fragmentNode=module.sampleTexture(target.texture);const copy=new module.QuadMesh(copyMaterial);renderer.setRenderTarget(outputTarget);try{copy.render(renderer);}finally{renderer.setRenderTarget(null);copyMaterial.dispose();}},async drain(){while(settlements.size)await Promise.allSettled([...settlements]);if(settlementFailure)throw settlementFailure;}});
     const plan=prepareGraphRuntimePlan(validateNestedGraph(profile.graph,profile.definitions));
     compositionBridge=await createImageCompositionVisual({plan,definitions:create,context:freeze(context),backend,
-      nodeControls:(path,frame)=>controlState.nodeValues(path,frame.timeSeconds,tempoClock.snapshot(frame.timeSeconds).beatPosition)});visual=compositionBridge;authoredCleanup=()=>compositionBridge.dispose();
+      nodeControls:(path,frame)=>controlState.nodeValues(path,frame.timeSeconds,tempoClock.snapshot(frame.timeSeconds).beatPosition),
+      nodeSampleControl:(path,controlId,instanceKey,frame)=>controlState.sample(path,controlId,instanceKey,frame.timeSeconds,tempoClock.snapshot(frame.timeSeconds).beatPosition)});visual=compositionBridge;authoredCleanup=()=>compositionBridge.dispose();
   }else if(prepared.admission.kind==='component'){
     const instance=await create(freeze(context));
     authoredCleanup=componentDisposer(instance);
