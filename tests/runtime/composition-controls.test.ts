@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import {parse} from '@babel/parser';
 import {createHash} from 'node:crypto';
 import {extractCompositionDeclaration} from '../../apps/build-worker/src/composition-declarations.mjs';
-import {compositionSourceBundle,kaleidoscopeAId,kaleidoscopeBId} from '../compiler/composition-fixture.mjs';
+import {compositionSourceBundle,ballId,kaleidoscopeAId,kaleidoscopeBId} from '../compiler/composition-fixture.mjs';
 import {createCompositionControlState} from '../../packages/runtime/src/components/composition-controls.ts';
 import {nodeIdSchema} from '../../packages/runtime-contracts/src/identities.ts';
 const hash=(value:string)=>createHash('sha256').update(value).digest('hex');
-function profile(){const source=compositionSourceBundle(),asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));return extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash})!;}
+function profile(source=compositionSourceBundle()){const asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));return extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash})!;}
 const kaleidoA=nodeIdSchema.parse(kaleidoscopeAId),kaleidoB=nodeIdSchema.parse(kaleidoscopeBId);
 test('node writes update only their instance and public aliases, rejecting stale or invalid writes atomically',()=>{
  const p=profile(),state=createCompositionControlState(p),node=p.nodes.find(row=>row.nodePath[0]===kaleidoA)!;
@@ -26,19 +26,16 @@ test('composition controls keep one canonical leaf state and derive independent 
 });
 test('node snapshots survive declaration reorder and compatible definition updates without retargeting aliases',()=>{
  const p=profile(),before=createCompositionControlState(p);before.apply({ballIntensity:.6,segmentsA:5,segmentsB:11});const saved=before.snapshot();
- const reordered:any=structuredClone(p);reordered.nodes.reverse();reordered.declaration.nodes.reverse();const restored=createCompositionControlState(reordered,saved);assert.deepEqual(restored.nodeValues([kaleidoA]),{segments:5});assert.deepEqual(restored.nodeValues([kaleidoB]),{segments:11});
- const rebound:any=structuredClone(p);rebound.declaration.expose.find((x:any)=>x.id==='segmentsA').nodeId=kaleidoscopeBId;rebound.publicControlBindings.segmentsA[0].nodePath=[kaleidoscopeBId];assert.throws(()=>createCompositionControlState(rebound,saved),/profile|binding|composition/i);
- const changed:any=structuredClone(p),declarationNode=changed.declaration.nodes.find((x:any)=>x.id===kaleidoscopeAId),oldHash=changed.definitionNames[declarationNode.definition],nextHash='f'.repeat(64);
- changed.definitionNames[declarationNode.definition]=nextHash;changed.definitions[nextHash]=changed.definitions[oldHash];delete changed.definitions[oldHash];
- for(const node of changed.nodes)if(node.definitionHash===oldHash)node.definitionHash=nextHash;
- for(const node of changed.definitions[changed.graph.rootDefinitionHash].body.nodes)if(node.definitionHash===oldHash)node.definitionHash=nextHash;
+ const reorderedSource=compositionSourceBundle();
+ reorderedSource.files['composition.ts']=reorderedSource.files['composition.ts'].replace(/nodes:\[[\s\S]*?\],edges:/,`nodes:[{id:'${kaleidoscopeBId}',definition:'kaleidoscope'},{id:'${kaleidoscopeAId}',definition:'kaleidoscope'},{id:'${ballId}',definition:'ball'}],edges:`);
+ const restored=createCompositionControlState(profile(reorderedSource),saved);assert.deepEqual(restored.nodeValues([kaleidoA]),{segments:5});assert.deepEqual(restored.nodeValues([kaleidoB]),{segments:11});
+ const rebound:any=structuredClone(p);rebound.declaration.expose.find((x:any)=>x.id==='segmentsA').nodeId=kaleidoscopeBId;rebound.publicControlBindings.segmentsA[0].nodePath=[kaleidoscopeBId];assert.throws(()=>createCompositionControlState(rebound,saved),/profile|binding|composition|declaration/i);
+ const changedSource=compositionSourceBundle();changedSource.files['kaleidoscope.ts']+='\n// Compatible implementation edit.\n';const changed=profile(changedSource);
  const updated=createCompositionControlState(changed,saved);assert.deepEqual(updated.nodeValues([kaleidoA]),{segments:5});assert.deepEqual(updated.nodeValues([kaleidoB]),{segments:11});assert.deepEqual(updated.changes(),[]);
 });
 test('component updates retain compatible values and report values reset by a narrowed schema',()=>{
- const p=profile(),before=createCompositionControlState(p);before.apply({ballIntensity:.6,segmentsA:5,segmentsB:11});const saved=before.snapshot(),changed:any=structuredClone(p);
- const sharedHash=changed.nodes.find((x:any)=>x.nodePath[0]===kaleidoscopeAId).definitionHash;
- changed.definitions[sharedHash].metadata.controls[0].max=8;
- for(const node of changed.nodes)if(node.definitionHash===sharedHash){node.schema[0].max=8;node.schemaHash='e'.repeat(64);}
+ const p=profile(),before=createCompositionControlState(p);before.apply({ballIntensity:.6,segmentsA:5,segmentsB:11});const saved=before.snapshot();
+ const changedSource=compositionSourceBundle();changedSource.files['kaleidoscope.ts']=changedSource.files['kaleidoscope.ts'].replace('min:2,max:16','min:2,max:8');const changed=profile(changedSource);
  const updated=createCompositionControlState(changed,saved);
  assert.deepEqual(updated.nodeValues([kaleidoA]),{segments:5});assert.deepEqual(updated.nodeValues([kaleidoB]),{segments:6});
  assert.deepEqual(updated.changes(),[{id:`${kaleidoscopeBId}:segments`,reason:'out-of-range',previousValue:11,value:6}]);

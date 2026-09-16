@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Button, Menu, MenuItem } from '@mui/material';
 import type { NodePath } from '../../../packages/runtime-contracts/src/graph.ts';
 import type { RuntimeView } from './service-client.ts';
-import { compositionNodeLabel, compositionOccurrence, nodeKey } from './GraphPanel.tsx';
+import { compositionNodeLabel, compositionOccurrence, nodeKey } from './visual-model.ts';
 
 /** A single quiet line; intermediate ancestors stay available in the parent menu. */
 export function InspectorBreadcrumb({ runtime, path, onSelect }: {
@@ -12,7 +12,7 @@ export function InspectorBreadcrumb({ runtime, path, onSelect }: {
   const currentButton = useRef<HTMLButtonElement>(null);
   const selectedParent = useRef(false);
   const parents = (path ?? []).slice(0, -1).map((_, index) => path!.slice(0, index + 1) as NodePath);
-  const hasComponent = !!path?.length;
+  const hasComponent = path !== undefined;
   const available = !hasComponent || !!compositionOccurrence(runtime, path!);
   const label = available ? compositionNodeLabel(runtime, path ?? []) : 'Unavailable component';
   if (!hasComponent) return null;
