@@ -51,7 +51,7 @@ try{
  report.checks.push('64 simultaneous animation bindings and all base values survive save/reopen');
  const controls=Object.fromEntries(Array.from({length:64},(_,i)=>[i?'control'+i:'intensity',{type:'number',label:`Component control ${i+1}`,group:`Motion ${Math.floor(i/8)+1}`,min:0,max:1,default:.5}]));
  let component=await readFile(join(root,'library/components/93a7215f-4df1-4e1e-9d34-3f7f0f27ad84/revisions/1/source/component.ts'),'utf8');
- component=component.replace(/    controls: \{[\s\S]*?\n    lifecycle:/,`    controls:${JSON.stringify(controls)},\n    controlDescriptions:${JSON.stringify(Object.fromEntries(Object.keys(controls).map(id=>[id,'Live value'])))},\n    lifecycle:`).replace('frame.controls.intensity','frame.controls.control63');
+ component=component.replace(/    controls: \{[\s\S]*?\n    lifecycle:/,`    controls:${JSON.stringify(controls)},\n    controlDescriptions:${JSON.stringify(Object.fromEntries(Object.keys(controls).map(id=>[id,'Live value'])))},\n    lifecycle:`).replace('frame.controls.intensity','frame.controls.control63').replace('IcosahedronGeometry(1, 24)','IcosahedronGeometry(1, 4)');
  const nodeId='11111111-1111-4111-8111-111111111111',expose=Object.keys(controls).map(id=>({id,nodeId,controlId:id}));
  const composition=`import {defineComposition} from '@lux/visual-sdk';import ball from './ball.ts';export default defineComposition({definitions:{ball},nodes:[{id:'${nodeId}',definition:'ball'}],edges:[],output:{nodeId:'${nodeId}',portId:'image'},expose:${JSON.stringify(expose)}});`;
  current=await call('read');await call('build',{source:{sdkVersion:'0.4.0',entry:'composition.ts',files:{'composition.ts':composition,'ball.ts':component}},expectedDraftVersion:current.draftVersion});
