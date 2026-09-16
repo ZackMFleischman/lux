@@ -85,6 +85,50 @@ test('RTL: code-defined controls expose independent values, numeric entry and de
   assert.deepEqual((fixture.calls[1] as any).input.values, { spikeHeight: 1 });
 });
 
+test('RTL: a flat control can add the strict shared-audio binding',async()=>{
+  const fixture=service(),priorAnimationFrame=globalThis.requestAnimationFrame,user=userEvent.setup({document});
+  globalThis.requestAnimationFrame=callback=>{callback(0);return 0;};
+  try{
+    render(<StudioApp client={fixture.client} nowMs={1000}/>);
+    fireEvent.click(screen.getByRole('button',{name:'Animate Intensity'}));
+    fireEvent.click(screen.getByRole('button',{name:'Add Audio'}));
+    await waitFor(()=>assert.equal(fixture.calls[0]?.name,'lux.node.animation.set'));
+    const operation=fixture.calls[0];
+    if(operation?.name!=='lux.node.animation.set')assert.fail('expected animation write');
+    assert.deepEqual(operation.input.animation,{kind:'audio',nodePath:[],definitionHash:operation.input.expectedControlSchemaHash,
+      schemaHash:operation.input.expectedControlSchemaHash,controlId:'intensity',source:{kind:'audio-band',logicalInputId:'primary-audio',band:'bass',
+        analyzer:{version:1,fftSize:2048,minDecibels:-100,maxDecibels:-30}},amount:.1,attackMs:50,releaseMs:400,enabled:true});
+    await user.click(screen.getByRole('combobox',{name:'Audio band'}));
+    await user.click(screen.getByRole('option',{name:'Highs'}));
+    await waitFor(()=>assert.equal(fixture.calls.length,2));
+    assert.equal((fixture.calls[1] as any).input.animation.source.band,'highs');
+    await user.keyboard('{Escape}');
+    await waitFor(()=>assert.equal(screen.queryByRole('dialog',{name:'Animate Intensity'}),null));
+  }finally{globalThis.requestAnimationFrame=priorAnimationFrame;}
+});
+
+test('RTL: audio configuration changes cancel an in-flight connection and ignore its stale completion',async()=>{
+  const {AudioInputControl}=await import('../../apps/studio/src/audio/AudioInputControl.tsx');
+  let resolveConnect!:()=>void;
+  const calls:string[]=[];
+  const provider={
+    connect:async()=>{calls.push('connect');await new Promise<void>(resolve=>{resolveConnect=resolve;});},
+    disconnect:async()=>{calls.push('disconnect');},dispose:async()=>{},
+    getSnapshot:()=>({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0}),subscribe:()=>()=>{},
+  } as any;
+  const first={logicalInputId:'primary-audio' as const,analyzer:{version:1 as const,fftSize:2048 as const,minDecibels:-100,maxDecibels:-30}};
+  const second={logicalInputId:'primary-audio' as const,analyzer:{version:1 as const,fftSize:2048 as const,minDecibels:-90,maxDecibels:-20}};
+  const view=render(<AudioInputControl provider={provider} onError={()=>{}} configuration={first}/>);
+  fireEvent.click(screen.getByRole('button',{name:'Connect audio'}));
+  await waitFor(()=>assert.deepEqual(calls,['connect']));
+  view.rerender(<CacheProvider value={styleCache}><AudioInputControl provider={provider} onError={()=>{}} configuration={second}/></CacheProvider>);
+  await waitFor(()=>assert.deepEqual(calls,['connect','disconnect']));
+  resolveConnect();
+  await act(async()=>{});
+  assert.ok(screen.getByRole('status',{name:'Audio input status'}));
+  assert.match(screen.getByRole('status').textContent??'',/Disconnected|Unavailable/);
+});
+
 test('RTL: direct component selection edits flat controls and keeps empty-path animation identity', async () => {
   const {useState}=await import('react');
   const {GraphPanel,nodeKey}=await import('../../apps/studio/src/GraphPanel.tsx');

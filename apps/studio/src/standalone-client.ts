@@ -20,6 +20,9 @@ import { createCompositionControlState, prepareCompositionControlState } from '.
 import type { SavedNodeControlSnapshot } from '../../../packages/core/src/scene-document.ts';
 import {validateControlAnimationBindings} from '../../../packages/runtime-contracts/src/control-animation.mjs';
 import type {ControlAnimationBinding,ControlAnimationIssue} from '../../../packages/runtime-contracts/src/control-animation.mjs';
+import {normalizeAudioBandSnapshot} from '../../../packages/runtime-contracts/src/audio-input.mjs';
+import type {AudioBandSnapshot} from '../../../packages/runtime-contracts/src/audio-input.mjs';
+import type {StudioAudioProvider} from './audio/studio-audio-provider.mjs';
 export interface AuthoringApi {
   example(): Promise<SourceBundle>;
   compile(source: SourceBundle): Promise<any>;
@@ -37,7 +40,7 @@ declare global { interface Window { luxAuthoring: AuthoringApi } }
 type RetryPolicy={lastFaultAt:number|null};
 type ReplacementPlaybackIntent={playing:boolean;settling:number;pending:Set<string>;synchronize?:()=>void};
 type Running = { worker: Worker; canvas: HTMLCanvasElement; instanceId: string; generation: number; revisionId: string; performance:PerformanceReceiver;retryPolicy:RetryPolicy;autoRetry:boolean;playback:'playing'|'paused';
-  lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; animations:number; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>>; desiredControls?:ControlValues; desiredNodeControls?:SavedNodeControlSnapshot;desiredControlAnimations?:readonly ControlAnimationBinding[]; };
+  lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; animations:number; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>>; desiredControls?:ControlValues; desiredNodeControls?:SavedNodeControlSnapshot;desiredControlAnimations?:readonly ControlAnimationBinding[];audioInFlight?:AudioBandSnapshot;audioLatest?:AudioBandSnapshot; };
 export class StandaloneClient implements StudioClient, PresentationPort {
   private snapshot: StudioSnapshot = { connection: 'connected', message: 'Open an example or write a visual, then Build & preview.', receivedAtMs: Date.now(), authoring: null, host: null, jobs: [], visualFps: null, uiFps: null };
   private listeners = new Set<() => void>();
@@ -54,10 +57,26 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private api: AuthoringApi;
   private codeDeclaredParameters:boolean;
   private readonly performanceMode:CollectionMode;
-  constructor(api: AuthoringApi, options:{codeDeclaredParameters?:boolean;performanceMode?:CollectionMode}={}) { this.api = api; this.codeDeclaredParameters=options.codeDeclaredParameters===true; this.performanceMode=collectionMode(options.performanceMode); }
+  private readonly audioRuntimes=new Set<Running>();
+  private audioSnapshot:AudioBandSnapshot;
+  constructor(api: AuthoringApi, options:{codeDeclaredParameters?:boolean;performanceMode?:CollectionMode;audioProvider?:Pick<StudioAudioProvider,'getSnapshot'|'subscribe'>}={}) {
+    this.api = api; this.codeDeclaredParameters=options.codeDeclaredParameters===true; this.performanceMode=collectionMode(options.performanceMode);
+    this.audioSnapshot=normalizeAudioBandSnapshot(options.audioProvider?.getSnapshot()??{generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0});
+    options.audioProvider?.subscribe(()=>{
+      this.audioSnapshot=normalizeAudioBandSnapshot(options.audioProvider!.getSnapshot());
+      for(const runtime of this.audioRuntimes)this.queueAudio(runtime,this.audioSnapshot);
+    });
+  }
   getSnapshot = () => this.snapshot;
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
   private publish(patch: Partial<StudioSnapshot>) { this.snapshot = { ...this.snapshot, ...patch, receivedAtMs: Date.now() }; for (const listener of this.listeners) listener(); }
+  private queueAudio(runtime:Running,snapshot:AudioBandSnapshot){
+    if(runtime.terminal)return;
+    if(runtime.audioInFlight){runtime.audioLatest=snapshot;return;}
+    runtime.audioInFlight=snapshot;
+    try{runtime.worker.postMessage({type:'audio',instanceId:runtime.instanceId,generation:runtime.generation,audioSnapshot:snapshot});}
+    catch(error){runtime.audioInFlight=undefined;runtime.audioLatest=undefined;if(runtime===this.running)this.fault(runtime,String(error));else this.stop(runtime,String(error));}
+  }
   private settleReplacementCommand(requestId:string) {
     const replacement=this.replacementPlayback;
     if(!replacement?.pending.delete(requestId))return;
@@ -151,6 +170,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     const candidate: Running = { worker, canvas, instanceId: this.running?.instanceId ?? crypto.randomUUID(), generation: ++this.generation,
       revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0,animations:0,state,output,performance:undefined as any,retryPolicy,autoRetry:false,playback:playing?'playing':'paused' };
     candidate.performance=new PerformanceReceiver({instanceId:candidate.instanceId,generation:candidate.generation,revisionId},performance.now());
+    this.audioRuntimes.add(candidate);
     const previous = this.running;
     let ready = false,initialized=false,latestStatus:any;
     let synchronization:Readonly<{requestId:string;kind:'controls'|'animations'|'playback';animationSourceSequence?:number;animationSequence?:number;expectedControlAnimations?:readonly ControlAnimationBinding[]}>|undefined;
@@ -229,6 +249,14 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           if (candidate.terminal || message?.instanceId !== candidate.instanceId || message.generation !== candidate.generation || message.revisionId !== candidate.revisionId) return;
           if(message.type==='performance') {
             if(this.running===candidate&&candidate.performance.receive(message.summary,performance.now()))this.publish({performance:candidate.performance.snapshot});
+            return;
+          }
+          if(message.type==='audio-ack'){
+            const current=candidate.audioInFlight;
+            if(!current||message.providerGeneration!==current.generation||message.sampleSequence!==current.sequence)return;
+            candidate.audioInFlight=undefined;
+            const latest=candidate.audioLatest;candidate.audioLatest=undefined;
+            if(latest)this.queueAudio(candidate,latest);
             return;
           }
           if (message.type === 'failure') { fail(String(message.message)); return; }
@@ -322,7 +350,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
         };
         const offscreen = canvas.transferControlToOffscreen();
         worker.postMessage({ type: 'init', requestId: crypto.randomUUID(), instanceId: candidate.instanceId, generation: candidate.generation,
-          revisionId, linked: structuredClone(linked), canvas: offscreen,...state,settings: {...DEFAULT_OUTPUT,...output}, playing, performanceMode:this.performanceMode }, [offscreen]);
+          revisionId, linked: structuredClone(linked), canvas: offscreen,...state,audioSnapshot:this.audioSnapshot,settings: {...DEFAULT_OUTPUT,...output}, playing, performanceMode:this.performanceMode }, [offscreen]);
       });
     } catch (error) { this.stop(candidate, String(error)); canvas.remove(); throw error; }
     finally{if(playbackIntent?.synchronize===synchronizeCandidate)playbackIntent.synchronize=undefined;}
@@ -331,6 +359,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     if(runtime===this.running){this.cancelAutomaticRetry();runtime.autoRetry=false;}
     if (runtime.terminal) return;
     runtime.terminal = true;
+    this.audioRuntimes.delete(runtime);runtime.audioInFlight=undefined;runtime.audioLatest=undefined;
     clearInterval(runtime.watchdog); clearTimeout(runtime.activationTimer); runtime.worker.onmessage = null; runtime.worker.onerror = null;
     runtime.worker.terminate(); // Requests browser termination; not native/GPU stop acknowledgement.
     for (const [id, wait] of this.pending) if (wait.runtime === runtime) { clearTimeout(wait.timer); this.pending.delete(id);this.settleReplacementCommand(id);wait.reject(Error(message)); }

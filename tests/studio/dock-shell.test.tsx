@@ -480,7 +480,7 @@ test('Graph keeps Scene available for plain visuals and compositions', async () 
   const selections: unknown[] = [];
   const { unmount } = render(<GraphPanel runtime={{ sceneName: 'Plain visual' } as any} selected={null} onSelect={path => selections.push(path)} />);
   assert.ok(within(screen.getByRole('navigation', { name: 'Component breadcrumb' })).getByRole('button', { name: 'Scene' }));
-  assert.equal(document.querySelectorAll('.graph-node').length, 1);
+  assert.equal(document.querySelectorAll('.graph-node').length, 2,'plain visual graph includes Scene and its visual source occurrence');
   assert.ok(screen.getByRole('button', { name: 'Scene' }));
   assert.equal(screen.queryByRole('button', { name: 'View inside' }), null);
   await act(async () => { fireEvent.click(document.querySelector<HTMLButtonElement>('.graph-scene-root')!); });

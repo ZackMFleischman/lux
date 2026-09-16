@@ -26,6 +26,17 @@ test('session reads, builds and saves a complete isolated draft', async () => {
   assert.equal(w.getSnapshot().dirty, false);
   assert.equal(session.getSnapshot().name, 'test.lux-scene');
 });
+test('path save and reopen preserve the accepted preview resolution',async()=>{
+  const output={width:640,height:360,fps:60,seed:0},accepted=createSceneDocument(source(),output,{intensity:.4});
+  const w=createSourceWorkspace(source());let saved:any,submitted:any;
+  const session=createAuthoringSession(w,{submit:async(_source,options)=>{submitted=options;},save:async()=>null,
+    savePath:async request=>{saved=request.document;return {token:'saved',name:'audio.lux-scene'};},
+    openPath:async()=>({token:'opened',name:'audio.lux-scene',document:saved}),acceptedDocument:()=>accepted,getOutput:()=>output,getControls:()=>({intensity:.4})});
+  await session.savePath('audio.lux-scene',session.read().draftVersion,false);
+  assert.deepEqual(saved.settings,output);
+  await session.openPath('audio.lux-scene',session.read().draftVersion);
+  assert.deepEqual(submitted.output,output);
+});
 test('cancelled/failed saves preserve dirty and an in-flight save excludes open/build/save', async () => {
   const w = createSourceWorkspace(source()); w.edit('main.ts', 'draft');
   let release!: (result: any) => void, opened = false;

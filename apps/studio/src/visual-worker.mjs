@@ -109,6 +109,7 @@ async function initialize(message) {
       !Number.isInteger(settings.seed) || settings.seed < 0 || settings.seed > 0xffffffff) throw Error('Unsupported output settings');
   const prepared=await prepareAuthoredModule(message);
   controlState=prepared.admission.kind==='composition'?await prepareWorkerCompositionState(message,prepared.admission):await prepareWorkerControlState(message,prepared.admission);
+  controlState.applyAudioSnapshot(message.audioSnapshot??{generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0});
   clock = new RuntimeClock(() => performance.now(), 'paused'); random = new SeededRandom(settings.seed);
   /*! lux-worker-liveness-v2: heartbeat starts before authored import/create. */
   let workerHeartbeat=0;
@@ -209,6 +210,9 @@ onmessage = event => {
       controlState.applyAnimations(message.controlAnimations,message.animationSequence,clock.snapshot().timeSeconds);
       if(message.restart)controlState.restartAnimation(message.restart.nodePath,message.restart.controlId,clock.snapshot().timeSeconds);
       await draw(message.requestId,'status');schedule();
+    } else if(message.type==='audio'){
+      controlState.applyAudioSnapshot(message.audioSnapshot);
+      send('audio-ack',{providerGeneration:message.audioSnapshot.generation,sampleSequence:message.audioSnapshot.sequence});
     } else if (message.type === 'playback') {
       if (!['play', 'pause', 'reset'].includes(message.action)) throw Error('Invalid playback command');
       clearTimeout(timer);

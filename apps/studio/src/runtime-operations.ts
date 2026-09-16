@@ -8,8 +8,15 @@ const valuesSchema=z.record(z.number().finite()).refine(values=>Object.keys(valu
 export const parameterInputSchema = z.object({ ...target, expectedRevisionId: z.string().min(1), expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/).optional(),values:valuesSchema, mode: z.literal('live').default('live') }).strict();
 export const playbackInputSchema = z.object({ ...target, action: z.enum(['play', 'pause', 'reset']) }).strict();
 export const nodeParameterInputSchema=parameterInputSchema.extend({nodePath:z.array(nodeIdSchema).min(1).max(16),expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/)});
-const animationBindingSchema=z.object({nodePath:z.array(nodeIdSchema).max(8),definitionHash:z.string().regex(/^[a-f0-9]{64}$/),schemaHash:z.string().regex(/^[a-f0-9]{64}$/),
-  controlId:z.string().min(1).max(64),shape:z.enum(['sine','triangle','saw','square']),periodSeconds:z.number().finite().min(.05).max(3600),amount:z.number().finite().nonnegative(),phase:z.number().finite().min(0).max(1),enabled:z.boolean()}).strict();
+const animationTarget={nodePath:z.array(nodeIdSchema).max(8),definitionHash:z.string().regex(/^[a-f0-9]{64}$/),schemaHash:z.string().regex(/^[a-f0-9]{64}$/),controlId:z.string().min(1).max(64)};
+const animationAmount={amount:z.number().finite().nonnegative(),enabled:z.boolean()};
+const lfoAnimationBindingSchema=z.object({...animationTarget,...animationAmount,shape:z.enum(['sine','triangle','saw','square']),periodSeconds:z.number().finite().min(.05).max(3600),phase:z.number().finite().min(0).max(1)}).strict();
+const audioAnalyzerSchema=z.object({version:z.literal(1),fftSize:z.literal(2048),minDecibels:z.number().finite().min(-120).max(-40),maxDecibels:z.number().finite().min(-80).max(0)}).strict()
+  .refine(analyzer=>analyzer.maxDecibels-analyzer.minDecibels>=10,{message:'Audio analyzer range must span at least 10 decibels'});
+const audioSourceSchema=z.object({kind:z.literal('audio-band'),logicalInputId:z.literal('primary-audio'),band:z.enum(['level','bass','mids','highs']),analyzer:audioAnalyzerSchema}).strict();
+const audioAnimationBindingSchema=z.object({...animationTarget,...animationAmount,kind:z.literal('audio'),source:audioSourceSchema,
+  attackMs:z.number().int().safe().min(0).max(60000),releaseMs:z.number().int().safe().min(0).max(60000)}).strict();
+const animationBindingSchema=z.union([lfoAnimationBindingSchema,audioAnimationBindingSchema]);
 export const nodeAnimationInputSchema=z.object({...target,expectedRevisionId:z.string().min(1),expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/),nodePath:z.array(nodeIdSchema).max(8),controlId:z.string().min(1).max(64),animation:animationBindingSchema.nullable(),restart:z.boolean().optional()}).strict();
 export const restartInputSchema = z.object(target).strict();
 export const previewResizeInputSchema = z.object({ ...target, width: z.number().int().min(1).max(3840), height: z.number().int().min(1).max(2160) }).strict();
