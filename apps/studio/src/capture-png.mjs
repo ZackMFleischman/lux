@@ -1,5 +1,7 @@
 import { encode } from 'fast-png';
 
+const maxCaptureBytes = 40 * 1024 * 1024;
+
 // The pinned WebGPU rgba8unorm-srgb attachment blends in linear light, storing
 // E(P), where P is premultiplied linear RGB. This is NOT premultiplied sRGB.
 // PNG requires E(P / alpha). Compute a bounded lookup before submitted code runs;
@@ -31,6 +33,6 @@ export function encodeCapturedTarget(pixels, width, height) {
   // Encode straight bytes directly. A 2D canvas would quantize through another
   // premultiplied store and can lose color precision at low coverage.
   const png = encode({ width, height, channels: 4, depth: 8, data });
-  if (png.byteLength > 8388608) throw Error('Capture exceeds 8 MiB');
+  if (png.byteLength > maxCaptureBytes) throw Error('Capture exceeds 40 MiB');
   return png;
 }

@@ -25,8 +25,17 @@ import { completeLibraryMutation } from './library/library-mutation.ts';
 import './library-client.ts';
 import './look-client.ts';
 import { LooksDialog } from './LooksDialog.tsx';
+import { PreviewCaptureMenu } from './PreviewCaptureMenu.tsx';
+import { PreviewRecorder } from './preview-recorder.ts';
+import { assertAgentCaptureSize } from './preview-capture-client.ts';
+import type { PreviewRecorderSnapshot } from './preview-recorder.ts';
+import './preview-capture-client.ts';
+import { createRendererSnapshot } from './renderer-snapshot.ts';
 const client = new StandaloneClient(window.luxAuthoring, { codeDeclaredParameters: true });
 const agentStatus = () => ({ ...client.getSnapshot(), capabilities: studioCapabilities });
+const idleRecording = Object.freeze({ phase: 'idle' }) as PreviewRecorderSnapshot;
+const subscribeIdle = () => () => {};
+const getIdleRecording = () => idleRecording;
 export function AuthoringApp() {
   const confirmation = useDiscardConfirmation();
   const windows = useMemo(() => window.luxStudioWindows ? { ...window.luxStudioWindows,
@@ -41,6 +50,13 @@ export function AuthoringApp() {
   const lookOperation = useRef(false);
   const composing = useRef(false);
   const workspace = useMemo(() => createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': '' } }), []);
+  const captureRuntimeView = useMemo(() => createRendererSnapshot(client), []);
+  const runtimeSnapshot = useSyncExternalStore(captureRuntimeView.subscribe, captureRuntimeView.getSnapshot, captureRuntimeView.getSnapshot);
+  const previewRecorder = useMemo(() => window.luxPreviewCapture ? new PreviewRecorder(window.luxPreviewCapture, {
+    onError: reason => setError(reason.message),
+  }) : null, []);
+  const recording = useSyncExternalStore(previewRecorder?.subscribe ?? subscribeIdle, previewRecorder?.getSnapshot ?? getIdleRecording);
+  const recordingRuntime = useRef<string | null>(null);
   const session = useMemo(() => createAuthoringSession(workspace, {
     submit: (source, options) => client.submit(source, options), save: request => window.luxAuthoring.save(request), savePath: request => {if(!window.luxAuthoring.savePath)throw Error('Path save is unavailable');return window.luxAuthoring.savePath(request);}, open: () => window.luxAuthoring.open(), openPath: path => {if(!window.luxAuthoring.openPath)throw Error('Path open is unavailable');return window.luxAuthoring.openPath(path);},
     export: request => window.luxExport.create(request),
@@ -106,6 +122,7 @@ export function AuthoringApp() {
     if (command.method === 'read') return { ...session.read(), status: agentStatus() };
     if (command.method === 'capture') {
       const capture = await client.capture(), bytes = new Uint8Array(capture.bytes);
+      assertAgentCaptureSize(capture.bytes);
       let binary = ''; for (let i = 0; i < bytes.length; i += 8192) binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
       return { base64: btoa(binary), metadata: capture.metadata };
     }
@@ -129,6 +146,13 @@ export function AuthoringApp() {
     void confirmation.confirm('close').then(discard => window.luxConfirmation!.reply(id, discard)).catch(reason => setError(String(reason)));
   }), [confirmation.confirm]);
   useEffect(() => { void window.luxAuthoring.dirty(dirty); }, [dirty]);
+  const runtime = runtimeSnapshot.authoring;
+  const runtimeKey = runtime ? `${runtime.instanceId}:${runtime.generation}:${runtime.output.width}x${runtime.output.height}` : null;
+  useEffect(() => {
+    if (recording.phase === 'idle' || recordingRuntime.current === runtimeKey) return;
+    void previewRecorder?.stop().catch(reason => setError(String(reason))).finally(() => { recordingRuntime.current = null; });
+  }, [runtimeKey, recording.phase, previewRecorder]);
+  useEffect(() => () => { void previewRecorder?.cancel(); }, [previewRecorder]);
   useEffect(() => {
     const signature = () => runtimeEditSignature(client.getSnapshot().authoring);
     let value = signature();
@@ -172,6 +196,42 @@ export function AuthoringApp() {
     setError('');
     try { if (await session.open()) clearDiagnostics(); } catch (reason) { const current = workspace.getSnapshot(); reportError(reason, current.version, current.source); }
   }
+  async function savePreviewFrame() {
+    const captureApi = window.luxPreviewCapture, target = client.getSnapshot().authoring;
+    if (!captureApi || !target || target.playback === 'failed') throw Error('A working preview is required');
+    setError('');
+    try {
+      const capture = await client.capture(), metadata = capture.metadata;
+      if (metadata.instanceId !== target.instanceId || metadata.generation !== target.generation ||
+          metadata.width !== target.output.width || metadata.height !== target.output.height) throw Error('Preview changed before the frame could be saved');
+      await captureApi.saveFrame(capture.bytes);
+    } catch (reason) { setError(String(reason)); }
+  }
+  async function startPreviewRecording() {
+    const target = client.getSnapshot().authoring;
+    if (!previewRecorder || !target || target.playback === 'failed') { setError('A working preview is required'); return; }
+    const canvas = document.querySelector<HTMLCanvasElement>('.preview-surface canvas');
+    if (!canvas) { setError('Preview output canvas is unavailable'); return; }
+    setError('');
+    const targetKey = `${target.instanceId}:${target.generation}:${target.output.width}x${target.output.height}`;
+    // Publish can synchronously render the recording state. Install its identity
+    // guard first so that render cannot mistake startup for runtime replacement.
+    recordingRuntime.current = targetKey;
+    try {
+      if (!await previewRecorder.start(canvas, target.output, () => {
+        const current = client.getSnapshot().authoring;
+        return !!current && current.playback !== 'failed' &&
+          `${current.instanceId}:${current.generation}:${current.output.width}x${current.output.height}` === targetKey &&
+          document.querySelector<HTMLCanvasElement>('.preview-surface canvas') === canvas;
+      })) recordingRuntime.current = null;
+    } catch (reason) { recordingRuntime.current = null; setError(String(reason)); }
+  }
+  async function stopPreviewRecording() {
+    setError('');
+    try { await previewRecorder?.stop(); }
+    catch (reason) { setError(String(reason)); }
+    finally { recordingRuntime.current = null; }
+  }
   async function withLookOperation<T>(operation: () => Promise<T>) {
     if (lookOperation.current || session.getSnapshot().busy || workspace.getSnapshot().busy) throw Error('Studio is busy');
     lookOperation.current = true;
@@ -210,14 +270,18 @@ export function AuthoringApp() {
       await session.loadLook(id); clearDiagnostics(); setError(''); return true;
     });
   }
-  const fileMenu = <StudioMenu label="File" buttonRef={fileSummary} className="file-tools">
-    <MenuItem disabled={busy} onClick={() => void open()}>Open</MenuItem>
-    <MenuItem disabled={busy} onClick={() => void save()}>Save</MenuItem>
-    <MenuItem disabled={busy} onClick={() => void save(true)}>Save as</MenuItem>
-    <MenuItem disabled={busy} onClick={() => setLooksOpen(true)}>Looks…</MenuItem>
-    <MenuItem disabled={busy || composing.current || !!window.luxExport?.unavailableReason} title={window.luxExport?.unavailableReason} onClick={() => setExportOpen(true)}>
-      Export for Resolume{window.luxExport?.unavailableReason ? ' (not included)' : ''}</MenuItem>
-  </StudioMenu>;
+  const fileMenu = <>
+    <StudioMenu label="File" buttonRef={fileSummary} className="file-tools">
+      <MenuItem disabled={busy} onClick={() => void open()}>Open</MenuItem>
+      <MenuItem disabled={busy} onClick={() => void save()}>Save</MenuItem>
+      <MenuItem disabled={busy} onClick={() => void save(true)}>Save as</MenuItem>
+      <MenuItem disabled={busy} onClick={() => setLooksOpen(true)}>Looks…</MenuItem>
+      <MenuItem disabled={busy || composing.current || !!window.luxExport?.unavailableReason} title={window.luxExport?.unavailableReason} onClick={() => setExportOpen(true)}>
+        Export for Resolume{window.luxExport?.unavailableReason ? ' (not included)' : ''}</MenuItem>
+    </StudioMenu>
+    <PreviewCaptureMenu available={!!previewRecorder && !!runtime && runtime.playback !== 'failed'} status={recording}
+      onSaveFrame={savePreviewFrame} onStart={startPreviewRecording} onStop={stopPreviewRecording} />
+  </>;
   const commands = <>
     <span className="document-name" title={io.name}><span className="document-label">Scene</span><span className="document-title">{io.name}</span>{dirty && <span aria-label="Unsaved changes"> *</span>}</span>
     <Button className="studio-build-button" variant="outlined" color="inherit" disabled={busy} aria-label="Build" aria-busy={busy} title="Build preview (Ctrl/Cmd+S in source)" onClick={() => void build()}>
