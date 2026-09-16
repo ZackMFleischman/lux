@@ -35,3 +35,11 @@ ink=(width,accent,handDrawn,grain). Bold near-black visible boundaries, optional
 New `ornament-renderer.ts`, metadata key `lux/ornament-region-styles`, label `Ornament Region Styles`. Inputs regions,watercolor,boundary,phrasing with exact above ABIs; image output; no duplicate controls. Assemble stable helper strings once and reject contract changes for the component instance. Update existing uniforms from values each frame. Use one paint pass. Main function first (wgslFn entry), helpers afterward. Keep actual shader readable.
 
 New `ornament-composition.ts` uses four existing producers and the new renderer: five nodes, independent of the count fix. Expose useful new shape/ink controls plus palette/material/clock controls with organized inherited groups. Use stable UUIDs. No tracers or pattern detail in this batch. Source Library bundles must include helper files imported by their provider. New visual saved separately.
+
+## Independent motif fields (LUX-172)
+
+Six fields use `lux/ornament-spirals/v1`, `lux/ornament-rings/v1`, `lux/ornament-membranes/v1`, `lux/ornament-contours/v1`, `lux/ornament-hatching/v1`, and `lux/ornament-ribbons/v1`. Each supplies fragments `{helpers}` and values `{density,width,variation,motion}`. Values are multipliers, all defaulting to1. The renderer multiplies its global pattern settings by each field, preserving the prototype defaults while allowing independent family controls.
+
+Each helper defines one entry (`loSpirals`, `loRings`, `loMembranes`, `loContours`, `loHatchMarks`, or `loRibbonMarks`) with `(r:LoRegion,p:vec2f,t:f32,settings:vec4f)->f32`, returning ink coverage. The host supplies LoRegion and deterministic noise functions. Region local/tangent share an attached frame; curved ribbons use intrinsic longitudinal position and signed transverse distance. Internal helper symbols are unique per field.
+
+The five new providers output `pattern`; existing Region Hatching adds `ornament` while preserving its original `field`. All six are data-only graph nodes; the renderer still uses one paint pass. The scene has11 nodes. Existing self-contained Pattern Prototype remains the saved pre-extraction version; renderer Library history retains its former inline-helper source.

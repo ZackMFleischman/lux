@@ -4,13 +4,25 @@ import watercolor from './watercolor.ts';
 import boundary from './boundary.ts';
 import phrasing from './phrasing.ts';
 import renderer from './ornament-renderer.ts';
+import spirals from './spirals.ts';
+import rings from './rings.ts';
+import membranes from './membranes.ts';
+import contours from './contours.ts';
+import hatching from './hatching.ts';
+import ribbons from './ribbons.ts';
 
 // The existing producers retain their original painting outputs. This companion
-// visual connects only their ornament fields and needs five executable nodes.
+// visual connects their ornament fields and six independent motif providers.
 export default defineComposition({
   label: 'Living Ornament',
-  definitions: { regions, watercolor, boundary, phrasing, renderer },
+  definitions: { regions, watercolor, boundary, phrasing, renderer, spirals, rings, membranes, contours, hatching, ribbons },
   nodes: [
+    { id: 'd1720000-63ac-49c7-8ad7-8cf6458b5101', definition: 'spirals' },
+    { id: 'd1720000-63ac-49c7-8ad7-8cf6458b5102', definition: 'rings' },
+    { id: 'd1720000-63ac-49c7-8ad7-8cf6458b5103', definition: 'membranes' },
+    { id: 'd1720000-63ac-49c7-8ad7-8cf6458b5104', definition: 'contours' },
+    { id: 'd1720000-63ac-49c7-8ad7-8cf6458b5105', definition: 'hatching' },
+    { id: 'd1720000-63ac-49c7-8ad7-8cf6458b5106', definition: 'ribbons' },
     { id: 'd1710000-63ac-49c7-8ad7-8cf6458b5101', definition: 'regions' },
     { id: 'd1710000-63ac-49c7-8ad7-8cf6458b5102', definition: 'watercolor' },
     { id: 'd1710000-63ac-49c7-8ad7-8cf6458b5103', definition: 'boundary' },
@@ -18,6 +30,12 @@ export default defineComposition({
     { id: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', definition: 'renderer' },
   ],
   edges: [
+    { id: 'd1721000-63ac-49c7-8ad7-8cf6458b5101', from: { nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5101', portId: 'pattern' }, to: { nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', portId: 'spirals' }, delay: 'none' },
+    { id: 'd1721000-63ac-49c7-8ad7-8cf6458b5102', from: { nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5102', portId: 'pattern' }, to: { nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', portId: 'rings' }, delay: 'none' },
+    { id: 'd1721000-63ac-49c7-8ad7-8cf6458b5103', from: { nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5103', portId: 'pattern' }, to: { nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', portId: 'membranes' }, delay: 'none' },
+    { id: 'd1721000-63ac-49c7-8ad7-8cf6458b5104', from: { nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5104', portId: 'pattern' }, to: { nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', portId: 'contours' }, delay: 'none' },
+    { id: 'd1721000-63ac-49c7-8ad7-8cf6458b5105', from: { nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5105', portId: 'ornament' }, to: { nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', portId: 'hatching' }, delay: 'none' },
+    { id: 'd1721000-63ac-49c7-8ad7-8cf6458b5106', from: { nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5106', portId: 'pattern' }, to: { nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', portId: 'ribbons' }, delay: 'none' },
     { id: 'd1711000-63ac-49c7-8ad7-8cf6458b5101', from: { nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5101', portId: 'ornament' }, to: { nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', portId: 'regions' }, delay: 'none' },
     { id: 'd1711000-63ac-49c7-8ad7-8cf6458b5102', from: { nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5102', portId: 'ornament' }, to: { nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', portId: 'watercolor' }, delay: 'none' },
     { id: 'd1711000-63ac-49c7-8ad7-8cf6458b5103', from: { nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5103', portId: 'ornament' }, to: { nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', portId: 'boundary' }, delay: 'none' },
@@ -25,6 +43,18 @@ export default defineComposition({
   ],
   output: { nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', portId: 'image' },
   expose: [
+    { id: 'spiralsDensity', nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5101', controlId: 'density' },
+    { id: 'spiralsWidth', nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5101', controlId: 'width' },
+    { id: 'ringsDensity', nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5102', controlId: 'density' },
+    { id: 'ringsWidth', nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5102', controlId: 'width' },
+    { id: 'membranesDensity', nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5103', controlId: 'density' },
+    { id: 'membranesWidth', nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5103', controlId: 'width' },
+    { id: 'contoursDensity', nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5104', controlId: 'density' },
+    { id: 'contoursWidth', nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5104', controlId: 'width' },
+    { id: 'hatchingDensity', nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5105', controlId: 'ornamentDensity' },
+    { id: 'hatchingWidth', nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5105', controlId: 'ornamentWidth' },
+    { id: 'ribbonsDensity', nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5106', controlId: 'density' },
+    { id: 'ribbonsWidth', nodeId: 'd1720000-63ac-49c7-8ad7-8cf6458b5106', controlId: 'width' },
     { id: 'patternDensity', nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', controlId: 'patternDensity' },
     { id: 'patternWidth', nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', controlId: 'patternWidth' },
     { id: 'patternVariation', nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', controlId: 'patternVariation' },
