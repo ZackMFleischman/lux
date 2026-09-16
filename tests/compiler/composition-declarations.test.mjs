@@ -5,6 +5,17 @@ import {createHash} from 'node:crypto';
 import {extractCompositionDeclaration} from '../../apps/build-worker/src/composition-declarations.mjs';
 import {compositionSourceBundle,nestedCompositionSourceBundle,ballId,kaleidoscopeAId,kaleidoscopeBId,compositeAId,compositeBId,wrapperNodeId,wrappedEffectId,directEffectId} from './composition-fixture.mjs';
 const hash=value=>createHash('sha256').update(value).digest('hex');
+test('composition exposes 64 controls without a cardinality ceiling',()=>{
+ const source=compositionSourceBundle();
+ const controls=Object.fromEntries(Array.from({length:64},(_,i)=>[`control${i}`,{type:'number',label:`Control ${i}`,default:0,min:0,max:1}]));
+ source.files['ball.ts']=source.files['ball.ts'].replace(/controls:\{[\s\S]*?,lifecycle:/,`controls:${JSON.stringify(controls)},controlDescriptions:${JSON.stringify(Object.fromEntries(Object.keys(controls).map(id=>[id,'Value'])))},lifecycle:`);
+ const exposed=Array.from({length:64},(_,i)=>`{id:'control${i}',nodeId:'${ballId}',controlId:'control${i}'}`).join(',');
+ source.files['composition.ts']=source.files['composition.ts'].replace(/expose:\[[\s\S]*?\]\}\);/,`expose:[${exposed}]});`);
+ const asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));
+ const profile=extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash});
+ assert.equal(profile.publicControls.length,64);
+ assert.equal(profile.declaration.expose.length,64);
+});
 test('static composition extraction derives canonical controls and distinct same-named leaf bindings without executing source',()=>{
  const source=compositionSourceBundle(),asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));
  const profile=extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash});
