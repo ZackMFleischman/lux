@@ -418,6 +418,7 @@ test('Graph wheel zoom anchors at the pointer and background gestures keep selec
   const selections: unknown[] = [];
   render(<GraphPanel runtime={{ composition } as any} selected={'["selected"]'} onSelect={path => selections.push(path)} />);
   const viewport = screen.getByLabelText('Graph canvas');
+  assert.equal(screen.queryByText(/Select Scene or a node for its controls/), null, 'Graph keeps navigation controls without instructional footer copy');
   viewport.getBoundingClientRect = () => ({ x: 100, y: 50, left: 100, top: 50, right: 700, bottom: 350, width: 600, height: 300, toJSON() {} });
   let captured: number | null = null;
   viewport.setPointerCapture = id => { captured = id; };

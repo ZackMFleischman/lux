@@ -27,3 +27,17 @@ Five field-producing nodes feed the final Styles renderer. Together with Tracer 
 Deterministic QA freezes visual time and replays tracer generation at 60 Hz in an isolated real Studio instance. It does not alter production shader math. Full-resolution captures are compared numerically and inspected alongside the actual Studio window. Normal playback, Library readback, save/reopen and failed-edit preservation are also checked.
 
 The original saved scenes remain separate. Each publication creates a new saved scene. An older running installed app is preserved; new resources require a current Studio build.
+
+## Completed extraction
+
+All eight leaves are independently published: Tracer Paths, Tracer Renderer,
+Organic Regions, Region Hatching, Animated Watercolor, Organic Boundary Ink,
+Composition Phrasing, and Region Styles & Split Transitions. The optional tracer
+wrapper stores wiring and pinned references, not duplicated implementations.
+
+See [the reuse guide](living-painting-reuse.md) for wiring and editing. The final
+saved scene is `Living Painting - Reusable Components.lux-scene`; each earlier
+milestone also has its own saved scene. Each extraction preserves the original
+18,522-byte painting shader and matching 18s/42s rendered checkpoints. Actual
+Studio publication checks include normal motion, Library source readback, save,
+reopen, and preservation of the accepted preview after an invalid edit.

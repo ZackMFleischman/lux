@@ -157,6 +157,7 @@ test('Library shader-field consumers retain typed resource diagnostics',async()=
   await assert.rejects(validateLibraryCandidate(source,compileForLibrary),/texture.*ShaderFieldResource|ShaderFieldResource.*texture/i);
 });
 test('Library shader-field producers reject fabricated unbranded resources',async()=>{
-  const source=fieldLeaf();source.files[source.entry]=source.files[source.entry]!.replace("context.shaderField('paths',{version:1,abi:'lux/test-field/v1',fragments:{body:'let field = 1.0;'},values:{scale:1}})","{data:{version:1,abi:'lux/test-field/v1',fragments:{},values:{}}}");
+  // Keep the brand diagnostic explicit even when defineComponent has graph overloads.
+  const source=fieldLeaf();source.files[source.entry]=source.files[source.entry]!.replace('{defineComponent}', '{defineComponent, type ShaderFieldResource}').replace("context.shaderField('paths',{version:1,abi:'lux/test-field/v1',fragments:{body:'let field = 1.0;'},values:{scale:1}})","({data:{version:1,abi:'lux/test-field/v1',fragments:{},values:{}}} satisfies ShaderFieldResource)");
   await assert.rejects(validateLibraryCandidate(source,compileForLibrary),/shaderFieldResourceBrand|ShaderFieldResource/i);
 });

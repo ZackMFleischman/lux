@@ -7,7 +7,6 @@ import { studioTheme } from './theme.ts';
 import { getRuntimeControlState, runtimeEditSignature } from './service-client.ts';
 import { StandaloneClient } from './standalone-client.ts';
 import { DEFAULT_OUTPUT } from '../../../packages/runtime-contracts/src/index.ts';
-import { createSceneDocument } from '../../../packages/core/src/scene-document.ts';
 import type { SourceBundle } from '../../../packages/runtime-contracts/src/index.ts';
 import { dispatchRuntimeCommand } from './runtime-operations.ts';
 import { createSourceWorkspace } from './source/workspace.ts';
@@ -174,26 +173,27 @@ export function AuthoringApp() {
     // Do not overwrite a draft edited while the initial example was loading.
     if (workspace.getSnapshot().version !== 0 || session.getSnapshot().busy) return;
     workspace.replaceDocument(source);
-    let smoke=false;
+    const smoke=await window.luxAuthoring.smokeEnabled?.()===true;
     try {
       await session.build(source, workspace.getSnapshot().version);
       clearDiagnostics();
-      smoke=await window.luxAuthoring.smokeEnabled?.()===true;
       if(smoke){
         const initial = client.getSnapshot().authoring!;
         await client.invoke({ name: 'lux.parameters.set', input: { requestId: crypto.randomUUID(), instanceId: initial.instanceId,
-          expectedGeneration: initial.generation, expectedRevisionId: initial.revisionId, values: { intensity: 0.8 }, mode: 'live' } });
+          expectedGeneration: initial.generation, expectedRevisionId: initial.revisionId, expectedControlSchemaHash: initial.controlSchemaHash,
+          values: { spikeHeight: 1.1 }, mode: 'live' } });
         await client.invoke({ name: 'lux.playback', input: { requestId: crypto.randomUUID(), instanceId: initial.instanceId, expectedGeneration: initial.generation, action: 'pause' } });
         await client.invoke({ name: 'lux.playback', input: { requestId: crypto.randomUUID(), instanceId: initial.instanceId, expectedGeneration: initial.generation, action: 'reset' } });
         const applied = client.getSnapshot().authoring!;
-        if (applied.intensity !== 0.8 || applied.playback !== 'paused' || applied.clockEpoch !== 1) throw Error('Applied control/playback/reset mismatch');
+        if (getRuntimeControlState(applied).controls.spikeHeight !== 1.1 || applied.playback !== 'paused' || applied.clockEpoch !== 1) throw Error('Applied control/playback/reset mismatch');
         let invalidRejected = false;
         try { await client.submit({ ...source, files: { [source.entry]: 'this is not valid TypeScript !!' } }); } catch { invalidRejected = true; }
         if (!invalidRejected || client.getSnapshot().authoring?.revisionId !== initial.revisionId) throw Error('Failed source changed active visual');
         const capture = await client.capture();
-        const roundtrip = await window.luxAuthoring.smokeSave(createSceneDocument(source, DEFAULT_OUTPUT, { intensity: applied.intensity }));
+        const saved = client.acceptedDocument();
+        const roundtrip = await window.luxAuthoring.smokeSave(saved);
         if (roundtrip.document.source.entry !== source.entry || roundtrip.document.source.sdkVersion !== source.sdkVersion ||
-            roundtrip.document.source.files[source.entry] !== source.files[source.entry] || ('intensity' in roundtrip.document.controls ? roundtrip.document.controls.intensity : undefined) !== 0.8) throw Error('Save/reopen did not preserve the visual');
+            roundtrip.document.source.files[source.entry] !== source.files[source.entry] || JSON.stringify(roundtrip.document.controls) !== JSON.stringify(saved.controls)) throw Error('Save/reopen did not preserve the visual');
         await new Promise(resolve => setTimeout(resolve, 500));
         await window.luxAuthoring.smokeResult?.({ ok: true, initial, applied, invalidRejected, capture, savedAndReopened: true });
       }
