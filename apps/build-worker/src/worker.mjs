@@ -83,14 +83,18 @@ async function main() {
   const sdk = await readFile(join(root, 'packages/visual-sdk/src', selectedSdk), 'utf8');
   const shared = await readFile(join(root, 'packages/runtime-contracts/src/index.ts'), 'utf8');
   await writeFile(join(workspace, 'types/sdk.ts'), sdk.replace('../../runtime-contracts/src/index.ts', './shared.ts')
-    .replaceAll('../../runtime-contracts/src/parameters.mjs', './parameters.js').replaceAll('../../runtime-contracts/src/components.mjs', './components.js'));
+    .replaceAll('../../runtime-contracts/src/parameters.mjs', './parameters.js').replaceAll('../../runtime-contracts/src/components.mjs', './components.js')
+    .replaceAll('../../runtime-contracts/src/paths2d.mjs', './paths2d.js'));
   await writeFile(join(workspace, 'types/shared.ts'), shared);
   if (source.sdkVersion !== '0.1.0') {
     // Fixed local type copy: emitted SDK resolves only its sibling virtual JS
     // module. No repo-relative path escapes into generated artifact imports.
     await writeFile(join(workspace, 'types/parameters.d.ts'), await readFile(join(root, 'packages/runtime-contracts/src/parameters.d.mts')));
   }
-  if (component||composition) await writeFile(join(workspace,'types/components.d.ts'), (await readFile(join(root,'packages/runtime-contracts/src/components.d.mts'),'utf8')).replaceAll('./parameters.mjs','./parameters.js'));
+  if (component||composition) {
+    await writeFile(join(workspace,'types/components.d.ts'), (await readFile(join(root,'packages/runtime-contracts/src/components.d.mts'),'utf8')).replaceAll('./parameters.mjs','./parameters.js').replaceAll('./paths2d.mjs','./paths2d.js'));
+    await writeFile(join(workspace,'types/paths2d.d.ts'), await readFile(join(root,'packages/runtime-contracts/src/paths2d.d.mts')));
+  }
   const definitionType=composition?'CompositionDefinition':component?'ComponentDefinition':'VisualDefinition';
   await writeFile(join(workspace, '__lux_check.ts'), `import visual from './source/${source.entry}';\nimport type { ${definitionType} } from '@lux/visual-sdk';\nconst checked: ${definitionType} = visual;\nexport { checked };\n`);
   const zod = JSON.parse(await readFile(join(dependencyRoot, 'zod/package.json'), 'utf8'));
@@ -129,7 +133,7 @@ async function main() {
   const dependencies = {
     ...((component||composition) ? Object.fromEntries(['components.mjs','components.d.mts','component-profile.mjs'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
     ...((component||composition) ? {'compiler/component-declarations.mjs':join(root,'apps/build-worker/src/component-declarations.mjs')} : {}),
-    ...(composition ? Object.fromEntries(['composition-profile.mjs','composition-profile.d.mts'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
+    ...(composition ? Object.fromEntries(['composition-profile.mjs','composition-profile.d.mts','paths2d.mjs','paths2d.d.mts'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
     ...(composition ? {'compiler/composition-declarations.mjs':join(root,'apps/build-worker/src/composition-declarations.mjs')} : {}),
     ...(composition ? {
       'runtime/nested-validate.ts':join(root,'packages/runtime/src/graph/nested-validate.ts'),
@@ -170,7 +174,7 @@ async function main() {
   const assetFields = version === 1 ? {} : { artifactVersion:version, ...await deriveAssets(source.assets ?? {},sha) };
   const parameterFields = version >= 3 ? {controls,controlSchemaHash:sha(canonicalControlSchemaJson(controls))} : {};
   const artifact = artifactBody({ sourceHash: sha(JSON.stringify(source)), entry: source.entry.replace(/\.ts$/, '.js'), modules, sourceMaps,
-    sdkVersion: source.sdkVersion, compilerVersion: pinned.typescript, dependencyHashes, ...assetFields, ...parameterFields, ...(component?{executionModel:'single-image-source-v1',component,componentMetadataHash:sha(canonicalComponentMetadataJson(component))}:{}),...(composition?{executionModel:'image-chain-v1',composition,compositionHash:sha(canonicalImageCompositionJson(composition))}:{}) });
+    sdkVersion: source.sdkVersion, compilerVersion: pinned.typescript, dependencyHashes, ...assetFields, ...parameterFields, ...(component?{executionModel:'single-image-source-v1',component,componentMetadataHash:sha(canonicalComponentMetadataJson(component))}:{}),...(composition?{executionModel:composition.version===1?'image-chain-v1':'typed-image-graph-v1',composition,compositionHash:sha(canonicalImageCompositionJson(composition))}:{}) });
   const result = { ok: true, artifact: { ...artifact, bundleHash: sha(JSON.stringify(artifact)) }, diagnostics: [] };
   assertResultBudgets(result);
   return result;

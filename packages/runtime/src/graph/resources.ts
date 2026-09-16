@@ -2,6 +2,8 @@ import type { GraphRuntimePlan } from './runtime-plan.ts';
 import { readGraphRuntimePlan } from './runtime-plan.ts';
 import type { NodePath } from '../../../runtime-contracts/src/graph.ts';
 import type { NestedExecutionPlan, NestedPlannedNode } from '../../../runtime-contracts/src/nested-graph.ts';
+import { normalizePaths2DSnapshot } from '../../../runtime-contracts/src/paths2d.mjs';
+import type { Paths2DPortDescriptor, Paths2DSnapshot } from '../../../runtime-contracts/src/paths2d.mjs';
 import type { ResourceCounts, ResourceLedger, ResourceReservation } from './resource-accounting.ts';
 import { createResourceLedger, resourceCapacities } from './resource-accounting.ts';
 declare const hostBrand: unique symbol, frameBrand: unique symbol;
@@ -25,6 +27,7 @@ export type ImageDescriptor = Readonly<{
 export type SignalDescriptor = Readonly<{
   kind:'signal'; value:number; unit:string|null; clock:'frame';
 }>;
+export type PathsDescriptor = Paths2DPortDescriptor;
 export type OutputMap = Readonly<Record<string,OutputToken>>;
 export type InputMap = Readonly<Record<string,InputView>>;
 export type BackendImage = Readonly<{
@@ -44,7 +47,9 @@ export type FrameOutput = Readonly<{
 export type CallbackResources = Readonly<{
   readSignal(input:InputView):SignalDescriptor;
   imageDescriptor(input:InputView):ImageDescriptor;
+  readPaths(input:InputView):Paths2DSnapshot;
   signal(portId:string,value:number):OutputToken;
+  paths(portId:string,snapshot:unknown):OutputToken;
   image(portId:string,descriptor:ImageDescriptor,inputs:readonly InputView[]):Promise<OutputToken>;
 }>;
 export type Evaluation = Readonly<{
@@ -82,7 +87,7 @@ type Frame = {host:Host; id:number; epoch:number; retired:boolean; nodes:Map<str
 type Node = {plan:NestedPlannedNode; selected:boolean; complete:boolean; obligations:Obligation[]};
 type Obligation = {reservation?:ResourceReservation; sourceKey:string; sourcePort:string; port:string; allocation?:Allocation; notified:boolean; reads:number};
 type Scope = {host:Host; frame:Frame; node:Node; notified:boolean; finished:boolean; outputs:Map<string,Allocation>; pending:number; settled:Deferred<void>};
-type Allocation = {host:Host; version:number; path:NodePath; port:string; descriptor?:ImageDescriptor|SignalDescriptor; image?:BackendImage; reservation:ResourceReservation; holds:number; attempted:boolean; released:boolean};
+type Allocation = {host:Host; version:number; path:NodePath; port:string; descriptor?:ImageDescriptor|SignalDescriptor|PathsDescriptor; image?:BackendImage; paths?:Paths2DSnapshot; reservation:ResourceReservation; holds:number; attempted:boolean; released:boolean};
 type Output = {host:Host; scope:Scope; port:string; allocation:Allocation};
 type View = {scope:Scope; obligation:Obligation};
 type Cache = {host:Host; released:boolean; allocations:Allocation[]};
@@ -193,19 +198,19 @@ function finishScope(s:Scope):void {
 function getScope(h:Host,token:EvaluationScope):Scope {const s=scopes.get(token);if(!s||s.host!==h)invalid();return s;}
 function getFrame(h:Host,token:ResourceFrame):Frame {const f=frames.get(token);if(!f||f.host!==h)invalid();if(f.retired||h.frame!==f)stale();return f;}
 function currentScope(s:Scope):void {active(s.host);if(s.notified||s.finished||s.host.slot!==s||s.frame.retired||s.host.frame!==s.frame)stale();}
-function input(s:Scope,token:InputView,kind:'image'|'signal'):Obligation {
+function input(s:Scope,token:InputView,kind:'image'|'signal'|'paths2d'):Obligation {
   const view=views.get(token);if(!view||view.scope!==s)invalid();currentScope(s);
   const o=view.obligation;if(!o.allocation||o.allocation.released||o.allocation.descriptor?.kind!==kind)invalid();return o;
 }
-function port(s:Scope,id:string,kind:'image'|'signal') {
+function port(s:Scope,id:string,kind:'image'|'signal'|'paths2d') {
   if(typeof id!=='string')invalid();
   const p=s.host.plan!.definitions[s.node.plan.definitionHash]!.metadata.outputs[id];
   if(!p||p.type.kind!==kind||s.outputs.has(id))invalid();return p.type;
 }
-function allocation(s:Scope,id:string,descriptor:ImageDescriptor|SignalDescriptor,reservation:ResourceReservation,version:number):{a:Allocation;token:OutputToken} {
+function allocation(s:Scope,id:string,descriptor:ImageDescriptor|SignalDescriptor|PathsDescriptor,reservation:ResourceReservation,version:number,paths?:Paths2DSnapshot):{a:Allocation;token:OutputToken} {
   const h=s.host,path=s.node.plan.nodePath;
   const image=descriptor.kind==='image'?Object.freeze({generation:h.profile.generation,clockEpoch:s.frame.epoch,version,nodePath:Object.freeze([...path]),portId:id,descriptor}):undefined;
-  const a:Allocation={host:h,version,path,port:id,descriptor,image,reservation,holds:1,attempted:false,released:false};
+  const a:Allocation={host:h,version,path,port:id,descriptor,image,paths,reservation,holds:1,attempted:false,released:false};
   const token=opaque<OutputToken>();outputs.set(token,{host:h,scope:s,port:id,allocation:a});
   h.version=version;h.allocations.add(a);s.outputs.set(id,a);return {a,token};
 }
@@ -244,10 +249,17 @@ function callbackResources(s:Scope):CallbackResources {
   return Object.freeze({
     readSignal:Object.freeze((view:InputView):SignalDescriptor=>admit(h,()=>input(s,view,'signal').allocation!.descriptor as SignalDescriptor)),
     imageDescriptor:Object.freeze((view:InputView):ImageDescriptor=>admit(h,()=>input(s,view,'image').allocation!.descriptor as ImageDescriptor)),
+    readPaths:Object.freeze((view:InputView):Paths2DSnapshot=>admit(h,()=>input(s,view,'paths2d').allocation!.paths!)),
     signal:Object.freeze((id:string,value:number):OutputToken=>admit(h,marker=>{
       currentScope(s);const type=port(s,id,'signal');if(type.kind!=='signal'||typeof value!=='number'||!Number.isFinite(value))invalid();
       const version=checkedNext(h.version);changed(h,marker);const [reservation]=reserveGroup(h.ledger,['allocations']);
       return allocation(s,id,Object.freeze({kind:'signal',value,unit:type.unit,clock:'frame'}),reservation!,version).token;
+    })),
+    paths:Object.freeze((id:string,value:unknown):OutputToken=>admit(h,marker=>{
+      currentScope(s);const type=port(s,id,'paths2d') as PathsDescriptor;
+      const snapshot=normalizePaths2DSnapshot(value);changed(h,marker);currentScope(s);
+      const version=checkedNext(h.version),[reservation]=reserveGroup(h.ledger,['allocations']);changed(h,marker);
+      return allocation(s,id,type,reservation!,version,snapshot).token;
     })),
     image:Object.freeze((id:string,d:ImageDescriptor,inputs:readonly InputView[])=>issueImage(s,id,d,inputs)),
   });
@@ -358,8 +370,12 @@ export function readResourceInputImage(host:ResourceHost,scope:EvaluationScope,i
 export function readResourceOutputImage(host:ResourceHost,scope:EvaluationScope,outputToken:OutputToken):BackendImage {
   const h=getHost(host),s=getScope(h,scope),o=outputs.get(outputToken);if(!o||o.host!==h||o.scope!==s||!o.allocation.image)invalid();return o.allocation.image;
 }
+/** Trusted scheduler bridge for immutable paths currently owned by this callback. */
+export function readResourceOutputPaths(host:ResourceHost,scope:EvaluationScope,outputToken:OutputToken):Paths2DSnapshot {
+  const h=getHost(host),s=getScope(h,scope),o=outputs.get(outputToken);if(!o||o.host!==h||o.scope!==s||!o.allocation.paths)invalid();return o.allocation.paths;
+}
 function retire(a:Allocation):void {
-  a.released=true;a.host.ledger.release(a.reservation);a.host.allocations.delete(a);a.descriptor=undefined;a.image=undefined;
+  a.released=true;a.host.ledger.release(a.reservation);a.host.allocations.delete(a);a.descriptor=undefined;a.image=undefined;a.paths=undefined;
 }
 function kick(h:Host):void {
   if(h.queued)return;h.queued=true;queueMicrotask(()=>{h.queued=false;drain(h);});

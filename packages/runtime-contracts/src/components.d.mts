@@ -1,8 +1,10 @@
 import type { ControlDeclarations, ControlSchema } from './parameters.mjs';
+import type { Paths2DPortDescriptor } from './paths2d.mjs';
 
 export type InitialPortType =
   | { readonly kind: 'signal'; readonly value: 'number'; readonly unit: string | null; readonly clock: 'frame' }
-  | { readonly kind: 'image'; readonly colorSpace: 'linear-srgb'; readonly alphaMode: 'premultiplied' };
+  | { readonly kind: 'image'; readonly colorSpace: 'linear-srgb'; readonly alphaMode: 'premultiplied' }
+  | Paths2DPortDescriptor;
 export type PortDeclaration = {
   readonly type: InitialPortType; readonly label: string; readonly description: string;
 };

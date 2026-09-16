@@ -36,7 +36,7 @@ export function artifactBody(input) {
   return versioned ? {...body,artifactVersion:2,assets:a.assets,assetSetHash:a.assetSetHash} : body;
 }
 function compositionFields(a){
- if(a.sdkVersion!=='0.4.0'||a.executionModel!=='image-chain-v1')throw violation('Unsupported composition SDK or execution model');requireHash(a.compositionHash);let composition;try{composition=normalizeImageCompositionProfile(a.composition);}catch(error){throw violation(error.message);}if(canonicalControlSchemaJson(composition.publicControls)!==canonicalControlSchemaJson(a.controls))throw violation('Composition control projection mismatch');return {sdkVersion:a.sdkVersion,executionModel:a.executionModel,composition,compositionHash:a.compositionHash,...parameterFields(a)};
+ if(a.sdkVersion!=='0.4.0'||!['image-chain-v1','typed-image-graph-v1'].includes(a.executionModel))throw violation('Unsupported composition SDK or execution model');requireHash(a.compositionHash);let composition;try{composition=normalizeImageCompositionProfile(a.composition);}catch(error){throw violation(error.message);}if(a.executionModel!==(composition.version===1?'image-chain-v1':'typed-image-graph-v1'))throw violation('Composition profile version and execution model mismatch');if(canonicalControlSchemaJson(composition.publicControls)!==canonicalControlSchemaJson(a.controls))throw violation('Composition control projection mismatch');return {sdkVersion:a.sdkVersion,executionModel:a.executionModel,composition,compositionHash:a.compositionHash,...parameterFields(a)};
 }
 function componentFields(a) {
   if(a.sdkVersion!=='0.3.0'||a.executionModel!=='single-image-source-v1')throw violation('Unsupported component SDK or execution model');

@@ -13,7 +13,7 @@ export interface LegacyLinkedEnvelope {code:string;sourceMap:string;bundleHash:s
 export interface AssetLinkedEnvelope extends LegacyLinkedEnvelope {linkedVersion:2;assets:DerivedAssets;assetSetHash:string}
 export interface ParameterLinkedEnvelope extends LegacyLinkedEnvelope {linkedVersion:3;assets:DerivedAssets;assetSetHash:string;controls:ControlSchema;controlSchemaHash:string}
 export interface ComponentLinkedEnvelope extends Omit<ParameterLinkedEnvelope,'linkedVersion'> {linkedVersion:4;sdkVersion:'0.3.0';executionModel:'single-image-source-v1';component:ComponentMetadata;componentMetadataHash:string}
-export interface CompositionLinkedEnvelope extends Omit<ParameterLinkedEnvelope,'linkedVersion'> {linkedVersion:5;sdkVersion:'0.4.0';executionModel:'image-chain-v1';composition:import('../../../packages/runtime-contracts/src/composition-profile.mjs').ImageCompositionProfile;compositionHash:string}
+export interface CompositionLinkedEnvelope extends Omit<ParameterLinkedEnvelope,'linkedVersion'> {linkedVersion:5;sdkVersion:'0.4.0';executionModel:'image-chain-v1'|'typed-image-graph-v1';composition:import('../../../packages/runtime-contracts/src/composition-profile.mjs').ImageCompositionProfile;compositionHash:string}
 export type LinkedEnvelope = LegacyLinkedEnvelope | AssetLinkedEnvelope | ParameterLinkedEnvelope | ComponentLinkedEnvelope | CompositionLinkedEnvelope;
 export type LinkedBody = Omit<LegacyLinkedEnvelope,'linkedHash'> | Omit<AssetLinkedEnvelope,'linkedHash'> | Omit<ParameterLinkedEnvelope,'linkedHash'> | Omit<ComponentLinkedEnvelope,'linkedHash'> | Omit<CompositionLinkedEnvelope,'linkedHash'>;
 /** Canonical body constructors; call verify functions for cryptographic admission. */

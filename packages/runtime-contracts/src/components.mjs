@@ -59,6 +59,11 @@ function portType(input, path) {
     if (raw.colorSpace !== 'linear-srgb' || raw.alphaMode !== 'premultiplied') invalid(path, 'expected linear-srgb premultiplied image');
     return Object.freeze({ kind: 'image', colorSpace: 'linear-srgb', alphaMode: 'premultiplied' });
   }
+  if (raw.kind === 'paths2d') {
+    record(raw, path, ['kind', 'version', 'coordinateSpace']);
+    if (raw.version !== 1 || raw.coordinateSpace !== 'canvas-height') invalid(path, 'expected paths2d version 1 in canvas-height coordinates');
+    return Object.freeze({ kind: 'paths2d', version: 1, coordinateSpace: 'canvas-height' });
+  }
   invalid(path, 'unsupported port type');
 }
 

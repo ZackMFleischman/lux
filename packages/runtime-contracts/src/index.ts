@@ -64,6 +64,7 @@ const componentPortSchema = z.object({
   type:z.union([
     z.object({kind:z.literal('image'),colorSpace:z.literal('linear-srgb'),alphaMode:z.literal('premultiplied')}).strict(),
     z.object({kind:z.literal('signal'),value:z.literal('number'),unit:z.string().nullable(),clock:z.literal('frame')}).strict(),
+    z.object({kind:z.literal('paths2d'),version:z.literal(1),coordinateSpace:z.literal('canvas-height')}).strict(),
   ]),label:z.string(),description:z.string(),
 }).strict();
 const componentMetadataDtoSchema = z.object({
@@ -77,7 +78,7 @@ export const componentCompiledArtifactSchema = parameterCompiledArtifactSchema.e
   component:componentMetadataDtoSchema,componentMetadataHash:hashSchema,
 }).strict();
 export const compositionCompiledArtifactSchema = parameterCompiledArtifactSchema.extend({
-  artifactVersion:z.literal(5),sdkVersion:z.literal('0.4.0'),executionModel:z.literal('image-chain-v1'),
+  artifactVersion:z.literal(5),sdkVersion:z.literal('0.4.0'),executionModel:z.enum(['image-chain-v1','typed-image-graph-v1']),
   composition:z.unknown(),compositionHash:hashSchema,
 }).strict();
 export const compiledArtifactSchema = z.union([legacyCompiledArtifactSchema,assetCompiledArtifactSchema,parameterCompiledArtifactSchema,componentCompiledArtifactSchema,compositionCompiledArtifactSchema]);

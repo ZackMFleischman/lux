@@ -116,8 +116,9 @@ function portRef(value:unknown,path:string): PortRef {
   return Object.freeze({nodeId:checked(()=>nodeIdSchema.parse(raw.nodeId),path),portId:raw.portId});
 }
 function matches(a:InitialPortType,b:InitialPortType): boolean {
-  return a.kind==='signal'?b.kind==='signal'&&a.value===b.value&&a.clock===b.clock&&a.unit===b.unit:
-    b.kind==='image'&&a.colorSpace===b.colorSpace&&a.alphaMode===b.alphaMode;
+  if(a.kind==='signal')return b.kind==='signal'&&a.value===b.value&&a.clock===b.clock&&a.unit===b.unit;
+  if(a.kind==='image')return b.kind==='image'&&a.colorSpace===b.colorSpace&&a.alphaMode===b.alphaMode;
+  return b.kind==='paths2d'&&a.version===b.version&&a.coordinateSpace===b.coordinateSpace;
 }
 
 export function validateGraph(graph:unknown,definitions:unknown): ValidatedGraph {

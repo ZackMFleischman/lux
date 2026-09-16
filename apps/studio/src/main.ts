@@ -15,8 +15,8 @@ import { createExportService, runExportChild } from './export-process.ts';
 import { createCloseConfirmation } from './close-confirmation.ts';
 import { resolveStudioSession } from '../../../scripts/studio-session.mjs';
 import { ComponentLibraryStore } from '../../../packages/core/src/component-library-store.ts';
+import { validateLibraryCandidate } from '../../../packages/core/src/component-library-validation.ts';
 import { LookStore } from '../../../packages/core/src/look-store.ts';
-import type { SourceBundle } from '../../../packages/runtime-contracts/src/index.ts';
 import { PreviewCaptureFileStore } from './preview-capture-files.ts';
 import type { VideoCaptureSettings } from './preview-capture-files.ts';
 import { resolveStandardLibrary } from './standard-library.ts';
@@ -47,11 +47,7 @@ const standardLibrary = resolveStandardLibrary({ workspace, appData: app.getPath
   desktop: process.env.LUX_STUDIO_DESKTOP === '1', overrideRoot: process.env.LUX_STUDIO_LIBRARY_ROOT,
   canonicalRoot: process.env.LUX_STUDIO_CANONICAL_LIBRARY_ROOT });
 const library = new ComponentLibraryStore(standardLibrary.root,{legacyPath:join(studioProfile.directory,'component-library.json'),
- seedRoots:standardLibrary.seedRoots,validateCandidate:async source=>{
-  const result=await compile({...source,sdkVersion:'0.3.0'} as SourceBundle) as {ok?:boolean;linked?:{linkedVersion?:number};diagnostics?:readonly {message?:string}[]};
-  if(!result.ok)throw Error(result.diagnostics?.map(item=>item.message).filter(Boolean).join('; ')||'Library component candidate did not compile');
-  if(result.linked?.linkedVersion!==4)throw Error('Library component candidate did not produce a component build');
-}});
+ seedRoots:standardLibrary.seedRoots,validateCandidate:source=>validateLibraryCandidate(source,compile)});
 let dirty = false;
 const closeConfirmation = createCloseConfirmation(() => randomBytes(16).toString('hex'), id => mainWindow?.webContents.send('studio:close-request', id));
 const agentRequests = new Map<string, { resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();

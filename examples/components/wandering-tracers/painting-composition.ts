@@ -1,0 +1,213 @@
+import { defineComposition } from '@lux/visual-sdk';
+import paths from './paths.ts';
+import painting from './painting.ts';
+import renderer from './renderer.ts';
+
+// One immutable snapshot drives both region carving and the visible tracer ink.
+export default defineComposition({
+  label: 'Living Painting — Shared Tracers',
+  definitions: { paths, painting, renderer },
+  nodes: [
+    { id: 'd10d1010-63ac-49c7-8ad7-8cf6458b5101', definition: 'paths' },
+    { id: 'd10d2020-63ac-49c7-8ad7-8cf6458b5102', definition: 'painting' },
+    { id: 'd10d3030-63ac-49c7-8ad7-8cf6458b5103', definition: 'renderer' },
+  ],
+  edges: [
+    { id: 'd10d4010-63ac-49c7-8ad7-8cf6458b5104', from: { nodeId: 'd10d1010-63ac-49c7-8ad7-8cf6458b5101', portId: 'paths' }, to: { nodeId: 'd10d2020-63ac-49c7-8ad7-8cf6458b5102', portId: 'paths' }, delay: 'none' },
+    { id: 'd10d4020-63ac-49c7-8ad7-8cf6458b5105', from: { nodeId: 'd10d1010-63ac-49c7-8ad7-8cf6458b5101', portId: 'paths' }, to: { nodeId: 'd10d3030-63ac-49c7-8ad7-8cf6458b5103', portId: 'paths' }, delay: 'none' },
+    { id: 'd10d4030-63ac-49c7-8ad7-8cf6458b5106', from: { nodeId: 'd10d2020-63ac-49c7-8ad7-8cf6458b5102', portId: 'image' }, to: { nodeId: 'd10d3030-63ac-49c7-8ad7-8cf6458b5103', portId: 'image' }, delay: 'none' },
+  ],
+  output: { nodeId: 'd10d3030-63ac-49c7-8ad7-8cf6458b5103', portId: 'image' },
+  expose: [
+  {
+    "id": "pace",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "pace"
+  },
+  {
+    "id": "motion",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "motion"
+  },
+  {
+    "id": "phrasing",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "phrasing"
+  },
+  {
+    "id": "scale",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "scale"
+  },
+  {
+    "id": "warp",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "warp"
+  },
+  {
+    "id": "growth",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "growth"
+  },
+  {
+    "id": "seed",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "seed"
+  },
+  {
+    "id": "composition",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "composition"
+  },
+  {
+    "id": "tension",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "tension"
+  },
+  {
+    "id": "hierarchy",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "hierarchy"
+  },
+  {
+    "id": "coverage",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "coverage"
+  },
+  {
+    "id": "spacing",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "spacing"
+  },
+  {
+    "id": "curvature",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "curvature"
+  },
+  {
+    "id": "angle",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "angle"
+  },
+  {
+    "id": "hatchWidth",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "hatchWidth"
+  },
+  {
+    "id": "relation",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "relation"
+  },
+  {
+    "id": "spacingVar",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "spacingVar"
+  },
+  {
+    "id": "curvatureVar",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "curvatureVar"
+  },
+  {
+    "id": "angleVar",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "angleVar"
+  },
+  {
+    "id": "palette",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "palette"
+  },
+  {
+    "id": "warmth",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "warmth"
+  },
+  {
+    "id": "contrast",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "contrast"
+  },
+  {
+    "id": "pooling",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "pooling"
+  },
+  {
+    "id": "blooms",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "blooms"
+  },
+  {
+    "id": "outline",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "outline"
+  },
+  {
+    "id": "inkWarmth",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "inkWarmth"
+  },
+  {
+    "id": "handDrawn",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "handDrawn"
+  },
+  {
+    "id": "grain",
+    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+    "controlId": "grain"
+  },
+  {
+    "id": "tracerCount",
+    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+    "controlId": "count"
+  },
+  {
+    "id": "tracerSpeed",
+    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+    "controlId": "speed"
+  },
+  {
+    "id": "tracerCurl",
+    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+    "controlId": "curl"
+  },
+  {
+    "id": "tracerSway",
+    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+    "controlId": "sway"
+  },
+  {
+    "id": "tracerSeed",
+    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+    "controlId": "seed"
+  },
+  {
+    "id": "tracerWidth",
+    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+    "controlId": "width"
+  },
+  {
+    "id": "tracerPace",
+    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+    "controlId": "pace"
+  },
+  {
+    "id": "tracerContrast",
+    "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+    "controlId": "contrast"
+  },
+  {
+    "id": "tracerHatch",
+    "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+    "controlId": "hatch"
+  },
+  {
+    "id": "tracerBleed",
+    "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+    "controlId": "bleed"
+  }
+],
+});

@@ -84,7 +84,11 @@ export function snapshot(values:readonly unknown[], names:readonly string[], byt
   function copy(v:unknown):unknown{if(v===null||typeof v!=='object')return v;const r=inspected.get(v)!;return r.array?r.entries.map(([,x])=>copy(x)):Object.fromEntries(r.entries.map(([k,x])=>[k,copy(x)]));}
   return values.map(copy);
 }
-function matches(a:InitialPortType,b:InitialPortType):boolean{return a.kind==='signal'?b.kind==='signal'&&a.unit===b.unit&&a.clock===b.clock&&a.value===b.value:b.kind==='image'&&a.colorSpace===b.colorSpace&&a.alphaMode===b.alphaMode;}
+function matches(a:InitialPortType,b:InitialPortType):boolean{
+  if(a.kind==='signal')return b.kind==='signal'&&a.unit===b.unit&&a.clock===b.clock&&a.value===b.value;
+  if(a.kind==='image')return b.kind==='image'&&a.colorSpace===b.colorSpace&&a.alphaMode===b.alphaMode;
+  return b.kind==='paths2d'&&a.version===b.version&&a.coordinateSpace===b.coordinateSpace;
+}
 function ref(v:unknown,p:string):PortRef{const r=record(v,p,['nodeId','portId']);if(typeof r.portId!=='string')invalid(p,'expected port ID');return {nodeId:checked(()=>nodeIdSchema.parse(r.nodeId),p),portId:r.portId};}
 export function patch(schema:ControlSchema,v:unknown,p:string,empty=true):ControlValues {
   const r=record(v,p);if(Object.keys(r).length===0){if(!empty)invalid(p,'expected nonempty control patch');return {};}

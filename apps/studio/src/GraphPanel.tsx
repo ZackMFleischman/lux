@@ -48,7 +48,7 @@ export function GraphPanel({runtime,selected,onSelect}:{runtime:RuntimeView|null
   const focusOccurrence=compositionOccurrence(runtime,focus),activeFocus=(focusOccurrence?.definition.kind==='graph'?focus:[]) as NodePath;
   useEffect(()=>{if(nodeKey(activeFocus)!==nodeKey(focus))setFocus(activeFocus);},[profile,focus,activeFocus]);
   const nodes=useMemo(()=>profile?orderedChildren(profile,activeFocus):[],[profile,nodeKey(activeFocus)]),definition=compositionOccurrence(runtime,activeFocus)?.definition,body=definition?.kind==='graph'?definition.body:null,output=body?.outputBindings.image;
-  const selectedNode=nodes.find(node=>nodeKey(node.nodePath)===selected),canOpen=selectedNode?.definition.kind==='graph',width=Math.max(240,nodes.length*250-30),height=180;
+  const selectedNode=nodes.find(node=>nodeKey(node.nodePath)===selected),canOpen=selectedNode?.definition.kind==='graph',width=Math.max(240,nodes.length*250-30),height=Math.max(180,190+(body?.edges.length??0)*12);
   function fit(){const box=viewport.current?.getBoundingClientRect();if(!box)return;const zoom=Math.max(.2,Math.min(1,(box.width-48)/width,(box.height-48)/height));updateView({x:(box.width-width*zoom)/2,y:Math.max(24,(box.height-height*zoom)/2),zoom});}
   function zoom(factor: number, point?: { x: number; y: number }) {
     const box = viewport.current?.getBoundingClientRect();
@@ -115,16 +115,23 @@ export function GraphPanel({runtime,selected,onSelect}:{runtime:RuntimeView|null
       onClickCapture={event => { if (suppressClick.current) { event.preventDefault(); event.stopPropagation(); suppressClick.current = false; } }}>
       <div className="graph-content" style={{width,height,transform:`translate(${view.x}px,${view.y}px) scale(${view.zoom})`}}>
         <svg className="graph-wires" width={width} height={height} aria-label="Node connections">
-          {body.edges.map(edge => {
+          {body.edges.map((edge, edgeIndex) => {
             const from = nodes.findIndex(node => node.id === edge.from.nodeId);
             const to = nodes.findIndex(node => node.id === edge.to.nodeId);
             const highlighted = selected === nodeKey(nodes[from]!.nodePath) || selected === nodeKey(nodes[to]!.nodePath);
-            const midpoint = (from * 250 + 220 + to * 250) / 2;
-            const direction = Math.sign(to * 250 - (from * 250 + 220));
+            const fromX = from * 250 + 220, toX = to * 250;
+            const fromY = 82 + Object.keys(nodes[from]!.metadata.outputs).indexOf(edge.from.portId) * 20;
+            const toY = 82 + Object.keys(nodes[to]!.metadata.inputs).indexOf(edge.to.portId) * 20;
+            // Route a branch beneath intervening nodes instead of hiding it behind them.
+            const detour = Math.abs(to - from) > 1;
+            const laneY = 166 + edgeIndex * 12;
+            const path = detour
+              ? `M ${fromX} ${fromY} C ${fromX + 18} ${fromY},${fromX + 18} ${laneY},${fromX + 30} ${laneY} L ${toX - 30} ${laneY} C ${toX - 18} ${laneY},${toX - 18} ${toY},${toX} ${toY}`
+              : `M ${fromX} ${fromY} C ${fromX + 15} ${fromY},${toX - 15} ${toY},${toX} ${toY}`;
             return <g key={edge.id} className={`graph-connection${highlighted ? ' graph-connection-selected' : ''}`}>
               <title>{nodes[from]?.label} {edge.from.portId} to {nodes[to]?.label} {edge.to.portId}</title>
-              <path d={`M ${from * 250 + 220} 82 C ${from * 250 + 235} 82,${to * 250 - 15} 82,${to * 250} 82`} />
-              <polygon points={`${midpoint - direction * 3},78 ${midpoint + direction * 3},82 ${midpoint - direction * 3},86`} />
+              <path d={path} />
+              <polygon points={`${toX - 8},${toY - 4} ${toX - 2},${toY} ${toX - 8},${toY + 4}`} />
             </g>;
           })}
         </svg>
