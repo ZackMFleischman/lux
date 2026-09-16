@@ -1,14 +1,32 @@
 import { execFileSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
 import { copyFile, mkdir, readFile, writeFile, readdir, realpath, lstat, symlink, rename } from 'node:fs/promises';
-import { dirname, join, relative, resolve, isAbsolute, sep } from 'node:path';
+import { basename, dirname, join, relative, resolve, isAbsolute, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 
 const within = (root, path) => { const rel=relative(root,path); return rel==='' || (!isAbsolute(rel)&&rel!=='..'&&!rel.startsWith('..'+sep)); };
 export function desktopSourceFile(path) {
- return /^(packages\/|apps\/build-worker\/src\/|apps\/studio\/src\/|apps\/render-host\/src\/|apps\/installed-runtime\/src\/|scripts\/|tools\/gpu-spike\/)/.test(path)
+ return /^(library\/|packages\/|apps\/build-worker\/src\/|apps\/studio\/src\/|apps\/render-host\/src\/|apps\/installed-runtime\/src\/|scripts\/|tools\/gpu-spike\/)/.test(path)
   || /^(package\.json|tsconfig[^/]*\.json|apps\/studio\/build\.mjs|apps\/(studio|build-worker)\/package\.json)$/.test(path);
+}
+export function repositoryLibraryRootFromCommonDirectory(commonDirectory) {
+ const common=resolve(commonDirectory);
+ if(basename(common).toLowerCase()!=='.git')throw Error(`Unsupported Git common directory: ${common}`);
+ return join(dirname(common),'library');
+}
+export function installedMainSource(canonicalLibraryRoot) {
+ return `const path = require('node:path');
+const testing = process.env.LUX_STUDIO_MCP_TEST === '1' && /^test-[a-z0-9-]+$/.test(process.env.LUX_STUDIO_PROFILE || '');
+process.env.LUX_STUDIO_PROFILE = testing ? process.env.LUX_STUDIO_PROFILE : 'desktop';
+process.env.LUX_STUDIO_DESKTOP = '1';
+process.env.LUX_STUDIO_CANONICAL_LIBRARY_ROOT = ${JSON.stringify(canonicalLibraryRoot)};
+process.env.LUX_WORKSPACE = path.join(__dirname, 'runtime');
+process.env.LUX_NODE_EXECUTABLE = path.join(__dirname, 'node.exe');
+delete process.env.LUX_STUDIO_SESSION_ID; delete process.env.LUX_STUDIO_DIST;
+if (!testing) { delete process.env.LUX_STUDIO_SMOKE; delete process.env.LUX_STUDIO_MCP_TEST; delete process.env.LUX_STUDIO_LIBRARY_ROOT; }
+require('./runtime/apps/studio/dist/main.cjs');
+`;
 }
 /** Copy actual bytes, then recreate only links that stay inside this tree. No dependency on the source checkout. */
 export async function copyIndependentTree(source, destination, workspaceLinks = new Map(), select = () => true) {
@@ -76,6 +94,7 @@ export async function packageDesktop({ source=resolve(import.meta.dirname,'..'),
  if(archiveHash!==checksums[archiveName])throw Error('Official Electron archive checksum mismatch');
  const git=(...args)=>execFileSync('git',['-c',`safe.directory=${source.replaceAll('\\','/')}`,...args],{cwd:source,encoding:'utf8',windowsHide:true}).trim();
  const commit=git('rev-parse','HEAD');
+ const canonicalLibraryRoot=repositoryLibraryRootFromCommonDirectory(git('rev-parse','--path-format=absolute','--git-common-dir'));
  const directory=join(resolve(installRoot),'builds',`${commit.slice(0,8)}-${randomUUID().slice(0,8)}`);
  await mkdir(directory,{recursive:true});
  console.error('Extracting the checksum-verified official Electron archive...');
@@ -106,18 +125,9 @@ export async function packageDesktop({ source=resolve(import.meta.dirname,'..'),
  const node=join(app,'node.exe'); await copyFile(process.execPath,node);
  const profile='desktop';
  const adapter=join(workspace,'scripts','studio-installed-mcp.mjs');
- const record={version:1,name:'Lux',sourceCommit:commit,sourceTree:'working tree snapshot',electron:{version,archiveName,sha256:archiveHash,source:'https://github.com/electron/electron/releases/download/v'+version+'/'+archiveName},installedAt:new Date().toISOString(),directory,executable,workspace,node,adapter,profile};
+ const record={version:1,name:'Lux',sourceCommit:commit,sourceTree:'working tree snapshot',canonicalLibraryRoot,electron:{version,archiveName,sha256:archiveHash,source:'https://github.com/electron/electron/releases/download/v'+version+'/'+archiveName},installedAt:new Date().toISOString(),directory,executable,workspace,node,adapter,profile};
  await writeFile(join(app,'package.json'),JSON.stringify({name:'lux-studio',productName:'Lux',version:'0.1.0',main:'main.cjs'}));
- await writeFile(join(app,'main.cjs'),`const path = require('node:path');
-const testing = process.env.LUX_STUDIO_MCP_TEST === '1' && /^test-[a-z0-9-]+$/.test(process.env.LUX_STUDIO_PROFILE || '');
-process.env.LUX_STUDIO_PROFILE = testing ? process.env.LUX_STUDIO_PROFILE : 'desktop';
-process.env.LUX_STUDIO_DESKTOP = '1';
-process.env.LUX_WORKSPACE = path.join(__dirname, 'runtime');
-process.env.LUX_NODE_EXECUTABLE = path.join(__dirname, 'node.exe');
-delete process.env.LUX_STUDIO_SESSION_ID; delete process.env.LUX_STUDIO_DIST;
-if (!testing) { delete process.env.LUX_STUDIO_SMOKE; delete process.env.LUX_STUDIO_MCP_TEST; }
-require('./runtime/apps/studio/dist/main.cjs');
-`);
+ await writeFile(join(app,'main.cjs'),installedMainSource(canonicalLibraryRoot));
  console.error('Building the installed Studio...');
  const env={...process.env}; delete env.LUX_STUDIO_DIST; delete env.ELECTRON_RUN_AS_NODE;
  // Build script is a packaging input, not a runtime dependency on the source checkout.

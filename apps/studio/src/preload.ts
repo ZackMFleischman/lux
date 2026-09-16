@@ -56,6 +56,7 @@ contextBridge.exposeInMainWorld('luxAuthoring', Object.freeze({
   },
 }));
 const libraryApi:ComponentLibraryClient={
+  location:()=>ipcRenderer.invoke('studio:library','location'),
   list:()=>ipcRenderer.invoke('studio:library','list'),
   read:id=>ipcRenderer.invoke('studio:library','read',id),
   create:input=>ipcRenderer.invoke('studio:library','create',input),

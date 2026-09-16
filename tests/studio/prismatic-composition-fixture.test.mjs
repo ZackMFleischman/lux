@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
+import { readFile } from 'node:fs/promises';
 import { compileVisual } from '../../apps/build-worker/src/compile.mjs';
 import { linkRuntime } from '../../apps/build-worker/src/link-runtime.mjs';
 import { prismaticCompositionSource } from './fixtures/prismatic-composition/source-bundle.mjs';
@@ -18,4 +19,13 @@ test('Studio nested prismatic fixture compiles two reusable composite instances 
   const linked=await linkRuntime(compiled.artifact,options);assert.equal(linked.linkedVersion,5);
   assert.equal(linked.composition.nodes.length,5);assert.equal(Object.values(linked.composition.definitions).filter(row=>row.kind==='graph').length,3);
   assert.deepEqual(linked.composition.publicControlBindings.segmentsA[0].nodePath,['44444444-4444-4444-8444-444444444444','66666666-6666-4666-8666-666666666666','77777777-7777-4777-8777-777777777777']);
+});
+test('repository library Prismatic Ball compiles and links as a standalone image source',async()=>{
+  const code=await readFile(resolve('library/components/93a7215f-4df1-4e1e-9d34-3f7f0f27ad84/revisions/1/source/component.ts'),'utf8');
+  const compiled=await compileVisual({source:{sdkVersion:'0.3.0',entry:'component.ts',files:{'component.ts':code}}},options);
+  assert.equal(compiled.ok,true,JSON.stringify(compiled.diagnostics));
+  assert.equal(compiled.artifact.artifactVersion,4);
+  const linked=await linkRuntime(compiled.artifact,options);
+  assert.equal(linked.linkedVersion,4);
+  assert.equal(linked.component.label,'Prismatic Ball');
 });

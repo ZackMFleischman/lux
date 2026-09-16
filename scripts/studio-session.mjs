@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { realpathSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
-import { homedir } from 'node:os';
+import { homedir, tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
 export function canonicalWorkspace(workspace) {
@@ -33,7 +33,9 @@ export function resolveStudioSession({ workspace, env = process.env, appData = s
 
 /** Always discard an inherited creative/worktree/test selection for a fresh run. */
 export function studioTestEnvironment(parent = process.env) {
-  const env = { ...parent, LUX_STUDIO_PROFILE: `test-${randomUUID()}`, LUX_STUDIO_MCP_TEST: '1' };
+  const profile = `test-${randomUUID()}`;
+  const env = { ...parent, LUX_STUDIO_PROFILE: profile, LUX_STUDIO_MCP_TEST: '1',
+    LUX_STUDIO_LIBRARY_ROOT: join(tmpdir(), 'lux-studio-tests', profile, 'library') };
   delete env.ELECTRON_RUN_AS_NODE;
   delete env.LUX_STUDIO_SMOKE;
   delete env.LUX_STUDIO_SESSION_ID;

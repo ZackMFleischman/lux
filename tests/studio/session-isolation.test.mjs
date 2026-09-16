@@ -21,12 +21,16 @@ test('normal checkouts, creative, and every test run have separate profiles', as
   const { a, b, appData } = await fixture(t);
   const one = resolveStudioSession({ workspace: a, appData, env: {} });
   assert.deepEqual(one, resolveStudioSession({ workspace: a, appData, env: {} }));
-  const creativeEnv = { LUX_STUDIO_PROFILE: 'creative', LUX_STUDIO_SMOKE: '1', ELECTRON_RUN_AS_NODE: '1', LUX_STUDIO_SESSION_ID: 'old' };
+  const creativeEnv = { LUX_STUDIO_PROFILE: 'creative', LUX_STUDIO_SMOKE: '1', ELECTRON_RUN_AS_NODE: '1', LUX_STUDIO_SESSION_ID: 'old',
+    LUX_STUDIO_LIBRARY_ROOT: join(appData, 'shared-user-library') };
   const test1 = studioTestEnvironment(creativeEnv), test2 = studioTestEnvironment(creativeEnv);
   assert.equal(test1.LUX_STUDIO_MCP_TEST, '1');
   assert.equal(test1.LUX_STUDIO_SMOKE, undefined);
   assert.equal(test1.ELECTRON_RUN_AS_NODE, undefined);
   assert.equal(test1.LUX_STUDIO_SESSION_ID, undefined);
+  assert.notEqual(test1.LUX_STUDIO_LIBRARY_ROOT, creativeEnv.LUX_STUDIO_LIBRARY_ROOT);
+  assert.notEqual(test1.LUX_STUDIO_LIBRARY_ROOT, test2.LUX_STUDIO_LIBRARY_ROOT);
+  assert.ok(resolve(test1.LUX_STUDIO_LIBRARY_ROOT).startsWith(resolve(tmpdir())));
   assert.equal(creativeEnv.LUX_STUDIO_PROFILE, 'creative');
   const paths = [one.directory,
     resolveStudioSession({ workspace: b, appData, env: {} }).directory,

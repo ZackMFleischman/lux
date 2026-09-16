@@ -10,6 +10,14 @@ const {completeLibraryMutation}=await import('../../apps/studio/src/library/libr
 afterEach(()=>cleanup());after(()=>dom.window.close());
 const id='11111111-1111-4111-8111-111111111111';
 const source={sdkVersion:'0.4.0' as const,entry:'component.ts',files:{'component.ts':'export default 1;','helper.ts':'export const value=1;'}};
+test('library panel identifies the standalone fallback storage location',async()=>{
+ const component={id,revision:1,name:'Shared Violet',description:'A reusable violet image.',updatedAt:'2026-09-13T20:00:00.000Z',source};
+ const client={list:async()=>[component],read:async()=>component,copyRequest:async()=>'request',create:async()=>component,update:async()=>component,
+  location:async()=>({kind:'fallback' as const,root:'C:\\Users\\test\\AppData\\Roaming\\Lux\\Studio\\library',seedRoots:[]})};
+ render(<LibraryPanel client={client} links={[]} updates={[]} fallbacks={[]} onApplyUpdates={async()=>{}} onFork={()=>{}} onError={reason=>assert.fail(String(reason))}/>);
+ await screen.findByText(/standalone fallback/i);
+ assert.ok(screen.getByText(/AppData.*Studio.*library/i));
+});
 test('library panel browses readable source and copies the exact agent request without inserting code',async()=>{
  const calls:string[]=[];const component={id,revision:2,name:'Shared Violet',description:'A reusable violet image.',updatedAt:'2026-09-13T20:00:00.000Z',source};
  const client={list:async()=>[component],read:async()=>{calls.push('read');return component;},copyRequest:async()=>{calls.push('copy');return 'request';},create:async()=>component,update:async()=>component};
