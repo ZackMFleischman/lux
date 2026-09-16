@@ -33,7 +33,7 @@ test('tempo clock rejects invalid settings and visual times before mutation',()=
   for(const tempoSequence of [-1,1.5,Number.MAX_SAFE_INTEGER+1])assert.throws(()=>createTempoClock({nowMs:()=>0,tempoSequence}),/sequence/);
   assert.throws(()=>createTempoClock({nowMs:null as never}),/monotonic clock/);
   const clock=createTempoClock({nowMs:()=>0});
-  for(const time of [-1,NaN,Infinity]){
+  for(const time of [-1,NaN,Infinity,Number.MAX_SAFE_INTEGER/1000+1,Number.MAX_VALUE]){
     assert.throws(()=>clock.snapshot(time),/visual time/);
     assert.throws(()=>clock.setBpm(100,time),/visual time/);
     assert.throws(()=>clock.reset(time),/visual time/);
@@ -41,6 +41,13 @@ test('tempo clock rejects invalid settings and visual times before mutation',()=
   assert.deepEqual(clock.snapshot(0),{bpm:120,beatPosition:0,beatPhase:0,tempoSequence:0});
   assert.throws(()=>clock.setBpm(19,0),/BPM/);
   assert.deepEqual(clock.snapshot(0),{bpm:120,beatPosition:0,beatPhase:0,tempoSequence:0});
+});
+
+test('tempo clock accepts the RuntimeClock upper time boundary without overflowing',()=>{
+  const time=Number.MAX_SAFE_INTEGER/1000,clock=createTempoClock({nowMs:()=>0,bpm:300});
+  const snapshot=clock.snapshot(time);
+  assert.equal(snapshot.beatPosition,Number.MAX_SAFE_INTEGER/200);
+  assert.ok(Number.isFinite(snapshot.beatPhase));
 });
 
 test('tempo sequence exhaustion rejects an admitted set before mutation',()=>{
@@ -100,9 +107,16 @@ test('tap rejects invalid monotonic samples and sequence exhaustion before mutat
   now=1000;assert.equal(clock.tap(0).tempoSequence,4);
   now=NaN;assert.throws(()=>clock.tap(0),/monotonic/);assert.equal(clock.snapshot(0).tempoSequence,4);
   now=999;assert.throws(()=>clock.tap(0),/monotonic/);assert.equal(clock.snapshot(0).tempoSequence,4);
+  now=Number.MAX_SAFE_INTEGER+1;assert.throws(()=>clock.tap(0),/monotonic/);assert.equal(clock.snapshot(0).tempoSequence,4);
+  now=Number.MAX_VALUE;assert.throws(()=>clock.tap(0),/monotonic/);assert.equal(clock.snapshot(0).tempoSequence,4);
   const exhausted=createTempoClock({nowMs:()=>1000,bpm:80,tempoSequence:Number.MAX_SAFE_INTEGER});
   assert.throws(()=>exhausted.tap(0),/sequence exhausted/);
   assert.equal(exhausted.snapshot(0).tempoSequence,Number.MAX_SAFE_INTEGER);
+});
+
+test('tap accepts the RuntimeClock safe millisecond boundary',()=>{
+  const clock=createTempoClock({nowMs:()=>Number.MAX_SAFE_INTEGER,bpm:80});
+  assert.deepEqual(clock.tap(0),{bpm:80,beatPosition:0,beatPhase:0,tempoSequence:1,tempoResult:'restarted'});
 });
 
 test('replacement initialization accepts acknowledged BPM and sequence with fresh phase',()=>{
