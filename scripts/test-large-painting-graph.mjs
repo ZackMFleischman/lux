@@ -132,10 +132,14 @@ try{
   await ready();let runtime=await build(baseline);assertRuntime(runtime,8);
   const before=await capture('baseline-eight');report.approvedComparison=comparePixels(approved,before);assert.equal(report.approvedComparison.changedChannels,0,'Eight-node painting differs from approved 18-second checkpoint');
   report.checks.push('Original eight-node painting matches the approved checkpoint pixel for pixel');
+  // Admit and initialize the larger worker at the routine functional-test size.
+  // Once it is producing heartbeats, restore the full-HD output for the exact
+  // pixel comparison and graph evidence below.
+  await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].setSize(640,360));await page.waitForTimeout(500);
   runtime=await build(candidate);assertRuntime(runtime,17,1);
+  await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].setSize(1920,1080));await page.waitForTimeout(500);
   const after=await capture('seventeen-default',1);report.defaultComparison=comparePixels(before,after);assert.equal(report.defaultComparison.changedChannels,0,'Nine unity relays changed the approved painting');
   report.checks.push('Seventeen-node painting builds and matches the original pixels at unity scale');
-  await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].setSize(1920,1080));
   let graph=await assertGraph(17);await graph.getByRole('button',{name:'Fit',exact:true}).click();
   const extra=graph.locator('.graph-node').filter({has:page.getByText('Hatching Relay 9',{exact:true})});assert.equal(await extra.count(),1);await extra.click();assert.equal(await extra.getAttribute('aria-pressed'),'true');
   await page.screenshot({path:join(output,'seventeen-full-graph.png')});await graph.screenshot({path:join(output,'seventeen-graph.png')});
