@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "f564a771-028a-4031-abaa-e64a1cfc8bec",
+  "revision": 1,
+  "name": "Region Hatching",
+  "description": "Region-specific curved, directional and perpendicular hatch patterns, with controlled irregularity and optional unhatched areas. Shader-field for compatible single-pass painting renderers.",
+  "updatedAt": "2026-09-16T07:59:17.616Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "hatching.ts",
+    "files": [
+      "hatching.ts"
+    ]
+  }
+}
