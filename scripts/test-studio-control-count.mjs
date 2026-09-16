@@ -72,7 +72,7 @@ try{
  await page.getByRole('button',{name:'Animate Component control 64',exact:true}).click();await page.getByRole('button',{name:'Add LFO',exact:true}).click();
  for(let i=0;i<100;i++){status=await call('status');if(status.authoring.controlAnimations.some(row=>row.nodePath.length&&row.controlId==='control63'))break;await page.waitForTimeout(100);}
  assert.ok(status.authoring.controlAnimations.some(row=>row.nodePath.length&&row.controlId==='control63'));
- const sampled=status.authoring.effectiveControls.control63;await page.waitForTimeout(300);status=await call('status');assert.notEqual(status.authoring.effectiveControls.control63,sampled);assert.equal(status.authoring.controls.control63,.7);
+ const sampled=status.authoring.effectiveNodeControls.nodes[0].values.control63;await page.waitForTimeout(300);status=await call('status');assert.notEqual(status.authoring.effectiveNodeControls.nodes[0].values.control63,sampled);assert.equal(status.authoring.controls.control63,.7);
  await page.screenshot({path:join(output,'component-64-controls.png')});
  await page.keyboard.press('Escape');current=await call('read');const componentPath=join(output,'component.lux-scene');await call('scene.save',{path:componentPath,expectedDraftVersion:current.draftVersion,overwrite:false});await call('scene.open',{path:componentPath,expectedDraftVersion:current.draftVersion,discardDirty:true});
  status=await call('status');assert.equal(status.authoring.controls.control63,.7);assert.ok(status.authoring.controlAnimations.some(row=>row.nodePath.length&&row.controlId==='control63'));
