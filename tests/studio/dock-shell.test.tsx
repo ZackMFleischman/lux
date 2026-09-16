@@ -49,7 +49,7 @@ async function click(name: string) {
   }
   if (name === 'Close selected panel') {
     await closeLayouts();
-    const titles: Record<string, string> = { source: 'Source', preview: 'Preview', library: 'Library', inspector: 'Inspector', jobs: 'Jobs', graph: 'Graph' };
+    const titles: Record<string, string> = { source: 'Source', preview: 'Preview', library: 'Library', inspector: 'Inspector', diagnostics: 'Diagnostics', jobs: 'Jobs', graph: 'Graph' };
     const tab = [...document.querySelectorAll('.dv-tab')].find(node => node.textContent?.trim() === titles[selectedPanel]);
     assert.ok(tab, `Expected ${selectedPanel} tab`);
     const close = tab.querySelector('.dv-default-tab-action');
@@ -140,6 +140,35 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   await click('Reset laptop layout');
   await click('Open Preview');
   assert.equal(canvas.closest('.preview-surface'), document.querySelector('.preview-surface'));
+  const sourceTab = [...document.querySelectorAll<HTMLElement>('.dv-tab')].find(node => node.textContent?.trim() === 'Source')!;
+  await act(async () => { sourceTab.focus(); fireEvent.click(sourceTab); });
+  await act(async () => { fireEvent.keyDown(window, { key: 'm', ctrlKey: true, shiftKey: true }); });
+  assert.equal(editorNode.closest('.studio-expanded-pane')?.hasAttribute('hidden'), false, 'focused Source panel is maximized');
+  assert.ok(canvas.closest('.studio-dock-grid'), 'maximize does not assume Preview');
+  await act(async () => { fireEvent.keyDown(window, { key: 'Escape' }); });
+  assert.ok(editorNode.closest('.studio-dock-grid'));
+  assert.equal(document.activeElement, sourceTab, 'restoring the workspace restores prior focus');
+  await act(async () => { fireEvent.keyDown(window, { key: 'i', ctrlKey: true, shiftKey: true }); });
+  assert.equal(document.querySelector('.studio-dock-grid .studio-pane-inspector'), null, 'Inspector shortcut closes the docked panel');
+  await act(async () => { fireEvent.keyDown(window, { key: 'i', ctrlKey: true, shiftKey: true }); });
+  assert.ok(document.querySelector('.studio-dock-grid .studio-pane-inspector'), 'Inspector shortcut restores the docked panel');
+  const diagnosticsTab = [...document.querySelectorAll<HTMLElement>('.dv-tab')].find(node => node.textContent?.trim() === 'Diagnostics')!;
+  await act(async () => { diagnosticsTab.focus(); fireEvent.click(diagnosticsTab); });
+  await act(async () => { fireEvent.keyDown(window, { key: 'm', ctrlKey: true, shiftKey: true }); });
+  assert.equal(document.querySelector('.studio-pane-diagnostics')?.closest('.studio-expanded-pane')?.hasAttribute('hidden'), false, 'focused Diagnostics panel is maximized');
+  const restoreWorkspace = screen.getByRole('button', { name: 'Restore workspace' });
+  assert.match(restoreWorkspace.getAttribute('title') ?? '', /Ctrl\+Shift\+M/);
+  assert.match(restoreWorkspace.textContent ?? '', /Ctrl\+Shift\+M/, 'Restore workspace prints its shortcut hint');
+  assert.equal(document.querySelector('.preview-surface canvas'), canvas, 'maximizing Diagnostics preserves the live Preview canvas');
+  assert.equal(canvas.isConnected, true);
+  await act(async () => { fireEvent.click(restoreWorkspace); });
+  assert.ok(document.querySelector('.studio-dock-grid .studio-pane-diagnostics'));
+  assert.equal(document.activeElement, diagnosticsTab, 'visible Restore workspace returns focus to the prior panel tab');
+  await act(async () => { editor.contentDOM.focus(); fireEvent.keyDown(editor.contentDOM, { key: 'm', ctrlKey: true, shiftKey: true }); });
+  assert.ok(editorNode.closest('.studio-dock-grid'), 'panel shortcuts do not hijack source text input');
+  await act(async () => { fireEvent.keyDown(editor.contentDOM, { key: 'i', ctrlKey: true, shiftKey: true }); });
+  assert.ok(document.querySelector('.studio-dock-grid .studio-pane-inspector'), 'Inspector shortcut is suppressed in source text input');
+  await click('Open Preview');
   await closeLayouts(); await click('Fullscreen');
   assert.equal(canvas.closest('.studio-expanded-pane')?.hasAttribute('hidden'), false);
   assert.equal(screen.queryByRole('button', { name: 'Play' }), null);
@@ -180,7 +209,7 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
   assert.ok(reopenedJobsTab?.closest('.dv-groupview')?.contains(document.activeElement), 'Focus moves into the Jobs group');
   assert.equal(document.querySelector('.cm-editor'), editorNode);
   assert.equal(attaches, 1); assert.equal(detaches, 0); assert.equal(subscriptions, 1);
-  for (const kind of ['preview', 'source', 'graph', 'library', 'inspector', 'jobs']) {
+  for (const kind of ['preview', 'source', 'graph', 'library', 'inspector', 'diagnostics', 'jobs']) {
     selectedPanel = kind;
     await click('Close selected panel');
   }
@@ -219,7 +248,7 @@ test('group menu targets its owning group, cancels with focus and rejects a vani
   await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: 'Open Source' })); });
   assert.ok(groups(adapter.capture('check').dock.grid.root).find((g: any) => g.id === 'preview-group').views.includes('source'));
   const target = adapter.groupTarget('jobs-group');
-  await act(async () => { adapter.close('jobs'); adapter.close('graph'); });
+  await act(async () => { adapter.close('jobs'); adapter.close('graph'); adapter.close('diagnostics'); });
   const before = adapter.capture('check');
   assert.throws(() => adapter.openInGroup('source', target), /no longer exists/);
   assert.deepEqual(adapter.capture('check'), before);
@@ -257,7 +286,8 @@ test('Scene and component controls expose real animation plus independent reset 
   assert.equal(calls[1].name,'lux.node.parameters.set');assert.deepEqual(calls[1].input.nodePath,[ballId]);assert.deepEqual(calls[1].input.values,{intensity:.6});
   calls.splice(0);
   await click('Open Graph');
-  const nodes=[...document.querySelectorAll<HTMLButtonElement>('.graph-node')];assert.equal(nodes.length,3);
+  const graphNodes=[...document.querySelectorAll<HTMLButtonElement>('.graph-node')];assert.equal(graphNodes.length,4);
+  const nodes=graphNodes.slice(1);
   assert.equal(document.querySelectorAll('.graph-wires path').length,2);
   assert.equal(document.querySelectorAll('.graph-final-output').length,1);
   selectedPanel = 'inspector';await click('Close selected panel');
@@ -329,10 +359,10 @@ test('Graph enters nested components one level at a time and edits an exposed co
   const alias=within(document.querySelector('.inspector')!).getByLabelText('firstSegments · Segments value');
   await act(async()=>{fireEvent.change(alias,{target:{value:'9'}});fireEvent.keyDown(alias,{key:'Enter'});});
   assert.deepEqual(calls[0].input.nodePath,[compositeAId,wrapperNodeId,wrappedEffectId]);assert.deepEqual(calls[0].input.values,{segments:9});
-  await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Open component'}));});
-  assert.equal(document.querySelectorAll('.graph-node').length,2);assert.ok(screen.getByRole('navigation',{name:'Component breadcrumb'}));
+  await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'View inside'}));});
+  assert.equal(document.querySelectorAll('.graph-node').length,3);assert.ok(screen.getByRole('navigation',{name:'Component breadcrumb'}));
   const wrapper=screen.getByRole('button',{name:/Wrapped mirror/});await act(async()=>{fireEvent.click(wrapper);fireEvent.dblClick(wrapper);});
-  assert.equal(document.querySelectorAll('.graph-node').length,1);assert.ok(screen.getByRole('button',{name:'Back to Double mirror 1'}));
+  assert.equal(document.querySelectorAll('.graph-node').length,2);assert.ok(screen.getByRole('button',{name:'Back to Double mirror 1'}));
   await act(async()=>{runtime={...runtime,revisionId:'nested-r2'};snapshot={...snapshot,authoring:runtime};listeners.forEach(fn=>fn());});
   assert.ok(within(document.querySelector('.inspector')!).getByText('Wrapped mirror'),'selection survives an accepted rebuild when the full path remains');
   selectedPanel='graph'; await click('Close selected panel');
@@ -348,7 +378,7 @@ test('Graph enters nested components one level at a time and edits an exposed co
   assert.equal(calls.length,writes,'Navigation does not write control values');
   assert.ok(!inspector.queryByRole('navigation',{name:'Inspector controls path'}));
   assert.ok(document.activeElement===document.querySelector('.inspector summary'));
-  assert.equal(document.querySelectorAll('.dv-tab').length,5,'Inspector navigation does not reopen Graph');
+  assert.equal(document.querySelectorAll('.dv-tab').length,6,'Inspector navigation does not reopen Graph');
   await click('Open Graph');
 
   await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Back to Double mirror 1'}));});
@@ -361,9 +391,9 @@ test('Graph enters nested components one level at a time and edits an exposed co
 test('View is a compact keyboard menu with recoverable panes and a separate layout dialog', async () => { const { StudioDockShell } = await import('../../apps/studio/src/layout/StudioDockShell.tsx');
   const ui = render(<StudioDockShell compact={false} showInspector={false}
     preview={<p>Preview content</p>} source={<p>Source content</p>} library={<p>Library content</p>}
-    inspector={<p>Inspector content</p>} jobs={<p>Jobs content</p>} graph={<p>Graph content</p>} />);
+    inspector={<p>Inspector content</p>} diagnostics={<p>Diagnostics content</p>} jobs={<p>Jobs content</p>} graph={<p>Graph content</p>} />);
   await click('View'); const menu = screen.getByRole('menu', { name: 'View' });
-  assert.equal(within(menu).getAllByRole('menuitem').length, 7); assert.equal(screen.queryByLabelText('Move panel'), null);
+  assert.equal(within(menu).getAllByRole('menuitem').length, 9); assert.ok(within(menu).getByRole('menuitem', { name: 'Diagnostics' })); assert.ok(within(menu).getByRole('menuitem', { name: 'Keyboard shortcuts' })); assert.equal(screen.queryByLabelText('Move panel'), null);
   assert.equal(screen.queryByLabelText('Layout name'), null); const first = within(menu).getByRole('menuitem', { name: 'Preview' }); assert.ok(document.activeElement === first, 'View focuses its first pane item');
   fireEvent.keyDown(first, { key: 'ArrowDown' }); assert.ok(document.activeElement === within(menu).getByRole('menuitem', { name: 'Source' }), 'ArrowDown focuses Source');
   fireEvent.keyDown(document.activeElement!, { key: 'Escape' }); await waitFor(() => assert.ok(document.activeElement === screen.getByRole('button', { name: 'View' }), 'Restore focus to View')); await click('View'); await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: 'Layouts…' })); });
@@ -371,6 +401,8 @@ test('View is a compact keyboard menu with recoverable panes and a separate layo
   assert.ok(within(dialog).getByLabelText('Layout name'));
   await click('Done');
   await waitFor(() => assert.ok(!screen.queryByRole('dialog')));
+  selectedPanel = 'diagnostics'; await click('Close selected panel'); await click('Open Diagnostics');
+  assert.ok([...document.querySelectorAll('.dv-tab')].some(tab => tab.textContent?.trim() === 'Diagnostics'));
   ui.unmount();
 });
 
@@ -441,6 +473,39 @@ test('Graph wheel zoom anchors at the pointer and background gestures keep selec
   assert.equal(transform().zoom, .2);
   await click('Scene controls');
   assert.deepEqual(selections, [null, null]);
+});
+
+test('Graph keeps Scene available for plain visuals and compositions', async () => {
+  const { GraphPanel } = await import('../../apps/studio/src/GraphPanel.tsx');
+  const selections: unknown[] = [];
+  const { unmount } = render(<GraphPanel runtime={{ sceneName: 'Plain visual' } as any} selected={null} onSelect={path => selections.push(path)} />);
+  assert.ok(within(screen.getByRole('navigation', { name: 'Component breadcrumb' })).getByRole('button', { name: 'Scene' }));
+  assert.equal(document.querySelectorAll('.graph-node').length, 1);
+  assert.ok(screen.getByRole('button', { name: 'Scene' }));
+  assert.equal(screen.queryByRole('button', { name: 'View inside' }), null);
+  await act(async () => { fireEvent.click(document.querySelector<HTMLButtonElement>('.graph-scene-root')!); });
+  assert.deepEqual(selections, [null]);
+  unmount();
+
+  const { parse } = await import('@babel/parser');
+  const { createHash } = await import('node:crypto');
+  const { useState } = await import('react');
+  const { extractCompositionDeclaration } = await import('../../apps/build-worker/src/composition-declarations.mjs');
+  const { nestedCompositionSourceBundle } = await import('../compiler/composition-fixture.mjs');
+  const source = nestedCompositionSourceBundle();
+  const asts = Object.fromEntries(Object.entries(source.files).map(([path, text]) => [path, parse(text as string, { sourceType: 'module', plugins: ['typescript'] })]));
+  const composition = extractCompositionDeclaration({ entry: source.entry, files: source.files, asts, hash: (text: string) => createHash('sha256').update(text).digest('hex') });
+  assert.ok(composition);
+  function CompositionGraph() {
+    const [selected, setSelected] = useState<string | null>(null);
+    return <GraphPanel runtime={{ composition } as any} selected={selected} onSelect={path => setSelected(path ? JSON.stringify(path) : null)} />;
+  }
+  render(<CompositionGraph />);
+  assert.equal(document.querySelectorAll('.graph-node').length, 4);
+  assert.equal(screen.queryByRole('button', { name: 'View inside' }), null);
+  const component = [...document.querySelectorAll<HTMLButtonElement>('.graph-node')].find(node => node.textContent?.includes('Double mirror'))!;
+  await act(async () => { fireEvent.click(component); });
+  assert.ok(screen.getByRole('button', { name: 'View inside' }));
 });
 
 test('Graph connections point from output to input with reversed node declarations', async () => {

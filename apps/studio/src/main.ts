@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog, clipboard } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, clipboard, Menu } from 'electron';
 import { join, sep, isAbsolute } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { randomBytes } from 'node:crypto';
@@ -122,6 +122,9 @@ function createWindow(preview: boolean): BrowserWindow {
 }
 
 app.whenReady().then(async () => {
+  // Electron's default menu owns F11, Ctrl+Shift+I and Ctrl+Shift+R. Studio
+  // handles those keys in the renderer so every entry point uses one action.
+  Menu.setApplicationMenu(null);
   // The single-instance lock prevents another UI process overwriting this
   // session's nonce-bearing local page. No renderer service lock is involved.
   if (!app.requestSingleInstanceLock()) { app.quit(); return; }

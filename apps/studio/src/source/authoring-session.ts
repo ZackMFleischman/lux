@@ -37,7 +37,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
   let token: string | undefined;
   type LibraryUpdate=Readonly<{componentId:string;name:string;resolvedRevision:number;availableRevision:number}>;
   type LibraryFallback=Readonly<{componentId:string;resolvedRevision:number;message:string}>;
-  let state: Readonly<{ busy: boolean; name: string; controlsDirty: boolean; libraryDirty:boolean; libraryUpdates:readonly LibraryUpdate[];libraryFallbacks:readonly LibraryFallback[] }> = Object.freeze({ busy: false, name: 'Untitled', controlsDirty: false,libraryDirty:false,libraryUpdates:Object.freeze([]),libraryFallbacks:Object.freeze([]) });
+  let state: Readonly<{ busy: boolean; runtimeControlsAvailable:boolean; name: string; controlsDirty: boolean; libraryDirty:boolean; libraryUpdates:readonly LibraryUpdate[];libraryFallbacks:readonly LibraryFallback[] }> = Object.freeze({ busy: false,runtimeControlsAvailable:true, name: 'Untitled', controlsDirty: false,libraryDirty:false,libraryUpdates:Object.freeze([]),libraryFallbacks:Object.freeze([]) });
   let controlsVersion = 0;
   let libraryLinks:readonly SceneLibraryLink[]=Object.freeze([]);
   // An opened document retains its own values until its visual activates.
@@ -46,10 +46,10 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
   let pendingDocumentAnimations:readonly ControlAnimationBinding[]|null=null;
   const listeners = new Set<() => void>();
   function update(patch: Partial<typeof state>) { state = Object.freeze({ ...state, ...patch }); for (const listener of listeners) listener(); }
-  async function exclusive<T>(operation: () => Promise<T>): Promise<T> {
+  async function exclusive<T>(operation: () => Promise<T>,runtimeControlsAvailable=false): Promise<T> {
     if (state.busy || workspace.getSnapshot().busy) throw Error('Studio is busy');
-    update({ busy: true });
-    try { return await operation(); } finally { update({ busy: false }); }
+    update({ busy: true,runtimeControlsAvailable });
+    try { return await operation(); } finally { update({ busy: false,runtimeControlsAvailable:true }); }
   }
   async function documentControls(source:SourceBundle, requireAccepted=false):Promise<ControlValues | SavedControls> {
     const candidate=pendingDocumentControls ?? ports.getControlSnapshot?.();
@@ -116,7 +116,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
     read() { const snapshot = workspace.getSnapshot(); return { source: structuredClone(snapshot.source), draftVersion: snapshot.version,libraryLinks:structuredClone(libraryLinks) }; },
     controlsChanged() { if (pendingDocumentControls) return; controlsVersion++; update({ controlsDirty: true }); },
     build(source: SourceBundle, expectedVersion: number,requested?:readonly Readonly<{componentId:string;mountPath:string}>[]) {
-      return exclusive(() => buildLinked(source, expectedVersion,requested));
+      return exclusive(() => buildLinked(source, expectedVersion,requested),true);
     },
     saveLook(name: string, selected?: {id: string; revision: number}) {
       return exclusive(async () => {

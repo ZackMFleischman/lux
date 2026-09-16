@@ -76,6 +76,12 @@ export class LuxDockviewAdapter {
     delete this.closed[id];
     const opened = this.api.getPanel(id); opened?.api.setActive(); opened?.group.focus();
   }
+  toggle(kind: string): boolean {
+    this.live();
+    const existing = this.api.panels.find(panel => panel.view.contentComponent === kind);
+    if (existing) { this.api.removePanel(existing); return false; }
+    this.open(kind); return true;
+  }
   close(id: string): void { this.live(); const panel = this.api.getPanel(id); if (panel) this.api.removePanel(panel); }
   openBeside(kind:string,referenceId:string):void {
     this.live();

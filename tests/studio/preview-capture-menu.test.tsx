@@ -2,7 +2,7 @@ import { test, after, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import React from 'react';
-import { PreviewCaptureMenu } from '../../apps/studio/src/PreviewCaptureMenu.tsx';
+import { PreviewCaptureActions, PreviewCaptureMenu } from '../../apps/studio/src/PreviewCaptureMenu.tsx';
 import { StudioMenuProvider } from '../../apps/studio/src/StudioMenu.tsx';
 
 const dom = new JSDOM('<!doctype html><html><body></body></html>', { url: 'http://localhost/', pretendToBeVisual: true });
@@ -23,6 +23,8 @@ test('Preview menu exposes frame and recording actions and announces fixed recor
     onSaveFrame={async () => { calls.push('frame'); }} onStart={async () => { calls.push('start'); }} onStop={async () => { calls.push('stop'); }} /></header></StudioMenuProvider>);
 
   await user.click(screen.getByRole('button', { name: 'Preview' }));
+  assert.ok(screen.getByText('Ctrl+Shift+P'));
+  assert.ok(screen.getByText('Ctrl+Shift+R'));
   await user.click(screen.getByRole('menuitem', { name: 'Save frame PNG' }));
   await user.click(screen.getByRole('button', { name: 'Preview' }));
   await user.click(screen.getByRole('menuitem', { name: 'Record video' }));
@@ -44,4 +46,39 @@ test('Preview menu disables capture when no working visual exists', async () => 
   await user.click(screen.getByRole('button', { name: 'Preview' }));
   assert.equal(screen.getByRole('menuitem', { name: 'Save frame PNG' }).getAttribute('aria-disabled'), 'true');
   assert.equal(screen.getByRole('menuitem', { name: 'Record video' }).getAttribute('aria-disabled'), 'true');
+});
+
+test('Preview header actions use the shared recorder state and expose concise labels', async () => {
+  const calls: string[] = [];
+  const user = userEvent.setup({ document });
+  const { rerender } = render(<PreviewCaptureActions available status={{ phase: 'idle' }}
+    onSaveFrame={async () => { calls.push('frame'); }} onStart={async () => { calls.push('start'); }} onStop={async () => { calls.push('stop'); }} />);
+
+  const frame = screen.getByRole('button', { name: 'Save frame PNG' });
+  assert.equal(frame.getAttribute('title'), null);
+  await user.hover(frame);
+  assert.ok(await screen.findByRole('tooltip', { name: /Save frame PNG.*Ctrl\+Shift\+P/ }));
+  await user.unhover(frame);
+  await user.click(frame);
+  await user.click(screen.getByRole('button', { name: 'Record video' }));
+  assert.deepEqual(calls, ['frame', 'start']);
+
+  rerender(<PreviewCaptureActions available status={{ phase: 'recording', width: 1920, height: 1080, mimeType: 'video/webm', path: 'C:/clip.webm' }}
+    onSaveFrame={async () => { calls.push('frame'); }} onStart={async () => { calls.push('start'); }} onStop={async () => { calls.push('stop'); }} />);
+  assert.ok(screen.getByLabelText('Preview capture actions').textContent?.includes('Recording 1920 × 1080'));
+  assert.equal((screen.getByRole('button', { name: 'Save frame PNG' }) as HTMLButtonElement).disabled, true);
+  await user.click(screen.getByRole('button', { name: 'Stop recording' }));
+  assert.deepEqual(calls, ['frame', 'start', 'stop']);
+
+  rerender(<PreviewCaptureActions available status={{ phase: 'stopping', width: 1920, height: 1080, mimeType: 'video/webm', path: 'C:/clip.webm' }}
+    onSaveFrame={async () => { calls.push('frame'); }} onStart={async () => { calls.push('start'); }} onStop={async () => { calls.push('stop'); }} />);
+  assert.equal((screen.getByRole('button', { name: 'Stop recording' }) as HTMLButtonElement).disabled, true);
+});
+
+test('Preview header keeps recording text local while the menu provides one live announcement', () => {
+  render(<StudioMenuProvider><header><PreviewCaptureMenu available status={{ phase: 'recording', width: 1920, height: 1080, mimeType: 'video/webm', path: 'C:/clip.webm' }}
+    onSaveFrame={async () => {}} onStart={async () => {}} onStop={async () => {}} /></header><PreviewCaptureActions available status={{ phase: 'recording', width: 1920, height: 1080, mimeType: 'video/webm', path: 'C:/clip.webm' }}
+    onSaveFrame={async () => {}} onStart={async () => {}} onStop={async () => {}} /></StudioMenuProvider>);
+  assert.equal(screen.getAllByRole('status').length, 1);
+  assert.ok(screen.getByLabelText('Preview capture actions').textContent?.includes('Recording 1920 × 1080'));
 });

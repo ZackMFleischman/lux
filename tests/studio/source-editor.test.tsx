@@ -8,7 +8,7 @@ Object.defineProperty(globalThis, 'IS_REACT_ACT_ENVIRONMENT', { configurable: tr
 // jsdom has no layout; these only allow CodeMirror's scheduled geometry reads.
 dom.window.Range.prototype.getClientRects = () => [] as unknown as DOMRectList;
 dom.window.Range.prototype.getBoundingClientRect = () => new dom.window.DOMRect();
-const { render, screen, cleanup, fireEvent, act, waitFor } = await import('@testing-library/react');
+const { render, screen, cleanup, fireEvent, act, waitFor, within } = await import('@testing-library/react');
 const { SourcePanel } = await import('../../apps/studio/src/source/SourcePanel.tsx');
 const { ProblemsPanel } = await import('../../apps/studio/src/source/ProblemsPanel.tsx');
 const { createSourceWorkspace } = await import('../../apps/studio/src/source/workspace.ts');
@@ -65,9 +65,9 @@ test('source panel preserves helper edits and undo across close/reopen and docum
   assert.equal(view().state.doc.toString(), 'new document');
   await act(async () => { assert.equal(undo(view()), false); });
 });
-test('file creation validates paths, saving sees all files, and busy view is readonly', async () => {
-  const w = fixture(); let saved: unknown;
-  const ui = render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => { saved = w.getSnapshot().source; }} />);
+test('file creation validates paths, includes all files, and busy view is readonly', async () => {
+  const w = fixture();
+  const ui = render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} />);
   assert.equal(screen.queryByRole('textbox', { name: 'New TypeScript file' }), null);
   await click(screen.getByRole('button', { name: 'New file' }));
   fireEvent.change(screen.getByRole('textbox', { name: 'New TypeScript file' }), { target: { value: '../bad.ts' } });
@@ -77,8 +77,7 @@ test('file creation validates paths, saving sees all files, and busy view is rea
   fireEvent.change(screen.getByRole('textbox', { name: 'New TypeScript file' }), { target: { value: 'lib/new.ts' } });
   await click(screen.getByRole('button', { name: 'Add file' }));
   assert.equal(w.getSnapshot().selectedFile, 'lib/new.ts');
-  fireEvent.keyDown(view().contentDOM, { key: 's', ctrlKey: true, shiftKey: true });
-  assert.equal(Object.keys((saved as any).files).length, 4);
+  assert.equal(Object.keys(w.getSnapshot().source.files).length, 4);
   ui.rerender(<SourcePanel workspace={w} readOnly={true} onApply={() => {}} onSave={() => {}} />);
   assert.equal(view().contentDOM.getAttribute('contenteditable'), 'false');
   assert.equal((screen.getByRole('button', { name: 'New file' }) as HTMLButtonElement).disabled, true);
@@ -100,27 +99,26 @@ test('external replacement resets changed file history and panel remount retains
   assert.ok(document.querySelector('.cm-lineNumbers'));
   assert.ok(document.querySelector('.cm-line span[class]'), 'TypeScript tokens have highlighting classes');
 });
-test('composition suppresses save and failed admission restores the admitted editor text', async () => {
-  const w = fixture(); let saves = 0;
-  render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => { saves++; }} />);
+test('composition suppresses Build and failed admission restores the admitted editor text', async () => {
+  const w = fixture(); let builds = 0;
+  render(<SourcePanel workspace={w} readOnly={false} onApply={() => { builds++; }} />);
   fireEvent.compositionStart(view().contentDOM);
-  fireEvent.keyDown(view().contentDOM, { key: 's', ctrlKey: true, shiftKey: true }); assert.equal(saves, 0);
+  fireEvent.keyDown(view().contentDOM, { key: 'Enter', ctrlKey: true }); assert.equal(builds, 0);
   fireEvent.compositionEnd(view().contentDOM);
-  fireEvent.keyDown(view().contentDOM, { key: 's', ctrlKey: true, shiftKey: true }); assert.equal(saves, 1);
+  fireEvent.keyDown(view().contentDOM, { key: 'Enter', ctrlKey: true }); assert.equal(builds, 1);
   await act(async () => { view().dispatch({ changes: { from: 0, insert: '\ud800' } }); });
   assert.equal(view().state.doc.toString(), w.getSnapshot().source.files['main.ts']);
   assert.match(screen.getByRole('alert').textContent!, /valid UTF-8/);
 });
 test('repeated rejected edits never diverge from admitted source and preserve prior undo history', async () => {
-  const w = fixture(); let saved: unknown;
-  render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => { saved = w.getSnapshot().source; }} />);
+  const w = fixture();
+  render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} />);
   await act(async () => { view().dispatch({ changes: { from: 0, insert: '// admitted\n' } }); });
   const version = w.getSnapshot().version, admitted = w.getSnapshot().source.files['main.ts'];
   for (let i = 0; i < 2; i++) {
     await act(async () => { view().dispatch({ changes: { from: 0, insert: '\ud800' } }); });
     assert.equal(view().state.doc.toString(), admitted); assert.equal(w.getSnapshot().version, version);
-    fireEvent.keyDown(view().contentDOM, { key: 's', ctrlKey: true, shiftKey: true });
-    assert.equal((saved as any).files['main.ts'], admitted);
+    assert.equal(w.getSnapshot().source.files['main.ts'], admitted);
   }
   await act(async () => { assert.equal(undo(view()), true); });
   assert.equal(w.getSnapshot().source.files['main.ts'], 'export const main = 1');
@@ -265,37 +263,36 @@ test('collapsing source navigation preserves the active asset and code draft', a
   assert.equal(w.getSnapshot().source.files['main.ts'], '// retained draft\nexport const main = 1');
 });
 
-test('source shortcuts apply all drafts with Ctrl/Cmd+S and save the scene only with Shift', async () => {
+test('source shortcut builds with Ctrl/Cmd+Enter and leaves scene save for the app command layer', async () => {
   const w = fixture(); const commands: string[] = [];
   const ui = render(<SourcePanel workspace={w} readOnly={false} onApply={() => { commands.push('apply'); }} onSave={() => { commands.push('save'); }} />);
-  const key = (options: KeyboardEventInit) => fireEvent.keyDown(view().contentDOM, { key: 's', ...options });
-  assert.equal(key({}), true);
+  const key = (value: string, options: KeyboardEventInit) => fireEvent.keyDown(view().contentDOM, { key: value, ...options });
+  key('Enter', {});
   for (const modifier of [{ ctrlKey: true }, { metaKey: true }]) {
-    assert.equal(key(modifier), false);
-    assert.equal(key({ ...modifier, key: 'S', shiftKey: true }), false);
-    for (const shiftKey of [false, true]) {
-      assert.equal(key({ ...modifier, shiftKey, repeat: true }), false);
-      key({ ...modifier, shiftKey, isComposing: true });
-      assert.equal(key({ ...modifier, shiftKey, altKey: true }), true);
-      fireEvent.compositionStart(view().contentDOM);
-      key({ ...modifier, shiftKey });
-      fireEvent.compositionEnd(view().contentDOM);
-    }
+    assert.equal(key('Enter', modifier), false);
+    key('s', modifier);
+    key('S', { ...modifier, shiftKey: true });
+    assert.equal(key('Enter', { ...modifier, repeat: true }), false);
+    key('Enter', { ...modifier, isComposing: true });
+    key('Enter', { ...modifier, altKey: true });
+    fireEvent.compositionStart(view().contentDOM);
+    key('Enter', modifier);
+    fireEvent.compositionEnd(view().contentDOM);
   }
-  assert.deepEqual(commands, ['apply', 'save', 'apply', 'save']);
+  assert.deepEqual(commands, ['apply', 'apply']);
   ui.rerender(<SourcePanel workspace={w} readOnly={true} onApply={() => { commands.push('apply'); }} onSave={() => { commands.push('save'); }} />);
-  key({ ctrlKey: true }); key({ metaKey: true, shiftKey: true });
-  assert.deepEqual(commands, ['apply', 'save', 'apply', 'save']);
+  key('Enter', { ctrlKey: true }); key('Enter', { metaKey: true });
+  assert.deepEqual(commands, ['apply', 'apply']);
   ui.rerender(<SourcePanel workspace={w} readOnly={false} onApply={() => { commands.push('apply'); }} onSave={() => { commands.push('save'); }} />);
   let finish!: () => void;
   let pending!: Promise<void>;
   await act(async () => { pending = w.submit(w.getSnapshot().source, w.getSnapshot().version, () => new Promise(resolve => { finish = resolve; })); });
-  key({ ctrlKey: true }); key({ metaKey: true, shiftKey: true });
-  assert.deepEqual(commands, ['apply', 'save', 'apply', 'save']);
+  key('Enter', { ctrlKey: true }); key('Enter', { metaKey: true });
+  assert.deepEqual(commands, ['apply', 'apply']);
   await act(async () => { finish(); await pending; });
 });
 
-test('authoring source shortcut compiles the complete edited bundle, exposes errors, and keeps explicit scene save', async () => {
+test('authoring source shortcut compiles the complete edited bundle, exposes errors, and keeps explicit scene save', async t => {
   // Only the compiler/file IPC boundary is replaced; authoring/session/workspace/editor stay real.
   Object.assign(globalThis, {
     requestAnimationFrame: dom.window.requestAnimationFrame.bind(dom.window),
@@ -324,17 +321,19 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
       clockEpoch: 0, controlSequence: 0, intensity: this.init.controls.intensity, playback: 'playing', ...extra } }); }
     terminate() { if (this.timer) clearInterval(this.timer); }
   }
+  t.after(()=>AuthoringWorker.all.forEach(worker=>worker.terminate()));
   Object.defineProperty(globalThis, 'Worker', { configurable: true, value: AuthoringWorker });
   (dom.window.HTMLCanvasElement.prototype as any).transferControlToOffscreen = () => ({});
   const sceneName = 'A deliberately long scene title.lux-scene';
+  window.luxExport = { unavailableReason: 'Resolume export is not included in this installation', create: async () => null };
   window.luxAuthoring = {
     example: async () => source,
     compile: async bundle => { builds.push(structuredClone(bundle));
-      if (!compileSucceeds) {
+      if (builds.length > 1 && !compileSucceeds) {
         await new Promise<void>(resolve => { finish = resolve; });
         return { ok: false, diagnostics: [{ file: 'lib/color.ts', line: 1, column: 8, message: 'Shortcut compile error' }] };
       }
-      return { ok: true, linked: { code: '' }, sourceHash: 'resolved-source' }; },
+      return { ok: true, linked: { code: '' }, sourceHash: 'a'.repeat(64) }; },
     save: async request => { saves.push(request);
       if (holdSave) await new Promise<void>(resolve => { finishSave = resolve; });
       return { token: 'scene-token', name: sceneName }; },
@@ -343,6 +342,17 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
   };
   const { AuthoringApp } = await import('../../apps/studio/src/authoring.tsx');
   await act(async () => { render(<AuthoringApp />); });
+  assert.deepEqual([...document.querySelectorAll<HTMLButtonElement>('header [data-studio-menu]')].map(button => button.textContent), ['File', 'View', 'Preview']);
+  await waitFor(() => assert.equal(builds.length, 1));
+  assert.equal(AuthoringWorker.all[0]!.init.playing, true, 'normal startup builds and plays the loaded example');
+  assert.match(screen.getByRole('button', { name: 'Build' }).getAttribute('title') ?? '', /Ctrl\+Enter/);
+  fireEvent.click(screen.getByText('File'));
+  const fileMenu = screen.getByRole('menu', { name: 'File' });
+  for (const hint of ['Ctrl+S', 'Ctrl+Shift+S', 'Ctrl+Shift+E']) assert.ok(within(fileMenu).getByText(hint));
+  const unavailableExport = within(fileMenu).getByRole('menuitem', { name: /Export for Resolume/ });
+  assert.equal(unavailableExport.getAttribute('aria-disabled'), 'true');
+  assert.equal(unavailableExport.getAttribute('title'), 'Resolume export is not included in this installation');
+  fireEvent.keyDown(fileMenu, { key: 'Escape' });
   await click(screen.getByRole('button', { name: 'View' }));
   await click(screen.getByRole('menuitem', { name: 'Source' }));
   await waitFor(() => assert.ok(screen.queryByRole('button', { name: 'View' })));
@@ -350,15 +360,23 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
   await act(async () => { view().dispatch({ changes: { from: 0, to: view().state.doc.length, insert: 'export const color = 42' } }); });
   const editor = view();
   await act(async () => {
-    fireEvent.keyDown(editor.contentDOM, { key: 's', ctrlKey: true });
-    fireEvent.keyDown(editor.contentDOM, { key: 's', ctrlKey: true });
+    fireEvent.keyDown(editor.contentDOM, { key: 'Enter', ctrlKey: true });
+    fireEvent.keyDown(editor.contentDOM, { key: 'Enter', ctrlKey: true });
     fireEvent.keyDown(editor.contentDOM, { key: 's', metaKey: true, shiftKey: true });
   });
-  assert.deepEqual(builds, [{ sdkVersion: '0.1.0', entry: 'main.ts', files: {
+  assert.deepEqual(builds, [source, { sdkVersion: '0.1.0', entry: 'main.ts', files: {
     'main.ts': 'export const main = 1', 'lib/color.ts': 'export const color = 42', 'other/color.ts': 'export const color = 2',
   } }]);
   assert.equal(saves.length, 0);
   assert.equal(screen.queryByText(/Studio is busy/), null);
+  await click(screen.getByRole('button', { name: 'View' }));
+  await click(screen.getByRole('menuitem', { name: 'Inspector' }));
+  await waitFor(() => assert.ok(screen.queryByRole('slider', { name: 'Intensity' })));
+  assert.equal((screen.getByRole('slider', { name: 'Intensity' }) as HTMLInputElement).disabled, false,
+    'the current preview controls remain editable during background compilation');
+  await click(screen.getByRole('button', { name: 'View' }));
+  await click(screen.getByRole('menuitem', { name: 'Source' }));
+  await waitFor(() => assert.ok(screen.queryByRole('button', { name: 'Open lib/color.ts' })));
   await act(async () => { finish(); });
   await click(screen.getByRole('button', { name: /Problems: 1/ }));
   await waitFor(() => assert.ok(screen.queryByRole('button', { name: /Shortcut compile error/ })));
@@ -375,30 +393,33 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
   assert.equal(view().state.selection.main.head, 0, 'consumed navigation does not replay when returning to the file');
   const activeEditor = view();
   fireEvent.click(screen.getByText('File'));
+  await waitFor(() => assert.equal(screen.getByRole('menuitem', { name: 'Save' }).getAttribute('aria-disabled'), null));
   await click(screen.getByRole('menuitem', { name: 'Save' }));
-  assert.equal(builds.length, 1); assert.equal(saves.length, 1);
+  assert.equal(builds.length, 2); await waitFor(() => assert.equal(saves.length, 1));
   assert.equal(screen.queryByText(/Studio is busy/), null);
   await act(async () => { holdSave = false; finishSave(); });
-  assert.equal(saves[0].saveAs, false); assert.deepEqual(saves[0].document.source, builds[0]);
+  assert.equal(saves[0].saveAs, false); assert.deepEqual(saves[0].document.source, builds[1]);
   const title = document.querySelector('.document-name')!;
   assert.equal(title.getAttribute('title'), sceneName);
   assert.ok(title.textContent?.includes(sceneName));
   assert.equal(title.querySelector('button, summary, [role="button"]'), null);
   await act(async () => { activeEditor.dispatch({ changes: { from: 0, insert: '// unsaved\n' } }); });
   assert.ok(title.textContent?.endsWith(' *'));
-  fireEvent.click(screen.getByText('File'));
-  await click(screen.getByRole('menuitem', { name: 'Save' }));
+  fireEvent.keyDown(activeEditor.contentDOM, { key: 's', ctrlKey: true });
+  await waitFor(() => assert.equal(saves.length, 2));
   assert.equal(saves.length, 2); assert.equal(saves[1].saveAs, false);
   assert.equal(title.textContent?.endsWith(' *'), false);
-  fireEvent.click(screen.getByText('File'));
-  await click(screen.getByRole('menuitem', { name: 'Save as' }));
+  fireEvent.keyDown(activeEditor.contentDOM, { key: 's', ctrlKey: true, shiftKey: true });
+  await waitFor(() => assert.equal(saves.length, 3));
   assert.equal(saves.length, 3); assert.equal(saves[2].saveAs, true);
+  fireEvent.keyDown(activeEditor.contentDOM, { key: 's', ctrlKey: true, shiftKey: true, repeat: true });
+  assert.equal(saves.length, 3, 'repeat does not reopen Save as');
   compileSucceeds = true;
   const current = await agentCommand({ method: 'read', params: {} });
   await act(async () => { await agentCommand({ method: 'build', params: { source: current.source, expectedDraftVersion: current.draftVersion } }); });
   assert.equal(screen.queryByText(/Shortcut compile error/), null);
   assert.ok(screen.getByRole('button', { name: /Problems: 0/ }));
-  assert.equal(builds.length, 2);
+  assert.equal(builds.length, 3);
   await act(async () => {
     AuthoringWorker.all.at(-1)!.reply({ type: 'failure', message: 'test cleanup' });
     await new Promise(resolve => setTimeout(resolve, 350));

@@ -25,17 +25,22 @@ import { completeLibraryMutation } from './library/library-mutation.ts';
 import './library-client.ts';
 import './look-client.ts';
 import { LooksDialog } from './LooksDialog.tsx';
-import { PreviewCaptureMenu } from './PreviewCaptureMenu.tsx';
+import { PreviewCaptureActions, PreviewCaptureMenu } from './PreviewCaptureMenu.tsx';
 import { PreviewRecorder } from './preview-recorder.ts';
 import { assertAgentCaptureSize } from './preview-capture-client.ts';
 import type { PreviewRecorderSnapshot } from './preview-recorder.ts';
 import './preview-capture-client.ts';
 import { createRendererSnapshot } from './renderer-snapshot.ts';
+import { shortcutHint } from './studio-shortcuts.ts';
+import type { StudioShortcutActions, StudioShortcutCommand } from './studio-shortcuts.ts';
 const client = new StandaloneClient(window.luxAuthoring, { codeDeclaredParameters: true });
 const agentStatus = () => ({ ...client.getSnapshot(), capabilities: studioCapabilities });
 const idleRecording = Object.freeze({ phase: 'idle' }) as PreviewRecorderSnapshot;
 const subscribeIdle = () => () => {};
 const getIdleRecording = () => idleRecording;
+function ShortcutLabel({ command }: { command: StudioShortcutCommand }) {
+  return <span className="studio-shortcut-hint" aria-hidden="true">{shortcutHint[command]}</span>;
+}
 export function AuthoringApp() {
   const confirmation = useDiscardConfirmation();
   const windows = useMemo(() => window.luxStudioWindows ? { ...window.luxStudioWindows,
@@ -102,7 +107,7 @@ export function AuthoringApp() {
     if (lookOperation.current && !['read', 'status'].includes(command.method)) throw Error('Wait for the look operation to finish');
     if (confirmation.isPending() && !['read', 'status', 'capture','library.list','library.read'].includes(command.method)) throw Error('Studio is waiting for a user confirmation');
     if (['parameters', 'playback', 'restart'].includes(command.method)) {
-      if(session.getSnapshot().busy)throw Error('Studio is busy with a scene file operation');
+      if(!session.getSnapshot().runtimeControlsAvailable)throw Error('Studio is busy with a scene file operation');
       const write = dispatchRuntimeCommand(client, command.method, command.params);
       if (command.method === 'parameters') {
         pendingControlWrites.current.add(write);
@@ -162,9 +167,12 @@ export function AuthoringApp() {
     // Do not overwrite a draft edited while the initial example was loading.
     if (workspace.getSnapshot().version !== 0 || session.getSnapshot().busy) return;
     workspace.replaceDocument(source);
-    if (await window.luxAuthoring.smokeEnabled?.()) {
-      try {
-        await session.build(source, workspace.getSnapshot().version);
+    let smoke=false;
+    try {
+      await session.build(source, workspace.getSnapshot().version);
+      clearDiagnostics();
+      smoke=await window.luxAuthoring.smokeEnabled?.()===true;
+      if(smoke){
         const initial = client.getSnapshot().authoring!;
         await client.invoke({ name: 'lux.parameters.set', input: { requestId: crypto.randomUUID(), instanceId: initial.instanceId,
           expectedGeneration: initial.generation, expectedRevisionId: initial.revisionId, values: { intensity: 0.8 }, mode: 'live' } });
@@ -181,8 +189,8 @@ export function AuthoringApp() {
             roundtrip.document.source.files[source.entry] !== source.files[source.entry] || ('intensity' in roundtrip.document.controls ? roundtrip.document.controls.intensity : undefined) !== 0.8) throw Error('Save/reopen did not preserve the visual');
         await new Promise(resolve => setTimeout(resolve, 500));
         await window.luxAuthoring.smokeResult?.({ ok: true, initial, applied, invalidRejected, capture, savedAndReopened: true });
-      } catch (error) { setError(String(error)); await window.luxAuthoring.smokeResult?.({ ok: false, error: String(error), snapshot: client.getSnapshot() }); }
-    }
+      }
+    } catch (error) { reportError(error,workspace.getSnapshot().version,source);if(smoke)await window.luxAuthoring.smokeResult?.({ ok: false, error: String(error), snapshot: client.getSnapshot() }); }
   }).catch(reason => setError(String(reason))); }, [session, workspace]);
   async function build() { if (composing.current || session.getSnapshot().busy || workspace.getSnapshot().busy) return; setError(''); const current = session.read();
     try { if (pendingControlWrites.current.size) await finishControlWrites(); await session.build(current.source, current.draftVersion); clearDiagnostics(); } catch (reason) { reportError(reason, current.draftVersion, current.source); } }
@@ -270,21 +278,31 @@ export function AuthoringApp() {
       await session.loadLook(id); clearDiagnostics(); setError(''); return true;
     });
   }
+  const previewAvailable = !!previewRecorder && !!runtimeSnapshot.authoring && runtimeSnapshot.authoring.playback !== 'failed';
+  const exportUnavailable = window.luxExport?.unavailableReason;
+  const shortcutActions: StudioShortcutActions = {
+    build: { run: build, disabled: busy },
+    save: { run: save, disabled: busy },
+    'save-as': { run: () => save(true), disabled: busy },
+    export: { run: () => setExportOpen(true), disabled: busy || composing.current || !!exportUnavailable, disabledReason: exportUnavailable },
+    'save-frame': { run: savePreviewFrame, disabled: !previewAvailable || recording.phase !== 'idle' },
+    'toggle-recording': { run: recording.phase === 'idle' ? startPreviewRecording : stopPreviewRecording, disabled: !previewAvailable || recording.phase === 'stopping' },
+  };
   const fileMenu = <>
     <StudioMenu label="File" buttonRef={fileSummary} className="file-tools">
       <MenuItem disabled={busy} onClick={() => void open()}>Open</MenuItem>
-      <MenuItem disabled={busy} onClick={() => void save()}>Save</MenuItem>
-      <MenuItem disabled={busy} onClick={() => void save(true)}>Save as</MenuItem>
+      <MenuItem disabled={shortcutActions.save!.disabled} onClick={() => void shortcutActions.save!.run()}><span>Save</span><ShortcutLabel command="save" /></MenuItem>
+      <MenuItem disabled={shortcutActions['save-as']!.disabled} onClick={() => void shortcutActions['save-as']!.run()}><span>Save as</span><ShortcutLabel command="save-as" /></MenuItem>
       <MenuItem disabled={busy} onClick={() => setLooksOpen(true)}>Looks…</MenuItem>
-      <MenuItem disabled={busy || composing.current || !!window.luxExport?.unavailableReason} title={window.luxExport?.unavailableReason} onClick={() => setExportOpen(true)}>
-        Export for Resolume{window.luxExport?.unavailableReason ? ' (not included)' : ''}</MenuItem>
+      <MenuItem disabled={shortcutActions.export!.disabled} title={shortcutActions.export!.disabledReason} onClick={() => void shortcutActions.export!.run()}>
+        <span>Export for Resolume{exportUnavailable ? ' (not included)' : ''}</span><ShortcutLabel command="export" /></MenuItem>
     </StudioMenu>
-    <PreviewCaptureMenu available={!!previewRecorder && !!runtime && runtime.playback !== 'failed'} status={recording}
-      onSaveFrame={savePreviewFrame} onStart={startPreviewRecording} onStop={stopPreviewRecording} />
   </>;
   const commands = <>
+    <PreviewCaptureMenu available={previewAvailable} status={recording}
+      onSaveFrame={savePreviewFrame} onStart={startPreviewRecording} onStop={stopPreviewRecording} />
     <span className="document-name" title={io.name}><span className="document-label">Scene</span><span className="document-title">{io.name}</span>{dirty && <span aria-label="Unsaved changes"> *</span>}</span>
-    <Button className="studio-build-button" variant="outlined" color="inherit" disabled={busy} aria-label="Build" aria-busy={busy} title="Build preview (Ctrl/Cmd+S in source)" onClick={() => void build()}>
+    <Button className="studio-build-button" variant="outlined" color="inherit" disabled={busy} aria-label="Build" aria-busy={busy} title={`Build preview (${shortcutHint.build})`} onClick={() => void shortcutActions.build!.run()}>
       {busy && <span className="status-spinner" aria-hidden="true" />}Build
     </Button>
   </>;
@@ -296,9 +314,10 @@ export function AuthoringApp() {
     {confirmation.dialog}
     <ExportDialog disabled={busy || composing.current} open={exportOpen} onClose={() => setExportOpen(false)} onClosed={() => fileSummary.current?.focus()} defaultName={io.name} create={async name => { if (pendingControlWrites.current.size) await finishControlWrites(); return session.exportSource(name); }} />
     <LooksDialog open={looksOpen} onClose={() => setLooksOpen(false)} onClosed={() => fileSummary.current?.focus()} client={window.luxLooks} onSave={saveLook} onLoad={loadLook} />
-    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} sourceChanged={draft.hasRunningSource && !draft.runningMatchesDraft} appCommands={commands} appError={error} controlEdits={controlEdits} controlsAvailable={!io.busy} libraryPanel={libraryPanel}
+    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} shortcutActions={shortcutActions} previewActions={<PreviewCaptureActions available={previewAvailable} status={recording}
+      onSaveFrame={savePreviewFrame} onStart={startPreviewRecording} onStop={stopPreviewRecording} />} sourceChanged={draft.hasRunningSource && !draft.runningMatchesDraft} appCommands={commands} appError={error} controlEdits={controlEdits} controlsAvailable={io.runtimeControlsAvailable} libraryPanel={libraryPanel}
       sourceDiagnostics={{ items: diagnostics, snapshot: draft, onNavigate: target => setDiagnosticTarget(previous => ({ ...target, request: (previous?.request ?? 0) + 1, documentKey: draft.documentKey, draftVersion: draft.version })) }}
-      sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onApply={() => void build()} onSave={() => void save()} onCompositionChange={value => { composing.current = value; }} diagnosticTarget={diagnosticTarget}
+      sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onApply={() => void shortcutActions.build!.run()} onCompositionChange={value => { composing.current = value; }} diagnosticTarget={diagnosticTarget}
         onDiagnosticTargetHandled={request => setDiagnosticTarget(current => current?.request === request ? null : current)} />} />
   </div></StudioMenuProvider></ThemeProvider>;
 }

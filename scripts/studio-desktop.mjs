@@ -37,7 +37,7 @@ export async function desktopInfo(record,{start=false}={}) {
   if(!status)throw Error('Installed Lux did not become ready within 60 seconds; inspect the desktop app before retrying.');
  }
  return {installed:true,running:true,...record,studioSession:status.studioSession,
-  mcp:{command:record.node,args:[record.adapter],cwd:record.workspace,env:{LUX_STUDIO_PROFILE:record.profile,LUX_STUDIO_SESSION_ID:status.studioSession.sessionId}}};
+  mcp:{command:record.node,args:[record.adapter],cwd:record.workspace,env:{LUX_STUDIO_PROFILE:record.profile,LUX_STUDIO_DESKTOP:'1',LUX_STUDIO_SESSION_ID:status.studioSession.sessionId}}};
 }
 export async function activateDesktop(recordPath,{root=desktopInstallRoot()}={}) {
  const record=await readDesktopInstallation({root,recordPath});

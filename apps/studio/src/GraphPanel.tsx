@@ -48,7 +48,7 @@ export function GraphPanel({runtime,selected,onSelect}:{runtime:RuntimeView|null
   const focusOccurrence=compositionOccurrence(runtime,focus),activeFocus=(focusOccurrence?.definition.kind==='graph'?focus:[]) as NodePath;
   useEffect(()=>{if(nodeKey(activeFocus)!==nodeKey(focus))setFocus(activeFocus);},[profile,focus,activeFocus]);
   const nodes=useMemo(()=>profile?orderedChildren(profile,activeFocus):[],[profile,nodeKey(activeFocus)]),definition=compositionOccurrence(runtime,activeFocus)?.definition,body=definition?.kind==='graph'?definition.body:null,output=body?.outputBindings.image;
-  const selectedNode=nodes.find(node=>nodeKey(node.nodePath)===selected),canOpen=selectedNode?.definition.kind==='graph',width=Math.max(240,nodes.length*250-30),height=Math.max(180,190+(body?.edges.length??0)*12);
+  const selectedNode=nodes.find(node=>nodeKey(node.nodePath)===selected),canOpen=selectedNode?.definition.kind==='graph',width=Math.max(240,(nodes.length+1)*250-30),height=Math.max(180,190+(body?.edges.length??0)*12);
   function fit(){const box=viewport.current?.getBoundingClientRect();if(!box)return;const zoom=Math.max(.2,Math.min(1,(box.width-48)/width,(box.height-48)/height));updateView({x:(box.width-width*zoom)/2,y:Math.max(24,(box.height-height*zoom)/2),zoom});}
   function zoom(factor: number, point?: { x: number; y: number }) {
     const box = viewport.current?.getBoundingClientRect();
@@ -87,12 +87,12 @@ export function GraphPanel({runtime,selected,onSelect}:{runtime:RuntimeView|null
   const parent=activeFocus.slice(0,-1) as NodePath,crumbs=activeFocus.map((_,index)=>activeFocus.slice(0,index+1) as NodePath);
   return <section className="graph-panel" aria-label="Composition graph">
     <div className="graph-toolbar"><Button onClick={()=>onSelect(null)} aria-pressed={selected===null}>Scene controls</Button>
-      <nav className="graph-breadcrumb" aria-label="Component breadcrumb"><Button onClick={()=>setFocus([])}>{compositionNodeLabel(runtime,[])}</Button>{crumbs.map(path=><span key={nodeKey(path)}><span aria-hidden="true">›</span><Button aria-current={nodeKey(path)===nodeKey(activeFocus)?'page':undefined} onClick={()=>setFocus(path)}>{compositionNodeLabel(runtime,path)}</Button></span>)}</nav>
+      <nav className="graph-breadcrumb" aria-label="Component breadcrumb"><Button onClick={()=>setFocus([])}>Scene</Button>{crumbs.map(path=><span key={nodeKey(path)}><span aria-hidden="true">›</span><Button aria-current={nodeKey(path)===nodeKey(activeFocus)?'page':undefined} onClick={()=>setFocus(path)}>{compositionNodeLabel(runtime,path)}</Button></span>)}</nav>
       {activeFocus.length>0&&<Button onClick={()=>setFocus(parent)} aria-label={`Back to ${compositionNodeLabel(runtime,parent)}`}>Back</Button>}
-      <Button disabled={!canOpen} onClick={()=>selectedNode&&enter(selectedNode.nodePath)}>Open component</Button>
+      {canOpen&&<Button onClick={()=>selectedNode&&enter(selectedNode.nodePath)}>View inside</Button>}
       <Button onClick={()=>zoom(1/1.2)} aria-label="Zoom out">−</Button><span>{Math.round(view.zoom*100)}%</span>
       <Button onClick={()=>zoom(1.2)} aria-label="Zoom in">+</Button><Button onClick={fit}>Fit</Button></div>
-    {!runtime?<p className="hint">Build a visual to see its composition.</p>:!body?<p className="hint">This visual has no component graph. Adjust its controls in Inspector.</p>:
+    {!runtime?<p className="hint">Build a visual to see its composition.</p>:
     <div className={`graph-viewport${panning ? ' graph-panning' : ''}`} ref={viewport} aria-label="Graph canvas"
       onPointerDown={event => {
         if (drag.current) return;
@@ -115,11 +115,11 @@ export function GraphPanel({runtime,selected,onSelect}:{runtime:RuntimeView|null
       onClickCapture={event => { if (suppressClick.current) { event.preventDefault(); event.stopPropagation(); suppressClick.current = false; } }}>
       <div className="graph-content" style={{width,height,transform:`translate(${view.x}px,${view.y}px) scale(${view.zoom})`}}>
         <svg className="graph-wires" width={width} height={height} aria-label="Node connections">
-          {body.edges.map((edge, edgeIndex) => {
+          {body?.edges.map((edge, edgeIndex) => {
             const from = nodes.findIndex(node => node.id === edge.from.nodeId);
             const to = nodes.findIndex(node => node.id === edge.to.nodeId);
             const highlighted = selected === nodeKey(nodes[from]!.nodePath) || selected === nodeKey(nodes[to]!.nodePath);
-            const fromX = from * 250 + 220, toX = to * 250;
+            const fromX = (from + 1) * 250 + 220, toX = (to + 1) * 250;
             const fromY = 82 + Object.keys(nodes[from]!.metadata.outputs).indexOf(edge.from.portId) * 20;
             const toY = 82 + Object.keys(nodes[to]!.metadata.inputs).indexOf(edge.to.portId) * 20;
             // Route a branch beneath intervening nodes instead of hiding it behind them.
@@ -135,7 +135,8 @@ export function GraphPanel({runtime,selected,onSelect}:{runtime:RuntimeView|null
             </g>;
           })}
         </svg>
-        {nodes.map((node,index)=><button type="button" className="graph-node" key={nodeKey(node.nodePath)} style={{left:index*250}} aria-pressed={selected===nodeKey(node.nodePath)} onClick={()=>onSelect(node.nodePath)} onDoubleClick={()=>enter(node.nodePath)} onKeyDown={event=>{if(event.key==='Enter'&&node.definition.kind==='graph'){event.preventDefault();onSelect(node.nodePath);enter(node.nodePath);}}}>
+        <button type="button" className="graph-node graph-scene-root" style={{left:0}} aria-pressed={selected===null} onClick={()=>onSelect(null)}><strong>Scene</strong><span className="graph-node-kind">Scene</span></button>
+        {nodes.map((node,index)=><button type="button" className="graph-node" key={nodeKey(node.nodePath)} style={{left:(index+1)*250}} aria-pressed={selected===nodeKey(node.nodePath)} onClick={()=>onSelect(node.nodePath)} onDoubleClick={()=>enter(node.nodePath)} onKeyDown={event=>{if(event.key==='Enter'&&node.definition.kind==='graph'){event.preventDefault();onSelect(node.nodePath);enter(node.nodePath);}}}>
           <strong>{node.label}</strong><span className="graph-node-kind">{node.definition.kind==='graph'?'Component':Object.keys(node.metadata.inputs).length?'Effect':'Source'}</span>
           <span className="graph-ports">
             <span>{Object.entries(node.metadata.inputs).map(([id, port]) => <span className="graph-port graph-port-input" key={id} title={`${port.label} input`}>
@@ -149,6 +150,6 @@ export function GraphPanel({runtime,selected,onSelect}:{runtime:RuntimeView|null
         </button>)}
       </div>
     </div>}
-    {body&&<p className="graph-hint">Select a node for its controls. Click the background for Scene controls. Drag to pan. Scroll to zoom. Double-click a component to enter.</p>}
+    <p className="graph-hint">Select Scene or a node for its controls. Click the background for Scene controls. Drag to pan. Scroll to zoom. Double-click a component to view inside.</p>
   </section>;
 }

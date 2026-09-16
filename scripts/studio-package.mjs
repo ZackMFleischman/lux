@@ -4,6 +4,7 @@ import { copyFile, mkdir, readFile, writeFile, readdir, realpath, lstat, symlink
 import { basename, dirname, join, relative, resolve, isAbsolute, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
+import { ComponentLibraryStore } from '../packages/core/src/component-library-store.ts';
 
 const within = (root, path) => { const rel=relative(root,path); return rel==='' || (!isAbsolute(rel)&&rel!=='..'&&!rel.startsWith('..'+sep)); };
 export function desktopSourceFile(path) {
@@ -14,6 +15,23 @@ export function repositoryLibraryRootFromCommonDirectory(commonDirectory) {
  const common=resolve(commonDirectory);
  if(basename(common).toLowerCase()!=='.git')throw Error(`Unsupported Git common directory: ${common}`);
  return join(dirname(common),'library');
+}
+/** Snapshot cataloged immutable revisions, including Studio saves not yet in Git. */
+export async function copyDesktopLibrary(sourceRoot,destination) {
+ await mkdir(destination,{recursive:true});
+ if((await readdir(destination)).length)throw Error('Packaged library destination must be empty');
+ await new ComponentLibraryStore(destination,{seedRoot:sourceRoot}).list();
+ const files=[];
+ async function collect(prefix='') {
+  for(const entry of await readdir(join(destination,prefix),{withFileTypes:true})) {
+   const path=prefix?`${prefix}/${entry.name}`:entry.name;
+   if(entry.isDirectory())await collect(path);
+   else if(entry.isFile())files.push(path);
+   else throw Error('Packaged library contains a non-regular file');
+  }
+ }
+ await collect();
+ return files.sort();
 }
 export function installedMainSource(canonicalLibraryRoot) {
  return `const path = require('node:path');
@@ -102,7 +120,8 @@ export async function packageDesktop({ source=resolve(import.meta.dirname,'..'),
  const executable=join(directory,'Lux.exe'); await rename(join(directory,'electron.exe'),executable);
  const app=join(directory,'resources','app'), workspace=join(app,'runtime');
  await mkdir(workspace,{recursive:true});
- const files=git('ls-files','-z').split('\0').filter(Boolean).filter(desktopSourceFile);
+ // Library storage is a complete validated snapshot, not a Git tracked-file list.
+ const files=git('ls-files','-z').split('\0').filter(Boolean).filter(path=>desktopSourceFile(path)&&!path.startsWith('library/'));
  // Include new packaging sources before their first commit; never glob private working files.
  for(const path of ['scripts/studio-package.mjs','scripts/studio-desktop.mjs','scripts/studio-installed-mcp.mjs','scripts/studio-shortcuts.ps1','scripts/set-lux-executable-icon.ps1','scripts/studio-extract.ps1']) if(!files.includes(path))files.push(path);
  const digest=createHash('sha256');
@@ -111,6 +130,11 @@ export async function packageDesktop({ source=resolve(import.meta.dirname,'..'),
   if(!stat.isFile()||stat.isSymbolicLink())throw Error(`Source is not a regular file: ${path}`);
   const bytes=await readFile(from);digest.update(path).update(bytes);
   await mkdir(dirname(join(workspace,path)),{recursive:true}); await writeFile(join(workspace,path),bytes);
+ }
+ const libraryDestination=join(workspace,'library');
+ for(const relativePath of await copyDesktopLibrary(canonicalLibraryRoot,libraryDestination)) {
+  const path=`library/${relativePath}`;
+  digest.update(path).update(await readFile(join(libraryDestination,relativePath)));
  }
  await copyIndependentTree(join(source,'apps','studio','assets'),join(workspace,'apps','studio','assets'));
  execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',join(source,'scripts/set-lux-executable-icon.ps1'),'-Executable',executable,'-Icon',join(workspace,'apps/studio/assets/branding/lux.ico')],{windowsHide:true,stdio:'pipe'});

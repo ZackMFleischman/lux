@@ -135,6 +135,17 @@ test('scene Open autoplays accepted source and a failed later Open retains the p
   assert.equal(workspace.getSnapshot().source.files['visual.ts'],'invalid incoming draft');assert.equal(workspace.getSnapshot().runningMatchesDraft,false);
 });
 
+test('explicit saved scene controls win over the previous preview during promotion',async t=>{
+  const f=fixture(t),old=await f.start(),before=f.client.getSnapshot().authoring!;
+  const write=f.client.invoke({name:'lux.parameters.set',input:{requestId:'old-control',instanceId:before.instanceId,expectedGeneration:before.generation,
+    expectedRevisionId:before.revisionId,values:{intensity:.2},mode:'live'}});
+  const request=old.messages.at(-1)!;old.reply({requestId:request.requestId,intensity:.2,controls:{intensity:.2},effectiveControls:{intensity:.2},controlSequence:1});await write;
+  const workerCount=WorkerFixture.all.length,loading=f.client.submit(source,{savedControls:{sourceHash:'a'.repeat(64),schema:before.controlSchema!,schemaHash:before.controlSchemaHash!,values:{intensity:.9}}});
+  for(let i=0;i<20&&WorkerFixture.all.length===workerCount;i++)await new Promise(resolve=>setImmediate(resolve));const candidate=WorkerFixture.all.at(-1)!;
+  assert.deepEqual(candidate.init.controls,{intensity:.9});candidate.reply({type:'ready',intensity:.9,controls:{intensity:.9},effectiveControls:{intensity:.9}});await loading;
+  assert.equal(f.client.getSnapshot().authoring!.intensity,.9);
+});
+
 test('Build still waits for a playback command that was already pending', async t => {
   const f = fixture(t), old = await f.start(), controller = new StudioController(f.client);
   const before = f.client.getSnapshot();
@@ -310,11 +321,14 @@ test('restart retains admitted controls across failure and failed recovery; reje
   assert.ok(f.client.getSnapshot().authoring!.generation > state.generation);
 });
 
-test('source replacement does not inherit unacknowledged control intent from the previous runtime', async t => {
-  const f = fixture(t); await f.start(); const state = f.client.getSnapshot().authoring!;
-  const pending = assert.rejects(f.client.invoke({ name: 'lux.parameters.set', input: { requestId: 'pending',
-    instanceId: state.instanceId, expectedGeneration: state.generation, expectedRevisionId: state.revisionId, mode: 'live', values: { intensity: 0.8 } } }), /Runtime changed/);
-  await f.start(); await pending;
+test('source replacement waits for a pre-existing control command and does not inherit its rejected intent', async t => {
+  const f = fixture(t),old=await f.start(),state=f.client.getSnapshot().authoring!;
+  const pending=assert.rejects(f.client.invoke({ name: 'lux.parameters.set', input: { requestId: 'pending',
+    instanceId: state.instanceId, expectedGeneration: state.generation, expectedRevisionId: state.revisionId, mode: 'live', values: { intensity: 0.8 } } }), /failed/);
+  let promoted=false;const replacement=f.client.submit(source).then(()=>{promoted=true;});await f.flush();
+  const candidate=WorkerFixture.all.at(-1)!;candidate.reply({type:'ready'});await Promise.resolve();
+  assert.equal(promoted,false);assert.equal(old.terminated,false);
+  old.reply({type:'failure',message:'failed'});await pending;await replacement;
   assert.equal(f.client.getSnapshot().authoring!.intensity, 0.5);
 });
 

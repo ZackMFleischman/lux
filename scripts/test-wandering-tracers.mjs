@@ -29,6 +29,8 @@ try{
  page.on('console',message=>void appendFile(join(output,'console.log'),message.type()+': '+message.text()+'\n'));
  let current;for(let i=0;i<80;i++){try{current=await call('read');if(current.source)break;}catch{}await page.waitForTimeout(100);}
  assert.ok(current?.source);
+ for(let readyTry=0;readyTry<100;readyTry++){const status=await call('status');if(status.authoring?.revisionId&&status.authoring?.frameId)break;await page.waitForTimeout(100);}
+ current=await call('read');
  const files={};for(const file of await readdir(join(root,'examples/components/wandering-tracers'))){if(file.endsWith('.ts')&&!file.endsWith('.test.ts'))files[file]=await readFile(join(root,'examples/components/wandering-tracers',file),'utf8');}
  for(const [entry,name] of [['composition.ts','overlay'],['painting-composition.ts','painting']].filter(([,name])=>name===mode)){
   current=await call('read');

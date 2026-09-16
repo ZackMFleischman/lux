@@ -18,7 +18,7 @@ export type LibraryDependency = Readonly<{
   revision: number;
   mountPath: string;
 }>;
-export type LibraryComponentSummary = Readonly<Omit<LibraryComponent, 'source'>>;
+export type LibraryComponentSummary = Readonly<Omit<LibraryComponent, 'source' | 'dependencies'>>;
 export type SceneLibraryLink = Readonly<{
   componentId: string;
   mountPath: string;
@@ -48,6 +48,15 @@ export function validateLibrarySource(value: unknown): SourceBundle {
   if ('sourceVersion' in result) throw Error('The first local component library path does not accept image assets');
   return structuredClone(result);
 }
+export function validateLibraryComponentSummary(value: unknown): LibraryComponentSummary {
+  const raw = plainLibraryRecord(value, ['id', 'revision', 'name', 'description', 'updatedAt'], 'Library component summary');
+  const id = componentIdSchema.parse(raw.id);
+  if (!Number.isSafeInteger(raw.revision) || (raw.revision as number) < 1) throw Error('Library component revision must be a positive integer');
+  const updatedAt = libraryText(raw.updatedAt, 'Updated time', 64);
+  if (!Number.isFinite(Date.parse(updatedAt))) throw Error('Library component updated time is invalid');
+  return Object.freeze({ id, revision: raw.revision as number, name: libraryText(raw.name, 'Component name', 80),
+    description: libraryText(raw.description, 'Component description', 512), updatedAt });
+}
 export function validateLibraryDependencies(value: unknown): readonly LibraryDependency[] {
   if (!Array.isArray(value) || value.length > 8) throw Error('Library dependencies must contain 0–8 rows');
   return Object.freeze(value.map(item => {
@@ -62,13 +71,10 @@ export function validateLibraryComponent(value: unknown): LibraryComponent {
   const raw = plainLibraryRecord(value, hasDependencies
     ? ['id', 'revision', 'name', 'description', 'updatedAt', 'source', 'dependencies']
     : ['id', 'revision', 'name', 'description', 'updatedAt', 'source'], 'Library component');
-  const id = componentIdSchema.parse(raw.id);
-  if (!Number.isSafeInteger(raw.revision) || (raw.revision as number) < 1) throw Error('Library component revision must be a positive integer');
-  const updatedAt = libraryText(raw.updatedAt, 'Updated time', 64);
-  if (!Number.isFinite(Date.parse(updatedAt))) throw Error('Library component updated time is invalid');
+  const summary = validateLibraryComponentSummary({ id: raw.id, revision: raw.revision, name: raw.name,
+    description: raw.description, updatedAt: raw.updatedAt });
   const dependencies = hasDependencies ? validateLibraryDependencies(raw.dependencies) : undefined;
-  return Object.freeze({ id, revision: raw.revision as number, name: libraryText(raw.name, 'Component name', 80),
-    description: libraryText(raw.description, 'Component description', 512), updatedAt, source: validateLibrarySource(raw.source),
+  return Object.freeze({ ...summary, source: validateLibrarySource(raw.source),
     ...(dependencies?.length ? { dependencies } : {}) });
 }
 

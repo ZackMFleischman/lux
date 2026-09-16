@@ -10,9 +10,10 @@ import type { SourceBundle } from '../../packages/runtime-contracts/src/index.ts
 
 class CompositionWorker {
   static all:CompositionWorker[]=[];
+  static autoReady=true;
   onmessage:any;onerror:any;messages:any[]=[];init:any;terminated=false;
   constructor(){CompositionWorker.all.push(this);}
-  postMessage(message:any){this.messages.push(message);if(message.type==='init'){this.init=message;queueMicrotask(()=>this.reply({type:'ready'}));}}
+  postMessage(message:any){this.messages.push(message);if(message.type==='init'){this.init=message;if(CompositionWorker.autoReady)queueMicrotask(()=>this.reply({type:'ready'}));}}
   reply(extra:any){this.onmessage?.({data:{...this.init,type:'status',frameId:'1',timeSeconds:0,clockEpoch:0,controlSequence:0,playback:this.init.playing?'playing':'paused',...extra,effectiveNodeControls:extra.effectiveNodeControls??extra.nodeControls??this.init.nodeControls}});}
   terminate(){this.terminated=true;}
 }
@@ -23,7 +24,7 @@ test('Studio saves, reopens, edits and restarts nested composition instances whi
   const originals=new Map(['Worker','document'].map(key=>[key,Object.getOwnPropertyDescriptor(globalThis,key)]));
   Object.defineProperty(globalThis,'Worker',{value:CompositionWorker,configurable:true});
   Object.defineProperty(globalThis,'document',{value:{createElement:()=>({style:{},transferControlToOffscreen:()=>({}),remove(){}})},configurable:true});
-  CompositionWorker.all=[];let compiles=0;
+  CompositionWorker.all=[];CompositionWorker.autoReady=true;let compiles=0;
   const compiler={compile:async(input:any)=>{compiles++;if(input.files['composite.ts']==='invalid')return {ok:false,diagnostics:[{code:'COMPILE_FAILED',message:'invalid nested composition'}]};return {ok:true,sourceHash:compiled.artifact.sourceHash,linked};}} as any;
   const client=new StandaloneClient(compiler,{codeDeclaredParameters:true});
   t.after(()=>{const runtime=(client as any).running;if(runtime)(client as any).stop(runtime,'test complete');for(const [key,value]of originals)if(value)Object.defineProperty(globalThis,key,value);else Reflect.deleteProperty(globalThis,key);});
@@ -70,4 +71,26 @@ test('Studio saves, reopens, edits and restarts nested composition instances whi
   assert.deepEqual(reopened.getSnapshot().authoring!.controls,{ballIntensity:.6,segmentsA:7,segmentsB:11});
   assert.deepEqual(reopened.getSnapshot().authoring!.controlAnimations,[binding]);
   assert.deepEqual(reopened.getSnapshot().authoring!.nodeControls!.nodes.find(row=>row.nodePath.join('/')===[compositeBId,directEffectId].join('/'))!.values,{segments:11},'the other reusable composition instance reopens independently');
+
+  const active=(client as any).running as {worker:CompositionWorker},beforeReplacement=client.getSnapshot().authoring!;
+  const workerCount=CompositionWorker.all.length;CompositionWorker.autoReady=false;let replacementError:unknown;const replacement=client.submit(source);void replacement.catch(error=>{replacementError=error;});
+  for(let i=0;i<200&&CompositionWorker.all.length===workerCount&&!replacementError;i++)await new Promise(resolve=>setTimeout(resolve,10));
+  assert.equal(CompositionWorker.all.length,workerCount+1,String(replacementError));
+  const candidate=CompositionWorker.all.at(-1)!;assert.notEqual(candidate,active.worker);
+  const latestNode=beforeReplacement.nodeControls!.nodes.find(row=>row.nodePath.join('/')===node.nodePath.join('/'))!;
+  const inFlight=client.invoke({name:'lux.node.parameters.set',input:{requestId:'replacement-node',instanceId:beforeReplacement.instanceId,
+    expectedGeneration:beforeReplacement.generation,expectedRevisionId:beforeReplacement.revisionId,expectedControlSchemaHash:latestNode.schemaHash,
+    nodePath:latestNode.nodePath,values:{segments:9},mode:'live'}});
+  candidate.reply({type:'ready'});await Promise.resolve();assert.equal(active.worker.terminated,false);
+  const latest=createCompositionControlState(linked.composition,active.worker.init.nodeControls);latest.applyNode(latestNode.nodePath,{segments:9},latestNode.schemaHash);
+  active.worker.reply({requestId:'replacement-node',controls:latest.values(),nodeControls:latest.snapshot(),controlSequence:1,controlAnimations:[binding],animationSequence:0});await inFlight;
+  assert.deepEqual(client.getSnapshot().authoring!.nodeControls!.nodes.find(row=>row.nodePath.join('/')===latestNode.nodePath.join('/'))!.values,{segments:9});
+  for(let i=0;i<8;i++)await Promise.resolve();const synchronized=candidate.messages.at(-1)!;
+  assert.equal(synchronized.type,'node-controls');assert.deepEqual(synchronized.nodePath,latestNode.nodePath);assert.deepEqual(synchronized.values,{segments:9});
+  const promoted=createCompositionControlState(linked.composition,candidate.init.nodeControls);promoted.applyNode(synchronized.nodePath,synchronized.values,synchronized.controlSchemaHash);
+  candidate.reply({requestId:synchronized.requestId,controls:promoted.values(),nodeControls:promoted.snapshot(),controlSequence:synchronized.controlSequence,
+    controlAnimations:[binding],animationSequence:0});await replacement;
+  const acceptedDocument:any=client.acceptedDocument();
+  assert.deepEqual(acceptedDocument.controls.nodes.find((row:any)=>row.nodePath.join('/')===latestNode.nodePath.join('/')).values,{segments:9});
+  assert.deepEqual(acceptedDocument.controlAnimations,[binding]);assert.equal(active.worker.terminated,true);
 });

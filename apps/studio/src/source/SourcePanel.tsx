@@ -8,8 +8,8 @@ import { sourceAssets } from './source-equality.ts';
 import { AssetImport } from './AssetImport.tsx';
 import { Disclosure } from '../Disclosure.tsx';
 export type SourceNavigationTarget = { path: string; offset: number; request: number; documentKey: number; draftVersion: number };
-export function SourcePanel({ workspace, readOnly, onApply, onSave, onCompositionChange, diagnosticTarget, onDiagnosticTargetHandled }: {
-  workspace: SourceWorkspace; readOnly: boolean; onApply(): void; onSave(): void; onCompositionChange?(value: boolean): void;
+export function SourcePanel({ workspace, readOnly, onApply, onCompositionChange, diagnosticTarget, onDiagnosticTargetHandled }: {
+  workspace: SourceWorkspace; readOnly: boolean; onApply(): void; onSave?(): void; onCompositionChange?(value: boolean): void;
   diagnosticTarget?: SourceNavigationTarget | null;
   onDiagnosticTargetHandled?(request: number): void;
 }) {
@@ -43,10 +43,10 @@ export function SourcePanel({ workspace, readOnly, onApply, onSave, onCompositio
   const locked = readOnly || snapshot.busy;
   function attempt(action: () => void) { try { action(); setError(''); return true; } catch (reason) { setError(String(reason)); return false; } }
   return <section className="source-workspace" aria-label="Source workspace" onKeyDownCapture={event => {
-    if ((event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === 's') {
+    if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && event.key === 'Enter') {
       event.preventDefault(); event.stopPropagation();
       if (locked || workspace.getSnapshot().busy || event.repeat || composing.current || event.nativeEvent.isComposing) return;
-      if (event.shiftKey) onSave(); else onApply();
+      onApply();
     }
   }}>
     <div className="source-columns"><Disclosure title="Files and assets" defaultOpen className="source-files-disclosure">

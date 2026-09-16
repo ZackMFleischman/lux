@@ -17,13 +17,14 @@ const binding=(amount=1)=>({nodePath:[] as const,definitionHash:schemaHash,schem
 
 class FlatWorker {
   static all:FlatWorker[]=[];
-  onmessage:any;onerror:any;messages:any[]=[];init:any;
+  static autoReady=true;
+  onmessage:any;onerror:any;messages:any[]=[];init:any;terminated=false;
   constructor(){FlatWorker.all.push(this);}
   postMessage(message:any){
     this.messages.push(message);
     if(message.type==='init'){
       this.init=message;
-      queueMicrotask(()=>this.reply({type:'ready',effectiveControls:{height:2,speed:.5}}));
+      if(FlatWorker.autoReady)queueMicrotask(()=>this.reply({type:'ready',effectiveControls:{height:2,speed:.5}}));
     }
   }
   reply(extra:any={}){
@@ -31,15 +32,16 @@ class FlatWorker {
       playback:this.init.playing?'playing':'paused',controls:this.init.controls,effectiveControls:this.init.controls,
       controlAnimations:this.init.controlAnimations??[],controlAnimationIssues:[],animationSequence:0,...extra}});
   }
-  terminate(){}
+  terminate(){this.terminated=true;}
 }
 
-async function fixture(t:any){
+async function fixture(t:any,compileGate:{wait?:()=>Promise<void>}={}){
   const originals=new Map(['Worker','document'].map(key=>[key,Object.getOwnPropertyDescriptor(globalThis,key)]));
   Object.defineProperty(globalThis,'Worker',{value:FlatWorker,configurable:true});
   Object.defineProperty(globalThis,'document',{value:{createElement:()=>({style:{},transferControlToOffscreen:()=>({}),remove(){}})},configurable:true});
-  FlatWorker.all=[];
+  FlatWorker.all=[];FlatWorker.autoReady=true;
   const client=new StandaloneClient({compile:async(input:any)=>{
+    await compileGate.wait?.();
     const body=linkedBody({linkedVersion:3,code:'accepted',sourceMap:'{}',bundleHash:'b'.repeat(64),linker:{version:'0.28.2',implementationHash:'c'.repeat(64),apiHash:'d'.repeat(64),binaryHash:'e'.repeat(64)},...await deriveAssets({},hash),controls:schema,controlSchemaHash:schemaHash});
     return {ok:true,sourceHash:hash(JSON.stringify(validateSource(input))),linked:{...body,linkedHash:hash(JSON.stringify(body))}};
   }} as any,{codeDeclaredParameters:true});
@@ -101,6 +103,95 @@ test('flat runtime keeps base controls while accepting guarded animation state a
   const document:any=client.acceptedDocument();
   assert.deepEqual(document.controls.values,{height:1,speed:.5},'saved controls must exclude the sampled animation value');
   assert.deepEqual(document.controlAnimations,[latest]);
+});
+
+test('background build promotes only after the latest compatible controls and animation reach its candidate',async t=>{
+  const client=await fixture(t);await client.submit(source);
+  const old=FlatWorker.all.at(-1)!,before=client.getSnapshot().authoring!;
+  let request=0;const controller=new StudioController(client,()=> `build-animation-${++request}`);
+  const pendingControl=client.invoke({name:'lux.parameters.set',input:{requestId:'pending-build-control',instanceId:before.instanceId,
+    expectedGeneration:before.generation,expectedRevisionId:before.revisionId,expectedControlSchemaHash:schemaHash,values:{height:2},mode:'live'}});
+  const pendingAnimation=controller.setNodeAnimation([],'height',binding(1.5));
+  void pendingControl.catch(()=>{});void pendingAnimation.catch(()=>{});
+  const pendingControlRequest=old.messages.at(-2)!,pendingAnimationRequest=old.messages.at(-1)!;
+  FlatWorker.autoReady=false;
+  let promoted=false;
+  const build=client.submit({...source,files:{'main.ts':'replacement'}}).then(()=>{promoted=true;});
+  for(let i=0;i<200&&FlatWorker.all.length<2;i++)await new Promise(resolve=>setTimeout(resolve,10));
+  const candidate=FlatWorker.all.at(-1)!;
+  assert.notEqual(candidate,old);assert.deepEqual(candidate.init.controls,{height:1,speed:.5});
+
+  const control=client.invoke({name:'lux.parameters.set',input:{requestId:'build-control',instanceId:before.instanceId,
+    expectedGeneration:before.generation,expectedRevisionId:before.revisionId,expectedControlSchemaHash:schemaHash,values:{height:3},mode:'live'}});
+  const animation=controller.setNodeAnimation([],'height',binding(2));
+  void control.catch(()=>{});void animation.catch(()=>{});
+  const controlRequest=old.messages.at(-2)!,animationRequest=old.messages.at(-1)!;
+  candidate.reply({type:'ready',effectiveControls:{height:2,speed:.5}});await Promise.resolve();
+  assert.equal(promoted,false);assert.equal(old.terminated,false);
+
+  old.reply({requestId:pendingControlRequest.requestId,controls:{height:2,speed:.5},effectiveControls:{height:2,speed:.5},controlSequence:1});
+  old.reply({requestId:pendingAnimationRequest.requestId,controls:{height:2,speed:.5},effectiveControls:{height:2,speed:.5},controlSequence:1,
+    controlAnimations:[binding(1.5)],animationSequence:1});
+  await Promise.all([pendingControl,pendingAnimation]);await Promise.resolve();
+  assert.equal(promoted,false,'commands started before the build remain part of the promotion gate');
+  const pendingCandidateControl=candidate.messages.at(-1)!;
+  assert.equal(pendingCandidateControl.type,'controls');assert.deepEqual(pendingCandidateControl.values,{height:2,speed:.5});
+  candidate.reply({requestId:pendingCandidateControl.requestId,controls:pendingCandidateControl.values,effectiveControls:pendingCandidateControl.values,
+    controlSequence:pendingCandidateControl.controlSequence});
+  for(let i=0;i<8;i++)await Promise.resolve();
+  const pendingCandidateAnimation=candidate.messages.at(-1)!;
+  assert.equal(pendingCandidateAnimation.type,'animations');assert.deepEqual(pendingCandidateAnimation.controlAnimations,[binding(1.5)]);
+  candidate.reply({requestId:pendingCandidateAnimation.requestId,controls:{height:2,speed:.5},effectiveControls:{height:2,speed:.5},
+    controlSequence:pendingCandidateControl.controlSequence,controlAnimations:pendingCandidateAnimation.controlAnimations,
+    animationSequence:pendingCandidateAnimation.animationSequence});
+  await Promise.resolve();assert.equal(promoted,false,'candidate synchronization cannot bypass later pending commands');
+  old.reply({requestId:controlRequest.requestId,controls:{height:3,speed:.5},effectiveControls:{height:3,speed:.5},controlSequence:2,
+    controlAnimations:[binding(1.5)],animationSequence:1});
+  old.reply({requestId:animationRequest.requestId,controls:{height:3,speed:.5},effectiveControls:{height:3,speed:.5},controlSequence:2,
+    controlAnimations:[binding(2)],animationSequence:2});
+  await Promise.all([control,animation]);for(let i=0;i<8;i++)await Promise.resolve();
+  const candidateControl=candidate.messages.at(-1)!;
+  assert.equal(candidateControl.type,'controls');assert.deepEqual(candidateControl.values,{height:3,speed:.5});
+  candidate.reply({requestId:candidateControl.requestId,controls:candidateControl.values,effectiveControls:candidateControl.values,controlSequence:candidateControl.controlSequence,
+    controlAnimations:pendingCandidateAnimation.controlAnimations,animationSequence:pendingCandidateAnimation.animationSequence});
+  for(let i=0;i<8;i++)await Promise.resolve();
+  const candidateAnimation=candidate.messages.at(-1)!;
+  assert.equal(candidateAnimation.type,'animations');assert.deepEqual(candidateAnimation.controlAnimations,[binding(2)]);
+  candidate.reply({requestId:candidateAnimation.requestId,controls:{height:3,speed:.5},effectiveControls:{height:3,speed:.5},controlSequence:candidateControl.controlSequence,
+    controlAnimations:[binding(.25)],animationSequence:candidateAnimation.animationSequence});
+  await Promise.resolve();assert.equal(promoted,false,'a forged candidate synchronization acknowledgement cannot promote or publish');
+  candidate.reply({requestId:candidateAnimation.requestId,controls:{height:3,speed:.5},effectiveControls:{height:3,speed:.5},controlSequence:candidateControl.controlSequence,
+    controlAnimations:candidateAnimation.controlAnimations,animationSequence:candidateAnimation.animationSequence});
+  await build;
+
+  const after=client.getSnapshot().authoring!;
+  assert.equal(promoted,true);assert.equal(old.terminated,true);assert.deepEqual(after.controls,{height:3,speed:.5});
+  assert.deepEqual(getRuntimeControlState(after).controlAnimations,[binding(2)]);
+  const accepted:any=client.acceptedDocument();assert.deepEqual(accepted.controls.values,{height:3,speed:.5});assert.deepEqual(accepted.controlAnimations,[binding(2)]);
+  await assert.rejects(client.invoke({name:'lux.parameters.set',input:{requestId:'stale-build-control',instanceId:before.instanceId,
+    expectedGeneration:before.generation,expectedRevisionId:before.revisionId,expectedControlSchemaHash:schemaHash,values:{height:2},mode:'live'}}),/Runtime changed/);
+});
+
+test('edits acknowledged during compilation initialize the eventual candidate with the latest state',async t=>{
+  const gate:{wait?:()=>Promise<void>}={};const client=await fixture(t,gate);await client.submit(source);
+  const old=FlatWorker.all.at(-1)!,before=client.getSnapshot().authoring!;let release!:()=>void,compiling=false;
+  gate.wait=()=>new Promise<void>(resolve=>{compiling=true;release=resolve;});
+  const build=client.submit({...source,files:{'main.ts':'compiled later'}});
+  while(!compiling)await new Promise(resolve=>setImmediate(resolve));
+  const control=client.invoke({name:'lux.parameters.set',input:{requestId:'compile-control',instanceId:before.instanceId,
+    expectedGeneration:before.generation,expectedRevisionId:before.revisionId,expectedControlSchemaHash:schemaHash,values:{height:2.5},mode:'live'}});
+  const animation=new StudioController(client,()=> 'compile-animation').setNodeAnimation([],'height',binding(3));
+  const controlRequest=old.messages.at(-2)!,animationRequest=old.messages.at(-1)!;
+  old.reply({requestId:controlRequest.requestId,controls:{height:2.5,speed:.5},effectiveControls:{height:2.5,speed:.5},controlSequence:1});
+  old.reply({requestId:animationRequest.requestId,controls:{height:2.5,speed:.5},effectiveControls:{height:2.5,speed:.5},controlSequence:1,
+    controlAnimations:[binding(3)],animationSequence:1});
+  await Promise.all([control,animation]);release();
+  for(let i=0;i<200&&FlatWorker.all.length<2;i++)await new Promise(resolve=>setTimeout(resolve,10));
+  const candidate=FlatWorker.all.at(-1)!;
+  assert.deepEqual(candidate.init.controls,{height:2.5,speed:.5});assert.deepEqual(candidate.init.controlAnimations,[binding(3)]);
+  candidate.reply({type:'ready',controls:candidate.init.controls,effectiveControls:candidate.init.controls,controlAnimations:candidate.init.controlAnimations});
+  await build;assert.deepEqual(client.getSnapshot().authoring!.controls,{height:2.5,speed:.5});
+  assert.deepEqual(getRuntimeControlState(client.getSnapshot().authoring!).controlAnimations,[binding(3)]);
 });
 
 test('legacy runtime state preserves scene animation fields',()=>{

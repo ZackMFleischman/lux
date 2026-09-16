@@ -10,12 +10,14 @@ import 'dockview-react/dist/styles/dockview.css';
 
 export type LuxPanelProps = { panelId: string; viewState: Readonly<Record<string, unknown>>; setViewState(value: unknown): void };
 /** Content closures bind application-owned stores/presentation leases above this shell. */
-export function LuxDockLayout({ registry, panels, storage, name = 'Default', mode = 'desktop', nonce, onReady }: {
+export function LuxDockLayout({ registry, panels, storage, name = 'Default', mode = 'desktop', nonce, onReady, onActivePanelChange }: {
   registry: PanelRegistry; panels: Record<string, FunctionComponent<LuxPanelProps>>; storage: LayoutStorage;
   name?: string; mode?: 'desktop' | 'laptop'; nonce: string;
   onReady?(adapter: LuxDockviewAdapter, result: RestoreResult): void;
+  onActivePanelChange?(kind: string | null): void;
 }) {
   const adapter = useRef<LuxDockviewAdapter | null>(null);
+  const activePanelSubscription = useRef<{ dispose(): void } | null>(null);
   const components = useMemo(() => Object.fromEntries(registry.list().map(definition => {
     const Panel = panels[definition.kind]; if (!Panel) throw Error('Missing real panel renderer: ' + definition.kind);
     const Component: FunctionComponent<IDockviewPanelProps> = props => <Panel panelId={props.api.id}
@@ -40,12 +42,16 @@ export function LuxDockLayout({ registry, panels, storage, name = 'Default', mod
         {error && <li role="alert">{error}</li>}
       </Menu></>;
   }, [registry]);
-  useEffect(() => () => { adapter.current?.dispose(); adapter.current = null; }, []);
+  useEffect(() => () => { activePanelSubscription.current?.dispose(); activePanelSubscription.current = null; adapter.current?.dispose(); adapter.current = null; }, []);
   if (!/^[A-Za-z0-9+/=]{24,64}$/.test(nonce)) throw Error('Studio style nonce unavailable');
   return <DockviewReact rightHeaderActionsComponent={HeaderActions} components={components} theme={themeDark} nonce={nonce} disableFloatingGroups
     dndStrategy="pointer" onReady={event => {
+      activePanelSubscription.current?.dispose();
       adapter.current?.dispose();
       const current = new LuxDockviewAdapter(event.api, registry, storage, mode); adapter.current = current;
-      const result = current.restore(name); onReady?.(current, result);
+      const result = current.restore(name);
+      onActivePanelChange?.(event.api.activePanel?.view.contentComponent ?? null);
+      activePanelSubscription.current = event.api.onDidActivePanelChange(change => onActivePanelChange?.(change.panel?.view.contentComponent ?? null));
+      onReady?.(current, result);
     }} />;
 }
