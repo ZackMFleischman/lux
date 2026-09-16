@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog, clipboard, Menu } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, clipboard, Menu, session } from 'electron';
 import { join, sep, isAbsolute } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { randomBytes } from 'node:crypto';
@@ -20,6 +20,7 @@ import type { SourceBundle } from '../../../packages/runtime-contracts/src/index
 import { PreviewCaptureFileStore } from './preview-capture-files.ts';
 import type { VideoCaptureSettings } from './preview-capture-files.ts';
 import { resolveStandardLibrary } from './standard-library.ts';
+import { createAudioPermissionBroker } from './audio/audio-permission-broker.ts';
 
 // This process owns presentation windows only. It never creates a render service,
 // starts an authoring instance, or terminates a host-owned process.
@@ -118,8 +119,6 @@ function createWindow(preview: boolean): BrowserWindow {
   window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   window.webContents.on('will-navigate', event => event.preventDefault());
   window.webContents.on('will-attach-webview', event => event.preventDefault());
-  window.webContents.session.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
-  window.webContents.session.setPermissionCheckHandler(() => false);
   fullscreenStates.set(window, observeFullscreen(window, publishState));
   window.once('closed', () => { owned.delete(window); fullscreenStates.delete(window); });
   return window;
@@ -132,6 +131,17 @@ app.whenReady().then(async () => {
   // The single-instance lock prevents another UI process overwriting this
   // session's nonce-bearing local page. No renderer service lock is involved.
   if (!app.requestSingleInstanceLock()) { app.quit(); return; }
+  const audioPermissions = createAudioPermissionBroker({
+    session: session.defaultSession,
+    getMainWebContents: () => mainWindow?.webContents ?? null,
+    pageUrl,
+    securityOrigin: 'file://',
+    now: () => performance.now(),
+    createToken: () => randomBytes(24).toString('base64url'),
+    setExpiry: (callback, milliseconds) => setTimeout(callback, milliseconds),
+    clearExpiry: handle => clearTimeout(handle as ReturnType<typeof setTimeout>),
+  });
+  app.once('will-quit', () => audioPermissions.dispose());
   let markAgentReady = () => {};
   const agentReady = new Promise<void>(resolve => { markAgentReady = resolve; });
   ipcMain.handle('studio:agent-ready', event => {
@@ -201,6 +211,20 @@ app.whenReady().then(async () => {
     }
     throw Error('Unsupported preview capture action');
   });
+  ipcMain.handle('studio:audio-permission', (event, action: unknown, value: unknown) => {
+    if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted audio permission sender');
+    if (action === 'arm') return audioPermissions.arm(event.sender);
+    if (action === 'activate') {
+      if (typeof value !== 'string') throw Error('Invalid audio permission token');
+      return audioPermissions.activate(event.sender, value);
+    }
+    if (action === 'cancel') {
+      if (typeof value !== 'string') throw Error('Invalid audio permission token');
+      return audioPermissions.cancel(event.sender, value);
+    }
+    if (action === 'disconnect') return audioPermissions.revoke(event.sender);
+    throw Error('Unsupported audio permission action');
+  });
   ipcMain.handle('studio:authoring', async (event, action: unknown, value: unknown) => {
     if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted authoring sender');
     if (action === 'example') return { sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': await readFile(join(workspace, 'packages/visual-sdk/examples/intensity.ts'), 'utf8') } };
@@ -263,6 +287,7 @@ app.whenReady().then(async () => {
     }
   });
   mainWindow = createWindow(false);
+  mainWindow.once('closed', () => audioPermissions.revoke());
   ipcMain.handle('studio:agent-result', (event, id: string, result: { ok: boolean; result?: unknown; error?: string }) => {
     if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted authoring reply');
     const pending = agentRequests.get(id); if (!pending) return;
