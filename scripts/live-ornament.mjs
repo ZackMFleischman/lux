@@ -8,7 +8,7 @@ try{
  await client.connect(new StdioClientTransport({command:installation.node,args:[installation.adapter],cwd:installation.workspace,env:{...process.env,LUX_STUDIO_PROFILE:'desktop',LUX_STUDIO_DESKTOP:'1',LUX_STUDIO_SESSION_ID:'552d95c4d5fed7e01d911575b0d6a37fd86a'}}));
  const call=async(name,args={})=>{const r=await client.callTool({name:'lux.studio.'+name,arguments:args},undefined,{timeout:75000});if(r.isError)throw Error(JSON.stringify(r.content));return r;};
  const json=r=>JSON.parse(r.content.find(c=>c.type==='text').text);
- const action=process.argv[2]??'capture';const current=json(await call('read'));
+ const action=process.argv[2]??'capture';if(action==='inspect'){await writeFile('artifacts/living-ornament/birds-discovery.json',JSON.stringify(json(await call('discover')),null,2));}const current=json(await call('read'));if(action==='inspect')await writeFile('artifacts/living-ornament/birds-before.json',JSON.stringify(current,null,2));
  if(['pause','play','reset'].includes(action)){const s=json(await call('status')).authoring;await call('playback',{action,instanceId:s.instanceId,expectedGeneration:s.generation});}
  if(action==='open')await call('open',{path:base+'Living Ornament - Pattern Prototype.lux-scene',expectedDraftVersion:current.draftVersion,discardDirty:false});
  if(action==='build'){
@@ -21,6 +21,20 @@ try{
   await visit('ornament-composition.ts');
   await call('build',{source,expectedDraftVersion:current.draftVersion,libraryLinks:[]});
  }
+
+ if(action==='build-birds'){
+  const runtime=json(await call('status')).authoring;
+  if(runtime.playback==='playing')await call('playback',{action:'pause',instanceId:runtime.instanceId,expectedGeneration:runtime.generation});
+  const source=structuredClone(current.source);
+  const renderer=Object.keys(source.files).find(f=>f.endsWith('ornament-renderer.ts'));
+  if(!renderer||source.entry!=='ornament-composition.ts')throw Error('Unexpected live scene');
+  source.files[renderer]=await readFile('examples/components/wandering-tracers/ornament-renderer.ts','utf8');
+  source.files[renderer.replace('ornament-renderer.ts','ornament-birds.ts')]=await readFile('examples/components/wandering-tracers/ornament-birds.ts','utf8');
+  if(!source.files[source.entry].includes("id: 'birdSize'"))source.files[source.entry]=source.files[source.entry].replace('  expose: [', '  expose: [\n'+['birdSize','birdSpeed','birdOrbit','birdVisits'].map(id=>"    { id: '"+id+"', nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', controlId: '"+id+"' },").join('\n'));
+  const libraryLinks=current.libraryLinks.filter(p=>p.componentId!=='0b92b112-f315-4479-9331-7a815deec27e').map(({componentId,mountPath})=>({componentId,mountPath}));
+  await call('build',{source,expectedDraftVersion:current.draftVersion,libraryLinks});
+ }
+ if(action==='save-birds')await call('save',{path:base+'Living Ornament - Companion Birds.lux-scene',expectedDraftVersion:current.draftVersion,overwrite:true});
  if(action==='link-foundation'){
   const parts=JSON.parse(await readFile('artifacts/living-ornament/live-foundation-publication.json'));
   let composition=await readFile('examples/components/wandering-tracers/ornament-composition.ts','utf8');
