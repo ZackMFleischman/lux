@@ -44,6 +44,7 @@ export default defineComposition({
   output: { nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', portId: 'image' },
   expose: [
     { id: 'birdThoughts', nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', controlId: 'birdThoughts' },
+    { id: 'birdThoughtDuration', nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', controlId: 'birdThoughtDuration' },
     { id: 'birdSociability', nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', controlId: 'birdSociability' },
     { id: 'birdPerchDuration', nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', controlId: 'birdPerchDuration' },
     { id: 'birdPitch', nodeId: 'd1710000-63ac-49c7-8ad7-8cf6458b5105', controlId: 'birdPitch' },

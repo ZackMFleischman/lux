@@ -161,6 +161,8 @@ After any skill update, reinstall it from this checkout with `node scripts/insta
 
 Visual parameters belong to each visual's code. `intensity` is an optional concrete visual parameter, not a global built-in contract. The current tracer's fixed Intensity control is temporary implementation debt, not the intended SDK design.
 
+For authored creative controls, prefer ranges roughly 2-3 times broader than a conservative initial range, while keeping meaningful physical bounds (for example, opacity stays 0-1). Keep defaults tasteful and allow expressive extremes. This is the user's standing preference from 16 September 2026.
+
 ## Creative session isolation
 
 Use `start-lux` for user creative work. Prefer the desktop installation when available unless the user explicitly selects a branch checkout. The installed app carries its own compiler, SDK, Node and MCP adapter. For checkout work, use `pnpm studio:creative` from the selected branch or main. The launcher automatically isolates its profile and built app files from development, reuses a responsive session, and builds current app source after it closes. The visual compiler still reads the selected checkout: use another normal development checkout for source edits while the user app runs. There is no reserved-version checkout or refresh procedure. Do not change dependencies beneath a running Studio or terminate the user's process. Preserve saved scenes outside test artifact directories. Existing legacy creative worktrees and profile data are retained; startup does not depend on them.

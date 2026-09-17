@@ -22,6 +22,8 @@ export type BirdSocialControls = {
   perchDuration: number;
   sociability: number;
   seed: number;
+  sizes?: readonly number[];
+  thoughtDuration?: number;
 };
 
 type Phase = 'orbit' | 'depart' | 'perch' | 'return';
@@ -61,6 +63,7 @@ export function createBirdSocial() {
   let clock = 0;
   let activeSeed = Number.NaN;
   const birds: Bird[] = [];
+  let thoughtDuration = 6;
 
   const random = (bird: Bird) => {
     bird.random = (bird.random + 0x9e3779b9) >>> 0;
@@ -89,27 +92,38 @@ export function createBirdSocial() {
     bird.events++;
     bird.emotion = emotion;
     bird.bubbleStart = clock;
-    bird.bubbleDuration = 1.8 + random(bird) * 1.4;
-    bird.bubbleAt = clock + 8 + random(bird) * 10;
+    bird.bubbleDuration = thoughtDuration * (0.85 + random(bird) * 0.30);
+    bird.bubbleAt = clock + bird.bubbleDuration + 6 + random(bird) * 10;
   };
 
   const startDeparture = (bird: Bird, controls: BirdSocialControls, partner = -1) => {
+    const index = birds.indexOf(bird);
+    const friend = partner >= 0 ? birds[partner] : undefined;
+    const owner = friend?.owner ?? (random(bird) < 0.5 ? 5 : 6);
+    const radius = (i: number) => Math.max(0.025, (controls.sizes?.[i] ?? 1) * 0.052 + 0.012);
+    const occupied = birds.filter(other => other !== bird && other.owner === owner
+      && (other.phase === 'depart' || other.phase === 'perch' || other.phase === 'return'));
+    const preferred = friend?.slot ?? (random(bird) - 0.5) * 0.30;
+    const candidates = Array.from({ length: 81 }, (_, i) => -0.48 + i * 0.012);
+    candidates.sort((a, b) => Math.abs(a - preferred) - Math.abs(b - preferred));
+    const slot = candidates.find(candidate => occupied.every(other =>
+      Math.abs(candidate - other.slot) >= radius(index) + radius(birds.indexOf(other))));
+    // Keep flying if this contour has no free landing space. Reserve on departure,
+    // so a second incoming bird cannot choose the same destination.
+    if (slot === undefined) { bird.elapsed = 0; bird.duration = 2; return; }
     bird.phase = 'depart';
     bird.elapsed = 0;
     bird.duration = 3.0 + random(bird) * 1.4;
-    bird.owner = (random(bird) < 0.5 ? 5 : 6) as 5 | 6;
+    bird.owner = owner;
     bird.partner = partner;
     bird.rest = 0;
     bird.idle = 0;
-    if (partner >= 0) {
-      const friend = birds[partner];
-      bird.owner = friend.owner;
-      friend.partner = birds.indexOf(bird);
-      bird.slot = friend.slot <= 0 ? 0.15 : -0.15;
-      friend.facing = bird.slot > friend.slot ? 1 : -1;
+    bird.slot = slot;
+    if (friend) {
+      friend.partner = index;
+      friend.facing = slot > friend.slot ? 1 : -1;
       bird.facing = friend.facing === 1 ? -1 : 1;
     } else {
-      bird.slot = (random(bird) - 0.5) * 0.12;
       bird.facing = random(bird) < 0.5 ? -1 : 1;
     }
   };
@@ -177,7 +191,7 @@ export function createBirdSocial() {
     if (bird.phase === 'perch') { bird.excursion = 1; bird.rest = 1; }
     if (bird.phase === 'return') { bird.excursion = 1 - smooth(progress); bird.rest = 1 - smooth(progress / 0.62); }
     const bubbleProgress = (clock - bird.bubbleStart) / Math.max(bird.bubbleDuration, 0.001);
-    bird.bubble = bird.emotion === 0 ? 0 : smooth(bubbleProgress / 0.18) * (1 - smooth((bubbleProgress - 0.66) / 0.34));
+    bird.bubble = bird.emotion === 0 ? 0 : smooth((clock - bird.bubbleStart) / 0.35) * (1 - smooth((clock - bird.bubbleStart - bird.bubbleDuration + 0.65) / 0.65));
     if (bubbleProgress >= 1) { bird.emotion = 0; bird.bubble = 0; }
   };
 
@@ -202,6 +216,7 @@ export function createBirdSocial() {
     if (controls.seed !== activeSeed) reset(controls.seed);
     const step = clamp(Number.isFinite(dt) ? dt : 0, 0, 1);
     clock += step;
+    thoughtDuration = clamp(controls.thoughtDuration ?? 6, 0.5, 30);
     const sociability = clamp(controls.sociability, 0, 1);
     for (let index = 0; index < birds.length; index++) {
       const bird = birds[index];
@@ -228,7 +243,7 @@ export function createBirdSocial() {
       if (bird.phase === 'perch' && clock >= bird.bubbleAt && bird.emotion === 0) {
         if (random(bird) < 0.22) startBubble(bird,
           bird.partner >= 0 ? (random(bird) < 0.65 ? 3 : 5) : (random(bird) < 0.5 ? 1 : 7));
-        else bird.bubbleAt = clock + 8 + random(bird) * 10;
+        else bird.bubbleAt = clock + bird.bubbleDuration + 6 + random(bird) * 10;
       }
       updateVisibleState(bird);
     }

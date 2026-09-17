@@ -147,6 +147,7 @@ export default defineComponent({
       birdPalette: { type: 'number', group: 'Bird Appearance', label: 'Plumage palette', default: 0.03, min: 0, max: 1, step: 0.01 },
       birdPerchDuration: { type: 'number', group: 'Bird Personality', label: 'Perch duration', default: 10, min: 1, max: 90, step: 0.5 },
       birdSociability: { type: 'number', group: 'Bird Personality', label: 'Sociability', default: 0.65, min: 0, max: 1, step: 0.01 },
+      birdThoughtDuration: { type: 'number', group: 'Bird Personality', label: 'Thought duration', default: 6, min: 0.5, max: 30, step: 0.5 },
       birdThoughts: { type: 'number', group: 'Bird Personality', label: 'Thought bubbles', default: 0.7, min: 0, max: 1, step: 0.01 },
       structuralActivity: { type: 'number', group: 'Structural Changes', label: 'Split and island activity', default: 1, min: 0, max: 1, step: 0.01 },
       patternDensity: { type: 'number', group: 'Patterns', label: 'Density', default: 1, min: 0.3, max: 2, step: 0.01 },
@@ -161,6 +162,7 @@ export default defineComponent({
     controlDescriptions: {
       birdPerchDuration: 'Typical stay in scene seconds; a friendly encounter can extend it until after the interaction.',
       birdSociability: 'Chance of visiting a perched companion, greeting, playing or shyly sharing a perch.',
+      birdThoughtDuration: 'Typical bubble lifetime in scene seconds, with a brief fade and a long readable hold.',
       birdThoughts: 'Visibility of occasional feeling bubbles; zero hides them.',
       birdPitch: 'Distance traveled along the ribbon for one spiral loop; independent of radius.',
       birdExcursionSpeed: 'Travel tempo for perching visits, independent of spiral travel.',

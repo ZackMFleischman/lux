@@ -120,9 +120,11 @@ fn loBirdInk(st: vec2f, index: f32, view: vec4f, shape: vec4f, detail: vec4f, se
   let bank = 0.86 + pose.bank * 0.18;
   var body = loEllipse(q, vec2f(0.023, 0.010 + broad * 0.004));
   let preen = select(0.0, pose.rest * (0.5 + 0.5 * sin(time * 3.0)), mood.y > 0.5 && mood.y < 1.5);
-  let headCenter = vec2f(0.020 - preen * 0.012, 0.007 - preen * 0.007 + pose.rest * sin(time * 2.2) * 0.002);
+  let headCenter = vec2f(0.020, 0.007);
   let head = length(q - headCenter) - 0.010;
   body = min(body, head);
+  // Keep the cute head and face rigidly attached; idle nods use pose.heading.
+  let face = q;
   var tail = loBirdTriangle(q, vec2f(-0.013, 0.0), vec2f(-0.041, 0.011), vec2f(-0.034, -0.010));
   if (swallow > 0.5) {
     tail = min(loBirdTriangle(q, vec2f(-0.012, 0.0), vec2f(-0.057, 0.019), vec2f(-0.031, 0.0)),
@@ -130,7 +132,7 @@ fn loBirdInk(st: vec2f, index: f32, view: vec4f, shape: vec4f, detail: vec4f, se
   }
   let topWing = loBirdTriangle(q, vec2f(0.012, 0.004), vec2f(-0.023 - broad * 0.012, 0.009), vec2f(-0.025 + flap * 0.005 + humming * 0.024, spread * bank));
   let bottomWing = loBirdTriangle(q, vec2f(0.009, -0.003), vec2f(-0.022, -0.006), vec2f(-0.027 + humming * 0.02, -spread / bank));
-  let beak = loBirdTriangle(q, vec2f(0.025, 0.003), vec2f(0.025, 0.011), vec2f(0.041 + humming * 0.027, 0.006));
+  let beak = loBirdTriangle(face, vec2f(0.025, 0.003), vec2f(0.025, 0.011), vec2f(0.041 + humming * 0.027, 0.006));
   var silhouette = min(min(body, tail), min(topWing, bottomWing));
   silhouette = min(silhouette, beak);
   if (pose.rest > 0.01) {
@@ -153,9 +155,9 @@ fn loBirdInk(st: vec2f, index: f32, view: vec4f, shape: vec4f, detail: vec4f, se
   ink = mix(ink, mix(accent * 0.8, iridescence, humming), wingMask * mix(0.65, 0.94, humming));
   ink = mix(ink, accent, breast * 0.95);
   ink = mix(ink, vec3f(0.95, 0.53, 0.10), 1.0 - smoothstep(-aa, aa, beak));
-  var eye = 1.0 - smoothstep(0.0015, 0.0023, length(q - vec2f(0.022, 0.009)));
+  var eye = 1.0 - smoothstep(0.0015, 0.0023, length(face - vec2f(0.022, 0.009)));
   if (mood.y > 3.5 && mood.y < 4.5 && pose.rest > 0.5) {
-    eye = 1.0 - smoothstep(0.0010, 0.0018, loCapsule(q, vec2f(0.019, 0.009), vec2f(0.024, 0.008), 0.0005));
+    eye = 1.0 - smoothstep(0.0010, 0.0018, loCapsule(face, vec2f(0.019, 0.009), vec2f(0.024, 0.008), 0.0005));
   }
   ink = mix(ink, vec3f(1.0, 0.93, 0.70), eye);
   var opacity = outline;
@@ -282,6 +284,8 @@ export function createOrnamentBirds(
         frequency: controls.birdVisits ?? 1,
         speed: Array.from({ length: 5 }, (_, i) => sampler?.('birdExcursionSpeed', i) ?? controls.birdExcursionSpeed ?? 1),
         perchDuration: controls.birdPerchDuration ?? 10,
+        sizes: settings.map(setting => setting.value.x),
+        thoughtDuration: controls.birdThoughtDuration ?? 6,
         sociability: controls.birdSociability ?? 0.65,
         seed: view.value.z,
       });
