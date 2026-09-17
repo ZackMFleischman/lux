@@ -1,0 +1,17 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "7bd99b27-08ae-4483-9314-1c8e1e98cf10",
+  "revision": 1,
+  "name": "Cosmos Starfield",
+  "description": "Layered fine stars and fixed six-ray feature stars with independent density, scale, variance, opacity, brightness, and subtle twinkle controls.",
+  "updatedAt": "2026-09-17T21:10:43.186Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "starfield.ts",
+    "files": [
+      "starfield-flare-rig.ts",
+      "starfield.ts"
+    ]
+  }
+}
