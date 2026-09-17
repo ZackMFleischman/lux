@@ -6,8 +6,8 @@ import { resolve } from 'node:path';
 import { createStudioConnection, resolveStudioSession, studioAppData } from './studio-session.mjs';
 import { createLibraryContext, resolveMcpStandardLibrary } from './studio-library-context.mjs';
 import { discoverVisualSdk } from '../packages/visual-sdk/src/discovery.mjs';
-import { parameterInputSchema,nodeVariationInputSchema, playbackInputSchema, restartInputSchema,tempoSetInputSchema,tempoTapInputSchema } from '../apps/studio/src/runtime-operations.ts';
-import {supportsManualTapTempoCapability} from '../apps/studio/src/capabilities.ts';
+import { parameterInputSchema,triggerInputSchema,nodeVariationInputSchema, playbackInputSchema, restartInputSchema,tempoSetInputSchema,tempoTapInputSchema } from '../apps/studio/src/runtime-operations.ts';
+import {supportsControlTriggersCapability,supportsManualTapTempoCapability} from '../apps/studio/src/capabilities.ts';
 const selectedSession = resolveStudioSession({ workspace: resolve(import.meta.dirname, '..') });
 let libraryContext;
 try { libraryContext = createLibraryContext(await resolveMcpStandardLibrary({ workspace: selectedSession.workspace,
@@ -19,6 +19,7 @@ const call = createStudioConnection(selectedSession);
 const text = value => ({ content: [{ type: 'text', text: JSON.stringify(value) }] });
 async function requireTempoCapability(){const status=await call('status');if(!supportsManualTapTempoCapability(status.capabilities))throw Error('Running Studio does not support manual/tap tempo from 20 through 300 BPM; restart from the matching checkout before sending tempo operations.');}
 async function requireVariationCapability(){const status=await call('status');if(status.capabilities?.controlVariation?.stableInstanceKeys!==true)throw Error('Running Studio does not support per-instance control variation; restart from the matching checkout before configuring it.');}
+async function requireTriggerCapability(){const status=await call('status');if(!supportsControlTriggersCapability(status.capabilities))throw Error('Running Studio does not support acknowledged trigger actions. Use the adapter and Studio from the same build.');}
 async function requireParameterKinds(input){
   const kinds=[...new Set(Object.values(input.values).map(value=>typeof value==='string'?'enum':typeof value))];
   if(kinds.every(kind=>kind==='number'))return;
@@ -33,9 +34,10 @@ async function runningStudio() {
     selectedSession: { profile: selectedSession.profile, workspace: selectedSession.workspace },
     advice: `Use the same Studio profile and checkout; reconnect the adapter after replacing Studio. ${error.message}` }; }
 }
-server.registerTool('lux.studio.discover', { description: 'Read the exact visual SDK, example and standalone Lux capabilities. Start Lux Studio separately.', inputSchema: {} }, async () => text({ ...await discoverVisualSdk(), scope: 'standalone-studio', tools: ['read', 'build', 'save', 'open', 'capture', 'status', 'parameters', 'variation', 'playback', 'restart','tempo.set','tempo.tap','library.list','library.read','library.create','library.update'], resolume: false,
+server.registerTool('lux.studio.discover', { description: 'Read the exact visual SDK, example and standalone Lux capabilities. Start Lux Studio separately.', inputSchema: {} }, async () => text({ ...await discoverVisualSdk(), scope: 'standalone-studio', tools: ['read', 'build', 'save', 'open', 'capture', 'status', 'parameters', 'trigger', 'variation', 'playback', 'restart','tempo.set','tempo.tap','library.list','library.read','library.create','library.update'], resolume: false,
   libraryCatalog: await libraryContext.catalog(),
   runningStudio: await runningStudio(),
+  triggers:{kind:'trigger',tool:'lux.studio.trigger',persistent:false,commandId:'Caller-supplied idempotency key; reuse only to retry the same uncertain action in the same guarded generation.',receipt:'Acknowledged after one completed update/render frame. A paused preview stays paused.',maxCommandIdsPerGeneration:16384},
   parameters: { kinds: ['number','boolean','enum'], declaredInCode: true, requiredGuard: 'expectedControlSchemaHash from current runtime status', implicitControls: false,
     composition: 'SDK 0.4 supports image-chain-v1 and typed-image-graph-v1 (image, paths2d and shader-field ports, acyclic fan-out). Selected leaf controls are public aliases; values remain owned by stable node identity.' },
   sourceDocuments: { versions: [1, 2], replacement: 'complete source; preserve sourceVersion and assets when editing v2',
@@ -61,6 +63,7 @@ for (const [method, schema, description] of [
   ['restart', restartInputSchema, 'Restart the Studio runtime using current instance and generation guards. Retains source and controls; returns replacement runtime state.'],
 ]) server.registerTool(`lux.studio.${method}`, { description, inputSchema: schema.shape }, async input => {if(method==='parameters')await requireParameterKinds(input);return text(await call(method, input));});
 server.registerTool('lux.studio.variation',{description:'Configure or remove stable per-instance variation for one numeric control. Read status first for nodePath, controlId and runtime guards. Amount is a symmetric range around the current base; distribution is random, centered, or spread. Pass variation:null to remove it.',inputSchema:nodeVariationInputSchema.shape},async input=>{await requireVariationCapability();return text(await call('variation',input));});
+server.registerTool('lux.studio.trigger',{description:'Invoke one discovered trigger control with current instance, generation, revision and schema guards, a controlId and caller-supplied commandId. Optional nodePath addresses a component instance. Returns the completed-frame receipt. Retry an uncertain action with the same commandId and guards; never automatically retry across generations. Trigger actions are not saved values. A paused preview draws once with zero delta and remains paused.',inputSchema:triggerInputSchema.shape},async input=>{await requireTriggerCapability();return text(await call('trigger',input));});
 server.registerTool('lux.studio.tempo.set',{description:'Set manual scene tempo from 20 through 300 BPM using current runtime identity and revision guards. Preserves beat phase and returns the acknowledged tempo result.',inputSchema:tempoSetInputSchema.shape},async input=>{await requireTempoCapability();return text(await call('tempo.set',input));});
 server.registerTool('lux.studio.tempo.tap',{description:'Tap scene tempo using the running Studio monotonic clock and current runtime identity and revision guards. Returns accepted, restarted, or ignored-short.',inputSchema:tempoTapInputSchema.shape},async input=>{await requireTempoCapability();return text(await call('tempo.tap',input));});
 await server.connect(new StdioServerTransport());

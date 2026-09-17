@@ -44,6 +44,7 @@ export async function prepareWorkerCompositionState(message,admission){
   visit(own(module,'default'),profile.graph.rootDefinitionHash);return freeze(byHash);
  }
  return freeze({checkDefinition,values:animated.values,nodeValues:animated.nodeValues,sample:animated.sample,
+  resolveTrigger(path,controlId){const target=state.resolveControl(path,controlId);if(target.type!=='trigger')throw Error('Composition trigger is unavailable');return freeze({nodePath:target.nodePath,controlId:target.controlId});},
   apply(input,nextSequence,hash){if(!safe(nextSequence)||nextSequence<=sequence||hash!==admission.controlSchemaHash)bad();state.apply(validateControlSnapshot(schema,input));sequence=nextSequence;},
   applyNode(path,input,nextSequence,hash){if(!safe(nextSequence)||nextSequence<=sequence)bad();state.applyNode(path,input,hash);sequence=nextSequence;},
   applyAnimations(input,nextSequence,timeSeconds){if(!safe(nextSequence)||nextSequence<=animationSequence)bad();animations=normalizeControlAnimations(input,profile);animated.replace(animations,timeSeconds);animationSequence=nextSequence;},

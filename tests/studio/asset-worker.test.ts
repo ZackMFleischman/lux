@@ -4,7 +4,7 @@ import {createHash} from 'node:crypto';
 import {deriveAssets} from '../../packages/assets/src/index.mjs';
 import {linkedBody} from '../../apps/build-worker/src/artifact-identity.mjs';
 import {loadAuthoredModule,prepareAuthoredModule} from '../../apps/studio/src/authored-worker-assets.mjs';
-import {canonicalControlSchemaJson,normalizeControlDeclarations} from '../../packages/runtime-contracts/src/parameters.mjs';
+import {canonicalControlSchemaJson,normalizeControlDeclarations,defaultControlValues} from '../../packages/runtime-contracts/src/parameters.mjs';
 const hash=(bytes:Uint8Array|string)=>createHash('sha256').update(bytes).digest('hex');
 const data='Qk06AAAAAAAAADYAAAAoAAAAAQAAAAEAAAABABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AA==';
 async function payload() {
@@ -119,7 +119,7 @@ test('actual worker exposes verified assets during create and missing keys fail 
     const result=new Promise<any>(resolve=>replace('postMessage',(message:any)=>{if(['ready','failure'].includes(message.type))resolve(message);}));
     await import(`../../apps/studio/src/visual-worker.mjs?asset-create=${crypto.randomUUID()}`);
     const identity={instanceId:'cpu',generation:1,revisionId:'revision'};
-    (globalThis as any).onmessage({data:{type:'init',...identity,linked,settings:{width:1920,height:1080,fps:60,seed:0},sdkVersion,controlSchema:controls,controlSchemaHash,controls:Object.fromEntries(controls.map(row=>[row.id,row.default]))}});
+    (globalThis as any).onmessage({data:{type:'init',...identity,linked,settings:{width:1920,height:1080,fps:60,seed:0},sdkVersion,controlSchema:controls,controlSchemaHash,controls:defaultControlValues(controls)}});
     const message=await result;
     if(missing) {assert.equal(message.type,'failure');assert.match(message.message,/Missing required asset: assets\/red.bmp/);}
     else {

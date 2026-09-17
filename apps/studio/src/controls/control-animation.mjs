@@ -137,7 +137,7 @@ export function createControlAnimationEvaluator(profile,base,normalized){
  }
  function values(timeSeconds,beatPosition=0){
   const values={...base.values()};
-  for(let index=0;index<profile.publicControls.length;index++){const definition=profile.publicControls[index],targets=profile.publicControlBindings[definition.id],target=targets?.length===1&&targets[0]?.active?targets[0]:undefined;if(target)values[definition.id]=nodeValues(target.nodePath,timeSeconds,beatPosition)[target.controlId];}
+  for(let index=0;index<profile.publicControls.length;index++){const definition=profile.publicControls[index];if(definition.type==='trigger')continue;const targets=profile.publicControlBindings[definition.id],target=targets?.length===1&&targets[0]?.active?targets[0]:undefined;if(target)values[definition.id]=nodeValues(target.nodePath,timeSeconds,beatPosition)[target.controlId];}
   return freeze(values);
  }
  function forEachKickEntry(visit){for(let index=0;index<current.bindings.length;index++){const binding=current.bindings[index];if(binding.kind==='kick'){const entry=mapGet(entries,`${key(binding.nodePath)}:${binding.controlId}`);if(entry)visit(entry);}}}

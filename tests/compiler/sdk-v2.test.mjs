@@ -60,6 +60,19 @@ export default defineVisual({
   },
   async create() { return { update(frame) { ${update} }, render() {}, reset() {}, dispose() {} }; },
 });`;
+const triggerSource = update => `
+import { defineVisual, type ControlDeclarations, type ControlsOf, type TriggerIdsOf } from '@lux/visual-sdk';
+type GenericValues = ControlsOf<ControlDeclarations>;
+const genericValue = (values: GenericValues): number | boolean | string | undefined => values.anyControl;
+type TriggerId = TriggerIdsOf<{ readonly regenerate: { readonly type:'trigger'; readonly label:'Regenerate' } }>;
+const triggerId: TriggerId = 'regenerate'; void triggerId; void genericValue;
+export default defineVisual({
+  controls: {
+    speed: { type: 'number', label: 'Speed', default: 1, min: 0, max: 4 },
+    regenerate: { type: 'trigger', label: 'Regenerate' },
+  },
+  async create() { return { update(frame) { ${update} }, render() {}, reset() {}, dispose() {} }; },
+});`;
 
 test('SDK 0.2 exposes an optional per-instance control sampler with a base-value fallback', async () => {
   const dependencies=process.env.LUX_COMPILER_DEPENDENCIES||resolve('node_modules');
@@ -92,6 +105,9 @@ test('real pinned TypeScript infers typed controls and restricts sampling and en
       [typedSource("frame.sampleControl?.('trail', 1);"), /not assignable.*speed|argument.*speed/i],
       [typedSource("const direction: 'sideways' = frame.controls.direction;"), /not assignable.*sideways/i],
       [typedSource('', 'sideways'), /not assignable|never|sideways/i],
+      [triggerSource("const event = frame.events[0]!; const kind: 'trigger' = event.type; const id: 'regenerate' = event.controlId; const command: string = event.commandId; const sequence: number = event.sequence; const speed: number = frame.controls.speed;"), null],
+      [triggerSource('frame.controls.regenerate;'), /Property 'regenerate' does not exist/],
+      [triggerSource("const id: 'other' = frame.events[0]!.controlId;"), /regenerate.*not assignable.*other/i],
       [source().replace(/controls: \{[\s\S]*?\n  \},/, 'controls: {},').replace('const height: number = frame.controls.spikeHeight; const roughness: number = frame.controls.roughness;', ''), null],
       [source('frame.controls.intensity;').replace(/controls: \{[\s\S]*?\n  \},/, 'controls: {},'), /Property 'intensity' does not exist/],
     ]) {

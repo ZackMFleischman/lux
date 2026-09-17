@@ -31,6 +31,8 @@ export const previewResizeInputSchema = z.object({ ...target, width: z.number().
 export const tempoSetInputSchema=z.object({...target,expectedRevisionId:z.string().min(1),bpm:z.number().finite().min(20).max(300)}).strict();
 export const tempoTapInputSchema=z.object({...target,expectedRevisionId:z.string().min(1)}).strict();
 const requestId = z.string().min(1).max(100);
+const commandId=z.string().min(1).max(100),controlId=z.string().regex(/^[a-z][A-Za-z0-9_]{0,63}$/);
+export const triggerInputSchema=z.object({...target,commandId,expectedRevisionId:z.string().min(1),expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/),controlId,nodePath:z.array(nodeIdSchema).min(1).max(16).optional()}).strict();
 export const studioOperationSchema = z.discriminatedUnion('name', [
   z.object({name:z.literal('lux.node.parameters.set'),input:nodeParameterInputSchema.extend({requestId})}).strict(),
   z.object({name:z.literal('lux.node.animation.set'),input:nodeAnimationInputSchema.extend({requestId})}).strict(),
@@ -41,14 +43,17 @@ export const studioOperationSchema = z.discriminatedUnion('name', [
   z.object({ name: z.literal('lux.preview.resize'), input: previewResizeInputSchema.extend({ requestId }) }).strict(),
   z.object({name:z.literal('lux.tempo.set'),input:tempoSetInputSchema.extend({requestId})}).strict(),
   z.object({name:z.literal('lux.tempo.tap'),input:tempoTapInputSchema.extend({requestId})}).strict(),
+  z.object({name:z.literal('lux.trigger.fire'),input:triggerInputSchema.omit({nodePath:true}).extend({requestId})}).strict(),
+  z.object({name:z.literal('lux.node.trigger.fire'),input:triggerInputSchema.required({nodePath:true}).extend({requestId})}).strict(),
 ]);
 export async function dispatchRuntimeCommand(client: StudioClient, method: string, params: unknown) {
-  const schemas = { parameters: parameterInputSchema, variation:nodeVariationInputSchema, playback: playbackInputSchema, restart: restartInputSchema,'tempo.set':tempoSetInputSchema,'tempo.tap':tempoTapInputSchema };
+  const schemas = { parameters: parameterInputSchema, variation:nodeVariationInputSchema, playback: playbackInputSchema, restart: restartInputSchema,'tempo.set':tempoSetInputSchema,'tempo.tap':tempoTapInputSchema,trigger:triggerInputSchema };
   if (!Object.hasOwn(schemas, method)) throw Error('Unsupported runtime command');
-  const names = { parameters: 'lux.parameters.set', variation:'lux.node.variation.set', playback: 'lux.playback', restart: 'lux.runtime.restart','tempo.set':'lux.tempo.set','tempo.tap':'lux.tempo.tap' } as const;
+  const names = { parameters: 'lux.parameters.set', variation:'lux.node.variation.set', playback: 'lux.playback', restart: 'lux.runtime.restart','tempo.set':'lux.tempo.set','tempo.tap':'lux.tempo.tap',trigger:'lux.trigger.fire' } as const;
   const key = method as keyof typeof schemas;
   if(key==='parameters') {const raw=snapshotRecord(params);params={...raw,values:snapshotRecord(raw.values)};}
-  const operation = studioOperationSchema.parse({ name: names[key], input: { ...schemas[key].parse(params), requestId: crypto.randomUUID() } });
+  const parsedInput=schemas[key].parse(params),name=key==='trigger'&&'nodePath' in parsedInput?'lux.node.trigger.fire':names[key];
+  const operation = studioOperationSchema.parse({ name, input: { ...parsedInput, requestId: crypto.randomUUID() } });
   const applied = await client.invoke(operation);
   return { applied, status: client.getSnapshot() };
 }

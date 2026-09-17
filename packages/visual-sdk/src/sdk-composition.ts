@@ -1,6 +1,7 @@
 import {normalizeComponentDeclaration} from '../../runtime-contracts/src/components.mjs';
 import type {ComponentDeclaration,ComponentMetadata} from '../../runtime-contracts/src/components.mjs';
-import type {ControlDeclarations,ControlsOf,NumberControlIdsOf,ValidControlDeclarations} from '../../runtime-contracts/src/parameters.mjs';
+import type {ControlDeclarations,ControlsOf,ControlTriggerEvent,NumberControlIdsOf,ValidControlDeclarations} from '../../runtime-contracts/src/parameters.mjs';
+export type {ControlTriggerEvent,TriggerControlDefinition,TriggerDeclaration,TriggerIdsOf} from '../../runtime-contracts/src/parameters.mjs';
 import type {Paths2DSnapshot} from '../../runtime-contracts/src/paths2d.mjs';
 import type {ShaderFieldSnapshot} from '../../runtime-contracts/src/shader-field.mjs';
 import type {OutputSettings} from '../../runtime-contracts/src/index.ts';
@@ -11,7 +12,7 @@ declare const shaderFieldResourceBrand:unique symbol;
 export interface ShaderFieldResource {readonly [shaderFieldResourceBrand]:true;readonly data:ShaderFieldSnapshot}
 export interface ImageResource {readonly [imageResourceBrand]:true;readonly width:number;readonly height:number;readonly colorSpace:'linear-srgb';readonly alphaMode:'premultiplied';readonly texture:unknown}
 export interface Paths2DResource {readonly [paths2dResourceBrand]:true;readonly data:Paths2DSnapshot}
-export interface ComponentFrame<C extends ControlDeclarations=ControlDeclarations>{readonly tick:number;readonly timeSeconds:number;readonly deltaSeconds:number;readonly controls:ControlsOf<C>;readonly events:readonly never[];readonly sampleControl?:(controlId:NumberControlIdsOf<C>,instanceKey:string|number)=>number}
+export interface ComponentFrame<C extends ControlDeclarations=ControlDeclarations>{readonly tick:number;readonly timeSeconds:number;readonly deltaSeconds:number;readonly controls:ControlsOf<C>;readonly events:readonly ControlTriggerEvent<C>[];readonly sampleControl?:(controlId:NumberControlIdsOf<C>,instanceKey:string|number)=>number}
 export interface ComponentContext {readonly settings:Readonly<OutputSettings>;readonly assets:ReadonlyMap<string,Readonly<Uint8Array>>;readonly images:ReadonlyMap<string,Readonly<{width:number;height:number;colorSpace:'srgb';alphaMode:'straight';data:Uint8Array}>>;random():number;reportError(message:string):void}
 export type ImageInputs=Readonly<Record<string,ImageResource>>;
 type PortDeclarations=ComponentDeclaration['inputs'];

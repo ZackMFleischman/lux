@@ -1,7 +1,8 @@
 import type { RuntimeKey, OutputSettings } from '../../../packages/runtime-contracts/src/index.ts';
 import type { ControlValues, ControlMigration } from '../../../packages/runtime-contracts/src/parameters.mjs';
-import { isNumberControlDefinition, normalizeControlSchema, validateControlSnapshot, validateControlPatch } from '../../../packages/runtime-contracts/src/parameters.mjs';
-import { LEGACY_CONTROL_SCHEMA, LEGACY_CONTROL_SCHEMA_HASH } from './controls/control-state.ts';
+import { canonicalControlSchemaJson,isNumberControlDefinition, normalizeControlSchema, validateControlSnapshot, validateControlPatch } from '../../../packages/runtime-contracts/src/parameters.mjs';
+import { LEGACY_CONTROL_SCHEMA, LEGACY_CONTROL_SCHEMA_HASH,sha256 } from './controls/control-state.ts';
+import {compositionControlSchema,resolveCompositionControlTarget} from '../../../packages/runtime/src/components/composition-controls.ts';
 import type { RuntimeControlState } from './controls/control-state.ts';
 import type { PerformanceSnapshot } from './performance/performance-state.ts';
 import type { ImageCompositionProfile } from '../../../packages/runtime-contracts/src/composition-profile.mjs';
@@ -14,10 +15,14 @@ export type { RuntimeKey } from '../../../packages/runtime-contracts/src/index.t
 /** sampledAtMs is a UI-normalized Unix-millisecond observation timestamp from
  * the status adapter, never uncalibrated GPU/process monotonic ticks. */
 export type Metric = Readonly<{ value: number; sampledAtMs: number; coverage: number }>;
+export type TriggerReceipt=Readonly<{result:'applied';commandId:string;controlId:string;nodePath:NodePath;sequence:number;frameId:string;timeSeconds:number}>;
+export type TriggerCommand=Readonly<{requestId:string;commandId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string;expectedControlSchemaHash:string;controlId:string;nodePath?:NodePath}>;
+export function isUncertainTriggerError(error:unknown):boolean{return !!error&&typeof error==='object'&&'code' in error&&(error as {code?:unknown}).code==='TRIGGER_TIMEOUT';}
 export type RuntimeView = RuntimeKey & Readonly<{
   revisionId: string; sceneName: string; authority: 'studio' | 'host';
   playback: 'playing' | 'paused' | 'starting' | 'failed';
   clockEpoch: number; timeSeconds?:number; frameId: string | null; controlMigration?: readonly ControlMigration[];
+  triggerSequence?:number;latestTriggerReceipt?:TriggerReceipt;
   tempo?:TempoSnapshot;tempoSequence?:number;
   output: Readonly<Pick<OutputSettings, 'width' | 'height'>>;
   fault: Readonly<{ code: string; message: string }> | null;
@@ -64,7 +69,9 @@ export type StudioOperation =
   | { name: 'lux.runtime.restart'; input: { requestId: string; instanceId: string; expectedGeneration: number } }
   | { name: 'lux.preview.resize'; input: { requestId: string; instanceId: string; expectedGeneration: number; width: number; height: number } }
   | { name:'lux.tempo.set';input:{requestId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string;bpm:number} }
-  | { name:'lux.tempo.tap';input:{requestId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string} };
+  | { name:'lux.tempo.tap';input:{requestId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string} }
+  | { name:'lux.trigger.fire';input:Omit<TriggerCommand,'nodePath'> }
+  | { name:'lux.node.trigger.fire';input:TriggerCommand&Readonly<{nodePath:NodePath}> };
 export interface StudioClient {
   getSnapshot(): StudioSnapshot;
   subscribe(listener: () => void): () => void;
@@ -139,6 +146,20 @@ export class StudioController {
       values: {...pending?.values,...patch}, mode: 'live',
     } };
     return this.startParameterDrain();
+  }
+  async fireTrigger(controlId:string,commandId:string):Promise<unknown>{
+    const target=this.target(),state=getRuntimeControlState(target),definition=state.controlSchema.find(row=>row.id===controlId);
+    if(!definition||(definition as {type:string}).type!=='trigger')throw Error('Scene trigger is unavailable');
+    return this.client.invoke({name:'lux.trigger.fire',input:{requestId:this.requestId(),commandId,instanceId:target.instanceId,expectedGeneration:target.generation,
+      expectedRevisionId:target.revisionId,expectedControlSchemaHash:state.controlSchemaHash,controlId}});
+  }
+  async fireNodeTrigger(nodePath:NodePath,controlId:string,commandId:string):Promise<unknown>{
+    const target=this.target();if(target.sdkVersion!=='0.4.0'||!target.composition)throw Error('Composition node trigger is unavailable');
+    const schema=compositionControlSchema(target.composition,nodePath),definition=schema.find(row=>row.id===controlId),resolved=resolveCompositionControlTarget(target.composition,nodePath,controlId);
+    if(!definition||definition.type!=='trigger'||resolved.type!=='trigger')throw Error('Composition node trigger is unavailable');
+    const schemaHash=await sha256(new TextEncoder().encode(canonicalControlSchemaJson(schema)));
+    return this.client.invoke({name:'lux.node.trigger.fire',input:{requestId:this.requestId(),commandId,instanceId:target.instanceId,expectedGeneration:target.generation,
+      expectedRevisionId:target.revisionId,expectedControlSchemaHash:schemaHash,nodePath:[...nodePath],controlId}});
   }
   private startParameterDrain(): Promise<void> {
     if (!this.parameterDrain) this.parameterDrain = this.drainParameters().then(() => {

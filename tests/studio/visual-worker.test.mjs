@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { canonicalControlSchemaJson, normalizeControlDeclarations } from '../../packages/runtime-contracts/src/parameters.mjs';
 import { decode } from 'fast-png';
 const schema=normalizeControlDeclarations({height:{type:'number',label:'Height',default:1,min:0,max:4},speed:{type:'number',label:'Speed',default:0.5,min:0,max:2}});
+const triggerSchema=normalizeControlDeclarations({height:{type:'number',label:'Height',default:1,min:0,max:4},regenerate:{type:'trigger',label:'Regenerate'}});
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const bundle=(await build({entryPoints:[fileURLToPath(new URL('../../apps/studio/src/visual-worker.mjs',import.meta.url))],bundle:true,write:false,format:'esm',platform:'browser',logLevel:'silent'})).outputFiles[0].text;
 async function fixture(controls=schema,declared=controls,mutation='',sdkVersion='0.2.0',timed=false,gpuTimed=false,workMs=0,waitCreate=false,lifecycle={}) {
@@ -24,7 +25,7 @@ async function fixture(controls=schema,declared=controls,mutation='',sdkVersion=
     ImageData:class{},OffscreenCanvas:class{getContext(){return {putImageData(){}}}async convertToBlob(){return new Blob(['png']);}},
   });
   vm.runInContext('const parseForHarness=JSON.parse; globalThis.deliver=raw=>onmessage({data:parseForHarness(raw)});',context);
-  const methods=[`update(frame){recordFrame(frame)}`,gpuTimed?'render(){gpuDraw();}':timed?'async render(){advanceClock(7);await Promise.resolve();advanceClock(11);}':'render(){}','reset(){}',`dispose(){recordLifecycle('authored-dispose',this===instance);${lifecycle.throwDispose?"throw Error('legacy dispose failed');":''}}`];
+  const methods=[`update(frame){recordFrame(frame);${lifecycle.mutationOnUpdate?'mutateAfterInit();globalThis.mutateAfterInit=()=>{};':''}}`,gpuTimed?'render(){gpuDraw();}':timed?'async render(){advanceClock(7);await Promise.resolve();advanceClock(11);}':'render(){}','reset(){}',`dispose(){recordLifecycle('authored-dispose',this===instance);${lifecycle.throwDispose?"throw Error('legacy dispose failed');":''}}`];
   const instanceCode=lifecycle.classInstance?`new (class {${methods.join(' ')}})()`:`{${methods.join(',')}}`;
   const visualCode=`${mutation}
     export class WebGPURenderer {backend={isWebGPUBackend:true};setSize(){}async init(){}setRenderTarget(){}render(){}dispose(){recordLifecycle('renderer-dispose');}async readRenderTargetPixelsAsync(){const pixels=new Uint8Array(1920*1080*4);pixels.set([188,0,0,128]);return pixels;}}
@@ -36,11 +37,11 @@ async function fixture(controls=schema,declared=controls,mutation='',sdkVersion=
   }});
   await module.link(()=>{throw Error('Unexpected bundled import')});await module.evaluate();
   const identity={instanceId:'instance',generation:1,revisionId:'revision'};
-  const initial={type:'init',requestId:'init',...identity,moduleSource:'fixture',canvas:{},settings:{width:1920,height:1080,fps:60,seed:0},sdkVersion,controlSchema:controls,controlSchemaHash:hash(canonicalControlSchemaJson(controls)),controls:Object.fromEntries(controls.map(row=>[row.id,row.default])),playing:false};
+  const initial={type:'init',requestId:'init',...identity,moduleSource:'fixture',canvas:{},settings:{width:1920,height:1080,fps:60,seed:0},sdkVersion,controlSchema:controls,controlSchemaHash:hash(canonicalControlSchemaJson(controls)),controls:Object.fromEntries(controls.filter(row=>row.type!=='trigger').map(row=>[row.id,row.default])),playing:false};
   const post=message=>context.deliver(JSON.stringify({...identity,...message}));
   async function send(message){const before=messages.length;post(message);const response=()=>messages.slice(before).find(row=>row.type!=='heartbeat');for(let i=0;i<200&&!response();i++)await new Promise(resolve=>setImmediate(resolve));assert.ok(response(),'worker must respond');return response();}
   const flush=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};
-  return {send,post,initial,events,messages,frames,requested,allocations,scheduled,timers,flush,async fireTimer(late=0){const [id,timer]=timers.entries().next().value;timers.delete(id);now=Math.max(now,timer.at)+late;timer.fn();await flush();},created:()=>created,imports:()=>imports,telemetry(){now=500;intervals.get(500)?.();return messages.at(-1);},intervals};
+  return {send,post,initial,events,messages,frames,requested,allocations,scheduled,timers,flush,mutate(code){vm.runInContext(code,context);},async fireTimer(late=0){const [id,timer]=timers.entries().next().value;timers.delete(id);now=Math.max(now,timer.at)+late;timer.fn();await flush();},created:()=>created,imports:()=>imports,telemetry(){now=500;intervals.get(500)?.();return messages.at(-1);},intervals};
 }
 
 test('legacy class prototype dispose retains its receiver and runs once across repeated disposal',async()=>{
@@ -95,6 +96,29 @@ test('baseline worker retains controls, frames and heartbeat with no query alloc
  const changed=await base.send({type:'controls',controlSequence:1,controlSchemaHash:base.initial.controlSchemaHash,values:{height:2,speed:1}});
  assert.deepEqual(changed.controls,{height:2,speed:1});assert.equal(base.frames.length,2);
  const bad=await fixture();assert.equal((await bad.send({...bad.initial,performanceMode:'unknown'})).type,'failure');
+});
+
+test('paused trigger draws once after hostile intrinsic mutation and duplicate IDs return the original receipt without regressing latest status',async()=>{
+ const f=await fixture(triggerSchema,triggerSchema,'','0.2.0');
+ const ready=await f.send(f.initial);assert.equal(ready.type,'ready',JSON.stringify(ready));assert.equal(ready.triggerSequence,0);
+ f.mutate("Map.prototype.get=()=>{throw new TypeError('mutated get')};Map.prototype.set=()=>{throw new TypeError('mutated set')};Object.freeze=value=>value;globalThis.Error=()=>new TypeError('mutated Error')");
+ const first=await f.send({type:'trigger',requestId:'trigger-a',commandId:'command-a',nodePath:[],controlId:'regenerate'});
+ assert.equal(first.type,'status',JSON.stringify(first));
+ assert.equal(first.playback,'paused');assert.equal(first.timeSeconds,ready.timeSeconds);assert.equal(first.triggerSequence,1);assert.deepEqual(first.triggerReceipt,{result:'applied',commandId:'command-a',controlId:'regenerate',nodePath:[],sequence:1,frameId:'2',timeSeconds:0});
+ assert.deepEqual(f.frames.at(-1).events,[{type:'trigger',controlId:'regenerate',commandId:'command-a',sequence:1}]);assert.equal(f.frames.at(-1).deltaSeconds,0);
+ const frameCount=f.frames.length,duplicate=await f.send({type:'trigger',requestId:'trigger-a-retry',commandId:'command-a',nodePath:[],controlId:'regenerate'});
+ assert.deepEqual(duplicate.triggerReceipt,first.triggerReceipt);assert.equal(f.frames.length,frameCount);
+ const second=await f.send({type:'trigger',requestId:'trigger-b',commandId:'command-b',nodePath:[],controlId:'regenerate'});assert.equal(second.triggerSequence,2);
+ const old=await f.send({type:'trigger',requestId:'trigger-a-late',commandId:'command-a',nodePath:[],controlId:'regenerate'});
+ assert.equal(old.triggerReceipt.sequence,1);assert.equal(old.latestTriggerReceipt.sequence,2);assert.equal(old.frameId,second.frameId);assert.equal(f.frames.length,frameCount+1);
+ const reset=await f.send({type:'playback',requestId:'reset',action:'reset'}),afterReset=f.frames.length;
+ assert.equal(reset.triggerSequence,2);
+ const resetDuplicate=await f.send({type:'trigger',requestId:'trigger-a-after-reset',commandId:'command-a',nodePath:[],controlId:'regenerate'});
+ assert.deepEqual(resetDuplicate.triggerReceipt,first.triggerReceipt);assert.equal(f.frames.length,afterReset,'reset retains the ledger without replay');
+ const capture=await f.send({type:'capture',requestId:'capture-after-trigger'}),serialized=JSON.stringify(capture.metadata);
+ for(const excluded of ['triggerSequence','latestTriggerReceipt','triggerReceipt','commandId','events'])assert.equal(serialized.includes(excluded),false,`capture excludes ${excluded}`);
+ const mismatch=await f.send({type:'trigger',requestId:'trigger-a-wrong',commandId:'command-a',nodePath:[],controlId:'height'});
+ assert.equal(mismatch.type,'command-error');assert.equal(mismatch.code,'TRIGGER_REJECTED');assert.equal(f.messages.some(message=>message.type==='failure'),false);
 });
 
 test('worker keeps routine sampling phase through unsampled frame notifications',async()=>{

@@ -41,6 +41,20 @@ test('static extraction admits boolean and dense literal enum declarations witho
   ]);
 });
 
+test('static extraction admits trigger metadata without inventing a persistent default', () => {
+  assert.deepEqual(extract(source(`{
+    regenerate: { type: 'trigger', label: ' Regenerate ', description: ' Build another pattern ', group: ' Actions ' },
+  }`)), [
+    { id: 'regenerate', type: 'trigger', label: 'Regenerate', description: 'Build another pattern', group: 'Actions', changeCost: 'live' },
+  ]);
+  for (const declaration of [
+    `{ type:'trigger', label:'Regenerate', default:false }`,
+    `{ type:'trigger', label:makeLabel() }`,
+    `{ type:'trigger', get label(){return 'Regenerate'} }`,
+    `{ type:'trigger', ['label']:'Regenerate' }`,
+  ]) assert.throws(() => extract(source(`{ regenerate: ${declaration} }`)), { code: 'COMPILE_FAILED' });
+});
+
 test('static enum extraction rejects references, calls, spreads, holes, methods and computed option fields', () => {
   for (const options of [
     'options', 'makeOptions()', '[first, {id:"reverse",label:"Reverse"}]',

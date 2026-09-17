@@ -6,19 +6,47 @@ import type {NodePath} from '../../../runtime-contracts/src/graph.ts';
 export type SavedNodeControls=Readonly<{nodes:readonly Readonly<{nodePath:NodePath;definitionHash:string;schema:ControlSchema;schemaHash:string;values:ControlValues}>[]}>;
 const freeze=Object.freeze,stringify=JSON.stringify,ownKeys=Reflect.ownKeys,descriptor=Object.getOwnPropertyDescriptor,prototype=Object.getPrototypeOf;
 const arrayIsArray=Array.isArray,objectPrototype=Object.prototype,finite=Number.isFinite,defineProperty=Object.defineProperty,createObject=Object.create,RuntimeError=Error;
-const RuntimeMap=Map,call=Function.prototype.call,arrayFind=call.bind(Array.prototype.find),arrayMap=call.bind(Array.prototype.map),arraySlice=call.bind(Array.prototype.slice);
+const RuntimeMap=Map,call=Function.prototype.call,arrayFind=call.bind(Array.prototype.find),arrayMap=call.bind(Array.prototype.map),arraySlice=call.bind(Array.prototype.slice),arrayConcat=call.bind(Array.prototype.concat);
 const mapGet=call.bind(Map.prototype.get),mapSet=call.bind(Map.prototype.set),hasOwn=call.bind(Object.prototype.hasOwnProperty);
 const key=(path:NodePath)=>stringify(path);
 const migrationId=(path:NodePath,id:string)=>`${path.join('/')}:${id}`;
+export type ResolvedCompositionControl=Readonly<{nodePath:NodePath;controlId:string;definitionHash:string;schemaHash:string;type:ControlSchema[number]['type']}>;
+function controlSchema(profile:ImageCompositionProfile,nodePath:NodePath):ControlSchema{
+ let hash=profile.graph.rootDefinitionHash;
+ for(let index=0;index<nodePath.length;index++){const nodeId=nodePath[index]!,definition=profile.definitions[hash];if(definition?.kind!=='graph')throw new RuntimeError('Unknown composition node path');const node=arrayFind(definition.body.nodes,(row:{id:string;definitionHash:string})=>row.id===nodeId);if(!node)throw new RuntimeError('Unknown composition node path');hash=node.definitionHash;}
+ const definition=profile.definitions[hash];if(!definition)throw new RuntimeError('Unknown composition node path');return definition.metadata.controls;
+}
+export function compositionControlSchema(input:ImageCompositionProfile,nodePath:NodePath):ControlSchema{
+ return controlSchema(normalizeImageCompositionProfile(input),nodePath);
+}
+function resolveControl(profile:ImageCompositionProfile,nodePath:NodePath,controlId:string):ResolvedCompositionControl{
+ let hash=profile.graph.rootDefinitionHash,path=[] as NodePath;
+ for(let index=0;index<nodePath.length;index++){const nodeId=nodePath[index]!,definition=profile.definitions[hash];if(definition?.kind!=='graph')throw new RuntimeError('Unknown composition node path');const node=arrayFind(definition.body.nodes,(row:{id:string;definitionHash:string})=>row.id===nodeId);if(!node)throw new RuntimeError('Unknown composition node path');hash=node.definitionHash;path=freeze(arrayConcat(path,[nodeId])) as NodePath;}
+ let definition=profile.definitions[hash],id=controlId;
+ if(!definition||!arrayFind(definition.metadata.controls,(row:ControlSchema[number])=>row.id===id))throw new RuntimeError('Composition control is unavailable');
+ while(definition.kind==='graph'){
+  const refs=definition.body.controlBindings[id];if(!refs||refs.length!==1)throw new RuntimeError('Unsupported composition control binding');
+  const ref=refs[0]!,node=arrayFind(definition.body.nodes,(row:{id:string;definitionHash:string})=>row.id===ref.nodeId);if(!node)throw new RuntimeError('Invalid composition control binding');
+  path=freeze(arrayConcat(path,[ref.nodeId])) as NodePath;hash=node.definitionHash;id=ref.controlId;definition=profile.definitions[hash]!;
+ }
+ const leaf=arrayFind(profile.nodes,(row:ImageCompositionProfile['nodes'][number])=>key(row.nodePath)===key(path)),control=arrayFind(definition.metadata.controls,(row:ControlSchema[number])=>row.id===id);
+ if(!leaf||!control)throw new RuntimeError('Composition control target is unavailable');
+ return freeze({nodePath:freeze(arraySlice(path,0)) as NodePath,controlId:id,definitionHash:leaf.definitionHash,schemaHash:leaf.schemaHash,type:control.type});
+}
+export function resolveCompositionControlTarget(input:ImageCompositionProfile,nodePath:NodePath,controlId:string):ResolvedCompositionControl{
+ return resolveControl(normalizeImageCompositionProfile(input),nodePath,controlId);
+}
 function preparedValues(schema:ControlSchema,input:unknown,complete:boolean):ControlValues {
  if(!input||typeof input!=='object'||arrayIsArray(input)||(prototype(input)!==objectPrototype&&prototype(input)!==null))throw new RuntimeError('Control values require a plain record');
  const keys=ownKeys(input);if(!complete&&!keys.length)throw new RuntimeError('Expected a nonempty control patch');
  const result=createObject(objectPrototype) as Record<string,ControlValues[string]>;
  for(let index=0;index<keys.length;index++){
-  const id=keys[index];if(typeof id!=='string'||!arrayFind(schema,(row:ControlSchema[number])=>row.id===id))throw new RuntimeError(`Unknown control value ${typeof id==='string'?id.slice(0,64):'invalid key'}`);
+  const id=keys[index],control=typeof id==='string'?arrayFind(schema,(row:ControlSchema[number])=>row.id===id):undefined;if(!control)throw new RuntimeError(`Unknown control value ${typeof id==='string'?id.slice(0,64):'invalid key'}`);
+  if(control.type==='trigger')throw new RuntimeError('Trigger controls use the trigger command');
  }
  for(let index=0;index<schema.length;index++){
   const control=schema[index]!,field=descriptor(input,control.id);
+  if(control.type==='trigger')continue;
   if(!field?.enumerable||!hasOwn(field,'value')){if(complete)throw new RuntimeError(`Missing control value ${control.id}`);continue;}
   const value=field.value;let admitted:ControlValues[string];
   if(control.type==='number'){
@@ -58,7 +86,7 @@ export function prepareCompositionControlState(input:ImageCompositionProfile){
  }
  const find=(path:NodePath)=>{const result=mapGet(values,key(path));if(!result)throw new RuntimeError('Unknown composition node path');return result;};
  const target=(id:string)=>{const targets=profile.publicControlBindings[id];if(!targets||targets.length!==1||!targets[0]?.active)throw new RuntimeError('Unsupported composition control binding');return targets[0];};
- function publicValues(){const result:Record<string,ControlValues[string]>={};for(let index=0;index<profile.publicControls.length;index++){const row=profile.publicControls[index]!,binding=target(row.id),value=find(binding.nodePath)[binding.controlId];if(value===undefined)throw new RuntimeError('Missing composition control value');result[row.id]=value;}return freeze(result);}
+ function publicValues(){const result:Record<string,ControlValues[string]>={};for(let index=0;index<profile.publicControls.length;index++){const row=profile.publicControls[index]!;if(row.type==='trigger')continue;const binding=target(row.id),value=find(binding.nodePath)[binding.controlId];if(value===undefined)throw new RuntimeError('Missing composition control value');result[row.id]=value;}return freeze(result);}
  return Object.freeze({
   values:publicValues,
   applyNode(path:NodePath,input:unknown,schemaHash:string){
@@ -68,8 +96,9 @@ export function prepareCompositionControlState(input:ImageCompositionProfile){
    const patch=preparedValues(node.schema,input,false);
    mapSet(values,key(path),freeze({...find(path),...patch}));
   },
-  apply(input:unknown){const next=preparedValues(profile.publicControls,input,true);for(let index=0;index<profile.publicControls.length;index++){const row=profile.publicControls[index]!,binding=target(row.id),value=next[row.id];if(value===undefined)throw new RuntimeError('Missing composition control value');const path=key(binding.nodePath),leaf:Record<string,ControlValues[string]>={...find(binding.nodePath),[binding.controlId]:value};mapSet(values,path,freeze(leaf));}},
+  apply(input:unknown){const next=preparedValues(profile.publicControls,input,true);for(let index=0;index<profile.publicControls.length;index++){const row=profile.publicControls[index]!;if(row.type==='trigger')continue;const binding=target(row.id),value=next[row.id];if(value===undefined)throw new RuntimeError('Missing composition control value');const path=key(binding.nodePath),leaf:Record<string,ControlValues[string]>={...find(binding.nodePath),[binding.controlId]:value};mapSet(values,path,freeze(leaf));}},
   nodeValues(path:NodePath){return freeze({...find(path)});},
+  resolveControl(path:NodePath,controlId:string){return resolveControl(profile,path,controlId);},
   changes(){return freeze(arraySlice(changes,0));},
   snapshot():SavedNodeControls{return freeze({nodes:freeze(arrayMap(profile.nodes,(node:ImageCompositionProfile['nodes'][number])=>freeze({nodePath:freeze(arraySlice(node.nodePath,0)),definitionHash:node.definitionHash,schema:node.schema,schemaHash:node.schemaHash,values:freeze({...find(node.nodePath)})})))});},
  });

@@ -118,6 +118,111 @@ test('RTL: Boolean and dropdown controls expose typed values, descriptions and d
   await act(async () => { await new Promise(resolve => setTimeout(resolve, 500)); });
 });
 
+
+test('RTL: trigger actions use one native button, isolate pending state and never mark persistent edits', async () => {
+  const fixture=service(),pending:{resolve(value:unknown):void}[]=[],dirty:string[]=[];
+  fixture.client.invoke=operation=>{fixture.calls.push(operation);return new Promise(resolve=>pending.push({resolve}));};
+  fixture.publish({sdkVersion:'0.2.0',intensity:undefined,controlSchema:[
+    {id:'regenerate',type:'trigger',label:'Regenerate flock',description:'Create a fresh flock arrangement.',changeCost:'live'},
+    {id:'shufflePalette',type:'trigger',label:'Shuffle palette',changeCost:'live'},
+  ] as any,controlSchemaHash:'3'.repeat(64),controls:{},controlSequence:0} as any);
+  const user=userEvent.setup({document});
+  render(<StudioApp client={fixture.client} nowMs={1000} controlEdits={{changed:()=>dirty.push('changed'),track:()=>dirty.push('track')}}/>);
+
+  const regenerate=screen.getByRole('button',{name:'Run Regenerate flock'});
+  const shuffle=screen.getByRole('button',{name:'Run Shuffle palette'});
+  assert.equal(screen.queryByRole('button',{name:'Reset Regenerate flock to default'}),null);
+  assert.equal(screen.queryByRole('button',{name:'Animate Regenerate flock'}),null);
+  const regenerateLabel=screen.getByText('Regenerate flock');await act(async()=>regenerateLabel.focus());
+  assert.equal(document.activeElement,regenerateLabel);
+  assert.ok(await screen.findByRole('tooltip',{name:/Create a fresh flock arrangement/}));
+  await act(async()=>{fireEvent.blur(screen.getByText('Regenerate flock'));await new Promise(resolve=>setTimeout(resolve,300));});
+
+  await user.click(regenerate);
+  await waitFor(()=>assert.equal(pending.length,1));
+  assert.equal(document.activeElement,regenerate,'pending must preserve the action focus');
+  assert.equal(regenerate.getAttribute('aria-busy'),'true');
+  assert.equal(regenerate.getAttribute('aria-disabled'),'true');
+  assert.equal((shuffle as HTMLButtonElement).disabled,false,'another trigger remains available');
+  assert.deepEqual(dirty,[],'commands never enter ControlEdits persistence tracking');
+  const first=(fixture.calls[0] as any).input.commandId;
+  assert.match(first,/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+  await user.click(regenerate);await user.keyboard('{Enter}');await user.keyboard('[Space]');
+  assert.equal(fixture.calls.length,1,'pending pointer and keyboard activation cannot duplicate the command');
+  await act(async()=>pending[0]!.resolve({result:'applied'}));
+  await waitFor(()=>assert.ok(screen.getByRole('button',{name:'Run Regenerate flock'})));
+  assert.equal(screen.queryByRole('status'),null,'an applied command has no optimistic or persistent success UI');
+
+  regenerate.focus();await user.keyboard('{Enter}');await waitFor(()=>assert.equal(pending.length,2));
+  await act(async()=>pending[1]!.resolve({result:'applied'}));
+  await waitFor(()=>assert.ok(screen.getByRole('button',{name:'Run Regenerate flock'})));
+  regenerate.focus();await user.keyboard('[Space]');await waitFor(()=>assert.equal(pending.length,3));
+  assert.equal(fixture.calls.length,3,'pointer, Enter and Space each dispatch exactly once');
+  assert.notEqual((fixture.calls[1] as any).input.commandId,first);
+  assert.notEqual((fixture.calls[2] as any).input.commandId,(fixture.calls[1] as any).input.commandId);
+  await act(async()=>pending[2]!.resolve({result:'applied'}));
+  await waitFor(()=>assert.ok(screen.getByRole('button',{name:'Run Regenerate flock'})));
+  await user.click(screen.getByRole('button',{name:'Run Regenerate flock'}));await waitFor(()=>assert.equal(pending.length,4));
+  await act(async()=>fixture.update());
+  const replacement=screen.getByRole('button',{name:'Run Regenerate flock'});
+  assert.equal(replacement.getAttribute('aria-busy'),null,'a replaced runtime cancels obsolete pending UI');
+  await act(async()=>pending[3]!.resolve({result:'applied'}));
+  assert.equal(screen.getByRole('button',{name:'Run Regenerate flock'}),replacement);
+  assert.deepEqual(dirty,[]);
+});
+
+test('RTL: an uncertain trigger failure retries manually with the same command ID', async () => {
+  const fixture=service(),outcomes:{resolve(value:unknown):void;reject(error:unknown):void}[]=[],errors:(string|null)[]=[];
+  fixture.client.invoke=operation=>{fixture.calls.push(operation);return new Promise((resolve,reject)=>outcomes.push({resolve,reject}));};
+  fixture.publish({sdkVersion:'0.2.0',intensity:undefined,controlSchema:[
+    {id:'burst',type:'trigger',label:'Burst particles',changeCost:'live'},
+  ] as any,controlSchemaHash:'4'.repeat(64),controls:{},controlSequence:0} as any);
+  const {ParameterInspector}=await import('../../apps/studio/src/controls/ParameterInspector.tsx'),{StudioController}=await import('../../apps/studio/src/service-client.ts');
+  const user=userEvent.setup({document});
+  render(<ParameterInspector runtime={fixture.client.getSnapshot().authoring} available client={fixture.client} controller={new StudioController(fixture.client)} onError={error=>errors.push(error)}/>);
+
+  await user.click(screen.getByRole('button',{name:'Run Burst particles'}));
+  await waitFor(()=>assert.equal(outcomes.length,1));
+  const uncertainId=(fixture.calls[0] as any).input.commandId;
+  await act(async()=>outcomes[0]!.reject(Object.assign(Error('Receipt timed out.'),{code:'TRIGGER_TIMEOUT'})));
+  const retry=await screen.findByRole('button',{name:'Retry Burst particles'});
+  assert.equal(fixture.calls.length,1,'timeout never auto-retries');
+  assert.match(errors.at(-1)??'',/Receipt timed out/);
+  await user.click(retry);await waitFor(()=>assert.equal(outcomes.length,2));
+  assert.equal((fixture.calls[1] as any).input.commandId,uncertainId,'manual retry preserves idempotency identity');
+  await act(async()=>outcomes[1]!.resolve({result:'applied'}));
+  await waitFor(()=>assert.ok(screen.getByRole('button',{name:'Run Burst particles'})));
+
+  await user.click(screen.getByRole('button',{name:'Run Burst particles'}));await waitFor(()=>assert.equal(outcomes.length,3));
+  const rejectedId=(fixture.calls[2] as any).input.commandId;
+  await act(async()=>outcomes[2]!.reject(Object.assign(Error('Trigger rejected.'),{code:'TRIGGER_REJECTED'})));
+  const runAgain=await screen.findByRole('button',{name:'Run Burst particles'});
+  await user.click(runAgain);await waitFor(()=>assert.equal(outcomes.length,4));
+  assert.notEqual((fixture.calls[3] as any).input.commandId,rejectedId,'a definite failure starts a fresh activation');
+  await act(async()=>outcomes[3]!.resolve({result:'applied'}));
+});
+
+test('RTL: a selected component trigger targets its canonical node without a persisted value', async () => {
+  const fixture=service(),trigger={id:'reseed',type:'trigger',label:'Reseed component',description:'Start this component with a new seed.',changeCost:'live'};
+  const rootHash='a'.repeat(64),leafHash='b'.repeat(64),schemaHash='c'.repeat(64),nodeId='11111111-1111-4111-8111-111111111111';
+  const leafMetadata={declarationVersion:1,key:'test/leaf',label:'Leaf',description:'Leaf',tags:[],inputs:{},outputs:{},controls:[trigger],controlDescriptions:{reseed:'Start this component with a new seed.'},lifecycle:{state:'stateful',reset:'seed'}};
+  const rootMetadata={...leafMetadata,key:'test/root',label:'Root',controls:[],controlDescriptions:{}};
+  fixture.publish({sdkVersion:'0.4.0',intensity:undefined,controlSchema:[],controlSchemaHash:'d'.repeat(64),controls:{},controlSequence:0,
+    composition:{graph:{version:2,rootDefinitionHash:rootHash,outputPort:'image'},definitions:{
+      [rootHash]:{kind:'graph',metadata:rootMetadata,body:{nodes:[{id:nodeId,definitionHash:leafHash,controlDefaults:{}}],edges:[],inputBindings:{},outputBindings:{},controlBindings:{}}},
+      [leafHash]:{kind:'code',metadata:leafMetadata},
+    },publicControls:[],publicControlBindings:{},nodes:[{nodePath:[nodeId],definitionHash:leafHash,schema:[trigger],schemaHash}],declaration:{},definitionNames:{}},
+    nodeControls:{sourceHash:'revision-2',nodes:[{nodePath:[nodeId],definitionHash:leafHash,schema:[trigger],schemaHash,values:{}}]},
+  } as any);
+  const {ParameterInspector}=await import('../../apps/studio/src/controls/ParameterInspector.tsx'),{StudioController}=await import('../../apps/studio/src/service-client.ts');
+  render(<ParameterInspector runtime={fixture.client.getSnapshot().authoring} available client={fixture.client} controller={new StudioController(fixture.client)} onError={()=>{}} nodePath={[nodeId] as any}/>);
+  const action=screen.getByRole('button',{name:'Run Reseed component'});fireEvent.click(action);
+  await waitFor(()=>assert.equal(fixture.calls.length,1));
+  assert.equal(fixture.calls[0]?.name,'lux.node.trigger.fire');
+  assert.deepEqual((fixture.calls[0] as any).input.nodePath,[nodeId]);
+  assert.equal((fixture.calls[0] as any).input.controlId,'reseed');
+  assert.deepEqual(fixture.client.getSnapshot().authoring?.nodeControls?.nodes[0]?.values,{});
+});
 test('RTL: segmented enum uses one roving tab stop and keyboard selection by stable option ID', async () => {
   const fixture = service();
   fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [{

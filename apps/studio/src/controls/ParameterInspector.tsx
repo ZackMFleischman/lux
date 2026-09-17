@@ -1,10 +1,10 @@
 import type {NodePath} from '../../../../packages/runtime-contracts/src/graph.ts';
 import type {ControlAnimationBinding,ControlAnimationShape,LfoControlAnimationBinding,AudioControlAnimationBinding,KickControlAnimationBinding,TempoControlAnimationBinding,VariationControlAnimationBinding,ControlVariationDistribution,KickEnvelopeShape} from '../../../../packages/runtime-contracts/src/control-animation.mjs';
-import type {BooleanControlDefinition,ControlDefinition,ControlValue,EnumControlDefinition,NumberControlDefinition} from '../../../../packages/runtime-contracts/src/parameters.mjs';
+import type {BooleanControlDefinition,ControlDefinition,ControlValue,EnumControlDefinition,NumberControlDefinition,TriggerControlDefinition} from '../../../../packages/runtime-contracts/src/parameters.mjs';
 import type {ComponentProps} from 'react';
 import {useEffect,useId,useRef,useState} from 'react';
 import {Button,Checkbox,ClickAwayListener,Divider,FormControlLabel,IconButton,MenuItem,Paper,Popper,Radio,RadioGroup,Select,Slider,Switch,TextField,Tooltip} from '@mui/material';
-import {getRuntimeControlState} from '../service-client.ts';
+import {getRuntimeControlState,isUncertainTriggerError} from '../service-client.ts';
 import type {RuntimeView,StudioClient,StudioController} from '../service-client.ts';
 import {compositionControlTarget,compositionOccurrence,visualControlNode} from '../visual-model.ts';
 export type ControlEdits={changed():void;track(write:Promise<unknown>):void};
@@ -84,6 +84,32 @@ function ParameterRow({definition,controlId,description,displayLabel,applied,eff
   </Paper></ClickAwayListener></Popper></div>;
 }
 
+
+function TriggerParameterRow({definition,controlId,description,displayLabel,owner,available,client,controller,onError,nodePath}:{definition:TriggerControlDefinition;controlId:string;description?:string;displayLabel:string;owner:string|null;available:boolean;client:StudioClient;controller:StudioController;onError:(error:string|null)=>void;nodePath?:NodePath}){
+  const [state,setState]=useState<'ready'|'pending'|'retry'>('ready'),retryCommandId=useRef<string|null>(null),intent=useRef<object|null>(null);
+  useEffect(()=>()=>{intent.current=null;},[]);
+  async function activate(){
+    if(intent.current||state==='pending'||!available||!owner||parameterOwner(client.getSnapshot().authoring,nodePath)!==owner)return;
+    const commandId=retryCommandId.current??crypto.randomUUID(),pending={};intent.current=pending;setState('pending');onError(null);
+    try{
+      if(nodePath?.length)await controller.fireNodeTrigger(nodePath,controlId,commandId);else await controller.fireTrigger(controlId,commandId);
+      if(intent.current===pending&&parameterOwner(client.getSnapshot().authoring,nodePath)===owner){retryCommandId.current=null;setState('ready');}
+    }catch(error){
+      if(intent.current===pending&&parameterOwner(client.getSnapshot().authoring,nodePath)===owner){
+        const uncertain=isUncertainTriggerError(error);retryCommandId.current=uncertain?commandId:null;setState(uncertain?'retry':'ready');
+        onError(error instanceof Error?error.message:String(error));
+      }
+    }finally{if(intent.current===pending)intent.current=null;}
+  }
+  const controlDescription=definition.description??description;
+  const label=<span className="parameter-name" {...(controlDescription?{tabIndex:0}:{title:displayLabel})}>{displayLabel}</span>;
+  const describedLabel=controlDescription?<Tooltip title={controlDescription} placement="left-start" disableInteractive slotProps={{tooltip:{className:'control-description-tooltip'}}}>{label}</Tooltip>:label;
+  const verb=state==='pending'?'Running':state==='retry'?'Retry':'Run';
+  return <div className="parameter-row parameter-row-trigger" data-control-id={definition.id}><div className="parameter-heading">{describedLabel}
+    <Button className="parameter-trigger-button" size="small" variant="outlined" disabled={!available||!owner} aria-label={`${verb} ${displayLabel}`} aria-busy={state==='pending'||undefined} aria-disabled={state==='pending'||undefined} onClick={()=>void activate()}>{state==='pending'?'Running…':state==='retry'?'Retry':'Run'}</Button>
+  </div></div>;
+}
+
 function TypedParameterRow({definition,controlId,description,displayLabel,applied,owner,available,client,controller,onError,edits,nodePath}:{definition:BooleanControlDefinition|EnumControlDefinition;controlId:string;description?:string;displayLabel:string;applied:boolean|string;owner:string|null;available:boolean;client:StudioClient;controller:StudioController;onError:(error:string|null)=>void;edits?:ControlEdits;nodePath?:NodePath}){
   const [value,setValue]=useState(applied),intent=useRef<object|null>(null),optionRefs=useRef(new Map<string,HTMLElement>());
   const [focusId,setFocusId]=useState(definition.type==='enum'?String(applied):'');
@@ -123,7 +149,9 @@ export function ParameterInspector({runtime,available,client,controller,onError,
   const renderControl=(definition:ControlDefinition)=>{
     const target=compositionControlTarget(runtime,nodePath??[],definition.id),targetNode=target?visualControlNode(runtime,target.nodePath):undefined,effectiveNode=target?runtime.effectiveNodeControls?.nodes.find(row=>samePath(row.nodePath,target.nodePath)):undefined;
     if(nodePath&&(!target||!targetNode))return <p className="hint" key={definition.id}>This control is no longer available. Rebuild or select another node.</p>;
-    const controlId=target?.controlId??definition.id,applied=targetNode?.values[controlId]??publicState.controls[definition.id]!,animation=runtime.controlAnimations?.find(row=>!!target&&samePath(row.nodePath,target.nodePath)&&row.controlId===controlId),issue=runtime.controlAnimationIssues?.find(row=>!!target&&samePath(row.nodePath,target.nodePath)&&row.controlId===controlId)?.message,owner=parameterOwner(runtime,target?.nodePath);
+    const controlId=target?.controlId??definition.id,owner=parameterOwner(runtime,target?.nodePath);
+    if(definition.type==='trigger')return <TriggerParameterRow key={`${selectionOwner}:${definition.id}`} definition={definition} controlId={controlId} description={occurrence?.metadata.controlDescriptions[definition.id]} displayLabel={display(definition)} owner={owner} available={available} client={client} controller={controller} onError={onError} nodePath={target?.nodePath}/>;
+    const applied=targetNode?.values[controlId]??publicState.controls[definition.id]!,animation=runtime.controlAnimations?.find(row=>!!target&&samePath(row.nodePath,target.nodePath)&&row.controlId===controlId),issue=runtime.controlAnimationIssues?.find(row=>!!target&&samePath(row.nodePath,target.nodePath)&&row.controlId===controlId)?.message;
     const animationUnavailable=target?undefined:'Animation is unavailable because this control does not map to one component control.';
     if(definition.type!=='number')return <TypedParameterRow key={`${selectionOwner}:${definition.id}`} definition={definition} controlId={controlId} description={occurrence?.metadata.controlDescriptions[definition.id]} displayLabel={display(definition)} applied={applied as boolean|string} owner={owner} available={available} client={client} controller={controller} onError={onError} edits={edits} nodePath={target?.nodePath}/>;
     return <ParameterRow key={`${selectionOwner}:${definition.id}`} definition={definition} controlId={controlId} description={occurrence?.metadata.controlDescriptions[definition.id]} displayLabel={display(definition)} applied={applied as number} effective={(effectiveNode?.values[controlId]??runtime.effectiveControls?.[controlId]??applied) as number} owner={owner} available={available} client={client} controller={controller} onError={onError} edits={edits} nodePath={target?.nodePath} node={targetNode} animation={animation} issue={issue} animationUnavailable={animationUnavailable} playback={runtime.playback} open={openId===definition.id} onOpen={()=>setOpenId(current=>current===definition.id?null:definition.id)} onClose={()=>setOpenId(current=>current===definition.id?null:current)}/>;

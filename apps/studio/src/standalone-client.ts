@@ -1,4 +1,4 @@
-import type { StudioClient, StudioSnapshot, StudioOperation, RuntimeView } from './service-client.ts';
+import type { StudioClient, StudioSnapshot, StudioOperation, RuntimeView,TriggerReceipt } from './service-client.ts';
 import { getRuntimeControlState } from './service-client.ts';
 import type { PresentationPort } from './presentation.ts';
 import type { SourceBundle, OutputSettings } from '../../../packages/runtime-contracts/src/index.ts';
@@ -7,7 +7,7 @@ import { DEFAULT_OUTPUT, outputSettingsSchema } from '../../../packages/runtime-
 import { createSceneDocument } from '../../../packages/core/src/scene-document.ts';
 import { SourceCompileError } from './source/diagnostics.ts';
 import type { LinkedEnvelope } from '../../build-worker/src/artifact-identity.mjs';
-import { isNumberControlDefinition, normalizeControlSchema, validateControlSnapshot, validateControlPatch } from '../../../packages/runtime-contracts/src/parameters.mjs';
+import { canonicalControlSchemaJson,isNumberControlDefinition, normalizeControlSchema, validateControlSnapshot, validateControlPatch } from '../../../packages/runtime-contracts/src/parameters.mjs';
 import type { ControlValues, ControlMigration } from '../../../packages/runtime-contracts/src/parameters.mjs';
 import { LEGACY_CONTROL_SCHEMA, LEGACY_CONTROL_SCHEMA_HASH, initialControlValues, validateSavedControls, sha256 } from './controls/control-state.ts';
 import type { SavedControlSnapshot, RuntimeControlState } from './controls/control-state.ts';
@@ -16,7 +16,7 @@ import { verifyLinked } from '../../build-worker/src/artifact-identity.mjs';
 import { PerformanceReceiver } from './performance/performance-state.ts';
 import { collectionMode } from '../../../packages/performance/collection-mode.mjs';
 import type { CollectionMode } from '../../../packages/performance/collection-mode.mjs';
-import { createCompositionControlState, prepareCompositionControlState } from '../../../packages/runtime/src/components/composition-controls.ts';
+import { compositionControlSchema,createCompositionControlState, prepareCompositionControlState,resolveCompositionControlTarget } from '../../../packages/runtime/src/components/composition-controls.ts';
 import type { SavedNodeControlSnapshot } from '../../../packages/core/src/scene-document.ts';
 import {validateControlAnimationBindings} from '../../../packages/runtime-contracts/src/control-animation.mjs';
 import type {ControlAnimationBinding,ControlAnimationIssue} from '../../../packages/runtime-contracts/src/control-animation.mjs';
@@ -38,11 +38,18 @@ export interface AuthoringApi {
   smokeSave(document: unknown): Promise<any>;
   onAgentCommand(listener: (command: any) => Promise<unknown>): () => void;
 }
+function parseTriggerReceipt(value:any):TriggerReceipt{
+  if(!value||value.result!=='applied'||typeof value.commandId!=='string'||value.commandId.length<1||value.commandId.length>100||typeof value.controlId!=='string'||value.controlId.length<1||value.controlId.length>64||!Array.isArray(value.nodePath)||value.nodePath.some((id:unknown)=>typeof id!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id))||!Number.isSafeInteger(value.sequence)||value.sequence<1||typeof value.frameId!=='string'||!/^\d{1,20}$/.test(value.frameId)||!Number.isFinite(value.timeSeconds))throw Error('Invalid trigger receipt');
+  return Object.freeze({result:'applied',commandId:value.commandId,controlId:value.controlId,nodePath:Object.freeze([...value.nodePath]),sequence:value.sequence,frameId:value.frameId,timeSeconds:value.timeSeconds});
+}
+const triggerTargetKey=(nodePath:readonly string[],controlId:string)=>`${JSON.stringify(nodePath)}:${controlId}`;
+const sameTriggerReceipt=(left:TriggerReceipt|undefined,right:TriggerReceipt)=>!!left&&left.commandId===right.commandId&&left.controlId===right.controlId&&triggerTargetKey(left.nodePath,left.controlId)===triggerTargetKey(right.nodePath,right.controlId)&&left.sequence===right.sequence&&left.frameId===right.frameId&&left.timeSeconds===right.timeSeconds;
 declare global { interface Window { luxAuthoring: AuthoringApi } }
 type RetryPolicy={lastFaultAt:number|null};
 type ReplacementPlaybackIntent={playing:boolean;settling:number;pending:Set<string>;synchronize?:()=>void};
+type TriggerTarget=Readonly<{nodePath:readonly string[];controlId:string;key:string;sequence:number}>;
 type Running = { worker: Worker; canvas: HTMLCanvasElement; instanceId: string; generation: number; revisionId: string; performance:PerformanceReceiver;retryPolicy:RetryPolicy;autoRetry:boolean;playback:'playing'|'paused';
-  lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; animations:number; tempoCommands:number;tempoSequence:number;tempo:SceneTempoSettings; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>>; desiredControls?:ControlValues; desiredNodeControls?:SavedNodeControlSnapshot;desiredControlAnimations?:readonly ControlAnimationBinding[];audioInFlight?:AudioBandSnapshot;audioLatest?:AudioBandSnapshot; };
+  lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; animations:number; tempoCommands:number;tempoSequence:number;tempo:SceneTempoSettings;triggerSequence:number;latestTriggerReceipt?:TriggerReceipt;triggerCommands:Map<string,TriggerTarget>;triggerReceipts:Map<string,TriggerReceipt>;triggerSequences:Map<number,string>; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>>; desiredControls?:ControlValues; desiredNodeControls?:SavedNodeControlSnapshot;desiredControlAnimations?:readonly ControlAnimationBinding[];audioInFlight?:AudioBandSnapshot;audioLatest?:AudioBandSnapshot; };
 export class StandaloneClient implements StudioClient, PresentationPort {
   private snapshot: StudioSnapshot = { connection: 'connected', message: 'Open an example or write a visual, then Build & preview.', receivedAtMs: Date.now(), authoring: null, host: null, jobs: [], visualFps: null, uiFps: null };
   private listeners = new Set<() => void>();
@@ -55,7 +62,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private busy = false;
   private replacementPlayback:ReplacementPlaybackIntent|null=null;
   private automaticRetry:ReturnType<typeof setTimeout>|undefined;
-  private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; playback?:boolean; expectedControlSequence?:number; expectedControls?:ControlValues; expectedNodeControls?:SavedNodeControlSnapshot;expectedAnimationSequence?:number;expectedControlAnimations?:readonly ControlAnimationBinding[];expectedTempoSequence?:number; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
+  private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; playback?:boolean; expectedControlSequence?:number; expectedControls?:ControlValues; expectedNodeControls?:SavedNodeControlSnapshot;expectedAnimationSequence?:number;expectedControlAnimations?:readonly ControlAnimationBinding[];expectedTempoSequence?:number;expectedTriggerCommandId?:string;expectedTriggerTarget?:TriggerTarget; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
   private api: AuthoringApi;
   private codeDeclaredParameters:boolean;
   private readonly performanceMode:CollectionMode;
@@ -172,7 +179,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     canvas.style.cssText = 'width:100%;height:100%;position:absolute;inset:0;object-fit:contain';
     const worker = new Worker(new URL('./visual-worker.js', import.meta.url), { type: 'module' });
     const candidate: Running = { worker, canvas, instanceId: this.running?.instanceId ?? crypto.randomUUID(), generation: ++this.generation,
-      revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0,animations:0,tempoCommands:tempoSequence,tempoSequence,tempo,state,output,performance:undefined as any,retryPolicy,autoRetry:false,playback:playing?'playing':'paused' };
+      revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0,animations:0,tempoCommands:tempoSequence,tempoSequence,tempo,triggerSequence:0,triggerCommands:new Map(),triggerReceipts:new Map(),triggerSequences:new Map(),state,output,performance:undefined as any,retryPolicy,autoRetry:false,playback:playing?'playing':'paused' };
     candidate.performance=new PerformanceReceiver({instanceId:candidate.instanceId,generation:candidate.generation,revisionId},performance.now());
     this.audioRuntimes.add(candidate);
     const previous = this.running;
@@ -191,6 +198,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           ...('linkedVersion' in linked&&linked.linkedVersion===5?{composition:linked.composition}:{}),
           sceneName: 'Untitled visual', authority: 'studio', playback: message.playback,
           ...candidate.state,controlMigration:migration,clockEpoch: message.clockEpoch,timeSeconds:message.timeSeconds,tempo:message.tempo,tempoSequence:message.tempoSequence, frameId: message.frameId,
+          triggerSequence:candidate.triggerSequence,...(candidate.latestTriggerReceipt?{latestTriggerReceipt:candidate.latestTriggerReceipt}:{}),
           ...(state.sdkVersion==='0.1.0'?{intensity:candidate.state.controls.intensity}:{}),
           output: candidate.output, fault: null } as RuntimeView });
         const promote=()=>{
@@ -270,12 +278,19 @@ export class StandaloneClient implements StudioClient, PresentationPort {
             if(latest)this.queueAudio(candidate,latest);
             return;
           }
-          if (message.type === 'failure') { fail(String(message.message)); return; }
+          if (message.type === 'failure') {
+            const wait=this.pending.get(message.requestId);
+            if(wait?.runtime===candidate){clearTimeout(wait.timer);this.pending.delete(message.requestId);this.settleReplacementCommand(message.requestId);wait.reject(Object.assign(Error(String(message.message).slice(0,500)),{code:typeof message.code==='string'?message.code:'RUNTIME_FAILED'}));}
+            fail(String(message.message)); return;
+          }
           if (message.type === 'heartbeat') { if (/^\d{1,20}$/.test(message.frameId)) candidate.lastHeartbeat = performance.now(); return; }
           if (message.type === 'capture-error') {
             const wait = this.pending.get(message.requestId);
             if (wait?.runtime === candidate && wait.kind === 'capture') { candidate.lastHeartbeat = performance.now(); clearTimeout(wait.timer); this.pending.delete(message.requestId); wait.reject(Error(message.message)); }
             return;
+          }
+          if(message.type==='command-error'){
+            const wait=this.pending.get(message.requestId);if(wait?.runtime===candidate&&wait.kind==='command'){candidate.lastHeartbeat=performance.now();clearTimeout(wait.timer);this.pending.delete(message.requestId);this.settleReplacementCommand(message.requestId);const error=Object.assign(Error(String(message.message).slice(0,500)),{code:typeof message.code==='string'?message.code:'COMMAND_REJECTED'});wait.reject(error);if(wait.expectedTriggerCommandId!==undefined)this.fault(candidate,`Trigger command was rejected after host admission: ${error.message}`);}return;
           }
           if (message.type === 'capture') {
             const wait = this.pending.get(message.requestId);
@@ -299,6 +314,24 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           catch(error){if(message.type==='ready')fail(String(error));return;}
           const animationSequence=message.animationSequence??0;
           if(!Number.isSafeInteger(animationSequence)||animationSequence<0||animationSequence>candidate.animations)return;
+          const receivedTriggerSequence=message.triggerSequence??0;
+          if(!Number.isSafeInteger(receivedTriggerSequence)||receivedTriggerSequence<0||receivedTriggerSequence<candidate.triggerSequence||receivedTriggerSequence>candidate.triggerSequence+1||receivedTriggerSequence>candidate.triggerCommands.size)return;
+          let receivedLatestTriggerReceipt:TriggerReceipt|undefined,requestTriggerReceipt:TriggerReceipt|undefined;
+          const triggerBindings:TriggerReceipt[]=[];
+          try{
+            const checkReceipt=(receipt:TriggerReceipt)=>{
+              const target=candidate.triggerCommands.get(receipt.commandId);if(!target||target.key!==triggerTargetKey(receipt.nodePath,receipt.controlId)||receipt.sequence!==target.sequence)throw Error('Unexpected trigger receipt target or sequence');
+              const previous=candidate.triggerReceipts.get(receipt.commandId);if(previous&&!sameTriggerReceipt(previous,receipt))throw Error('Trigger receipt identity changed');
+              const owner=candidate.triggerSequences.get(receipt.sequence);if(owner&&owner!==receipt.commandId)throw Error('Trigger receipt sequence changed owner');
+              const pendingBinding=triggerBindings.find(row=>row.sequence===receipt.sequence||row.commandId===receipt.commandId);if(pendingBinding&&!sameTriggerReceipt(pendingBinding,receipt))throw Error('Trigger receipt identity differs within one status');
+              if(!pendingBinding)triggerBindings.push(receipt);
+            };
+            if(receivedTriggerSequence>0){receivedLatestTriggerReceipt=parseTriggerReceipt(message.latestTriggerReceipt);if(receivedLatestTriggerReceipt.sequence!==receivedTriggerSequence)throw Error('Invalid latest trigger receipt');if(receivedTriggerSequence===candidate.triggerSequence+1&&(receivedLatestTriggerReceipt.frameId!==message.frameId||receivedLatestTriggerReceipt.timeSeconds!==message.timeSeconds))throw Error('Trigger receipt does not identify the completed frame');checkReceipt(receivedLatestTriggerReceipt);}
+            else if(message.latestTriggerReceipt)throw Error('Unexpected latest trigger receipt');
+            if(message.triggerReceipt){requestTriggerReceipt=parseTriggerReceipt(message.triggerReceipt);if(requestTriggerReceipt.sequence>receivedTriggerSequence)throw Error('Trigger request receipt exceeds latest sequence');checkReceipt(requestTriggerReceipt);}
+            if(receivedTriggerSequence===candidate.triggerSequence&&candidate.latestTriggerReceipt&&(!receivedLatestTriggerReceipt||!sameTriggerReceipt(candidate.latestTriggerReceipt,receivedLatestTriggerReceipt)))throw Error('Latest trigger receipt regressed');
+          }
+          catch{return;}
           let applied:ControlValues,effectiveControls:ControlValues,compositionNodeControls:SavedNodeControlSnapshot|undefined,effectiveNodeControls:SavedNodeControlSnapshot|undefined,controlAnimations:readonly ControlAnimationBinding[]=Object.freeze([]),controlAnimationIssues:readonly ControlAnimationIssue[]=Object.freeze([]);
           try {
             applied=validateControlSnapshot(state.controlSchema,state.sdkVersion==='0.1.0'?{intensity:message.intensity}:message.controls);
@@ -325,7 +358,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
               const effective=compositionState!(message.effectiveNodeControls);
               effectiveNodeControls=Object.freeze({sourceHash:revisionId,nodes:effective.snapshot().nodes});
             }
-            if(message.type==='ready'&&(message.controlSequence!==0||animationSequence!==0||JSON.stringify(applied)!==JSON.stringify(state.controls)||JSON.stringify(controlAnimations)!==JSON.stringify(state.controlAnimations??[])))throw Error('Initial control snapshot mismatch');
+            if(message.type==='ready'&&(message.controlSequence!==0||animationSequence!==0||receivedTriggerSequence!==0||JSON.stringify(applied)!==JSON.stringify(state.controls)||JSON.stringify(controlAnimations)!==JSON.stringify(state.controlAnimations??[])))throw Error('Initial control snapshot mismatch');
           } catch(error) {if(message.type==='ready')fail(String(error));return;}
           const currentAnimationSequence=candidate.state.animationSequence??0;
           if(animationSequence<currentAnimationSequence)return;
@@ -342,6 +375,8 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           candidate.state={...state,controls:applied,effectiveControls,controlSequence:message.controlSequence,controlAnimations,controlAnimationIssues,animationSequence,
             ...(compositionNodeControls?{nodeControls:compositionNodeControls,effectiveNodeControls}:{} )};
           candidate.playback=message.playback;
+          for(const receipt of triggerBindings){candidate.triggerReceipts.set(receipt.commandId,receipt);candidate.triggerSequences.set(receipt.sequence,receipt.commandId);}
+          candidate.triggerSequence=receivedTriggerSequence;candidate.latestTriggerReceipt=receivedLatestTriggerReceipt;
           candidate.tempo=receivedTempo;candidate.tempoSequence=message.tempoSequence;
           candidate.lastHeartbeat = performance.now();
           if (BigInt(message.frameId) > BigInt(candidate.frameId)) { candidate.frameId = message.frameId; candidate.lastFrame = performance.now(); }
@@ -362,7 +397,8 @@ export class StandaloneClient implements StudioClient, PresentationPort {
                 (message.controlSequence === wait.expectedControlSequence && JSON.stringify(applied) === JSON.stringify(wait.expectedControls) && (!wait.expectedNodeControls || JSON.stringify(compositionNodeControls)===JSON.stringify(wait.expectedNodeControls)))) &&
               (wait.expectedAnimationSequence===undefined || (animationSequence===wait.expectedAnimationSequence&&JSON.stringify(controlAnimations)===JSON.stringify(wait.expectedControlAnimations)))) {
             if(wait.expectedTempoSequence!==undefined&&message.tempoSequence!==wait.expectedTempoSequence)return;
-            clearTimeout(wait.timer); this.pending.delete(message.requestId);this.settleReplacementCommand(message.requestId);wait.resolve(message);
+            if(wait.expectedTriggerCommandId!==undefined&&(!requestTriggerReceipt||requestTriggerReceipt.commandId!==wait.expectedTriggerCommandId||wait.expectedTriggerTarget?.key!==triggerTargetKey(requestTriggerReceipt.nodePath,requestTriggerReceipt.controlId)))return;
+            clearTimeout(wait.timer); this.pending.delete(message.requestId);this.settleReplacementCommand(message.requestId);wait.resolve(requestTriggerReceipt??message);
           }
         };
         const offscreen = canvas.transferControlToOffscreen();
@@ -419,7 +455,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     const runtime = this.running, input = operation.input;
     if (this.snapshot.authoring?.authority !== 'studio') throw Error('Authority conflict: Studio cannot control this instance');
     const replacementWrite=this.busy&&this.replacementPlayback&&(
-      operation.name==='lux.parameters.set'||operation.name==='lux.node.parameters.set'||operation.name==='lux.node.animation.set'||operation.name==='lux.node.variation.set'||operation.name==='lux.tempo.set'||operation.name==='lux.tempo.tap'||
+      operation.name==='lux.parameters.set'||operation.name==='lux.node.parameters.set'||operation.name==='lux.node.animation.set'||operation.name==='lux.node.variation.set'||operation.name==='lux.tempo.set'||operation.name==='lux.tempo.tap'||operation.name==='lux.trigger.fire'||operation.name==='lux.node.trigger.fire'||
       (operation.name==='lux.playback'&&operation.input.action!=='reset'))?this.replacementPlayback:null;
     if (this.busy&&!replacementWrite) throw Error('A visual build is already running');
     if (!runtime || input.instanceId !== runtime.instanceId || input.expectedGeneration !== runtime.generation) throw Error('Runtime changed; retry using its current state');
@@ -486,6 +522,24 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       if(index>=0)current.splice(index,1,...(requested?[requested]:[]));else if(requested)current.push(requested);
       runtime.desiredControlAnimations=validateControlAnimationBindings(current);
       message={type:'animations',animationSequence:++runtime.animations,controlAnimations:runtime.desiredControlAnimations,...(operation.name==='lux.node.animation.set'&&operation.input.restart?{restart:{nodePath:operation.input.nodePath,controlId:operation.input.controlId}}:{})};
+    } else if(operation.name==='lux.trigger.fire'||operation.name==='lux.node.trigger.fire'){
+      if(operation.input.expectedRevisionId!==runtime.revisionId)throw Error('Revision changed; read current runtime state');
+      let nodePath:readonly string[],canonicalControlId=operation.input.controlId,definition:any;
+      if(operation.name==='lux.trigger.fire'){
+        if(operation.input.expectedControlSchemaHash!==runtime.state.controlSchemaHash)throw Error('Control schema changed; read current runtime state');
+        if(runtime.state.sdkVersion==='0.4.0'){
+          const linked=this.accepted?.linked;if(!linked||!('linkedVersion' in linked)||linked.linkedVersion!==5)throw Error('This visual has no composition triggers');
+          const resolved=resolveCompositionControlTarget(linked.composition,[],operation.input.controlId);nodePath=resolved.nodePath;canonicalControlId=resolved.controlId;definition={type:resolved.type};
+        }else{nodePath=[];definition=runtime.state.controlSchema.find(row=>row.id===operation.input.controlId);}
+      }else{
+        const linked=this.accepted?.linked;if(!linked||!('linkedVersion' in linked)||linked.linkedVersion!==5)throw Error('This visual has no matching composition node');
+        const selectedSchema=compositionControlSchema(linked.composition,operation.input.nodePath),selectedHash=await sha256(new TextEncoder().encode(canonicalControlSchemaJson(selectedSchema)));
+        if(this.running!==runtime||runtime.terminal||operation.input.instanceId!==runtime.instanceId||operation.input.expectedGeneration!==runtime.generation||operation.input.expectedRevisionId!==runtime.revisionId)throw Error('Runtime changed; retry using its current state');
+        if(operation.input.expectedControlSchemaHash!==selectedHash)throw Error('Composition node control schema changed');
+        const resolved=resolveCompositionControlTarget(linked.composition,operation.input.nodePath,operation.input.controlId);nodePath=resolved.nodePath;canonicalControlId=resolved.controlId;definition={type:resolved.type};
+      }
+      if(definition?.type!=='trigger')throw Error('Trigger control is unavailable');
+      message={type:'trigger',commandId:operation.input.commandId,nodePath,controlId:canonicalControlId};
     } else if(operation.name==='lux.tempo.set'||operation.name==='lux.tempo.tap'){
       if(operation.input.expectedRevisionId!==runtime.revisionId)throw Error('Revision changed; read current runtime state');
       if(runtime.tempoCommands>=Number.MAX_SAFE_INTEGER)throw Error('Tempo sequence exhausted; restart runtime');
@@ -495,13 +549,23 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       message = { type: 'playback', action: operation.input.action };
       if(replacementWrite){replacementPlaybackPrevious=replacementWrite.playing;replacementWrite.playing=operation.input.action==='play';}
     }
+    let expectedTriggerTarget:TriggerTarget|undefined;
+    if(message.type==='trigger'){
+      const triggerMessage=message as {type:'trigger';commandId:string;nodePath:readonly string[];controlId:string};
+      const key=triggerTargetKey(triggerMessage.nodePath,triggerMessage.controlId),existing=runtime.triggerCommands.get(triggerMessage.commandId);
+      if(existing&&existing.key!==key)throw Error('Trigger command ID was already used for another target');
+      if(!existing){if(runtime.triggerCommands.size>=16384)throw Error('Trigger command ledger is full; restart runtime');expectedTriggerTarget=Object.freeze({nodePath:Object.freeze([...triggerMessage.nodePath]),controlId:triggerMessage.controlId,key,sequence:runtime.triggerCommands.size+1});runtime.triggerCommands.set(triggerMessage.commandId,expectedTriggerTarget);}
+      else expectedTriggerTarget=existing;
+    }
     if(replacementWrite){replacementWrite.settling++;replacementWrite.synchronize?.();}
     const result=new Promise((resolve, reject) => {
-      const timer = setTimeout(() => this.fault(runtime, 'Runtime command timed out'), 5000);
+      const triggerMessage=message.type==='trigger';
+      const timer = setTimeout(() => {if(triggerMessage){const wait=this.pending.get(input.requestId);if(wait?.runtime===runtime){this.pending.delete(input.requestId);this.settleReplacementCommand(input.requestId);wait.reject(Object.assign(Error('Trigger result is uncertain; retry the same command ID while this runtime generation remains active.'),{code:'TRIGGER_TIMEOUT'}));}}else this.fault(runtime, 'Runtime command timed out');}, 5000);
       this.pending.set(input.requestId, { runtime, kind: 'command', playback: message.type === 'playback', resolve, reject, timer,
         ...('controlSequence' in message ? { expectedControlSequence: message.controlSequence, expectedControls: runtime.desiredControls,expectedNodeControls:runtime.desiredNodeControls } : {}),
         ...('animationSequence' in message?{expectedAnimationSequence:message.animationSequence,expectedControlAnimations:runtime.desiredControlAnimations}:{}) });
       const wait=this.pending.get(input.requestId);if(wait&&message.type==='tempo')wait.expectedTempoSequence=runtime.tempoCommands;
+      if(wait&&message.type==='trigger'&&'commandId' in message){wait.expectedTriggerCommandId=(message as {commandId:string}).commandId;wait.expectedTriggerTarget=expectedTriggerTarget;}
       try { runtime.worker.postMessage({ ...message, requestId: input.requestId, instanceId: runtime.instanceId, generation: runtime.generation }); }
       catch (error) { this.fault(runtime, String(error)); }
     });

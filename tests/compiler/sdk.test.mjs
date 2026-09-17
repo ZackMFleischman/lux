@@ -31,3 +31,11 @@ test('discovery exposes real SDK source and the submitted example without execut
   assert.match(discovery.contractSource, /interface VisualContext/);
   assert.match(discovery.example, /export default defineVisual/);
 });
+
+test('discoverable trigger example compiles its event declaration without a saved value',async()=>{
+  const discovery=await discoverVisualSdk();
+  const result=await compileVisual({source:{sdkVersion:'0.2.0',entry:'visual.ts',files:{'visual.ts':discovery.triggerExample}}});
+  assert.equal(result.ok,true,JSON.stringify(result));
+  assert.deepEqual(result.artifact.controls.map(control=>control.type),['number','trigger']);
+  assert.equal(Object.hasOwn(result.artifact.controls[1],'default'),false);
+});

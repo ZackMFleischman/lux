@@ -19,6 +19,7 @@ function compatibleControlDomain(publicControl:ControlDefinition,target:ControlD
   if(publicControl.type!==target.type||publicControl.changeCost!==target.changeCost)return false;
   if(publicControl.type==='number')return target.type==='number'&&publicControl.unit===target.unit&&publicControl.min===target.min&&publicControl.max===target.max&&publicControl.step===target.step;
   if(publicControl.type==='boolean')return target.type==='boolean';
+  if(publicControl.type==='trigger')return target.type==='trigger';
   return target.type==='enum'&&publicControl.presentation===target.presentation&&publicControl.options.length===target.options.length&&publicControl.options.every((option,index)=>option.id===target.options[index]?.id);
 }
 export function invalid(path:string,rule:string):never {

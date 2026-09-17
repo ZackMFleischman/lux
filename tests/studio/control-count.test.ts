@@ -28,6 +28,12 @@ test('64 scene and component controls pass normalization and compiled DTOs',()=>
  const unicode=normalizeControlDeclarations({value:{type:'number',label:'Value',group:'😀'.repeat(80),description:'😀'.repeat(512),min:0,max:1,default:0}});
  assert.equal(parameterCompiledArtifactSchema.shape.controls.parse(unicode)[0]!.group,unicode[0]!.group);
 });
+test('artifact DTOs admit strict trigger definitions without a persistent default',()=>{
+ const trigger=normalizeControlDeclarations({regenerate:{type:'trigger',label:'Regenerate',description:'Build another pattern',group:'Actions'}})[0]!;
+ assert.deepEqual(parameterCompiledArtifactSchema.shape.controls.parse([trigger]),[trigger]);
+ assert.throws(()=>parameterCompiledArtifactSchema.shape.controls.parse([{...trigger,default:false}]));
+ assert.throws(()=>parameterCompiledArtifactSchema.shape.controls.parse([{...trigger,extra:true}]));
+});
 test('animation metadata remains byte-bounded without a binding-count cap',()=>{
  const binding={nodePath:['x'.repeat(1048576)],definitionHash:'a'.repeat(64),schemaHash:'a'.repeat(64),controlId:'control0',shape:'sine',periodSeconds:2,amount:.5,phase:0,enabled:true};
  assert.throws(()=>validateControlAnimationBindings([binding]),/metadata exceeds 1 MiB/);

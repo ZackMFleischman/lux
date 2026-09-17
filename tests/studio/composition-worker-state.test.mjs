@@ -67,6 +67,28 @@ test('worker rejects nested runtime definition tampering before returning a leaf
  assert.throws(()=>state.checkDefinition({default:runtime}),/mismatch/i);
 });
 
+test('public and direct trigger targets resolve to one canonical leaf while persistent snapshots omit actions',async()=>{
+ const triggerSource=nestedCompositionSourceBundle();
+ triggerSource.files['kaleidoscope.ts']=triggerSource.files['kaleidoscope.ts'].replace(
+  "segments:{type:'number',label:'Segments',default:6,min:2,max:16,step:1}",
+  "segments:{type:'trigger',label:'Regenerate'}");
+ const profile=extract(triggerSource),triggerAdmission={...admission,composition:profile,controls:profile.publicControls,controlSchemaHash:hash(JSON.stringify(profile.publicControls))};
+ const state=await prepareWorkerCompositionState({sdkVersion:'0.4.0',controlSchema:profile.publicControls,controlSchemaHash:triggerAdmission.controlSchemaHash,controls:{ballIntensity:.6}},triggerAdmission);
+ const originals={arrayIsArray:Array.isArray,arrayFind:Array.prototype.find,arrayMap:Array.prototype.map,arrayIterator:Array.prototype[Symbol.iterator],mapGet:Map.prototype.get,mapSet:Map.prototype.set,stringify:JSON.stringify,freeze:Object.freeze,RuntimeError:globalThis.Error,getPrototypeOf:Object.getPrototypeOf,getOwnPropertyDescriptor:Object.getOwnPropertyDescriptor,ownKeys:Reflect.ownKeys};let publicTarget,nodeAliasTarget,directTarget;
+ try{
+  Array.isArray=()=>{throw Error('mutated Array.isArray');};Array.prototype.find=()=>{throw Error('mutated Array.find');};
+  Array.prototype.map=()=>{throw Error('mutated Array.map');};Array.prototype[Symbol.iterator]=()=>{throw Error('mutated Array iterator');};
+  Map.prototype.get=()=>{throw Error('mutated Map.get');};Map.prototype.set=()=>{throw Error('mutated Map.set');};JSON.stringify=()=>{throw Error('mutated JSON.stringify');};
+  Object.freeze=()=>{throw Error('mutated Object.freeze');};Object.getPrototypeOf=()=>{throw Error('mutated Object.getPrototypeOf');};Object.getOwnPropertyDescriptor=()=>{throw Error('mutated Object.getOwnPropertyDescriptor');};Reflect.ownKeys=()=>{throw Error('mutated Reflect.ownKeys');};globalThis.Error=()=>{throw originals.RuntimeError('mutated Error');};
+  publicTarget=state.resolveTrigger([], 'segmentsA');nodeAliasTarget=state.resolveTrigger([compositeAId], 'firstSegments');directTarget=state.resolveTrigger([compositeAId,wrapperNodeId,wrappedEffectId], 'segments');
+ }finally{Array.isArray=originals.arrayIsArray;Array.prototype.find=originals.arrayFind;Array.prototype.map=originals.arrayMap;Array.prototype[Symbol.iterator]=originals.arrayIterator;Map.prototype.get=originals.mapGet;Map.prototype.set=originals.mapSet;JSON.stringify=originals.stringify;Object.freeze=originals.freeze;Object.getPrototypeOf=originals.getPrototypeOf;Object.getOwnPropertyDescriptor=originals.getOwnPropertyDescriptor;Reflect.ownKeys=originals.ownKeys;globalThis.Error=originals.RuntimeError;}
+ assert.deepEqual(publicTarget,directTarget);assert.deepEqual(nodeAliasTarget,directTarget);assert.deepEqual(publicTarget,{nodePath:[compositeAId,wrapperNodeId,wrappedEffectId],controlId:'segments'});
+ assert.notDeepEqual(state.resolveTrigger([compositeBId], 'secondSegments'),directTarget,'sibling aliases remain distinct canonical targets');
+ assert.deepEqual(state.values(),{ballIntensity:.6});assert.deepEqual(state.state().controls,{ballIntensity:.6});
+ state.apply({ballIntensity:.8},1,triggerAdmission.controlSchemaHash);assert.deepEqual(state.values(),{ballIntensity:.8});
+ assert.throws(()=>state.resolveTrigger([], 'ballIntensity'),/trigger/i);
+});
+
 test('typed composition live writes retain captured validation after authored intrinsic mutation',async()=>{
  const typedSource=compositionSourceBundle();
  typedSource.files['ball.ts']=typedSource.files['ball.ts'].replace(

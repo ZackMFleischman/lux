@@ -47,10 +47,11 @@ export async function prepareWorkerControlState(message,admission){
   const base=freeze({values:()=>values,nodeValues:path=>isArray(path)&&path.length===0?values:freeze(createObject(objectPrototype))});
   const animated=createControlAnimationEvaluator(profile,base,animations);
   function validateValues(input){
-    if(record(input).length!==schema.length)bad('Invalid full control snapshot');
+    let persistent=0;for(let index=0;index<schema.length;index++)if(schema[index].type!=='trigger')persistent++;
+    if(record(input).length!==persistent)bad('Invalid full control snapshot');
     const result=createObject(objectPrototype);
     for(let index=0;index<schema.length;index++){
-      const control=schema[index],value=own(input,control.id);let admitted;
+      const control=schema[index];if(control.type==='trigger')continue;const value=own(input,control.id);let admitted;
       if(control.type==='number'){
         if(typeof value!=='number'||!isFiniteNumber(value)||value<control.min||value>control.max)bad('Invalid value for '+control.id);
         admitted=value===0?0:value;
@@ -84,6 +85,11 @@ export async function prepareWorkerControlState(message,admission){
       animations=normalizeControlAnimations(input,profile);animated.replace(animations,timeSeconds);animationSequence=nextSequence;
     },
     restartAnimation(path,controlId,timeSeconds){animated.restart(path,controlId,timeSeconds);},
+    resolveTrigger(path,controlId){
+      if(!isArray(path)||path.length!==0)bad('Scene trigger path is unavailable');let control;
+      for(let index=0;index<schema.length;index++)if(schema[index].id===controlId){control=schema[index];break;}
+      if(!control||control.type!=='trigger')bad('Scene trigger is unavailable');return freeze({nodePath:scenePath,controlId});
+    },
     resetAnimations(timeSeconds){for(let index=0;index<animations.bindings.length;index++){const binding=animations.bindings[index];animated.restart(binding.nodePath,binding.controlId,timeSeconds);}},
     applyAudioSnapshot(input,context){return animated.applyAudioSnapshot(input,context);},
     fenceAudioEvents(){animated.fenceAudioEvents();},

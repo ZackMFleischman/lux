@@ -1,7 +1,7 @@
 // Pure browser-compatible parameter policy. No visual execution, hashing,
 // environment access, or legacy Intensity fallback belongs at this boundary.
 export const parameterLimits = Object.freeze({ metadataBytes: 32768, id: 64, label: 80, unit: 24, description: 512, group: 80 });
-const commonRequiredFields = ['type', 'label', 'default'];
+const commonRequiredFields = ['type', 'label'];
 const commonOptionalFields = ['description', 'group'];
 const numberFields = ['min', 'max', 'step', 'unit'];
 const enumFields = ['options', 'presentation'];
@@ -77,14 +77,19 @@ function definition(id, input, normalizedRow) {
   for (const key of [...(normalizedRow ? ['id'] : []), ...commonRequiredFields, ...(normalizedRow ? ['changeCost'] : [])]) if (!Object.hasOwn(raw, key)) invalid(path, `missing field ${key}`);
   if (normalizedRow && raw.changeCost !== 'live') invalid(path, 'changeCost must be live');
   const type = raw.type;
-  const kindFields = type === 'number' ? numberFields : type === 'boolean' ? [] : type === 'enum' ? enumFields : null;
-  if (!kindFields) invalid(`${path}.type`, 'expected number, boolean, or enum');
-  const requiredKindFields = type === 'number' ? ['min', 'max'] : type === 'enum' ? ['options'] : [];
+  const kindFields = type === 'number' ? numberFields : type === 'boolean' || type === 'trigger' ? [] : type === 'enum' ? enumFields : null;
+  if (!kindFields) invalid(`${path}.type`, 'expected number, boolean, enum, or trigger');
+  const requiredKindFields = type === 'number' ? ['default', 'min', 'max'] : type === 'boolean' ? ['default'] : type === 'enum' ? ['default', 'options'] : [];
   for (const key of requiredKindFields) if (!Object.hasOwn(raw, key)) invalid(path, `missing field ${key}`);
-  const allowed = [...(normalizedRow ? ['id', 'changeCost'] : []), ...commonRequiredFields, ...commonOptionalFields, ...kindFields];
+  const allowed = [...(normalizedRow ? ['id', 'changeCost'] : []), ...commonRequiredFields, ...(type === 'trigger' ? [] : ['default']), ...commonOptionalFields, ...kindFields];
   for (const key of Object.keys(raw)) if (!allowed.includes(key)) invalid(path, `unsupported field ${key.slice(0, 80)}`);
 
   const label = text(raw.label, `${path}.label`, parameterLimits.label);
+  if (type === 'trigger') {
+    const result = { id, type: 'trigger', label };
+    optionalMetadata(raw, result, path); result.changeCost = 'live';
+    return Object.freeze(result);
+  }
   if (type === 'number') {
     const minimum = finite(raw.min, `${path}.min`), maximum = finite(raw.max, `${path}.max`), value = finite(raw.default, `${path}.default`);
     if (!(minimum < maximum) || !Number.isFinite(maximum - minimum)) invalid(path, 'min must be below max with a finite range');
@@ -132,10 +137,11 @@ export function normalizeControlSchema(input) {
   return finishSchema(rows);
 }
 export function canonicalControlSchemaJson(schema) { return JSON.stringify(normalizeControlSchema(schema)); }
-export function defaultControlValues(schema) { return Object.freeze(Object.fromEntries(normalizeControlSchema(schema).map(control => [control.id, control.default]))); }
+export function defaultControlValues(schema) { return Object.freeze(Object.fromEntries(normalizeControlSchema(schema).filter(control => control.type !== 'trigger').map(control => [control.id, control.default]))); }
 export function isNumberControlDefinition(value) { return value.type === 'number'; }
 
 function admittedValue(control, input, path) {
+  if (control.type === 'trigger') throw Object.assign(new Error('Trigger controls use the trigger command.'), { code: 'INVALID_PARAMETERS', path });
   if (control.type === 'number') {
     const value = finite(input, path);
     if (value < control.min || value > control.max) invalid(path, `expected a number from ${control.min} to ${control.max}`);
@@ -153,8 +159,10 @@ function values(schema, input, complete) {
   if (!complete && !keys.length) invalid('values', 'expected a nonempty parameter patch');
   const known = new Map(definitions.map(control => [control.id, control]));
   for (const id of keys) if (!known.has(id)) invalid(`values.${id.slice(0, 64)}`, 'unknown parameter ID');
+  for (const id of keys) if (known.get(id).type === 'trigger') admittedValue(known.get(id), raw[id], `values.${id}`);
   const result = {};
   for (const control of definitions) {
+    if (control.type === 'trigger') continue;
     const path = `values.${control.id}`;
     if (!Object.hasOwn(raw, control.id)) {
       if (complete) invalid(path, 'missing parameter in full snapshot');
@@ -168,8 +176,10 @@ export function validateControlPatch(schema, input) { return values(schema, inpu
 export function validateControlSnapshot(schema, input) { return values(schema, input, true); }
 
 export function reconcileControlValues(previousSchema, previousValues, nextSchema) {
-  const previous = normalizeControlSchema(previousSchema), next = normalizeControlSchema(nextSchema);
-  const oldValues = validateControlSnapshot(previous, previousValues), old = new Map(previous.map(control => [control.id, control]));
+  const previousSchemaRows = normalizeControlSchema(previousSchema), nextSchemaRows = normalizeControlSchema(nextSchema);
+  const oldValues = validateControlSnapshot(previousSchemaRows, previousValues);
+  const previous = previousSchemaRows.filter(control => control.type !== 'trigger'), next = nextSchemaRows.filter(control => control.type !== 'trigger');
+  const old = new Map(previous.map(control => [control.id, control]));
   const result = {}, changes = [], nextIds = new Set();
   for (const control of next) {
     nextIds.add(control.id);

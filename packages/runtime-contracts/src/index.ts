@@ -66,8 +66,12 @@ const parameterEnumControlDefinitionSchema = z.object({
   options:z.array(parameterEnumOptionSchema).min(2).max(64),presentation:z.enum(['segmented','radio','dropdown']),
   description:z.string().min(1).optional(),group:z.string().min(1).optional(),changeCost:z.literal('live'),
 }).strict();
+const parameterTriggerControlDefinitionSchema = z.object({
+  id:z.string().regex(/^[a-z][A-Za-z0-9_]{0,63}$/),type:z.literal('trigger'),label:z.string().min(1),
+  description:z.string().min(1).optional(),group:z.string().min(1).optional(),changeCost:z.literal('live'),
+}).strict();
 export const parameterControlDefinitionSchema = z.discriminatedUnion('type',[
-  parameterNumberControlDefinitionSchema,parameterBooleanControlDefinitionSchema,parameterEnumControlDefinitionSchema,
+  parameterNumberControlDefinitionSchema,parameterBooleanControlDefinitionSchema,parameterEnumControlDefinitionSchema,parameterTriggerControlDefinitionSchema,
 ]);
 export const parameterCompiledArtifactSchema = assetCompiledArtifactSchema.extend({
   artifactVersion:z.literal(3),sdkVersion:z.literal('0.2.0'),

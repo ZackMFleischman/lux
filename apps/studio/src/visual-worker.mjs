@@ -12,10 +12,11 @@ import { prepareAuthoredModule } from './authored-worker-assets.mjs';
 import { prepareWorkerControlState } from './controls/worker-control-state.mjs';
 import {prepareWorkerCompositionState} from './controls/worker-composition-state.mjs';
 import {createTempoClock} from './controls/tempo-clock.mjs';
+import {createTriggerLedger} from './controls/trigger-ledger.mjs';
 import { createFrameCollector } from '../../../packages/performance/live.mjs';
 import { createGpuPassTimer } from '../../../packages/performance/gpu-pass.mjs';
 import { collectionMode } from '../../../packages/performance/collection-mode.mjs';
-const freeze=Object.freeze, RuntimeError=Error;
+const freeze=Object.freeze, RuntimeError=Error,stringify=JSON.stringify;
 const scenePath=freeze([]);
 const createURL=URL.createObjectURL.bind(URL),revokeURL=URL.revokeObjectURL.bind(URL),RuntimeBlob=Blob;
 const now=performance.now.bind(performance);
@@ -24,11 +25,13 @@ let identity, renderer, device, visual, clock, tempoClock, random, settings, out
 let initializationProbe, material, componentBridge, compositionBridge, authoredCleanup, cleanupPromise, activeOperation;
 let authoredDisposalAttempted=false,terminalError;
 let controlState, frame = 0, tick = 0, lastTime = 0;
+let triggerSequence=0,latestTriggerReceipt,activeTrigger;
+const triggerLedger=createTriggerLedger();
 let drawStarted=0,scheduleEpoch=0;
 let performanceMode='routine';
 let stopped = false, externallyDriven=false, timer, heartbeat, telemetryTimer, collector, gpuTimer, gpuCapability, chain = Promise.resolve();
 const send = (type, extra = {}) => post({ type, ...identity, ...extra });
-function state() { const clockState=clock.snapshot(),tempo=tempoClock.snapshot(clockState.timeSeconds);return { ...clockState, tempo,tempoSequence:tempo.tempoSequence, frameId: String(frame),...controlState.state(clockState.timeSeconds,tempo.beatPosition) }; }
+function state() { const clockState=clock.snapshot(),tempo=tempoClock.snapshot(clockState.timeSeconds);return { ...clockState, tempo,tempoSequence:tempo.tempoSequence, frameId: String(frame),...controlState.state(clockState.timeSeconds,tempo.beatPosition),triggerSequence,...(latestTriggerReceipt?{latestTriggerReceipt}:{}) }; }
 function runOperation(operation) {
   // Device loss bypasses the command queue. Keep the current command's lifetime
   // separate from terminal cleanup so teardown can await it without awaiting itself.
@@ -63,15 +66,16 @@ function failure(error, requestId) {
   if(!terminalError){terminalError=error;send('failure',{requestId,code:'RUNTIME_FAILED',message:String(error?.message||error).slice(0,2000)});}
   void terminalCleanup();
 }
-async function draw(requestId, type = 'frame',extra = {}) {
+async function draw(requestId, type = 'frame',extra = {},trigger) {
   requireRunning();
   drawStarted=now();
   const time = clock.snapshot(),tempo=tempoClock.snapshot(time.timeSeconds);
   const profiling=performanceMode==='routine';
   if(profiling)gpuTimer.begin(frame+1);
   const updateStart=profiling?now():0;
+  const triggerEvent=trigger?.event,events=triggerEvent&&trigger.target.nodePath.length===0?freeze([triggerEvent]):freeze([]);activeTrigger=trigger;
   await visual.update(freeze({ tick: tick++, timeSeconds: time.timeSeconds,
-    deltaSeconds: Math.max(0, time.timeSeconds - lastTime), controls: controlState.values(time.timeSeconds,tempo.beatPosition), events: freeze([]),
+    deltaSeconds: triggerEvent&&time.playback==='paused'?0:Math.max(0, time.timeSeconds - lastTime), controls: controlState.values(time.timeSeconds,tempo.beatPosition), events,
     sampleControl:(controlId,instanceKey)=>controlState.sample(scenePath,controlId,instanceKey,time.timeSeconds,tempo.beatPosition) }));
   requireRunning();
   const updateEnd=profiling?now():0;
@@ -86,9 +90,13 @@ async function draw(requestId, type = 'frame',extra = {}) {
   requireRunning();
   const completed=now();
   lastTime = time.timeSeconds; frame++;
+  let triggerReceipt;
+  if(trigger){triggerReceipt=freeze({result:'applied',commandId:trigger.event.commandId,controlId:trigger.target.controlId,nodePath:trigger.target.nodePath,sequence:trigger.event.sequence,frameId:String(frame),timeSeconds:time.timeSeconds});triggerLedger.complete(trigger.entry,triggerReceipt);latestTriggerReceipt=triggerReceipt;}
+  activeTrigger=undefined;
   if(profiling){collector.record(completed,frame,updateEnd-updateStart,renderCallEnd-updateEnd,completed-renderEnd,asynchronous,renderEnd-renderCallEnd);gpuTimer.end();}
   else collector.record(completed,frame);
-  send(type, { requestId, ...state(), timeSeconds: time.timeSeconds,...extra });
+  send(type, { requestId, ...state(), timeSeconds: time.timeSeconds,...extra,...(triggerReceipt?{triggerReceipt}:{}) });
+  return triggerReceipt;
 }
 function schedule() {
   clearTimeout(timer);
@@ -164,7 +172,8 @@ async function initialize(message) {
     const plan=prepareGraphRuntimePlan(validateNestedGraph(profile.graph,profile.definitions));
     compositionBridge=await createImageCompositionVisual({plan,definitions:create,context:freeze(context),backend,
       nodeControls:(path,frame)=>controlState.nodeValues(path,frame.timeSeconds,tempoClock.snapshot(frame.timeSeconds).beatPosition),
-      nodeSampleControl:(path,controlId,instanceKey,frame)=>controlState.sample(path,controlId,instanceKey,frame.timeSeconds,tempoClock.snapshot(frame.timeSeconds).beatPosition)});visual=compositionBridge;authoredCleanup=()=>compositionBridge.dispose();
+      nodeSampleControl:(path,controlId,instanceKey,frame)=>controlState.sample(path,controlId,instanceKey,frame.timeSeconds,tempoClock.snapshot(frame.timeSeconds).beatPosition),
+      nodeEvents:path=>activeTrigger&&stringify(path)===stringify(activeTrigger.target.nodePath)?freeze([activeTrigger.event]):freeze([])});visual=compositionBridge;authoredCleanup=()=>compositionBridge.dispose();
   }else if(prepared.admission.kind==='component'){
     const instance=await create(freeze(context));
     authoredCleanup=componentDisposer(instance);
@@ -222,6 +231,15 @@ onmessage = event => {
       const acknowledgement=message.action==='set'?tempoClock.setBpm(message.bpm,time):message.action==='tap'?tempoClock.tap(time):message.action==='synchronize'?tempoClock.synchronize(message.bpm,message.tempoSequence,time):undefined;
       if(!acknowledgement)throw Error('Invalid tempo command');
       await draw(message.requestId,'status',acknowledgement.tempoResult?{tempoResult:acknowledgement.tempoResult}:{});schedule();
+    } else if(message.type==='trigger'){
+      let target,entry;
+      try{
+        if(typeof message.commandId!=='string'||message.commandId.length<1||message.commandId.length>100)throw Error('Invalid trigger command ID');
+        target=controlState.resolveTrigger(message.nodePath??scenePath,message.controlId);const targetKey=stringify([target.nodePath,target.controlId]),admitted=triggerLedger.begin(message.commandId,targetKey);entry=admitted.entry;
+        if(admitted.duplicate){if(!entry.receipt)throw Error('Trigger command is still pending');send('status',{requestId:message.requestId,...state(),triggerReceipt:entry.receipt});return;}
+      }catch(error){send('command-error',{requestId:message.requestId,code:'TRIGGER_REJECTED',message:String(error?.message||error).slice(0,500)});return;}
+      const event=freeze({type:'trigger',controlId:target.controlId,commandId:message.commandId,sequence:++triggerSequence});
+      await draw(message.requestId,'status',{},freeze({target,event,entry}));schedule();
     } else if (message.type === 'playback') {
       if (!['play', 'pause', 'reset'].includes(message.action)) throw Error('Invalid playback command');
       clearTimeout(timer);
@@ -236,7 +254,8 @@ onmessage = event => {
         if(stopped)return;
         const png = encodeCapturedTarget(pixels, settings.width, settings.height);
         const bytes = png.slice().buffer;
-        const metadata = { ...state(), timeSeconds: lastTime, width: settings.width, height: settings.height, seed: settings.seed, colorSpace: 'srgb', alphaMode: 'straight' };
+        const {triggerSequence:_triggerSequence,latestTriggerReceipt:_latestTriggerReceipt,...persistentState}=state();
+        const metadata = { ...persistentState, timeSeconds: lastTime, width: settings.width, height: settings.height, seed: settings.seed, colorSpace: 'srgb', alphaMode: 'straight' };
         postMessage({ type: 'capture', ...identity, requestId: message.requestId, metadata, bytes }, [bytes]);
       } catch (error) { if(!stopped)send('capture-error', { requestId: message.requestId, message: String(error.message) }); }
     }

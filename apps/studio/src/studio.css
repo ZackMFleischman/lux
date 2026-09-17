@@ -181,3 +181,5 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 .inspector-current .MuiButton-root { min-width:0; max-width:100%; }
 .inspector-current span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .inspector-breadcrumb [aria-current="page"] { color:#b7bccb; font-weight:400; }
+
+.parameter-row-trigger .parameter-trigger-button{flex:none;min-width:54px;height:24px;padding:2px 7px;font-size:10px;line-height:18px;text-transform:none;white-space:nowrap}.parameter-row-trigger .parameter-trigger-button[aria-busy="true"]{opacity:.7;cursor:progress}

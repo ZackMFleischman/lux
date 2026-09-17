@@ -1,12 +1,12 @@
 // SDK 0.2 entry prepared for compiler version selection. The package's current
 // index/discovery remain 0.1 until compilation and artifact support land.
 import { normalizeControlDeclarations } from '../../runtime-contracts/src/parameters.mjs';
-import type { ControlDeclarations, ControlSchema, ControlsOf, NumberControlIdsOf, ValidControlDeclarations } from '../../runtime-contracts/src/parameters.mjs';
+import type { ControlDeclarations, ControlSchema, ControlsOf, ControlTriggerEvent, NumberControlIdsOf, ValidControlDeclarations } from '../../runtime-contracts/src/parameters.mjs';
 import type { OutputSettings } from '../../runtime-contracts/src/index.ts';
 export type {
   BooleanControlDefinition, BooleanDeclaration, ControlDeclaration, ControlDeclarations, ControlDefinition, ControlSchema,
   ControlsOf, ControlValue, ControlValues, EnumControlDefinition, EnumDeclaration, EnumOption, EnumPresentation,
-  NumberControlDefinition, NumberControlIdsOf, NumberDeclaration,
+  NumberControlDefinition, NumberControlIdsOf, NumberDeclaration, TriggerControlDefinition, TriggerDeclaration, TriggerIdsOf, ControlTriggerEvent,
 } from '../../runtime-contracts/src/parameters.mjs';
 
 export const sdkVersion = '0.2.0' as const;
@@ -16,7 +16,7 @@ export interface OutputTarget {
 }
 export interface FrameContext<C extends ControlDeclarations = ControlDeclarations> {
   readonly tick: number; readonly timeSeconds: number; readonly deltaSeconds: number;
-  readonly controls: ControlsOf<C>; readonly events: readonly never[];
+  readonly controls: ControlsOf<C>; readonly events: readonly ControlTriggerEvent<C>[];
   readonly sampleControl?: (controlId: NumberControlIdsOf<C>, instanceKey: string | number) => number;
 }
 export interface VisualContext {

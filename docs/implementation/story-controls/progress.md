@@ -10,4 +10,6 @@ Ruling: sustained beatdefinitions are distinct from sequenceoccurrences/dwell; n
 
 C1 ownership: contracts agent owns parameters/index SDK/compilerextractor; runtime agent owns Studio worker/composition/client/operations/controlanimation; Inspector agent owns ParameterInspector/localCSS/DOMregressions; parent owns sceneverification/exportpreflight/MCP/capability/docs. LUX203 padding is elsewhere; preserve it during later integration.
 
-Status: C1 in progress (claim12c6f592-7e81-4a6e-a06c-373177bb96d4, session6222a3d9-d48b-484b-847e-d086bbd4260e, revision5). No delivery claim yet. C2 and Story wait on sharedcontracts/prerequisites; no redundant userapproval required within authorized scope.
+Status: C1 accepted as LUX195 done revision7. Product325be93de6ca0a5e5871b0165358cf91d8cd352b; harness/evidenceae43dbb1f0f1a64865a4ae26df220847581ad05a. Native run1789632976959 and independent source/UI review pass. Installed app unchanged.
+
+C2 active: LUX196 claim eae5a1d7-4e9d-49c2-b563-321eeba70cc2, session6222a3d9-d48b-484b-847e-d086bbd4260e, revision5. Contracts: trigger_contracts (Sol high). Runtime: compact_alert_fix repurposed with focused assignment; Inspector: typed_inspector. Fresh runtime spawn exceeded host thread limit, so existing available contexts are reused. Parent owns MCP/capabilities/docs/examples/export. Story waits on shared SDK/runtime edits; no redundant user approval is required.

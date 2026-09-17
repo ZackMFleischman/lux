@@ -12,6 +12,7 @@ const enumeration = (overrides = {}) => ({
   options: [{ id: 'forward', label: 'Forward' }, { id: 'reverse', label: 'Reverse', description: 'Move backward' }],
   ...overrides,
 });
+const trigger = (overrides = {}) => ({ type: 'trigger', label: 'Regenerate', ...overrides });
 const declarations = () => ({ spikeHeight: number(), roughness: number({ label: 'Roughness', default: 0.4, max: 1, step: 0.1 }) });
 
 test('declarations preserve semantic IDs/order, normalize metadata, and freeze independent snapshots', () => {
@@ -74,6 +75,31 @@ test('boolean and enum declarations normalize stable option identities and typed
   assert.equal(isNumberControlDefinition(normalizeControlDeclarations({ height: number() })[0]), true);
   assert.throws(() => { schema[1].options[0].label = 'Changed'; }, TypeError);
   assert.throws(() => schema[1].options.push({ id: 'other', label: 'Other' }), TypeError);
+});
+
+test('trigger declarations participate in schema identity without creating persistent values', () => {
+  const schema = normalizeControlDeclarations({
+    height: number(), regenerate: trigger({ label: '  Regenerate  ', description: ' Rebuild the pattern ', group: ' Actions ' }),
+  });
+  assert.deepEqual(schema, [
+    { id: 'height', type: 'number', label: 'Height', default: 1, min: 0, max: 4, changeCost: 'live' },
+    { id: 'regenerate', type: 'trigger', label: 'Regenerate', description: 'Rebuild the pattern', group: 'Actions', changeCost: 'live' },
+  ]);
+  assert.equal(canonicalControlSchemaJson(schema), '[{"id":"height","type":"number","label":"Height","default":1,"min":0,"max":4,"changeCost":"live"},{"id":"regenerate","type":"trigger","label":"Regenerate","description":"Rebuild the pattern","group":"Actions","changeCost":"live"}]');
+  assert.deepEqual(defaultControlValues(schema), { height: 1 });
+  assert.deepEqual(validateControlSnapshot(schema, { height: 2 }), { height: 2 });
+  assert.throws(() => validateControlPatch(schema, { regenerate: true }), error => error.message === 'Trigger controls use the trigger command.');
+  assert.throws(() => validateControlSnapshot(schema, { height: 2, regenerate: 'now' }), error => error.message === 'Trigger controls use the trigger command.');
+});
+
+test('trigger declaration validation rejects value fields and preserves strict metadata admission', () => {
+  for (const invalid of [
+    trigger({ default: false }), trigger({ changeCost: 'live' }), trigger({ extra: true }),
+  ]) assert.throws(() => normalizeControlDeclarations({ regenerate: invalid }), /field/i);
+  let calls = 0;
+  const accessor = { type: 'trigger', get label() { calls++; return 'Regenerate'; } };
+  assert.throws(() => normalizeControlDeclarations({ regenerate: accessor }));
+  assert.equal(calls, 0);
 });
 
 test('typed patches and snapshots enforce each declared control kind and enum membership', () => {
@@ -243,4 +269,10 @@ test('reconciliation preserves typed identities and reports option removal or ki
     { id: 'direction', reason: 'option-removed', previousValue: 'forward', value: 'reverse' },
     { id: 'changed', reason: 'type-changed', previousValue: true, value: 'a' },
   ]);
+});
+
+test('reconciliation ignores trigger additions, removals and metadata changes', () => {
+  const previous = normalizeControlDeclarations({ height: number(), removedAction: trigger(), renamedAction: trigger({ label: 'Before' }) });
+  const next = normalizeControlDeclarations({ height: number(), addedAction: trigger(), renamedAction: trigger({ label: 'After' }) });
+  assert.deepEqual(reconcileControlValues(previous, { height: 2 }, next), { values: { height: 2 }, changes: [] });
 });

@@ -73,6 +73,7 @@ Read live tool schemas if available; these are the checked adapter's contracts. 
 | `tempo.set` | `{ instanceId, expectedGeneration, expectedRevisionId, bpm }` → acknowledged runtime state. BPM is 20–300; manual changes preserve current beat phase. Requires running Studio protocol 3 tempo capability. |
 | `tempo.tap` | `{ instanceId, expectedGeneration, expectedRevisionId }` → acknowledged runtime state with `tempoResult: 'accepted' | 'restarted' | 'ignored-short'`. Requires running Studio protocol 3 tempo capability. |
 | `parameters` | `{ instanceId, expectedGeneration, expectedRevisionId, expectedControlSchemaHash, values: { spikeHeight: 0.5 }, mode: 'live' }` → `{ applied, status }`. Use actual runtime `controlSchema` IDs/ranges and `controlSchemaHash`; the patch can change several keys atomically. Unknown keys and stale schemas are rejected. |
+| `trigger` | `{ instanceId, expectedGeneration, expectedRevisionId, expectedControlSchemaHash, controlId, commandId, nodePath? }` → `{ applied, status }` with a completed-frame trigger receipt. Requires running `controlTriggers` capability. Use a fresh command ID per intentional action; retry uncertainty with the same ID and guards. Optional nodePath addresses an instance. |
 | `variation` | `{ instanceId, expectedGeneration, expectedRevisionId, expectedControlSchemaHash, nodePath, controlId, variation: { amount, distribution: 'random' | 'centered' | 'spread', enabled } | null }` → `{ applied, status }`. Status exposes the admitted `kind: 'variation'` binding in `authoring.controlAnimations`. Use an empty `nodePath` for a direct visual, or the canonical leaf path reported by composition status. Requires `capabilities.controlVariation.stableInstanceKeys`. |
 | `restart` | `{ instanceId, expectedGeneration }` → replacement runtime status; source and controls retained. Use for recovery when needed, not every edit. |
 
@@ -81,6 +82,17 @@ Discovery can also expose local tools with the `lux.library.` prefix. The MCP in
 The Library panel is read-only for source. It lists the repository-shared standard entries, opens their source files, and shows the active storage path. An installed app made from the repository uses that same marked path when available; **Standalone fallback** identifies the app-data store used when the recorded repository is absent. Copying an agent request does not message an agent or insert source. A linked scene stores the last resolved revision and mounted source as an explicit fallback. Reopen resolves the latest library revision; if it fails to build, Studio keeps the saved working preview and reports the fallback. A running scene reports newer revisions and waits for Apply update. Fork copies the mounted source into the scene and unlinks that component.
 
 Obtain `instanceId`, `generation`, `revisionId`, and `playback` from `status.authoring` (or a tool response's `status.authoring`). Map `generation` to `expectedGeneration` and `revisionId` to `expectedRevisionId`; do not invent them. Restart replaces the generation, so refresh guards afterward. For rejected stale guards, reread state and reconsider the action instead of forcing it against an unrelated runtime.
+
+Trigger IDs are rows with `type: 'trigger'` in the accepted schema. They have no
+entry in parameter values. A command's receipt is returned only after its event
+has been consumed by one update and the frame completes. A paused trigger uses
+zero delta and stays paused. Duplicate IDs for the same canonical target return
+the original receipt; using that ID for another target rejects. Each generation
+admits at most 16,384 IDs without eviction. Saturation rejects new commands until
+an explicit runtime restart. Reset retains the ledger and never replays actions.
+Rebuild/restart changes generation; do not automatically reissue an old action
+under new guards. A timeout is uncertain, so retain the command ID for a same-
+generation retry. Save/open, Looks and captured values contain no action history.
 
 For source edits, `structuredClone(current.source)` is a useful starting point. Modify only the intended entries in `.files`; preserve the remaining bundle. A complete-source build is atomic and version guarded. Typing through Playwright or streaming characters into the user's editor has different concurrency behavior and is not the creation path; token-by-token edit visualization is not exposed by the checked MCP API.
 
