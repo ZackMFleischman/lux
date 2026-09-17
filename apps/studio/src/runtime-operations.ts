@@ -4,7 +4,8 @@ import type { StudioClient } from './service-client.ts';
 import { nodeIdSchema } from '../../../packages/runtime-contracts/src/identities.ts';
 
 const target = { instanceId: z.string().min(1), expectedGeneration: z.number().int().nonnegative().safe() };
-const valuesSchema=z.record(z.number().finite()).refine(values=>Object.keys(values).length>0,'Expected at least one parameter value');
+const controlValueSchema=z.union([z.number().finite(),z.boolean(),z.string().min(1).max(64)]);
+const valuesSchema=z.record(controlValueSchema).refine(values=>Object.keys(values).length>0,'Expected at least one parameter value');
 export const parameterInputSchema = z.object({ ...target, expectedRevisionId: z.string().min(1), expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/).optional(),values:valuesSchema, mode: z.literal('live').default('live') }).strict();
 export const playbackInputSchema = z.object({ ...target, action: z.enum(['play', 'pause', 'reset']) }).strict();
 export const nodeParameterInputSchema=parameterInputSchema.extend({nodePath:z.array(nodeIdSchema).min(1).max(16),expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/)});

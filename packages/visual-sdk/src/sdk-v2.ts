@@ -1,9 +1,13 @@
 // SDK 0.2 entry prepared for compiler version selection. The package's current
 // index/discovery remain 0.1 until compilation and artifact support land.
 import { normalizeControlDeclarations } from '../../runtime-contracts/src/parameters.mjs';
-import type { ControlDeclarations, ControlSchema, ControlsOf } from '../../runtime-contracts/src/parameters.mjs';
+import type { ControlDeclarations, ControlSchema, ControlsOf, NumberControlIdsOf, ValidControlDeclarations } from '../../runtime-contracts/src/parameters.mjs';
 import type { OutputSettings } from '../../runtime-contracts/src/index.ts';
-export type { ControlDeclarations, ControlSchema, ControlsOf, NumberDeclaration } from '../../runtime-contracts/src/parameters.mjs';
+export type {
+  BooleanControlDefinition, BooleanDeclaration, ControlDeclaration, ControlDeclarations, ControlDefinition, ControlSchema,
+  ControlsOf, ControlValue, ControlValues, EnumControlDefinition, EnumDeclaration, EnumOption, EnumPresentation,
+  NumberControlDefinition, NumberControlIdsOf, NumberDeclaration,
+} from '../../runtime-contracts/src/parameters.mjs';
 
 export const sdkVersion = '0.2.0' as const;
 export interface OutputTarget {
@@ -13,7 +17,7 @@ export interface OutputTarget {
 export interface FrameContext<C extends ControlDeclarations = ControlDeclarations> {
   readonly tick: number; readonly timeSeconds: number; readonly deltaSeconds: number;
   readonly controls: ControlsOf<C>; readonly events: readonly never[];
-  readonly sampleControl?: (controlId: keyof C & string, instanceKey: string | number) => number;
+  readonly sampleControl?: (controlId: NumberControlIdsOf<C>, instanceKey: string | number) => number;
 }
 export interface VisualContext {
   readonly settings: Readonly<OutputSettings>;
@@ -29,13 +33,13 @@ export interface VisualInstance<C extends ControlDeclarations = ControlDeclarati
   reset(seed: number): void | Promise<void>;
   dispose(): void | Promise<void>;
 }
-export interface VisualDefinition<C extends ControlDeclarations = ControlDeclarations> {
+export interface VisualDefinition<C extends ControlDeclarations = any> {
   readonly sdkVersion: typeof sdkVersion;
   readonly controls: ControlSchema;
   create(context: VisualContext): Promise<VisualInstance<C>>;
 }
 export function defineVisual<const C extends ControlDeclarations>(definition: {
-  readonly controls: C;
+  readonly controls: C & ValidControlDeclarations<C>;
   create(context: VisualContext): Promise<VisualInstance<NoInfer<C>>>;
 }): VisualDefinition<C> {
   if (!definition || typeof definition !== 'object' ||

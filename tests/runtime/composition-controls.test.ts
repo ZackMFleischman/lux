@@ -8,7 +8,7 @@ import {createCompositionControlState} from '../../packages/runtime/src/componen
 import {nodeIdSchema} from '../../packages/runtime-contracts/src/identities.ts';
 const hash=(value:string)=>createHash('sha256').update(value).digest('hex');
 function profile(source=compositionSourceBundle()){const asts=Object.fromEntries(Object.entries(source.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));return extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash})!;}
-const kaleidoA=nodeIdSchema.parse(kaleidoscopeAId),kaleidoB=nodeIdSchema.parse(kaleidoscopeBId);
+const ball=nodeIdSchema.parse(ballId),kaleidoA=nodeIdSchema.parse(kaleidoscopeAId),kaleidoB=nodeIdSchema.parse(kaleidoscopeBId);
 test('node writes update only their instance and public aliases, rejecting stale or invalid writes atomically',()=>{
  const p=profile(),state=createCompositionControlState(p),node=p.nodes.find(row=>row.nodePath[0]===kaleidoA)!;
  state.applyNode([kaleidoA],{segments:8},node.schemaHash);
@@ -39,4 +39,24 @@ test('component updates retain compatible values and report values reset by a na
  const updated=createCompositionControlState(changed,saved);
  assert.deepEqual(updated.nodeValues([kaleidoA]),{segments:5});assert.deepEqual(updated.nodeValues([kaleidoB]),{segments:6});
  assert.deepEqual(updated.changes(),[{id:`${kaleidoscopeBId}:segments`,reason:'out-of-range',previousValue:11,value:6}]);
+});
+
+test('typed composition node writes preserve Boolean and enum values through public aliases',()=>{
+ const typedSource=compositionSourceBundle();
+ typedSource.files['ball.ts']=typedSource.files['ball.ts'].replace(
+  "intensity:{type:'number',label:'Intensity',default:.6,min:0,max:1,step:.01}",
+  "intensity:{type:'boolean',label:'Enabled',default:true}");
+ typedSource.files['kaleidoscope.ts']=typedSource.files['kaleidoscope.ts'].replace(
+  "segments:{type:'number',label:'Segments',default:6,min:2,max:16,step:1}",
+  "segments:{type:'enum',label:'Mode',default:'soft',options:[{id:'soft',label:'Soft'},{id:'hard',label:'Hard'}]}");
+ const p=profile(typedSource),state=createCompositionControlState(p);
+ const ballNode=p.nodes.find(row=>row.nodePath[0]===ball)!,kaleido=p.nodes.find(row=>row.nodePath[0]===kaleidoA)!;
+ assert.deepEqual(state.values(),{ballIntensity:true,segmentsA:'soft',segmentsB:'soft'});
+ state.applyNode([ball],{intensity:false},ballNode.schemaHash);
+ state.applyNode([kaleidoA],{segments:'hard'},kaleido.schemaHash);
+ assert.deepEqual(state.nodeValues([ball]),{intensity:false});
+ assert.deepEqual(state.nodeValues([kaleidoA]),{segments:'hard'});
+ assert.deepEqual(state.nodeValues([kaleidoB]),{segments:'soft'});
+ assert.deepEqual(state.values(),{ballIntensity:false,segmentsA:'hard',segmentsB:'soft'});
+ assert.throws(()=>state.applyNode([kaleidoA],{segments:'missing'},kaleido.schemaHash),/segments/i);
 });

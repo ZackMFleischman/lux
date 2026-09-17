@@ -12,6 +12,14 @@ const schemaHash=hash(canonicalControlSchemaJson(schema));
 const binding=(overrides={})=>({nodePath:[],definitionHash:schemaHash,schemaHash,controlId:'height',shape:'sine',periodSeconds:2,amount:1,phase:.25,enabled:true,...overrides});
 const tempoBinding=(overrides={})=>({kind:'tempo',nodePath:[],definitionHash:schemaHash,schemaHash,controlId:'height',shape:'sine',beatsPerCycle:2,amount:1,phase:.25,enabled:true,...overrides});
 
+const typedSchema=normalizeControlDeclarations({
+ height:{type:'number',label:'Height',default:1,min:0,max:4},
+ enabled:{type:'boolean',label:'Enabled',default:true},
+ mode:{type:'enum',label:'Mode',default:'soft',options:[{id:'soft',label:'Soft'},{id:'hard',label:'Hard'}]},
+});
+const typedSchemaHash=hash(canonicalControlSchemaJson(typedSchema));
+const typedBinding=(controlId)=>({nodePath:[],definitionHash:typedSchemaHash,schemaHash:typedSchemaHash,controlId,shape:'sine',periodSeconds:2,amount:1,phase:.25,enabled:true});
+
 test('scene animation bindings use the empty path as a distinct validated target',()=>{
  const scene=validateControlAnimationBindings([binding()]);
  assert.deepEqual(scene,[binding()]);
@@ -63,6 +71,17 @@ test('changed scene schema disables a retained binding without retargeting it',a
  assert.deepEqual(state.values(0),{height:1,speed:.5});
  assert.deepEqual(state.state(0).controlAnimations,[incompatible]);
  assert.match(state.state(0).controlAnimationIssues[0].message,/changed|incompatible/i);
+});
+
+test('retained animations targeting Boolean or enum controls stay disabled with type diagnostics',async()=>{
+ const bindings=[typedBinding('enabled'),typedBinding('mode')];
+ const state=await prepareWorkerControlState({sdkVersion:'0.2.0',controlSchema:typedSchema,controlSchemaHash:typedSchemaHash,
+  controls:{height:1,enabled:true,mode:'soft'},controlAnimations:bindings});
+ assert.deepEqual(state.values(0),{height:1,enabled:true,mode:'soft'});
+ assert.deepEqual(state.state(0).controlAnimations,bindings);
+ assert.deepEqual(state.state(0).controlAnimationIssues.map(issue=>issue.controlId),['enabled','mode']);
+ for(const issue of state.state(0).controlAnimationIssues)assert.match(issue.message,/number|numeric|type/i);
+ assert.throws(()=>state.sample([], 'enabled','instance',0),/number|numeric/i);
 });
 
 test('scene animation evaluation retains captured intrinsics after authored code mutates prototypes',async()=>{

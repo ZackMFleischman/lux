@@ -93,10 +93,18 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 .parameter-row .MuiInputBase-input{padding:3px 5px;font-size:11px;line-height:18px;height:18px;text-align:right;font-variant-numeric:tabular-nums}
 .parameter-row .MuiIconButton-root{width:22px;height:22px;padding:2px;font-size:14px}
 .parameter-actions{display:flex;align-items:center;gap:4px;flex:0 0 48px;min-width:0}
+.parameter-actions.parameter-actions-reset{flex-basis:22px}
+.parameter-boolean.MuiFormControlLabel-root{display:flex;justify-content:space-between;gap:4px;flex:1;min-width:0;margin:0}
+.parameter-boolean .MuiFormControlLabel-label{flex:1;min-width:0}.parameter-boolean .MuiSwitch-root{flex:none;margin-right:-3px}
+.parameter-enum-select.MuiInputBase-root{width:100%;height:26px;font-size:11px}.parameter-enum-select .MuiSelect-select{padding:3px 24px 3px 6px;line-height:18px;min-height:18px}
+.parameter-segments{display:flex;flex-wrap:wrap;gap:2px;max-width:100%;overflow:hidden}
+.parameter-segments button{flex:1 1 70px;min-width:0;max-width:100%;height:24px;padding:2px 5px;border:1px solid #4a4d5d;border-radius:3px;background:#292c36;color:#d6d7df;font:inherit;font-size:10px;font-weight:500;line-height:18px;cursor:pointer}
+.parameter-segments button>span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.parameter-segments button[aria-pressed="true"]{border-color:#9b91d4;background:#4b456e;color:#fff}.parameter-segments button:focus-visible{outline:2px solid #bbb0fa;outline-offset:-2px}.parameter-segments button:disabled{cursor:default;opacity:.45}
+.parameter-radios.MuiFormGroup-root{gap:1px}.parameter-radios .MuiFormControlLabel-root{min-width:0;min-height:22px;margin:0}.parameter-radios .MuiRadio-root{padding:2px 4px 2px 1px}.parameter-radios .MuiFormControlLabel-label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
 .parameter-row .MuiSlider-root{display:block;width:calc(100% - 8px);height:2px;padding:6px 0;margin:0 4px}
 .parameter-row .MuiSlider-thumb{width:9px;height:9px}
 .parameter-row .animation-on{font-size:7px;font-weight:800;margin-left:1px;line-height:1}
-@container (max-width:150px){.parameter-heading{flex-wrap:wrap}.parameter-heading>.parameter-name{flex-basis:100%}.parameter-row .parameter-number{width:46px;min-width:0;margin-left:auto}}
+@container (max-width:150px){.parameter-heading{flex-wrap:wrap}.parameter-heading>.parameter-name{flex-basis:100%}.parameter-row .parameter-number{width:46px;min-width:0;margin-left:auto}.parameter-segments button{flex-basis:100%}}
 .animation-range{position:relative;height:4px;margin:-5px 5px 3px;background:#242832;border-radius:4px}
 .animation-range span{position:absolute;top:1px;height:2px;background:#786bd2;border-radius:2px}
 .animation-range i{position:absolute;top:-1px;width:2px;height:6px;background:#fff;border-radius:2px;transform:translateX(-1px)}

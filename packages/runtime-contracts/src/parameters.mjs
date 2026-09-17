@@ -1,9 +1,12 @@
 // Pure browser-compatible parameter policy. No visual execution, hashing,
 // environment access, or legacy Intensity fallback belongs at this boundary.
 export const parameterLimits = Object.freeze({ metadataBytes: 32768, id: 64, label: 80, unit: 24, description: 512, group: 80 });
-const requiredFields = ['type', 'label', 'default', 'min', 'max'];
-const optionalFields = ['step', 'unit', 'description', 'group'];
+const commonRequiredFields = ['type', 'label', 'default'];
+const commonOptionalFields = ['description', 'group'];
+const numberFields = ['min', 'max', 'step', 'unit'];
+const enumFields = ['options', 'presentation'];
 const reservedIds = new Set(['constructor', 'prototype', '__proto__']);
+const enumPresentations = new Set(['segmented', 'radio', 'dropdown']);
 const encoder = new TextEncoder();
 
 function invalid(path, message) {
@@ -16,23 +19,30 @@ function record(input, path) {
   const result = Object.create(null);
   for (const key of Reflect.ownKeys(input)) {
     const descriptor = Object.getOwnPropertyDescriptor(input, key);
-    if (typeof key !== 'string' || !descriptor?.enumerable || !Object.hasOwn(descriptor, 'value')) {
-      invalid(path, 'expected enumerable own data properties');
-    }
+    if (typeof key !== 'string' || !descriptor?.enumerable || !Object.hasOwn(descriptor, 'value')) invalid(path, 'expected enumerable own data properties');
     result[key] = descriptor.value;
   }
   return result;
 }
-function controlId(id) {
-  if (typeof id !== 'string' || !/^[a-z][A-Za-z0-9_]{0,63}$/.test(id) || reservedIds.has(id)) {
-    invalid('controls', 'invalid control ID');
+function denseArray(input, path) {
+  if (!Array.isArray(input) || Object.getPrototypeOf(input) !== Array.prototype) invalid(path, 'expected a plain array');
+  const length = Object.getOwnPropertyDescriptor(input, 'length')?.value;
+  if (!Number.isSafeInteger(length) || Reflect.ownKeys(input).length !== length + 1) invalid(path, 'expected a dense own data array');
+  const result = [];
+  for (let index = 0; index < length; index++) {
+    const descriptor = Object.getOwnPropertyDescriptor(input, String(index));
+    if (!descriptor?.enumerable || !Object.hasOwn(descriptor, 'value')) invalid(path, 'expected dense own data array elements');
+    result.push(descriptor.value);
   }
+  return result;
+}
+function stableId(id, path) {
+  if (typeof id !== 'string' || !/^[a-z][A-Za-z0-9_]{0,63}$/.test(id) || reservedIds.has(id)) invalid(path, 'invalid ID');
   return id;
 }
+function controlId(id) { return stableId(id, 'controls'); }
 function text(value, path, maximum) {
-  if (typeof value !== 'string' || !value.isWellFormed() || /[\u0000-\u001f\u007f-\u009f]/.test(value)) {
-    invalid(path, 'expected valid Unicode without control characters');
-  }
+  if (typeof value !== 'string' || !value.isWellFormed() || /[\u0000-\u001f\u007f-\u009f]/.test(value)) invalid(path, 'expected valid Unicode without control characters');
   const normalized = value.trim();
   if (!normalized || [...normalized].length > maximum) invalid(path, `expected 1–${maximum} code points`);
   return normalized;
@@ -41,28 +51,66 @@ function finite(value, path) {
   if (typeof value !== 'number' || !Number.isFinite(value)) invalid(path, 'expected a finite number');
   return Object.is(value, -0) ? 0 : value;
 }
-function definition(id, input, normalizedRow) {
-  const path = `controls.${controlId(id)}`, raw = record(input, path);
-  const required = normalizedRow ? ['id', ...requiredFields, 'changeCost'] : requiredFields;
-  for (const key of required) if (!Object.hasOwn(raw, key)) invalid(path, `missing field ${key}`);
-  for (const key of Object.keys(raw)) if (!required.includes(key) && !optionalFields.includes(key)) invalid(path, `unsupported field ${key.slice(0, 80)}`);
-  if (normalizedRow && raw.changeCost !== 'live') invalid(path, 'changeCost must be live');
-  if (raw.type !== 'number') invalid(path, 'only number controls are supported');
-  const label = text(raw.label, `${path}.label`, parameterLimits.label);
-  const minimum = finite(raw.min, `${path}.min`), maximum = finite(raw.max, `${path}.max`);
-  const value = finite(raw.default, `${path}.default`);
-  if (!(minimum < maximum) || !Number.isFinite(maximum - minimum)) invalid(path, 'min must be below max with a finite range');
-  if (value < minimum || value > maximum) invalid(`${path}.default`, `expected a number from ${minimum} to ${maximum}`);
-  const result = { id, type: 'number', label, default: value, min: minimum, max: maximum };
-  if (Object.hasOwn(raw, 'step')) {
-    const step = finite(raw.step, `${path}.step`);
-    if (step <= 0 || step > maximum - minimum) invalid(`${path}.step`, 'expected a positive increment no greater than the range');
-    result.step = step;
-  }
-  if (Object.hasOwn(raw, 'unit')) result.unit = text(raw.unit, `${path}.unit`, parameterLimits.unit);
+function optionalMetadata(raw, result, path) {
   if (Object.hasOwn(raw, 'description')) result.description = text(raw.description, `${path}.description`, parameterLimits.description);
   if (Object.hasOwn(raw, 'group')) result.group = text(raw.group, `${path}.group`, parameterLimits.group);
-  result.changeCost = 'live';
+}
+function enumOptions(input, path) {
+  const rows = denseArray(input, path);
+  if (rows.length < 2 || rows.length > 64) invalid(path, 'expected 2–64 enum options');
+  const result = [], ids = new Set();
+  for (let index = 0; index < rows.length; index++) {
+    const optionPath = `${path}.${index}`, raw = record(rows[index], optionPath);
+    for (const key of ['id', 'label']) if (!Object.hasOwn(raw, key)) invalid(optionPath, `missing field ${key}`);
+    for (const key of Object.keys(raw)) if (!['id', 'label', 'description'].includes(key)) invalid(optionPath, `unsupported field ${key.slice(0, 80)}`);
+    const id = stableId(raw.id, `${optionPath}.id`);
+    if (ids.has(id)) invalid(path, `duplicate option ID ${id}`);
+    ids.add(id);
+    const option = { id, label: text(raw.label, `${optionPath}.label`, parameterLimits.label) };
+    if (Object.hasOwn(raw, 'description')) option.description = text(raw.description, `${optionPath}.description`, parameterLimits.description);
+    result.push(Object.freeze(option));
+  }
+  return Object.freeze(result);
+}
+function definition(id, input, normalizedRow) {
+  const path = `controls.${controlId(id)}`, raw = record(input, path);
+  for (const key of [...(normalizedRow ? ['id'] : []), ...commonRequiredFields, ...(normalizedRow ? ['changeCost'] : [])]) if (!Object.hasOwn(raw, key)) invalid(path, `missing field ${key}`);
+  if (normalizedRow && raw.changeCost !== 'live') invalid(path, 'changeCost must be live');
+  const type = raw.type;
+  const kindFields = type === 'number' ? numberFields : type === 'boolean' ? [] : type === 'enum' ? enumFields : null;
+  if (!kindFields) invalid(`${path}.type`, 'expected number, boolean, or enum');
+  const requiredKindFields = type === 'number' ? ['min', 'max'] : type === 'enum' ? ['options'] : [];
+  for (const key of requiredKindFields) if (!Object.hasOwn(raw, key)) invalid(path, `missing field ${key}`);
+  const allowed = [...(normalizedRow ? ['id', 'changeCost'] : []), ...commonRequiredFields, ...commonOptionalFields, ...kindFields];
+  for (const key of Object.keys(raw)) if (!allowed.includes(key)) invalid(path, `unsupported field ${key.slice(0, 80)}`);
+
+  const label = text(raw.label, `${path}.label`, parameterLimits.label);
+  if (type === 'number') {
+    const minimum = finite(raw.min, `${path}.min`), maximum = finite(raw.max, `${path}.max`), value = finite(raw.default, `${path}.default`);
+    if (!(minimum < maximum) || !Number.isFinite(maximum - minimum)) invalid(path, 'min must be below max with a finite range');
+    if (value < minimum || value > maximum) invalid(`${path}.default`, `expected a number from ${minimum} to ${maximum}`);
+    const result = { id, type: 'number', label, default: value, min: minimum, max: maximum };
+    if (Object.hasOwn(raw, 'step')) {
+      const step = finite(raw.step, `${path}.step`);
+      if (step <= 0 || step > maximum - minimum) invalid(`${path}.step`, 'expected a positive increment no greater than the range');
+      result.step = step;
+    }
+    if (Object.hasOwn(raw, 'unit')) result.unit = text(raw.unit, `${path}.unit`, parameterLimits.unit);
+    optionalMetadata(raw, result, path); result.changeCost = 'live';
+    return Object.freeze(result);
+  }
+  if (type === 'boolean') {
+    if (typeof raw.default !== 'boolean') invalid(`${path}.default`, 'expected a boolean');
+    const result = { id, type: 'boolean', label, default: raw.default };
+    optionalMetadata(raw, result, path); result.changeCost = 'live';
+    return Object.freeze(result);
+  }
+  const options = enumOptions(raw.options, `${path}.options`);
+  if (typeof raw.default !== 'string' || !options.some(option => option.id === raw.default)) invalid(`${path}.default`, 'expected an admitted enum option ID');
+  const presentation = Object.hasOwn(raw, 'presentation') ? raw.presentation : 'dropdown';
+  if (!enumPresentations.has(presentation)) invalid(`${path}.presentation`, 'expected segmented, radio, or dropdown');
+  const result = { id, type: 'enum', label, default: raw.default, options, presentation };
+  optionalMetadata(raw, result, path); result.changeCost = 'live';
   return Object.freeze(result);
 }
 function finishSchema(rows) {
@@ -71,34 +119,35 @@ function finishSchema(rows) {
 }
 
 export function normalizeControlDeclarations(input) {
-  const raw = record(input, 'controls'), ids = Object.keys(raw);
-  return finishSchema(ids.map(id => definition(id, raw[id], false)));
+  const raw = record(input, 'controls');
+  return finishSchema(Object.keys(raw).map(id => definition(id, raw[id], false)));
 }
-
 export function normalizeControlSchema(input) {
-  if (!Array.isArray(input) || Object.getPrototypeOf(input) !== Array.prototype) invalid('controls', 'expected a plain array of control definitions');
-  const length = Object.getOwnPropertyDescriptor(input, 'length').value;
-  if (Reflect.ownKeys(input).length !== length + 1) invalid('controls', 'unexpected array properties');
-  const rows = [], ids = new Set();
-  for (let i = 0; i < length; i++) {
-    const descriptor = Object.getOwnPropertyDescriptor(input, String(i));
-    if (!descriptor?.enumerable || !Object.hasOwn(descriptor, 'value')) invalid('controls', 'expected dense own data array elements');
-    const raw = record(descriptor.value, `controls[${i}]`);
-    const id = controlId(raw.id);
+  const values = denseArray(input, 'controls'), rows = [], ids = new Set();
+  for (let index = 0; index < values.length; index++) {
+    const raw = record(values[index], `controls[${index}]`), id = controlId(raw.id);
     if (ids.has(id)) invalid('controls', `duplicate control ID ${id}`);
     ids.add(id); rows.push(definition(id, raw, true));
   }
   return finishSchema(rows);
 }
+export function canonicalControlSchemaJson(schema) { return JSON.stringify(normalizeControlSchema(schema)); }
+export function defaultControlValues(schema) { return Object.freeze(Object.fromEntries(normalizeControlSchema(schema).map(control => [control.id, control.default]))); }
+export function isNumberControlDefinition(value) { return value.type === 'number'; }
 
-export function canonicalControlSchemaJson(schema) {
-  return JSON.stringify(normalizeControlSchema(schema));
+function admittedValue(control, input, path) {
+  if (control.type === 'number') {
+    const value = finite(input, path);
+    if (value < control.min || value > control.max) invalid(path, `expected a number from ${control.min} to ${control.max}`);
+    return value;
+  }
+  if (control.type === 'boolean') {
+    if (typeof input !== 'boolean') invalid(path, 'expected a boolean');
+    return input;
+  }
+  if (typeof input !== 'string' || !control.options.some(option => option.id === input)) invalid(path, 'expected an admitted enum option ID');
+  return input;
 }
-
-export function defaultControlValues(schema) {
-  return Object.freeze(Object.fromEntries(normalizeControlSchema(schema).map(control => [control.id, control.default])));
-}
-
 function values(schema, input, complete) {
   const definitions = normalizeControlSchema(schema), raw = record(input, 'values'), keys = Object.keys(raw);
   if (!complete && !keys.length) invalid('values', 'expected a nonempty parameter patch');
@@ -111,9 +160,7 @@ function values(schema, input, complete) {
       if (complete) invalid(path, 'missing parameter in full snapshot');
       continue;
     }
-    const value = finite(raw[control.id], path);
-    if (value < control.min || value > control.max) invalid(path, `expected a number from ${control.min} to ${control.max}`);
-    result[control.id] = value;
+    result[control.id] = admittedValue(control, raw[control.id], path);
   }
   return Object.freeze(result);
 }
@@ -127,8 +174,9 @@ export function reconcileControlValues(previousSchema, previousValues, nextSchem
   for (const control of next) {
     nextIds.add(control.id);
     const before = old.get(control.id), previousValue = oldValues[control.id];
-    const reason = !before ? 'added' : before.unit !== control.unit ? 'unit-changed'
-      : previousValue < control.min || previousValue > control.max ? 'out-of-range' : null;
+    let reason = !before ? 'added' : before.type !== control.type ? 'type-changed' : null;
+    if (!reason && control.type === 'number') reason = before.unit !== control.unit ? 'unit-changed' : previousValue < control.min || previousValue > control.max ? 'out-of-range' : null;
+    else if (!reason && control.type === 'enum' && !control.options.some(option => option.id === previousValue)) reason = 'option-removed';
     result[control.id] = reason ? control.default : previousValue;
     if (reason) changes.push(Object.freeze({ id: control.id, reason, ...(before ? { previousValue } : {}), value: control.default }));
   }

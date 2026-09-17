@@ -18,18 +18,19 @@ class WorkerFixture {
   reply(extra:any){this.onmessage?.({data:{...this.init,type:'status',frameId:'1',timeSeconds:0,clockEpoch:0,controlSequence:0,playback:this.init.playing?'playing':'paused',...extra}});}
   terminate(){this.terminated=true;}
 }
-async function fixture(t:any,enabled=true){
+async function fixture(t:any,enabled=true,activeSchema=schema){
   const originals=new Map(['Worker','document'].map(key=>[key,Object.getOwnPropertyDescriptor(globalThis,key)]));
   Object.defineProperty(globalThis,'Worker',{value:WorkerFixture,configurable:true});
   Object.defineProperty(globalThis,'document',{value:{createElement:()=>({style:{},transferControlToOffscreen:()=>({}),remove(){}})},configurable:true});
   WorkerFixture.all=[];WorkerFixture.failNext=false;let compiles=0;
+  const activeSchemaHash=hash(canonicalControlSchemaJson(activeSchema));
   const client=new StandaloneClient({compile:async(input:any)=>{
-    compiles++;const body=linkedBody({linkedVersion:3,code:'accepted',sourceMap:'{}',bundleHash:'b'.repeat(64),linker:{version:'0.28.2',implementationHash:'c'.repeat(64),apiHash:'d'.repeat(64),binaryHash:'e'.repeat(64)},...await deriveAssets({},hash),controls:schema,controlSchemaHash:schemaHash});
+    compiles++;const body=linkedBody({linkedVersion:3,code:'accepted',sourceMap:'{}',bundleHash:'b'.repeat(64),linker:{version:'0.28.2',implementationHash:'c'.repeat(64),apiHash:'d'.repeat(64),binaryHash:'e'.repeat(64)},...await deriveAssets({},hash),controls:activeSchema,controlSchemaHash:activeSchemaHash});
     return {ok:true,sourceHash:hash(JSON.stringify(validateSource(input))),linked:{...body,linkedHash:hash(JSON.stringify(body))}};
   }} as any,{codeDeclaredParameters:enabled});
   t.after(()=>{const runtime=(client as any).running;if(runtime)(client as any).stop(runtime,'test complete');for(const [key,value]of originals)if(value)Object.defineProperty(globalThis,key,value);else Reflect.deleteProperty(globalThis,key);});
-  const operation=(values:any,extra:any={})=>{const runtime=client.getSnapshot().authoring!;return{name:'lux.parameters.set' as const,input:{requestId:crypto.randomUUID(),instanceId:runtime.instanceId,expectedGeneration:runtime.generation,expectedRevisionId:runtime.revisionId,expectedControlSchemaHash:schemaHash,values,mode:'live' as const,...extra}};};
-  return {client,operation,worker:()=>WorkerFixture.all.at(-1)!,compiles:()=>compiles};
+  const operation=(values:any,extra:any={})=>{const runtime=client.getSnapshot().authoring!;return{name:'lux.parameters.set' as const,input:{requestId:crypto.randomUUID(),instanceId:runtime.instanceId,expectedGeneration:runtime.generation,expectedRevisionId:runtime.revisionId,expectedControlSchemaHash:activeSchemaHash,values,mode:'live' as const,...extra}};};
+  return {client,operation,worker:()=>WorkerFixture.all.at(-1)!,compiles:()=>compiles,schemaHash:activeSchemaHash};
 }
 test('SDK 0.2 activation is explicitly gated while legacy UI integration is incomplete',async t=>{
   const f=await fixture(t,false);await assert.rejects(f.client.submit(source),/code.declared.*not.*enabled/i);assert.equal(f.compiles(),0);assert.equal(WorkerFixture.all.length,0);
@@ -60,4 +61,22 @@ test('failed candidates retain schema/values and restart restores admitted inten
   assert.equal(f.client.getSnapshot().authoring!.controls!.height,1);
   const compiles=f.compiles();await f.client.invoke({name:'lux.runtime.restart',input:{requestId:'restart',instanceId:original.instanceId,expectedGeneration:original.generation}});
   assert.equal(f.compiles(),compiles);assert.deepEqual(f.worker().init.controls,{height:3,speed:0.5});assert.deepEqual(f.client.getSnapshot().authoring!.controls,{height:3,speed:0.5});
+});
+
+test('typed flat controls preserve Boolean and enum values through guarded live acknowledgements',async t=>{
+ const typedSchema=normalizeControlDeclarations({
+  height:{type:'number',label:'Height',default:1,min:0,max:4},
+  enabled:{type:'boolean',label:'Enabled',default:true},
+  mode:{type:'enum',label:'Mode',default:'soft',options:[{id:'soft',label:'Soft'},{id:'hard',label:'Hard'}]},
+ });
+ const f=await fixture(t,true,typedSchema);await f.client.submit(source);
+ assert.deepEqual(f.worker().init.controls,{height:1,enabled:true,mode:'soft'});
+ const pending=f.client.invoke(f.operation({enabled:false,mode:'hard'}));
+ const message=f.worker().messages.at(-1);
+ assert.deepEqual(message.values,{height:1,enabled:false,mode:'hard'});
+ f.worker().reply({requestId:message.requestId,controls:message.values,effectiveControls:message.values,controlSequence:1});
+ await pending;
+ assert.deepEqual(f.client.getSnapshot().authoring!.controls,{height:1,enabled:false,mode:'hard'});
+ await assert.rejects(f.client.invoke(f.operation({enabled:0})),/enabled/i);
+ await assert.rejects(f.client.invoke(f.operation({mode:'missing'})),/mode/i);
 });

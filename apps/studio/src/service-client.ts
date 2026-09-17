@@ -1,6 +1,6 @@
 import type { RuntimeKey, OutputSettings } from '../../../packages/runtime-contracts/src/index.ts';
 import type { ControlValues, ControlMigration } from '../../../packages/runtime-contracts/src/parameters.mjs';
-import { normalizeControlSchema, validateControlSnapshot, validateControlPatch } from '../../../packages/runtime-contracts/src/parameters.mjs';
+import { isNumberControlDefinition, normalizeControlSchema, validateControlSnapshot, validateControlPatch } from '../../../packages/runtime-contracts/src/parameters.mjs';
 import { LEGACY_CONTROL_SCHEMA, LEGACY_CONTROL_SCHEMA_HASH } from './controls/control-state.ts';
 import type { RuntimeControlState } from './controls/control-state.ts';
 import type { PerformanceSnapshot } from './performance/performance-state.ts';
@@ -108,8 +108,10 @@ export class StudioController {
   async setNodeAnimation(nodePath:NodePath,controlId:string,animation:ControlAnimationBinding|null,restart=false):Promise<unknown>{
     const target=this.target(),state=getRuntimeControlState(target),node=target.nodeControls?.nodes.find(row=>JSON.stringify(row.nodePath)===JSON.stringify(nodePath));
     const flat=nodePath.length===0&&state.sdkVersion!=='0.4.0';
-    if(!flat&&(target.sdkVersion!=='0.4.0'||!node||!node.schema.some(row=>row.id===controlId)))throw Error('Composition node control is unavailable');
-    if(flat&&!state.controlSchema.some(row=>row.id===controlId))throw Error('Scene control is unavailable');
+    const definition=(flat?state.controlSchema:node?.schema)?.find(row=>row.id===controlId);
+    if(!flat&&(target.sdkVersion!=='0.4.0'||!node||!definition))throw Error('Composition node control is unavailable');
+    if(flat&&!definition)throw Error('Scene control is unavailable');
+    if(animation&&!isNumberControlDefinition(definition!))throw Error('Only number controls can be animated');
     const definitionHash=flat?state.controlSchemaHash:node!.definitionHash,schemaHash=flat?state.controlSchemaHash:node!.schemaHash;
     if(animation&&(JSON.stringify(animation.nodePath)!==JSON.stringify(nodePath)||animation.controlId!==controlId||animation.definitionHash!==definitionHash||animation.schemaHash!==schemaHash))throw Error('Animation target identity changed');
     return this.client.invoke({name:'lux.node.animation.set',input:{requestId:this.requestId(),instanceId:target.instanceId,expectedGeneration:target.generation,
@@ -118,8 +120,10 @@ export class StudioController {
   async setNodeVariation(nodePath:NodePath,controlId:string,variation:Readonly<{distribution:'random'|'centered'|'spread';amount:number;enabled:boolean}>|null):Promise<unknown>{
     const target=this.target(),state=getRuntimeControlState(target),node=target.nodeControls?.nodes.find(row=>JSON.stringify(row.nodePath)===JSON.stringify(nodePath));
     const flat=nodePath.length===0&&state.sdkVersion!=='0.4.0';
-    if(!flat&&(target.sdkVersion!=='0.4.0'||!node||!node.schema.some(row=>row.id===controlId)))throw Error('Composition node control is unavailable');
-    if(flat&&!state.controlSchema.some(row=>row.id===controlId))throw Error('Scene control is unavailable');
+    const definition=(flat?state.controlSchema:node?.schema)?.find(row=>row.id===controlId);
+    if(!flat&&(target.sdkVersion!=='0.4.0'||!node||!definition))throw Error('Composition node control is unavailable');
+    if(flat&&!definition)throw Error('Scene control is unavailable');
+    if(variation&&!isNumberControlDefinition(definition!))throw Error('Only number controls support per-instance variation');
     const schemaHash=flat?state.controlSchemaHash:node!.schemaHash;
     return this.client.invoke({name:'lux.node.variation.set',input:{requestId:this.requestId(),instanceId:target.instanceId,expectedGeneration:target.generation,
       expectedRevisionId:target.revisionId,expectedControlSchemaHash:schemaHash,nodePath:[...nodePath],controlId,variation}});

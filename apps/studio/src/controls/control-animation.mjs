@@ -1,5 +1,6 @@
 import {validateControlAnimationBindings} from '../../../../packages/runtime-contracts/src/control-animation.mjs';
 import {normalizeAudioBandSnapshot} from '../../../../packages/runtime-contracts/src/audio-input.mjs';
+import {isNumberControlDefinition} from '../../../../packages/runtime-contracts/src/parameters.mjs';
 const freeze=Object.freeze,stringify=JSON.stringify,isFiniteNumber=Number.isFinite,sin=Math.sin,abs=Math.abs,min=Math.min,max=Math.max,exp=Math.exp,PI=Math.PI,RuntimeError=Error;
 const RuntimeMap=Map,RuntimeSet=Set,call=Function.prototype.call;
 const arrayFind=call.bind(Array.prototype.find),arraySome=call.bind(Array.prototype.some),arrayPush=call.bind(Array.prototype.push);
@@ -27,7 +28,10 @@ export function normalizeControlAnimations(input,profile){
   const raw=bindings[index],node=mapGet(nodes,key(raw.nodePath));let issue;
   if(!node)issue='Animation target is no longer available.';
   else if(node.definitionHash!==raw.definitionHash||node.schemaHash!==raw.schemaHash)issue='Animated control changed and is incompatible with this binding.';
-  else if(!arraySome(node.schema,control=>control.id===raw.controlId))issue='Animated control is no longer available.';
+  else {const definition=arrayFind(node.schema,control=>control.id===raw.controlId);
+   if(!definition)issue='Animated control is no longer available.';
+   else if(!isNumberControlDefinition(definition))issue='Animated control is no longer a number control.';
+  }
   if(raw.kind==='audio'||raw.kind==='kick'){
    const configuration=stringify([raw.source.logicalInputId,raw.source.analyzer]);
    if(audioConfiguration===undefined)audioConfiguration=configuration;else if(audioConfiguration!==configuration&&!issue)issue='Audio binding uses an unavailable input configuration.';
@@ -127,6 +131,7 @@ export function createControlAnimationEvaluator(profile,base,normalized){
  function sample(path,controlId,instanceKey,timeSeconds,beatPosition=0){
   const node=arrayFind(profile.nodes,row=>key(row.nodePath)===key(path)),definition=node&&arrayFind(node.schema,row=>row.id===controlId),id=`${key(path)}:${controlId}`,entry=mapGet(entries,id);
   if(!definition)throw new RuntimeError('Unknown variation control');
+  if(!isNumberControlDefinition(definition))throw new RuntimeError('Only number controls support per-instance variation');
   const baseValue=nodeValues(path,timeSeconds,beatPosition)[controlId];
   return entry?.binding.kind==='variation'&&!arraySome(current.issues,issue=>`${key(issue.nodePath)}:${issue.controlId}`===id)?controlVariationValue(baseValue,definition,entry.binding,instanceKey):baseValue;
  }

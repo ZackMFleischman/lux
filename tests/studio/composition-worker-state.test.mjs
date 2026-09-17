@@ -66,3 +66,37 @@ test('worker rejects nested runtime definition tampering before returning a leaf
  runtime.definitions.composite.definitions.wrapped.definitions.kaleidoscope={...nested,metadata:{...nested.metadata,label:'Tampered'}};
  assert.throws(()=>state.checkDefinition({default:runtime}),/mismatch/i);
 });
+
+test('typed composition live writes retain captured validation after authored intrinsic mutation',async()=>{
+ const typedSource=compositionSourceBundle();
+ typedSource.files['ball.ts']=typedSource.files['ball.ts'].replace(
+  "intensity:{type:'number',label:'Intensity',default:.6,min:0,max:1,step:.01}",
+  "intensity:{type:'boolean',label:'Enabled',default:true}");
+ typedSource.files['kaleidoscope.ts']=typedSource.files['kaleidoscope.ts'].replace(
+  "segments:{type:'number',label:'Segments',default:6,min:2,max:16,step:1}",
+  "segments:{type:'enum',label:'Mode',default:'soft',options:[{id:'soft',label:'Soft'},{id:'hard',label:'Hard'}]}");
+ const profile=extract(typedSource),typedAdmission={...admission,composition:profile,controls:profile.publicControls,controlSchemaHash:hash(JSON.stringify(profile.publicControls))};
+ const state=await prepareWorkerCompositionState({sdkVersion:'0.4.0',controlSchema:profile.publicControls,controlSchemaHash:typedAdmission.controlSchemaHash,
+  controls:{ballIntensity:true,segmentsA:'soft',segmentsB:'soft'}},typedAdmission);
+ const node=profile.nodes.find(row=>row.nodePath[0]===kaleidoscopeAId),runtime=runtimeDefinition(profile,profile.graph.rootDefinitionHash);
+ const originals={getPrototypeOf:Object.getPrototypeOf,getOwnPropertyDescriptor:Object.getOwnPropertyDescriptor,ownKeys:Reflect.ownKeys,
+  keys:Object.keys,entries:Object.entries,stringify:JSON.stringify,arrayIsArray:Array.isArray,mapGet:Map.prototype.get,mapSet:Map.prototype.set,
+  arrayFind:Array.prototype.find,arrayMap:Array.prototype.map,arrayIterator:Array.prototype[Symbol.iterator]};
+ let snapshot,factories;
+ try{
+  Object.getPrototypeOf=()=>{throw Error('mutated Object.getPrototypeOf');};
+  Object.getOwnPropertyDescriptor=()=>{throw Error('mutated Object.getOwnPropertyDescriptor');};
+  Reflect.ownKeys=()=>{throw Error('mutated Reflect.ownKeys');};Object.keys=()=>{throw Error('mutated Object.keys');};Object.entries=()=>{throw Error('mutated Object.entries');};
+  JSON.stringify=()=>{throw Error('mutated JSON.stringify');};Array.isArray=()=>{throw Error('mutated Array.isArray');};
+  Map.prototype.get=()=>{throw Error('mutated Map.get');};Map.prototype.set=()=>{throw Error('mutated Map.set');};
+  Array.prototype.find=()=>{throw Error('mutated Array.find');};Array.prototype.map=()=>{throw Error('mutated Array.map');};Array.prototype[Symbol.iterator]=()=>{throw Error('mutated Array iterator');};
+  factories=state.checkDefinition({default:runtime});
+  state.applyNode([kaleidoscopeAId],{segments:'hard'},1,node.schemaHash);
+  snapshot=state.state();
+ }finally{
+  Object.getPrototypeOf=originals.getPrototypeOf;Object.getOwnPropertyDescriptor=originals.getOwnPropertyDescriptor;Reflect.ownKeys=originals.ownKeys;
+  Object.keys=originals.keys;Object.entries=originals.entries;JSON.stringify=originals.stringify;Array.isArray=originals.arrayIsArray;
+  Map.prototype.get=originals.mapGet;Map.prototype.set=originals.mapSet;Array.prototype.find=originals.arrayFind;Array.prototype.map=originals.arrayMap;Array.prototype[Symbol.iterator]=originals.arrayIterator;
+ }
+ assert.equal(Object.keys(factories).length,2);assert.equal(snapshot.controls.segmentsA,'hard');assert.equal(snapshot.nodeControls.nodes.find(row=>row.nodePath[0]===kaleidoscopeAId).values.segments,'hard');
+});

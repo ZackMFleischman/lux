@@ -105,3 +105,23 @@ test('generic parameter coalescing preserves different keys and original schema 
   await assert.rejects(controller.setParameters({intensity:0.5}),/unknown/i);
   assert.deepEqual(snapshot.authoring!.controls,{height:1,speed:0.5});
 });
+
+test('typed parameter writes keep values typed and reject modulation on nonnumeric controls',async()=>{
+ const controlSchema=normalizeControlDeclarations({
+  height:{type:'number',label:'Height',default:1,min:0,max:4},
+  enabled:{type:'boolean',label:'Enabled',default:true},
+  mode:{type:'enum',label:'Mode',default:'soft',options:[{id:'soft',label:'Soft'},{id:'hard',label:'Hard'}]},
+ });
+ const snapshot:StudioSnapshot={...connected(),authoring:{...connected().authoring!,sdkVersion:'0.2.0',controlSchema,
+  controlSchemaHash:'a'.repeat(64),controls:{height:1,enabled:true,mode:'soft'},controlSequence:0,intensity:undefined}};
+ const operations:StudioOperation[]=[];
+ const client:StudioClient={getSnapshot:()=>snapshot,subscribe:()=>()=>{},invoke:async operation=>{operations.push(operation);return {};}};
+ const controller=new StudioController(client,()=> 'typed-request');
+ await controller.setParameters({enabled:false,mode:'hard'});
+ assert.equal(operations[0]?.name,'lux.parameters.set');
+ if(operations[0]?.name==='lux.parameters.set')assert.deepEqual(operations[0].input.values,{enabled:false,mode:'hard'});
+ const animation={nodePath:[],definitionHash:'a'.repeat(64),schemaHash:'a'.repeat(64),controlId:'enabled',shape:'sine' as const,periodSeconds:2,amount:1,phase:0,enabled:true};
+ await assert.rejects(controller.setNodeAnimation([], 'enabled',animation),/number|numeric/i);
+ await assert.rejects(controller.setNodeVariation([], 'mode',{distribution:'random',amount:1,enabled:true}),/number|numeric/i);
+ assert.equal(operations.length,1);
+});

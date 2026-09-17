@@ -49,11 +49,26 @@ export const derivedAssetSchema = sourceAssetSchema.extend({byteLength:z.number(
 export const assetCompiledArtifactSchema = legacyCompiledArtifactSchema.extend({artifactVersion:z.literal(2),assets:z.record(derivedAssetSchema),assetSetHash:hashSchema}).strict();
 // Pure parameter policy and identity verification enforce cross-field ranges,
 // own-property provenance, canonical metadata bytes and hashes at admission.
-export const parameterControlDefinitionSchema = z.object({
+const parameterNumberControlDefinitionSchema = z.object({
   id:z.string().regex(/^[a-z][A-Za-z0-9_]{0,63}$/),type:z.literal('number'),label:z.string().min(1),
   default:z.number().finite(),min:z.number().finite(),max:z.number().finite(),
   step:z.number().finite().positive().optional(),unit:z.string().min(1).optional(),description:z.string().min(1).optional(),group:z.string().min(1).optional(),changeCost:z.literal('live'),
 }).strict();
+const parameterBooleanControlDefinitionSchema = z.object({
+  id:z.string().regex(/^[a-z][A-Za-z0-9_]{0,63}$/),type:z.literal('boolean'),label:z.string().min(1),default:z.boolean(),
+  description:z.string().min(1).optional(),group:z.string().min(1).optional(),changeCost:z.literal('live'),
+}).strict();
+const parameterEnumOptionSchema = z.object({
+  id:z.string().regex(/^[a-z][A-Za-z0-9_]{0,63}$/),label:z.string().min(1),description:z.string().min(1).optional(),
+}).strict();
+const parameterEnumControlDefinitionSchema = z.object({
+  id:z.string().regex(/^[a-z][A-Za-z0-9_]{0,63}$/),type:z.literal('enum'),label:z.string().min(1),default:z.string(),
+  options:z.array(parameterEnumOptionSchema).min(2).max(64),presentation:z.enum(['segmented','radio','dropdown']),
+  description:z.string().min(1).optional(),group:z.string().min(1).optional(),changeCost:z.literal('live'),
+}).strict();
+export const parameterControlDefinitionSchema = z.discriminatedUnion('type',[
+  parameterNumberControlDefinitionSchema,parameterBooleanControlDefinitionSchema,parameterEnumControlDefinitionSchema,
+]);
 export const parameterCompiledArtifactSchema = assetCompiledArtifactSchema.extend({
   artifactVersion:z.literal(3),sdkVersion:z.literal('0.2.0'),
   controls:z.array(parameterControlDefinitionSchema),controlSchemaHash:hashSchema,

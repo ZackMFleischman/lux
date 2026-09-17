@@ -1,7 +1,7 @@
 // Internal root-output profile. Public Studio admission remains SDK 0.1/0.2.
 import { normalizeComponentDeclaration } from '../../runtime-contracts/src/components.mjs';
 import type { ComponentDeclaration, ComponentMetadata } from '../../runtime-contracts/src/components.mjs';
-import type { ControlDeclarations, ControlsOf } from '../../runtime-contracts/src/parameters.mjs';
+import type { ControlDeclarations, ControlsOf, NumberControlIdsOf, ValidControlDeclarations } from '../../runtime-contracts/src/parameters.mjs';
 import type { OutputSettings } from '../../runtime-contracts/src/index.ts';
 export const sdkVersion = '0.3.0' as const;
 declare const imageResourceBrand: unique symbol;
@@ -15,7 +15,7 @@ export interface EvaluationContext { render(scene: unknown, camera: unknown): Pr
 export interface ComponentFrame<C extends ControlDeclarations = ControlDeclarations> {
   readonly tick: number; readonly timeSeconds: number; readonly deltaSeconds: number;
   readonly controls: ControlsOf<C>; readonly events: readonly never[];
-  readonly sampleControl?: (controlId: keyof C & string, instanceKey: string | number) => number;
+  readonly sampleControl?: (controlId: NumberControlIdsOf<C>, instanceKey: string | number) => number;
 }
 export interface ComponentContext {
   readonly settings: Readonly<OutputSettings>;
@@ -28,13 +28,13 @@ export interface ComponentInstance<C extends ControlDeclarations = ControlDeclar
   evaluate(inputs: EmptyInputs, context: EvaluationContext): Promise<Readonly<{image:ImageResource}>>;
   reset(seed:number): void | Promise<void>; dispose(): void | Promise<void>;
 }
-export interface ComponentDefinition<C extends ControlDeclarations = ControlDeclarations> {
+export interface ComponentDefinition<C extends ControlDeclarations = any> {
   readonly kind:'component'; readonly sdkVersion:'0.3.0'; readonly metadata:ComponentMetadata;
   create(context:ComponentContext): Promise<ComponentInstance<C>>;
 }
 export function defineComponent<const C extends ControlDeclarations>(definition:{
   readonly metadata:Omit<ComponentDeclaration,'controls'|'controlDescriptions'> & {
-    readonly controls:C; readonly controlDescriptions:{readonly [K in keyof C]:string};
+    readonly controls:C & ValidControlDeclarations<C>; readonly controlDescriptions:{readonly [K in keyof C]:string};
   };
   create(context:ComponentContext):Promise<ComponentInstance<NoInfer<C>>>;
 }):ComponentDefinition<C> {

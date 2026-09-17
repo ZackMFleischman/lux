@@ -87,6 +87,128 @@ test('RTL: code-defined controls expose independent values, numeric entry and de
   assert.deepEqual((fixture.calls[1] as any).input.values, { spikeHeight: 1 });
 });
 
+test('RTL: Boolean and dropdown controls expose typed values, descriptions and defaults without animation', async () => {
+  const fixture = service();
+  const schema = [
+    { id: 'trail', type: 'boolean', label: 'Trail', default: false, description: 'Keep earlier frames visible.', changeCost: 'live' },
+    { id: 'direction', type: 'enum', label: 'Direction', default: 'forward', presentation: 'dropdown', options: [
+      { id: 'forward', label: 'Forward' }, { id: 'reverse', label: 'Reverse', description: 'Move back through the path.' },
+    ], changeCost: 'live' },
+  ] as any;
+  fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: schema, controlSchemaHash: 'c'.repeat(64), controls: { trail: true, direction: 'reverse' }, controlSequence: 0 } as any);
+  const user = userEvent.setup({ document });
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+
+  const trail = screen.getByRole('switch', { name: 'Trail' }) as HTMLInputElement;
+  assert.equal(trail.checked, true);
+  assert.equal(screen.queryByRole('button', { name: 'Animate Trail' }), null);
+  assert.equal(screen.queryByRole('button', { name: 'Animate Direction' }), null);
+  assert.equal(screen.getByText('Trail').getAttribute('tabindex'), '0', 'descriptions stay keyboard reachable');
+
+  await user.click(trail);
+  await waitFor(() => assert.deepEqual((fixture.calls[0] as any).input.values, { trail: false }));
+  await user.click(screen.getByRole('combobox', { name: 'Direction value' }));
+  await user.click(screen.getByRole('option', { name: 'Forward' }));
+  await waitFor(() => assert.deepEqual((fixture.calls[1] as any).input.values, { direction: 'forward' }));
+  await user.click(screen.getByRole('button', { name: 'Reset Trail to default' }));
+  await waitFor(() => assert.deepEqual((fixture.calls[2] as any).input.values, { trail: false }));
+  await act(async () => { await new Promise(resolve => setTimeout(resolve, 500)); });
+});
+
+test('RTL: segmented enum uses one roving tab stop and keyboard selection by stable option ID', async () => {
+  const fixture = service();
+  fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [{
+    id: 'pattern', type: 'enum', label: 'Pattern', default: 'dots', presentation: 'segmented',
+    options: [{ id: 'dots', label: 'Dots' }, { id: 'lines', label: 'Lines' }, { id: 'grid', label: 'A very long grid label', description: 'A regular grid.' }], changeCost: 'live',
+  }] as any, controlSchemaHash: 'd'.repeat(64), controls: { pattern: 'lines' }, controlSequence: 0 } as any);
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+
+  const group = screen.getByRole('group', { name: 'Pattern value' });
+  const choices = within(group).getAllByRole('button') as HTMLButtonElement[];
+  assert.deepEqual(choices.map(choice => choice.tabIndex), [-1, 0, -1]);
+  choices[1]!.focus();
+  fireEvent.keyDown(choices[1]!, { key: 'End' });
+  assert.equal(document.activeElement, choices[2]);
+  fireEvent.keyDown(choices[2]!, { key: 'Enter' });
+  await waitFor(() => assert.deepEqual((fixture.calls[0] as any).input.values, { pattern: 'grid' }));
+  await act(async () => {});
+  assert.equal(choices[2]!.title, 'A very long grid label — A regular grid.');
+});
+
+test('RTL: radio enum exposes a radiogroup and arrow keys select the next stable option ID', async () => {
+  const fixture = service();
+  fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [{
+    id: 'quality', type: 'enum', label: 'Quality', default: 'balanced', presentation: 'radio',
+    options: [{ id: 'fast', label: 'Fast' }, { id: 'balanced', label: 'Balanced' }, { id: 'fine', label: 'Fine' }], changeCost: 'live',
+  }] as any, controlSchemaHash: 'e'.repeat(64), controls: { quality: 'balanced' }, controlSequence: 0 } as any);
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+
+  const group = screen.getByRole('radiogroup', { name: 'Quality value' });
+  const radios = within(group).getAllByRole('radio') as HTMLInputElement[];
+  assert.deepEqual(radios.map(radio => radio.tabIndex), [-1, 0, -1]);
+  fireEvent.focus(radios[1]!);
+  fireEvent.keyDown(radios[1]!, { key: 'ArrowRight' });
+  await waitFor(() => assert.deepEqual((fixture.calls[0] as any).input.values, { quality: 'fine' }));
+  await act(async () => {});
+  assert.equal(document.activeElement, radios[2]);
+});
+
+test('RTL: an older Boolean acknowledgement cannot revert a newer local edit', async () => {
+  const fixture = service(), pending: { resolve(value: unknown): void }[] = [];
+  fixture.client.invoke = operation => { fixture.calls.push(operation); return new Promise(resolve => pending.push({ resolve })); };
+  const schema = [{ id: 'trail', type: 'boolean', label: 'Trail', default: false, changeCost: 'live' }] as any;
+  fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: schema, controlSchemaHash: 'f'.repeat(64), controls: { trail: true }, controlSequence: 0 } as any);
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+  const trail = screen.getByRole('switch', { name: 'Trail' }) as HTMLInputElement;
+
+  fireEvent.click(trail);
+  await waitFor(() => assert.equal(pending.length, 1));
+  fireEvent.click(trail);
+  assert.equal(trail.checked, true);
+  await act(async () => { fixture.publish({ controls: { trail: false }, controlSequence: 1 } as any); pending[0]!.resolve({ accepted: true }); });
+  await waitFor(() => assert.equal(pending.length, 2));
+  assert.equal(trail.checked, true, 'the first applied value must not overwrite the second pending intent');
+  await act(async () => { fixture.publish({ controls: { trail: true }, controlSequence: 2 } as any); pending[1]!.resolve({ accepted: true }); });
+  assert.equal(trail.checked, true);
+});
+
+for(const presentation of ['segmented','radio'] as const)test(`RTL: an older acknowledgement preserves a newer ${presentation} enum selection and roving tab stop`,async()=>{
+  const fixture=service(),pending:{resolve(value:unknown):void}[]=[];
+  fixture.client.invoke=operation=>{fixture.calls.push(operation);return new Promise(resolve=>pending.push({resolve}));};
+  fixture.publish({sdkVersion:'0.2.0',intensity:undefined,controlSchema:[{id:'pattern',type:'enum',label:'Pattern',default:'lines',presentation,
+    options:[{id:'dots',label:'Dots'},{id:'lines',label:'Lines'},{id:'grid',label:'Grid'}],changeCost:'live'}] as any,
+    controlSchemaHash:'1'.repeat(64),controls:{pattern:'lines'},controlSequence:0} as any);
+  render(<StudioApp client={fixture.client} nowMs={1000}/>);
+  const group=screen.getByRole(presentation==='radio'?'radiogroup':'group',{name:'Pattern value'}),role=presentation==='radio'?'radio':'button';
+  const options=within(group).getAllByRole(role) as HTMLInputElement[];
+
+  fireEvent.focus(options[2]!);fireEvent.click(options[2]!);await waitFor(()=>assert.equal(pending.length,1));
+  fireEvent.focus(options[0]!);fireEvent.click(options[0]!);
+  const selected=(element:HTMLInputElement)=>presentation==='radio'?element.checked:element.getAttribute('aria-pressed')==='true';
+  assert.equal(selected(options[0]!),true);assert.deepEqual(options.map(option=>option.tabIndex),[0,-1,-1]);
+  await act(async()=>{fixture.publish({controls:{pattern:'grid'},controlSequence:1} as any);pending[0]!.resolve({accepted:true});});
+  await waitFor(()=>assert.equal(pending.length,2));
+  assert.equal(selected(options[0]!),true,'the first applied value must not overwrite the second pending enum intent');
+  assert.deepEqual(options.map(option=>option.tabIndex),[0,-1,-1],'the old acknowledgement must not move the roving tab stop');
+  await act(async()=>{fixture.publish({controls:{pattern:'dots'},controlSequence:2} as any);pending[1]!.resolve({accepted:true});});
+});
+
+for(const presentation of ['segmented','radio'] as const)test(`RTL: a rejected ${presentation} enum edit restores its confirmed selection and roving tab stop`,async()=>{
+  const fixture=service();fixture.fail();
+  fixture.publish({sdkVersion:'0.2.0',intensity:undefined,controlSchema:[{id:'pattern',type:'enum',label:'Pattern',default:'lines',presentation,
+    options:[{id:'dots',label:'Dots'},{id:'lines',label:'Lines'},{id:'grid',label:'Grid'}],changeCost:'live'}] as any,
+    controlSchemaHash:'2'.repeat(64),controls:{pattern:'lines'},controlSequence:0} as any);
+  const {ParameterInspector}=await import('../../apps/studio/src/controls/ParameterInspector.tsx'),{StudioController}=await import('../../apps/studio/src/service-client.ts');
+  render(<ParameterInspector runtime={fixture.client.getSnapshot().authoring} available client={fixture.client} controller={new StudioController(fixture.client)} onError={()=>{}}/>);
+  const group=screen.getByRole(presentation==='radio'?'radiogroup':'group',{name:'Pattern value'}),role=presentation==='radio'?'radio':'button';
+  const options=within(group).getAllByRole(role) as HTMLInputElement[],selected=(element:HTMLInputElement)=>presentation==='radio'?element.checked:element.getAttribute('aria-pressed')==='true';
+
+  fireEvent.focus(options[2]!);fireEvent.click(options[2]!);
+  await waitFor(()=>assert.equal(selected(options[1]!),true));
+  assert.deepEqual((fixture.calls[0] as any).input.values,{pattern:'grid'});
+  assert.deepEqual(options.map(option=>option.tabIndex),[-1,0,-1]);
+});
+
 test('RTL: a flat control can add the strict shared-audio binding',async()=>{
   const fixture=service(),priorAnimationFrame=globalThis.requestAnimationFrame,user=userEvent.setup({document});
   globalThis.requestAnimationFrame=callback=>{callback(0);return 0;};

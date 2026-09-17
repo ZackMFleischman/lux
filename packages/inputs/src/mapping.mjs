@@ -129,6 +129,7 @@ export function normalizeNumericMappingPlan(input) {
     unique(keys, targetKey(address), path);
     fields(row.definition, definitionFields, `${path}.definition`, ['step', 'unit']);
     const definition = parameterCall(() => normalizeControlSchema([row.definition])[0], `${path}.definition`);
+    if (definition.type !== 'number') invalid(path, 'input mappings require numeric controls');
     if (definition.id !== address.controlId) invalid(path, 'definition ID must match target');
     return { target: address, definition };
   });

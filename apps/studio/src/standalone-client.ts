@@ -7,7 +7,7 @@ import { DEFAULT_OUTPUT, outputSettingsSchema } from '../../../packages/runtime-
 import { createSceneDocument } from '../../../packages/core/src/scene-document.ts';
 import { SourceCompileError } from './source/diagnostics.ts';
 import type { LinkedEnvelope } from '../../build-worker/src/artifact-identity.mjs';
-import { normalizeControlSchema, validateControlSnapshot, validateControlPatch } from '../../../packages/runtime-contracts/src/parameters.mjs';
+import { isNumberControlDefinition, normalizeControlSchema, validateControlSnapshot, validateControlPatch } from '../../../packages/runtime-contracts/src/parameters.mjs';
 import type { ControlValues, ControlMigration } from '../../../packages/runtime-contracts/src/parameters.mjs';
 import { LEGACY_CONTROL_SCHEMA, LEGACY_CONTROL_SCHEMA_HASH, initialControlValues, validateSavedControls, sha256 } from './controls/control-state.ts';
 import type { SavedControlSnapshot, RuntimeControlState } from './controls/control-state.ts';
@@ -475,9 +475,11 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       if(operation.input.expectedRevisionId!==runtime.revisionId)throw Error('Revision changed; read current runtime state');
       const definitionHash=flat?runtime.state.controlSchemaHash:node!.definitionHash,schemaHash=flat?runtime.state.controlSchemaHash:node!.schemaHash,schema=flat?runtime.state.controlSchema:node!.schema;
       if(operation.input.expectedControlSchemaHash!==schemaHash)throw Error(flat?'Scene control schema changed':'Composition node control schema changed');
-      if(!schema.some(row=>row.id===operation.input.controlId))throw Error(flat?'Scene control is unavailable':'Composition node control is unavailable');
+      const definition=schema.find(row=>row.id===operation.input.controlId);
+      if(!definition)throw Error(flat?'Scene control is unavailable':'Composition node control is unavailable');
       if(runtime.animations>=Number.MAX_SAFE_INTEGER)throw Error('Animation sequence exhausted; restart runtime');
       const requested=operation.name==='lux.node.animation.set'?operation.input.animation:operation.input.variation?{kind:'variation' as const,nodePath:[...operation.input.nodePath],definitionHash,schemaHash,controlId:operation.input.controlId,...operation.input.variation}:null;
+      if(requested&&!isNumberControlDefinition(definition))throw Error('Only number controls can be animated');
       if(requested){const animation=validateControlAnimationBindings([requested])[0]!;
         if(JSON.stringify(animation.nodePath)!==JSON.stringify(operation.input.nodePath)||animation.controlId!==operation.input.controlId||animation.definitionHash!==definitionHash||animation.schemaHash!==schemaHash)throw Error('Animation target identity changed');}
       const current=[...(runtime.desiredControlAnimations??runtime.state.controlAnimations??[])],index=current.findIndex(row=>JSON.stringify(row.nodePath)===JSON.stringify(operation.input.nodePath)&&row.controlId===operation.input.controlId);

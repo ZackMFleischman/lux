@@ -23,11 +23,24 @@ function properties(node) {
   }
   return rows;
 }
-function literal(node) {
+function literal(node, path, locations) {
   node = unwrap(node);
-  if (node?.type === 'StringLiteral' || node?.type === 'NumericLiteral') return node.value;
+  locations.set(path, node);
+  if (node?.type === 'StringLiteral' || node?.type === 'NumericLiteral' || node?.type === 'BooleanLiteral') return node.value;
   if (node?.type === 'UnaryExpression' && node.operator === '-' && node.argument.type === 'NumericLiteral') return -node.argument.value;
-  fail(node, 'Control metadata requires string or numeric literals; expressions, calls and references are unavailable');
+  if (node?.type === 'ArrayExpression') return node.elements.map((element, index) => {
+    if (!element || element.type === 'SpreadElement') fail(element ?? node, 'Control metadata arrays require dense literal elements; holes and spreads are unavailable');
+    return literal(element, `${path}.${index}`, locations);
+  });
+  if (node?.type === 'ObjectExpression') {
+    const fields = properties(node), value = Object.create(null);
+    for (const [key, field] of fields) {
+      if (field.type !== 'ObjectProperty') fail(field, 'Control metadata requires literal data properties; getters and methods are unavailable');
+      value[key] = literal(field.value, `${path}.${key}`, locations);
+    }
+    return value;
+  }
+  fail(node, 'Control metadata requires literal data; expressions, calls and references are unavailable');
 }
 
 /** Reads Babel syntax only. Never imports or evaluates submitted source. */
@@ -51,7 +64,7 @@ export function extractControlDeclarations(ast) {
     locations.set(`controls.${id}`,row);
     for (const [key, field] of fields) {
       if (field.type !== 'ObjectProperty') fail(field, 'Control metadata requires literal values; getters and methods are unavailable');
-      value[key] = literal(field.value); locations.set(`controls.${id}.${key}`,field.value);
+      value[key] = literal(field.value, `controls.${id}.${key}`, locations);
     }
     declarations[id] = value;
   }

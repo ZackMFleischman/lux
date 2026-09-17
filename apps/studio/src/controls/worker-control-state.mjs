@@ -13,6 +13,19 @@ const isFiniteNumber=Number.isFinite,isSafeInteger=Number.isSafeInteger,RuntimeE
 function bad(message){throw new RuntimeError(message);}
 function own(input,key){const descriptor=getDescriptor(input,key);if(!descriptor||!descriptor.enumerable||!hasOwn(descriptor,'value'))bad('Control schema requires own data properties');return descriptor.value;}
 function record(input){if(!input||typeof input!=='object'||(getPrototype(input)!==objectPrototype&&getPrototype(input)!==null))bad('Control schema requires plain records');return ownKeys(input);}
+function sameData(actual,expected,depth=0){
+  if(actual===expected)return true;
+  if(depth>8||!actual||!expected||typeof actual!=='object'||typeof expected!=='object')return false;
+  if(isArray(expected)){
+    if(!isArray(actual)||getPrototype(actual)!==arrayPrototype||ownKeys(actual).length!==actual.length+1||actual.length!==expected.length)return false;
+    for(let index=0;index<expected.length;index++)if(!sameData(own(actual,''+index),expected[index],depth+1))return false;
+    return true;
+  }
+  const expectedKeys=ownKeys(expected);
+  if(record(actual).length!==expectedKeys.length)return false;
+  for(let index=0;index<expectedKeys.length;index++){const key=expectedKeys[index];if(typeof key!=='string'||!sameData(own(actual,key),expected[key],depth+1))return false;}
+  return true;
+}
 
 /** Must finish before importing user code; post-import methods use captures. */
 export async function prepareWorkerControlState(message,admission){
@@ -33,14 +46,22 @@ export async function prepareWorkerControlState(message,admission){
   let animations=normalizeControlAnimations(message.controlAnimations??[],profile),animationSequence=0;
   const base=freeze({values:()=>values,nodeValues:path=>isArray(path)&&path.length===0?values:freeze(createObject(objectPrototype))});
   const animated=createControlAnimationEvaluator(profile,base,animations);
-  const fields=schema.map(row=>ownKeys(row));
   function validateValues(input){
     if(record(input).length!==schema.length)bad('Invalid full control snapshot');
     const result=createObject(objectPrototype);
-    for(let i=0;i<schema.length;i++){
-      const control=schema[i],value=own(input,control.id);
-      if(typeof value!=='number'||!isFiniteNumber(value)||value<control.min||value>control.max)bad('Invalid value for '+control.id);
-      defineProperty(result,control.id,{value:value===0?0:value,enumerable:true});
+    for(let index=0;index<schema.length;index++){
+      const control=schema[index],value=own(input,control.id);let admitted;
+      if(control.type==='number'){
+        if(typeof value!=='number'||!isFiniteNumber(value)||value<control.min||value>control.max)bad('Invalid value for '+control.id);
+        admitted=value===0?0:value;
+      }else if(control.type==='boolean'){
+        if(typeof value!=='boolean')bad('Invalid value for '+control.id);admitted=value;
+      }else{
+        if(typeof value!=='string')bad('Invalid value for '+control.id);let found=false;
+        for(let optionIndex=0;optionIndex<control.options.length;optionIndex++)if(control.options[optionIndex].id===value){found=true;break;}
+        if(!found)bad('Invalid value for '+control.id);admitted=value;
+      }
+      defineProperty(result,control.id,{value:admitted,enumerable:true});
     }
     return freeze(result);
   }
@@ -49,12 +70,7 @@ export async function prepareWorkerControlState(message,admission){
     const definition=own(module,'default');record(definition);
     if(own(definition,'sdkVersion')!==sdkVersion)bad('Visual SDK mismatch');
     const declared=own(definition,'controls');
-    if(!isArray(declared)||getPrototype(declared)!==arrayPrototype||getDescriptor(declared,'length').value!==schema.length||ownKeys(declared).length!==schema.length+1)bad('Visual control schema mismatch');
-    for(let i=0;i<schema.length;i++){
-      const row=own(declared,''+i),expected=schema[i],keys=fields[i];
-      if(record(row).length!==keys.length)bad('Visual control schema mismatch');
-      for(let j=0;j<keys.length;j++)if(own(row,keys[j])!==expected[keys[j]])bad('Visual control schema mismatch');
-    }
+    if(!sameData(declared,schema))bad('Visual control schema mismatch');
     const create=own(definition,'create');if(typeof create!=='function')bad('Invalid visual create function');return create;
   }
   return freeze({checkDefinition,values:(timeSeconds=0,beatPosition=0)=>animated.values(timeSeconds,beatPosition),

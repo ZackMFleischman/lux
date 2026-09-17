@@ -3,7 +3,7 @@ import { hashSchema } from '../../../runtime-contracts/src/index.ts';
 import { normalizeComponentMetadata } from '../../../runtime-contracts/src/components.mjs';
 import type { ComponentMetadata, InitialPortType } from '../../../runtime-contracts/src/components.mjs';
 import { defaultControlValues, validateControlPatch } from '../../../runtime-contracts/src/parameters.mjs';
-import type { ControlValues, ControlSchema } from '../../../runtime-contracts/src/parameters.mjs';
+import type { ControlDefinition, ControlValues, ControlSchema } from '../../../runtime-contracts/src/parameters.mjs';
 import type { PortRef, GraphEdge, NodePath } from '../../../runtime-contracts/src/graph.ts';
 import { nestedGraphLimits as limits } from '../../../runtime-contracts/src/nested-graph.ts';
 import type { NestedNode, NestedDefinition, NestedDefinitions, GraphBody, LocalControlRef, ValidatedNestedGraph, ExpandedControlRef } from '../../../runtime-contracts/src/nested-graph.ts';
@@ -15,6 +15,12 @@ export function comparePaths(a:NodePath,b:NodePath):number {
   for(let i=0;i<Math.min(a.length,b.length);i++){const c=compare(a[i]!,b[i]!);if(c)return c;}return a.length-b.length;
 }
 export const pathKey=(path:NodePath)=>stringify(path);
+function compatibleControlDomain(publicControl:ControlDefinition,target:ControlDefinition):boolean {
+  if(publicControl.type!==target.type||publicControl.changeCost!==target.changeCost)return false;
+  if(publicControl.type==='number')return target.type==='number'&&publicControl.unit===target.unit&&publicControl.min===target.min&&publicControl.max===target.max&&publicControl.step===target.step;
+  if(publicControl.type==='boolean')return target.type==='boolean';
+  return target.type==='enum'&&publicControl.presentation===target.presentation&&publicControl.options.length===target.options.length&&publicControl.options.every((option,index)=>option.id===target.options[index]?.id);
+}
 export function invalid(path:string,rule:string):never {
   const bounded=(s:string,n:number)=>s.length>n?`${s.slice(0,n-3)}...`:s;
   const location=bounded(path,384);
@@ -99,7 +105,7 @@ function localBody(raw:unknown,metadata:ComponentMetadata,defs:NestedDefinitions
     const targets=controlRaw[id],publicControl=metadata.controls.find(c=>c.id===id)!;if(!Array.isArray(targets)||!targets.length)invalid(p,'control binding needs targets');
     const refs:LocalControlRef[]=targets.map(v=>{const t=record(v,p,['nodeId','controlId']);if(typeof t.controlId!=='string')invalid(p,'expected control ID');return {nodeId:checked(()=>nodeIdSchema.parse(t.nodeId),p),controlId:t.controlId};}).sort((a,b)=>compare(a.nodeId,b.nodeId)||compare(a.controlId,b.controlId));
     for(const t of refs){const n=byId.get(t.nodeId),target=n&&defs[n.definitionHash]!.metadata.controls.find(c=>c.id===t.controlId);if(!target)invalid(p,'missing immediate control target');
-      for(const k of ['type','changeCost','unit','min','max','step'] as const)if(Object.hasOwn(publicControl,k)!==Object.hasOwn(target,k)||publicControl[k]!==target[k])invalid(p,'control binding schema mismatch');
+      if(!compatibleControlDomain(publicControl,target))invalid(p,'control binding schema mismatch');
       const key=stringify([t.nodeId,t.controlId]);if(controlWriters.has(key))invalid(p,'duplicate control binding writer');controlWriters.add(key);
     }return [id,refs];
   }));
@@ -136,7 +142,7 @@ function cardinalities(defs:NestedDefinitions):void{
 export function workCounter():()=>void{let count=0;return ()=>{if(++count>limits.resolutionSteps)invalid('expansion','resolution work budget exceeded');};}
 export type Address={nodePath:NodePath;portId:string};
 export type Occurrence={path:NodePath;hash:string;children:Map<string,Occurrence>;controls:Record<string,ExpandedControlRef[]>};
-export type ExpandedLeaf={path:NodePath;hash:string;values:Record<string,number>};
+export type ExpandedLeaf={path:NodePath;hash:string;values:Record<string,ControlValues[string]>};
 export type Expansion={root:Occurrence;occurrences:Map<string,Occurrence>;leaves:Map<string,ExpandedLeaf>;edges:{from:Address;to:Address}[]};
 /** All callers supply admitted data whose complete catalog cardinalities passed. */
 export function expand(defs:NestedDefinitions,rootHash:string,charge:()=>void):Expansion{

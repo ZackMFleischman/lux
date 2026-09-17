@@ -48,6 +48,18 @@ export default defineVisual({
     };
   },
 });`;
+const typedSource = (update, defaultDirection = 'forward') => `
+import { defineVisual } from '@lux/visual-sdk';
+export default defineVisual({
+  controls: {
+    speed: { type: 'number', label: 'Speed', default: 1, min: 0, max: 4 },
+    trail: { type: 'boolean', label: 'Trail', default: true },
+    direction: { type: 'enum', label: 'Direction', default: '${defaultDirection}', options: [
+      { id: 'forward', label: 'Forward' }, { id: 'reverse', label: 'Reverse' },
+    ] },
+  },
+  async create() { return { update(frame) { ${update} }, render() {}, reset() {}, dispose() {} }; },
+});`;
 
 test('SDK 0.2 exposes an optional per-instance control sampler with a base-value fallback', async () => {
   const dependencies=process.env.LUX_COMPILER_DEPENDENCIES||resolve('node_modules');
@@ -55,7 +67,7 @@ test('SDK 0.2 exposes an optional per-instance control sampler with a base-value
   assert.equal(result.ok,true,JSON.stringify(result));
 });
 
-test('real pinned TypeScript infers declared numeric keys through async create and rejects absent/readonly/literal misuse', async () => {
+test('real pinned TypeScript infers typed controls and restricts sampling and enum IDs', async () => {
   const dependencies = process.env.LUX_COMPILER_DEPENDENCIES || resolve('node_modules');
   assert.equal(JSON.parse(await readFile(join(dependencies, 'typescript/package.json'), 'utf8')).version, '7.0.2');
   const { default: getExePath } = await import(pathToFileURL(join(dependencies, 'typescript/lib/getExePath.js')).href);
@@ -76,6 +88,10 @@ test('real pinned TypeScript infers declared numeric keys through async create a
       [source('frame.controls.roughness = 0.9;'), /read-only/],
       [source('const value: 0.4 = frame.controls.roughness;'), /number.*not assignable.*0\.4/],
       [source('const value: string = frame.controls.roughness;'), /number.*not assignable.*string/],
+      [typedSource("const speed: number = frame.controls.speed; const trail: boolean = frame.controls.trail; const direction: 'forward' | 'reverse' = frame.controls.direction; frame.sampleControl?.('speed', 1);"), null],
+      [typedSource("frame.sampleControl?.('trail', 1);"), /not assignable.*speed|argument.*speed/i],
+      [typedSource("const direction: 'sideways' = frame.controls.direction;"), /not assignable.*sideways/i],
+      [typedSource('', 'sideways'), /not assignable|never|sideways/i],
       [source().replace(/controls: \{[\s\S]*?\n  \},/, 'controls: {},').replace('const height: number = frame.controls.spikeHeight; const roughness: number = frame.controls.roughness;', ''), null],
       [source('frame.controls.intensity;').replace(/controls: \{[\s\S]*?\n  \},/, 'controls: {},'), /Property 'intensity' does not exist/],
     ]) {

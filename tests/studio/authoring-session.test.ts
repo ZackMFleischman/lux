@@ -114,7 +114,7 @@ test('failed preview validation prevents export and releases the session lock', 
 test('failed open preserves document controls through save and applies them when repaired', async () => {
   const w = createSourceWorkspace(source()), saved: any[] = [];
   let invalid = true, intensity = 0.2;
-  const session = createAuthoringSession(w, { submit: async (_source, options) => { if (invalid) throw Error('broken source'); const controls=options!.savedControls!;assert.ok('values' in controls);intensity = controls.values.intensity!; },
+  const session = createAuthoringSession(w, { submit: async (_source, options) => { if (invalid) throw Error('broken source'); const controls=options!.savedControls!;assert.ok('values' in controls);assert.equal(typeof controls.values.intensity,'number'); intensity = controls.values.intensity as number; },
     save: async request => { saved.push(request); return { token: 'opened', name: 'broken.lux-scene' }; },
     getControls: () => ({ intensity }),
     open: async () => ({ token: 'opened', name: 'broken.lux-scene', document: { format: 'lux-scene', version: 1,
@@ -132,7 +132,7 @@ test('failed open preserves document controls through save and applies them when
 const hash = (value: string) => createHash('sha256').update(value).digest('hex');
 const parameterSource = () => ({...source(),sdkVersion:'0.2.0' as const});
 const parameterSchema = normalizeControlDeclarations({height:{type:'number',label:'Height',default:1,min:0,max:2}});
-const cache = (s:SourceBundle=parameterSource(),schema=parameterSchema,values:Readonly<Record<string,number>>={height:1.8}) => ({sourceHash:hash(JSON.stringify(validateSource(s))),schema,schemaHash:hash(canonicalControlSchemaJson(schema)),values});
+const cache = (s:SourceBundle=parameterSource(),schema=parameterSchema,values:import('../../packages/runtime-contracts/src/parameters.mjs').ControlValues={height:1.8}) => ({sourceHash:hash(JSON.stringify(validateSource(s))),schema,schemaHash:hash(canonicalControlSchemaJson(schema)),values});
 
 test('new SDK draft saves an empty cache without inventing controls or executing source', async () => {
   const w=createSourceWorkspace(parameterSource()); let saved:any;

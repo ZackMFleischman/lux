@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { defineVisual, sdkVersion } from '../../packages/visual-sdk/src/index.ts';
 import { discoverVisualSdk } from '../../packages/visual-sdk/src/discovery.mjs';
+import {compileVisual} from '../../apps/build-worker/src/compile.mjs';
 
 test('SDK fixes and freezes literal intensity schema without calling visual creation', () => {
   let called = false;
@@ -11,6 +12,13 @@ test('SDK fixes and freezes literal intensity schema without calling visual crea
   assert.deepEqual(visual.controls, [{ id: 'intensity', type: 'number', label: 'Intensity', default: 0.5, min: 0, max: 1, changeCost: 'live' }]);
   assert.throws(() => { visual.controls[0].default = 1; }, TypeError);
   assert.throws(() => { visual.controls.push({}); }, TypeError);
+});
+
+test('discoverable typed parameter example compiles with number, boolean and enum controls',async()=>{
+  const discovery=await discoverVisualSdk();
+  const result=await compileVisual({source:{sdkVersion:'0.2.0',entry:'visual.ts',files:{'visual.ts':discovery.example}}});
+  assert.equal(result.ok,true,JSON.stringify(result));
+  assert.deepEqual(result.artifact.controls.map(control=>control.type),['number','number','boolean','enum']);
 });
 
 test('discovery exposes real SDK source and the submitted example without execution', async () => {

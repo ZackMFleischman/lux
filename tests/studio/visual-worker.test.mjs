@@ -159,6 +159,22 @@ test('actual worker applies complete initial/live controls and captures exact me
   assert.deepEqual(Array.from(decode(new Uint8Array(capture.bytes)).data.slice(0,4)),[255,0,0,128]);
 });
 
+test('actual worker applies typed controls and acknowledges their exact values after a completed frame',async()=>{
+  const typedSchema=normalizeControlDeclarations({
+    height:{type:'number',label:'Height',default:1,min:0,max:4},
+    enabled:{type:'boolean',label:'Enabled',default:true},
+    mode:{type:'enum',label:'Mode',default:'soft',options:[{id:'soft',label:'Soft'},{id:'hard',label:'Hard'}]},
+  });
+  const f=await fixture(typedSchema),ready=await f.send(f.initial);
+  assert.equal(ready.type,'ready',JSON.stringify(ready));
+  assert.deepEqual(ready.controls,{height:1,enabled:true,mode:'soft'});
+  const values={height:2,enabled:false,mode:'hard'};
+  const applied=await f.send({type:'controls',requestId:'typed-set',controlSequence:1,controlSchemaHash:f.initial.controlSchemaHash,values});
+  assert.equal(applied.type,'status');assert.deepEqual(applied.controls,values);assert.deepEqual(f.frames.at(-1).controls,values);
+  const capture=await f.send({type:'capture',requestId:'typed-capture'});
+  assert.deepEqual(capture.metadata.controls,values);
+});
+
 test('actual worker exposes stable per-instance samples without changing the base control',async()=>{
   const f=await fixture(),schemaHash=f.initial.controlSchemaHash;
   const variation={kind:'variation',nodePath:[],definitionHash:schemaHash,schemaHash,controlId:'height',distribution:'spread',amount:.5,enabled:true};

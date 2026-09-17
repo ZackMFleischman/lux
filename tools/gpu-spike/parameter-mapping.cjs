@@ -4,6 +4,8 @@ function policy(){return require(fs.existsSync(path.join(__dirname,'runtime-vali
 function schemaHash(schema){return createHash('sha256').update(policy().canonicalControlSchemaJson(schema)).digest('hex');}
 function parameterMapping(schema,values,expectedHash){
  const p=policy(),rows=p.normalizeControlSchema(schema);p.validateControlSnapshot(rows,values);
+ const unsupported=rows.find(row=>row.type!=='number');
+ if(unsupported)throw Error(`Resolume export does not support control ${unsupported.id} (${unsupported.type}).`);
  if(schemaHash(rows)!==expectedHash)throw Error('Control schema hash mismatch');
  // This is the existing native ring-v4 capacity, not a Studio authoring limit.
  if(rows.length>32)throw Error('The current Resolume plug-in transport supports at most 32 exposed controls; this scene can still be edited and captured in Studio.');

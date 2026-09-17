@@ -2,7 +2,7 @@ import { parameterLimits } from '../../../packages/runtime-contracts/src/paramet
 // Emitted by the running app, independently of an adapter's installed checkout.
 export const studioCapabilities = Object.freeze({ protocolVersion: 4,
   supportedSdkVersions: Object.freeze(['0.1.0', '0.2.0', '0.4.0']),
-  codeDeclaredParameters: true, parameterKinds: Object.freeze(['number']), maxParameterMetadataBytes: parameterLimits.metadataBytes,
+  codeDeclaredParameters: true, parameterKinds: Object.freeze(['number','boolean','enum']), maxParameterMetadataBytes: parameterLimits.metadataBytes,
   imageFormats: Object.freeze(['image/bmp', 'image/png', 'image/jpeg']), assetExport: true,
   sceneVersions: Object.freeze([1, 2, 3, 4,5]),controlVariation:Object.freeze({stableInstanceKeys:true,distributions:Object.freeze(['random','centered','spread'])}),tempo:Object.freeze({manual:true,tap:true,bpm:Object.freeze({min:20,max:300})}),
 });

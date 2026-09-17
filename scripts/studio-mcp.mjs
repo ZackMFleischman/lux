@@ -19,6 +19,12 @@ const call = createStudioConnection(selectedSession);
 const text = value => ({ content: [{ type: 'text', text: JSON.stringify(value) }] });
 async function requireTempoCapability(){const status=await call('status');if(!supportsManualTapTempoCapability(status.capabilities))throw Error('Running Studio does not support manual/tap tempo from 20 through 300 BPM; restart from the matching checkout before sending tempo operations.');}
 async function requireVariationCapability(){const status=await call('status');if(status.capabilities?.controlVariation?.stableInstanceKeys!==true)throw Error('Running Studio does not support per-instance control variation; restart from the matching checkout before configuring it.');}
+async function requireParameterKinds(input){
+  const kinds=[...new Set(Object.values(input.values).map(value=>typeof value==='string'?'enum':typeof value))];
+  if(kinds.every(kind=>kind==='number'))return;
+  const status=await call('status');
+  if(kinds.some(kind=>!status.capabilities?.parameterKinds?.includes(kind)))throw Error('Running Studio does not support these parameter types. Use the adapter and Studio from the same build.');
+}
 async function runningStudio() {
   try { const status = await call('status'); return { connected: true, studioSession: status.studioSession, capabilities: status.capabilities ?? null,
     compatible: status.capabilities?.codeDeclaredParameters === true && status.capabilities?.supportedSdkVersions?.includes('0.4.0'),
@@ -30,7 +36,7 @@ async function runningStudio() {
 server.registerTool('lux.studio.discover', { description: 'Read the exact visual SDK, example and standalone Lux capabilities. Start Lux Studio separately.', inputSchema: {} }, async () => text({ ...await discoverVisualSdk(), scope: 'standalone-studio', tools: ['read', 'build', 'save', 'open', 'capture', 'status', 'parameters', 'variation', 'playback', 'restart','tempo.set','tempo.tap','library.list','library.read','library.create','library.update'], resolume: false,
   libraryCatalog: await libraryContext.catalog(),
   runningStudio: await runningStudio(),
-  parameters: { kinds: ['number'], declaredInCode: true, requiredGuard: 'expectedControlSchemaHash from current runtime status', implicitControls: false,
+  parameters: { kinds: ['number','boolean','enum'], declaredInCode: true, requiredGuard: 'expectedControlSchemaHash from current runtime status', implicitControls: false,
     composition: 'SDK 0.4 supports image-chain-v1 and typed-image-graph-v1 (image, paths2d and shader-field ports, acyclic fan-out). Selected leaf controls are public aliases; values remain owned by stable node identity.' },
   sourceDocuments: { versions: [1, 2], replacement: 'complete source; preserve sourceVersion and assets when editing v2',
     assetPlayback: true, assetExport: true, assetFormats: ['image/bmp', 'image/png', 'image/jpeg'], decodedImages: 'context.images: top-down sRGB straight-alpha RGBA' , assetDimension: assetLimits.dimension, assetCount: assetLimits.count,
@@ -50,10 +56,10 @@ server.registerTool('lux.studio.capture', { description: 'Return an actual PNG a
   const result = await call('capture'); return { content: [{ type: 'image', mimeType: 'image/png', data: result.base64 }, { type: 'text', text: JSON.stringify(result.metadata) }] };
 });
 for (const [method, schema, description] of [
-  ['parameters', parameterInputSchema, 'Set a partial map of code-defined numeric parameters. Read status for controlSchema IDs/ranges, instance, generation, revision and expectedControlSchemaHash guards. Returns actual applied frame state; live mode only.'],
+  ['parameters', parameterInputSchema, 'Set a partial map of code-defined parameters: numbers, booleans, or stable enum option IDs. Read status for controlSchema types/options/ranges, instance, generation, revision and expectedControlSchemaHash guards. Returns actual applied frame state; live mode only.'],
   ['playback', playbackInputSchema, 'Play, pause or reset the Studio runtime using current instance and generation guards. Reset preserves playing/paused state. Returns applied state.'],
   ['restart', restartInputSchema, 'Restart the Studio runtime using current instance and generation guards. Retains source and controls; returns replacement runtime state.'],
-]) server.registerTool(`lux.studio.${method}`, { description, inputSchema: schema.shape }, async input => text(await call(method, input)));
+]) server.registerTool(`lux.studio.${method}`, { description, inputSchema: schema.shape }, async input => {if(method==='parameters')await requireParameterKinds(input);return text(await call(method, input));});
 server.registerTool('lux.studio.variation',{description:'Configure or remove stable per-instance variation for one numeric control. Read status first for nodePath, controlId and runtime guards. Amount is a symmetric range around the current base; distribution is random, centered, or spread. Pass variation:null to remove it.',inputSchema:nodeVariationInputSchema.shape},async input=>{await requireVariationCapability();return text(await call('variation',input));});
 server.registerTool('lux.studio.tempo.set',{description:'Set manual scene tempo from 20 through 300 BPM using current runtime identity and revision guards. Preserves beat phase and returns the acknowledged tempo result.',inputSchema:tempoSetInputSchema.shape},async input=>{await requireTempoCapability();return text(await call('tempo.set',input));});
 server.registerTool('lux.studio.tempo.tap',{description:'Tap scene tempo using the running Studio monotonic clock and current runtime identity and revision guards. Returns accepted, restarted, or ignored-short.',inputSchema:tempoTapInputSchema.shape},async input=>{await requireTempoCapability();return text(await call('tempo.tap',input));});

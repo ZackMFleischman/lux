@@ -1,4 +1,5 @@
 import type {CodeComponentDefinition,ComponentFrame,ComponentContext,ImageResource,Paths2DResource,ShaderFieldResource} from '../../../visual-sdk/src/sdk-composition.ts';
+import type {ControlValues} from '../../../runtime-contracts/src/parameters.mjs';
 import type {ShaderFieldSnapshot} from '../../../runtime-contracts/src/shader-field.mjs';
 import type {Paths2DSnapshot} from '../../../runtime-contracts/src/paths2d.mjs';
 import type {GraphRuntimePlan} from '../graph/runtime-plan.ts';
@@ -9,7 +10,7 @@ import {SeededRandom} from '../seed.ts';
 
 type Backend=Readonly<{resources:CpuResourceBackend;stage(scene:unknown,camera:unknown):void;texture(image:BackendImage):unknown;present(image:BackendImage):void|Promise<void>;drain():Promise<void>}>;
 type AnyComponent=CodeComponentDefinition<any,any,any>;
-type Options=Readonly<{plan:GraphRuntimePlan;definitions:Readonly<Record<string,AnyComponent>>;context:ComponentContext;backend:Backend;nodeControls?:(nodePath:readonly string[],frame:ComponentFrame)=>Readonly<Record<string,number>>;nodeSampleControl?:(nodePath:readonly string[],controlId:string,instanceKey:string|number,frame:ComponentFrame)=>number}>;
+type Options=Readonly<{plan:GraphRuntimePlan;definitions:Readonly<Record<string,AnyComponent>>;context:ComponentContext;backend:Backend;nodeControls?:(nodePath:readonly string[],frame:ComponentFrame)=>ControlValues;nodeSampleControl?:(nodePath:readonly string[],controlId:string,instanceKey:string|number,frame:ComponentFrame)=>number}>;
 type WrappedResource={output:OutputToken|InputView;kind:'image'|'paths2d'|'shader-field';image?:BackendImage;paths?:Paths2DSnapshot;shaderField?:ShaderFieldSnapshot};
 const pathKey=(path:readonly string[])=>JSON.stringify(path);
 
