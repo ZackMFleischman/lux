@@ -1,7 +1,6 @@
 # Reference audio demo scenes
 
-Two self-contained scenes are saved outside test artifacts in:
-`C:/Users/zFlei/.codex/visualizations/2026/09/17/01a0ad28-e169-78d1-b8ae-3e72c9c783ec/`
+Two self-contained scenes are committed alongside the repository's saved scenes in `visuals/`.
 
 - `Fiber-Optic Heart - Audio Demo.lux-scene`: kick raises core brightness and traveling pulse strength; bass expands the core slightly; mids lift strand brightness; highs lift dust sparkle.
 - `Pigment Rivers - Audio Demo.lux-scene`: bass gently folds the bands; mids warm the pigment; overall level adds pooling; highs strengthen contours. Longer attack/release times preserve the painted flow.
