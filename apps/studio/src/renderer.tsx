@@ -217,6 +217,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const expandedPanel: StudioPanelKind = previewOnly || windowState.fullscreen ? 'preview' : maximizedPanel ?? 'preview';
   const showMaximizedInspector = maximizedPanel === 'preview' && maximizedInspector && !windowState.fullscreen;
   const previewOutput = runtime?.output;
+  const previewFps = metricText(snapshot.visualFps, nowMs ?? clock);
+  const previewFpsValue = runtime?.playback === 'playing' && !previewFps.detail.startsWith('Stale') && previewFps.value !== 'Unavailable' ? previewFps.value.replace(' fps', ' FPS') : '— FPS';
   const presetValue = previewOutput && [[1280,720],[1920,1080],[2560,1440]].some(([width,height]) => width === previewOutput.width && height === previewOutput.height)
     ? `${previewOutput.width}x${previewOutput.height}` : 'custom';
   const resizePreview = (height: number) => {
@@ -241,6 +243,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
             </label>
             <label className="preview-resolution-scale">Scale <input aria-label="Preview resolution scale" type="range" min="360" max="2160" step="90" disabled={!available || busy || !previewOutput} value={previewOutput ? Math.min(2160, Math.max(360, previewOutput.height)) : 1080} onChange={event => resizePreview(Number(event.target.value))} /></label>
             {previewOutput && <span className="preview-resolution-value" aria-live="polite">{previewOutput.width} × {previewOutput.height}</span>}
+            <span className="preview-fps" aria-label={`Measured frame rate ${previewFpsValue}`} title={previewFps.detail}>{previewFpsValue}</span>
           </div>
         </div>
         <Preview runtime={runtime} port={presentation} moved={!previewOnly && windowState.detached} onError={setError} onDock={() => windows && windowAction(() => windows.dock())} />

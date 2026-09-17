@@ -36,8 +36,11 @@ test('connected view distinguishes actual zero measurement, stale coverage and h
   const client: StudioClient = { getSnapshot: () => snapshot, subscribe: () => () => {}, invoke: async () => ({}) };
   const html = renderToStaticMarkup(<StudioApp client={client} nowMs={4000} />);
   assert.match(html, /0.0 fps/); assert.match(html, /75% coverage/); assert.match(html, /Stale/);
+  assert.match(html, /— FPS/);
   assert.match(html, /host-revision/); assert.match(html, /author-revision/);
   assert.match(html, /COMPILE_FAILED/); assert.match(html, /Line 8: unknown symbol/);
+  const live = renderToStaticMarkup(<StudioApp client={{ ...client, getSnapshot: () => ({ ...snapshot, authoring: { ...snapshot.authoring!, playback: 'playing' } }) }} nowMs={1000} />);
+  assert.match(live, /0\.0 FPS/);
 });
 
 test('status bar exposes current build, problem and runtime health as actionable labels', () => {
