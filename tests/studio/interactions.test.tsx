@@ -247,6 +247,7 @@ test('RTL: Story ribbon keeps selection separate from the attached occurrence an
   assert.equal(rows[2]!.getAttribute('aria-pressed'),'true','selection moves without moving output');
   assert.equal(rows[1]!.getAttribute('aria-current'),'step','the transport cursor remains on the attached occurrence');
   assert.equal(calls.length,0);assert.ok(screen.getAllByText('Awaiting cue').length>=2);assert.ok(screen.getByText('Staying on beat'));
+  const announcement=document.querySelector('.story-transition[aria-live="polite"]')!;assert.ok(announcement);assert.doesNotMatch(announcement.textContent??'',/12\.0s active/,'advancing elapsed time stays outside the live transition announcement');assert.ok(screen.getByText('12.0s active'));
   assert.equal(screen.queryByRole('slider',{name:/Local time/}),null,'sustained beats have no fabricated local timeline');
   assert.ok(screen.getByRole('button',{name:/Start here: Hold — occurrence 3 of 3/}));
   assert.ok(screen.getByRole('button',{name:'Return to normal'}));

@@ -20,5 +20,19 @@ Completed local verification:
   fields, seek bounds, opaque hash provenance and return-normal cursor behavior
   in response to the retrieval gaps. Repository skill installation and --check passed; installed app compatibility is still checked at use time.
 
-Native Story demonstration, full runtime review, and acceptance remain pending.
+Independent source review approved the contracts/compiler, persistence, runtime,
+command receipts, Story UI and MCP wiring. Fresh receipt/runtime/transport checks
+passed 9/9; the worker suite passed 21/21. Studio TypeScript and build passed.
+
+Product commit: 90209c5022cb3990be8ce2039b8524cdda8e951c.
+The first native run found the authenticated bridge omitted both Story methods.
+Commit d4e179676e243c9be3a1733e0e2bf879597991e0 admits them; the independent bridge
+regression passed 2/2, including unknown-method rejection.
+
+Native acceptance remains in progress. The second run inherited the original
+full-HD output and failed the resize setup after an initialization watchdog fault.
+The migrated demonstration copy now starts at 640×360; runtime watchdogs are
+unchanged. Native evidence must be read with that output-size limit.
+
 The original Vinyl Cosmos file is not edited. Migration writes a separate copy.
+Original SHA-256: b18bdd303430c288bd95c156f35a1bfa5c9f24b90745c3a013a0e79a8b27043e.

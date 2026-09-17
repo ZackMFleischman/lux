@@ -1,4 +1,11 @@
-import type { StudioClient, StudioSnapshot } from './service-client.ts';
+import type { RuntimeView, StudioClient, StudioSnapshot } from './service-client.ts';
+
+function urgentStory(story:NonNullable<RuntimeView['story']>){
+  const {frame,sequence,effectiveAdvancing:_effectiveAdvancing,...state}=story;
+  const frameState=frame.state==='active'?((({elapsedSeconds:_elapsedSeconds,localTimeSeconds:_localTimeSeconds,progress:_progress,...identity})=>identity)(frame)):frame;
+  const {dwellElapsedSeconds:_dwellElapsedSeconds,dwellRemainingSeconds:_dwellRemainingSeconds,...sequenceState}=sequence;
+  return {...state,frame:frameState,sequence:sequenceState};
+}
 
 // Only these observations may wait. Newly added state fields conservatively
 // remain urgent, including applied controls, transport, owner, faults and jobs.
@@ -7,8 +14,8 @@ function urgentState(snapshot: StudioSnapshot): string {
   // Animation time and effective values advance with the render clock. They are
   // display-only observations, so keep them on the same bounded UI cadence as
   // frame/FPS updates. Base values, bindings, issues and transport remain urgent.
-  const runtime = authoring ? (({ frameId, timeSeconds, effectiveControls, effectiveNodeControls, tempo, ...rest }) => ({...rest,
-    ...(tempo?{tempo:{bpm:tempo.bpm,tempoSequence:tempo.tempoSequence}}:{})}))(authoring) : null;
+  const runtime = authoring ? (({ frameId, timeSeconds, effectiveControls, effectiveNodeControls, tempo, story, ...rest }) => ({...rest,
+    ...(tempo?{tempo:{bpm:tempo.bpm,tempoSequence:tempo.tempoSequence}}:{}),...(story?{story:urgentStory(story)}:{})}))(authoring) : null;
   return JSON.stringify({ ...state, authoring: runtime });
 }
 

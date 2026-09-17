@@ -39,8 +39,8 @@ assert.equal(scene.story.beats.length, 6);
 assert.equal(scene.story.sequence.length, 6);
 assert.equal(scene.story.sequence.filter(row => row.beatId === 'orbit').length, 1);
 const repeatedStory = structuredClone(scene.story);
-repeatedStory.sequence.splice(2, 0, { id: 'orbit-2', beatId: 'orbit', follow: { kind: 'after', seconds: 1.5 } });
-repeatedStory.sequence[1] = { id: 'orbit-1', beatId: 'orbit', follow: { kind: 'after', seconds: 1.5 } };
+repeatedStory.sequence.splice(2, 0, { id: 'orbit-2', beatId: 'orbit', follow: { kind: 'after', seconds: 4 } });
+repeatedStory.sequence[1] = { id: 'orbit-1', beatId: 'orbit', follow: { kind: 'after', seconds: 4 } };
 
 let app;
 let child;
@@ -239,8 +239,10 @@ try {
     await page.getByRole('button', { name: /Resume here: Orbit and tidal distortion — occurrence 3 of 7/ }).click();
     value = await storyWhen(story => story.sequence.occurrenceId === 'orbit-2', 'explicit repeated occurrence resume');
     assert.equal(value.story.frame.activationId, repeatedActivation, 'Same-beat resume preserves activation');
-    assert.ok(value.story.sequence.dwellElapsedSeconds < 1.5, 'Resume starts a fresh dwell');
+    assert.ok(value.story.sequence.dwellElapsedSeconds < 4, 'Resume starts a fresh dwell');
     assert.equal(value.story.autoAdvance, true);
+    await screenshot('story-attached-occurrence-dwell', 1360, 900);
+    assert.ok(await page.locator('.story-dwell-progress').isVisible());
     value = await storyWhen(story => story.sequence.occurrenceId === 'chaos-1', 'scheduled orbit dwell advance', 10000);
     assert.equal(value.story.frame.beatId, 'chaos');
     report.checks.push('Explicit repeated-occurrence resume preserves the pose, starts fresh dwell, and advances on the worker clock');
@@ -267,6 +269,7 @@ try {
     assert.equal(stale.isError, true);
     assert.match(resultText(stale), /Story transport changed|STORY_CHANGED|revision/i);
     assert.equal((await backingFrame('timed-seek-after-stale')).sha256, heldSeek.sha256);
+    await screenshot('story-timed-paused-seek', 1360, 900);
     report.checks.push('Timed direct seek returns the drawn pose; exact retry is idempotent and stale revision leaves it unchanged');
 
     const beforeReplay = (await runtime()).story.frame.activationId;

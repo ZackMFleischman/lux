@@ -214,7 +214,11 @@ const publicControlBindings = Object.fromEntries(artifact.controls.map(control =
 const animationCheck = normalizeControlAnimations(controlAnimations, { nodes: [sceneNode], publicControls: artifact.controls, publicControlBindings });
 assert.deepEqual(animationCheck.issues, [], 'Migrated audio bindings must target the compiled copied scene');
 
-const document = createSceneDocument(nextSource, original.settings, controls, [], controlAnimations, original.tempo, story);
+// The migrated demonstration opens at the QA/demo render size. Vinyl Cosmos can
+// exhaust the native initialization watchdog at its legacy 1920x1080 setting
+// before Studio has a chance to accept a live resize command.
+const settings = { ...original.settings, width: 640, height: 360 };
+const document = createSceneDocument(nextSource, settings, controls, [], controlAnimations, original.tempo, story);
 assert.equal(document.version, 6);
 assert.deepEqual(document.source.assets, original.source.assets);
 await mkdir(dirname(outputPath), { recursive: true });
@@ -233,5 +237,6 @@ console.log(JSON.stringify({
   controlSchemaHash: artifact.controlSchemaHash,
   storyCapabilityHash: artifact.storyCapabilityHash,
   story: { beats: story.beats.length, occurrences: story.sequence.length },
+  settings,
   preserved: { files: Object.keys(nextSource.files).length, assets: Object.keys(nextSource.assets).length, audioBindings: controlAnimations.length },
 }, null, 2));

@@ -48,6 +48,24 @@ test('renderer bounds animation time and effective-value observations to UI cade
   off();
 });
 
+test('renderer coalesces advancing Story observations while publishing Story transitions immediately', context => {
+  context.mock.timers.enable({ apis: ['setTimeout'] });
+  const source=fixture(),initial=source.client.getSnapshot(),definition={version:1 as const,beats:[{id:'orbit',label:'Orbit',timing:{kind:'sustained' as const}}],sequence:[{id:'orbit-a',beatId:'orbit',follow:{kind:'after' as const,seconds:4}}]};
+  const story:any={definition,capability:{version:1,beats:[{id:'orbit',kind:'sustained',seek:'none'}]},storyHash:'a'.repeat(64),storyRevision:1,
+    frame:{state:'active',storyEpoch:1,beatId:'orbit',activationId:1,occurrenceId:'orbit-a',elapsedSeconds:0,localTimeSeconds:null,progress:null},phase:'running',autoAdvance:true,loop:false,effectiveAdvancing:true,
+    sequence:{state:'attached',occurrenceId:'orbit-a',index:0,nextOccurrenceId:null,dwellElapsedSeconds:0,dwellRemainingSeconds:4,awaitingCue:false},resumeCandidates:[],disabledReasons:{}};
+  source.publish({authoring:{...initial.authoring!,story} as any});
+  const view=createRendererSnapshot(source.client);let notifications=0;const off=view.subscribe(()=>{notifications++;});const baseline=view.getSnapshot();
+  for(let frame=1;frame<=60;frame++)source.publish({receivedAtMs:frame,authoring:{...baseline.authoring!,frameId:String(frame),story:{...story,
+    frame:{...story.frame,elapsedSeconds:frame/60},sequence:{...story.sequence,dwellElapsedSeconds:frame/60,dwellRemainingSeconds:4-frame/60}}} as any});
+  assert.equal(notifications,0,'elapsed Story and dwell samples must not synchronously rerender the dock tree');
+  context.mock.timers.tick(100);assert.equal(notifications,1);assert.equal(view.getSnapshot(),source.client.getSnapshot());
+  source.publish({receivedAtMs:61,authoring:{...source.client.getSnapshot().authoring!,frameId:'61',story:{...story,frame:{...story.frame,elapsedSeconds:1.1},sequence:{...story.sequence,dwellElapsedSeconds:1.1,dwellRemainingSeconds:2.9}}} as any});
+  const transitioned=source.publish({authoring:{...source.client.getSnapshot().authoring!,story:{...story,storyRevision:2,frame:{...story.frame,storyEpoch:2,activationId:2,elapsedSeconds:0},phase:'paused'}} as any});
+  assert.equal(notifications,2,'revision, activation and phase transitions remain urgent');assert.equal(view.getSnapshot(),transitioned);
+  context.mock.timers.tick(100);assert.equal(notifications,2,'the urgent transition cancels its pending telemetry sample');off();
+});
+
 test('control, transport, owner, fault and jobs changes bypass pending frame delay', context => {
   context.mock.timers.enable({ apis: ['setTimeout'] });
   const source = fixture(), view = createRendererSnapshot(source.client);
