@@ -334,6 +334,37 @@ test('RTL: grouped controls use independent keyboard disclosures and preserve li
   assert.ok(screen.getByRole('slider', { name: 'Exposure' }), 'ungrouped controls remain available');
 });
 
+test('RTL: Inspector filtering matches control and group names without changing values', () => {
+  const fixture = service();
+  fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [
+    { id: 'perchDuration', type: 'number' as const, label: 'Perch duration', group: 'Bird Personality', min: 1, max: 90, default: 10, changeCost: 'live' as const },
+    { id: 'sociability', type: 'number' as const, label: 'Sociability', group: 'Bird Personality', min: 0, max: 1, default: .5, changeCost: 'live' as const },
+    { id: 'wingSpeed', type: 'number' as const, label: 'Wing speed', group: 'Bird Flight', min: 0, max: 8, default: 1, changeCost: 'live' as const },
+    { id: 'plumage', type: 'number' as const, label: 'Plumage palette', group: 'Bird Appearance', min: 0, max: 1, default: .5, changeCost: 'live' as const },
+  ], controlSchemaHash: 'f'.repeat(64), controls: { perchDuration: 10, sociability: .5, wingSpeed: 1, plumage: .5 }, controlSequence: 0 });
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+  const filter = screen.getByRole('textbox', { name: 'Filter controls' });
+  const personality = screen.getByText('Bird Personality').closest('details')!;
+  fireEvent.click(screen.getByText('Bird Personality').closest('summary')!);
+  assert.equal(personality.open, false);
+  fireEvent.change(filter, { target: { value: 'flight' } });
+  assert.ok(screen.getByText('Bird Flight'));
+  assert.ok(screen.getByRole('slider', { name: 'Wing speed' }));
+  assert.equal(screen.queryByText('Bird Personality'), null);
+  assert.equal(screen.queryByRole('slider', { name: 'Perch duration' }), null);
+  fireEvent.change(filter, { target: { value: 'soci' } });
+  assert.ok(screen.getByText('Bird Personality'));
+  assert.equal(screen.getByText('Bird Personality').closest('details')!.open, true);
+  assert.ok(screen.getByRole('slider', { name: 'Sociability' }));
+  assert.equal(screen.queryByRole('slider', { name: 'Perch duration' }), null);
+  fireEvent.change(filter, { target: { value: 'missing' } });
+  assert.ok(screen.getByText('No controls match “missing”.'));
+  fireEvent.change(filter, { target: { value: '' } });
+  assert.equal(document.querySelectorAll('.parameter-group').length, 3);
+  assert.equal(personality.open, false);
+  assert.deepEqual(fixture.client.getSnapshot().authoring?.controls, { perchDuration: 10, sociability: .5, wingSpeed: 1, plumage: .5 });
+});
+
 test('RTL: an empty authored schema has no invented control', () => {
   const fixture = service();
   fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [], controlSchemaHash: 'b'.repeat(64), controls: {}, controlSequence: 0 });

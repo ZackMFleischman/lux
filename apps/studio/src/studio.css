@@ -82,9 +82,10 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 .studio .preview-surface{flex:1;width:100%;height:100%;aspect-ratio:auto;max-height:none;min-height:0;border:0;border-radius:0;box-shadow:none}
 .studio .preview-caption{position:absolute;width:1px;height:1px;min-height:0;max-width:none;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 
-.parameter-row{margin-top:5px;padding:0 1px 2px}
-.parameter-group{margin-top:8px;border:1px solid #3a3d4b;border-radius:4px;background:#22242d}.parameter-group>summary{cursor:pointer;color:#d0d1dd;font-size:13px;font-weight:600;letter-spacing:.02em;padding:5px 7px;user-select:none;border-radius:3px}.parameter-group[open]>summary{border-bottom:1px solid #3a3d4b;border-radius:3px 3px 0 0;background:#272a34}.parameter-group>summary:focus-visible{outline:2px solid #bbb0fa;outline-offset:-2px}.parameter-group-controls{padding:2px 7px 5px;background:#22242d;border-radius:0 0 3px 3px}
-.parameter-heading{position:relative;z-index:1;display:flex;align-items:center;gap:4px;min-height:26px}
+.parameter-filter{display:flex;align-items:center;gap:2px;margin:0 0 4px}.parameter-filter .MuiInputBase-root{height:24px;font-size:11px}.parameter-filter .MuiInputBase-input{padding:3px 6px}.parameter-filter .MuiIconButton-root{width:22px;height:22px;padding:2px;font-size:16px}
+.parameter-row{margin-top:2px;padding:0 1px}
+.parameter-group{margin-top:4px;border:1px solid #3a3d4b;border-radius:4px;background:#22242d}.parameter-group>summary{cursor:pointer;color:#d0d1dd;font-size:13px;font-weight:600;letter-spacing:.02em;padding:2px 4px;user-select:none;border-radius:3px}.parameter-group[open]>summary{border-bottom:1px solid #3a3d4b;border-radius:3px 3px 0 0;background:#272a34}.parameter-group>summary:focus-visible{outline:2px solid #bbb0fa;outline-offset:-2px}.parameter-group-controls{padding:0 4px 2px;background:#22242d;border-radius:0 0 3px 3px}
+.parameter-heading{position:relative;z-index:1;display:flex;align-items:center;gap:4px;min-height:24px}
 .parameter-name{font-size:11px;line-height:16px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .parameter-name:focus-visible{outline:2px solid #bbb0fa;outline-offset:2px;border-radius:2px}
 .parameter-name small{font-size:9px;color:#8c90a2}
@@ -92,7 +93,7 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 .parameter-row .MuiInputBase-input{padding:3px 5px;font-size:11px;line-height:18px;height:18px;text-align:right;font-variant-numeric:tabular-nums}
 .parameter-row .MuiIconButton-root{width:22px;height:22px;padding:2px;font-size:14px}
 .parameter-actions{display:flex;align-items:center;gap:4px;flex:0 0 48px;min-width:0}
-.parameter-row .MuiSlider-root{display:block;width:calc(100% - 8px);height:2px;padding:8px 0;margin:0 4px}
+.parameter-row .MuiSlider-root{display:block;width:calc(100% - 8px);height:2px;padding:6px 0;margin:0 4px}
 .parameter-row .MuiSlider-thumb{width:9px;height:9px}
 .parameter-row .animation-on{font-size:7px;font-weight:800;margin-left:1px;line-height:1}
 @container (max-width:150px){.parameter-heading{flex-wrap:wrap}.parameter-heading>.parameter-name{flex-basis:100%}.parameter-row .parameter-number{width:46px;min-width:0;margin-left:auto}}
