@@ -45,12 +45,20 @@ try {
   current = await call('read');
   const source = JSON.parse(await readFile(resolve(input), 'utf8'));
   console.log(`Building ${label} in ${session.profile}`);
-  const build = await call('build', { source, expectedDraftVersion: current.draftVersion });
+  const isScene = source.format === 'lux-scene';
+  const build = isScene
+    ? await call('scene.open', { path: resolve(input), expectedDraftVersion: current.draftVersion, discardDirty: true })
+    : await call('build', { source, expectedDraftVersion: current.draftVersion });
   await writeFile(join(output, 'build.json'), JSON.stringify(build, null, 2));
-  assert.ok(build.status?.authoring?.revisionId && !build.status?.authoring?.fault, JSON.stringify(build));
+  if (!isScene) assert.ok(build.status?.authoring?.revisionId && !build.status?.authoring?.fault, JSON.stringify(build));
   await new Promise(done => setTimeout(done, 1500));
   let status = await call('status');
   assert.ok(status.authoring?.revisionId && !status.authoring?.fault, JSON.stringify(status));
+  if (isScene) {
+    assert.deepEqual(status.authoring.controlAnimations, source.controlAnimations);
+    assert.deepEqual(status.authoring.controlAnimationIssues, []);
+    report.checks.push('saved scene opened with all audio bindings intact and no binding issues');
+  }
   report.checks.push('source admitted and GPU runtime started');
   for (let index = 0; index < 2; index++) {
     const captured = await call('capture');
