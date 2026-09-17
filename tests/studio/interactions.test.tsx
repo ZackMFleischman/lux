@@ -275,6 +275,55 @@ test('RTL: direct component selection edits flat controls and keeps empty-path a
   } finally {globalThis.requestAnimationFrame=priorAnimationFrame;}
 });
 
+test('RTL: animation issues use one expandable warning, aggregate repeated reasons and follow the exact selected path', async () => {
+  const {ParameterInspector}=await import('../../apps/studio/src/controls/ParameterInspector.tsx');
+  const {StudioController}=await import('../../apps/studio/src/service-client.ts');
+  const fixture=service(),controller=new StudioController(fixture.client),runtime={...fixture.client.getSnapshot().authoring!,controlAnimationIssues:[
+    {index:0,nodePath:[],controlId:'intensity',message:'The saved control definition changed.'},
+    {index:1,nodePath:['missing'],controlId:'speed',message:'The saved control definition changed.'},
+    {index:2,nodePath:['missing'],controlId:'scale',message:'The saved control definition changed.'},
+    {index:3,nodePath:['other'],controlId:'amount',message:'The animation source is unavailable.'},
+  ]} as RuntimeView;
+  const view=render(<ParameterInspector runtime={runtime} available client={fixture.client} controller={controller} onError={()=>{}}/>);
+  assert.equal(screen.getAllByRole('alert').length,1,'all issues share one warning region');
+  assert.equal(screen.getByText('4 animations disabled · 2 reasons').closest('details')?.hasAttribute('open'),false);
+  assert.equal(screen.getAllByText('The saved control definition changed.').length,1,'matching diagnostics are grouped');
+  assert.match(screen.getByRole('alert').textContent??'',/intensity · node Scene\/root \[\]/);
+  assert.match(screen.getByRole('alert').textContent??'',/speed · node \["missing"\]/);
+  const priorAnimationFrame=globalThis.requestAnimationFrame;
+  globalThis.requestAnimationFrame=callback=>{callback(0);return 0;};
+  fireEvent.click(screen.getByRole('button',{name:'Animate Intensity'}));
+  const editor=screen.getByRole('dialog',{name:'Animate Intensity'});
+  assert.ok(within(editor).getByText('Disabled: The saved control definition changed.'));
+  assert.equal(within(editor).queryByRole('alert'),null,'the editor explains its disabled state without adding another live alert');
+  globalThis.requestAnimationFrame=priorAnimationFrame;
+  view.rerender(<CacheProvider value={styleCache}><ParameterInspector runtime={runtime} available client={fixture.client} controller={controller} onError={()=>{}} nodePath={['missing']}/></CacheProvider>);
+  assert.equal(screen.getAllByRole('alert').length,1,'a missing selected node keeps its warning');
+  assert.ok(screen.getByText('2 animations disabled · 1 reason'));
+  assert.match(screen.getByRole('alert').textContent??'',/speed · node \["missing"\]/);
+  assert.doesNotMatch(screen.getByRole('alert').textContent??'',/intensity|amount/,'selection uses the exact canonical node path');
+  assert.ok(screen.getByText('This node is no longer available. Select another node.'));
+});
+
+test('RTL: a selected composite reports animation issues from its resolved nested control targets', async () => {
+  const {parse}=await import('@babel/parser');
+  const {createHash}=await import('node:crypto');
+  const {extractCompositionDeclaration}=await import('../../apps/build-worker/src/composition-declarations.mjs');
+  const {nestedCompositionSourceBundle,compositeAId,wrapperNodeId,wrappedEffectId}=await import('../compiler/composition-fixture.mjs');
+  const {createCompositionControlState}=await import('../../packages/runtime/src/components/composition-controls.ts');
+  const {ParameterInspector}=await import('../../apps/studio/src/controls/ParameterInspector.tsx');
+  const {StudioController}=await import('../../apps/studio/src/service-client.ts');
+  const source=nestedCompositionSourceBundle(),asts=Object.fromEntries(Object.entries(source.files).map(([path,contents])=>[path,parse(contents,{sourceType:'module',plugins:['typescript']})]));
+  const composition=extractCompositionDeclaration({entry:source.entry,files:source.files,asts,hash:(value:string)=>createHash('sha256').update(value).digest('hex')})!;
+  const state=createCompositionControlState(composition),fixture=service(),runtime={...fixture.client.getSnapshot().authoring!,sdkVersion:'0.4.0',intensity:undefined,
+    controlSchema:composition.publicControls,controlSchemaHash:'a'.repeat(64),controls:state.values(),nodeControls:{sourceHash:'revision-2',nodes:state.snapshot().nodes},composition,
+    controlAnimationIssues:[{index:0,nodePath:[compositeAId,wrapperNodeId,wrappedEffectId],controlId:'segments',message:'The nested animation target changed.'}],
+  } as RuntimeView;
+  render(<ParameterInspector runtime={runtime} available client={fixture.client} controller={new StudioController(fixture.client)} onError={()=>{}} nodePath={[compositeAId]}/>);
+  assert.equal(screen.getAllByRole('alert').length,1);
+  assert.match(screen.getByRole('alert').textContent??'',new RegExp(`segments · node \\["${compositeAId}","${wrapperNodeId}","${wrappedEffectId}"\\]`));
+});
+
 test('RTL: control descriptions appear on hover and keyboard focus without creating empty help', async () => {
   const fixture = service();
   fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [
