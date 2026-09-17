@@ -8,6 +8,8 @@ export type LocalAudioInput=Readonly<{id:string;label:string}>;
 export type StudioAudioRuntime=StudioAudioProvider&Readonly<{
   listInputs():Promise<readonly LocalAudioInput[]>;
   subscribeDevices(listener:()=>void):()=>void;
+  getMonitoring():boolean;
+  setMonitoring(enabled:boolean):Promise<boolean>;
 }>;
 
 export function createStudioAudioRuntime(options:Readonly<{
@@ -18,6 +20,12 @@ export function createStudioAudioRuntime(options:Readonly<{
   createAnalyzer?:(context:AudioContext,stream:MediaStream,config:Parameters<NonNullable<Parameters<typeof createStudioAudioProvider>[0]['createAnalyzer']>>[2])=>AudioBandAnalyzer;
 }>):StudioAudioRuntime{
   let capturesPending=0;
+  let capture:Readonly<{stream:MediaStream;context:AudioContext}>|undefined;
+  let monitor:MediaStreamAudioSourceNode|undefined;
+  let monitoring=false;
+  const listeners=new Set<()=>void>();
+  const notify=()=>{for(const listener of listeners)listener();};
+  const stopMonitoring=()=>{try{monitor?.disconnect();}catch{}monitor=undefined;monitoring=false;};
   const provider=createStudioAudioProvider({
     scheduler:options.scheduler,
     ...(options.createAnalyzer?{createAnalyzer:options.createAnalyzer}:{}),
@@ -35,7 +43,8 @@ export function createStudioAudioRuntime(options:Readonly<{
         const revoke=()=>{void options.permissions.disconnect();};
         for(const track of stream.getTracks())track.addEventListener?.('ended',revoke,{once:true});
         ownedContext.addEventListener?.('statechange',()=>{if(ownedContext.state==='closed'||ownedContext.state==='interrupted')revoke();});
-        return {stream,context:ownedContext};
+        capture={stream,context:ownedContext};
+        return capture;
       }catch(error){
         for(const track of stream?.getTracks()??[]){try{track.stop();}catch{}}
         try{if(context?.state!=='closed')await context?.close();}catch{}
@@ -43,6 +52,10 @@ export function createStudioAudioRuntime(options:Readonly<{
         throw error;
       }
     },
+  });
+  provider.subscribe(()=>{
+    if(!provider.getSnapshot().available){stopMonitoring();capture=undefined;}
+    notify();
   });
   return Object.freeze({
     async listInputs(){
@@ -62,9 +75,17 @@ export function createStudioAudioRuntime(options:Readonly<{
       return()=>options.mediaDevices.removeEventListener('devicechange',changed);
     },
     async connect(configuration,localDeviceId){capturesPending++;try{await provider.connect(configuration,localDeviceId);}finally{capturesPending--;}},
-    async disconnect(){try{await provider.disconnect();}finally{await options.permissions.disconnect();}},
+    async disconnect(){stopMonitoring();capture=undefined;try{await provider.disconnect();}finally{await options.permissions.disconnect();}},
     getSnapshot:provider.getSnapshot,
-    subscribe:provider.subscribe,
-    async dispose(){try{await provider.dispose();}finally{await options.permissions.disconnect();}},
+    subscribe(listener){listeners.add(listener);return()=>listeners.delete(listener);},
+    getMonitoring:()=>monitoring,
+    async setMonitoring(enabled){
+      if(!enabled){stopMonitoring();notify();return false;}
+      const active=capture;
+      if(!active||!provider.getSnapshot().available)throw Error('Audio input is not connected');
+      try{stopMonitoring();monitor=active.context.createMediaStreamSource(active.stream);monitor.connect(active.context.destination);monitoring=true;notify();return true;}
+      catch(error){stopMonitoring();notify();throw error;}
+    },
+    async dispose(){stopMonitoring();capture=undefined;try{await provider.dispose();}finally{await options.permissions.disconnect();}},
   });
 }
