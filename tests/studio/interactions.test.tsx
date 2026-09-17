@@ -365,6 +365,23 @@ test('RTL: Inspector filtering matches control and group names without changing 
   assert.deepEqual(fixture.client.getSnapshot().authoring?.controls, { perchDuration: 10, sociability: .5, wingSpeed: 1, plumage: .5 });
 });
 
+test('RTL: Inspector group actions clear filters and apply to every group without changing values', () => {
+  const fixture = service();
+  fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [
+    { id: 'perchDuration', type: 'number' as const, label: 'Perch duration', group: 'Bird Personality', min: 1, max: 90, default: 10, changeCost: 'live' as const },
+    { id: 'wingSpeed', type: 'number' as const, label: 'Wing speed', group: 'Bird Flight', min: 0, max: 8, default: 1, changeCost: 'live' as const },
+  ], controlSchemaHash: 'g'.repeat(64), controls: { perchDuration: 10, wingSpeed: 1 }, controlSequence: 0 });
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+  const filter = screen.getByRole('textbox', { name: 'Filter controls' });
+  fireEvent.change(filter, { target: { value: 'flight' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Collapse all control groups' }));
+  assert.equal((filter as HTMLInputElement).value, '');
+  assert.ok([...document.querySelectorAll<HTMLDetailsElement>('.parameter-group')].every(group => !group.open));
+  fireEvent.click(screen.getByRole('button', { name: 'Expand all control groups' }));
+  assert.ok([...document.querySelectorAll<HTMLDetailsElement>('.parameter-group')].every(group => group.open));
+  assert.deepEqual(fixture.client.getSnapshot().authoring?.controls, { perchDuration: 10, wingSpeed: 1 });
+});
+
 test('RTL: an empty authored schema has no invented control', () => {
   const fixture = service();
   fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [], controlSchemaHash: 'b'.repeat(64), controls: {}, controlSequence: 0 });
