@@ -14,15 +14,18 @@ test('local agent bridge requires token, rejects browser origins and deduplicate
   } finally { bridge.close(); }
 });
 
-test('local agent bridge forwards runtime controls through the application dispatcher', async () => {
+test('local agent bridge forwards every authoring method and rejects unknown methods', async () => {
   const calls: unknown[] = [];
   const bridge = await createAgentBridge(async (method, params) => { calls.push({ method, params }); return { applied: true }; });
   try {
-    for (const method of ['parameters','trigger', 'variation', 'playback', 'restart','tempo.set','tempo.tap', 'library.list', 'library.read', 'library.create', 'library.update']) {
+    const methods=['read','build','capture','status','parameters','trigger','variation','playback','restart','tempo.set','tempo.tap','story.read','story.transport','scene.save','scene.open','library.list','library.read','library.create','library.update'];
+    for (const method of methods) {
       const params = { instanceId: 'runtime', expectedGeneration: 2 };
       const response = await fetch(bridge.url, { method: 'POST', headers: { authorization: `Bearer ${bridge.token}` }, body: JSON.stringify({ id: method, method, params }) });
       assert.equal(response.status, 200);
       assert.deepEqual(calls.at(-1), { method, params });
     }
+    const rejected=await fetch(bridge.url,{method:'POST',headers:{authorization:`Bearer ${bridge.token}`},body:JSON.stringify({id:'unknown',method:'story.unknown',params:{}})});
+    assert.equal(rejected.status,400);assert.match((await rejected.json()).error,/Invalid authoring command/);assert.equal(calls.length,methods.length);
   } finally { bridge.close(); }
 });

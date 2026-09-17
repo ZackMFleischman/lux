@@ -1,6 +1,8 @@
 # LUX-198 bounded Story visual lifecycle
 
-Status: architecture handoff only. S2 starts after S1 acceptance and resolution of
+Status: initial proposal, superseded where different by the exact implementation contract in [story-lifecycle-review.md](./story-lifecycle-review.md#implementation-contract-addendum).
+
+Architecture handoff only. S2 starts after S1 acceptance and resolution of
 the resource-accounting gate below. This document proposes the shortest two-visual
 result; it does not claim SDK 0.4 Story support, export support, or an editing suite.
 
