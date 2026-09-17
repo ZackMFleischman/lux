@@ -83,7 +83,7 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 .studio .preview-caption{position:absolute;width:1px;height:1px;min-height:0;max-width:none;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 
 .parameter-row{margin-top:5px;padding:0 1px 2px}
-.parameter-group{margin-top:8px;border-top:1px solid #2d2f3a;padding-top:4px}.parameter-group>summary{cursor:pointer;color:#b9bbca;font-size:10px;font-weight:600;letter-spacing:.04em;padding:5px 2px;user-select:none}.parameter-group>summary:focus-visible{outline:2px solid #bbb0fa;outline-offset:2px;border-radius:2px}.parameter-group-controls{padding-left:9px;border-left:1px solid #303340}
+.parameter-group{margin-top:8px;border:1px solid #3a3d4b;border-radius:4px;background:#22242d}.parameter-group>summary{cursor:pointer;color:#d0d1dd;font-size:13px;font-weight:600;letter-spacing:.02em;padding:5px 7px;user-select:none;border-radius:3px}.parameter-group[open]>summary{border-bottom:1px solid #3a3d4b;border-radius:3px 3px 0 0;background:#272a34}.parameter-group>summary:focus-visible{outline:2px solid #bbb0fa;outline-offset:-2px}.parameter-group-controls{padding:2px 7px 5px;background:#22242d;border-radius:0 0 3px 3px}
 .parameter-heading{position:relative;z-index:1;display:flex;align-items:center;gap:4px;min-height:26px}
 .parameter-name{font-size:11px;line-height:16px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .parameter-name:focus-visible{outline:2px solid #bbb0fa;outline-offset:2px;border-radius:2px}
