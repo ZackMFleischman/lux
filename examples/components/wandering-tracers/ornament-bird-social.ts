@@ -133,13 +133,19 @@ export function createBirdSocial() {
         bird.interactionUntil = interactionEnd + linger;
         friend.interactionUntil = Math.max(friend.interactionUntil, bird.interactionUntil);
         friend.duration = Math.max(friend.duration, friend.elapsed + (bird.interactionUntil - clock));
-        startBubble(bird, outcome < 0.45 ? 2 : 5);
-        startBubble(friend, 3);
+        bird.idle = outcome < 0.45 ? 2 : 3;
+        friend.idle = outcome < 0.45 ? 2 : 5;
+        bird.idleAt = interactionEnd;
+        friend.idleAt = interactionEnd;
+        if (random(bird) < 0.45) startBubble(bird, outcome < 0.45 ? 2 : 5);
+        if (random(friend) < 0.4) startBubble(friend, 3);
       } else {
         bird.interactionUntil = 0;
         friend.interactionUntil = 0;
-        startBubble(bird, outcome < 0.86 ? 8 : 6);
-        startBubble(friend, outcome < 0.86 ? 7 : 6);
+        bird.idle = outcome < 0.86 ? 2 : 3;
+        friend.idle = outcome < 0.86 ? 4 : 2;
+        if (random(bird) < 0.4) startBubble(bird, outcome < 0.86 ? 8 : 6);
+        if (random(friend) < 0.35) startBubble(friend, outcome < 0.86 ? 7 : 6);
       }
     } else {
       bird.interactionUntil = 0;
@@ -157,7 +163,7 @@ export function createBirdSocial() {
     if (partner >= 0 && birds[partner]?.partner === birds.indexOf(bird)) {
       const friend = birds[partner];
       friend.partner = -1;
-      if (friend.phase === 'perch') startBubble(friend, 4);
+      if (friend.phase === 'perch' && random(friend) < 0.35) startBubble(friend, 4);
     }
     if (random(bird) < 0.18) startBubble(bird, 1);
   };
