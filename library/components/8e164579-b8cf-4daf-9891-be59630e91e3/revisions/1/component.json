@@ -1,0 +1,17 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "8e164579-b8cf-4daf-9891-be59630e91e3",
+  "revision": 1,
+  "name": "Layered Optical Flare",
+  "description": "Camera-axis chromatic ghosts, soft bloom, rounded aperture layers and a restrained optional streak. Transparent source with independent placement and tint.",
+  "updatedAt": "2026-09-17T06:47:11.001Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "optical.ts",
+    "files": [
+      "flare-rig.ts",
+      "optical.ts"
+    ]
+  }
+}
