@@ -51,7 +51,7 @@ export function AudioInputControl({provider,onError,configuration=defaultConfigu
     <Select size="small" value={device} disabled={phase==='connecting'||phase==='connected'} aria-label="Audio input device" displayEmpty onChange={event=>{const next=String(event.target.value);setDevice(next);setPhase(current=>current==='unavailable'?'disconnected':current);onError('');try{if(next)localStorage.setItem(devicePreference,next);else localStorage.removeItem(devicePreference);}catch{}}}>
       <MenuItem value="">Default input</MenuItem>{device&&!devices.some(row=>row.id===device)?<MenuItem value={device} disabled>Previously selected input (unavailable)</MenuItem>:null}{devices.map(row=><MenuItem key={row.id} value={row.id}>{row.label}</MenuItem>)}
     </Select>
-    {phase==='connected'?<Button size="small" color="inherit" aria-pressed={monitoring} title="Monitor audio through default speakers" onClick={()=>void toggleMonitoring()}>Monitor</Button>:null}
+    {phase==='connected'?<Button size="small" color="inherit" aria-pressed={monitoring} title="Monitor audio through default speakers" onClick={()=>void toggleMonitoring()}>{monitoring?'Monitor on':'Monitor'}</Button>:null}
     <span className={`audio-input-status ${phase}`} role="status" aria-live="polite" aria-label="Audio input status">{label}</span>
     {phase==='connected'?<Button size="small" color="inherit" onClick={()=>void disconnect()}>Disconnect</Button>:<Button size="small" color="inherit" disabled={phase==='connecting'} onClick={()=>void connect()}>{devices.length?'Connect':'Connect audio'}</Button>}
   </span>;
