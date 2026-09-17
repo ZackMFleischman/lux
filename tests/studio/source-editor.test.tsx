@@ -218,7 +218,7 @@ test('selected asset refreshes on replacement, reports dirty bytes and cannot su
   assert.match(screen.getByRole('button', { name: 'View assets/red.bmp' }).textContent!, /\*/);
   await act(async () => { await w.submit({ ...next, assets: {} }, w.getSnapshot().version, async () => {}); });
   assert.equal(screen.queryByRole('img', { name: /Image preview:/ }), null);
-  assert.match(screen.getByText('No image assets.').textContent!, /No image/);
+  assert.equal(screen.getByText('No assets').textContent, 'No assets');
   await act(async () => { w.replaceDocument(imageSource()); });
   assert.equal(screen.queryByRole('img', { name: /Image preview:/ }), null);
   await click(screen.getByRole('button', { name: 'View assets/red.bmp' }));
@@ -227,7 +227,7 @@ test('selected asset refreshes on replacement, reports dirty bytes and cannot su
 });
 test('legacy files remain editable with an empty asset list', () => {
   render(<SourcePanel workspace={fixture()} readOnly={false} onApply={() => {}} onSave={() => {}} />);
-  assert.ok(screen.getByText('No image assets.')); assert.equal(view().state.doc.toString(), 'export const main = 1');
+  assert.ok(screen.getByText('No assets')); assert.equal(view().state.doc.toString(), 'export const main = 1');
 });
 test('malformed image presentation stays local and code remains accessible', async () => {
   const w = createSourceWorkspace(imageSource()), snapshot = w.getSnapshot();
@@ -254,23 +254,35 @@ test('keyboard asset activation and source tabs keep navigation accessible', asy
   assert.equal(screen.queryByRole('img', { name: /Image preview:/ }), null);
 });
 
-test('collapsing source navigation preserves the active asset and code draft', async () => {
+test('source sidebar collapses to an accessible rail and preserves the active asset and code draft', async () => {
   const w = createSourceWorkspace(imageSource()); render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => {}} />);
   await act(async () => { view().dispatch({ changes: { from: 0, insert: '// retained draft\n' } }); });
   await click(screen.getByRole('button', { name: 'View assets/red.bmp' }));
-  const header = screen.getByText('Files and assets');
-  const disclosure = header.closest('details');
-  assert.ok(disclosure);
-  assert.ok(disclosure.classList.contains('studio-disclosure'));
-  assert.ok(disclosure.open);
-  await click(header);
+  const assets = screen.getByText('Assets').closest('details');
+  if (!assets) assert.fail('Assets disclosure is missing');
+  assert.ok(assets.classList.contains('studio-disclosure'));
+  assert.equal(assets.open, true);
+  assert.ok(screen.getByRole('button', { name: 'Import images' }));
+  await click(screen.getByRole('button', { name: 'Collapse source sidebar' }));
   assert.ok(screen.getByRole('region', { name: 'Asset preview' }));
-  assert.equal(disclosure.open, false);
-  await click(header);
-  assert.equal(disclosure.open, true);
+  assert.equal(screen.queryByText('Files'), null);
+  assert.equal(screen.queryByText('Assets'), null);
+  const expand = screen.getByRole('button', { name: 'Expand source sidebar' });
+  assert.equal(expand.closest('.source-sidebar')?.getAttribute('data-collapsed'), 'true');
+  await click(expand);
+  assert.equal(screen.getByText('Assets').closest('details')?.open, true);
   await click(screen.getByRole('button', { name: 'Open main.ts' }));
   assert.match(view().state.doc.toString(), /retained draft/);
   assert.equal(w.getSnapshot().source.files['main.ts'], '// retained draft\nexport const main = 1');
+});
+
+test('source replacement undo is an icon action in the Files header', async () => {
+  const w = fixture(); render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} />);
+  await act(async () => { await w.submit({ ...w.getSnapshot().source, files: { ...w.getSnapshot().source.files, 'main.ts': 'replacement' } }, w.getSnapshot().version, async () => {}); });
+  const undo = screen.getByRole('button', { name: 'Undo source replacement' });
+  assert.equal(undo.closest('.source-files-heading')?.textContent?.includes('Undo source replacement'), false);
+  await click(undo);
+  assert.equal(w.getSnapshot().source.files['main.ts'], 'export const main = 1');
 });
 
 test('source shortcut builds with Ctrl/Cmd+Enter and leaves scene save for the app command layer', async () => {

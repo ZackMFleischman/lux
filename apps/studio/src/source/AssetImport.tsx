@@ -1,12 +1,13 @@
-import { useRef, useState, useSyncExternalStore } from 'react';
-import { Alert, Button } from '@mui/material';
+import { useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { Alert, Button, IconButton, Tooltip } from '@mui/material';
 import { assetLimits, validateAssetPath, type SourceAssets } from '../../../../packages/assets/src/index.mjs';
 import { sourceAssets } from './source-equality.ts';
 import type { SourceWorkspace } from './workspace.ts';
+import { Disclosure } from '../Disclosure.tsx';
 
 const createWorker = () => new Worker(new URL('./source-admission-worker.js',import.meta.url),{type:'module'});
 /** Imports originals as an unsaved source edit; rendering still needs explicit apply. */
-export function AssetImport({workspace,readOnly=false,selectedPath=null}:{workspace:SourceWorkspace;readOnly?:boolean;selectedPath?:string|null}) {
+export function AssetImport({workspace,readOnly=false,selectedPath=null,children}:{workspace:SourceWorkspace;readOnly?:boolean;selectedPath?:string|null;children?:ReactNode}) {
   const snapshot=useSyncExternalStore(workspace.subscribe,workspace.getSnapshot);
   const input=useRef<HTMLInputElement>(null),target=useRef<string|null>(null);
   const [reading,setReading]=useState(false),[error,setError]=useState('');
@@ -34,14 +35,19 @@ export function AssetImport({workspace,readOnly=false,selectedPath=null}:{worksp
     } catch(reason) {setError(String(reason instanceof Error?reason.message:reason));}
     finally {setReading(false);target.current=null;if(input.current)input.current.value='';}
   }
-  return <div className="asset-import" aria-label="Image actions">
-    <Button disabled={locked} onClick={()=>{target.current=null;if(input.current){input.current.multiple=true;input.current.click();}}}>Import images</Button>
+  const importImages=()=>{target.current=null;if(input.current){input.current.multiple=true;input.current.click();}};
+  const importAction=<Tooltip title="Import images"><span><IconButton className="asset-import-button" aria-label="Import images" disabled={locked}
+    onClick={event=>{event.preventDefault();event.stopPropagation();importImages();}}><span aria-hidden="true">↥</span></IconButton></span></Tooltip>;
+  return <Disclosure title="Assets" badge={importAction} defaultOpen className="source-assets-disclosure">
+    <div className="asset-import" aria-label="Image actions">
     <input ref={input} type="file" accept=".bmp,.png,.jpg,.jpeg" hidden aria-label="Choose image files" onChange={event=>{const files=Array.from(event.target.files??[]);if(files.length)void readFiles(files);}} />
-    {Object.keys(assets).filter(path=>path===selectedPath).map(path=><span key={path}>
+    {reading&&<Alert severity="info" role="status">Reading image…</Alert>}{snapshot.busy&&<Alert severity="info" role="status">Validating images…</Alert>}
+    {error&&<Alert severity="error">{error}</Alert>}
+    {Object.keys(assets).filter(path=>path===selectedPath).map(path=><span className="asset-selection-actions" key={path}>
       <Button disabled={locked} aria-label={`Replace ${path}`} onClick={()=>{target.current=path;if(input.current){input.current.multiple=false;input.current.click();}}}>Replace</Button>
       <Button disabled={locked} aria-label={`Remove ${path}`} onClick={()=>{const before=workspace.getSnapshot(),next={...sourceAssets(before.source)};delete next[path];void workspace.editAssetsAsync(next,before.version,createWorker).catch(reason=>setError(String(reason)));}}>Remove</Button>
     </span>)}
-    {reading&&<span role="status">Reading image…</span>}{snapshot.busy&&<span role="status">Validating images…</span>}
-    {error&&<Alert severity="error">{error}</Alert>}
-  </div>;
+    {children}
+    </div>
+  </Disclosure>;
 }

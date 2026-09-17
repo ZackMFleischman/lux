@@ -89,6 +89,28 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 .studio .preview-caption{position:absolute;width:1px;height:1px;min-height:0;max-width:none;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 
 .parameter-filter{display:flex;align-items:center;gap:2px;margin:0 0 4px}.parameter-filter .MuiTextField-root{flex:1;min-width:0}.parameter-filter .MuiInputBase-root{height:24px;font-size:11px}.parameter-filter .MuiInputBase-input{padding:3px 6px}.parameter-filter .MuiIconButton-root{width:22px;height:22px;padding:2px;font-size:16px}
+
+/* Source navigation remains left of the editor at every pane width. */
+.studio-pane-source .source-columns{flex-direction:row}
+.source-sidebar{width:clamp(156px,28%,220px);flex:0 0 clamp(156px,28%,220px);min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid #30323d;padding-right:6px}
+.source-file-section{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
+.source-files-actions{display:flex;align-items:center}
+.source-files-actions .MuiIconButton-root{height:28px;width:28px;font-size:19px}
+.studio-pane-source .source-files nav.source-file-list{flex:1;min-height:0;max-height:none;overflow:auto;margin:0;gap:0}
+.source-assets-disclosure{position:relative;flex:0 1 auto;max-height:48%;overflow:auto;margin-top:auto;border-top:1px solid #30323d}
+.source-assets-disclosure>summary{display:flex;align-items:center;justify-content:space-between;padding-left:4px;list-style:none}
+.source-assets-disclosure>summary::-webkit-details-marker{display:none}
+.source-assets-disclosure>summary::before{content:'›';margin-right:5px;color:#9e9cb7;transform:rotate(90deg)}
+.source-assets-disclosure:not([open])>summary::before{transform:none}
+.source-assets-disclosure .disclosure-badge{margin-left:auto}
+.asset-import-button{height:28px!important;width:28px!important;font-size:18px!important}
+.asset-import>.MuiAlert-root{margin:2px 0;font-size:11px;padding:0 6px}
+.asset-selection-actions{display:flex;gap:4px;padding:2px 0}
+.source-sidebar[data-collapsed=true]{width:36px;flex-basis:36px;padding-right:0;align-items:center}
+.source-sidebar-rail{display:flex;justify-content:center;width:100%;padding-top:2px}
+.source-sidebar-rail .MuiIconButton-root{width:30px;height:30px;font-size:22px}
+.source-editing{min-width:0}
+@container (max-width:300px){.source-sidebar:not([data-collapsed=true]){width:104px;flex-basis:104px}.source-files-actions .MuiIconButton-root{width:24px}.file-marker{display:none}}
 .parameter-row{margin-top:2px;padding:0 1px}
 .parameter-group{margin-top:4px;border:1px solid #3a3d4b;border-radius:4px;background:#22242d}.parameter-group>summary{cursor:pointer;color:#d0d1dd;font-size:13px;font-weight:600;letter-spacing:.02em;padding:2px 4px;user-select:none;border-radius:3px}.parameter-group[open]>summary{border-bottom:1px solid #3a3d4b;border-radius:3px 3px 0 0;background:#272a34}.parameter-group>summary:focus-visible{outline:2px solid #bbb0fa;outline-offset:-2px}.parameter-group-controls{padding:0 4px 2px;background:#22242d;border-radius:0 0 3px 3px}
 .parameter-heading{position:relative;z-index:1;display:flex;align-items:center;gap:4px;min-height:24px}
