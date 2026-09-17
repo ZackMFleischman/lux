@@ -1,3 +1,4 @@
+import { hummingbirdShader } from './ornament-hummingbird.ts';
 import { createBirdSocial } from './ornament-bird-social.ts';
 import { Mesh, MeshBasicNodeMaterial, PlaneGeometry, Vector4 } from 'three/webgpu';
 import { positionLocal, uniform, uv, wgslFn } from 'three/tsl';
@@ -51,7 +52,7 @@ fn loBirdPose(index: f32, view: vec4f, shape: vec4f, detail: vec4f, settings: ve
       perch.y -= clamp(distance * 0.8, -0.025, 0.12);
     }
     rest = social.y;
-    position = mix(position, vec3f(perch + vec2f(0.0, 0.037 * settings.x), 0.04), excursion);
+    position = mix(position, vec3f(perch + vec2f(0.0, 0.024 * settings.x), 0.04), excursion);
     position.y += sin(excursion * 3.141593) * 0.18;
     let idle = mood.y;
     let hop = pow(max(0.0, sin(motion.z * 5.0 + index)), 8.0) * 0.016;
@@ -134,8 +135,8 @@ fn loBirdInk(st: vec2f, index: f32, view: vec4f, shape: vec4f, detail: vec4f, se
   silhouette = min(silhouette, beak);
   if (pose.rest > 0.01) {
     let reach = smoothstep(0.1, 0.9, pose.rest);
-    let feet = min(loCapsule(q, vec2f(-0.004, -0.006), vec2f(-0.004 - 0.006 * reach, -0.006 - 0.028 * reach), 0.0015),
-      loCapsule(q, vec2f(0.008, -0.006), vec2f(0.008 + 0.002 * reach, -0.006 - 0.028 * reach), 0.0015));
+    let feet = min(loCapsule(q, vec2f(-0.004, -0.006), vec2f(-0.004 - 0.006 * reach, -0.006 - 0.015 * reach), 0.0015),
+      loCapsule(q, vec2f(0.008, -0.006), vec2f(0.008 + 0.002 * reach, -0.006 - 0.015 * reach), 0.0015));
     silhouette = min(silhouette, feet);
   }
   let aa = max(fwidth(silhouette), 0.0007);
@@ -158,13 +159,19 @@ fn loBirdInk(st: vec2f, index: f32, view: vec4f, shape: vec4f, detail: vec4f, se
   }
   ink = mix(ink, vec3f(1.0, 0.93, 0.70), eye);
   var opacity = outline;
+  var birdColor = mix(vec3f(0.99, 0.91, 0.68), ink, fill);
+  if (humming > 0.5) {
+    let hum = loHummingbird(q, time, pose.bank, pose.rest, mood.y, index, style.y);
+    birdColor = hum.rgb;
+    opacity = hum.a;
+  }
   if (pose.center.z < 0.0 && pose.rest < 0.05) {
     let noise = loFbm(world * (1.35 + shape.y * 0.38) + vec2f(view.z * 0.071, -view.z * 0.043)) - 0.5;
     let ribbons = min(loShapeSdf(9, world, view.x, view.z, shape, detail, noise),
       loShapeSdf(10, world, view.x, view.z, shape, detail, noise));
     opacity *= smoothstep(0.006, 0.012, ribbons);
   }
-  var color = mix(vec3f(0.99, 0.91, 0.68), ink, fill);
+  var color = birdColor;
   if (mood.w > 0.001) {
     let b = offset - vec2f(0.014, 0.110);
     let bubbleSdf = loEllipse(b, vec2f(0.038, 0.030));
@@ -238,7 +245,7 @@ export function createOrnamentBirds(
     const identity = uniform(index);
     const material = new MeshBasicNodeMaterial({ transparent: true, depthTest: false, depthWrite: false });
     material.positionNode = wgslFn(vertex + birdHelpers + helpers)(positionLocal, identity, view, shape, detail, settings[index]!, motions[index]!, socials[index]!, moods[index]!);
-    material.fragmentNode = wgslFn(fragment + birdHelpers + helpers)(uv(), identity, view, shape, detail, settings[index]!, motions[index]!, styles[index]!, socials[index]!, moods[index]!, rates[index]!);
+    material.fragmentNode = wgslFn(fragment + hummingbirdShader + birdHelpers + helpers)(uv(), identity, view, shape, detail, settings[index]!, motions[index]!, styles[index]!, socials[index]!, moods[index]!, rates[index]!);
     const mesh = new Mesh(geometry, material);
     mesh.frustumCulled = false;
     mesh.renderOrder = 10 + index;
