@@ -17,6 +17,8 @@
 .studio{height:100%;min-height:0}
 .studio [hidden]{display:none!important}
 
+.preview-fps{font-size:10px;font-variant-numeric:tabular-nums;color:#c8c5d6;white-space:nowrap}
+
 .studio-pane-host>.inspector{padding-inline:6px}
 .authoring-shell:has(.studio-preview-fullscreen)>.authoring-tools{display:none}
 .studio-preview-fullscreen{position:fixed;inset:0;width:100vw;height:100vh;z-index:2000;background:#000;overflow:hidden}
