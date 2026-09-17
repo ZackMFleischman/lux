@@ -49,14 +49,43 @@ export const derivedAssetSchema = sourceAssetSchema.extend({byteLength:z.number(
 export const assetCompiledArtifactSchema = legacyCompiledArtifactSchema.extend({artifactVersion:z.literal(2),assets:z.record(derivedAssetSchema),assetSetHash:hashSchema}).strict();
 // Pure parameter policy and identity verification enforce cross-field ranges,
 // own-property provenance, canonical metadata bytes and hashes at admission.
-export const parameterControlDefinitionSchema = z.object({
+const parameterNumberControlDefinitionSchema = z.object({
   id:z.string().regex(/^[a-z][A-Za-z0-9_]{0,63}$/),type:z.literal('number'),label:z.string().min(1),
   default:z.number().finite(),min:z.number().finite(),max:z.number().finite(),
   step:z.number().finite().positive().optional(),unit:z.string().min(1).optional(),description:z.string().min(1).optional(),group:z.string().min(1).optional(),changeCost:z.literal('live'),
 }).strict();
+const parameterBooleanControlDefinitionSchema = z.object({
+  id:z.string().regex(/^[a-z][A-Za-z0-9_]{0,63}$/),type:z.literal('boolean'),label:z.string().min(1),default:z.boolean(),
+  description:z.string().min(1).optional(),group:z.string().min(1).optional(),changeCost:z.literal('live'),
+}).strict();
+const parameterEnumOptionSchema = z.object({
+  id:z.string().regex(/^[a-z][A-Za-z0-9_]{0,63}$/),label:z.string().min(1),description:z.string().min(1).optional(),
+}).strict();
+const parameterEnumControlDefinitionSchema = z.object({
+  id:z.string().regex(/^[a-z][A-Za-z0-9_]{0,63}$/),type:z.literal('enum'),label:z.string().min(1),default:z.string(),
+  options:z.array(parameterEnumOptionSchema).min(2).max(64),presentation:z.enum(['segmented','radio','dropdown']),
+  description:z.string().min(1).optional(),group:z.string().min(1).optional(),changeCost:z.literal('live'),
+}).strict();
+const parameterTriggerControlDefinitionSchema = z.object({
+  id:z.string().regex(/^[a-z][A-Za-z0-9_]{0,63}$/),type:z.literal('trigger'),label:z.string().min(1),
+  description:z.string().min(1).optional(),group:z.string().min(1).optional(),changeCost:z.literal('live'),
+}).strict();
+export const parameterControlDefinitionSchema = z.discriminatedUnion('type',[
+  parameterNumberControlDefinitionSchema,parameterBooleanControlDefinitionSchema,parameterEnumControlDefinitionSchema,parameterTriggerControlDefinitionSchema,
+]);
 export const parameterCompiledArtifactSchema = assetCompiledArtifactSchema.extend({
   artifactVersion:z.literal(3),sdkVersion:z.literal('0.2.0'),
   controls:z.array(parameterControlDefinitionSchema),controlSchemaHash:hashSchema,
+}).strict();
+const storyIdSchema=z.string().regex(/^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/).refine(id=>!['constructor','prototype','__proto__'].includes(id));
+const storyBeatCapabilitySchema=z.discriminatedUnion('kind',[
+  z.object({id:storyIdSchema,kind:z.literal('sustained'),seek:z.literal('none')}).strict(),
+  z.object({id:storyIdSchema,kind:z.literal('timed'),seek:z.literal('direct')}).strict(),
+]);
+export const storyCompiledArtifactSchema=parameterCompiledArtifactSchema.extend({
+  artifactVersion:z.literal(6),sdkVersion:z.literal('0.2.0'),
+  storyCapability:z.object({version:z.literal(1),beats:z.array(storyBeatCapabilitySchema).min(1).max(128).refine(beats=>new Set(beats.map(beat=>beat.id)).size===beats.length)}).strict(),
+  storyCapabilityHash:hashSchema,
 }).strict();
 // Structural DTO only. The pure C01 policy and identity verifier additionally
 // enforce text/count/canonical-byte bounds, descriptions and control agreement.
@@ -82,7 +111,7 @@ export const compositionCompiledArtifactSchema = parameterCompiledArtifactSchema
   artifactVersion:z.literal(5),sdkVersion:z.literal('0.4.0'),executionModel:z.enum(['image-chain-v1','typed-image-graph-v1']),
   composition:z.unknown(),compositionHash:hashSchema,
 }).strict();
-export const compiledArtifactSchema = z.union([legacyCompiledArtifactSchema,assetCompiledArtifactSchema,parameterCompiledArtifactSchema,componentCompiledArtifactSchema,compositionCompiledArtifactSchema]);
+export const compiledArtifactSchema = z.union([legacyCompiledArtifactSchema,assetCompiledArtifactSchema,parameterCompiledArtifactSchema,componentCompiledArtifactSchema,compositionCompiledArtifactSchema,storyCompiledArtifactSchema]);
 export type CompiledArtifact = z.infer<typeof compiledArtifactSchema>;
 // A compiled artifact has not run a candidate smoke test and is not a ValidatedBundle.
 export const compileFailureCodeSchema = z.enum(['SOURCE_BOUNDARY_VIOLATION', 'COMPILE_FAILED', 'QUOTA_EXCEEDED', 'TIMEOUT', 'SERVICE_UNAVAILABLE']);

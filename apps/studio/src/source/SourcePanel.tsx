@@ -7,11 +7,12 @@ import { AssetItem, AssetPreview } from './AssetPreview.tsx';
 import { sourceAssets } from './source-equality.ts';
 import { AssetImport } from './AssetImport.tsx';
 import { Disclosure } from '../Disclosure.tsx';
-export type SourceNavigationTarget = { path: string; offset: number; request: number; documentKey: number; draftVersion: number };
-export function SourcePanel({ workspace, readOnly, onApply, onCompositionChange, diagnosticTarget, onDiagnosticTargetHandled }: {
+export type SourceNavigationTarget = { path: string; offset: number; request: number; documentKey: number; draftVersion: number; visualId?:string };
+export function SourcePanel({ workspace, readOnly, onApply, onCompositionChange, diagnosticTarget, onDiagnosticTargetHandled, visualIds, selectedVisualId, onSelectVisual, onAddSource }: {
   workspace: SourceWorkspace; readOnly: boolean; onApply(): void; onSave?(): void; onCompositionChange?(value: boolean): void;
   diagnosticTarget?: SourceNavigationTarget | null;
   onDiagnosticTargetHandled?(request: number): void;
+  visualIds?:readonly string[];selectedVisualId?:string;onSelectVisual?(visualId:string):void;onAddSource?():void;
 }) {
   const snapshot = useSyncExternalStore(workspace.subscribe, workspace.getSnapshot);
   const [adding, setAdding] = useState(false);
@@ -22,14 +23,14 @@ export function SourcePanel({ workspace, readOnly, onApply, onCompositionChange,
   useLayoutEffect(() => { if (!assetPath) setAssetSelection(null); }, [assetPath]);
   useLayoutEffect(() => {
     if (!diagnosticTarget) return;
-    if (diagnosticTarget.documentKey !== snapshot.documentKey || diagnosticTarget.draftVersion !== snapshot.version ||
+    if ((diagnosticTarget.visualId!==undefined&&diagnosticTarget.visualId!==selectedVisualId)||diagnosticTarget.documentKey !== snapshot.documentKey || diagnosticTarget.draftVersion !== snapshot.version ||
         !Object.hasOwn(snapshot.source.files, diagnosticTarget.path)) {
       onDiagnosticTargetHandled?.(diagnosticTarget.request);
       return;
     }
     setAssetSelection(null);
     workspace.openFile(diagnosticTarget.path);
-  }, [diagnosticTarget?.request, snapshot.documentKey, snapshot.version, workspace]);
+  }, [diagnosticTarget?.request, snapshot.documentKey, snapshot.version, workspace,selectedVisualId]);
   const tabs = useRef<HTMLDivElement>(null), focusAfterClose = useRef(false);
   const addButton = useRef<HTMLButtonElement>(null);
   const [newPath, setNewPath] = useState(''), [error, setError] = useState('');
@@ -49,6 +50,11 @@ export function SourcePanel({ workspace, readOnly, onApply, onCompositionChange,
       onApply();
     }
   }}>
+    {(visualIds?.length||onAddSource)&&<div className="source-visual-toolbar">
+      {visualIds?.length?<label><span>Visual source</span><select aria-label="Visual source" disabled={locked} value={selectedVisualId} onChange={event=>onSelectVisual?.(event.target.value)}>
+        {visualIds.map(id=><option key={id} value={id}>{id}</option>)}</select></label>:<span>Story sources</span>}
+      {onAddSource&&<Button size="small" disabled={locked} onClick={onAddSource}>Add source</Button>}
+    </div>}
     <div className="source-columns"><Disclosure title="Files and assets" defaultOpen className="source-files-disclosure">
       <div id="source-files-and-assets" className="source-files">
       <div className="source-files-heading"><span>Files</span><Tooltip title="New file"><IconButton ref={addButton} aria-label="New file" disabled={locked} onClick={() => setAdding(true)}>+</IconButton></Tooltip></div>

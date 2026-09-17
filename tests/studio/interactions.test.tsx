@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import type { StudioClient, StudioOperation, StudioSnapshot, RuntimeView } from '../../apps/studio/src/service-client.ts';
 import type { WindowState } from '../../apps/studio/src/window-client.ts';
+import { image, meta as componentMetadata } from '../runtime/nested-graph-fixtures.ts';
 
 // jsdom models DOM events only. It starts no browser, Electron, canvas or GPU.
 const dom = new JSDOM('<!doctype html><html><head></head><body></body></html>', { url: 'http://studio.test/' });
@@ -87,6 +88,412 @@ test('RTL: code-defined controls expose independent values, numeric entry and de
   assert.deepEqual((fixture.calls[1] as any).input.values, { spikeHeight: 1 });
 });
 
+test('RTL: Boolean and dropdown controls expose typed values, descriptions and defaults without animation', async () => {
+  const fixture = service();
+  const schema = [
+    { id: 'trail', type: 'boolean', label: 'Trail', default: false, description: 'Keep earlier frames visible.', changeCost: 'live' },
+    { id: 'direction', type: 'enum', label: 'Direction', default: 'forward', presentation: 'dropdown', options: [
+      { id: 'forward', label: 'Forward' }, { id: 'reverse', label: 'Reverse', description: 'Move back through the path.' },
+    ], changeCost: 'live' },
+  ] as any;
+  fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: schema, controlSchemaHash: 'c'.repeat(64), controls: { trail: true, direction: 'reverse' }, controlSequence: 0 } as any);
+  const user = userEvent.setup({ document });
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+
+  const trail = screen.getByRole('switch', { name: 'Trail' }) as HTMLInputElement;
+  assert.equal(trail.checked, true);
+  assert.equal(screen.queryByRole('button', { name: 'Animate Trail' }), null);
+  assert.equal(screen.queryByRole('button', { name: 'Animate Direction' }), null);
+  assert.equal(screen.getByText('Trail').getAttribute('tabindex'), '0', 'descriptions stay keyboard reachable');
+
+  await user.click(trail);
+  await waitFor(() => assert.deepEqual((fixture.calls[0] as any).input.values, { trail: false }));
+  await user.click(screen.getByRole('combobox', { name: 'Direction value' }));
+  const reverse=screen.getByRole('option',{name:'Reverse'});fireEvent.focus(reverse);
+  assert.ok(await screen.findByRole('tooltip',{name:/Move back through the path/}));
+  await act(async()=>{fireEvent.blur(reverse);await new Promise(resolve=>setTimeout(resolve,300));});
+  await user.click(screen.getByRole('option', { name: 'Forward' }));
+  await waitFor(() => assert.deepEqual((fixture.calls[1] as any).input.values, { direction: 'forward' }));
+  await user.click(screen.getByRole('button', { name: 'Reset Trail to default' }));
+  await waitFor(() => assert.deepEqual((fixture.calls[2] as any).input.values, { trail: false }));
+  await act(async () => { await new Promise(resolve => setTimeout(resolve, 500)); });
+});
+
+
+test('RTL: trigger actions use one native button, isolate pending state and never mark persistent edits', async () => {
+  const fixture=service(),pending:{resolve(value:unknown):void}[]=[],dirty:string[]=[];
+  fixture.client.invoke=operation=>{fixture.calls.push(operation);return new Promise(resolve=>pending.push({resolve}));};
+  fixture.publish({sdkVersion:'0.2.0',intensity:undefined,controlSchema:[
+    {id:'regenerate',type:'trigger',label:'Regenerate flock',description:'Create a fresh flock arrangement.',changeCost:'live'},
+    {id:'shufflePalette',type:'trigger',label:'Shuffle palette',changeCost:'live'},
+  ] as any,controlSchemaHash:'3'.repeat(64),controls:{},controlSequence:0} as any);
+  const user=userEvent.setup({document});
+  render(<StudioApp client={fixture.client} nowMs={1000} controlEdits={{changed:()=>dirty.push('changed'),track:()=>dirty.push('track')}}/>);
+
+  const regenerate=screen.getByRole('button',{name:'Run Regenerate flock'});
+  const shuffle=screen.getByRole('button',{name:'Run Shuffle palette'});
+  assert.equal(screen.queryByRole('button',{name:'Reset Regenerate flock to default'}),null);
+  assert.equal(screen.queryByRole('button',{name:'Animate Regenerate flock'}),null);
+  const regenerateLabel=screen.getByText('Regenerate flock');await act(async()=>regenerateLabel.focus());
+  assert.equal(document.activeElement,regenerateLabel);
+  assert.ok(await screen.findByRole('tooltip',{name:/Create a fresh flock arrangement/}));
+  await act(async()=>{fireEvent.blur(screen.getByText('Regenerate flock'));await new Promise(resolve=>setTimeout(resolve,300));});
+
+  await user.click(regenerate);
+  await waitFor(()=>assert.equal(pending.length,1));
+  assert.equal(document.activeElement,regenerate,'pending must preserve the action focus');
+  assert.equal(regenerate.getAttribute('aria-busy'),'true');
+  assert.equal(regenerate.getAttribute('aria-disabled'),'true');
+  assert.equal((shuffle as HTMLButtonElement).disabled,false,'another trigger remains available');
+  assert.deepEqual(dirty,[],'commands never enter ControlEdits persistence tracking');
+  const first=(fixture.calls[0] as any).input.commandId;
+  assert.match(first,/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+  await user.click(regenerate);await user.keyboard('{Enter}');await user.keyboard('[Space]');
+  assert.equal(fixture.calls.length,1,'pending pointer and keyboard activation cannot duplicate the command');
+  await act(async()=>pending[0]!.resolve({result:'applied'}));
+  await waitFor(()=>assert.ok(screen.getByRole('button',{name:'Run Regenerate flock'})));
+  assert.equal(screen.queryByRole('status'),null,'an applied command has no optimistic or persistent success UI');
+
+  regenerate.focus();await user.keyboard('{Enter}');await waitFor(()=>assert.equal(pending.length,2));
+  await act(async()=>pending[1]!.resolve({result:'applied'}));
+  await waitFor(()=>assert.ok(screen.getByRole('button',{name:'Run Regenerate flock'})));
+  regenerate.focus();await user.keyboard('[Space]');await waitFor(()=>assert.equal(pending.length,3));
+  assert.equal(fixture.calls.length,3,'pointer, Enter and Space each dispatch exactly once');
+  assert.notEqual((fixture.calls[1] as any).input.commandId,first);
+  assert.notEqual((fixture.calls[2] as any).input.commandId,(fixture.calls[1] as any).input.commandId);
+  await act(async()=>pending[2]!.resolve({result:'applied'}));
+  await waitFor(()=>assert.ok(screen.getByRole('button',{name:'Run Regenerate flock'})));
+  await user.click(screen.getByRole('button',{name:'Run Regenerate flock'}));await waitFor(()=>assert.equal(pending.length,4));
+  await act(async()=>fixture.update());
+  const replacement=screen.getByRole('button',{name:'Run Regenerate flock'});
+  assert.equal(replacement.getAttribute('aria-busy'),null,'a replaced runtime cancels obsolete pending UI');
+  await act(async()=>pending[3]!.resolve({result:'applied'}));
+  assert.equal(screen.getByRole('button',{name:'Run Regenerate flock'}),replacement);
+  assert.deepEqual(dirty,[]);
+});
+
+test('RTL: a trigger visibly requires the selected source to be the active Story visual', async () => {
+  const fixture=service();
+  fixture.publish({sdkVersion:'0.2.0',intensity:undefined,controlSchema:[
+    {id:'regenerate',type:'trigger',label:'Regenerate flock',changeCost:'live'},
+  ] as any,controlSchemaHash:'5'.repeat(64),controls:{},controlSequence:0,selectedVisualId:'ambient',
+    storySchedule:{committed:{visualId:'lead',activationId:3}} as any} as any);
+  const {ParameterInspector}=await import('../../apps/studio/src/controls/ParameterInspector.tsx'),{StudioController}=await import('../../apps/studio/src/service-client.ts');
+  const controller=new StudioController(fixture.client),view=render(<ParameterInspector runtime={fixture.client.getSnapshot().authoring} available client={fixture.client} controller={controller} onError={()=>{}}/>);
+
+  let action=screen.getByRole('button',{name:'Run Regenerate flock'}) as HTMLButtonElement;
+  assert.equal(action.disabled,true);
+  const explanation=screen.getByText('Triggers require the active Story visual (lead). Select that source to run this action.');
+  assert.equal(action.getAttribute('aria-describedby'),explanation.id);
+  fireEvent.click(action);
+  assert.equal(fixture.calls.length,0);
+
+  fixture.publish({selectedVisualId:'lead'});
+  view.rerender(<CacheProvider value={styleCache}><ParameterInspector runtime={fixture.client.getSnapshot().authoring} available client={fixture.client} controller={controller} onError={()=>{}}/></CacheProvider>);
+  action=screen.getByRole('button',{name:'Run Regenerate flock'}) as HTMLButtonElement;
+  assert.equal(action.disabled,false);
+  assert.equal(screen.queryByText('Triggers require the active Story visual (lead). Select that source to run this action.'),null);
+});
+
+test('RTL: an uncertain trigger failure retries manually with the same command ID', async () => {
+  const fixture=service(),outcomes:{resolve(value:unknown):void;reject(error:unknown):void}[]=[],errors:(string|null)[]=[];
+  fixture.client.invoke=operation=>{fixture.calls.push(operation);return new Promise((resolve,reject)=>outcomes.push({resolve,reject}));};
+  fixture.publish({sdkVersion:'0.2.0',intensity:undefined,controlSchema:[
+    {id:'burst',type:'trigger',label:'Burst particles',changeCost:'live'},
+  ] as any,controlSchemaHash:'4'.repeat(64),controls:{},controlSequence:0} as any);
+  const {ParameterInspector}=await import('../../apps/studio/src/controls/ParameterInspector.tsx'),{StudioController}=await import('../../apps/studio/src/service-client.ts');
+  const user=userEvent.setup({document});
+  render(<ParameterInspector runtime={fixture.client.getSnapshot().authoring} available client={fixture.client} controller={new StudioController(fixture.client)} onError={error=>errors.push(error)}/>);
+
+  await user.click(screen.getByRole('button',{name:'Run Burst particles'}));
+  await waitFor(()=>assert.equal(outcomes.length,1));
+  const uncertainId=(fixture.calls[0] as any).input.commandId;
+  await act(async()=>outcomes[0]!.reject(Object.assign(Error('Receipt timed out.'),{code:'TRIGGER_TIMEOUT'})));
+  const retry=await screen.findByRole('button',{name:'Retry Burst particles'});
+  assert.equal(fixture.calls.length,1,'timeout never auto-retries');
+  assert.match(errors.at(-1)??'',/Receipt timed out/);
+  await user.click(retry);await waitFor(()=>assert.equal(outcomes.length,2));
+  assert.equal((fixture.calls[1] as any).input.commandId,uncertainId,'manual retry preserves idempotency identity');
+  await act(async()=>outcomes[1]!.resolve({result:'applied'}));
+  await waitFor(()=>assert.ok(screen.getByRole('button',{name:'Run Burst particles'})));
+
+  await user.click(screen.getByRole('button',{name:'Run Burst particles'}));await waitFor(()=>assert.equal(outcomes.length,3));
+  const rejectedId=(fixture.calls[2] as any).input.commandId;
+  await act(async()=>outcomes[2]!.reject(Object.assign(Error('Trigger rejected.'),{code:'TRIGGER_REJECTED'})));
+  const runAgain=await screen.findByRole('button',{name:'Run Burst particles'});
+  await user.click(runAgain);await waitFor(()=>assert.equal(outcomes.length,4));
+  assert.notEqual((fixture.calls[3] as any).input.commandId,rejectedId,'a definite failure starts a fresh activation');
+  await act(async()=>outcomes[3]!.resolve({result:'applied'}));
+});
+
+test('RTL: a selected component trigger targets its canonical node without a persisted value', async () => {
+  const fixture=service(),leafMetadata=componentMetadata({},{image},{reseed:{type:'trigger',label:'Reseed component'}}),trigger=leafMetadata.controls[0]!;
+  const errors:(string|null)[]=[];
+  const rootHash='a'.repeat(64),leafHash='b'.repeat(64),schemaHash='c'.repeat(64),nodeId='11111111-1111-4111-8111-111111111111';
+  const rootMetadata=componentMetadata({},{image});
+  fixture.publish({sdkVersion:'0.4.0',intensity:undefined,controlSchema:[],controlSchemaHash:'d'.repeat(64),controls:{},controlSequence:0,
+    composition:{version:2,declaration:{definitions:{leaf:'./leaf.ts'},nodes:[{id:nodeId,definition:'leaf'}],edges:[],output:{nodeId,portId:'image'},expose:[]},definitionNames:{leaf:leafHash},graph:{version:2,rootDefinitionHash:rootHash,outputPort:'image'},definitions:{
+      [rootHash]:{kind:'graph',metadata:rootMetadata,body:{nodes:[{id:nodeId,definitionHash:leafHash,controlDefaults:{}}],edges:[],inputBindings:{},outputBindings:{image:{nodeId,portId:'image'}},controlBindings:{}}},
+      [leafHash]:{kind:'code',metadata:leafMetadata},
+    },publicControls:[],publicControlBindings:{},nodes:[{nodePath:[nodeId],definitionHash:leafHash,schema:[trigger],schemaHash}]},
+    nodeControls:{sourceHash:'revision-2',nodes:[{nodePath:[nodeId],definitionHash:leafHash,schema:[trigger],schemaHash,values:{}}]},
+  } as any);
+  const {ParameterInspector}=await import('../../apps/studio/src/controls/ParameterInspector.tsx'),{StudioController}=await import('../../apps/studio/src/service-client.ts');
+  render(<ParameterInspector runtime={fixture.client.getSnapshot().authoring} available client={fixture.client} controller={new StudioController(fixture.client)} onError={error=>errors.push(error)} nodePath={[nodeId] as any}/>);
+  const action=screen.getByRole('button',{name:'Run Reseed component'});fireEvent.click(action);
+  await waitFor(()=>assert.ok(fixture.calls.length||errors.some(Boolean)));
+  assert.deepEqual(errors.filter(Boolean),[]);
+  assert.equal(fixture.calls[0]?.name,'lux.node.trigger.fire');
+  assert.deepEqual((fixture.calls[0] as any).input.nodePath,[nodeId]);
+  assert.equal((fixture.calls[0] as any).input.controlId,'reseed');
+  assert.deepEqual(fixture.client.getSnapshot().authoring?.nodeControls?.nodes[0]?.values,{});
+});
+function storyStatus(overrides:Record<string,unknown>={}){
+  const beats=[{id:'arrival',label:'Arrival',timing:{kind:'timed',durationSeconds:10}},{id:'hold',label:'Hold',timing:{kind:'sustained'}}];
+  const sequence=[{id:'arrival-a',beatId:'arrival',follow:{kind:'after',seconds:4}},{id:'hold-a',beatId:'hold',follow:{kind:'manual'}},{id:'hold-b',beatId:'hold',follow:{kind:'after',seconds:5}}];
+  return {definition:{version:1,beats,sequence},storyHash:'a'.repeat(64),storyRevision:4,
+    frame:{state:'normal',storyEpoch:1},phase:'paused',autoAdvance:false,loop:false,effectiveAdvancing:false,
+    sequence:{state:'detached',occurrenceId:null,index:null,nextOccurrenceId:null,dwellElapsedSeconds:0,dwellRemainingSeconds:null,awaitingCue:false},
+    resumeCandidates:[],disabledReasons:{},...overrides} as any;
+}
+function storySchedule(overrides:Record<string,unknown>={}){
+  const definition={version:2,normalVisualId:'lead',crossfadeSeconds:.35,
+    beats:[{id:'arrival',label:'Arrival',timing:{kind:'timed',durationSeconds:10},visualId:'ambient'},{id:'hold',label:'Hold',timing:{kind:'sustained'},visualId:'lead'}],
+    sequence:[{id:'arrival-a',beatId:'arrival',follow:{kind:'manual'},visualId:'ambient'}]};
+  const committed={slotId:'slot-in',visualId:'ambient',beatId:'arrival',occurrenceId:'arrival-a',activationId:3,storyEpoch:2,
+    frame:{state:'active',storyEpoch:2,beatId:'arrival',activationId:3,occurrenceId:'arrival-a',elapsedSeconds:2,localTimeSeconds:2,progress:.2}};
+  return {instanceId:'instance',generation:2,scheduleHash:'b'.repeat(64),capsuleHash:'c'.repeat(64),definition,storyHash:'a'.repeat(64),storyRevision:5,
+    visualCapabilities:[{visualId:'lead',storyCapability:{version:1,beats:[{id:'hold',kind:'sustained',seek:'none'}]}},{visualId:'ambient',storyCapability:{version:1,beats:[{id:'arrival',kind:'timed',seek:'direct'}]}}],
+    phase:'running',autoAdvance:true,loop:false,effectiveAdvancing:true,committed,outgoing:null,incoming:null,crossfadeProgress:null,pendingPreparation:null,dueNext:null,preparationFailure:null,
+    sequence:{state:'attached',occurrenceId:'arrival-a',index:0,nextOccurrenceId:null,dwellElapsedSeconds:0,dwellRemainingSeconds:null,awaitingCue:true},disabledReasons:{},resources:{slots:2,slotStates:{preparing:0,ready:0,active:1,retiring:0,unsettled:0},pendingCreates:0,storyTargetBytes:1,assetLeases:0,assetLeaseBytes:0,assetStagingJobs:0,assetStagingBytes:0,pendingImports:0,ownedModuleURLs:0,pendingCallbacks:0,gpuSubmissions:0,readbackGrants:0,readbackBytes:0},...overrides} as any;
+}
+
+test('RTL: Story v2 exposes source-specific capabilities, overlap and preparation state',async()=>{
+  const outgoing={slotId:'slot-out',visualId:'lead',beatId:'hold',occurrenceId:null,activationId:2,storyEpoch:1,frame:{state:'active',storyEpoch:1,beatId:'hold',activationId:2,occurrenceId:null,elapsedSeconds:5,localTimeSeconds:null,progress:null}};
+  const status=storySchedule({outgoing,crossfadeProgress:.4,disabledReasons:{launch:{code:'STORY_CAPACITY',message:'Wait for a Story slot to retire.'}}});
+  const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
+  const view=render(<StoryPanel status={status} available controller={{storyTransport:async()=>({})} as any} onError={()=>{}}/>);
+  assert.ok(screen.getByText('Source ambient'));assert.ok(screen.getByText(/Transitioning from source lead to ambient · 40%/));
+  assert.ok(screen.getByText(/source ambient · timed/));assert.ok(screen.getByText(/source lead · sustained/));assert.ok(screen.getByText('Wait for a Story slot to retire.'));
+  assert.equal((screen.getByRole('button',{name:'Launch Arrival'}) as HTMLButtonElement).disabled,true);
+  view.rerender(<CacheProvider value={styleCache}><StoryPanel status={storySchedule({committed:null,pendingPreparation:{token:'prepare-1',phase:'preparing',visualId:'ambient',beatId:'arrival',occurrenceId:'arrival-a',commandId:null,cancelled:false}})} available controller={{storyTransport:async()=>({})} as any} onError={()=>{}}/></CacheProvider>);
+  assert.ok(screen.getByText('Preparing ambient'));assert.ok(screen.getByText('Preparing source ambient.'));
+});
+
+test('RTL: Story v2 reports a failed next-source preparation while keeping the committed preview active',async()=>{
+  const status=storySchedule({preparationFailure:{visualId:'lead',beatId:'hold',occurrenceId:null,code:'STORY_PREPARATION_FAILED',message:'Shader compilation failed.'}});
+  const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
+  render(<StoryPanel status={status} available controller={{storyTransport:async()=>({})} as any} onError={()=>{}}/>);
+
+  assert.ok(screen.getByRole('alert').textContent?.includes('Could not prepare source lead for Hold. Shader compilation failed.'));
+  assert.ok(screen.getByText('Source ambient'),'the committed source remains the active preview status');
+  assert.ok(screen.getByText('2.0s active'));
+  assert.equal(screen.queryByRole('button',{name:/Retry/}),null,'preparation failure does not invent a retry command');
+  assert.ok(screen.getByRole('button',{name:'Launch Hold'}),'the normal launch action remains the explicit retry path');
+});
+
+test('RTL: Story ribbon keeps selection separate from the attached occurrence and shows sustained dwell',async()=>{
+  const status=storyStatus({frame:{state:'active',storyEpoch:2,beatId:'hold',activationId:3,occurrenceId:'hold-a',elapsedSeconds:12,localTimeSeconds:null,progress:null},
+    phase:'running',autoAdvance:true,effectiveAdvancing:true,
+    sequence:{state:'attached',occurrenceId:'hold-a',index:1,nextOccurrenceId:'hold-b',dwellElapsedSeconds:0,dwellRemainingSeconds:null,awaitingCue:true}});
+  const calls:any[]=[];const controller={storyTransport:async(...args:any[])=>{calls.push(args);return {};}} as any;
+  const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
+  render(<StoryPanel status={status} available controller={controller} onError={()=>{}}/>);
+  const ribbon=screen.getByRole('list',{name:'Story sequence'}),rows=within(ribbon).getAllByRole('button');
+  assert.equal(rows.length,3);assert.equal(rows[1]!.getAttribute('aria-current'),'step');assert.equal(rows[1]!.getAttribute('aria-pressed'),'true');
+  fireEvent.click(rows[2]!);
+  assert.equal(rows[2]!.getAttribute('aria-pressed'),'true','selection moves without moving output');
+  assert.equal(rows[1]!.getAttribute('aria-current'),'step','the transport cursor remains on the attached occurrence');
+  assert.equal(calls.length,0);assert.ok(screen.getAllByText('Awaiting cue').length>=2);assert.ok(screen.getByText('Staying on beat'));
+  assert.ok(screen.getByText('Auto-advance'),'the sequence switch has a visible label');
+  const announcement=document.querySelector('.story-transition[aria-live="polite"]')!;assert.ok(announcement);assert.doesNotMatch(announcement.textContent??'',/12\.0s active/,'advancing elapsed time stays outside the live transition announcement');assert.ok(screen.getByText('12.0s active'));
+  assert.equal(screen.queryByRole('slider',{name:/Local time/}),null,'sustained beats have no fabricated local timeline');
+  assert.ok(screen.getByRole('button',{name:/Start here: Hold — occurrence 3 of 3/}));
+  assert.ok(screen.getByRole('button',{name:'Return to normal'}));
+});
+
+test('RTL: Story ribbon shows scheduled dwell progress independently of a sustained beat',async()=>{
+  const status=storyStatus({frame:{state:'active',storyEpoch:2,beatId:'hold',activationId:3,occurrenceId:'hold-b',elapsedSeconds:20,localTimeSeconds:null,progress:null},
+    phase:'running',autoAdvance:true,effectiveAdvancing:true,
+    sequence:{state:'attached',occurrenceId:'hold-b',index:2,nextOccurrenceId:null,dwellElapsedSeconds:2,dwellRemainingSeconds:3,awaitingCue:false}});
+  const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
+  render(<StoryPanel status={status} available controller={{storyTransport:async()=>({})} as any} onError={()=>{}}/>);
+  const progress=screen.getByRole('progressbar',{name:'Dwell for Hold — occurrence 3 of 3'});
+  assert.equal(progress.getAttribute('aria-valuenow'),'40');assert.ok(screen.getByText('3.0s remaining'));assert.ok(screen.getByText('Staying on beat'));
+});
+test('RTL: uncertain Story transport exposes an explicit exact retry',async()=>{
+  const status=storyStatus(),calls:any[]=[],pending:{resolve(value:unknown):void;reject(error:unknown):void}[]=[];
+  const controller={storyTransport:(...args:any[])=>{calls.push(args);return new Promise((resolve,reject)=>pending.push({resolve,reject}));}} as any;
+  const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
+  render(<StoryPanel status={status} available controller={controller} onError={()=>{}}/>);
+  fireEvent.click(screen.getByRole('button',{name:'Start story'}));await waitFor(()=>assert.equal(calls.length,1));
+  await act(async()=>pending[0]!.reject(Object.assign(Error('Story receipt timed out.'),{code:'STORY_TIMEOUT'})));
+  assert.equal(calls.length,1,'an uncertain command is never retried automatically');
+  fireEvent.click(await screen.findByRole('button',{name:'Retry start story'}));await waitFor(()=>assert.equal(calls.length,2));
+  assert.deepEqual(calls[1],calls[0],'explicit retry preserves action, command ID and expected revision');
+  await act(async()=>pending[1]!.resolve({receipt:{},currentStatus:status}));
+});
+test('RTL: timed Story scrub admits one seek and replaces the queued target with the latest position',async()=>{
+  let status=storyStatus({storyRevision:7,frame:{state:'active',storyEpoch:2,beatId:'arrival',activationId:4,occurrenceId:null,elapsedSeconds:2,localTimeSeconds:2,progress:.2},phase:'running'});
+  const calls:any[]=[],pending:{resolve(value:unknown):void;reject(error:unknown):void}[]=[];
+  const controller={storyTransport:(...args:any[])=>{calls.push(args);return new Promise((resolve,reject)=>pending.push({resolve,reject}));}} as any;
+  const errors:string[]=[];const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
+  render(<StoryPanel status={status} available controller={controller} onError={error=>errors.push(error)}/>);
+  const slider=screen.getByRole('slider',{name:'Local time for Arrival'}) as HTMLInputElement;
+  const local=document.querySelector('.story-local-time')!,beats=document.querySelector('.story-beats')!;assert.ok(local.compareDocumentPosition(beats)&Node.DOCUMENT_POSITION_FOLLOWING,'active timed controls precede the full Beats list');
+  fireEvent.change(slider,{target:{value:'3'}});fireEvent.change(slider,{target:{value:'6'}});fireEvent.change(slider,{target:{value:'8'}});
+  await waitFor(()=>assert.equal(calls.length,1));assert.deepEqual(calls[0]![0],{action:'seek',localTimeSeconds:3});assert.equal(calls[0]![2],7);
+  status=storyStatus({...status,storyRevision:8,frame:{...status.frame,localTimeSeconds:3,progress:.3}});
+  await act(async()=>pending[0]!.resolve({result:'applied',commandId:calls[0]![1],action:calls[0]![0],storyRevision:8,frameId:'11',timeSeconds:2,story:status.frame,currentStatus:status}));
+  await waitFor(()=>assert.equal(calls.length,2));assert.deepEqual(calls[1]![0],{action:'seek',localTimeSeconds:8});assert.equal(calls[1]![2],8);
+  fireEvent.pointerDown(slider,{pointerId:1});fireEvent.change(slider,{target:{value:'9'}});fireEvent.keyDown(slider,{key:'Escape'});
+  fireEvent.change(slider,{target:{value:'7'}});fireEvent.pointerUp(slider,{pointerId:1});
+  status=storyStatus({...status,storyRevision:9,frame:{...status.frame,localTimeSeconds:8,progress:.8}});
+  await act(async()=>pending[1]!.resolve({result:'applied',commandId:calls[1]![1],action:calls[1]![0],storyRevision:9,frameId:'12',timeSeconds:2,story:status.frame,currentStatus:status}));
+  await act(async()=>{});assert.equal(calls.length,2,'Escape clears the unsent target');assert.equal(slider.value,'8');assert.deepEqual(errors,[]);
+});
+test('RTL: an acknowledgement from an earlier Story activation cannot overwrite the current scrub',async()=>{
+  const first=storyStatus({storyRevision:7,frame:{state:'active',storyEpoch:2,beatId:'arrival',activationId:4,occurrenceId:null,elapsedSeconds:2,localTimeSeconds:2,progress:.2},phase:'running'});
+  const second=storyStatus({storyRevision:8,frame:{state:'active',storyEpoch:2,beatId:'arrival',activationId:5,occurrenceId:null,elapsedSeconds:6,localTimeSeconds:6,progress:.6},phase:'running'});
+  const calls:any[]=[],pending:{resolve(value:unknown):void}[]=[];
+  const controller={storyTransport:(...args:any[])=>{calls.push(args);return new Promise(resolve=>pending.push({resolve}));}} as any;
+  const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
+  const view=render(<StoryPanel status={first} available controller={controller} onError={()=>{}}/>);
+  fireEvent.change(screen.getByRole('slider',{name:'Local time for Arrival'}),{target:{value:'3'}});
+  await waitFor(()=>assert.equal(calls.length,1));
+  view.rerender(<CacheProvider value={styleCache}><StoryPanel status={second} available controller={controller} onError={()=>{}}/></CacheProvider>);
+  const current=screen.getByRole('slider',{name:'Local time for Arrival'}) as HTMLInputElement;
+  assert.equal(current.value,'6');
+  const acknowledged=storyStatus({...first,storyRevision:9,frame:{...first.frame,localTimeSeconds:3,progress:.3}});
+  await act(async()=>pending[0]!.resolve({receipt:{},currentStatus:acknowledged}));
+  assert.equal(current.value,'6','the old activation acknowledgement cannot replace the new activation position');
+  fireEvent.change(current,{target:{value:'7'}});await waitFor(()=>assert.equal(calls.length,2));
+  assert.deepEqual(calls[1]![0],{action:'seek',localTimeSeconds:7});assert.equal(calls[1]![2],8);
+});
+test('RTL: a rejected seek reconciles a newer revision on the same Story activation',async()=>{
+  const first=storyStatus({storyRevision:7,frame:{state:'active',storyEpoch:2,beatId:'arrival',activationId:4,occurrenceId:null,elapsedSeconds:2,localTimeSeconds:2,progress:.2},phase:'running'});
+  const newer=storyStatus({storyRevision:8,frame:{state:'active',storyEpoch:2,beatId:'arrival',activationId:4,occurrenceId:null,elapsedSeconds:6,localTimeSeconds:6,progress:.6},phase:'paused'});
+  const calls:any[]=[],pending:{resolve(value:unknown):void;reject(error:unknown):void}[]=[];
+  const controller={storyTransport:(...args:any[])=>{calls.push(args);return new Promise((resolve,reject)=>pending.push({resolve,reject}));}} as any,errors:string[]=[];
+  const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
+  const view=render(<StoryPanel status={first} available controller={controller} onError={error=>errors.push(error)}/>);
+  fireEvent.change(screen.getByRole('slider',{name:'Local time for Arrival'}),{target:{value:'3'}});await waitFor(()=>assert.equal(calls.length,1));
+  view.rerender(<CacheProvider value={styleCache}><StoryPanel status={newer} available controller={controller} onError={error=>errors.push(error)}/></CacheProvider>);
+  await act(async()=>pending[0]!.reject(Object.assign(Error('Story changed.'),{code:'STORY_CHANGED'})));
+  const slider=screen.getByRole('slider',{name:'Local time for Arrival'}) as HTMLInputElement;
+  assert.equal(slider.value,'6','a failed stale seek restores the latest authoritative position');
+  fireEvent.change(slider,{target:{value:'7'}});await waitFor(()=>assert.equal(calls.length,2));
+  assert.deepEqual(calls[1]![0],{action:'seek',localTimeSeconds:7});assert.equal(calls[1]![2],8,'the next seek uses the latest rendered revision');
+  assert.deepEqual(errors,['Story changed.']);
+});
+test('RTL: a sub-10ms timed Story beat retains a usable local-time step and readable position',async()=>{
+  const tiny=storyStatus({definition:{version:1,beats:[{id:'spark',label:'Spark',timing:{kind:'timed',durationSeconds:.005}}],sequence:[]},frame:{state:'active',storyEpoch:2,beatId:'spark',activationId:1,occurrenceId:null,elapsedSeconds:.0025,localTimeSeconds:.0025,progress:.5}});
+  const calls:any[]=[],controller={storyTransport:(...args:any[])=>{calls.push(args);return new Promise(()=>{});}} as any;
+  const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');render(<StoryPanel status={tiny} available controller={controller} onError={()=>{}}/>);
+  const slider=screen.getByRole('slider',{name:'Local time for Spark'}) as HTMLInputElement;
+  assert.equal(slider.max,'0.005');assert.equal(slider.step,'0.00005');assert.ok(screen.getByText('2.5ms / 5ms'));
+  fireEvent.change(slider,{target:{value:'.003'}});await waitFor(()=>assert.equal(calls.length,1));assert.deepEqual(calls[0]![0],{action:'seek',localTimeSeconds:.003});
+});
+test('RTL: segmented enum uses one roving tab stop and keyboard selection by stable option ID', async () => {
+  const fixture = service();
+  fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [{
+    id: 'pattern', type: 'enum', label: 'Pattern', default: 'dots', presentation: 'segmented',
+    options: [{ id: 'dots', label: 'Dots' }, { id: 'lines', label: 'Lines' }, { id: 'grid', label: 'A very long grid label', description: 'A regular grid.' }], changeCost: 'live',
+  }] as any, controlSchemaHash: 'd'.repeat(64), controls: { pattern: 'lines' }, controlSequence: 0 } as any);
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+
+  const group = screen.getByRole('group', { name: 'Pattern value' });
+  const choices = within(group).getAllByRole('button') as HTMLButtonElement[];
+  assert.deepEqual(choices.map(choice => choice.tabIndex), [-1, 0, -1]);
+  choices[1]!.focus();
+  fireEvent.keyDown(choices[1]!, { key: 'End' });
+  assert.equal(document.activeElement, choices[2]);
+  assert.ok(await screen.findByRole('tooltip',{name:/A regular grid/}));
+  assert.ok(screen.getByRole('button',{name:'A very long grid label',description:/A regular grid/}));
+  fireEvent.keyDown(choices[2]!, { key: 'Enter' });
+  await waitFor(() => assert.deepEqual((fixture.calls[0] as any).input.values, { pattern: 'grid' }));
+  await act(async () => {});
+  assert.ok(screen.getByRole('button',{name:'A very long grid label'}));
+  await act(async()=>{fireEvent.blur(choices[2]!);await new Promise(resolve=>setTimeout(resolve,300));});
+});
+
+test('RTL: radio enum exposes a radiogroup and arrow keys select the next stable option ID', async () => {
+  const fixture = service();
+  fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [{
+    id: 'quality', type: 'enum', label: 'Quality', default: 'balanced', presentation: 'radio',
+    options: [{ id: 'fast', label: 'Fast' }, { id: 'balanced', label: 'Balanced' }, { id: 'fine', label: 'Fine', description: 'Use the highest detail.' }], changeCost: 'live',
+  }] as any, controlSchemaHash: 'e'.repeat(64), controls: { quality: 'balanced' }, controlSequence: 0 } as any);
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+
+  const group = screen.getByRole('radiogroup', { name: 'Quality value' });
+  const radios = within(group).getAllByRole('radio') as HTMLInputElement[];
+  assert.deepEqual(radios.map(radio => radio.tabIndex), [-1, 0, -1]);
+  fireEvent.focus(radios[1]!);
+  fireEvent.keyDown(radios[1]!, { key: 'ArrowRight' });
+  assert.ok(await screen.findByRole('tooltip',{name:/Use the highest detail/}));
+  assert.ok(screen.getByRole('radio',{name:'Fine',description:/Use the highest detail/}));
+  await waitFor(() => assert.deepEqual((fixture.calls[0] as any).input.values, { quality: 'fine' }));
+  await act(async () => {});
+  assert.equal(document.activeElement, radios[2]);
+  await act(async()=>{fireEvent.blur(radios[2]!);await new Promise(resolve=>setTimeout(resolve,300));});
+});
+
+test('RTL: an older Boolean acknowledgement cannot revert a newer local edit', async () => {
+  const fixture = service(), pending: { resolve(value: unknown): void }[] = [];
+  fixture.client.invoke = operation => { fixture.calls.push(operation); return new Promise(resolve => pending.push({ resolve })); };
+  const schema = [{ id: 'trail', type: 'boolean', label: 'Trail', default: false, changeCost: 'live' }] as any;
+  fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: schema, controlSchemaHash: 'f'.repeat(64), controls: { trail: true }, controlSequence: 0 } as any);
+  render(<StudioApp client={fixture.client} nowMs={1000} />);
+  const trail = screen.getByRole('switch', { name: 'Trail' }) as HTMLInputElement;
+
+  fireEvent.click(trail);
+  await waitFor(() => assert.equal(pending.length, 1));
+  fireEvent.click(trail);
+  assert.equal(trail.checked, true);
+  await act(async () => { fixture.publish({ controls: { trail: false }, controlSequence: 1 } as any); pending[0]!.resolve({ accepted: true }); });
+  await waitFor(() => assert.equal(pending.length, 2));
+  assert.equal(trail.checked, true, 'the first applied value must not overwrite the second pending intent');
+  await act(async () => { fixture.publish({ controls: { trail: true }, controlSequence: 2 } as any); pending[1]!.resolve({ accepted: true }); });
+  assert.equal(trail.checked, true);
+});
+
+for(const presentation of ['segmented','radio'] as const)test(`RTL: an older acknowledgement preserves a newer ${presentation} enum selection and roving tab stop`,async()=>{
+  const fixture=service(),pending:{resolve(value:unknown):void}[]=[];
+  fixture.client.invoke=operation=>{fixture.calls.push(operation);return new Promise(resolve=>pending.push({resolve}));};
+  fixture.publish({sdkVersion:'0.2.0',intensity:undefined,controlSchema:[{id:'pattern',type:'enum',label:'Pattern',default:'lines',presentation,
+    options:[{id:'dots',label:'Dots'},{id:'lines',label:'Lines'},{id:'grid',label:'Grid'}],changeCost:'live'}] as any,
+    controlSchemaHash:'1'.repeat(64),controls:{pattern:'lines'},controlSequence:0} as any);
+  render(<StudioApp client={fixture.client} nowMs={1000}/>);
+  const group=screen.getByRole(presentation==='radio'?'radiogroup':'group',{name:'Pattern value'}),role=presentation==='radio'?'radio':'button';
+  const options=within(group).getAllByRole(role) as HTMLInputElement[];
+
+  fireEvent.focus(options[2]!);fireEvent.click(options[2]!);await waitFor(()=>assert.equal(pending.length,1));
+  fireEvent.focus(options[0]!);fireEvent.click(options[0]!);
+  const selected=(element:HTMLInputElement)=>presentation==='radio'?element.checked:element.getAttribute('aria-pressed')==='true';
+  assert.equal(selected(options[0]!),true);assert.deepEqual(options.map(option=>option.tabIndex),[0,-1,-1]);
+  await act(async()=>{fixture.publish({controls:{pattern:'grid'},controlSequence:1} as any);pending[0]!.resolve({accepted:true});});
+  await waitFor(()=>assert.equal(pending.length,2));
+  assert.equal(selected(options[0]!),true,'the first applied value must not overwrite the second pending enum intent');
+  assert.deepEqual(options.map(option=>option.tabIndex),[0,-1,-1],'the old acknowledgement must not move the roving tab stop');
+  await act(async()=>{fixture.publish({controls:{pattern:'dots'},controlSequence:2} as any);pending[1]!.resolve({accepted:true});});
+});
+
+for(const presentation of ['segmented','radio'] as const)test(`RTL: a rejected ${presentation} enum edit restores its confirmed selection and roving tab stop`,async()=>{
+  const fixture=service();fixture.fail();
+  fixture.publish({sdkVersion:'0.2.0',intensity:undefined,controlSchema:[{id:'pattern',type:'enum',label:'Pattern',default:'lines',presentation,
+    options:[{id:'dots',label:'Dots'},{id:'lines',label:'Lines'},{id:'grid',label:'Grid'}],changeCost:'live'}] as any,
+    controlSchemaHash:'2'.repeat(64),controls:{pattern:'lines'},controlSequence:0} as any);
+  const {ParameterInspector}=await import('../../apps/studio/src/controls/ParameterInspector.tsx'),{StudioController}=await import('../../apps/studio/src/service-client.ts');
+  render(<ParameterInspector runtime={fixture.client.getSnapshot().authoring} available client={fixture.client} controller={new StudioController(fixture.client)} onError={()=>{}}/>);
+  const group=screen.getByRole(presentation==='radio'?'radiogroup':'group',{name:'Pattern value'}),role=presentation==='radio'?'radio':'button';
+  const options=within(group).getAllByRole(role) as HTMLInputElement[],selected=(element:HTMLInputElement)=>presentation==='radio'?element.checked:element.getAttribute('aria-pressed')==='true';
+
+  fireEvent.focus(options[2]!);fireEvent.click(options[2]!);
+  await waitFor(()=>assert.equal(selected(options[1]!),true));
+  assert.deepEqual((fixture.calls[0] as any).input.values,{pattern:'grid'});
+  assert.deepEqual(options.map(option=>option.tabIndex),[-1,0,-1]);
+});
+
 test('RTL: a flat control can add the strict shared-audio binding',async()=>{
   const fixture=service(),priorAnimationFrame=globalThis.requestAnimationFrame,user=userEvent.setup({document});
   globalThis.requestAnimationFrame=callback=>{callback(0);return 0;};
@@ -158,6 +565,7 @@ test('RTL: audio configuration changes cancel an in-flight connection and ignore
     listInputs:async()=>[],subscribeDevices:()=>()=>{},
     connect:async()=>{calls.push('connect');await new Promise<void>(resolve=>{resolveConnect=resolve;});},
     disconnect:async()=>{calls.push('disconnect');},dispose:async()=>{},
+    getMonitoring:()=>false,setMonitoring:async(value:boolean)=>value,
     getSnapshot:()=>({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0}),subscribe:()=>()=>{},
   } as any;
   const first={logicalInputId:'primary-audio' as const,analyzer:{version:1 as const,fftSize:2048 as const,minDecibels:-100,maxDecibels:-30}};
@@ -179,6 +587,7 @@ test('RTL: a failed default connection keeps the prelisted CABLE input available
   const provider={
     listInputs:async()=>{calls.push('list');return [{id:'cable',label:'CABLE Output (VB-Audio Virtual Cable)'}];},
     subscribeDevices:()=>()=>{},connect:async(_configuration:any,id?:string)=>{calls.push(`connect:${id}`);if(!id)throw Error('default input failed');},disconnect:async()=>{},dispose:async()=>{},
+    getMonitoring:()=>false,setMonitoring:async(value:boolean)=>value,
     getSnapshot:()=>({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0}),subscribe:()=>()=>{},
   } as any;
   const user=userEvent.setup({document});localStorage.clear();
@@ -199,6 +608,7 @@ test('RTL: a missing saved audio input blocks connection until the user chooses 
   const provider={
     listInputs:async()=>[{id:'cable',label:'CABLE Output (VB-Audio Virtual Cable)'}],subscribeDevices:()=>()=>{},
     connect:async(_configuration:any,id?:string)=>{calls.push(`connect:${id}`);},disconnect:async()=>{},dispose:async()=>{},
+    getMonitoring:()=>false,setMonitoring:async(value:boolean)=>value,
     getSnapshot:()=>({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0}),subscribe:()=>()=>{},
   } as any;
   const user=userEvent.setup({document});localStorage.setItem('lux.audio.primary-device','missing-device');
@@ -223,6 +633,7 @@ test('RTL: an audio device change refreshes inputs and unmount removes the liste
   const provider={
     listInputs:async()=>++lists===1?[]:[{id:'cable',label:'CABLE Output (VB-Audio Virtual Cable)'}],
     subscribeDevices:(next:()=>void)=>{listener=next;return()=>{unsubscribed=true;};},connect:async()=>{},disconnect:async()=>{},dispose:async()=>{},
+    getMonitoring:()=>false,setMonitoring:async(value:boolean)=>value,
     getSnapshot:()=>({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0}),subscribe:()=>()=>{},
   } as any;
   localStorage.clear();const view=render(<AudioInputControl provider={provider} onError={()=>{}}/>);
@@ -286,7 +697,7 @@ test('RTL: control descriptions appear on hover and keyboard focus without creat
   fireEvent.mouseOver(described);
   const tooltip = await screen.findByRole('tooltip', { name: /Expands the area sampled/ });
   assert.ok(tooltip.querySelector('.MuiTooltip-tooltipPlacementLeft'), 'help must open toward Preview');
-  await waitFor(() => assert.equal(getComputedStyle(tooltip.querySelector('.MuiTooltip-tooltip')!).fontSize, '12px'));
+  assert.ok(tooltip.querySelector('.control-description-tooltip'),'description tooltip keeps its product styling hook');
   fireEvent.change(screen.getByRole('slider', { name: 'Source sampling radius' }), { target: { value: '2' } });
   await waitFor(() => assert.deepEqual((fixture.calls[0] as any).input.values, { samplingRadius: 2 }));
   fireEvent.mouseOut(described);

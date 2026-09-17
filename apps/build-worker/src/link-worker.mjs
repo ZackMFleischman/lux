@@ -27,11 +27,14 @@ async function link() {
   }
   if (!Object.hasOwn(artifact.modules, artifact.entry) || !Object.hasOwn(artifact.modules, '__lux/sdk.js')) fail('Missing entry or emitted SDK module');
   if (artifact.artifactVersion>=3 && !Object.hasOwn(artifact.modules, '__lux/parameters.js')) fail('Missing SDK parameter policy module');
+  if(artifact.artifactVersion===6 && !Object.hasOwn(artifact.modules,'__lux/story.js')) fail('Missing SDK Story policy module');
   const { default: getExePath } = await import(pathToFileURL(join(dependencyRoot, 'typescript/lib/getExePath.js')).href);
-  if(artifact.artifactVersion>=4 && !Object.hasOwn(artifact.modules,'__lux/components.js')) fail('Missing SDK component policy module');
+  if([4,5].includes(artifact.artifactVersion) && !Object.hasOwn(artifact.modules,'__lux/components.js')) fail('Missing SDK component policy module');
   const known = {
-    ...(artifact.artifactVersion>=4 ? Object.fromEntries(['components.mjs','components.d.mts','component-profile.mjs'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
-    ...(artifact.artifactVersion>=4 ? {'compiler/component-declarations.mjs':join(root,'apps/build-worker/src/component-declarations.mjs')} : {}),
+    ...(artifact.sdkVersion==='0.2.0' ? Object.fromEntries(['story.mjs','story.d.mts'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
+    ...(artifact.sdkVersion==='0.2.0' ? {'compiler/story-declarations.mjs':join(root,'apps/build-worker/src/story-declarations.mjs')} : {}),
+    ...([4,5].includes(artifact.artifactVersion) ? Object.fromEntries(['components.mjs','components.d.mts','component-profile.mjs'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
+    ...([4,5].includes(artifact.artifactVersion) ? {'compiler/component-declarations.mjs':join(root,'apps/build-worker/src/component-declarations.mjs')} : {}),
     ...(artifact.artifactVersion===5 ? Object.fromEntries(['composition-profile.mjs','composition-profile.d.mts','paths2d.mjs','paths2d.d.mts','shader-field.mjs','shader-field.d.mts'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
     ...(artifact.artifactVersion===5 ? {'compiler/composition-declarations.mjs':join(root,'apps/build-worker/src/composition-declarations.mjs')} : {}),
     ...(artifact.artifactVersion===5 ? {
@@ -65,7 +68,8 @@ async function link() {
     'three/tsl': join(dependencyRoot, 'three/build/three.tsl.js'),
     'three/core': join(dependencyRoot, 'three/build/three.core.js'),
   };
-  for (const key of Object.keys(known)) if (!Object.hasOwn(artifact.dependencyHashes, key)) fail(`Missing required dependency identity: ${key}`);
+  const optionalLegacyStory=new Set(artifact.artifactVersion===3?['contracts/story.mjs','contracts/story.d.mts','compiler/story-declarations.mjs']:[]);
+  for (const key of Object.keys(known)) if (!optionalLegacyStory.has(key)&&!Object.hasOwn(artifact.dependencyHashes, key)) fail(`Missing required dependency identity: ${key}`);
   const realRoot = await realpath(dependencyRoot), snapshots = new Map();
   for (const [key, expected] of Object.entries(artifact.dependencyHashes)) {
     let path = known[key];
@@ -82,11 +86,15 @@ async function link() {
     if (['three/webgpu', 'three/tsl', 'three/core'].includes(key)) snapshots.set(key, bytes.toString('utf8'));
   }
   const esbuildPackage = JSON.parse(await readFile(join(dependencyRoot, 'esbuild/package.json'), 'utf8'));
-  if(artifact.artifactVersion>=4){
+  if([4,5].includes(artifact.artifactVersion)){
     for(const name of ['components','parameters']){
       const expected=(await readFile(known[`contracts/${name}.mjs`],'utf8')).replaceAll('./parameters.mjs','./parameters.js');
       if(artifact.modules[`__lux/${name}.js`]!==expected)fail('Emitted component policy module mismatch: '+name);
     }
+  }
+  if(artifact.artifactVersion===6) {
+    const expected=await readFile(known['contracts/story.mjs'],'utf8');
+    if(artifact.modules['__lux/story.js']!==expected) fail('Emitted Story policy module mismatch');
   }
   if (esbuildPackage.version !== '0.28.2') fail('Install pinned esbuild 0.28.2');
   const esbuildEntry = join(dependencyRoot, 'esbuild/lib/main.js');
@@ -149,7 +157,8 @@ async function link() {
     ...(artifact.artifactVersion ? {linkedVersion:artifact.artifactVersion,assets:artifact.assets,assetSetHash:artifact.assetSetHash}: {}),
     ...(artifact.artifactVersion>=3 ? {controls:artifact.controls,controlSchemaHash:artifact.controlSchemaHash} : {}),
     ...(artifact.artifactVersion===4 ? {sdkVersion:artifact.sdkVersion,executionModel:artifact.executionModel,component:artifact.component,componentMetadataHash:artifact.componentMetadataHash}: {}),
-    ...(artifact.artifactVersion===5 ? {sdkVersion:artifact.sdkVersion,executionModel:artifact.executionModel,composition:artifact.composition,compositionHash:artifact.compositionHash}: {}) });
+    ...(artifact.artifactVersion===5 ? {sdkVersion:artifact.sdkVersion,executionModel:artifact.executionModel,composition:artifact.composition,compositionHash:artifact.compositionHash}: {}),
+    ...(artifact.artifactVersion===6 ? {sdkVersion:artifact.sdkVersion,storyCapability:artifact.storyCapability,storyCapabilityHash:artifact.storyCapabilityHash}: {}) });
   const linked = { ...body, linkedHash: hash(JSON.stringify(body)) };
   if (Buffer.byteLength(JSON.stringify(linked), 'utf8') > 16777216 - 128) throw violation('Linked ESM result exceeds 16 MiB', 'QUOTA_EXCEEDED');
   return linked;

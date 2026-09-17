@@ -26,6 +26,8 @@ await build({ ...common, entryPoints: [join(directory, 'src/source/admission-wor
   platform: 'browser', format: 'esm', target: 'chrome140' });
 await build({ ...common, entryPoints: [join(directory, 'src/source/image-preview-worker.mjs')], outfile: join(dist, 'image-preview-worker.js'),
   platform: 'browser', format: 'esm', target: 'chrome140' });
+await build({ ...common, entryPoints: [join(directory, 'src/assets/story-asset-decoder-worker.mjs')], outfile: join(dist, 'story-asset-decoder-worker.js'),
+  platform: 'browser', format: 'esm', target: 'chrome140' });
 await copyFile(join(directory, 'src/index.html'), join(dist, 'index.html'));
 await copyFile(join(directory, 'assets/branding/lux-icon.png'), join(dist, 'lux-icon.png'));
 await copyFile(join(directory, 'assets/branding/lux-favicon.svg'), join(dist, 'lux-favicon.svg'));

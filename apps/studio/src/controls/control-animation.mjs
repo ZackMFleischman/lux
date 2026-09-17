@@ -1,5 +1,6 @@
 import {validateControlAnimationBindings} from '../../../../packages/runtime-contracts/src/control-animation.mjs';
 import {normalizeAudioBandSnapshot} from '../../../../packages/runtime-contracts/src/audio-input.mjs';
+import {isNumberControlDefinition} from '../../../../packages/runtime-contracts/src/parameters.mjs';
 const freeze=Object.freeze,stringify=JSON.stringify,isFiniteNumber=Number.isFinite,sin=Math.sin,abs=Math.abs,min=Math.min,max=Math.max,exp=Math.exp,PI=Math.PI,RuntimeError=Error;
 const RuntimeMap=Map,RuntimeSet=Set,call=Function.prototype.call;
 const arrayFind=call.bind(Array.prototype.find),arraySome=call.bind(Array.prototype.some),arrayPush=call.bind(Array.prototype.push);
@@ -27,7 +28,10 @@ export function normalizeControlAnimations(input,profile){
   const raw=bindings[index],node=mapGet(nodes,key(raw.nodePath));let issue;
   if(!node)issue='Animation target is no longer available.';
   else if(node.definitionHash!==raw.definitionHash||node.schemaHash!==raw.schemaHash)issue='Animated control changed and is incompatible with this binding.';
-  else if(!arraySome(node.schema,control=>control.id===raw.controlId))issue='Animated control is no longer available.';
+  else {const definition=arrayFind(node.schema,control=>control.id===raw.controlId);
+   if(!definition)issue='Animated control is no longer available.';
+   else if(!isNumberControlDefinition(definition))issue='Animated control is no longer a number control.';
+  }
   if(raw.kind==='audio'||raw.kind==='kick'){
    const configuration=stringify([raw.source.logicalInputId,raw.source.analyzer]);
    if(audioConfiguration===undefined)audioConfiguration=configuration;else if(audioConfiguration!==configuration&&!issue)issue='Audio binding uses an unavailable input configuration.';
@@ -55,10 +59,10 @@ export function tempoControlValue(base,definition,binding,beatPosition){
  return min(definition.max,max(definition.min,base+binding.amount*wave(binding.shape,cycle)));
 }
 
-export function createControlAnimationEvaluator(profile,base,normalized){
+export function createControlAnimationEvaluator(profile,base,normalized,preparedAudioSnapshot){
  let current=normalized;
  let entries=new RuntimeMap();
- let audioSnapshot=normalizeAudioBandSnapshot({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0});
+ let audioSnapshot=preparedAudioSnapshot??normalizeAudioBandSnapshot({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0});
  const createEntry=binding=>binding.kind==='audio'?{binding,filtered:0,lastTime:undefined}:binding.kind==='kick'?{binding,phase:'idle',phaseStart:0,startValue:0,peak:0,lastTrigger:undefined,observedGeneration:audioSnapshot.generation,observedKickSequence:audioSnapshot.kickSequence,wasAvailable:audioSnapshot.available}:binding.kind==='tempo'||binding.kind==='variation'?{binding}:{binding,anchorTime:0,frozenElapsed:0};
  for(let index=0;index<normalized.bindings.length;index++){const binding=normalized.bindings[index];mapSet(entries,`${key(binding.nodePath)}:${binding.controlId}`,createEntry(binding));}
  const elapsed=(entry,timeSeconds)=>entry.frozenElapsed+(entry.binding.enabled?max(0,timeSeconds-entry.anchorTime):0);
@@ -127,12 +131,13 @@ export function createControlAnimationEvaluator(profile,base,normalized){
  function sample(path,controlId,instanceKey,timeSeconds,beatPosition=0){
   const node=arrayFind(profile.nodes,row=>key(row.nodePath)===key(path)),definition=node&&arrayFind(node.schema,row=>row.id===controlId),id=`${key(path)}:${controlId}`,entry=mapGet(entries,id);
   if(!definition)throw new RuntimeError('Unknown variation control');
+  if(!isNumberControlDefinition(definition))throw new RuntimeError('Only number controls support per-instance variation');
   const baseValue=nodeValues(path,timeSeconds,beatPosition)[controlId];
   return entry?.binding.kind==='variation'&&!arraySome(current.issues,issue=>`${key(issue.nodePath)}:${issue.controlId}`===id)?controlVariationValue(baseValue,definition,entry.binding,instanceKey):baseValue;
  }
  function values(timeSeconds,beatPosition=0){
   const values={...base.values()};
-  for(let index=0;index<profile.publicControls.length;index++){const definition=profile.publicControls[index],targets=profile.publicControlBindings[definition.id],target=targets?.length===1&&targets[0]?.active?targets[0]:undefined;if(target)values[definition.id]=nodeValues(target.nodePath,timeSeconds,beatPosition)[target.controlId];}
+  for(let index=0;index<profile.publicControls.length;index++){const definition=profile.publicControls[index];if(definition.type==='trigger')continue;const targets=profile.publicControlBindings[definition.id],target=targets?.length===1&&targets[0]?.active?targets[0]:undefined;if(target)values[definition.id]=nodeValues(target.nodePath,timeSeconds,beatPosition)[target.controlId];}
   return freeze(values);
  }
  function forEachKickEntry(visit){for(let index=0;index<current.bindings.length;index++){const binding=current.bindings[index];if(binding.kind==='kick'){const entry=mapGet(entries,`${key(binding.nodePath)}:${binding.controlId}`);if(entry)visit(entry);}}}

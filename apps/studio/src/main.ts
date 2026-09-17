@@ -71,18 +71,19 @@ function trusted(event: Electron.IpcMainInvokeEvent): boolean {
   const window = BrowserWindow.fromWebContents(event.sender);
   return !!window && owned.has(window) && event.senderFrame === event.sender.mainFrame && isTrustedStudioUrl(event.senderFrame.url, pageUrl);
 }
-async function compile(source: unknown): Promise<unknown> {
+async function compile(source: unknown, shared = false): Promise<unknown> {
   if (compiling) throw Error('Another compile is in progress');
   const encoded = JSON.stringify(source);
-  if (!encoded || Buffer.byteLength(encoded) > 8388608) throw Error('Source request exceeds its limit');
+  if (!encoded || Buffer.byteLength(encoded) > (shared ? 33554432 : 8388608)) throw Error('Source request exceeds its limit');
   const executable = process.env.LUX_NODE_EXECUTABLE;
   if (!executable) throw Error('Start Studio with pnpm studio');
   compiling = true;
   try { return await new Promise((done, reject) => {
-    const child = spawn(executable, [join(workspace, 'scripts/studio-compile.mjs')], { cwd: workspace, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
+    const child = spawn(executable, [join(workspace, shared ? 'scripts/studio-compile-story.mjs' : 'scripts/studio-compile.mjs')], { cwd: workspace, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
+    if (shared) child.stdout.setEncoding('utf8');
     let output = '', bytes = 0;
     const timer = setTimeout(() => { child.kill(); reject(Error('Compile/link deadline exceeded')); }, 75000);
-    child.stdout.on('data', chunk => { bytes += chunk.length; if (bytes > 18000000) { child.kill(); reject(Error('Compile result exceeded its limit')); } else output += chunk; });
+    child.stdout.on('data', chunk => { bytes += typeof chunk === 'string' ? Buffer.byteLength(chunk, 'utf8') : chunk.length; if (bytes > (shared ? 68157440 : 18000000)) { child.kill(); reject(Error('Compile result exceeded its limit')); } else output += chunk; });
     child.stderr.resume();
     child.once('error', error => { clearTimeout(timer); reject(error); });
     child.once('close', code => { clearTimeout(timer); try { if (code !== 0) throw Error('Compiler process failed'); done(JSON.parse(output)); } catch (error) { reject(error); } });
@@ -230,6 +231,7 @@ app.whenReady().then(async () => {
     if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted authoring sender');
     if (action === 'example') return { sdkVersion: '0.2.0', entry: 'visual.ts', files: { 'visual.ts': await readFile(join(workspace, 'skills/lux-visual-creation/assets/noise-sphere.ts'), 'utf8') } };
     if (action === 'compile') return compile(value);
+    if (action === 'compile-document') return compile(value, true);
     if (action === 'smoke-enabled') return process.env.LUX_STUDIO_SMOKE === '1';
     if (action === 'dirty') { if (typeof value !== 'boolean') throw Error('Invalid dirty state'); dirty = value; return; }
     if (action === 'close-confirmation') {

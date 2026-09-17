@@ -4,8 +4,10 @@ import type { StudioClient } from './service-client.ts';
 import { nodeIdSchema } from '../../../packages/runtime-contracts/src/identities.ts';
 
 const target = { instanceId: z.string().min(1), expectedGeneration: z.number().int().nonnegative().safe() };
-const valuesSchema=z.record(z.number().finite()).refine(values=>Object.keys(values).length>0,'Expected at least one parameter value');
-export const parameterInputSchema = z.object({ ...target, expectedRevisionId: z.string().min(1), expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/).optional(),values:valuesSchema, mode: z.literal('live').default('live') }).strict();
+const visualIdSchema=z.string().regex(/^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/).refine(value=>!['constructor','prototype','__proto__'].includes(value));
+const controlValueSchema=z.union([z.number().finite(),z.boolean(),z.string().min(1).max(64)]);
+const valuesSchema=z.record(controlValueSchema).refine(values=>Object.keys(values).length>0,'Expected at least one parameter value');
+export const parameterInputSchema = z.object({ ...target, expectedRevisionId: z.string().min(1), expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/).optional(),visualId:visualIdSchema.optional(),values:valuesSchema, mode: z.literal('live').default('live') }).strict();
 export const playbackInputSchema = z.object({ ...target, action: z.enum(['play', 'pause', 'reset']) }).strict();
 export const nodeParameterInputSchema=parameterInputSchema.extend({nodePath:z.array(nodeIdSchema).min(1).max(16),expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/)});
 const animationTarget={nodePath:z.array(nodeIdSchema).max(8),definitionHash:z.string().regex(/^[a-f0-9]{64}$/),schemaHash:z.string().regex(/^[a-f0-9]{64}$/),controlId:z.string().min(1).max(64)};
@@ -23,13 +25,32 @@ const kickAnimationBindingSchema=z.object({...animationTarget,...animationAmount
 const tempoAnimationBindingSchema=z.object({...animationTarget,...animationAmount,kind:z.literal('tempo'),shape:z.enum(['sine','triangle','saw','square']),beatsPerCycle:z.number().finite().min(.25).max(64),phase:z.number().finite().min(0).max(1)}).strict();
 const variationAnimationBindingSchema=z.object({...animationTarget,...animationAmount,kind:z.literal('variation'),distribution:z.enum(['random','centered','spread'])}).strict();
 const animationBindingSchema=z.union([lfoAnimationBindingSchema,audioAnimationBindingSchema,kickAnimationBindingSchema,tempoAnimationBindingSchema,variationAnimationBindingSchema]);
-export const nodeAnimationInputSchema=z.object({...target,expectedRevisionId:z.string().min(1),expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/),nodePath:z.array(nodeIdSchema).max(8),controlId:z.string().min(1).max(64),animation:animationBindingSchema.nullable(),restart:z.boolean().optional()}).strict();
-export const nodeVariationInputSchema=z.object({...target,expectedRevisionId:z.string().min(1),expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/),nodePath:z.array(nodeIdSchema).max(8),controlId:z.string().min(1).max(64),variation:z.object({distribution:z.enum(['random','centered','spread']),amount:z.number().finite().nonnegative(),enabled:z.boolean()}).strict().nullable()}).strict();
+export const nodeAnimationInputSchema=z.object({...target,expectedRevisionId:z.string().min(1),expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/),visualId:visualIdSchema.optional(),nodePath:z.array(nodeIdSchema).max(8),controlId:z.string().min(1).max(64),animation:animationBindingSchema.nullable(),restart:z.boolean().optional()}).strict();
+export const nodeVariationInputSchema=z.object({...target,expectedRevisionId:z.string().min(1),expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/),visualId:visualIdSchema.optional(),nodePath:z.array(nodeIdSchema).max(8),controlId:z.string().min(1).max(64),variation:z.object({distribution:z.enum(['random','centered','spread']),amount:z.number().finite().nonnegative(),enabled:z.boolean()}).strict().nullable()}).strict();
 export const restartInputSchema = z.object(target).strict();
 export const previewResizeInputSchema = z.object({ ...target, width: z.number().int().min(1).max(3840), height: z.number().int().min(1).max(2160) }).strict();
 export const tempoSetInputSchema=z.object({...target,expectedRevisionId:z.string().min(1),bpm:z.number().finite().min(20).max(300)}).strict();
 export const tempoTapInputSchema=z.object({...target,expectedRevisionId:z.string().min(1)}).strict();
 const requestId = z.string().min(1).max(100);
+const commandId=z.string().min(1).max(100),controlId=z.string().regex(/^[a-z][A-Za-z0-9_]{0,63}$/);
+export const triggerInputSchema=z.object({...target,commandId,expectedRevisionId:z.string().min(1),expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/),visualId:visualIdSchema.optional(),activationId:z.number().int().positive().safe().optional(),controlId,nodePath:z.array(nodeIdSchema).min(1).max(16).optional()}).strict();
+const storyGuard={...target,commandId,expectedRevisionId:z.string().min(1),expectedStoryHash:z.string().regex(/^[a-f0-9]{64}$/),expectedStoryRevision:z.number().int().nonnegative().safe()};
+const storyId=z.string().regex(/^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/);
+export const storyTransportInputSchema=z.discriminatedUnion('action',[
+ z.object({...storyGuard,action:z.literal('launch'),beatId:storyId}).strict(),z.object({...storyGuard,action:z.literal('start'),occurrenceId:storyId.optional()}).strict(),
+ z.object({...storyGuard,action:z.literal('pause')}).strict(),z.object({...storyGuard,action:z.literal('play')}).strict(),
+ z.object({...storyGuard,action:z.literal('set-auto-advance'),enabled:z.boolean()}).strict(),z.object({...storyGuard,action:z.literal('resume'),occurrenceId:storyId}).strict(),
+ z.object({...storyGuard,action:z.literal('advance')}).strict(),z.object({...storyGuard,action:z.literal('seek'),localTimeSeconds:z.number().finite().nonnegative()}).strict(),
+ z.object({...storyGuard,action:z.literal('replay'),beatId:storyId}).strict(),z.object({...storyGuard,action:z.literal('loop'),beatId:storyId}).strict(),z.object({...storyGuard,action:z.literal('return-normal')}).strict(),
+]);
+const storyOperationGuard={...storyGuard,requestId};
+const storyTransportOperationInputSchema=z.discriminatedUnion('action',[
+ z.object({...storyOperationGuard,action:z.literal('launch'),beatId:storyId}).strict(),z.object({...storyOperationGuard,action:z.literal('start'),occurrenceId:storyId.optional()}).strict(),
+ z.object({...storyOperationGuard,action:z.literal('pause')}).strict(),z.object({...storyOperationGuard,action:z.literal('play')}).strict(),
+ z.object({...storyOperationGuard,action:z.literal('set-auto-advance'),enabled:z.boolean()}).strict(),z.object({...storyOperationGuard,action:z.literal('resume'),occurrenceId:storyId}).strict(),
+ z.object({...storyOperationGuard,action:z.literal('advance')}).strict(),z.object({...storyOperationGuard,action:z.literal('seek'),localTimeSeconds:z.number().finite().nonnegative()}).strict(),
+ z.object({...storyOperationGuard,action:z.literal('replay'),beatId:storyId}).strict(),z.object({...storyOperationGuard,action:z.literal('loop'),beatId:storyId}).strict(),z.object({...storyOperationGuard,action:z.literal('return-normal')}).strict(),
+]);
 export const studioOperationSchema = z.discriminatedUnion('name', [
   z.object({name:z.literal('lux.node.parameters.set'),input:nodeParameterInputSchema.extend({requestId})}).strict(),
   z.object({name:z.literal('lux.node.animation.set'),input:nodeAnimationInputSchema.extend({requestId})}).strict(),
@@ -40,14 +61,18 @@ export const studioOperationSchema = z.discriminatedUnion('name', [
   z.object({ name: z.literal('lux.preview.resize'), input: previewResizeInputSchema.extend({ requestId }) }).strict(),
   z.object({name:z.literal('lux.tempo.set'),input:tempoSetInputSchema.extend({requestId})}).strict(),
   z.object({name:z.literal('lux.tempo.tap'),input:tempoTapInputSchema.extend({requestId})}).strict(),
+  z.object({name:z.literal('lux.trigger.fire'),input:triggerInputSchema.omit({nodePath:true}).extend({requestId})}).strict(),
+  z.object({name:z.literal('lux.node.trigger.fire'),input:triggerInputSchema.required({nodePath:true}).extend({requestId})}).strict(),
+  z.object({name:z.literal('lux.story.transport'),input:storyTransportOperationInputSchema}).strict(),
 ]);
 export async function dispatchRuntimeCommand(client: StudioClient, method: string, params: unknown) {
-  const schemas = { parameters: parameterInputSchema, variation:nodeVariationInputSchema, playback: playbackInputSchema, restart: restartInputSchema,'tempo.set':tempoSetInputSchema,'tempo.tap':tempoTapInputSchema };
+  const schemas = { parameters: parameterInputSchema, variation:nodeVariationInputSchema, playback: playbackInputSchema, restart: restartInputSchema,'tempo.set':tempoSetInputSchema,'tempo.tap':tempoTapInputSchema,trigger:triggerInputSchema,'story.transport':storyTransportInputSchema };
   if (!Object.hasOwn(schemas, method)) throw Error('Unsupported runtime command');
-  const names = { parameters: 'lux.parameters.set', variation:'lux.node.variation.set', playback: 'lux.playback', restart: 'lux.runtime.restart','tempo.set':'lux.tempo.set','tempo.tap':'lux.tempo.tap' } as const;
+  const names = { parameters: 'lux.parameters.set', variation:'lux.node.variation.set', playback: 'lux.playback', restart: 'lux.runtime.restart','tempo.set':'lux.tempo.set','tempo.tap':'lux.tempo.tap',trigger:'lux.trigger.fire','story.transport':'lux.story.transport' } as const;
   const key = method as keyof typeof schemas;
   if(key==='parameters') {const raw=snapshotRecord(params);params={...raw,values:snapshotRecord(raw.values)};}
-  const operation = studioOperationSchema.parse({ name: names[key], input: { ...schemas[key].parse(params), requestId: crypto.randomUUID() } });
+  const parsedInput=schemas[key].parse(params),name=key==='trigger'&&'nodePath' in parsedInput?'lux.node.trigger.fire':names[key];
+  const operation = studioOperationSchema.parse({ name, input: { ...parsedInput, requestId: crypto.randomUUID() } });
   const applied = await client.invoke(operation);
   return { applied, status: client.getSnapshot() };
 }

@@ -5,8 +5,14 @@ import { webcrypto, createHash } from 'node:crypto';
 import { build } from 'esbuild';
 import { fileURLToPath } from 'node:url';
 import { canonicalControlSchemaJson, normalizeControlDeclarations } from '../../packages/runtime-contracts/src/parameters.mjs';
+import {canonicalSceneStoryJson} from '../../packages/runtime-contracts/src/story.mjs';
+import {compileVisual} from '../../apps/build-worker/src/compile.mjs';
+import {linkRuntime} from '../../apps/build-worker/src/link-runtime.mjs';
+import {readFile} from 'node:fs/promises';
+import {resolve} from 'node:path';
 import { decode } from 'fast-png';
 const schema=normalizeControlDeclarations({height:{type:'number',label:'Height',default:1,min:0,max:4},speed:{type:'number',label:'Speed',default:0.5,min:0,max:2}});
+const triggerSchema=normalizeControlDeclarations({height:{type:'number',label:'Height',default:1,min:0,max:4},regenerate:{type:'trigger',label:'Regenerate'}});
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const bundle=(await build({entryPoints:[fileURLToPath(new URL('../../apps/studio/src/visual-worker.mjs',import.meta.url))],bundle:true,write:false,format:'esm',platform:'browser',logLevel:'silent'})).outputFiles[0].text;
 async function fixture(controls=schema,declared=controls,mutation='',sdkVersion='0.2.0',timed=false,gpuTimed=false,workMs=0,waitCreate=false,lifecycle={}) {
@@ -24,23 +30,23 @@ async function fixture(controls=schema,declared=controls,mutation='',sdkVersion=
     ImageData:class{},OffscreenCanvas:class{getContext(){return {putImageData(){}}}async convertToBlob(){return new Blob(['png']);}},
   });
   vm.runInContext('const parseForHarness=JSON.parse; globalThis.deliver=raw=>onmessage({data:parseForHarness(raw)});',context);
-  const methods=[`update(frame){recordFrame(frame)}`,gpuTimed?'render(){gpuDraw();}':timed?'async render(){advanceClock(7);await Promise.resolve();advanceClock(11);}':'render(){}','reset(){}',`dispose(){recordLifecycle('authored-dispose',this===instance);${lifecycle.throwDispose?"throw Error('legacy dispose failed');":''}}`];
+  const methods=[`update(frame){recordFrame(frame);${lifecycle.mutationOnUpdate?'mutateAfterInit();globalThis.mutateAfterInit=()=>{};':''}}`,gpuTimed?'render(){gpuDraw();}':timed?'async render(){advanceClock(7);await Promise.resolve();advanceClock(11);}':'render(){}','reset(){}',`dispose(){recordLifecycle('authored-dispose',this===instance);${lifecycle.throwDispose?"throw Error('legacy dispose failed');":''}}`];
   const instanceCode=lifecycle.classInstance?`new (class {${methods.join(' ')}})()`:`{${methods.join(',')}}`;
   const visualCode=`${mutation}
     export class WebGPURenderer {backend={isWebGPUBackend:true};setSize(){}async init(){}setRenderTarget(){}render(){}dispose(){recordLifecycle('renderer-dispose');}async readRenderTargetPixelsAsync(){const pixels=new Uint8Array(1920*1080*4);pixels.set([188,0,0,128]);return pixels;}}
     export class RenderTarget{texture={};dispose(){recordLifecycle('target-dispose');}} export const SRGBColorSpace='srgb';
     export class MeshBasicNodeMaterial {dispose(){recordLifecycle('material-dispose');}} export class QuadMesh {constructor(material){this.material=material;}render(){}} export const sampleTexture=()=>({});
-    export default {sdkVersion:${JSON.stringify(sdkVersion)},controls:${typeof declared==='string'?declared:JSON.stringify(declared)},async create(){recordCreate();${waitCreate?'await new Promise(()=>{});':''}const instance=${instanceCode};return instance;}};`;
+    export default {sdkVersion:${JSON.stringify(sdkVersion)},controls:${typeof declared==='string'?declared:JSON.stringify(declared)},${lifecycle.storyCapability?`story:${JSON.stringify(lifecycle.storyCapability)},`:''}async create(){recordCreate();${waitCreate?'await new Promise(()=>{});':''}const instance=${instanceCode};return instance;}};`;
   const module=new vm.SourceTextModule(bundle,{context,importModuleDynamically:async()=>{
     imports++;assert.equal(messages[0]?.type,'heartbeat','worker must announce liveness before authored module import');assert.equal(messages[0].workerHeartbeat,1);const visual=new vm.SourceTextModule(visualCode,{context});await visual.link(()=>{throw Error('Unexpected import')});await visual.evaluate();return visual;
   }});
   await module.link(()=>{throw Error('Unexpected bundled import')});await module.evaluate();
   const identity={instanceId:'instance',generation:1,revisionId:'revision'};
-  const initial={type:'init',requestId:'init',...identity,moduleSource:'fixture',canvas:{},settings:{width:1920,height:1080,fps:60,seed:0},sdkVersion,controlSchema:controls,controlSchemaHash:hash(canonicalControlSchemaJson(controls)),controls:Object.fromEntries(controls.map(row=>[row.id,row.default])),playing:false};
+  const initial={type:'init',requestId:'init',...identity,moduleSource:'fixture',canvas:{},settings:{width:1920,height:1080,fps:60,seed:0},sdkVersion,controlSchema:controls,controlSchemaHash:hash(canonicalControlSchemaJson(controls)),controls:Object.fromEntries(controls.filter(row=>row.type!=='trigger').map(row=>[row.id,row.default])),playing:false};
   const post=message=>context.deliver(JSON.stringify({...identity,...message}));
-  async function send(message){const before=messages.length;post(message);const response=()=>messages.slice(before).find(row=>row.type!=='heartbeat');for(let i=0;i<200&&!response();i++)await new Promise(resolve=>setImmediate(resolve));assert.ok(response(),'worker must respond');return response();}
+  async function send(message){const before=messages.length;post(message);const response=()=>messages.slice(before).find(row=>row.type!=='heartbeat');for(let i=0;i<2000&&!response();i++)await new Promise(resolve=>setImmediate(resolve));assert.ok(response(),`worker must respond; messages=${JSON.stringify(messages.slice(before))}`);return response();}
   const flush=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};
-  return {send,post,initial,events,messages,frames,requested,allocations,scheduled,timers,flush,async fireTimer(late=0){const [id,timer]=timers.entries().next().value;timers.delete(id);now=Math.max(now,timer.at)+late;timer.fn();await flush();},created:()=>created,imports:()=>imports,telemetry(){now=500;intervals.get(500)?.();return messages.at(-1);},intervals};
+  return {send,post,initial,events,messages,frames,requested,allocations,scheduled,timers,flush,mutate(code){vm.runInContext(code,context);},async fireTimer(late=0){const [id,timer]=timers.entries().next().value;timers.delete(id);now=Math.max(now,timer.at)+late;timer.fn();await flush();},created:()=>created,imports:()=>imports,telemetry(){now=500;intervals.get(500)?.();return messages.at(-1);},intervals};
 }
 
 test('legacy class prototype dispose retains its receiver and runs once across repeated disposal',async()=>{
@@ -95,6 +101,47 @@ test('baseline worker retains controls, frames and heartbeat with no query alloc
  const changed=await base.send({type:'controls',controlSequence:1,controlSchemaHash:base.initial.controlSchemaHash,values:{height:2,speed:1}});
  assert.deepEqual(changed.controls,{height:2,speed:1});assert.equal(base.frames.length,2);
  const bad=await fixture();assert.equal((await bad.send({...bad.initial,performanceMode:'unknown'})).type,'failure');
+});
+
+test('paused trigger draws once after hostile intrinsic mutation and duplicate IDs return the original receipt without regressing latest status',async()=>{
+ const f=await fixture(triggerSchema,triggerSchema,'','0.2.0');
+ const ready=await f.send(f.initial);assert.equal(ready.type,'ready',JSON.stringify(ready));assert.equal(ready.triggerSequence,0);
+ f.mutate("Map.prototype.get=()=>{throw new TypeError('mutated get')};Map.prototype.set=()=>{throw new TypeError('mutated set')};Object.freeze=value=>value;globalThis.Error=()=>new TypeError('mutated Error')");
+ const first=await f.send({type:'trigger',requestId:'trigger-a',commandId:'command-a',nodePath:[],controlId:'regenerate'});
+ assert.equal(first.type,'status',JSON.stringify(first));
+ assert.equal(first.playback,'paused');assert.equal(first.timeSeconds,ready.timeSeconds);assert.equal(first.triggerSequence,1);assert.deepEqual(first.triggerReceipt,{result:'applied',commandId:'command-a',controlId:'regenerate',nodePath:[],sequence:1,frameId:'2',timeSeconds:0});
+ assert.deepEqual(f.frames.at(-1).events,[{type:'trigger',controlId:'regenerate',commandId:'command-a',sequence:1}]);assert.equal(f.frames.at(-1).deltaSeconds,0);
+ const frameCount=f.frames.length,duplicate=await f.send({type:'trigger',requestId:'trigger-a-retry',commandId:'command-a',nodePath:[],controlId:'regenerate'});
+ assert.deepEqual(duplicate.triggerReceipt,first.triggerReceipt);assert.equal(f.frames.length,frameCount);
+ const second=await f.send({type:'trigger',requestId:'trigger-b',commandId:'command-b',nodePath:[],controlId:'regenerate'});assert.equal(second.triggerSequence,2);
+ const old=await f.send({type:'trigger',requestId:'trigger-a-late',commandId:'command-a',nodePath:[],controlId:'regenerate'});
+ assert.equal(old.triggerReceipt.sequence,1);assert.equal(old.latestTriggerReceipt.sequence,2);assert.equal(old.frameId,second.frameId);assert.equal(f.frames.length,frameCount+1);
+ const reset=await f.send({type:'playback',requestId:'reset',action:'reset'}),afterReset=f.frames.length;
+ assert.equal(reset.triggerSequence,2);
+ const resetDuplicate=await f.send({type:'trigger',requestId:'trigger-a-after-reset',commandId:'command-a',nodePath:[],controlId:'regenerate'});
+ assert.deepEqual(resetDuplicate.triggerReceipt,first.triggerReceipt);assert.equal(f.frames.length,afterReset,'reset retains the ledger without replay');
+ const capture=await f.send({type:'capture',requestId:'capture-after-trigger'}),serialized=JSON.stringify(capture.metadata);
+ for(const excluded of ['triggerSequence','latestTriggerReceipt','triggerReceipt','commandId','events'])assert.equal(serialized.includes(excluded),false,`capture excludes ${excluded}`);
+ const mismatch=await f.send({type:'trigger',requestId:'trigger-a-wrong',commandId:'command-a',nodePath:[],controlId:'height'});
+ assert.equal(mismatch.type,'command-error');assert.equal(mismatch.code,'TRIGGER_REJECTED');assert.equal(f.messages.some(message=>message.type==='failure'),false);
+});
+
+test('paused Story commands survive authored intrinsic mutation, draw with zero delta, and dedupe after reset',async()=>{
+ const source={sdkVersion:'0.2.0',entry:'visual.ts',files:{'visual.ts':await readFile('packages/visual-sdk/examples/story.ts','utf8')}},options={dependencyRoot:process.env.LUX_COMPILER_DEPENDENCIES||resolve('node_modules')};
+ const compiled=await compileVisual({source},options);if(!compiled.ok)assert.fail(JSON.stringify(compiled));const linked=await linkRuntime(compiled.artifact,options);
+ const story={version:1,beats:[{id:'arrival',label:'Arrival',timing:{kind:'timed',durationSeconds:4}},{id:'orbit',label:'Orbit',timing:{kind:'sustained'}}],sequence:[{id:'arrival-1',beatId:'arrival',follow:{kind:'manual'}}]},storyHash=hash(canonicalSceneStoryJson(story));
+ const mutation=`const NativeError=Error, nativeFinite=Number.isFinite;
+  Math.min=()=>{throw new NativeError('mutated min')};Math.max=()=>{throw new NativeError('mutated max')};Array.prototype.includes=()=>{throw new NativeError('mutated includes')};
+  Object.freeze=value=>value;Object.defineProperty(Error.prototype,'code',{configurable:true,set(){throw new NativeError('mutated error setter')}});Object.defineProperty(Object.prototype,'pause',{configurable:true,set(){throw new NativeError('mutated object setter')}});
+  globalThis.Number={isFinite:nativeFinite,MAX_SAFE_INTEGER:0};globalThis.Error=()=>new NativeError('mutated Error');`;
+ const f=await fixture(linked.controls,linked.controls,mutation,'0.2.0',false,false,0,false,{storyCapability:linked.storyCapability});
+ const {moduleSource:_,...initial}=f.initial;f.post({...initial,linked,story,storyHash});for(let index=0;index<500&&!f.messages.some(row=>row.type==='ready'||row.type==='failure');index++)await new Promise(resolve=>setTimeout(resolve,10));const ready=f.messages.find(row=>row.type==='ready'||row.type==='failure');assert.equal(ready?.type,'ready',JSON.stringify(ready));assert.equal(ready.story.frame.state,'normal');
+ const applied=await f.send({type:'story-transport',requestId:'story-a',commandId:'command-a',expectedRevisionId:'revision',expectedStoryHash:storyHash,expectedStoryRevision:0,action:'launch',beatId:'arrival'});
+ assert.equal(applied.type,'status',JSON.stringify(applied));assert.equal(applied.storyReceipt.result,'applied');assert.equal(applied.storyReceipt.story.state,'active');assert.equal(applied.storyReceipt.frameId,applied.frameId);assert.equal(applied.storyReceipt.timeSeconds,applied.timeSeconds);
+ assert.equal(f.frames.at(-1).deltaSeconds,0);assert.deepEqual(f.frames.at(-1).story,applied.storyReceipt.story);
+ const frameCount=f.frames.length,reset=await f.send({type:'playback',requestId:'reset',action:'reset'});assert.equal(reset.type,'status',JSON.stringify(reset));assert.equal(reset.story.frame.state,'normal');
+ const duplicate=await f.send({type:'story-transport',requestId:'story-a-retry',commandId:'command-a',expectedRevisionId:'revision',expectedStoryHash:storyHash,expectedStoryRevision:0,action:'launch',beatId:'arrival'});
+ assert.deepEqual(duplicate.storyReceipt,applied.storyReceipt);assert.equal(f.frames.length,frameCount+1,'reset draws once and the duplicate does not replay');
 });
 
 test('worker keeps routine sampling phase through unsampled frame notifications',async()=>{
@@ -157,6 +204,22 @@ test('actual worker applies complete initial/live controls and captures exact me
   const reset=await f.send({type:'playback',requestId:'reset',action:'reset'});assert.deepEqual(reset.controls,applied.controls);assert.equal(reset.clockEpoch,1);assert.equal(reset.tempo.bpm,150);assert.equal(reset.tempoSequence,2);assert.equal(reset.tempo.beatPhase,0);
   const capture=await f.send({type:'capture',requestId:'capture'});assert.equal(capture.type,'capture');assert.deepEqual(capture.metadata.controls,applied.controls);assert.equal(capture.metadata.controlSchemaHash,f.initial.controlSchemaHash);assert.equal(capture.metadata.controlSequence,1);assert.equal(capture.metadata.tempo.bpm,150);
   assert.deepEqual(Array.from(decode(new Uint8Array(capture.bytes)).data.slice(0,4)),[255,0,0,128]);
+});
+
+test('actual worker applies typed controls and acknowledges their exact values after a completed frame',async()=>{
+  const typedSchema=normalizeControlDeclarations({
+    height:{type:'number',label:'Height',default:1,min:0,max:4},
+    enabled:{type:'boolean',label:'Enabled',default:true},
+    mode:{type:'enum',label:'Mode',default:'soft',options:[{id:'soft',label:'Soft'},{id:'hard',label:'Hard'}]},
+  });
+  const f=await fixture(typedSchema),ready=await f.send(f.initial);
+  assert.equal(ready.type,'ready',JSON.stringify(ready));
+  assert.deepEqual(ready.controls,{height:1,enabled:true,mode:'soft'});
+  const values={height:2,enabled:false,mode:'hard'};
+  const applied=await f.send({type:'controls',requestId:'typed-set',controlSequence:1,controlSchemaHash:f.initial.controlSchemaHash,values});
+  assert.equal(applied.type,'status');assert.deepEqual(applied.controls,values);assert.deepEqual(f.frames.at(-1).controls,values);
+  const capture=await f.send({type:'capture',requestId:'typed-capture'});
+  assert.deepEqual(capture.metadata.controls,values);
 });
 
 test('actual worker exposes stable per-instance samples without changing the base control',async()=>{

@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SceneFileStore } from '../packages/core/src/scene-file.ts';
-import { prepareTransportScene } from './transport-prepare.mjs';
+import { prepareTransportScene, assertNumericExportControls } from './transport-prepare.mjs';
 import { exportResolume } from './export-resolume.mjs';
 
 /** Child-process entry point. No generated source is evaluated in this process. */
@@ -16,6 +16,9 @@ export async function exportSceneDocument(request, { prepare = prepareTransportS
   try {
     const scenePath = join(temporary, 'draft.lux-scene');
     const saved = await new SceneFileStore().saveAs(scenePath, request.document);
+    if(saved.document.version===7||saved.document.version===6&&saved.document.story)throw Error('Resolume export does not support Story playback yet');
+    if(saved.document.version===3||saved.document.version===6)assertNumericExportControls(saved.document.controls.schema);
+    else if(saved.document.version===4||saved.document.version===5)for(const node of saved.document.controls.nodes)assertNumericExportControls(node.schema);
     const prepared = await prepare(scenePath, join(temporary, 'prepared'));
     return await exporter({ scenePath, name: request.name.trim(), outputDirectory: request.outputDirectory,
       preparedPath: prepared.path, intensity: saved.document.controls.intensity,savedControls:prepared.savedControls });

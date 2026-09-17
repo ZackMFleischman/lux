@@ -18,6 +18,10 @@ test('versioned desktop split and laptop tab layouts contain Diagnostics beside 
   assert.ok((laptop.dock.grid.root.data as any[])[0].data.views.includes('graph'));
   assert.equal(registry.get('graph').title,'Graph');
   assert.equal(registry.get('diagnostics').title,'Diagnostics');
+  assert.equal(registry.get('story').title,'Story');
+  const inspectorGroup=(desktop.dock.grid.root.data as any[])[1];
+  assert.deepEqual(inspectorGroup.data.views,['inspector']);
+  assert.equal(inspectorGroup.data.activeView,'inspector');
   assert.throws(() => registry.get('timeline'), /Unavailable/);
   const expanded = createStudioPanelRegistry([{ kind: 'timeline', title: 'Timeline', multiple: false, parseViewState: () => ({}) }]);
   assert.equal(expanded.get('timeline').title, 'Timeline');
@@ -104,5 +108,8 @@ test('real Dockview CPU adapter moves, saves, restores, reopens and resets witho
   const read = storage.getItem; storage.getItem = () => { throw Error('storage unavailable'); };
   assert.match(adapter.restore('Unreadable').reason!, /storage unavailable/); assert.equal(api.totalPanels, 7); storage.getItem = read;
   data.set('lux.personal-layout.v1.Broken', '{bad'); assert.equal(adapter.restore('Broken').restored, false); assert.equal(api.totalPanels, 7);
+  adapter.move('graph','preview','center');adapter.openInToolGroup('story');assert.equal(api.getPanel('story')!.group,api.getPanel('jobs')!.group,'Story chooses a tool group that does not contain Preview');
+  adapter.move('story','preview','center');const customStoryGroup=api.getPanel('story')!.group;adapter.openInToolGroup('story');assert.equal(api.getPanel('story')!.group,customStoryGroup,'reopening an existing Story preserves user docking');
+  adapter.reset('Narrow','laptop');adapter.openInToolGroup('story');assert.notEqual(api.getPanel('story')!.group,api.getPanel('preview')!.group,'a single-group layout opens Story below Preview');
   adapter.dispose(); assert.throws(() => adapter.save('Personal'), /disposed/);
 });

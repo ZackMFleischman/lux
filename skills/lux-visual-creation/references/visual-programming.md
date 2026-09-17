@@ -6,9 +6,45 @@ This reference describes checked SDK 0.2.0 visuals, SDK 0.4.0 image composition,
 
 A source bundle contains `sdkVersion`, an `entry` such as `visual.ts`, and a `files` record mapping relative `.ts` paths to source text. v2 adds `sourceVersion: 2` and `assets`; preserve those fields on edits. Helpers are normal submitted modules, for example `import { palette } from './lib/palette.ts'`. The compiler accepts at most 32 files and 1 MiB aggregate UTF-8 code. Use simple ASCII path segments, forward slashes, explicit `.ts` extensions, and no case-only collisions.
 
-The entry must directly `export default defineVisual({...})`, importing `defineVisual` from `@lux/visual-sdk`. SDK 0.2 requires `{ controls, create }`. `controls` is a static literal map of numeric descriptors with no fixed control-count ceiling: `{ type: 'number', label, default, min, max, step?, unit?, description?, group? }`. The normalized schema must fit within 32 KiB of UTF-8 metadata. Use camelCase IDs. `description` is optional plain text, up to 512 characters, that Studio shows as help on hover or keyboard focus. No computed metadata, spreads, functions or imported declarations. `frame.controls` is typed from those IDs. Empty `{}` means no controls; do not invent Intensity. The source bundle must set `sdkVersion: '0.2.0'`. Legacy 0.1 sources retain `{ create }` and their compatibility intensity field. Discovery's contract and parameter types describe exact bounds.
+The entry must directly `export default defineVisual({...})`, importing `defineVisual` from `@lux/visual-sdk`. SDK 0.2 requires `{ controls, create }` and may add a literal `story` capability declaration on a supporting Studio build; see [Story playback](story-playback.md). `controls` is a static literal map of control descriptors (number, boolean, enum or trigger) with no fixed control-count ceiling: `{ type: 'number', label, default, min, max, step?, unit?, description?, group? }`. The normalized schema must fit within 32 KiB of UTF-8 metadata. Use camelCase IDs. `description` is optional plain text, up to 512 characters, that Studio shows as help on hover or keyboard focus. No computed metadata, spreads, functions or imported declarations. `frame.controls` is typed from those IDs. Empty `{}` means no controls; do not invent Intensity. The source bundle must set `sdkVersion: '0.2.0'`. Legacy 0.1 sources retain `{ create }` and their compatibility intensity field. Discovery's contract and parameter types describe exact bounds.
 
-When one control should differ across repeated elements, read it with `frame.sampleControl?.('size', instanceIndex) ?? frame.controls.size`. The first argument is a declared control ID. The second is a stable string or whole-number identity for the element, not a frame counter. Studio returns the ordinary base value when no compatible variation is configured; the optional call and fallback also keep the source runnable in an older Studio. Random gives stable uniform values, Center-weighted favors the base, and Spread gives consecutive numeric keys an even artistic range. All results clamp to the declared minimum and maximum.
+Controls also support booleans and named choices when the running Studio reports `parameterKinds` containing `boolean` and `enum`. Declare them as literal data:
+
+```ts
+controls: {
+  trails: { type: 'boolean', label: 'Trails', default: true },
+  palette: {
+    type: 'enum', label: 'Palette', default: 'cool', presentation: 'segmented',
+    options: [{ id: 'cool', label: 'Cool' }, { id: 'warm', label: 'Warm' }],
+  },
+}
+```
+
+Use `frame.controls.trails` as a boolean and `frame.controls.palette` as the stable option ID. Enum presentation can be `dropdown` (default), `radio`, or `segmented`; it does not change the saved value. Renaming/reordering options preserves an existing selected ID; removing it uses the new default. Booleans and enums support reset to default but not numeric animation, variation, or input mapping. Current Resolume export rejects these types explicitly; do not substitute numbers merely to claim equivalent export behavior.
+
+For a momentary action, declare `regenerate: { type: 'trigger', label: 'Regenerate' }`
+in the same literal control map. It may have `description` and `group`, but no
+default or value. Handle it inside `update(frame)`:
+
+```ts
+for (const event of frame.events) {
+  if (event.controlId === 'regenerate') {
+    // Change this instance's authored state once.
+  }
+}
+```
+
+Each event has `type: 'trigger'`, a typed `controlId`, `commandId` and `sequence`.
+The ID is absent from `frame.controls`. Events route to the addressed component
+instance, including public aliases. They are not repeated on later frames or
+saved in scene values. Make the action work with zero delta while paused; avoid
+using elapsed time as evidence that a button was pressed. Studio renders a real
+button and acknowledges a completed frame. Numeric modulation and current
+Resolume export do not support triggers. Require the running app's
+`controlTriggers` capability before authoring or invoking them. See
+[trigger controls](../assets/trigger-controls.ts) for a complete example.
+
+When one numeric control should differ across repeated elements, read it with `frame.sampleControl?.('size', instanceIndex) ?? frame.controls.size`. The first argument is a declared numeric control ID. The second is a stable string or whole-number identity for the element, not a frame counter. Studio returns the ordinary base value when no compatible variation is configured; the optional call and fallback also keep the source runnable in an older Studio. Random gives stable uniform values, Center-weighted favors the base, and Spread gives consecutive numeric keys an even artistic range. All results clamp to the declared minimum and maximum.
 
 ## Readable authored TypeScript
 
@@ -20,7 +56,7 @@ Keep a short object or method on one line only when it remains easy to scan. Pre
 
 For TypeScript annotations, `ComponentDefinition` retains its existing code-component meaning (including `create`). `CodeComponentDefinition` is its explicit equivalent; use `AnyComponentDefinition` when an annotation must accept either code or graph implementations. `defineComponent` infers the correct result for each form.
 
-SDK 0.4 uses `defineComponent` for reusable code components or graph components, and `defineVisual` for the runnable entry graph. Code components declare `metadata` and `create`; graph components declare the literal graph fields below. Existing `defineComposition` entries and reusable groups remain compatible without source migration. A graph component may import code or graph components recursively, but cannot import a runnable `defineVisual` as a component. Code metadata statically declares image, paths2d or shader-field ports, numeric controls, descriptions, and lifecycle. A code component instance implements `update(frame)`, `evaluate(inputs, evaluation)`, `reset(seed)`, and `dispose()`. Its evaluation returns `{ image: await evaluation.render(scene, camera) }`; an effect reads `inputs.image.texture` and renders its own output. Lux owns intermediate render targets and releases them only after downstream GPU work settles.
+SDK 0.4 uses `defineComponent` for reusable code components or graph components, and `defineVisual` for the runnable entry graph. Code components declare `metadata` and `create`; graph components declare the literal graph fields below. Existing `defineComposition` entries and reusable groups remain compatible without source migration. A graph component may import code or graph components recursively, but cannot import a runnable `defineVisual` as a component. Code metadata statically declares image, paths2d or shader-field ports, typed controls, descriptions, and lifecycle. A code component instance implements `update(frame)`, `evaluate(inputs, evaluation)`, `reset(seed)`, and `dispose()`. Its evaluation returns `{ image: await evaluation.render(scene, camera) }`; an effect reads `inputs.image.texture` and renders its own output. Lux owns intermediate render targets and releases them only after downstream GPU work settles.
 
 Each composition statically lists `definitions`, stable UUID `nodes`, `edges`, one `output`, and selected `expose` rows. A reusable effect composition also declares one `input: { nodeId, portId: 'image' }`, while the root omits `input`; `label` gives the group a readable Graph name. Each exposed ID is an alias for exactly one `{nodeId, controlId}` target, which may itself be another composition exposure. Lux resolves the chain to one canonical leaf control. The alias keeps that control's description, so authors do not duplicate help text. For example, two root nodes using the same two-effect composition can expose `segmentsA` and `segmentsB`; changing one does not mutate the other. Stable full node paths persist compatible values and local LFOs across save/reopen, declaration reorder, and a linked component revision. Added, removed, unit-changed, and out-of-range controls are reported; incompatible values reset to the new declaration default. A rebound alias does not transfer a saved value to another instance.
 

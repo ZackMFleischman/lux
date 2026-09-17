@@ -28,6 +28,45 @@ test('static extraction preserves optional literal control groups', () => {
   ]);
 });
 
+test('static extraction admits boolean and dense literal enum declarations without executing metadata', () => {
+  assert.deepEqual(extract(source(`{
+    trail: { type: 'boolean', label: 'Trail', default: true },
+    direction: { type: 'enum', label: 'Direction', default: 'reverse', presentation: 'radio', options: [
+      { id: 'forward', label: 'Forward' },
+      ({ id: 'reverse', label: 'Reverse', description: 'Move backward' } as const),
+    ] },
+  }`)), [
+    { id: 'trail', type: 'boolean', label: 'Trail', default: true, changeCost: 'live' },
+    { id: 'direction', type: 'enum', label: 'Direction', default: 'reverse', options: [{ id: 'forward', label: 'Forward' }, { id: 'reverse', label: 'Reverse', description: 'Move backward' }], presentation: 'radio', changeCost: 'live' },
+  ]);
+});
+
+test('static extraction admits trigger metadata without inventing a persistent default', () => {
+  assert.deepEqual(extract(source(`{
+    regenerate: { type: 'trigger', label: ' Regenerate ', description: ' Build another pattern ', group: ' Actions ' },
+  }`)), [
+    { id: 'regenerate', type: 'trigger', label: 'Regenerate', description: 'Build another pattern', group: 'Actions', changeCost: 'live' },
+  ]);
+  for (const declaration of [
+    `{ type:'trigger', label:'Regenerate', default:false }`,
+    `{ type:'trigger', label:makeLabel() }`,
+    `{ type:'trigger', get label(){return 'Regenerate'} }`,
+    `{ type:'trigger', ['label']:'Regenerate' }`,
+  ]) assert.throws(() => extract(source(`{ regenerate: ${declaration} }`)), { code: 'COMPILE_FAILED' });
+});
+
+test('static enum extraction rejects references, calls, spreads, holes, methods and computed option fields', () => {
+  for (const options of [
+    'options', 'makeOptions()', '[first, {id:"reverse",label:"Reverse"}]',
+    '[...options]', '[{id:"forward",label:"Forward"},, {id:"reverse",label:"Reverse"}]',
+    '[{id:"forward",label:"Forward"}, {...second}]',
+    '[{id:"forward",label:"Forward"}, {get id(){return "reverse"},label:"Reverse"}]',
+    '[{id:"forward",label:"Forward"}, {["id"]:"reverse",label:"Reverse"}]',
+  ]) assert.throws(() => extract(source(`{ direction: { type:'enum', label:'Direction', default:'forward', options:${options} } }`)), error => {
+    assert.equal(error.code, 'COMPILE_FAILED'); assert.match(error.message, /literal|dense|spread|computed|reference|call/i); return true;
+  }, options);
+});
+
 test('static extraction rejects executable/reference metadata, spreads, duplicate and computed keys', () => {
   for (const controls of [
     'settings', 'makeControls()', `{ ...settings }`, `{ height: settings }`, `{ height: makeControl() }`,

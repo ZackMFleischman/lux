@@ -2,10 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   normalizeControlDeclarations, normalizeControlSchema, canonicalControlSchemaJson,
-  defaultControlValues, validateControlPatch, validateControlSnapshot, reconcileControlValues,
+  defaultControlValues, validateControlPatch, validateControlSnapshot, reconcileControlValues, isNumberControlDefinition,
 } from '../../packages/runtime-contracts/src/parameters.mjs';
 
 const number = (overrides = {}) => ({ type: 'number', label: 'Height', default: 1, min: 0, max: 4, ...overrides });
+const boolean = (overrides = {}) => ({ type: 'boolean', label: 'Trail', default: true, ...overrides });
+const enumeration = (overrides = {}) => ({
+  type: 'enum', label: 'Direction', default: 'forward',
+  options: [{ id: 'forward', label: 'Forward' }, { id: 'reverse', label: 'Reverse', description: 'Move backward' }],
+  ...overrides,
+});
+const trigger = (overrides = {}) => ({ type: 'trigger', label: 'Regenerate', ...overrides });
 const declarations = () => ({ spikeHeight: number(), roughness: number({ label: 'Roughness', default: 0.4, max: 1, step: 0.1 }) });
 
 test('declarations preserve semantic IDs/order, normalize metadata, and freeze independent snapshots', () => {
@@ -50,6 +57,77 @@ test('optional groups preserve declared order while legacy schemas keep their ca
   });
   assert.deepEqual(grouped.map(({ id, group }) => [id, group]), [['speed', 'Motion'], ['height', 'Shape']]);
   assert.deepEqual(normalizeControlSchema(grouped), grouped);
+});
+
+test('boolean and enum declarations normalize stable option identities and typed defaults', () => {
+  const schema = normalizeControlDeclarations({
+    trail: boolean({ label: '  Trail  ', group: ' Motion ' }),
+    direction: enumeration({ options: [{ id: 'forward', label: ' Forward ' }, { id: 'reverse', label: ' Reverse ', description: ' Move backward ' }] }),
+    mode: enumeration({ label: 'Mode', default: 'soft', presentation: 'segmented', options: [{ id: 'hard', label: 'Hard' }, { id: 'soft', label: 'Soft' }] }),
+  });
+  assert.deepEqual(schema, [
+    { id: 'trail', type: 'boolean', label: 'Trail', default: true, group: 'Motion', changeCost: 'live' },
+    { id: 'direction', type: 'enum', label: 'Direction', default: 'forward', options: [{ id: 'forward', label: 'Forward' }, { id: 'reverse', label: 'Reverse', description: 'Move backward' }], presentation: 'dropdown', changeCost: 'live' },
+    { id: 'mode', type: 'enum', label: 'Mode', default: 'soft', options: [{ id: 'hard', label: 'Hard' }, { id: 'soft', label: 'Soft' }], presentation: 'segmented', changeCost: 'live' },
+  ]);
+  assert.deepEqual(defaultControlValues(schema), { trail: true, direction: 'forward', mode: 'soft' });
+  assert.equal(isNumberControlDefinition(schema[0]), false);
+  assert.equal(isNumberControlDefinition(normalizeControlDeclarations({ height: number() })[0]), true);
+  assert.throws(() => { schema[1].options[0].label = 'Changed'; }, TypeError);
+  assert.throws(() => schema[1].options.push({ id: 'other', label: 'Other' }), TypeError);
+});
+
+test('trigger declarations participate in schema identity without creating persistent values', () => {
+  const schema = normalizeControlDeclarations({
+    height: number(), regenerate: trigger({ label: '  Regenerate  ', description: ' Rebuild the pattern ', group: ' Actions ' }),
+  });
+  assert.deepEqual(schema, [
+    { id: 'height', type: 'number', label: 'Height', default: 1, min: 0, max: 4, changeCost: 'live' },
+    { id: 'regenerate', type: 'trigger', label: 'Regenerate', description: 'Rebuild the pattern', group: 'Actions', changeCost: 'live' },
+  ]);
+  assert.equal(canonicalControlSchemaJson(schema), '[{"id":"height","type":"number","label":"Height","default":1,"min":0,"max":4,"changeCost":"live"},{"id":"regenerate","type":"trigger","label":"Regenerate","description":"Rebuild the pattern","group":"Actions","changeCost":"live"}]');
+  assert.deepEqual(defaultControlValues(schema), { height: 1 });
+  assert.deepEqual(validateControlSnapshot(schema, { height: 2 }), { height: 2 });
+  assert.throws(() => validateControlPatch(schema, { regenerate: true }), error => error.message === 'Trigger controls use the trigger command.');
+  assert.throws(() => validateControlSnapshot(schema, { height: 2, regenerate: 'now' }), error => error.message === 'Trigger controls use the trigger command.');
+});
+
+test('trigger declaration validation rejects value fields and preserves strict metadata admission', () => {
+  for (const invalid of [
+    trigger({ default: false }), trigger({ changeCost: 'live' }), trigger({ extra: true }),
+  ]) assert.throws(() => normalizeControlDeclarations({ regenerate: invalid }), /field/i);
+  let calls = 0;
+  const accessor = { type: 'trigger', get label() { calls++; return 'Regenerate'; } };
+  assert.throws(() => normalizeControlDeclarations({ regenerate: accessor }));
+  assert.equal(calls, 0);
+});
+
+test('typed patches and snapshots enforce each declared control kind and enum membership', () => {
+  const schema = normalizeControlDeclarations({ height: number(), trail: boolean(), direction: enumeration() });
+  assert.deepEqual(validateControlPatch(schema, { trail: false, direction: 'reverse' }), { trail: false, direction: 'reverse' });
+  assert.deepEqual(validateControlSnapshot(schema, { direction: 'forward', trail: true, height: 2 }), { height: 2, trail: true, direction: 'forward' });
+  for (const values of [{ trail: 1 }, { trail: 'true' }, { direction: 'Forward' }, { direction: 'missing' }, { direction: false }]) {
+    assert.throws(() => validateControlPatch(schema, values), /trail|direction/);
+  }
+});
+
+test('enum declarations reject unsafe, duplicate, sparse, oversized and unknown option data without invoking accessors', () => {
+  for (const options of [
+    [], [{ id: 'forward', label: 'Forward' }],
+    [{ id: 'forward', label: 'Forward' }, { id: 'forward', label: 'Again' }],
+    [{ id: 'constructor', label: 'Unsafe' }, { id: 'forward', label: 'Forward' }],
+    Array.from({ length: 65 }, (_, index) => ({ id: `option${index}`, label: `Option ${index}` })),
+  ]) assert.throws(() => normalizeControlDeclarations({ direction: enumeration({ options }) }), /option|2.*64|duplicate|ID/i);
+  for (const invalid of [
+    enumeration({ default: 'missing' }), enumeration({ presentation: 'buttons' }),
+    enumeration({ options: [{ id: 'forward', label: 'Forward', extra: true }, { id: 'reverse', label: 'Reverse' }] }),
+  ]) assert.throws(() => normalizeControlDeclarations({ direction: invalid }), /default|presentation|field/i);
+  const sparse = new Array(2); sparse[0] = { id: 'forward', label: 'Forward' };
+  assert.throws(() => normalizeControlDeclarations({ direction: enumeration({ options: sparse }) }), /dense|array/i);
+  let calls = 0;
+  const options = [{ get id() { calls++; return 'forward'; }, label: 'Forward' }, { id: 'reverse', label: 'Reverse' }];
+  assert.throws(() => normalizeControlDeclarations({ direction: enumeration({ options }) }));
+  assert.equal(calls, 0);
 });
 
 test('invalid IDs, duplicate normalized IDs and unsupported descriptor fields are rejected', () => {
@@ -174,4 +252,27 @@ test('reconciliation validates saved snapshots and handles first build, empty sc
   assert.throws(() => reconcileControlValues(next, {}, next));
   const old = normalizeControlDeclarations({ height: number({ unit: 'm' }) });
   assert.equal(reconcileControlValues(old, { height: 2 }, next).changes[0].reason, 'unit-changed');
+});
+
+test('reconciliation preserves typed identities and reports option removal or kind changes', () => {
+  const previous = normalizeControlDeclarations({
+    trail: boolean(), direction: enumeration(), changed: boolean({ default: false }),
+  });
+  const next = normalizeControlDeclarations({
+    trail: boolean({ label: 'Trail enabled', default: false }),
+    direction: enumeration({ default: 'reverse', presentation: 'radio', options: [{ id: 'reverse', label: 'Back' }, { id: 'sideways', label: 'Sideways' }] }),
+    changed: enumeration({ default: 'a', options: [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }] }),
+  });
+  const result = reconcileControlValues(previous, { trail: true, direction: 'forward', changed: true }, next);
+  assert.deepEqual(result.values, { trail: true, direction: 'reverse', changed: 'a' });
+  assert.deepEqual(result.changes, [
+    { id: 'direction', reason: 'option-removed', previousValue: 'forward', value: 'reverse' },
+    { id: 'changed', reason: 'type-changed', previousValue: true, value: 'a' },
+  ]);
+});
+
+test('reconciliation ignores trigger additions, removals and metadata changes', () => {
+  const previous = normalizeControlDeclarations({ height: number(), removedAction: trigger(), renamedAction: trigger({ label: 'Before' }) });
+  const next = normalizeControlDeclarations({ height: number(), addedAction: trigger(), renamedAction: trigger({ label: 'After' }) });
+  assert.deepEqual(reconcileControlValues(previous, { height: 2 }, next), { values: { height: 2 }, changes: [] });
 });

@@ -1,4 +1,23 @@
-import type { StudioClient, StudioSnapshot } from './service-client.ts';
+import type { RuntimeView, StudioClient, StudioSnapshot } from './service-client.ts';
+
+type StoryFrame=NonNullable<RuntimeView['story']>['frame'];
+function urgentStoryFrame(frame:StoryFrame){
+  return frame.state==='active'?((({elapsedSeconds:_elapsedSeconds,localTimeSeconds:_localTimeSeconds,progress:_progress,...identity})=>identity)(frame)):frame;
+}
+function urgentStory(story:NonNullable<RuntimeView['story']>){
+  const {frame,sequence,effectiveAdvancing:_effectiveAdvancing,...state}=story;
+  const {dwellElapsedSeconds:_dwellElapsedSeconds,dwellRemainingSeconds:_dwellRemainingSeconds,...sequenceState}=sequence;
+  return {...state,frame:urgentStoryFrame(frame),sequence:sequenceState};
+}
+function urgentStorySchedule(story:NonNullable<RuntimeView['storySchedule']>){
+  const {committed,outgoing,incoming,crossfadeProgress:_crossfadeProgress,sequence,effectiveAdvancing:_effectiveAdvancing,...state}=story;
+  const activation=(value:typeof committed)=>value?{...value,frame:urgentStoryFrame(value.frame)}:null;
+  const {dwellElapsedSeconds:_dwellElapsedSeconds,dwellRemainingSeconds:_dwellRemainingSeconds,...sequenceState}=sequence;
+  return {...state,committed:activation(committed),outgoing:activation(outgoing),incoming:activation(incoming),sequence:sequenceState};
+}
+function urgentVisualStates(states:NonNullable<RuntimeView['visualStates']>){
+  return states.map(({effectiveControls:_effectiveControls,effectiveNodeControls:_effectiveNodeControls,...state})=>state);
+}
 
 // Only these observations may wait. Newly added state fields conservatively
 // remain urgent, including applied controls, transport, owner, faults and jobs.
@@ -7,8 +26,9 @@ function urgentState(snapshot: StudioSnapshot): string {
   // Animation time and effective values advance with the render clock. They are
   // display-only observations, so keep them on the same bounded UI cadence as
   // frame/FPS updates. Base values, bindings, issues and transport remain urgent.
-  const runtime = authoring ? (({ frameId, timeSeconds, effectiveControls, effectiveNodeControls, tempo, ...rest }) => ({...rest,
-    ...(tempo?{tempo:{bpm:tempo.bpm,tempoSequence:tempo.tempoSequence}}:{})}))(authoring) : null;
+  const runtime = authoring ? (({ frameId, timeSeconds, effectiveControls, effectiveNodeControls, tempo, story, storySchedule, visualStates, ...rest }) => ({...rest,
+    ...(tempo?{tempo:{bpm:tempo.bpm,tempoSequence:tempo.tempoSequence}}:{}),...(story?{story:urgentStory(story)}:{}),
+    ...(storySchedule?{storySchedule:urgentStorySchedule(storySchedule)}:{}),...(visualStates?{visualStates:urgentVisualStates(visualStates)}:{})}))(authoring) : null;
   return JSON.stringify({ ...state, authoring: runtime });
 }
 

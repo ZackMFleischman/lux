@@ -63,8 +63,8 @@ Read live tool schemas if available; these are the checked adapter's contracts. 
 | Tool | Arguments and result |
 | --- | --- |
 | `discover` | `{}` → adapter-checkout SDK source, example, shared types, imports, declared capabilities, and compact Library catalog without component source. No running-app handshake; can succeed with Studio closed. |
-| `read` | `{}` → `{ source, draftVersion, ..., status }`. Complete source; don't truncate assets/files when storing it for an edit. |
-| `build` | `{ expectedDraftVersion, source, libraryLinks?: [{ componentId, mountPath }] }` → `{ draftVersion, status }` after resolving linked component source and candidate promotion. The accepted candidate starts playing by default. A later explicit Pause during the operation wins before promotion. This is a complete replacement. Preserve current links from `read.libraryLinks` unless the requested edit changes them. |
+| `read` | `{}` → `{ source, document, draftVersion, ..., status }`. For Scene versions 1–6, `source` is the complete source bundle and `document` is null. For Scene 7, `document` is the complete authoritative multi-visual scene and `source` is only the selected editor view. |
+| `build` | Exactly one of `{ expectedDraftVersion, source, libraryLinks?, story? }` or `{ expectedDraftVersion, document }` → `{ draftVersion, status }` after candidate promotion. The first form replaces one complete source bundle. The second replaces one complete Scene 7 document and cannot include source, libraryLinks, or Story v1 siblings. The accepted candidate starts playing by default. A later explicit Pause during the operation wins before promotion. |
 | `save` | `{ path, expectedDraftVersion, overwrite?: false }` → saved scene name/token. `path` is an absolute `.lux-scene` path. Existing targets require explicit `overwrite: true`; no-overwrite uses exclusive creation and retains external-change protection. The saved document includes current controls and control animations. |
 | `open` | `{ path, expectedDraftVersion, discardDirty?: false }` → opened scene name/token. `path` is an absolute `.lux-scene` path. Dirty source, controls, or library links require `discardDirty: true`. Invalid reads or failed candidate activation retain the existing draft and preview. |
 | `status` | `{}` → snapshot containing `authoring`, which is null before a working runtime exists. |
@@ -73,6 +73,7 @@ Read live tool schemas if available; these are the checked adapter's contracts. 
 | `tempo.set` | `{ instanceId, expectedGeneration, expectedRevisionId, bpm }` → acknowledged runtime state. BPM is 20–300; manual changes preserve current beat phase. Requires running Studio protocol 3 tempo capability. |
 | `tempo.tap` | `{ instanceId, expectedGeneration, expectedRevisionId }` → acknowledged runtime state with `tempoResult: 'accepted' | 'restarted' | 'ignored-short'`. Requires running Studio protocol 3 tempo capability. |
 | `parameters` | `{ instanceId, expectedGeneration, expectedRevisionId, expectedControlSchemaHash, values: { spikeHeight: 0.5 }, mode: 'live' }` → `{ applied, status }`. Use actual runtime `controlSchema` IDs/ranges and `controlSchemaHash`; the patch can change several keys atomically. Unknown keys and stale schemas are rejected. |
+| `trigger` | `{ instanceId, expectedGeneration, expectedRevisionId, expectedControlSchemaHash, controlId, commandId, nodePath? }` → `{ applied, status }` with a completed-frame trigger receipt. Requires running `controlTriggers` capability. Use a fresh command ID per intentional action; retry uncertainty with the same ID and guards. Optional nodePath addresses an instance. |
 | `variation` | `{ instanceId, expectedGeneration, expectedRevisionId, expectedControlSchemaHash, nodePath, controlId, variation: { amount, distribution: 'random' | 'centered' | 'spread', enabled } | null }` → `{ applied, status }`. Status exposes the admitted `kind: 'variation'` binding in `authoring.controlAnimations`. Use an empty `nodePath` for a direct visual, or the canonical leaf path reported by composition status. Requires `capabilities.controlVariation.stableInstanceKeys`. |
 | `restart` | `{ instanceId, expectedGeneration }` → replacement runtime status; source and controls retained. Use for recovery when needed, not every edit. |
 
@@ -82,9 +83,20 @@ The Library panel is read-only for source. It lists the repository-shared standa
 
 Obtain `instanceId`, `generation`, `revisionId`, and `playback` from `status.authoring` (or a tool response's `status.authoring`). Map `generation` to `expectedGeneration` and `revisionId` to `expectedRevisionId`; do not invent them. Restart replaces the generation, so refresh guards afterward. For rejected stale guards, reread state and reconsider the action instead of forcing it against an unrelated runtime.
 
-For source edits, `structuredClone(current.source)` is a useful starting point. Modify only the intended entries in `.files`; preserve the remaining bundle. A complete-source build is atomic and version guarded. Typing through Playwright or streaming characters into the user's editor has different concurrency behavior and is not the creation path; token-by-token edit visualization is not exposed by the checked MCP API.
+Trigger IDs are rows with `type: 'trigger'` in the accepted schema. They have no
+entry in parameter values. A command's receipt is returned only after its event
+has been consumed by one update and the frame completes. A paused trigger uses
+zero delta and stays paused. Duplicate IDs for the same canonical target return
+the original receipt; using that ID for another target rejects. Each generation
+admits at most 16,384 IDs without eviction. Saturation rejects new commands until
+an explicit runtime restart. Reset retains the ledger and never replays actions.
+Rebuild/restart changes generation; do not automatically reissue an old action
+under new guards. A timeout is uncertain, so retain the command ID for a same-
+generation retry. Save/open, Looks and captured values contain no action history.
 
-Current tools do not expose export, resolution changes or audio inputs. Numeric visual-defined controls are available; color/Boolean/enum controls are not yet supported. Do not claim a tool result performed those actions. Inspect updated discovery for newer capabilities before concluding they remain unavailable.
+For a version 1–6 source edit, `structuredClone(current.source)` is a useful starting point. Modify only the intended entries in `.files`; preserve the remaining bundle. For Scene 7, start from `structuredClone(current.document)`, locate the intended row in `document.visuals`, and modify that row's source. Preserve every other visual, saved control cache, control animation, output setting, tempo field, and Story field. Never submit the selected `source` as though it were the whole Scene 7. Both build forms are atomic and version guarded. Legacy source bundles keep their existing source-format size limits. A Scene 7 document is limited to 32 MiB; its local bridge request is limited to 34 MiB. Read JSON has a 52 MiB bound for the document, one selected-source view and runtime metadata; the escaped MCP result is limited to 104 MiB. Typing through Playwright or streaming characters into the user's editor has different concurrency behavior and is not the creation path; token-by-token edit visualization is not exposed by the checked MCP API.
+
+Current tools do not expose export, resolution changes or audio inputs. Number, boolean and enum visual-defined controls are available when reported by the running app parameterKinds capability; color controls are not yet supported. Do not claim a tool result performed those actions. Inspect updated discovery for newer capabilities before concluding they remain unavailable.
 
 Studio's Inspector also supports local audio modulation through **Animate → Add Audio**. The user explicitly connects an input in the audio controls; all bindings share that analyzer and can select Level, Bass, Mids or Highs with independent amount, attack and release. Base control values remain editable. Scene files retain the logical input and binding settings, not device IDs or microphone permission; reopening requires an explicit connection. Disconnect before choosing another device; changing the shared analyzer configuration also disconnects the current input. Disconnect releases modulation back to the manual base. This UI capability does not grant agents an MCP audio-capture command. Kick detection drives transient envelopes only. Manual/tap tempo is separate and never inferred from audio.
 
@@ -107,3 +119,17 @@ Use File → Looks… to save and recall a named working preview. A look include
 Studio does not impose a fixed control-count ceiling. Discovery reports `maxParameterMetadataBytes` for schema metadata. The current native Resolume plug-in transport still accepts at most 32 exposed controls; export reports that compatibility limit explicitly without restricting Studio editing, animation, scene saves, or Preview capture.
 
 Library create/update accept optional `dependencies` rows `{componentId, revision, mountPath}`. Library read accepts optional `revision`. Each dependency is pinned, resolved for validation and mounting, and stays a reference in stored composition source. Use independently published image/paths2d/shader-field leaves for generators and renderers.
+
+## Typed parameter edits
+
+Read status for the running app's `parameterKinds`, current `controlSchema`, instance/generation/revision and schema hash. Use the existing `lux.studio.parameters` tool for all persistent types: `values: { speed: 0.8, trails: true, palette: "warm" }`, with the current required guards and `mode: "live"`. Enum values are option IDs, never labels or indices. The authoritative schema rejects incorrect value types, unknown IDs and absent options. Inspect the applied response; a submitted patch is not evidence of a rendered frame. Re-read after a stale guard rather than replaying old intent against an unrelated visual. No tool per switch or option is needed. Source declaration changes still use complete guarded build and scene save/open.
+
+## Story playback
+
+When the running app reports Story support for SDK0.2 root visuals, use
+`lux.story.read` (`status`, `definition`, or `capabilities`) and the single
+`lux.story.transport` action DTO. Source builds accept an optional complete
+`story` definition: omission preserves it, null removes it. See
+[Story playback](story-playback.md) for guards, sustained/manual behavior,
+sequence occurrences, timed seeking, return-to-normal examples, and complete
+Scene 7 multi-visual document builds.

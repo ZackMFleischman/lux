@@ -38,6 +38,7 @@ contextBridge.exposeInMainWorld('luxConfirmation', Object.freeze({
 contextBridge.exposeInMainWorld('luxAuthoring', Object.freeze({
   example: () => ipcRenderer.invoke('studio:authoring', 'example'),
   compile: (source: unknown) => ipcRenderer.invoke('studio:authoring', 'compile', source),
+  compileDocument: (document: unknown) => ipcRenderer.invoke('studio:authoring', 'compile-document', document),
   smokeResult: (result: unknown) => ipcRenderer.invoke('studio:authoring', 'smoke-result', result),
   smokeEnabled: () => ipcRenderer.invoke('studio:authoring', 'smoke-enabled'),
   open: () => ipcRenderer.invoke('studio:authoring', 'open'),

@@ -7,13 +7,24 @@ import { linkRuntime } from '../apps/build-worker/src/link-runtime.mjs';
 import releaseIO from '../tools/gpu-spike/transport-release.cjs';
 import { reconcileControlValues } from '../packages/runtime-contracts/src/parameters.mjs';
 
+export function assertNumericExportControls(schema) {
+  const unsupported=schema?.find(control=>control.type!=='number');
+  if(unsupported)throw Error(`Resolume export does not support control ${unsupported.id} (${unsupported.type}). This scene can still be edited and captured in Studio.`);
+}
+
 export async function prepareTransportScene(filename, directory = 'artifacts/transport') {
   const { document } = await new SceneFileStore().open(filename);
+  if(document.version===7||document.version===6&&document.story)throw Error('Resolume export does not support Story playback yet');
+  if(document.version===3||document.version===6)assertNumericExportControls(document.controls.schema);
+  else if(document.version===4||document.version===5)for(const node of document.controls.nodes)assertNumericExportControls(node.schema);
   const { settings } = document;
   if (settings.width !== 1920 || settings.height !== 1080 || settings.fps !== 60) throw Error('Transport currently requires 1920×1080 at 60 fps');
   const dependencyRoot = await realpath(fileURLToPath(new URL('../node_modules', import.meta.url)));
   const result = await compileVisual({ source: document.source }, { dependencyRoot });
   if (!result.ok) throw Error(result.diagnostics.map(d => d.message).join('\n'));
+  if(result.artifact.storyCapability)throw Error('Resolume export does not support Story-aware visuals yet');
+  assertNumericExportControls(result.artifact.controls);
+  for(const node of result.artifact.composition?.nodes??[])assertNumericExportControls(node.schema);
   const linked = await linkRuntime(result.artifact, { dependencyRoot });
   const release = { format: 'lux-transport', version: 1, sourceHash: result.artifact.sourceHash, settings, linked };
   const bytes = JSON.stringify(release);

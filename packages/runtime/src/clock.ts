@@ -8,6 +8,7 @@ export type ClockSnapshot = Readonly<{
   timeSeconds: number;
   clockEpoch: number;
 }>;
+const finite=Number.isFinite,maxSafeInteger=Number.MAX_SAFE_INTEGER,freeze=Object.freeze,RuntimeRangeError=RangeError,RuntimeTypeError=TypeError;
 
 export class RuntimeClock {
   private readonly nowMs: () => number;
@@ -18,8 +19,8 @@ export class RuntimeClock {
   private epoch = 0;
 
   constructor(nowMs: () => number, initialPlayback: PlaybackState = 'paused') {
-    if (typeof nowMs !== 'function') throw TypeError('An injected monotonic clock is required');
-    if (initialPlayback !== 'paused' && initialPlayback !== 'playing') throw TypeError('Invalid initial playback state');
+    if (typeof nowMs !== 'function') throw new RuntimeTypeError('An injected monotonic clock is required');
+    if (initialPlayback !== 'paused' && initialPlayback !== 'playing') throw new RuntimeTypeError('Invalid initial playback state');
     this.nowMs = nowMs;
     this.playback = initialPlayback;
     this.anchorMs = this.sample();
@@ -47,7 +48,7 @@ export class RuntimeClock {
 
   reset(): ClockSnapshot {
     const now = this.sample();
-    if (this.epoch === Number.MAX_SAFE_INTEGER) throw RangeError('Clock epoch exhausted; a new runtime generation is required');
+    if (this.epoch === maxSafeInteger) throw new RuntimeRangeError('Clock epoch exhausted; a new runtime generation is required');
     this.accumulatedMs = 0;
     this.anchorMs = now;
     this.epoch++;
@@ -56,8 +57,8 @@ export class RuntimeClock {
 
   private sample(): number {
     const now = this.nowMs();
-    if (!Number.isFinite(now) || now < this.lastSampleMs || now > Number.MAX_SAFE_INTEGER) {
-      throw RangeError('Monotonic clock must provide finite nonnegative nondecreasing milliseconds within the safe range');
+    if (!finite(now) || now < this.lastSampleMs || now > maxSafeInteger) {
+      throw new RuntimeRangeError('Monotonic clock must provide finite nonnegative nondecreasing milliseconds within the safe range');
     }
     this.lastSampleMs = now;
     return now;
@@ -65,6 +66,6 @@ export class RuntimeClock {
 
   private at(now: number): ClockSnapshot {
     const elapsed = this.accumulatedMs + (this.playback === 'playing' ? now - this.anchorMs : 0);
-    return Object.freeze({ playback: this.playback, timeSeconds: elapsed / 1000, clockEpoch: this.epoch });
+    return freeze({ playback: this.playback, timeSeconds: elapsed / 1000, clockEpoch: this.epoch });
   }
 }

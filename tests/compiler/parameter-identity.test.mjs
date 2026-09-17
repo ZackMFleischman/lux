@@ -75,3 +75,14 @@ test('compiler parent binds v3 to SDK, source hash and source assets including a
     assert.equal(result.ok,false); assert.match(result.diagnostics[0].message,/source.*asset/i);
   } finally { if(dirname(resolve(directory))!==resolve(tmpdir()))throw Error('Unsafe cleanup'); await rm(directory,{recursive:true,force:true}); }
 });
+
+test('compiled artifact DTO admits normalized boolean and enum definitions and rejects incomplete enum metadata', () => {
+  const typedControls = normalizeControlDeclarations({
+    trail: { type: 'boolean', label: 'Trail', default: true },
+    direction: { type: 'enum', label: 'Direction', default: 'forward', options: [{ id: 'forward', label: 'Forward' }, { id: 'reverse', label: 'Reverse' }] },
+  });
+  const artifact = sign(artifactBody({ ...base, controls: typedControls, controlSchemaHash: hash(canonicalControlSchemaJson(typedControls)) }));
+  assert.equal(compiledArtifactSchema.safeParse(artifact).success, true);
+  const incomplete = structuredClone(artifact); delete incomplete.controls[1].presentation;
+  assert.equal(compiledArtifactSchema.safeParse(incomplete).success, false);
+});

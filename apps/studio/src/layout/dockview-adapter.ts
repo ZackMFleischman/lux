@@ -90,6 +90,16 @@ export class LuxDockviewAdapter {
     const panel=this.api.getPanel(kind);
     if(reference&&panel&&panel!==reference&&panel.group===reference.group)panel.api.moveTo({group:reference.group,position:'right'});
   }
+  openInToolGroup(kind:string):void {
+    this.live();
+    if(this.api.getPanel(kind)){this.open(kind);return;}
+    const preview=this.api.getPanel('preview');
+    const reference=['graph','jobs','diagnostics'].map(id=>this.api.getPanel(id)).find(panel=>panel&&(!preview||panel.group!==preview.group));
+    if(reference){this.open(kind,kind,reference.group);return;}
+    this.open(kind);
+    const panel=this.api.getPanel(kind);
+    if(preview&&panel&&panel!==preview)panel.api.moveTo({group:preview.group,position:'bottom'});
+  }
   move(id: string, referenceId: string, position: 'left' | 'right' | 'top' | 'bottom' | 'center'): void {
     this.live(); const panel = this.api.getPanel(id), target = this.api.getPanel(referenceId);
     if (!panel || !target || panel === target) throw Error('Choose two different open panels');

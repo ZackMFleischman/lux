@@ -20,7 +20,8 @@ test('MCP full-source schema preserves v2 and rejects omitted assets or unknown 
   assert.equal(sourceBuildInputSchema.safeParse({ source: { ...source, assets: undefined }, expectedDraftVersion: 3 }).success, false);
   assert.equal(sourceBuildInputSchema.safeParse({ source: { ...source, other: true }, expectedDraftVersion: 3 }).success, false);
   assert.deepEqual(JSON.parse(sourceReadResult({ source, draftVersion: 3 }).content[0]!.text), { source, draftVersion: 3 });
-  assert.throws(() => sourceReadResult({ text: '\\'.repeat(8 * 1024 * 1024) }), /16 MiB/);
+  assert.doesNotThrow(() => sourceReadResult({ text: '\\'.repeat(8 * 1024 * 1024) }));
+  assert.throws(() => sourceReadResult({ text: '€'.repeat(18 * 1024 * 1024) }), /52 MiB/);
 });
 test('v2 source reaches preview compilation and compiler failure keeps the current preview', async () => {
   let compiled = false;
@@ -35,14 +36,14 @@ test('source and linked versions must match before creating a preview worker',as
   assert.equal(client.getSnapshot().authoring,null);
 });
 test('agent bridge round-trips complete Unicode source and rejects oversized read responses', async () => {
-  const bridge = await createAgentBridge(async method => method === 'read' ? { value: 'x'.repeat(16 * 1024 * 1024) } : source);
+  const bridge = await createAgentBridge(async method => method === 'read' ? { value: '€'.repeat(18 * 1024 * 1024) } : source);
   try {
     const headers = { authorization: `Bearer ${bridge.token}` };
     const response = await fetch(bridge.url, { method: 'POST', headers, body: JSON.stringify({ id: 'source', method: 'build', params: { source } }) });
     assert.deepEqual((await response.json()).result, source);
     const rejected = await fetch(bridge.url, { method: 'POST', headers, body: JSON.stringify({ id: 'large', method: 'read' }) });
     assert.equal(rejected.status, 400);
-    assert.match((await rejected.json()).error, /16 MiB/);
+    assert.match((await rejected.json()).error, /52 MiB/);
     const malformed = Buffer.concat([Buffer.from('{"id":"bad","method":"build","params":{"text":"'), Buffer.from([0xc3]), Buffer.from('"}}')]);
     assert.equal((await fetch(bridge.url, { method: 'POST', headers, body: malformed })).status, 400);
   } finally { bridge.close(); }

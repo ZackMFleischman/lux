@@ -13,10 +13,10 @@ function rows(node){
 }
 function literal(node){
  node=unwrap(node);
- if(['StringLiteral','NumericLiteral'].includes(node?.type))return node.value;
+ if(['StringLiteral','NumericLiteral','BooleanLiteral'].includes(node?.type))return node.value;
  if(node?.type==='NullLiteral')return null;
  if(node?.type==='UnaryExpression'&&node.operator==='-'&&node.argument.type==='NumericLiteral')return -node.argument.value;
- if(node?.type==='ArrayExpression')return node.elements.map(literal);
+ if(node?.type==='ArrayExpression')return node.elements.map(element=>{if(!element||element.type==='SpreadElement')fail(element??node,'Metadata arrays require dense literal elements; no holes or spreads');return literal(element);});
  if(node?.type==='ObjectExpression'){
   const value=Object.create(null);for(const [key,p] of rows(node)){if(p.type!=='ObjectProperty')fail(p,'No methods or accessors in metadata');value[key]=literal(p.value);}return value;
  }

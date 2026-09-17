@@ -13,6 +13,7 @@ test('flat scene saves animation separately from its base value and reopens it',
   const animations=[{kind:'variation' as const,nodePath:[],definitionHash:schemaHash,schemaHash,controlId:'speed',distribution:'centered' as const,amount:1,enabled:true}];
   const saved=createSceneDocument(source,DEFAULT_OUTPUT,controls,[],animations);
   const reopened=await verifySceneDocument(JSON.parse(JSON.stringify(saved)));
+  assert.equal(reopened.version,3);
   assert.deepEqual(reopened.controlAnimations,animations);
   assert.deepEqual(reopened.controls,controls);
 });
@@ -40,6 +41,7 @@ test('audio animation persists only portable source identity and smoothing setti
   const serialized=JSON.stringify(saved);
   assert.equal(serialized.includes('deviceId'),false);
   const reopened=await verifySceneDocument(JSON.parse(serialized));
+  assert.equal(reopened.version,3);
   assert.deepEqual(reopened.controlAnimations,animations);
   assert.deepEqual(reopened.controls,controls);
 });

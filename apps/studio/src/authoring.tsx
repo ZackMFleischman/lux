@@ -8,12 +8,14 @@ import { getRuntimeControlState, runtimeEditSignature } from './service-client.t
 import { StandaloneClient } from './standalone-client.ts';
 import { DEFAULT_OUTPUT } from '../../../packages/runtime-contracts/src/index.ts';
 import type { SourceBundle } from '../../../packages/runtime-contracts/src/index.ts';
+import type {StorySceneDocumentV7} from '../../../packages/core/src/story-scene-v2.ts';
 import { dispatchRuntimeCommand } from './runtime-operations.ts';
 import { createSourceWorkspace } from './source/workspace.ts';
 import { createAuthoringSession } from './source/authoring-session.ts';
 import { SourcePanel } from './source/SourcePanel.tsx';
 import type { SourceNavigationTarget } from './source/SourcePanel.tsx';
 import { SourceCompileError, diagnosticsForSource } from './source/diagnostics.ts';
+import {sourceBuildInputSchema} from './source/agent-contract.ts';
 import type { SourceDiagnostic } from './source/diagnostics.ts';
 import { ExportDialog } from './ExportDialog.tsx';
 import './export-client.ts';
@@ -67,6 +69,7 @@ export function AuthoringApp() {
   const recordingRuntime = useRef<string | null>(null);
   const session = useMemo(() => createAuthoringSession(workspace, {
     submit: (source, options) => client.submit(source, options), save: request => window.luxAuthoring.save(request), savePath: request => {if(!window.luxAuthoring.savePath)throw Error('Path save is unavailable');return window.luxAuthoring.savePath(request);}, open: () => window.luxAuthoring.open(), openPath: path => {if(!window.luxAuthoring.openPath)throw Error('Path open is unavailable');return window.luxAuthoring.openPath(path);},
+    submitDocument:document=>client.submitDocument(document),selectVisual:visualId=>client.selectVisual(visualId),
     export: request => window.luxExport.create(request),
     getControls: () => ({ intensity: client.getSnapshot().authoring?.intensity ?? 0.5 }), settleControls: finishControlWrites,
     getControlSnapshot: () => {
@@ -94,13 +97,16 @@ export function AuthoringApp() {
     void write.then(() => pendingControlWrites.current.delete(write), () => pendingControlWrites.current.delete(write));
   } }), [session]);
   async function finishControlWrites() { while (pendingControlWrites.current.size) await Promise.all([...pendingControlWrites.current]); }
-  const draft = useSyncExternalStore(workspace.subscribe, workspace.getSnapshot);
   const io = useSyncExternalStore(session.subscribe, session.getSnapshot);
-  const busy = io.busy || draft.busy, dirty = draft.dirty || io.controlsDirty || io.libraryDirty;
-  function reportError(reason: unknown, draftVersion: number, submittedSource: SourceBundle) {
+  const draft = useSyncExternalStore(io.activeWorkspace.subscribe, io.activeWorkspace.getSnapshot);
+  const sourceCatalog=io.storySourceCatalog?.getSnapshot()??null;
+  const busy = io.busy || draft.busy, dirty = (sourceCatalog?.dirty??draft.dirty) || io.controlsDirty || io.libraryDirty;
+  function reportError(reason: unknown, draftVersion: number, submittedSource: SourceBundle,submittedDocument?:StorySceneDocumentV7|null) {
     if (reason instanceof SourceCompileError) {
       setError('');
-      setDiagnostics(diagnosticsForSource(reason.diagnostics, submittedSource, draftVersion, workspace.getSnapshot()));
+      const state=session.getSnapshot(),catalog=state.storySourceCatalog;
+      const visuals=submittedDocument&&catalog?submittedDocument.visuals.map(row=>({id:row.id,source:row.source,snapshot:catalog.snapshot(row.id)})):undefined;
+      setDiagnostics(diagnosticsForSource(reason.diagnostics, submittedSource, draftVersion, state.activeWorkspace.getSnapshot(),visuals));
     } else {
       setDiagnostics([]);
       setDiagnosticTarget(null);
@@ -109,9 +115,9 @@ export function AuthoringApp() {
   }
   function clearDiagnostics() { setDiagnostics([]); setDiagnosticTarget(null); }
   useEffect(() => window.luxAuthoring.onAgentCommand(async command => {
-    if (lookOperation.current && !['read', 'status'].includes(command.method)) throw Error('Wait for the look operation to finish');
-    if (confirmation.isPending() && !['read', 'status', 'capture','library.list','library.read'].includes(command.method)) throw Error('Studio is waiting for a user confirmation');
-    if (['parameters', 'variation', 'playback', 'restart','tempo.set','tempo.tap'].includes(command.method)) {
+    if (lookOperation.current && !['read', 'status','story.read'].includes(command.method)) throw Error('Wait for the look operation to finish');
+    if (confirmation.isPending() && !['read', 'status','story.read', 'capture','library.list','library.read'].includes(command.method)) throw Error('Studio is waiting for a user confirmation');
+    if (['parameters', 'variation', 'playback', 'restart','tempo.set','tempo.tap','trigger','story.transport'].includes(command.method)) {
       if(!session.getSnapshot().runtimeControlsAvailable)throw Error('Studio is busy with a scene file operation');
       const write = dispatchRuntimeCommand(client, command.method, command.params);
       if (command.method === 'parameters'||command.method==='variation'||command.method==='tempo.set'||command.method==='tempo.tap') {
@@ -130,6 +136,7 @@ export function AuthoringApp() {
     }
     if (command.method === 'status') return agentStatus();
     if (command.method === 'read') return { ...session.read(), status: agentStatus() };
+    if (command.method === 'story.read') return client.readStory(command.params.view);
     if (command.method === 'capture') {
       const capture = await client.capture(), bytes = new Uint8Array(capture.bytes);
       assertAgentCaptureSize(capture.bytes);
@@ -138,19 +145,20 @@ export function AuthoringApp() {
     }
     if(command.method==='scene.save'){await finishControlWrites();return session.savePath(command.params.path,command.params.expectedDraftVersion,command.params.overwrite);}
     if(command.method==='scene.open'){
-      await finishControlWrites();const current=workspace.getSnapshot(),io=session.getSnapshot();
-      if((current.dirty||io.controlsDirty||io.libraryDirty)&&!command.params.discardDirty)throw Error('Scene has unsaved changes; pass discardDirty:true to open another scene');
+      await finishControlWrites();const current=session.getSnapshot(),catalog=current.storySourceCatalog?.getSnapshot();
+      if(((catalog?.dirty??current.activeWorkspace.getSnapshot().dirty)||current.controlsDirty||current.libraryDirty)&&!command.params.discardDirty)throw Error('Scene has unsaved changes; pass discardDirty:true to open another scene');
       const result=await session.openPath(command.params.path,command.params.expectedDraftVersion);setError('');setDiagnostics([]);return result;
     }
     if (command.method !== 'build' || session.getSnapshot().busy || composing.current) throw Error('Studio is busy or command is unsupported');
-    const source = command.params.source as SourceBundle;
+    const params=sourceBuildInputSchema.parse(command.params),current=session.read(),document=params.document,source=document?current.source:params.source!;
     setError('');
     try {
       if (pendingControlWrites.current.size) await finishControlWrites();
-      await session.build(source, command.params?.expectedDraftVersion,command.params?.libraryLinks);
+      if(document!==undefined)await session.buildDocument(document,params.expectedDraftVersion);
+      else await session.build(source, params.expectedDraftVersion,params.libraryLinks,params.story);
       clearDiagnostics();
-      return { draftVersion: workspace.getSnapshot().version, status: agentStatus() };
-    } catch (reason) { reportError(reason, command.params?.expectedDraftVersion, source); throw reason; }
+      return { draftVersion: session.read().draftVersion, status: agentStatus() };
+    } catch (reason) { reportError(reason, params.expectedDraftVersion, source,document); throw reason; }
   }), [session, workspace]);
   useEffect(() => window.luxConfirmation?.onCloseRequest(id => {
     void confirmation.confirm('close').then(discard => window.luxConfirmation!.reply(id, discard)).catch(reason => setError(String(reason)));
@@ -193,24 +201,26 @@ export function AuthoringApp() {
         const capture = await client.capture();
         const saved = client.acceptedDocument();
         const roundtrip = await window.luxAuthoring.smokeSave(saved);
-        if (roundtrip.document.source.entry !== source.entry || roundtrip.document.source.sdkVersion !== source.sdkVersion ||
+        if(saved.version===7||roundtrip.document.version===7||roundtrip.document.source.entry !== source.entry || roundtrip.document.source.sdkVersion !== source.sdkVersion ||
             roundtrip.document.source.files[source.entry] !== source.files[source.entry] || JSON.stringify(roundtrip.document.controls) !== JSON.stringify(saved.controls)) throw Error('Save/reopen did not preserve the visual');
         await new Promise(resolve => setTimeout(resolve, 500));
         await window.luxAuthoring.smokeResult?.({ ok: true, initial, applied, invalidRejected, capture, savedAndReopened: true });
       }
     } catch (error) { reportError(error,workspace.getSnapshot().version,source);if(smoke)await window.luxAuthoring.smokeResult?.({ ok: false, error: String(error), snapshot: client.getSnapshot() }); }
   }).catch(reason => setError(String(reason))); }, [session, workspace]);
-  async function build() { if (composing.current || session.getSnapshot().busy || workspace.getSnapshot().busy) return; setError(''); const current = session.read();
-    try { if (pendingControlWrites.current.size) await finishControlWrites(); await session.build(current.source, current.draftVersion); clearDiagnostics(); } catch (reason) { reportError(reason, current.draftVersion, current.source); } }
+  async function build() { const state=session.getSnapshot();if (composing.current || state.busy || state.activeWorkspace.getSnapshot().busy) return; setError(''); const current = session.read();
+    try { if (pendingControlWrites.current.size) await finishControlWrites();if(current.document)await session.buildDocument(current.document,current.draftVersion);else await session.build(current.source, current.draftVersion); clearDiagnostics(); } catch (reason) { reportError(reason, current.draftVersion, current.source,current.document); } }
+  function selectVisual(visualId:string){setError('');try{session.selectVisual(visualId);clearDiagnostics();}catch(reason){setError(String(reason));}}
+  async function addSource(){const state=session.getSnapshot();if(composing.current||state.busy||state.activeWorkspace.getSnapshot().busy)return;setError('');try{await finishControlWrites();await session.addSource(session.read().draftVersion);clearDiagnostics();}catch(reason){setError(String(reason));}}
   async function save(saveAs = false) {
-    if (composing.current || session.getSnapshot().busy || workspace.getSnapshot().busy) return;
+    const state=session.getSnapshot();if (composing.current || state.busy || state.activeWorkspace.getSnapshot().busy) return;
     setError('');
     try { if (pendingControlWrites.current.size) await finishControlWrites(); await session.save(saveAs); } catch (reason) { setError(String(reason)); }
   }
   async function open() {
     if (dirty && !await confirmation.confirm('open')) return;
     setError('');
-    try { if (await session.open()) clearDiagnostics(); } catch (reason) { const current = workspace.getSnapshot(); reportError(reason, current.version, current.source); }
+    try { if (await session.open()) clearDiagnostics(); } catch (reason) { const current = session.read(); reportError(reason, current.draftVersion, current.source); }
   }
   async function savePreviewFrame() {
     const captureApi = window.luxPreviewCapture, target = client.getSnapshot().authoring;
@@ -249,7 +259,7 @@ export function AuthoringApp() {
     finally { recordingRuntime.current = null; }
   }
   async function withLookOperation<T>(operation: () => Promise<T>) {
-    if (lookOperation.current || session.getSnapshot().busy || workspace.getSnapshot().busy) throw Error('Studio is busy');
+    const state=session.getSnapshot();if (lookOperation.current || state.busy || state.activeWorkspace.getSnapshot().busy) throw Error('Studio is busy');
     lookOperation.current = true;
     try { await finishControlWrites(); return await operation(); }
     finally { lookOperation.current = false; }
@@ -282,7 +292,7 @@ export function AuthoringApp() {
   async function loadLook(id: string) {
     return withLookOperation(async () => {
       const current = session.getSnapshot();
-      if ((workspace.getSnapshot().dirty || current.controlsDirty || current.libraryDirty) && !await confirmation.confirm('load-look')) return false;
+      if (((current.storySourceCatalog?.getSnapshot().dirty??current.activeWorkspace.getSnapshot().dirty) || current.controlsDirty || current.libraryDirty) && !await confirmation.confirm('load-look')) return false;
       await session.loadLook(id); clearDiagnostics(); setError(''); return true;
     });
   }
@@ -325,8 +335,12 @@ export function AuthoringApp() {
     <LooksDialog open={looksOpen} onClose={() => setLooksOpen(false)} onClosed={() => fileSummary.current?.focus()} client={window.luxLooks} onSave={saveLook} onLoad={loadLook} />
     <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} shortcutActions={shortcutActions} previewActions={<PreviewCaptureActions available={previewAvailable} status={recording}
       onSaveFrame={savePreviewFrame} onStart={startPreviewRecording} onStop={stopPreviewRecording} />} sourceChanged={draft.hasRunningSource && !draft.runningMatchesDraft} appCommands={commands} appError={error} controlEdits={controlEdits} controlsAvailable={io.runtimeControlsAvailable} libraryPanel={libraryPanel}
-      sourceDiagnostics={{ items: diagnostics, snapshot: draft, onNavigate: target => setDiagnosticTarget(previous => ({ ...target, request: (previous?.request ?? 0) + 1, documentKey: draft.documentKey, draftVersion: draft.version })) }}
-      sourcePanel={<SourcePanel workspace={workspace} readOnly={busy} onApply={() => void shortcutActions.build!.run()} onCompositionChange={value => { composing.current = value; }} diagnosticTarget={diagnosticTarget}
+      selectedVisualId={sourceCatalog?.selectedVisualId} sourceDiagnostics={{ items: diagnostics, snapshot: draft,visualSnapshots:sourceCatalog?Object.fromEntries(sourceCatalog.sources.map(row=>[row.id,Object.freeze({...row.snapshot,version:sourceCatalog.version})])):undefined, onNavigate: target => {
+        if(target.visualId&&target.visualId!==session.getSnapshot().storySourceCatalog?.getSnapshot().selectedVisualId)session.selectVisual(target.visualId);
+        const current=session.getSnapshot().activeWorkspace.getSnapshot();setDiagnosticTarget(previous => ({ ...target, request: (previous?.request ?? 0) + 1, documentKey: current.documentKey, draftVersion: current.version,visualId:target.visualId??sourceCatalog?.selectedVisualId }));
+      } }}
+      sourcePanel={<SourcePanel workspace={io.activeWorkspace} readOnly={busy} onApply={() => void shortcutActions.build!.run()} onCompositionChange={value => { composing.current = value; }} diagnosticTarget={diagnosticTarget}
+        visualIds={sourceCatalog?.visualIds} selectedVisualId={sourceCatalog?.selectedVisualId} onSelectVisual={sourceCatalog?selectVisual:undefined} onAddSource={sourceCatalog||runtime?.story?()=>void addSource():undefined}
         onDiagnosticTargetHandled={request => setDiagnosticTarget(current => current?.request === request ? null : current)} />} />
   </div></StudioMenuProvider></ThemeProvider>;
 }

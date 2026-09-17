@@ -8,7 +8,7 @@ import {validateSceneDocument} from '../../packages/core/src/scene-document.ts';
 import { sourceBundleSchema } from '../../packages/runtime-contracts/src/index.ts';
 import { createHash } from 'node:crypto';
 import { canonicalControlSchemaJson, normalizeControlDeclarations } from '../../packages/runtime-contracts/src/parameters.mjs';
-const document = { format: 'lux-scene', version: 1, source: { sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': '// 🌈 unfinished draft' } }, settings: { width: 1920, height: 1080, fps: 60, seed: 0 }, controls: { intensity: 0.8 } };
+const document = { format: 'lux-scene', version: 1, source: { sdkVersion: '0.1.0', entry: 'visual.ts', files: { 'visual.ts': '// 🌈 unfinished draft' } }, settings: { width: 1920, height: 1080, fps: 60, seed: 0 }, controls: { intensity: 0.8 }, tempo: { bpm:120 } };
 
 test('scene v3 preserves empty and named caches with accepted-source provenance and assets', async () => {
   const folder = await mkdtemp(join(tmpdir(), 'lux-parameters-scene-'));
@@ -87,7 +87,9 @@ test('no-overwrite creation is atomic and later token saves remain available', a
     const saved=await store.saveAs(path,document,{overwrite:false});
     await assert.rejects(new SceneFileStore().saveAs(path,document,{overwrite:false}),/already exists/);
     await store.save(saved.token,{...document,controls:{intensity:0.3}});
-    const reopened=(await store.open(path)).document.controls;
+    const reopenedDocument=(await store.open(path)).document;
+    assert.equal(reopenedDocument.version,1);
+    const reopened=reopenedDocument.controls;
     assert.equal('intensity' in reopened?reopened.intensity:undefined,0.3);
   } finally { await rm(folder,{recursive:true,force:true}); }
 });

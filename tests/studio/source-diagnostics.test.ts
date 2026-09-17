@@ -34,3 +34,10 @@ test('failed changed multi-file candidate retains draft but labels its diagnosti
   const current = diagnosticsForSource(records, structuredClone(before.source), before.version, w.getSnapshot());
   assert.equal(current[0]!.candidateOnly, false); assert.deepEqual(diagnosticTarget(current[0]!, w.getSnapshot()), { path: 'lib/helper.ts', offset: 1 });
 });
+test('whole-document diagnostics retain their visual identity and compare against that visual draft',()=>{
+  const lead=createSourceWorkspace({sdkVersion:'0.2.0',entry:'main.ts',files:{'main.ts':'lead'}}),ambient=createSourceWorkspace({sdkVersion:'0.2.0',entry:'main.ts',files:{'main.ts':'ambient'}});
+  const records=[{visualId:'ambient',file:'main.ts',line:1,column:1,message:'ambient error'}],submitted=structuredClone(ambient.getSnapshot().source);
+  const diagnostics=diagnosticsForSource(records,lead.getSnapshot().source,3,lead.getSnapshot(),[{id:'lead',source:lead.getSnapshot().source,snapshot:lead.getSnapshot()},{id:'ambient',source:submitted,snapshot:ambient.getSnapshot()}]);
+  assert.equal(diagnostics[0]!.candidateOnly,false);assert.deepEqual(diagnosticTarget(diagnostics[0]!,{...ambient.getSnapshot(),version:3}),{path:'main.ts',offset:0,visualId:'ambient'});
+  submitted.files['main.ts']='invalid';const changed=diagnosticsForSource(records,lead.getSnapshot().source,3,lead.getSnapshot(),[{id:'ambient',source:submitted,snapshot:ambient.getSnapshot()}]);assert.equal(changed[0]!.candidateOnly,true);
+});

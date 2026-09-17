@@ -8,7 +8,7 @@ import { createStudioPanelRegistry, PanelRegistry } from './registry.ts';
 import type { LuxDockviewAdapter, LayoutStorage } from './dockview-adapter.ts';
 import { shortcutHint } from '../studio-shortcuts.ts';
 
-const kinds = ['preview', 'source', 'library', 'inspector', 'diagnostics', 'jobs', 'graph'] as const;
+const kinds = ['preview', 'source', 'library', 'inspector', 'story', 'diagnostics', 'jobs', 'graph'] as const;
 export type StudioPanelKind = typeof kinds[number];
 type Kind = StudioPanelKind;
 // Resolve Storage only during an operation so denied access uses adapter recovery.
@@ -58,6 +58,8 @@ export function StudioDockShell({ compact, expandedPanel = 'preview', showInspec
     try { if (!adapter.current) throw Error('Layout is loading'); run(adapter.current); }
     catch (reason) { setMessage(String(reason)); }
   }
+  function openViewPanel(value:LuxDockviewAdapter,kind:Kind){if(kind==='story')value.openInToolGroup(kind);else value.open(kind);}
+  function openRequestedPanel(value:LuxDockviewAdapter,kind:Kind){if(kind==='inspector')value.openBeside(kind,'graph');else openViewPanel(value,kind);}
   function noteFocusedPanel(target: EventTarget | null) {
     if (!(target instanceof Element)) return;
     const hostKind = target.closest<HTMLElement>('[data-studio-pane-kind]')?.dataset.studioPaneKind;
@@ -72,7 +74,7 @@ export function StudioDockShell({ compact, expandedPanel = 'preview', showInspec
   const nonce = document.querySelector<HTMLMetaElement>('meta[name="style-nonce"]')?.content ?? '';
   const tools = <div className="layout-tools" hidden={compact}>
     <StudioMenu label="View" buttonRef={viewButton}>
-      {kinds.map(kind => <MenuItem key={kind} onClick={() => action(value => value.open(kind))}>
+      {kinds.map(kind => <MenuItem key={kind} onClick={() => action(value => openViewPanel(value,kind))}>
         <span>{registry.get(kind).title}</span>{kind === 'inspector' && <span className="studio-shortcut-hint" aria-hidden="true">{shortcutHint['toggle-inspector']}</span>}
       </MenuItem>)}
       <Divider />
@@ -99,7 +101,7 @@ export function StudioDockShell({ compact, expandedPanel = 'preview', showInspec
 
     <div className="studio-dock-grid" hidden={compact}><LuxDockLayout registry={registry} panels={panels} storage={storage} nonce={nonce} mode={mode}
       onActivePanelChange={kind => { if (kinds.includes(kind as Kind)) onActivePanelChange?.(kind as Kind); }}
-      onReady={(value, result) => { adapter.current = value; onOpenPanelReady?.(kind=>{if(kind==='inspector')value.openBeside(kind,'graph');else value.open(kind);}); onTogglePanelReady?.(kind=>{value.toggle(kind);}); if (result.reason && result.reason !== 'No saved personal layout') setMessage(result.reason); }} /></div>
+      onReady={(value, result) => { adapter.current = value; onOpenPanelReady?.(kind=>openRequestedPanel(value,kind)); onTogglePanelReady?.(kind=>{value.toggle(kind);}); if (result.reason && result.reason !== 'No saved personal layout') setMessage(result.reason); }} /></div>
     <div className={`studio-expanded-pane ${showInspector ? 'studio-expanded-with-inspector' : ''}`} hidden={!compact} ref={expanded} />
     {kinds.map(kind => createPortal(content[kind], hosts[kind], kind))}
   </div>;

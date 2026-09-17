@@ -24,6 +24,7 @@ export function createStudioPanelRegistry(additional: readonly PanelDefinition[]
     define('source', 'Source', z.object({ selectedFile: z.string().max(240).regex(/^(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.ts$/).optional() }).strict()),
     define('library','Library',z.object({selectedComponentId:z.string().uuid().optional(),selectedFile:z.string().max(240).optional()}).strict()),
     define('inspector', 'Inspector', z.object({ lockedTargetId: z.string().min(1).max(128).nullable().optional() }).strict(), true),
+    define('story','Story',z.object({}).strict()),
     define('diagnostics', 'Diagnostics', z.object({}).strict()),
     define('graph','Graph',z.object({}).strict()),
     define('jobs', 'Jobs', z.object({ filter: z.enum(['all', 'failed', 'running']).optional() }).strict()),
