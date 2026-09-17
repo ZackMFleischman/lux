@@ -96,7 +96,7 @@ export function createBirdSocial() {
   const startDeparture = (bird: Bird, controls: BirdSocialControls, partner = -1) => {
     bird.phase = 'depart';
     bird.elapsed = 0;
-    bird.duration = 0.65 + random(bird) * 0.45;
+    bird.duration = 3.0 + random(bird) * 1.4;
     bird.owner = (random(bird) < 0.5 ? 5 : 6) as 5 | 6;
     bird.partner = partner;
     bird.rest = 0;
@@ -142,6 +142,8 @@ export function createBirdSocial() {
       } else {
         bird.interactionUntil = 0;
         friend.interactionUntil = 0;
+        bird.idleAt = clock + 2.2;
+        friend.idleAt = clock + 2.2;
         bird.idle = outcome < 0.86 ? 2 : 3;
         friend.idle = outcome < 0.86 ? 4 : 2;
         if (random(bird) < 0.4) startBubble(bird, outcome < 0.86 ? 8 : 6);
@@ -157,7 +159,7 @@ export function createBirdSocial() {
     const partner = bird.partner;
     bird.phase = 'return';
     bird.elapsed = 0;
-    bird.duration = 0.65 + random(bird) * 0.45;
+    bird.duration = 3.0 + random(bird) * 1.4;
     bird.partner = -1;
     bird.idle = 0;
     if (partner >= 0 && birds[partner]?.partner === birds.indexOf(bird)) {
