@@ -11,7 +11,7 @@ function random01(value){let hash=2166136261;for(let index=0;index<value.length;
 export function controlVariationValue(base,definition,binding,instanceKey){
  if(!binding?.enabled)return base;
  if(!((typeof instanceKey==='string'&&instanceKey.length<=256)||(typeof instanceKey==='number'&&Number.isSafeInteger(instanceKey))))throw new RuntimeError('Invalid variation instance key');
- const identity=`${key(binding.nodePath)}:${binding.controlId}:${instanceKey}`,uniform=salt=>random01(`${identity}:${salt}`);
+ const typedInstanceKey=`${typeof instanceKey}:${instanceKey}`,identity=`${key(binding.nodePath)}:${binding.controlId}:${typedInstanceKey}`,uniform=salt=>random01(`${identity}:${salt}`);
  let unit;
  if(binding.distribution==='spread'){const sequence=typeof instanceKey==='number'?(instanceKey+1)*0.6180339887498949:uniform(0);unit=((sequence%1)+1)%1;}
  else if(binding.distribution==='centered')unit=(uniform(0)+uniform(1)+uniform(2))/3;

@@ -17,6 +17,17 @@ test('per-instance variation is stable, bounded, and supports all distributions'
   }
 });
 
+test('variation keeps numeric and string instance keys distinct',()=>{
+  for(const distribution of ['random','centered','spread']){
+    const admitted=validateControlAnimationBindings([binding(distribution)])[0];
+    assert.notEqual(
+      controlVariationValue(10,definition,admitted,1),
+      controlVariationValue(10,definition,admitted,'1'),
+      `${distribution} must preserve the instance key type`,
+    );
+  }
+});
+
 test('even spread distributes consecutive instances across the range and clamps at control limits',()=>{
   const admitted=validateControlAnimationBindings([binding('spread')])[0];
   const samples=[0,1,2,3].map(key=>controlVariationValue(10,definition,admitted,key));
