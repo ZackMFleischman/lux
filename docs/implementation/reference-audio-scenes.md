@@ -2,8 +2,8 @@
 
 Two self-contained scenes are committed alongside the repository's saved scenes in `visuals/`.
 
-- `Fiber-Optic Heart - Audio Demo.lux-scene`: kick raises core brightness and traveling pulse strength; bass expands the core slightly; mids lift strand brightness; highs lift dust sparkle.
-- `Pigment Rivers - Audio Demo.lux-scene`: bass gently folds the bands; mids warm the pigment; overall level adds pooling; highs strengthen contours. Longer attack/release times preserve the painted flow.
+- `Fiber Tracers and Glass Ribbons.lux-scene`: kick raises core brightness and traveling pulse strength; bass expands the core slightly; mids lift strand brightness; highs lift dust sparkle.
+- `Pigment Bands and Ink Contours.lux-scene`: bass gently folds the bands; mids warm the pigment; overall level adds pooling; highs strengthen contours. Longer attack/release times preserve the painted flow.
 
 Mappings use portable `primary-audio`, with no physical device identifier. Connect the desired audio input in Lux. Original base values and ordinary animation remain available without audio. Geometry counts, seeds and time multipliers are deliberately stable.
 

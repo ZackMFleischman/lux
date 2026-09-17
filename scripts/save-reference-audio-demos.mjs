@@ -9,14 +9,14 @@ if (!destination) throw Error('Supply saved fiber scene, pigment scene, and dest
 const store = new SceneFileStore();
 const analyzer = { version: 1, fftSize: 2048, minDecibels: -100, maxDecibels: -30 };
 const presets = [
-  [fiberInput, 'Fiber-Optic Heart - Audio Demo', [
+  [fiberInput, 'Fiber Tracers and Glass Ribbons', [
     ['0001', 'brightness', 'kick', 1.3, 15, 400],
     ['0001', 'radius', 'bass', .018, 120, 500],
     ['0003', 'pulseStrength', 'kick', 1.8, 10, 500],
     ['0003', 'brightness', 'mids', .45, 100, 400],
     ['0004', 'brightness', 'highs', .45, 40, 250],
   ]],
-  [pigmentInput, 'Pigment Rivers - Audio Demo', [
+  [pigmentInput, 'Pigment Bands and Ink Contours', [
     ['0001', 'fold', 'bass', .10, 700, 1600],
     ['0003', 'warmth', 'mids', .35, 500, 1200],
     ['0003', 'pooling', 'level', .20, 600, 1600],
