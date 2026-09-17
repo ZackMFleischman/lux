@@ -7,6 +7,8 @@ const pageUrl = 'file:///C:/profile/studio-shell.html';
 const securityOrigin = 'file:///';
 const requestDetails = Object.freeze({ isMainFrame: true, requestingUrl: pageUrl, securityOrigin, mediaTypes: ['audio'] });
 const checkDetails = Object.freeze({ isMainFrame: true, requestingUrl: '', embeddingOrigin: securityOrigin, mediaType: 'audio' });
+const originCheckDetails = Object.freeze({ isMainFrame: true, requestingUrl: pageUrl, securityOrigin, mediaType: 'audio' });
+const postRequestCheckDetails = Object.freeze({ isMainFrame: true, requestingUrl: pageUrl, embeddingOrigin: securityOrigin });
 
 function fixture() {
   let requestHandler: any, checkHandler: any, now = 1000, timer: (() => void) | undefined;
@@ -44,7 +46,10 @@ test('fresh arm permits one exact audio request and active capture only satisfie
 
   assert.deepEqual(arm, { token: 'arm-token-000001', expiresAtMs: 6000 });
   assert.equal(f.check(f.main), true);
+  assert.equal(f.check(f.main, 'media', securityOrigin, originCheckDetails), true);
+  assert.equal(f.check(f.main, 'media', securityOrigin, postRequestCheckDetails), false, 'capture continuation requires an exact allowed request');
   assert.equal(f.request(f.main), true);
+  assert.equal(f.check(f.main, 'media', securityOrigin, postRequestCheckDetails), true);
   assert.equal(f.request(f.main), false, 'active attempt cannot authorize another request');
   assert.equal(f.broker.activate(f.main as any, arm.token), true);
   assert.equal(f.check(f.main), true);
@@ -52,6 +57,18 @@ test('fresh arm permits one exact audio request and active capture only satisfie
 
   f.broker.revoke(f.main as any);
   assert.equal(f.check(f.main), false);
+});
+
+test('discovery arm permits exact audio enumeration checks without permitting capture', () => {
+  const f = fixture();
+  const arm = f.broker.discover(f.main as any);
+
+  assert.deepEqual(arm, { token: 'arm-token-000001', expiresAtMs: 6000 });
+  assert.equal(f.check(f.main), true);
+  assert.equal(f.check(f.main, 'media', securityOrigin, originCheckDetails), true);
+  assert.equal(f.check(f.main, 'media', securityOrigin, postRequestCheckDetails), false);
+  assert.equal(f.request(f.main), false, 'discovery cannot authorize media capture');
+  assert.equal(f.check(f.main), false, 'a denied capture consumes the discovery arm');
 });
 
 test('an allowed request must activate before the original arm deadline', () => {

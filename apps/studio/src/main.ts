@@ -213,6 +213,7 @@ app.whenReady().then(async () => {
   });
   ipcMain.handle('studio:audio-permission', (event, action: unknown, value: unknown) => {
     if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted audio permission sender');
+    if (action === 'discover') return audioPermissions.discover(event.sender);
     if (action === 'arm') return audioPermissions.arm(event.sender);
     if (action === 'activate') {
       if (typeof value !== 'string') throw Error('Invalid audio permission token');

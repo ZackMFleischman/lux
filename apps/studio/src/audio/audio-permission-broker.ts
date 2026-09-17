@@ -30,7 +30,7 @@ type PermissionSession = Readonly<{
 }>;
 
 type BrokerState = {
-  phase: 'armed' | 'attempting' | 'active';
+  phase: 'discovering' | 'armed' | 'attempting' | 'active';
   webContents: PermissionWebContents;
   token: string;
   expiresAtMs: number;
@@ -76,11 +76,16 @@ export function createAudioPermissionBroker(options: Readonly<{
       Array.isArray(details.mediaTypes) && details.mediaTypes.length === 1 && details.mediaTypes[0] === 'audio';
   }
 
-  function exactCheck(webContents: PermissionWebContents | null, permission: string,
-    requestingOrigin: string, details: PermissionCheckDetails) {
-    return exactWebContents(webContents) && permission === 'media' && requestingOrigin === '' &&
-      details?.isMainFrame === true && details.requestingUrl === '' && details.securityOrigin === undefined &&
-      details.embeddingOrigin === options.securityOrigin && details.mediaType === 'audio';
+  function exactAudioCheck(webContents: PermissionWebContents | null, permission: string,
+    requestingOrigin: string, details: PermissionCheckDetails, phase: BrokerState['phase']) {
+    if (!exactWebContents(webContents) || permission !== 'media' || details?.isMainFrame !== true) return false;
+    const legacyProbe = requestingOrigin === '' && details.requestingUrl === '' &&
+      details.securityOrigin === undefined && details.embeddingOrigin === options.securityOrigin && details.mediaType === 'audio';
+    const documentAudio = requestingOrigin === options.securityOrigin && details.requestingUrl === options.pageUrl &&
+      details.securityOrigin === options.securityOrigin && details.embeddingOrigin === undefined && details.mediaType === 'audio';
+    const captureContinuation = requestingOrigin === options.securityOrigin && details.requestingUrl === options.pageUrl &&
+      details.securityOrigin === undefined && details.embeddingOrigin === options.securityOrigin && details.mediaType === undefined;
+    return legacyProbe || documentAudio || ((phase === 'attempting' || phase === 'active') && captureContinuation);
   }
 
   function observe(webContents: PermissionWebContents) {
@@ -93,6 +98,7 @@ export function createAudioPermissionBroker(options: Readonly<{
   options.session.setPermissionRequestHandler((webContents, permission, callback, details) => {
     const current = state;
     if (!current || current.phase !== 'armed' || current.webContents !== webContents) {
+      if (current?.phase === 'discovering') clearState();
       callback(false);
       return;
     }
@@ -104,26 +110,33 @@ export function createAudioPermissionBroker(options: Readonly<{
   });
   options.session.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
     const current = state;
-    if (!current || current.webContents !== webContents || !exactCheck(webContents, permission, requestingOrigin, details)) return false;
+    if (!current || current.webContents !== webContents || !exactAudioCheck(webContents, permission, requestingOrigin, details, current.phase)) return false;
     if (current.phase === 'active') return true;
     if (options.now() <= current.expiresAtMs) return true;
     clearState();
     return false;
   });
 
+  function begin(webContents: PermissionWebContents, phase: 'discovering' | 'armed'): AudioPermissionArm {
+    if (disposed) throw new Error('Audio permission broker is disposed');
+    if (!exactWebContents(webContents)) throw new Error('Untrusted audio permission sender');
+    clearState();
+    const token = options.createToken();
+    if (typeof token !== 'string' || token.length < 16 || token.length > 256) throw new Error('Invalid audio permission token');
+    const expiresAtMs = options.now() + armLifetimeMs;
+    state = { phase, webContents, token, expiresAtMs, detach: observe(webContents) };
+    expiry = options.setExpiry(() => {
+      if (state?.phase !== 'active' && state?.token === token) clearState();
+    }, armLifetimeMs);
+    return Object.freeze({ token, expiresAtMs });
+  }
+
   return Object.freeze({
+    discover(webContents: PermissionWebContents): AudioPermissionArm {
+      return begin(webContents, 'discovering');
+    },
     arm(webContents: PermissionWebContents): AudioPermissionArm {
-      if (disposed) throw new Error('Audio permission broker is disposed');
-      if (!exactWebContents(webContents)) throw new Error('Untrusted audio permission sender');
-      clearState();
-      const token = options.createToken();
-      if (typeof token !== 'string' || token.length < 16 || token.length > 256) throw new Error('Invalid audio permission token');
-      const expiresAtMs = options.now() + armLifetimeMs;
-      state = { phase: 'armed', webContents, token, expiresAtMs, detach: observe(webContents) };
-      expiry = options.setExpiry(() => {
-        if (state?.phase !== 'active' && state?.token === token) clearState();
-      }, armLifetimeMs);
-      return Object.freeze({ token, expiresAtMs });
+      return begin(webContents, 'armed');
     },
     activate(webContents: PermissionWebContents, token: string) {
       if (!state || state.phase !== 'attempting' || state.webContents !== webContents || state.token !== token) return false;

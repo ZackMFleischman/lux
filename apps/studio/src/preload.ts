@@ -74,6 +74,7 @@ const previewCaptureApi: PreviewCaptureClient = {
 };
 contextBridge.exposeInMainWorld('luxPreviewCapture', Object.freeze(previewCaptureApi));
 const audioPermissionApi: StudioAudioPermissionClient = {
+  discover: () => ipcRenderer.invoke('studio:audio-permission', 'discover'),
   arm: () => ipcRenderer.invoke('studio:audio-permission', 'arm'),
   activate: token => ipcRenderer.invoke('studio:audio-permission', 'activate', token),
   cancel: token => ipcRenderer.invoke('studio:audio-permission', 'cancel', token),
