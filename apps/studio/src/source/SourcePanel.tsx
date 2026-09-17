@@ -6,7 +6,6 @@ import { editorCache } from './editor-state.ts';
 import { AssetItem, AssetPreview } from './AssetPreview.tsx';
 import { sourceAssets } from './source-equality.ts';
 import { AssetImport } from './AssetImport.tsx';
-import { Disclosure } from '../Disclosure.tsx';
 export type SourceNavigationTarget = { path: string; offset: number; request: number; documentKey: number; draftVersion: number; visualId?:string };
 export function SourcePanel({ workspace, readOnly, onApply, onCompositionChange, diagnosticTarget, onDiagnosticTargetHandled, visualIds, selectedVisualId, onSelectVisual, onAddSource }: {
   workspace: SourceWorkspace; readOnly: boolean; onApply(): void; onSave?(): void; onCompositionChange?(value: boolean): void;
@@ -16,6 +15,7 @@ export function SourcePanel({ workspace, readOnly, onApply, onCompositionChange,
 }) {
   const snapshot = useSyncExternalStore(workspace.subscribe, workspace.getSnapshot);
   const [adding, setAdding] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [assetSelection, setAssetSelection] = useState<{ path: string; documentKey: number } | null>(null);
   const assets = sourceAssets(snapshot.source);
   const assetPath = assetSelection?.documentKey === snapshot.documentKey && Object.hasOwn(assets, assetSelection.path) ? assetSelection.path : null;
@@ -55,17 +55,16 @@ export function SourcePanel({ workspace, readOnly, onApply, onCompositionChange,
         {visualIds.map(id=><option key={id} value={id}>{id}</option>)}</select></label>:<span>Story sources</span>}
       {onAddSource&&<Button size="small" disabled={locked} onClick={onAddSource}>Add source</Button>}
     </div>}
-    <div className="source-columns"><Disclosure title="Files and assets" defaultOpen className="source-files-disclosure">
-      <div id="source-files-and-assets" className="source-files">
-      <div className="source-files-heading"><span>Files</span><Tooltip title="New file"><IconButton ref={addButton} aria-label="New file" disabled={locked} onClick={() => setAdding(true)}>+</IconButton></Tooltip></div>
-      <nav aria-label="Source files">{Object.keys(snapshot.source.files).map(path => <Button key={path} title={path} aria-label={`Open ${path}`} aria-current={!assetPath && snapshot.selectedFile === path ? 'page' : undefined}
+    <div className="source-columns"><aside className="source-sidebar" data-collapsed={sidebarCollapsed || undefined} aria-label="Source sidebar">
+      {sidebarCollapsed?<div className="source-sidebar-rail"><Tooltip title="Expand source sidebar"><IconButton aria-label="Expand source sidebar" onClick={()=>setSidebarCollapsed(false)}><span aria-hidden="true">›</span></IconButton></Tooltip></div>:<>
+      <div id="source-files-and-assets" className="source-files source-file-section">
+      <div className="source-files-heading"><span>Files</span><span className="source-files-actions">
+        {snapshot.canUndoReplacement&&<Tooltip title="Undo the last source replacement"><span><IconButton aria-label="Undo source replacement" disabled={locked} onClick={()=>workspace.undoReplacement()}><span aria-hidden="true">↶</span></IconButton></span></Tooltip>}
+        <Tooltip title="New file"><span><IconButton ref={addButton} aria-label="New file" disabled={locked} onClick={() => setAdding(true)}>+</IconButton></span></Tooltip>
+        <Tooltip title="Collapse source sidebar"><IconButton aria-label="Collapse source sidebar" onClick={()=>setSidebarCollapsed(true)}><span aria-hidden="true">‹</span></IconButton></Tooltip>
+      </span></div>
+      <nav className="source-file-list" aria-label="Source files">{Object.keys(snapshot.source.files).map(path => <Button key={path} title={path} aria-label={`Open ${path}`} aria-current={!assetPath && snapshot.selectedFile === path ? 'page' : undefined}
         onClick={() => openCode(path)}><span className="file-path">{path}</span>{path === snapshot.source.entry && <span className="file-marker">Entry</span>}{snapshot.dirtyFiles.includes(path) && <span aria-label="Unsaved">*</span>}</Button>)}</nav>
-      <div className="source-files-heading"><span>Assets</span></div>
-      <AssetImport workspace={workspace} readOnly={locked} selectedPath={assetPath} />
-      <nav aria-label="Image assets">{Object.keys(assets).map(path => <AssetItem key={path} path={path} asset={assets[path]!}
-        selected={assetPath === path} dirty={snapshot.dirtyAssets.includes(path)}
-        onSelect={() => setAssetSelection({ path, documentKey: snapshot.documentKey })} />)}</nav>
-      {!Object.keys(assets).length && <p className="asset-empty">No image assets.</p>}
       {adding && <form onKeyDown={event => { if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); setAdding(false); setNewPath(''); setError(''); addButton.current?.focus(); } }}
         onSubmit={event => { event.preventDefault(); if (!locked) {
           if (attempt(() => workspace.addFile(newPath, ''))) { setAssetSelection(null); setNewPath(''); setAdding(false); }
@@ -74,8 +73,15 @@ export function SourcePanel({ workspace, readOnly, onApply, onCompositionChange,
           onKeyDown={event => { if (event.key === 'Enter' && event.nativeEvent.isComposing) { event.preventDefault(); event.stopPropagation(); } }} />
         <Button type="submit" disabled={locked}>Add file</Button>
       </form>}
-      {snapshot.canUndoReplacement && <Button disabled={locked} onClick={() => workspace.undoReplacement()}>Undo source replacement</Button>}
-      </div></Disclosure>
+      </div>
+      <AssetImport workspace={workspace} readOnly={locked} selectedPath={assetPath}>
+        <nav aria-label="Image assets">{Object.keys(assets).map(path => <AssetItem key={path} path={path} asset={assets[path]!}
+          selected={assetPath === path} dirty={snapshot.dirtyAssets.includes(path)}
+          onSelect={() => setAssetSelection({ path, documentKey: snapshot.documentKey })} />)}</nav>
+        {!Object.keys(assets).length && <p className="asset-empty">No assets</p>}
+      </AssetImport>
+      </>}
+      </aside>
       <div className="source-editing"><Tabs ref={tabs} value={assetPath ? false : snapshot.selectedFile || false} onChange={(_, path: string) => openCode(path)} variant="scrollable" scrollButtons="auto" aria-label="Open source files">
         {snapshot.openFiles.map(path => <Tab key={path} value={path} title={path} label={<span className="file-tab-label"><span className="file-path">{path}{snapshot.dirtyFiles.includes(path) ? ' *' : ''}</span><span role="button" tabIndex={0} aria-label={`Close ${path}`} className="file-tab-close"
           onClick={event => { event.stopPropagation(); closeFile(path); }} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); closeFile(path); } }}>×</span></span>} />)}
