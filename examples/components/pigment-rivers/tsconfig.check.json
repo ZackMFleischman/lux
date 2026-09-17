@@ -1,0 +1,12 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "@lux/visual-sdk": ["../../../packages/visual-sdk/src/sdk-composition.ts"]
+    },
+    "allowImportingTsExtensions": true
+  },
+  "include": ["*.ts"],
+  "exclude": []
+}
