@@ -49,7 +49,10 @@ After the user authorizes testing, the next agent should:
 3. Run `node --test examples/components/fiber-optic-heart/geometry.test.ts`.
    These tests were authored but never executed; investigate rather than assume
    they pass. Verify generated snapshots against the runtime paths2d contract.
-4. Compile the complete source bundle. Include all seven non-test TypeScript
+4. Prepare the complete source bundle with
+   `node scripts/prepare-reference-visual-bundle.mjs fiber-optic-heart artifacts/fiber-optic-heart-source.json`.
+   This script is untested and refuses overwrites. Then compile the bundle.
+   Include all seven non-test TypeScript
    files in this directory, entry `composition.ts`, SDK `0.4.0`. Exclude tests,
    Markdown and tsconfig. Use `scripts/test-wandering-tracers.mjs` only as a
    reference for an isolated QA harness; it does not accept this visual.

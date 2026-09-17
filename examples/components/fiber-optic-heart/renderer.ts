@@ -68,9 +68,10 @@ export default defineComponent({
     const strength = uniform(2);
     const collarGeometry = new PlaneGeometry(1, 1);
     const collarMaterial = new MeshBasicNodeMaterial({ transparent: true, depthTest: false, depthWrite: false });
+    const collarOpacity = uniform(0.7);
     const collarColor = collarShader(uv());
     collarMaterial.colorNode = collarColor.rgb;
-    collarMaterial.opacityNode = collarColor.a;
+    collarMaterial.opacityNode = collarColor.a.mul(collarOpacity);
     const strands = Array.from({ length: MAX_PATHS }, (_, index) => {
       const positions = new Float32Array(POINTS * 6);
       const uvs = new Float32Array(POINTS * 4);
@@ -124,7 +125,7 @@ export default defineComponent({
           throw Error('Neon renderer supports at most 16 paths of 97 points; no paths were truncated');
         }
         backgroundNode.value = inputs.image.texture as Texture;
-        collarMaterial.opacity = appearance.collars;
+        collarOpacity.value = appearance.collars;
         const ribbonCount = Math.round(appearance.ribbons);
         const cableCount = Math.round(appearance.cables);
         for (let index = 0; index < strands.length; index++) {
