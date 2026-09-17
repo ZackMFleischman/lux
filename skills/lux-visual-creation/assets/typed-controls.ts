@@ -32,9 +32,9 @@ export default defineVisual({
       presentation: 'dropdown',
       group: 'Appearance',
       options: [
-        { id: 'violet', label: 'Violet' },
-        { id: 'ember', label: 'Ember' },
-        { id: 'mint', label: 'Mint' },
+        { id: 'violet', label: 'Violet', description: 'Electric violet tones.' },
+        { id: 'ember', label: 'Ember', description: 'Warm ember tones.' },
+        { id: 'mint', label: 'Mint', description: 'Fresh mint tones.' },
       ],
     },
     direction: {

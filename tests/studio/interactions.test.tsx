@@ -108,6 +108,9 @@ test('RTL: Boolean and dropdown controls expose typed values, descriptions and d
   await user.click(trail);
   await waitFor(() => assert.deepEqual((fixture.calls[0] as any).input.values, { trail: false }));
   await user.click(screen.getByRole('combobox', { name: 'Direction value' }));
+  const reverse=screen.getByRole('option',{name:'Reverse'});fireEvent.focus(reverse);
+  assert.ok(await screen.findByRole('tooltip',{name:/Move back through the path/}));
+  await act(async()=>{fireEvent.blur(reverse);await new Promise(resolve=>setTimeout(resolve,300));});
   await user.click(screen.getByRole('option', { name: 'Forward' }));
   await waitFor(() => assert.deepEqual((fixture.calls[1] as any).input.values, { direction: 'forward' }));
   await user.click(screen.getByRole('button', { name: 'Reset Trail to default' }));
@@ -129,17 +132,20 @@ test('RTL: segmented enum uses one roving tab stop and keyboard selection by sta
   choices[1]!.focus();
   fireEvent.keyDown(choices[1]!, { key: 'End' });
   assert.equal(document.activeElement, choices[2]);
+  assert.ok(await screen.findByRole('tooltip',{name:/A regular grid/}));
+  assert.ok(screen.getByRole('button',{name:'A very long grid label',description:/A regular grid/}));
   fireEvent.keyDown(choices[2]!, { key: 'Enter' });
   await waitFor(() => assert.deepEqual((fixture.calls[0] as any).input.values, { pattern: 'grid' }));
   await act(async () => {});
-  assert.equal(choices[2]!.title, 'A very long grid label — A regular grid.');
+  assert.ok(screen.getByRole('button',{name:'A very long grid label'}));
+  await act(async()=>{fireEvent.blur(choices[2]!);await new Promise(resolve=>setTimeout(resolve,300));});
 });
 
 test('RTL: radio enum exposes a radiogroup and arrow keys select the next stable option ID', async () => {
   const fixture = service();
   fixture.publish({ sdkVersion: '0.2.0', intensity: undefined, controlSchema: [{
     id: 'quality', type: 'enum', label: 'Quality', default: 'balanced', presentation: 'radio',
-    options: [{ id: 'fast', label: 'Fast' }, { id: 'balanced', label: 'Balanced' }, { id: 'fine', label: 'Fine' }], changeCost: 'live',
+    options: [{ id: 'fast', label: 'Fast' }, { id: 'balanced', label: 'Balanced' }, { id: 'fine', label: 'Fine', description: 'Use the highest detail.' }], changeCost: 'live',
   }] as any, controlSchemaHash: 'e'.repeat(64), controls: { quality: 'balanced' }, controlSequence: 0 } as any);
   render(<StudioApp client={fixture.client} nowMs={1000} />);
 
@@ -148,9 +154,12 @@ test('RTL: radio enum exposes a radiogroup and arrow keys select the next stable
   assert.deepEqual(radios.map(radio => radio.tabIndex), [-1, 0, -1]);
   fireEvent.focus(radios[1]!);
   fireEvent.keyDown(radios[1]!, { key: 'ArrowRight' });
+  assert.ok(await screen.findByRole('tooltip',{name:/Use the highest detail/}));
+  assert.ok(screen.getByRole('radio',{name:'Fine',description:/Use the highest detail/}));
   await waitFor(() => assert.deepEqual((fixture.calls[0] as any).input.values, { quality: 'fine' }));
   await act(async () => {});
   assert.equal(document.activeElement, radios[2]);
+  await act(async()=>{fireEvent.blur(radios[2]!);await new Promise(resolve=>setTimeout(resolve,300));});
 });
 
 test('RTL: an older Boolean acknowledgement cannot revert a newer local edit', async () => {
