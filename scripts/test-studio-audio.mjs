@@ -69,17 +69,35 @@ try{
   assert.equal(new Set(status.authoring.controlAnimations.map(row=>JSON.stringify([row.source.logicalInputId,row.source.analyzer]))).size,1);
   report.checks.push('Bass and Highs bindings share one portable analyzer configuration');
 
-  await page.getByRole('button',{name:'Connect audio',exact:true}).click();
-  await page.getByLabel('Audio input Connected',{exact:true}).waitFor();
-  await page.getByRole('button',{name:'Disconnect',exact:true}).click();
-  await page.getByLabel('Audio input Disconnected',{exact:true}).waitFor();
   const device=page.getByRole('combobox',{name:'Audio input device',exact:true});
   await device.click();
-  const inputOptions=page.locator('li[role="option"]'),inputLabels=(await inputOptions.allTextContents()).map(label=>label.trim());
-  const hardwareIndex=inputLabels.findIndex(label=>/eMeet C960/i.test(label));
-  const selectedIndex=hardwareIndex>=0?hardwareIndex:inputLabels.findIndex(label=>label!=='Default input');
+  const cableOption=page.getByRole('option',{name:/CABLE Output \(VB-Audio Virtual Cable\)/i});
+  await cableOption.waitFor();
+  await page.screenshot({path:join(output,'available-inputs-before-connect.png')});
+  const cableLabel=(await cableOption.textContent())?.trim();
+  await cableOption.click();
+  await page.getByRole('button',{name:'Connect',exact:true}).click();
+  await page.getByLabel('Audio input Connected',{exact:true}).waitFor();
+  report.cableInput=cableLabel;
+  report.checks.push('CABLE Output was listed and connected before any successful default capture');
+  await page.screenshot({path:join(output,'cable-output-connected.png')});
+  await page.getByRole('button',{name:'Disconnect',exact:true}).click();
+  await page.getByLabel('Audio input Disconnected',{exact:true}).waitFor();
+
+  await device.click();
+  await page.getByRole('option',{name:'Default input',exact:true}).click();
+  await page.getByRole('button',{name:'Connect',exact:true}).click();
+  await page.getByLabel('Audio input Connected',{exact:true}).waitFor();
+  report.checks.push('Default input also connected after the Electron permission-check correction');
+  await page.getByRole('button',{name:'Disconnect',exact:true}).click();
+  await page.getByLabel('Audio input Disconnected',{exact:true}).waitFor();
+
+  await device.click();
+  const refreshedOptions=page.locator('li[role="option"]'),refreshedLabels=(await refreshedOptions.allTextContents()).map(label=>label.trim());
+  const hardwareIndex=refreshedLabels.findIndex(label=>/eMeet C960/i.test(label)&&!/^(Default|Communications) -/i.test(label));
+  const selectedIndex=hardwareIndex>=0?hardwareIndex:refreshedLabels.findIndex(label=>label!=='Default input'&&!/CABLE Output/i.test(label));
   assert.ok(selectedIndex>=0,'an operating-system audio input is available after the explicit first capture');
-  const hardware=inputOptions.nth(selectedIndex),hardwareLabel=inputLabels[selectedIndex];
+  const hardware=refreshedOptions.nth(selectedIndex),hardwareLabel=refreshedLabels[selectedIndex];
   await hardware.click();
   await page.getByRole('button',{name:'Connect',exact:true}).click();
   await page.getByLabel('Audio input Connected',{exact:true}).waitFor();

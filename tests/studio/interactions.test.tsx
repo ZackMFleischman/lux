@@ -9,6 +9,7 @@ const dom = new JSDOM('<!doctype html><html><head></head><body></body></html>', 
 for (const name of ['window', 'document', 'navigator', 'HTMLElement', 'Element', 'Node', 'ShadowRoot', 'DocumentFragment', 'Event', 'KeyboardEvent', 'MouseEvent', 'getComputedStyle'] as const) {
   Object.defineProperty(globalThis, name, { configurable: true, value: dom.window[name] });
 }
+Object.defineProperty(globalThis,'localStorage',{configurable:true,value:dom.window.localStorage});
 Object.defineProperty(globalThis, 'IS_REACT_ACT_ENVIRONMENT', { configurable: true, writable: true, value: true });
 const { render: renderUI, screen, cleanup, waitFor, fireEvent, act, within } = await import('@testing-library/react');
 const { CacheProvider } = await import('@emotion/react');
@@ -137,6 +138,7 @@ test('RTL: audio configuration changes cancel an in-flight connection and ignore
   let resolveConnect!:()=>void;
   const calls:string[]=[];
   const provider={
+    listInputs:async()=>[],subscribeDevices:()=>()=>{},
     connect:async()=>{calls.push('connect');await new Promise<void>(resolve=>{resolveConnect=resolve;});},
     disconnect:async()=>{calls.push('disconnect');},dispose:async()=>{},
     getSnapshot:()=>({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0}),subscribe:()=>()=>{},
@@ -152,6 +154,67 @@ test('RTL: audio configuration changes cancel an in-flight connection and ignore
   await act(async()=>{});
   assert.ok(screen.getByRole('status',{name:'Audio input status'}));
   assert.match(screen.getByRole('status').textContent??'',/Disconnected|Unavailable/);
+});
+
+test('RTL: a failed default connection keeps the prelisted CABLE input available for an exact retry',async()=>{
+  const {AudioInputControl}=await import('../../apps/studio/src/audio/AudioInputControl.tsx');
+  const calls:string[]=[],errors:string[]=[];
+  const provider={
+    listInputs:async()=>{calls.push('list');return [{id:'cable',label:'CABLE Output (VB-Audio Virtual Cable)'}];},
+    subscribeDevices:()=>()=>{},connect:async(_configuration:any,id?:string)=>{calls.push(`connect:${id}`);if(!id)throw Error('default input failed');},disconnect:async()=>{},dispose:async()=>{},
+    getSnapshot:()=>({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0}),subscribe:()=>()=>{},
+  } as any;
+  const user=userEvent.setup({document});localStorage.clear();
+  render(<AudioInputControl provider={provider} onError={error=>errors.push(error)}/>);
+  await waitFor(()=>assert.deepEqual(calls,['list']));
+  await user.click(await screen.findByRole('button',{name:'Connect'}));
+  await waitFor(()=>assert.match(errors.at(-1)??'',/default input failed/));
+  await user.click(screen.getByRole('combobox',{name:'Audio input device'}));
+  await user.click(screen.getByRole('option',{name:'CABLE Output (VB-Audio Virtual Cable)'}));
+  await user.click(screen.getByRole('button',{name:'Connect'}));
+  await waitFor(()=>assert.deepEqual(calls,['list','connect:undefined','connect:cable']));
+  assert.equal(screen.getByRole('status').textContent,'Connected');
+});
+
+test('RTL: a missing saved audio input blocks connection until the user chooses an available device',async()=>{
+  const {AudioInputControl}=await import('../../apps/studio/src/audio/AudioInputControl.tsx');
+  const calls:string[]=[],errors:string[]=[];
+  const provider={
+    listInputs:async()=>[{id:'cable',label:'CABLE Output (VB-Audio Virtual Cable)'}],subscribeDevices:()=>()=>{},
+    connect:async(_configuration:any,id?:string)=>{calls.push(`connect:${id}`);},disconnect:async()=>{},dispose:async()=>{},
+    getSnapshot:()=>({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0}),subscribe:()=>()=>{},
+  } as any;
+  const user=userEvent.setup({document});localStorage.setItem('lux.audio.primary-device','missing-device');
+  render(<AudioInputControl provider={provider} onError={error=>errors.push(error)}/>);
+  await screen.findByRole('button',{name:'Connect'});
+  await user.click(screen.getByRole('combobox',{name:'Audio input device'}));
+  assert.ok(screen.getByRole('option',{name:'Previously selected input (unavailable)'}));
+  await user.keyboard('{Escape}');
+  await user.click(screen.getByRole('button',{name:'Connect'}));
+  await waitFor(()=>assert.match(errors.at(-1)??'',/previously selected audio input is unavailable/i));
+  assert.deepEqual(calls,[]);
+  await user.click(screen.getByRole('combobox',{name:'Audio input device'}));
+  await user.click(screen.getByRole('option',{name:'CABLE Output (VB-Audio Virtual Cable)'}));
+  await user.click(screen.getByRole('button',{name:'Connect'}));
+  await waitFor(()=>assert.deepEqual(calls,['connect:cable']));
+  localStorage.clear();
+});
+
+test('RTL: an audio device change refreshes inputs and unmount removes the listener',async()=>{
+  const {AudioInputControl}=await import('../../apps/studio/src/audio/AudioInputControl.tsx');
+  let listener:(()=>void)|undefined,unsubscribed=false,lists=0;
+  const provider={
+    listInputs:async()=>++lists===1?[]:[{id:'cable',label:'CABLE Output (VB-Audio Virtual Cable)'}],
+    subscribeDevices:(next:()=>void)=>{listener=next;return()=>{unsubscribed=true;};},connect:async()=>{},disconnect:async()=>{},dispose:async()=>{},
+    getSnapshot:()=>({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0}),subscribe:()=>()=>{},
+  } as any;
+  localStorage.clear();const view=render(<AudioInputControl provider={provider} onError={()=>{}}/>);
+  await waitFor(()=>assert.equal(lists,1));
+  await act(async()=>listener?.());
+  await waitFor(()=>assert.equal(lists,2));
+  const user=userEvent.setup({document});await user.click(screen.getByRole('combobox',{name:'Audio input device'}));
+  assert.ok(screen.getByRole('option',{name:'CABLE Output (VB-Audio Virtual Cable)'}));
+  view.unmount();assert.equal(unsubscribed,true);
 });
 
 test('RTL: direct component selection edits flat controls and keeps empty-path animation identity', async () => {

@@ -3,7 +3,12 @@ import type {AudioBandAnalyzer} from './audio-analysis.mjs';
 import type {StudioAudioPermissionClient} from './audio-permission-client.ts';
 import type {StudioAudioProvider,AudioFrameScheduler} from './studio-audio-provider.mjs';
 
-type CaptureMediaDevices=Pick<MediaDevices,'getUserMedia'>;
+type CaptureMediaDevices=Pick<MediaDevices,'getUserMedia'|'enumerateDevices'|'addEventListener'|'removeEventListener'>;
+export type LocalAudioInput=Readonly<{id:string;label:string}>;
+export type StudioAudioRuntime=StudioAudioProvider&Readonly<{
+  listInputs():Promise<readonly LocalAudioInput[]>;
+  subscribeDevices(listener:()=>void):()=>void;
+}>;
 
 export function createStudioAudioRuntime(options:Readonly<{
   permissions:StudioAudioPermissionClient;
@@ -11,7 +16,8 @@ export function createStudioAudioRuntime(options:Readonly<{
   createContext():AudioContext;
   scheduler:AudioFrameScheduler;
   createAnalyzer?:(context:AudioContext,stream:MediaStream,config:Parameters<NonNullable<Parameters<typeof createStudioAudioProvider>[0]['createAnalyzer']>>[2])=>AudioBandAnalyzer;
-}>):StudioAudioProvider{
+}>):StudioAudioRuntime{
+  let capturesPending=0;
   const provider=createStudioAudioProvider({
     scheduler:options.scheduler,
     ...(options.createAnalyzer?{createAnalyzer:options.createAnalyzer}:{}),
@@ -39,7 +45,23 @@ export function createStudioAudioRuntime(options:Readonly<{
     },
   });
   return Object.freeze({
-    connect:(configuration,localDeviceId)=>provider.connect(configuration,localDeviceId),
+    async listInputs(){
+      const arm=provider.getSnapshot().available||capturesPending>0?undefined:await options.permissions.discover();
+      try{
+        const rows=await options.mediaDevices.enumerateDevices();
+        let index=0;
+        return Object.freeze(rows.filter(row=>row.kind==='audioinput'&&row.deviceId).map(row=>{
+          index++;
+          return Object.freeze({id:row.deviceId,label:row.label||`Audio input ${index}`});
+        }));
+      }finally{if(arm)await options.permissions.cancel(arm.token);}
+    },
+    subscribeDevices(listener){
+      const changed=()=>listener();
+      options.mediaDevices.addEventListener('devicechange',changed);
+      return()=>options.mediaDevices.removeEventListener('devicechange',changed);
+    },
+    async connect(configuration,localDeviceId){capturesPending++;try{await provider.connect(configuration,localDeviceId);}finally{capturesPending--;}},
     async disconnect(){try{await provider.disconnect();}finally{await options.permissions.disconnect();}},
     getSnapshot:provider.getSnapshot,
     subscribe:provider.subscribe,
