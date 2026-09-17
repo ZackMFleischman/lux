@@ -1,5 +1,10 @@
 # Two reference-inspired visuals — source-only handoff
 
+Update: the user subsequently authorized background testing. See
+[actual render results](reference-visuals-render-results.md) for captures,
+successful checks and the remaining reopen limitation. The original scope below
+is retained as the historical blind-source handoff.
+
 Branch: `codex/fiber-optic-heart`.
 Worktree: `C:/Users/zFlei/repos/lux/.worktrees/fiber-optic-heart`.
 Base: `b4f327bdd5f44b5285fd278fe31ffdd15ebd406d`.

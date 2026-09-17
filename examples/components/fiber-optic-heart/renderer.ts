@@ -69,7 +69,7 @@ export default defineComponent({
     const collarGeometry = new PlaneGeometry(1, 1);
     const collarMaterial = new MeshBasicNodeMaterial({ transparent: true, depthTest: false, depthWrite: false });
     const collarOpacity = uniform(0.7);
-    const collarColor = collarShader(uv());
+    const collarColor = collarShader(uv()) as ReturnType<typeof vec4>;
     collarMaterial.colorNode = collarColor.rgb;
     collarMaterial.opacityNode = collarColor.a.mul(collarOpacity);
     const strands = Array.from({ length: MAX_PATHS }, (_, index) => {
@@ -92,7 +92,7 @@ export default defineComponent({
       const material = new MeshBasicNodeMaterial({
         transparent: true, depthTest: false, depthWrite: false, side: DoubleSide,
       });
-      const color = strandShader(uv(), vec4(tint, brightness, phase, 0), vec4(time, speed, pulseWidth, strength), vec4(style, opacity, length, 0));
+      const color = strandShader(uv(), vec4(tint, brightness, phase, 0), vec4(time, speed, pulseWidth, strength), vec4(style, opacity, length, 0)) as ReturnType<typeof vec4>;
       material.colorNode = color.rgb;
       material.opacityNode = color.a;
       const mesh = new Mesh(geometry, material);

@@ -3,7 +3,7 @@ import {
   AdditiveBlending, DataTexture, Mesh, MeshBasicNodeMaterial, OrthographicCamera,
   PlaneGeometry, Scene, type Texture,
 } from 'three/webgpu';
-import { texture, uniform, uv, wgslFn } from 'three/tsl';
+import { texture, uniform, uv, vec4, wgslFn } from 'three/tsl';
 
 const dustShader = wgslFn(`
 fn fiberDust(st: vec2f, strength: f32) -> vec4f {
@@ -60,7 +60,8 @@ export default defineComponent({
     const material = new MeshBasicNodeMaterial({
       transparent: true, blending: AdditiveBlending, depthTest: false, depthWrite: false,
     });
-    const color = dustShader(uv(), brightness);
+    // wgslFn's declarations do not infer the WGSL vec4f return type.
+    const color = dustShader(uv(), brightness) as ReturnType<typeof vec4>;
     material.colorNode = color.rgb;
     material.opacityNode = color.a;
     const geometry = new PlaneGeometry(1, 1);
