@@ -137,10 +137,17 @@ export default defineComponent({
       },
     },
     controls: {
-      birdSize: { type: 'number', group: 'Birds', label: 'Subject size', default: 1, min: 0, max: 2, step: 0.01 },
-      birdSpeed: { type: 'number', group: 'Birds', label: 'Flight speed', default: 1, min: 0, max: 2, step: 0.01 },
-      birdOrbit: { type: 'number', group: 'Birds', label: 'Spiral radius', default: 1, min: 0, max: 2, step: 0.01 },
-      birdVisits: { type: 'number', group: 'Birds', label: 'Perching excursions', default: 1, min: 0, max: 1, step: 0.01 },
+      birdSize: { type: 'number', group: 'Bird Flight', label: 'Subject size', default: 1, min: 0, max: 8, step: 0.01 },
+      birdSpeed: { type: 'number', group: 'Bird Flight', label: 'Spiral travel speed', default: 1, min: 0, max: 8, step: 0.01 },
+      birdOrbit: { type: 'number', group: 'Bird Flight', label: 'Spiral radius', default: 1, min: 0, max: 8, step: 0.01 },
+      birdVisits: { type: 'number', group: 'Bird Flight', label: 'Perching excursions', default: 1, min: 0, max: 8, step: 0.01 },
+      birdPitch: { type: 'number', group: 'Bird Flight', label: 'Spiral length', default: 2.5, min: 0.15, max: 12, step: 0.01 },
+      birdExcursionSpeed: { type: 'number', group: 'Bird Flight', label: 'Excursion speed', default: 1.5, min: 0, max: 8, step: 0.01 },
+      birdSpecies: { type: 'number', group: 'Bird Appearance', label: 'Species rotation', default: 0, min: 0, max: 3, step: 1 },
+      birdPalette: { type: 'number', group: 'Bird Appearance', label: 'Plumage palette', default: 0.03, min: 0, max: 1, step: 0.01 },
+      birdPerchDuration: { type: 'number', group: 'Bird Personality', label: 'Perch duration', default: 10, min: 1, max: 90, step: 0.5 },
+      birdSociability: { type: 'number', group: 'Bird Personality', label: 'Sociability', default: 0.65, min: 0, max: 1, step: 0.01 },
+      birdThoughts: { type: 'number', group: 'Bird Personality', label: 'Thought bubbles', default: 0.7, min: 0, max: 1, step: 0.01 },
       structuralActivity: { type: 'number', group: 'Structural Changes', label: 'Split and island activity', default: 1, min: 0, max: 1, step: 0.01 },
       patternDensity: { type: 'number', group: 'Patterns', label: 'Density', default: 1, min: 0.3, max: 2, step: 0.01 },
       patternWidth: { type: 'number', group: 'Patterns', label: 'Line width', default: 1, min: 0.3, max: 2, step: 0.01 },
@@ -152,10 +159,17 @@ export default defineComponent({
       patternGrowth: { type: 'number', group: 'Pattern Motion', label: 'Drawing and release', default: 0.48, min: 0, max: 1, step: 0.01 },
     },
     controlDescriptions: {
+      birdPerchDuration: 'Typical stay in scene seconds; a friendly encounter can extend it until after the interaction.',
+      birdSociability: 'Chance of visiting a perched companion, greeting, playing or shyly sharing a perch.',
+      birdThoughts: 'Visibility of occasional feeling bubbles; zero hides them.',
+      birdPitch: 'Distance traveled along the ribbon for one spiral loop; independent of radius.',
+      birdExcursionSpeed: 'Travel tempo for perching visits, independent of spiral travel.',
+      birdSpecies: 'Rotate the mixed flock through original, hummingbird, swallow and broad-winged silhouettes.',
+      birdPalette: 'Shift individual plumage colors while retaining differences within each flock.',
       birdSize: 'Size of the five companion birds; zero hides them.',
-      birdSpeed: 'Flight, wingbeat and visit tempo relative to the painting clock.',
+      birdSpeed: 'Forward spiral flight speed. Wingbeats and excursions have independent clocks.',
       birdOrbit: 'Depth and width of the spiral around each ribbon.',
-      birdVisits: 'Blend from uninterrupted ribbon flight to occasional landing and departure.',
+      birdVisits: 'Excursion frequency: zero disables visits; higher values visit more often.',
       structuralActivity: 'Zero preserves the previous scene. Higher values grow curved splits, close narrow connections, and birth islands with gradual inherited styles.',
       patternDensity: 'Sets the scale and spacing of region motifs.',
       patternWidth: 'Sets motif stroke thickness.',
@@ -185,15 +199,17 @@ export default defineComponent({
     // creates an image directly; it does not resample a render-target texture.
     const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
     let birds: ReturnType<typeof createOrnamentBirds> | undefined;
-    let birdControls = [1, 1, 1, 1];
+    let birdControls: Record<string, number> = {};
+    let birdSampler: ((id: string, key: number) => number) | undefined;
     let material: MeshBasicNodeMaterial | undefined;
     let scene: Scene | undefined;
     let capturedHelpers: readonly string[] | undefined;
 
     return {
       update(frame) {
-        birdControls = [frame.controls.birdSize, frame.controls.birdSpeed, frame.controls.birdOrbit, frame.controls.birdVisits];
-        birds?.update(birdControls[0]!, birdControls[1]!, birdControls[2]!, birdControls[3]!);
+        birdControls = { ...frame.controls };
+        birdSampler = (frame as typeof frame & { sampleControl?: (id: string, key: number) => number }).sampleControl;
+        birds?.update(birdControls, birdSampler);
         structuralActivity.value = frame.controls.structuralActivity;
         pattern.value.set(frame.controls.patternDensity, frame.controls.patternWidth, frame.controls.patternVariation, frame.controls.patternMotion);
         patternStyle.value.set(frame.controls.patternStrength, frame.controls.patternRest, frame.controls.patternTravel, frame.controls.patternGrowth);
@@ -222,7 +238,7 @@ export default defineComponent({
           scene.add(mesh);
           birds = createOrnamentBirds(view, shape, detail, helpers.slice(0, 2).join('\n'));
           scene.add(...birds.meshes);
-          birds.update(birdControls[0]!, birdControls[1]!, birdControls[2]!, birdControls[3]!);
+          birds.update(birdControls, birdSampler);
         }
 
         // The four producers remain the sole owners of their live controls.
