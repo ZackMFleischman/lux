@@ -9,7 +9,9 @@ import type { ImageCompositionProfile } from '../../../packages/runtime-contract
 import type { NodePath } from '../../../packages/runtime-contracts/src/graph.ts';
 import type {ControlAnimationBinding} from '../../../packages/runtime-contracts/src/control-animation.mjs';
 import type {TempoSnapshot} from './controls/tempo-clock.mjs';
+import type {SceneStoryV1,StoryCapabilityV1,StoryFrame} from '../../../packages/runtime-contracts/src/story.mjs';
 export type { RuntimeKey } from '../../../packages/runtime-contracts/src/index.ts';
+export type {SceneStoryV1,StoryCapabilityV1,StoryFrame} from '../../../packages/runtime-contracts/src/story.mjs';
 /** Provisional Studio view port over canonical runtime identity/output/control
  * DTOs. This is not a competing application service or frozen core API. */
 /** sampledAtMs is a UI-normalized Unix-millisecond observation timestamp from
@@ -18,11 +20,23 @@ export type Metric = Readonly<{ value: number; sampledAtMs: number; coverage: nu
 export type TriggerReceipt=Readonly<{result:'applied';commandId:string;controlId:string;nodePath:NodePath;sequence:number;frameId:string;timeSeconds:number}>;
 export type TriggerCommand=Readonly<{requestId:string;commandId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string;expectedControlSchemaHash:string;controlId:string;nodePath?:NodePath}>;
 export function isUncertainTriggerError(error:unknown):boolean{return !!error&&typeof error==='object'&&'code' in error&&(error as {code?:unknown}).code==='TRIGGER_TIMEOUT';}
+export type StoryTransportAction=
+ | Readonly<{action:'launch';beatId:string}>|Readonly<{action:'start';occurrenceId?:string}>|Readonly<{action:'pause'}>|Readonly<{action:'play'}>
+ | Readonly<{action:'set-auto-advance';enabled:boolean}>|Readonly<{action:'resume';occurrenceId:string}>|Readonly<{action:'advance'}>
+ | Readonly<{action:'seek';localTimeSeconds:number}>|Readonly<{action:'replay';beatId:string}>|Readonly<{action:'loop';beatId:string}>|Readonly<{action:'return-normal'}>;
+export type StoryRuntimeStatus=Readonly<{definition:SceneStoryV1;capability:StoryCapabilityV1;storyHash:string;storyRevision:number;frame:StoryFrame;phase:'running'|'paused';autoAdvance:boolean;loop:boolean;effectiveAdvancing:boolean;
+ sequence:Readonly<{state:'detached'|'attached'|'ended';occurrenceId:string|null;index:number|null;nextOccurrenceId:string|null;dwellElapsedSeconds:number;dwellRemainingSeconds:number|null;awaitingCue:boolean}>;
+ resumeCandidates:readonly string[];disabledReasons:Readonly<Partial<Record<StoryTransportAction['action'],Readonly<{code:string;message:string;candidateOccurrenceIds?:readonly string[]}>>>>}>;
+export type StoryTransportCommand=Readonly<{requestId:string;commandId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string;expectedStoryHash:string;expectedStoryRevision:number}>&StoryTransportAction;
+export type StoryTransportReceipt=Readonly<{result:'applied';commandId:string;action:StoryTransportAction['action'];storyRevision:number;frameId:string;timeSeconds:number;story:StoryFrame}>;
+export type StoryTransportResult=Readonly<{receipt:StoryTransportReceipt;currentStatus:StoryRuntimeStatus}>;
+export function isUncertainStoryError(error:unknown):boolean{return !!error&&typeof error==='object'&&'code' in error&&(error as {code?:unknown}).code==='STORY_TIMEOUT';}
 export type RuntimeView = RuntimeKey & Readonly<{
   revisionId: string; sceneName: string; authority: 'studio' | 'host';
   playback: 'playing' | 'paused' | 'starting' | 'failed';
   clockEpoch: number; timeSeconds?:number; frameId: string | null; controlMigration?: readonly ControlMigration[];
   triggerSequence?:number;latestTriggerReceipt?:TriggerReceipt;
+  story?:StoryRuntimeStatus;
   tempo?:TempoSnapshot;tempoSequence?:number;
   output: Readonly<Pick<OutputSettings, 'width' | 'height'>>;
   fault: Readonly<{ code: string; message: string }> | null;
@@ -71,7 +85,8 @@ export type StudioOperation =
   | { name:'lux.tempo.set';input:{requestId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string;bpm:number} }
   | { name:'lux.tempo.tap';input:{requestId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string} }
   | { name:'lux.trigger.fire';input:Omit<TriggerCommand,'nodePath'> }
-  | { name:'lux.node.trigger.fire';input:TriggerCommand&Readonly<{nodePath:NodePath}> };
+  | { name:'lux.node.trigger.fire';input:TriggerCommand&Readonly<{nodePath:NodePath}> }
+  | { name:'lux.story.transport';input:StoryTransportCommand };
 export interface StudioClient {
   getSnapshot(): StudioSnapshot;
   subscribe(listener: () => void): () => void;
@@ -160,6 +175,11 @@ export class StudioController {
     const schemaHash=await sha256(new TextEncoder().encode(canonicalControlSchemaJson(schema)));
     return this.client.invoke({name:'lux.node.trigger.fire',input:{requestId:this.requestId(),commandId,instanceId:target.instanceId,expectedGeneration:target.generation,
       expectedRevisionId:target.revisionId,expectedControlSchemaHash:schemaHash,nodePath:[...nodePath],controlId}});
+  }
+  async storyTransport(action:StoryTransportAction,commandId:string,expectedStoryRevision?:number):Promise<StoryTransportResult>{
+    const target=this.target(),story=target.story;if(!story)throw Error('This visual has no Story');
+    return this.client.invoke({name:'lux.story.transport',input:{requestId:this.requestId(),commandId,instanceId:target.instanceId,expectedGeneration:target.generation,
+      expectedRevisionId:target.revisionId,expectedStoryHash:story.storyHash,expectedStoryRevision:expectedStoryRevision??story.storyRevision,...action}}) as Promise<StoryTransportResult>;
   }
   private startParameterDrain(): Promise<void> {
     if (!this.parameterDrain) this.parameterDrain = this.drainParameters().then(() => {

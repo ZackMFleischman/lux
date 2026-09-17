@@ -31,6 +31,16 @@ test('SDK 0.2 rejects missing controls, malformed definitions and getters withou
   assert.equal(called, false);
 });
 
+test('SDK 0.2 freezes optional Story capability without changing legacy definition shape',()=>{
+ let called=false;
+ const legacy=defineVisual({controls:{},async create(){called=true;throw Error('not during declaration');}});
+ assert.equal(Object.hasOwn(legacy,'story'),false);
+ const visual=defineVisual({controls:{},story:{version:1,beats:{arrival:{kind:'timed',seek:'direct'},orbit:{kind:'sustained',seek:'none'}}},async create(){called=true;throw Error('not during declaration');}});
+ assert.deepEqual(visual.story,{version:1,beats:[{id:'arrival',kind:'timed',seek:'direct'},{id:'orbit',kind:'sustained',seek:'none'}]});
+ assert.equal(called,false);
+ assert.throws(()=>{visual.story.beats[0].id='changed';},TypeError);
+});
+
 const source = (update = 'const height: number = frame.controls.spikeHeight; const roughness: number = frame.controls.roughness;') => `
 import { defineVisual } from '@lux/visual-sdk';
 export default defineVisual({
@@ -73,6 +83,13 @@ export default defineVisual({
   },
   async create() { return { update(frame) { ${update} }, render() {}, reset() {}, dispose() {} }; },
 });`;
+const storySource=update=>`
+import {defineVisual} from '@lux/visual-sdk';
+export default defineVisual({
+ controls:{brightness:{type:'number',label:'Brightness',default:1,min:0,max:2}},
+ story:{version:1,beats:{arrival:{kind:'timed',seek:'direct'},orbit:{kind:'sustained',seek:'none'}}},
+ async create(){return {update(frame){${update}},render(){},reset(){},dispose(){}}},
+});`;
 
 test('SDK 0.2 exposes an optional per-instance control sampler with a base-value fallback', async () => {
   const dependencies=process.env.LUX_COMPILER_DEPENDENCIES||resolve('node_modules');
@@ -108,6 +125,8 @@ test('real pinned TypeScript infers typed controls and restricts sampling and en
       [triggerSource("const event = frame.events[0]!; const kind: 'trigger' = event.type; const id: 'regenerate' = event.controlId; const command: string = event.commandId; const sequence: number = event.sequence; const speed: number = frame.controls.speed;"), null],
       [triggerSource('frame.controls.regenerate;'), /Property 'regenerate' does not exist/],
       [triggerSource("const id: 'other' = frame.events[0]!.controlId;"), /regenerate.*not assignable.*other/i],
+      [storySource("if(frame.story.state==='active'){const id:'arrival'|'orbit'=frame.story.beatId;const activation:number=frame.story.activationId;const occurrence:string|null=frame.story.occurrenceId;const elapsed:number=frame.story.elapsedSeconds;const local:number|null=frame.story.localTimeSeconds;const progress:number|null=frame.story.progress;}else{const epoch:number=frame.story.storyEpoch;}"), null],
+      [storySource("if(frame.story.state==='active'){const id:'missing'=frame.story.beatId;}"), /arrival.*orbit.*not assignable.*missing|not assignable.*missing/i],
       [source().replace(/controls: \{[\s\S]*?\n  \},/, 'controls: {},').replace('const height: number = frame.controls.spikeHeight; const roughness: number = frame.controls.roughness;', ''), null],
       [source('frame.controls.intensity;').replace(/controls: \{[\s\S]*?\n  \},/, 'controls: {},'), /Property 'intensity' does not exist/],
     ]) {

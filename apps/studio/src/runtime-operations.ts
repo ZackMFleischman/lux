@@ -33,6 +33,23 @@ export const tempoTapInputSchema=z.object({...target,expectedRevisionId:z.string
 const requestId = z.string().min(1).max(100);
 const commandId=z.string().min(1).max(100),controlId=z.string().regex(/^[a-z][A-Za-z0-9_]{0,63}$/);
 export const triggerInputSchema=z.object({...target,commandId,expectedRevisionId:z.string().min(1),expectedControlSchemaHash:z.string().regex(/^[a-f0-9]{64}$/),controlId,nodePath:z.array(nodeIdSchema).min(1).max(16).optional()}).strict();
+const storyGuard={...target,commandId,expectedRevisionId:z.string().min(1),expectedStoryHash:z.string().regex(/^[a-f0-9]{64}$/),expectedStoryRevision:z.number().int().nonnegative().safe()};
+const storyId=z.string().regex(/^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/);
+export const storyTransportInputSchema=z.discriminatedUnion('action',[
+ z.object({...storyGuard,action:z.literal('launch'),beatId:storyId}).strict(),z.object({...storyGuard,action:z.literal('start'),occurrenceId:storyId.optional()}).strict(),
+ z.object({...storyGuard,action:z.literal('pause')}).strict(),z.object({...storyGuard,action:z.literal('play')}).strict(),
+ z.object({...storyGuard,action:z.literal('set-auto-advance'),enabled:z.boolean()}).strict(),z.object({...storyGuard,action:z.literal('resume'),occurrenceId:storyId}).strict(),
+ z.object({...storyGuard,action:z.literal('advance')}).strict(),z.object({...storyGuard,action:z.literal('seek'),localTimeSeconds:z.number().finite().nonnegative()}).strict(),
+ z.object({...storyGuard,action:z.literal('replay'),beatId:storyId}).strict(),z.object({...storyGuard,action:z.literal('loop'),beatId:storyId}).strict(),z.object({...storyGuard,action:z.literal('return-normal')}).strict(),
+]);
+const storyOperationGuard={...storyGuard,requestId};
+const storyTransportOperationInputSchema=z.discriminatedUnion('action',[
+ z.object({...storyOperationGuard,action:z.literal('launch'),beatId:storyId}).strict(),z.object({...storyOperationGuard,action:z.literal('start'),occurrenceId:storyId.optional()}).strict(),
+ z.object({...storyOperationGuard,action:z.literal('pause')}).strict(),z.object({...storyOperationGuard,action:z.literal('play')}).strict(),
+ z.object({...storyOperationGuard,action:z.literal('set-auto-advance'),enabled:z.boolean()}).strict(),z.object({...storyOperationGuard,action:z.literal('resume'),occurrenceId:storyId}).strict(),
+ z.object({...storyOperationGuard,action:z.literal('advance')}).strict(),z.object({...storyOperationGuard,action:z.literal('seek'),localTimeSeconds:z.number().finite().nonnegative()}).strict(),
+ z.object({...storyOperationGuard,action:z.literal('replay'),beatId:storyId}).strict(),z.object({...storyOperationGuard,action:z.literal('loop'),beatId:storyId}).strict(),z.object({...storyOperationGuard,action:z.literal('return-normal')}).strict(),
+]);
 export const studioOperationSchema = z.discriminatedUnion('name', [
   z.object({name:z.literal('lux.node.parameters.set'),input:nodeParameterInputSchema.extend({requestId})}).strict(),
   z.object({name:z.literal('lux.node.animation.set'),input:nodeAnimationInputSchema.extend({requestId})}).strict(),
@@ -45,11 +62,12 @@ export const studioOperationSchema = z.discriminatedUnion('name', [
   z.object({name:z.literal('lux.tempo.tap'),input:tempoTapInputSchema.extend({requestId})}).strict(),
   z.object({name:z.literal('lux.trigger.fire'),input:triggerInputSchema.omit({nodePath:true}).extend({requestId})}).strict(),
   z.object({name:z.literal('lux.node.trigger.fire'),input:triggerInputSchema.required({nodePath:true}).extend({requestId})}).strict(),
+  z.object({name:z.literal('lux.story.transport'),input:storyTransportOperationInputSchema}).strict(),
 ]);
 export async function dispatchRuntimeCommand(client: StudioClient, method: string, params: unknown) {
-  const schemas = { parameters: parameterInputSchema, variation:nodeVariationInputSchema, playback: playbackInputSchema, restart: restartInputSchema,'tempo.set':tempoSetInputSchema,'tempo.tap':tempoTapInputSchema,trigger:triggerInputSchema };
+  const schemas = { parameters: parameterInputSchema, variation:nodeVariationInputSchema, playback: playbackInputSchema, restart: restartInputSchema,'tempo.set':tempoSetInputSchema,'tempo.tap':tempoTapInputSchema,trigger:triggerInputSchema,'story.transport':storyTransportInputSchema };
   if (!Object.hasOwn(schemas, method)) throw Error('Unsupported runtime command');
-  const names = { parameters: 'lux.parameters.set', variation:'lux.node.variation.set', playback: 'lux.playback', restart: 'lux.runtime.restart','tempo.set':'lux.tempo.set','tempo.tap':'lux.tempo.tap',trigger:'lux.trigger.fire' } as const;
+  const names = { parameters: 'lux.parameters.set', variation:'lux.node.variation.set', playback: 'lux.playback', restart: 'lux.runtime.restart','tempo.set':'lux.tempo.set','tempo.tap':'lux.tempo.tap',trigger:'lux.trigger.fire','story.transport':'lux.story.transport' } as const;
   const key = method as keyof typeof schemas;
   if(key==='parameters') {const raw=snapshotRecord(params);params={...raw,values:snapshotRecord(raw.values)};}
   const parsedInput=schemas[key].parse(params),name=key==='trigger'&&'nodePath' in parsedInput?'lux.node.trigger.fire':names[key];

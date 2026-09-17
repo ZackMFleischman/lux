@@ -4,9 +4,15 @@ export const studioCapabilities = Object.freeze({ protocolVersion: 4,
   supportedSdkVersions: Object.freeze(['0.1.0', '0.2.0', '0.4.0']),
   codeDeclaredParameters: true, parameterKinds: Object.freeze(['number','boolean','enum']), maxParameterMetadataBytes: parameterLimits.metadataBytes,
   controlTriggers: Object.freeze({commandReceipts:true,pausedFrame:true,maxCommandIds:16384}),
+  story: Object.freeze({version:1,rootSdkVersion:'0.2.0',sustained:true,timedDirectSeek:true,commandReceipts:true}),
   imageFormats: Object.freeze(['image/bmp', 'image/png', 'image/jpeg']), assetExport: true,
-  sceneVersions: Object.freeze([1, 2, 3, 4,5]),controlVariation:Object.freeze({stableInstanceKeys:true,distributions:Object.freeze(['random','centered','spread'])}),tempo:Object.freeze({manual:true,tap:true,bpm:Object.freeze({min:20,max:300})}),
+  sceneVersions: Object.freeze([1, 2, 3, 4,5,6]),controlVariation:Object.freeze({stableInstanceKeys:true,distributions:Object.freeze(['random','centered','spread'])}),tempo:Object.freeze({manual:true,tap:true,bpm:Object.freeze({min:20,max:300})}),
 });
+
+export function supportsStoryCapability(value:unknown):boolean{
+  const story=(value as {story?:{version?:unknown;rootSdkVersion?:unknown;sustained?:unknown;timedDirectSeek?:unknown;commandReceipts?:unknown}}|null)?.story;
+  return story?.version===1&&story.rootSdkVersion==='0.2.0'&&story.sustained===true&&story.timedDirectSeek===true&&story.commandReceipts===true;
+}
 
 export function supportsControlTriggersCapability(value:unknown):boolean{
   const capability=(value as {controlTriggers?:{commandReceipts?:unknown;pausedFrame?:unknown;maxCommandIds?:unknown}}|null)?.controlTriggers;

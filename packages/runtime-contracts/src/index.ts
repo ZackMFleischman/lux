@@ -77,6 +77,16 @@ export const parameterCompiledArtifactSchema = assetCompiledArtifactSchema.exten
   artifactVersion:z.literal(3),sdkVersion:z.literal('0.2.0'),
   controls:z.array(parameterControlDefinitionSchema),controlSchemaHash:hashSchema,
 }).strict();
+const storyIdSchema=z.string().regex(/^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/).refine(id=>!['constructor','prototype','__proto__'].includes(id));
+const storyBeatCapabilitySchema=z.discriminatedUnion('kind',[
+  z.object({id:storyIdSchema,kind:z.literal('sustained'),seek:z.literal('none')}).strict(),
+  z.object({id:storyIdSchema,kind:z.literal('timed'),seek:z.literal('direct')}).strict(),
+]);
+export const storyCompiledArtifactSchema=parameterCompiledArtifactSchema.extend({
+  artifactVersion:z.literal(6),sdkVersion:z.literal('0.2.0'),
+  storyCapability:z.object({version:z.literal(1),beats:z.array(storyBeatCapabilitySchema).min(1).max(128).refine(beats=>new Set(beats.map(beat=>beat.id)).size===beats.length)}).strict(),
+  storyCapabilityHash:hashSchema,
+}).strict();
 // Structural DTO only. The pure C01 policy and identity verifier additionally
 // enforce text/count/canonical-byte bounds, descriptions and control agreement.
 const componentPortSchema = z.object({
@@ -101,7 +111,7 @@ export const compositionCompiledArtifactSchema = parameterCompiledArtifactSchema
   artifactVersion:z.literal(5),sdkVersion:z.literal('0.4.0'),executionModel:z.enum(['image-chain-v1','typed-image-graph-v1']),
   composition:z.unknown(),compositionHash:hashSchema,
 }).strict();
-export const compiledArtifactSchema = z.union([legacyCompiledArtifactSchema,assetCompiledArtifactSchema,parameterCompiledArtifactSchema,componentCompiledArtifactSchema,compositionCompiledArtifactSchema]);
+export const compiledArtifactSchema = z.union([legacyCompiledArtifactSchema,assetCompiledArtifactSchema,parameterCompiledArtifactSchema,componentCompiledArtifactSchema,compositionCompiledArtifactSchema,storyCompiledArtifactSchema]);
 export type CompiledArtifact = z.infer<typeof compiledArtifactSchema>;
 // A compiled artifact has not run a candidate smoke test and is not a ValidatedBundle.
 export const compileFailureCodeSchema = z.enum(['SOURCE_BOUNDARY_VIOLATION', 'COMPILE_FAILED', 'QUOTA_EXCEEDED', 'TIMEOUT', 'SERVICE_UNAVAILABLE']);

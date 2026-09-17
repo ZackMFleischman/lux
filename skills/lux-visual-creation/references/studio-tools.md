@@ -123,3 +123,12 @@ Library create/update accept optional `dependencies` rows `{componentId, revisio
 ## Typed parameter edits
 
 Read status for the running app's `parameterKinds`, current `controlSchema`, instance/generation/revision and schema hash. Use the existing `lux.studio.parameters` tool for all persistent types: `values: { speed: 0.8, trails: true, palette: "warm" }`, with the current required guards and `mode: "live"`. Enum values are option IDs, never labels or indices. The authoritative schema rejects incorrect value types, unknown IDs and absent options. Inspect the applied response; a submitted patch is not evidence of a rendered frame. Re-read after a stale guard rather than replaying old intent against an unrelated visual. No tool per switch or option is needed. Source declaration changes still use complete guarded build and scene save/open.
+
+## Story playback
+
+When the running app reports Story version1 for SDK0.2 root visuals, use
+`lux.story.read` (`status`, `definition`, or `capabilities`) and the single
+`lux.story.transport` action DTO. Source builds accept an optional complete
+`story` definition: omission preserves it, null removes it. See
+[Story playback](story-playback.md) for guards, sustained/manual behavior,
+sequence occurrences, timed seeking, and return-to-normal examples.

@@ -54,7 +54,7 @@ export function extractControlDeclarations(ast) {
     fail(exported, 'Entry must export default defineVisual({...}) imported from @lux/visual-sdk');
   }
   const outer = properties(call.arguments[0]);
-  for (const key of outer.keys()) if (!['controls','create'].includes(key)) fail(outer.get(key), `Unsupported visual literal property: ${key.slice(0,80)}`);
+  for (const key of outer.keys()) if (!['controls','story','create'].includes(key)) fail(outer.get(key), `Unsupported visual literal property: ${key.slice(0,80)}`);
   const property = outer.get('controls');
   if (!property || property.type !== 'ObjectProperty') fail(property ?? call, 'Visual requires literal controls: {} or named number declarations');
   const controlRows = properties(property.value), declarations = Object.create(null), locations = new Map();

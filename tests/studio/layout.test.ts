@@ -18,6 +18,10 @@ test('versioned desktop split and laptop tab layouts contain Diagnostics beside 
   assert.ok((laptop.dock.grid.root.data as any[])[0].data.views.includes('graph'));
   assert.equal(registry.get('graph').title,'Graph');
   assert.equal(registry.get('diagnostics').title,'Diagnostics');
+  assert.equal(registry.get('story').title,'Story');
+  const inspectorGroup=(desktop.dock.grid.root.data as any[])[1];
+  assert.deepEqual(inspectorGroup.data.views,['inspector']);
+  assert.equal(inspectorGroup.data.activeView,'inspector');
   assert.throws(() => registry.get('timeline'), /Unavailable/);
   const expanded = createStudioPanelRegistry([{ kind: 'timeline', title: 'Timeline', multiple: false, parseViewState: () => ({}) }]);
   assert.equal(expanded.get('timeline').title, 'Timeline');

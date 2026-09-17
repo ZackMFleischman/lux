@@ -79,11 +79,11 @@ test('stale build cannot submit and opening invalid code preserves the previous 
       format: 'lux-scene', version: 1, source: incoming, settings: { width: 1920, height: 1080, fps: 60, seed: 0 }, controls: { intensity: 0.8 } } }) });
   await assert.rejects(session.build(source(), 0), /Editor changed/); assert.equal(count, 0);
   await assert.rejects(session.open(), /compiler/);
-  assert.equal(w.getSnapshot().selectedFile, 'other.ts');
+  assert.equal(w.getSnapshot().selectedFile, 'main.ts');
   assert.equal(w.getSnapshot().dirty, false);
   assert.equal(w.getSnapshot().hasRunningSource, true);
-  assert.equal(w.getSnapshot().runningMatchesDraft, false);
-  assert.equal(session.getSnapshot().name, 'new');
+  assert.equal(w.getSnapshot().runningMatchesDraft, true);
+  assert.equal(session.getSnapshot().name, 'Untitled');
 });
 
 test('export validates a complete snapshot, excludes competing operations and preserves dirty state', async () => {
@@ -111,7 +111,7 @@ test('failed preview validation prevents export and releases the session lock', 
   assert.equal(session.getSnapshot().busy, false);
 });
 
-test('failed open preserves document controls through save and applies them when repaired', async () => {
+test('failed open preserves prior controls and retry admits incoming controls only after success', async () => {
   const w = createSourceWorkspace(source()), saved: any[] = [];
   let invalid = true, intensity = 0.2;
   const session = createAuthoringSession(w, { submit: async (_source, options) => { if (invalid) throw Error('broken source'); const controls=options!.savedControls!;assert.ok('values' in controls);assert.equal(typeof controls.values.intensity,'number'); intensity = controls.values.intensity as number; },
@@ -121,9 +121,9 @@ test('failed open preserves document controls through save and applies them when
       source: source(), settings: { width: 1920, height: 1080, fps: 60, seed: 0 }, controls: { intensity: 0.8 } } }) });
   await assert.rejects(session.open(), /broken source/);
   intensity = 0.3; session.controlsChanged();
-  assert.equal(session.getSnapshot().controlsDirty, false, 'Previous preview controls do not mutate the newly opened document');
-  await session.save(); assert.equal(saved[0].document.controls.intensity, 0.8);
-  invalid = false; await session.build(session.read().source, session.read().draftVersion);
+  assert.equal(session.getSnapshot().controlsDirty, true, 'The prior scene still owns its live controls');
+  await session.save(); assert.equal(saved[0].document.controls.intensity, 0.3);
+  invalid = false; await session.open();
   assert.equal(intensity, 0.8);
   intensity = 0.9; session.controlsChanged(); await session.save();
   assert.equal(saved[1].document.controls.intensity, 0.9);
@@ -151,7 +151,7 @@ test('invalid draft save retains the accepted snapshot provenance, not the draft
   assert.notEqual(saved.controls.sourceHash,hash(JSON.stringify(validateSource(saved.source))));
 });
 
-test('opened parameters enter first candidate initialization and failed open retains document ownership', async () => {
+test('opened parameters enter candidate initialization and failed open retains prior ownership', async () => {
   const incoming=cache(); const w=createSourceWorkspace(parameterSource()); let invalid=true,applied=cache(parameterSource(),parameterSchema,{height:0.2});
   let saved:any; const firstFrames:unknown[]=[];
   const nextSchema=normalizeControlDeclarations({height:{type:'number',label:'Height',default:0.4,min:0,max:1},speed:{type:'number',label:'Speed',default:2,min:0,max:3}});
@@ -162,9 +162,9 @@ test('opened parameters enter first candidate initialization and failed open ret
       const reconciled=reconcileControlValues(options!.savedControls!.schema,options!.savedControls!.values,nextSchema);
       changes=reconciled.changes;applied=cache(s,nextSchema,reconciled.values);firstFrames.push(applied.values);
     }});
-  await assert.rejects(session.open(),/broken/);session.controlsChanged();assert.equal(session.getSnapshot().controlsDirty,false);
-  await session.save();assert.deepEqual(saved.controls,incoming);
-  invalid=false;await session.build(session.read().source,session.read().draftVersion);
+  await assert.rejects(session.open(),/broken/);session.controlsChanged();assert.equal(session.getSnapshot().controlsDirty,true);
+  await session.save();assert.deepEqual(saved.controls,applied);
+  invalid=false;await session.open();
   assert.deepEqual(firstFrames,[{height:0.4,speed:2}]);assert.deepEqual(changes,[{id:'height',reason:'out-of-range',previousValue:1.8,value:0.4},{id:'speed',reason:'added',value:2}]);
   await session.save();assert.deepEqual(saved.controls,applied);
 });

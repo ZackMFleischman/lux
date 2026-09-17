@@ -8,7 +8,7 @@ import { createStudioPanelRegistry, PanelRegistry } from './registry.ts';
 import type { LuxDockviewAdapter, LayoutStorage } from './dockview-adapter.ts';
 import { shortcutHint } from '../studio-shortcuts.ts';
 
-const kinds = ['preview', 'source', 'library', 'inspector', 'diagnostics', 'jobs', 'graph'] as const;
+const kinds = ['preview', 'source', 'library', 'inspector', 'story', 'diagnostics', 'jobs', 'graph'] as const;
 export type StudioPanelKind = typeof kinds[number];
 type Kind = StudioPanelKind;
 // Resolve Storage only during an operation so denied access uses adapter recovery.

@@ -3,6 +3,7 @@ import {verifyDerivedAssets,createReadonlyAssetMap,createReadonlyImageMap} from 
 import {validateSingleImageProfile} from '../../../packages/runtime-contracts/src/component-profile.mjs';
 import {snapshotRecord} from '../../../apps/build-worker/src/source-policy.mjs';
 import {normalizeImageCompositionProfile} from '../../../packages/runtime-contracts/src/composition-profile.mjs';
+import {normalizeStoryCapability,validateStoryAgainstCapability,canonicalSceneStoryJson} from '../../../packages/runtime-contracts/src/story.mjs';
 
 // This module is loaded in the pristine worker realm. All admission and private
 // store construction finish before invoking the trusted submitted-code importer.
@@ -25,7 +26,12 @@ export async function prepareAuthoredModule(message) {
     assets=createReadonlyAssetMap(sourceAssets);
     images=createReadonlyImageMap(sourceAssets);
     moduleSource=linked.code;
-    if(linked.linkedVersion===5){
+    if(linked.linkedVersion===6){
+      const storyCapability=normalizeStoryCapability(linked.storyCapability),story=message.story==null?null:validateStoryAgainstCapability(message.story,storyCapability);
+      const storyHash=story?await sha256(new TextEncoder().encode(canonicalSceneStoryJson(story))):null;
+      if(message.storyHash!==storyHash)throw Error('Story definition hash mismatch');
+      admission=freeze({kind:'story',sdkVersion:linked.sdkVersion,storyCapability,storyCapabilityHash:linked.storyCapabilityHash,story,storyHash,controls:linked.controls,controlSchemaHash:linked.controlSchemaHash});
+    }else if(linked.linkedVersion===5){
       const composition=normalizeImageCompositionProfile(linked.composition);
       admission=freeze({kind:'composition',sdkVersion:linked.sdkVersion,executionModel:linked.executionModel,composition,compositionHash:linked.compositionHash,controls:linked.controls,controlSchemaHash:linked.controlSchemaHash});
     }else if(linked.linkedVersion===4){

@@ -37,6 +37,7 @@ export async function prepareWorkerControlState(message,admission){
   if(admission?.kind==='component'||sdkVersion==='0.3.0'){
     if(admission?.kind!=='component'||sdkVersion!==admission.sdkVersion||schemaHash!==admission.controlSchemaHash||canonicalControlSchemaJson(schema)!==canonicalControlSchemaJson(admission.controls))bad('Component linked/message schema or SDK mismatch');
   }
+  if(admission?.kind==='story'&&(sdkVersion!=='0.2.0'||sdkVersion!==admission.sdkVersion||schemaHash!==admission.controlSchemaHash||canonicalControlSchemaJson(schema)!==canonicalControlSchemaJson(admission.controls)))bad('Story linked/message schema or SDK mismatch');
   const componentCheck=sdkVersion==='0.3.0'?prepareComponentDefinition(admission.component):undefined;
   let values=validateControlSnapshot(schema,message.controls), sequence=0;
   const scenePath=freeze([]),sceneNode=freeze({nodePath:scenePath,definitionHash:schemaHash,schemaHash,schema});
@@ -70,6 +71,7 @@ export async function prepareWorkerControlState(message,admission){
     if(componentCheck)return componentCheck(module);
     const definition=own(module,'default');record(definition);
     if(own(definition,'sdkVersion')!==sdkVersion)bad('Visual SDK mismatch');
+    if(admission?.kind==='story'&&!sameData(own(definition,'story'),admission.storyCapability))bad('Visual Story capability mismatch');
     const declared=own(definition,'controls');
     if(!sameData(declared,schema))bad('Visual control schema mismatch');
     const create=own(definition,'create');if(typeof create!=='function')bad('Invalid visual create function');return create;

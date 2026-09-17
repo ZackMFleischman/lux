@@ -1,4 +1,4 @@
-import type { StudioClient, StudioSnapshot, StudioOperation, RuntimeView,TriggerReceipt } from './service-client.ts';
+import type { StudioClient, StudioSnapshot, StudioOperation, RuntimeView,TriggerReceipt,StoryRuntimeStatus,StoryTransportReceipt,StoryTransportAction,SceneStoryV1,StoryCapabilityV1 } from './service-client.ts';
 import { getRuntimeControlState } from './service-client.ts';
 import type { PresentationPort } from './presentation.ts';
 import type { SourceBundle, OutputSettings } from '../../../packages/runtime-contracts/src/index.ts';
@@ -25,6 +25,7 @@ import type {AudioBandSnapshot} from '../../../packages/runtime-contracts/src/au
 import type {StudioAudioProvider} from './audio/studio-audio-provider.mjs';
 import {normalizeTempoSettings} from '../../../packages/runtime-contracts/src/tempo.mjs';
 import type {SceneTempoSettings} from '../../../packages/runtime-contracts/src/tempo.mjs';
+import {canonicalSceneStoryJson,normalizeSceneStory,normalizeStoryCapability,validateStoryAgainstCapability} from '../../../packages/runtime-contracts/src/story.mjs';
 export interface AuthoringApi {
   example(): Promise<SourceBundle>;
   compile(source: SourceBundle): Promise<any>;
@@ -44,12 +45,90 @@ function parseTriggerReceipt(value:any):TriggerReceipt{
 }
 const triggerTargetKey=(nodePath:readonly string[],controlId:string)=>`${JSON.stringify(nodePath)}:${controlId}`;
 const sameTriggerReceipt=(left:TriggerReceipt|undefined,right:TriggerReceipt)=>!!left&&left.commandId===right.commandId&&left.controlId===right.controlId&&triggerTargetKey(left.nodePath,left.controlId)===triggerTargetKey(right.nodePath,right.controlId)&&left.sequence===right.sequence&&left.frameId===right.frameId&&left.timeSeconds===right.timeSeconds;
+function parseStoryFrame(value:any){
+  if(!value||!Number.isSafeInteger(value.storyEpoch)||value.storyEpoch<0)throw Error('Invalid Story frame');
+  if(value.state==='normal'){if(Object.keys(value).length!==2)throw Error('Invalid Normal Story frame');return Object.freeze({state:'normal' as const,storyEpoch:value.storyEpoch});}
+  if(value.state!=='active'||typeof value.beatId!=='string'||!Number.isSafeInteger(value.activationId)||value.activationId<1||(value.occurrenceId!==null&&typeof value.occurrenceId!=='string')||!Number.isFinite(value.elapsedSeconds)||value.elapsedSeconds<0||(value.localTimeSeconds!==null&&(!Number.isFinite(value.localTimeSeconds)||value.localTimeSeconds<0))||(value.progress!==null&&(!Number.isFinite(value.progress)||value.progress<0||value.progress>1)))throw Error('Invalid Story frame');
+  if(Object.keys(value).length!==8)throw Error('Invalid active Story frame');
+  return Object.freeze({state:'active' as const,storyEpoch:value.storyEpoch,beatId:value.beatId,activationId:value.activationId,occurrenceId:value.occurrenceId,elapsedSeconds:value.elapsedSeconds,localTimeSeconds:value.localTimeSeconds,progress:value.progress});
+}
+function validateStoryFrameDefinition(frame:ReturnType<typeof parseStoryFrame>,definition:SceneStoryV1){
+  if(frame.state==='normal')return;
+  const beat=definition.beats.find(row=>row.id===frame.beatId);if(!beat)throw Error('Story frame beat is unavailable');
+  if(frame.occurrenceId!==null){const occurrence=definition.sequence.find(row=>row.id===frame.occurrenceId);if(!occurrence||occurrence.beatId!==beat.id)throw Error('Story frame occurrence does not match its beat');}
+  if(beat.timing.kind==='sustained'){if(frame.localTimeSeconds!==null||frame.progress!==null)throw Error('Sustained Story frames have no local timeline');}
+  else if(frame.localTimeSeconds===null||frame.progress===null||frame.localTimeSeconds>beat.timing.durationSeconds||frame.progress!==frame.localTimeSeconds/beat.timing.durationSeconds)throw Error('Timed Story frame progress is invalid');
+}
+function parseStoryStatus(value:any,definition:SceneStoryV1,capability:StoryCapabilityV1,storyHash:string):StoryRuntimeStatus{
+  if(!value||value.storyHash!==storyHash||!Number.isSafeInteger(value.storyRevision)||value.storyRevision<0||!['running','paused'].includes(value.phase)||typeof value.autoAdvance!=='boolean'||typeof value.loop!=='boolean'||typeof value.effectiveAdvancing!=='boolean')throw Error('Invalid Story status');
+  if(JSON.stringify(normalizeSceneStory(value.definition))!==JSON.stringify(definition)||JSON.stringify(normalizeStoryCapability(value.capability))!==JSON.stringify(capability))throw Error('Story status identity changed');
+  const sequence=value.sequence;if(!sequence||!['detached','attached','ended'].includes(sequence.state)||(sequence.occurrenceId!==null&&typeof sequence.occurrenceId!=='string')||(sequence.index!==null&&(!Number.isSafeInteger(sequence.index)||sequence.index<0))||(sequence.nextOccurrenceId!==null&&typeof sequence.nextOccurrenceId!=='string')||!Number.isFinite(sequence.dwellElapsedSeconds)||sequence.dwellElapsedSeconds<0||(sequence.dwellRemainingSeconds!==null&&(!Number.isFinite(sequence.dwellRemainingSeconds)||sequence.dwellRemainingSeconds<0))||typeof sequence.awaitingCue!=='boolean'||!Array.isArray(value.resumeCandidates)||value.resumeCandidates.some((id:unknown)=>typeof id!=='string')||!value.disabledReasons||typeof value.disabledReasons!=='object')throw Error('Invalid Story sequence status');
+  const frame=parseStoryFrame(value.frame);validateStoryFrameDefinition(frame,definition);
+  return Object.freeze({...value,definition,capability,frame,sequence:Object.freeze({...sequence}),resumeCandidates:Object.freeze([...value.resumeCandidates]),disabledReasons:Object.freeze({...value.disabledReasons})}) as StoryRuntimeStatus;
+}
+function parseStoryReceipt(value:any):StoryTransportReceipt{
+  if(!value||value.result!=='applied'||typeof value.commandId!=='string'||value.commandId.length<1||value.commandId.length>100||typeof value.action!=='string'||!Number.isSafeInteger(value.storyRevision)||value.storyRevision<1||typeof value.frameId!=='string'||!/^\d{1,20}$/.test(value.frameId)||!Number.isFinite(value.timeSeconds))throw Error('Invalid Story receipt');
+  return Object.freeze({result:'applied',commandId:value.commandId,action:value.action,storyRevision:value.storyRevision,frameId:value.frameId,timeSeconds:value.timeSeconds,story:parseStoryFrame(value.story)}) as StoryTransportReceipt;
+}
+const sameStoryReceipt=(left:StoryTransportReceipt|undefined,right:StoryTransportReceipt)=>!!left&&JSON.stringify(left)===JSON.stringify(right);
+function storyCommandKey(input:any){return JSON.stringify({expectedRevisionId:input.expectedRevisionId,expectedStoryHash:input.expectedStoryHash,expectedStoryRevision:input.expectedStoryRevision,action:input.action,
+  ...(['launch','replay','loop'].includes(input.action)?{beatId:input.beatId}:{}),...(['start','resume'].includes(input.action)&&input.occurrenceId!==undefined?{occurrenceId:input.occurrenceId}:{}),
+  ...(input.action==='set-auto-advance'?{enabled:input.enabled}:{}),...(input.action==='seek'?{localTimeSeconds:input.localTimeSeconds}:{})});}
+export function validateStoryReceiptTarget(receipt:StoryTransportReceipt,target:StoryCommandTarget,definition:SceneStoryV1){
+  validateStoryFrameDefinition(receipt.story,definition);const frame=receipt.story,action=target.action,active=frame.state==='active'?frame:null,occurrence=(id:string|null|undefined)=>definition.sequence.find(row=>row.id===id);
+  const before=target.before.frame,beforeActive=before.state==='active'?before:null;
+  const requireNewActivation=()=>{if(beforeActive&&active!.activationId!==beforeActive.activationId+1)throw Error('Story receipt did not create the next activation');if(active!.storyEpoch!==before.storyEpoch+1||active!.elapsedSeconds!==0)throw Error('Story receipt did not begin a fresh epoch');const beat=definition.beats.find(row=>row.id===active!.beatId)!;if(beat.timing.kind==='timed'&&active!.localTimeSeconds!==0)throw Error('New timed Story activation did not start at local zero');};
+  if(action.action==='return-normal'){if(frame.state!=='normal'||frame.storyEpoch!==before.storyEpoch+1)throw Error('Story receipt did not return to Normal');return;}
+  if(!active)throw Error('Story receipt is missing its active beat');
+  if(action.action==='launch'||action.action==='replay'||action.action==='loop'){
+    if(active.beatId!==action.beatId||active.occurrenceId!==null)throw Error('Story receipt identifies the wrong detached beat');
+    if(action.action==='launch'&&beforeActive?.beatId===action.beatId){if(active.activationId!==beforeActive.activationId||active.storyEpoch!==before.storyEpoch+(target.before.sequence.state==='detached'?0:1))throw Error('Same-beat launch replaced its activation');}else requireNewActivation();return;
+  }
+  if(action.action==='start'||action.action==='resume'){
+    const occurrenceId=action.action==='start'?(action.occurrenceId??definition.sequence[0]?.id):action.occurrenceId,row=occurrence(occurrenceId);
+    if(!row||active.occurrenceId!==row.id||active.beatId!==row.beatId)throw Error('Story receipt identifies the wrong occurrence');
+    if(action.action==='resume'&&beforeActive?.beatId===row.beatId){if(active.activationId!==beforeActive.activationId||active.storyEpoch!==before.storyEpoch+1)throw Error('Same-beat resume replaced its activation');}else requireNewActivation();return;
+  }
+  if(action.action==='advance'){
+    const row=occurrence(target.before.sequence.nextOccurrenceId);
+    if(!row||active.occurrenceId!==row.id||active.beatId!==row.beatId)throw Error('Story receipt identifies the wrong advanced occurrence');requireNewActivation();return;
+  }
+  if(action.action==='seek'){
+    if(!beforeActive||active.beatId!==beforeActive.beatId||active.activationId!==beforeActive.activationId||active.occurrenceId!==beforeActive.occurrenceId||active.localTimeSeconds!==action.localTimeSeconds||active.storyEpoch!==before.storyEpoch+1)throw Error('Story receipt identifies the wrong seek target');return;
+  }
+  if(!beforeActive||active.beatId!==beforeActive.beatId||active.activationId!==beforeActive.activationId||active.occurrenceId!==beforeActive.occurrenceId||active.storyEpoch!==before.storyEpoch)throw Error('Story receipt changed the active Story identity');
+}
+export function validateFreshStoryIntent(status:StoryRuntimeStatus,target:StoryCommandTarget){
+  const action=target.action,before=target.before,frame=status.frame,beforeFrame=before.frame,definition=status.definition;
+  const active=()=>{if(frame.state!=='active')throw Error('Story completion is not active');return frame;};
+  const detached=()=>{if(status.sequence.state!=='detached'||status.sequence.occurrenceId!==null||status.sequence.index!==null||status.sequence.nextOccurrenceId!==null||status.sequence.dwellElapsedSeconds!==0||status.sequence.dwellRemainingSeconds!==null||status.sequence.awaitingCue)throw Error('Story completion is not detached');};
+  const attached=(occurrenceId:string)=>{const index=definition.sequence.findIndex(row=>row.id===occurrenceId),row=definition.sequence[index];if(!row||status.sequence.state!=='attached'||status.sequence.occurrenceId!==occurrenceId||status.sequence.index!==index||status.sequence.nextOccurrenceId!==(definition.sequence[index+1]?.id??null)||status.sequence.dwellElapsedSeconds!==0||status.sequence.dwellRemainingSeconds!==(row.follow.kind==='after'?row.follow.seconds:null)||status.sequence.awaitingCue!==(row.follow.kind==='manual'))throw Error('Story completion has the wrong attached occurrence');};
+  const sequenceIdentity=()=>{for(const key of ['state','occurrenceId','index','nextOccurrenceId'] as const)if(status.sequence[key]!==before.sequence[key])throw Error('Story completion changed sequence identity');};
+  const newActivation=()=>{const current=active();if(beforeFrame.state==='active'&&current.activationId!==beforeFrame.activationId+1)throw Error('Story completion did not create the next activation');if(current.storyEpoch!==beforeFrame.storyEpoch+1||current.elapsedSeconds!==0)throw Error('Story completion did not begin a fresh epoch');};
+  if(action.action==='launch'){
+    const current=active();detached();if(status.autoAdvance||status.loop)throw Error('Launch retained sequence intent');
+    if(beforeFrame.state==='active'&&beforeFrame.beatId===action.beatId){if(current.activationId!==beforeFrame.activationId||current.storyEpoch!==beforeFrame.storyEpoch+(before.sequence.state==='detached'?0:1))throw Error('Same-beat launch changed activation identity');const beat=definition.beats.find(row=>row.id===action.beatId)!;const canRun=beat.timing.kind==='sustained'||beforeFrame.localTimeSeconds!<beat.timing.durationSeconds;if(status.phase!==(canRun?'running':before.phase))throw Error('Same-beat launch has the wrong phase');}
+    else{newActivation();if(status.phase!=='running')throw Error('Launch did not run its new activation');}return;
+  }
+  if(action.action==='start'||action.action==='resume'){
+    const occurrenceId=action.action==='start'?(action.occurrenceId??definition.sequence[0]?.id):action.occurrenceId;attached(occurrenceId!);if(!status.autoAdvance||status.loop||status.phase!=='running')throw Error('Story occurrence did not start with sequence intent');
+    const row=definition.sequence.find(item=>item.id===occurrenceId)!;
+    if(action.action==='resume'&&beforeFrame.state==='active'&&beforeFrame.beatId===row.beatId){const current=active();if(current.activationId!==beforeFrame.activationId||current.storyEpoch!==beforeFrame.storyEpoch+1)throw Error('Same-beat resume changed activation identity');}else newActivation();return;
+  }
+  if(action.action==='advance'){attached(before.sequence.nextOccurrenceId!);newActivation();if(status.phase!=='running'||status.autoAdvance!==before.autoAdvance||status.loop)throw Error('Advance has the wrong transport intent');return;}
+  if(action.action==='replay'||action.action==='loop'){detached();newActivation();if(status.phase!=='running'||status.autoAdvance||status.loop!==(action.action==='loop'))throw Error('Replay or loop has the wrong transport intent');return;}
+  if(action.action==='seek'){sequenceIdentity();if(status.phase!=='paused'||status.loop||status.autoAdvance!==before.autoAdvance||active().storyEpoch!==beforeFrame.storyEpoch+1)throw Error('Seek has the wrong transport intent');return;}
+  if(action.action==='pause'||action.action==='play'){sequenceIdentity();if(status.phase!==(action.action==='pause'?'paused':'running')||status.autoAdvance!==before.autoAdvance||status.loop!==before.loop||active().storyEpoch!==beforeFrame.storyEpoch)throw Error('Play or pause has the wrong transport intent');return;}
+  if(action.action==='set-auto-advance'){sequenceIdentity();if(status.autoAdvance!==action.enabled||status.phase!==before.phase||status.loop!==before.loop||active().storyEpoch!==beforeFrame.storyEpoch)throw Error('Story auto-advance receipt has the wrong intent');return;}
+  if(frame.state!=='normal'||frame.storyEpoch!==beforeFrame.storyEpoch+1||status.phase!=='paused'||status.autoAdvance||status.loop||status.sequence.state!=='detached'||status.sequence.occurrenceId!==null||status.sequence.index!==null||status.sequence.nextOccurrenceId!==null||status.sequence.dwellElapsedSeconds!==0||status.sequence.dwellRemainingSeconds!==null||status.sequence.awaitingCue||status.resumeCandidates.length)throw Error('Return Normal receipt has the wrong state');
+}
 declare global { interface Window { luxAuthoring: AuthoringApi } }
 type RetryPolicy={lastFaultAt:number|null};
 type ReplacementPlaybackIntent={playing:boolean;settling:number;pending:Set<string>;synchronize?:()=>void};
 type TriggerTarget=Readonly<{nodePath:readonly string[];controlId:string;key:string;sequence:number}>;
+export type StoryCommandTarget=Readonly<{payloadKey:string;action:StoryTransportAction;expectedRevision:number;before:StoryRuntimeStatus}>;
 type Running = { worker: Worker; canvas: HTMLCanvasElement; instanceId: string; generation: number; revisionId: string; performance:PerformanceReceiver;retryPolicy:RetryPolicy;autoRetry:boolean;playback:'playing'|'paused';
-  lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; animations:number; tempoCommands:number;tempoSequence:number;tempo:SceneTempoSettings;triggerSequence:number;latestTriggerReceipt?:TriggerReceipt;triggerCommands:Map<string,TriggerTarget>;triggerReceipts:Map<string,TriggerReceipt>;triggerSequences:Map<number,string>; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>>; desiredControls?:ControlValues; desiredNodeControls?:SavedNodeControlSnapshot;desiredControlAnimations?:readonly ControlAnimationBinding[];audioInFlight?:AudioBandSnapshot;audioLatest?:AudioBandSnapshot; };
+  lastHeartbeat: number; lastFrame: number; frameId: string; terminal: boolean; watchdog: ReturnType<typeof setInterval>; activationTimer?: ReturnType<typeof setTimeout>; controls: number; animations:number; tempoCommands:number;tempoSequence:number;tempo:SceneTempoSettings;triggerSequence:number;latestTriggerReceipt?:TriggerReceipt;triggerCommands:Map<string,TriggerTarget>;triggerReceipts:Map<string,TriggerReceipt>;triggerSequences:Map<number,string>;storyDefinition?:SceneStoryV1;storyCapability?:StoryCapabilityV1;storyHash?:string;storyStatus?:StoryRuntimeStatus;storyCommands:Map<string,StoryCommandTarget>;storyReceipts:Map<string,StoryTransportReceipt>; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>>; desiredControls?:ControlValues; desiredNodeControls?:SavedNodeControlSnapshot;desiredControlAnimations?:readonly ControlAnimationBinding[];audioInFlight?:AudioBandSnapshot;audioLatest?:AudioBandSnapshot; };
 export class StandaloneClient implements StudioClient, PresentationPort {
   private snapshot: StudioSnapshot = { connection: 'connected', message: 'Open an example or write a visual, then Build & preview.', receivedAtMs: Date.now(), authoring: null, host: null, jobs: [], visualFps: null, uiFps: null };
   private listeners = new Set<() => void>();
@@ -57,12 +136,12 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private target: HTMLElement | null = null;
   private generation = 0;
   private source: SourceBundle | null = null;
-  private accepted: { linked: LinkedEnvelope; revisionId: string; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>> } | null = null;
+  private accepted: { linked: LinkedEnvelope; revisionId: string; state:RuntimeControlState; output:Readonly<Pick<OutputSettings,'width'|'height'>>;story:SceneStoryV1|null;storyHash:string|null;retainStoryVersion:boolean } | null = null;
   private previewOutput: Readonly<Pick<OutputSettings,'width'|'height'>> = DEFAULT_OUTPUT;
   private busy = false;
   private replacementPlayback:ReplacementPlaybackIntent|null=null;
   private automaticRetry:ReturnType<typeof setTimeout>|undefined;
-  private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; playback?:boolean; expectedControlSequence?:number; expectedControls?:ControlValues; expectedNodeControls?:SavedNodeControlSnapshot;expectedAnimationSequence?:number;expectedControlAnimations?:readonly ControlAnimationBinding[];expectedTempoSequence?:number;expectedTriggerCommandId?:string;expectedTriggerTarget?:TriggerTarget; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
+  private pending = new Map<string, { runtime: Running; kind: 'command' | 'capture'; playback?:boolean; expectedControlSequence?:number; expectedControls?:ControlValues; expectedNodeControls?:SavedNodeControlSnapshot;expectedAnimationSequence?:number;expectedControlAnimations?:readonly ControlAnimationBinding[];expectedTempoSequence?:number;expectedTriggerCommandId?:string;expectedTriggerTarget?:TriggerTarget;expectedStoryCommandId?:string;expectedStoryTarget?:StoryCommandTarget;expectedStoryRetry?:boolean; resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
   private api: AuthoringApi;
   private codeDeclaredParameters:boolean;
   private readonly performanceMode:CollectionMode;
@@ -77,6 +156,17 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     });
   }
   getSnapshot = () => this.snapshot;
+  readStory(view:'status'|'definition'|'capabilities'){
+    const runtime=this.running,accepted=this.accepted;
+    if(!runtime||runtime.terminal||!accepted||runtime!==this.running)throw Error('No working Story runtime');
+    const capability=runtime.storyCapability;
+    if(!capability)throw Error('The accepted visual does not declare Story capabilities');
+    const guards={instanceId:runtime.instanceId,generation:runtime.generation,revisionId:runtime.revisionId,storyHash:runtime.storyHash??null,storyRevision:runtime.storyStatus?.storyRevision??null};
+    if(view==='capabilities')return Object.freeze({...guards,capabilities:capability});
+    if(!runtime.storyDefinition||!runtime.storyStatus||!runtime.storyHash)throw Error('The accepted visual has no Story definition');
+    if(view==='definition')return Object.freeze({...guards,definition:runtime.storyDefinition});
+    return Object.freeze({...guards,status:runtime.storyStatus});
+  }
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
   private publish(patch: Partial<StudioSnapshot>) { this.snapshot = { ...this.snapshot, ...patch, receivedAtMs: Date.now() }; for (const listener of this.listeners) listener(); }
   private queueAudio(runtime:Running,snapshot:AudioBandSnapshot){
@@ -104,9 +194,9 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       ? {sourceHash: runtime.revisionId, nodes: state.nodeControls!.nodes}
       : state.sdkVersion === '0.1.0' ? {intensity: runtime.intensity ?? 0.5}
       : {sourceHash: runtime.revisionId, schema: state.controlSchema, schemaHash: state.controlSchemaHash, values: state.controls};
-    return createSceneDocument(structuredClone(this.source), {...DEFAULT_OUTPUT, ...runtime.output}, controls, [], state.controlAnimations ?? [],normalizeTempoSettings({bpm:runtime.tempo?.bpm??120}));
+    return createSceneDocument(structuredClone(this.source), {...DEFAULT_OUTPUT, ...runtime.output}, controls, [], state.controlAnimations ?? [],normalizeTempoSettings({bpm:runtime.tempo?.bpm??120}),this.accepted?.story??null,this.accepted?.retainStoryVersion??false);
   }
-  async submit(source: SourceBundle, options:{savedControls?:SavedControlSnapshot;savedControlAnimations?:readonly ControlAnimationBinding[];savedTempo?:SceneTempoSettings;output?:OutputSettings}={}): Promise<void> {
+  async submit(source: SourceBundle, options:{savedControls?:SavedControlSnapshot;savedControlAnimations?:readonly ControlAnimationBinding[];savedTempo?:SceneTempoSettings;output?:OutputSettings;story?:SceneStoryV1|null}={}): Promise<void> {
     if(source.sdkVersion!=='0.1.0'&&source.sdkVersion!=='0.2.0'&&source.sdkVersion!=='0.4.0')throw Error('Unsupported Studio SDK');
     const supportedSdkVersion=source.sdkVersion;
     if(source.sdkVersion==='0.2.0'&&!this.codeDeclaredParameters)throw Error('Code-declared parameters are not enabled in this Studio UI yet');
@@ -130,15 +220,16 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       const result = await this.api.compile(submittedSource);
       if (!result.ok) throw new SourceCompileError(result.diagnostics ?? []);
       let linked = structuredClone(result.linked) as LinkedEnvelope;
-      const expectedLinkedVersion = submittedSource.sdkVersion === '0.4.0' ? 5 : submittedSource.sdkVersion === '0.2.0' ? 3 : ('sourceVersion' in submittedSource ? 2 : 1);
-      if (('linkedVersion' in linked ? linked.linkedVersion : 1) !== expectedLinkedVersion) throw Error('Compiled source and linked payload versions do not match');
+      const actualLinkedVersion='linkedVersion' in linked?linked.linkedVersion:1;
+      const expectedLinkedVersion = submittedSource.sdkVersion === '0.4.0' ? 5 : submittedSource.sdkVersion === '0.2.0' ? actualLinkedVersion : ('sourceVersion' in submittedSource ? 2 : 1);
+      if ((submittedSource.sdkVersion==='0.2.0'?![3,6].includes(actualLinkedVersion):actualLinkedVersion!==expectedLinkedVersion)) throw Error('Compiled source and linked payload versions do not match');
       let schema=LEGACY_CONTROL_SCHEMA, schemaHash=LEGACY_CONTROL_SCHEMA_HASH;
       if(submittedSource.sdkVersion==='0.2.0'||submittedSource.sdkVersion==='0.4.0') {
         linked=await verifyLinked(linked,sha256);
         if(!('linkedVersion' in linked)||linked.linkedVersion!==expectedLinkedVersion)throw Error('Code-declared parameters require the matching sealed linked version');
         const sourceHash=await sha256(new TextEncoder().encode(JSON.stringify(validateSource(submittedSource))));
         if(result.sourceHash!==sourceHash)throw Error('Compiled source identity mismatch');
-        if(linked.linkedVersion!==3&&linked.linkedVersion!==5)throw Error('Missing parameter schema in linked payload');
+        if(linked.linkedVersion!==3&&linked.linkedVersion!==5&&linked.linkedVersion!==6)throw Error('Missing parameter schema in linked payload');
         schema=normalizeControlSchema(linked.controls);schemaHash=linked.controlSchemaHash;
       }
       const saved=options.savedControls?await validateSavedControls(options.savedControls):undefined;
@@ -161,25 +252,34 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       this.publish({ jobs: [{ jobId, state: 'initializing', summary: 'Preparing preview…' }] });
       const tempo=normalizeTempoSettings(options.savedTempo??{bpm:this.snapshot.authoring?.tempo?.bpm??120});
       const tempoSequence=options.savedTempo?0:this.snapshot.authoring?.tempoSequence??0;
+      const requestedStory=options.story===undefined?(this.accepted?.story??null):options.story;
+      const retainStoryVersion=options.story===undefined?(this.accepted?.retainStoryVersion??false):options.story!==null||(this.accepted?.retainStoryVersion??false);
+      let story:SceneStoryV1|null=null,storyHash:string|null=null;
+      if(requestedStory!==null){
+        if(!('linkedVersion' in linked)||linked.linkedVersion!==6)throw Error('The compiled visual does not declare a matching Story capability');
+        story=validateStoryAgainstCapability(requestedStory,linked.storyCapability);storyHash=await sha256(new TextEncoder().encode(canonicalSceneStoryJson(story)));
+      }
       await this.start(linked, result.sourceHash,state,migration, {lastFaultAt:null}, playbackIntent.playing, requestedOutput,playbackIntent,
-        options.savedControls===undefined&&options.savedControlAnimations===undefined,tempo,tempoSequence);
+        options.savedControls===undefined&&options.savedControlAnimations===undefined,tempo,tempoSequence,story,storyHash);
       this.previewOutput = requestedOutput;
       this.source = submittedSource;
       let acceptedState=state;const running=this.running;
       if(running&&running.revisionId===result.sourceHash)acceptedState=running.state;
-      this.accepted = { linked, revisionId: result.sourceHash,state:acceptedState,output:this.previewOutput };
+      this.accepted = { linked, revisionId: result.sourceHash,state:acceptedState,output:this.previewOutput,story,storyHash,retainStoryVersion };
       this.publish({ message:null,jobs: [{ jobId, state: 'succeeded', summary: 'Visual is ready in Lux.' }] });
     } catch (error) { this.publish({ jobs: [{ jobId, state: 'failed', summary: 'Build failed; previous preview retained.', fault: String(error) }] }); throw error; }
     finally { if(this.replacementPlayback===playbackIntent)this.replacementPlayback=null;this.busy = false; this.scheduleAutomaticRetry(); }
   }
-  private async start(linked: LinkedEnvelope, revisionId: string, state:RuntimeControlState, migration:readonly ControlMigration[]=[],retryPolicy:RetryPolicy={lastFaultAt:null},playingOverride?:boolean, output:Readonly<Pick<OutputSettings,'width'|'height'>>=this.previewOutput,playbackIntent?:ReplacementPlaybackIntent,reconcileRuntime=false,tempo:SceneTempoSettings=normalizeTempoSettings({bpm:this.snapshot.authoring?.tempo?.bpm??120}),tempoSequence=this.snapshot.authoring?.tempoSequence??0): Promise<void> {
+  private async start(linked: LinkedEnvelope, revisionId: string, state:RuntimeControlState, migration:readonly ControlMigration[]=[],retryPolicy:RetryPolicy={lastFaultAt:null},playingOverride?:boolean, output:Readonly<Pick<OutputSettings,'width'|'height'>>=this.previewOutput,playbackIntent?:ReplacementPlaybackIntent,reconcileRuntime=false,tempo:SceneTempoSettings=normalizeTempoSettings({bpm:this.snapshot.authoring?.tempo?.bpm??120}),tempoSequence=this.snapshot.authoring?.tempoSequence??0,story:SceneStoryV1|null=this.accepted?.story??null,storyHash:string|null=this.accepted?.storyHash??null): Promise<void> {
     const compositionState='linkedVersion' in linked&&linked.linkedVersion===5?prepareCompositionControlState(linked.composition):undefined;
     const playing = playingOverride ?? this.snapshot.authoring?.playback === 'playing';
     const canvas = document.createElement('canvas'); canvas.width = output.width; canvas.height = output.height;
     canvas.style.cssText = 'width:100%;height:100%;position:absolute;inset:0;object-fit:contain';
     const worker = new Worker(new URL('./visual-worker.js', import.meta.url), { type: 'module' });
+    const storyCapability='linkedVersion' in linked&&linked.linkedVersion===6?normalizeStoryCapability(linked.storyCapability):undefined;
+    if(story&&!storyCapability)throw Error('Story definition requires a compiled Story capability');
     const candidate: Running = { worker, canvas, instanceId: this.running?.instanceId ?? crypto.randomUUID(), generation: ++this.generation,
-      revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0,animations:0,tempoCommands:tempoSequence,tempoSequence,tempo,triggerSequence:0,triggerCommands:new Map(),triggerReceipts:new Map(),triggerSequences:new Map(),state,output,performance:undefined as any,retryPolicy,autoRetry:false,playback:playing?'playing':'paused' };
+      revisionId, lastHeartbeat: performance.now(), lastFrame: performance.now(), frameId: '0', terminal: false, watchdog: undefined as any, controls: 0,animations:0,tempoCommands:tempoSequence,tempoSequence,tempo,triggerSequence:0,triggerCommands:new Map(),triggerReceipts:new Map(),triggerSequences:new Map(),storyCommands:new Map(),storyReceipts:new Map(),...(story&&storyCapability&&storyHash?{storyDefinition:story,storyCapability,storyHash}:{}),state,output,performance:undefined as any,retryPolicy,autoRetry:false,playback:playing?'playing':'paused' };
     candidate.performance=new PerformanceReceiver({instanceId:candidate.instanceId,generation:candidate.generation,revisionId},performance.now());
     this.audioRuntimes.add(candidate);
     const previous = this.running;
@@ -199,7 +299,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           sceneName: 'Untitled visual', authority: 'studio', playback: message.playback,
           ...candidate.state,controlMigration:migration,clockEpoch: message.clockEpoch,timeSeconds:message.timeSeconds,tempo:message.tempo,tempoSequence:message.tempoSequence, frameId: message.frameId,
           triggerSequence:candidate.triggerSequence,...(candidate.latestTriggerReceipt?{latestTriggerReceipt:candidate.latestTriggerReceipt}:{}),
-          ...(state.sdkVersion==='0.1.0'?{intensity:candidate.state.controls.intensity}:{}),
+          ...(candidate.storyStatus?{story:candidate.storyStatus}:{}),...(state.sdkVersion==='0.1.0'?{intensity:candidate.state.controls.intensity}:{}),
           output: candidate.output, fault: null } as RuntimeView });
         const promote=()=>{
           if(ready||!initialized||!latestStatus)return;
@@ -290,7 +390,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
             return;
           }
           if(message.type==='command-error'){
-            const wait=this.pending.get(message.requestId);if(wait?.runtime===candidate&&wait.kind==='command'){candidate.lastHeartbeat=performance.now();clearTimeout(wait.timer);this.pending.delete(message.requestId);this.settleReplacementCommand(message.requestId);const error=Object.assign(Error(String(message.message).slice(0,500)),{code:typeof message.code==='string'?message.code:'COMMAND_REJECTED'});wait.reject(error);if(wait.expectedTriggerCommandId!==undefined)this.fault(candidate,`Trigger command was rejected after host admission: ${error.message}`);}return;
+            const wait=this.pending.get(message.requestId);if(wait?.runtime===candidate&&wait.kind==='command'){candidate.lastHeartbeat=performance.now();clearTimeout(wait.timer);this.pending.delete(message.requestId);this.settleReplacementCommand(message.requestId);let candidates:readonly string[]|undefined;if(wait.expectedStoryCommandId!==undefined&&Array.isArray(message.candidates)&&message.candidates.length<=1024){const known=new Set(candidate.storyDefinition?.sequence.map(row=>row.id)??[]),seen=new Set<string>();if(message.candidates.every((id:unknown)=>typeof id==='string'&&known.has(id)&&!seen.has(id)&&!!seen.add(id)))candidates=Object.freeze([...message.candidates]);}const error=Object.assign(Error(String(message.message).slice(0,500)),{code:typeof message.code==='string'?message.code:'COMMAND_REJECTED',...(candidates?{candidates}:{})});wait.reject(error);if(wait.expectedTriggerCommandId!==undefined)this.fault(candidate,`Trigger command was rejected after host admission: ${error.message}`);}return;
           }
           if (message.type === 'capture') {
             const wait = this.pending.get(message.requestId);
@@ -332,6 +432,28 @@ export class StandaloneClient implements StudioClient, PresentationPort {
             if(receivedTriggerSequence===candidate.triggerSequence&&candidate.latestTriggerReceipt&&(!receivedLatestTriggerReceipt||!sameTriggerReceipt(candidate.latestTriggerReceipt,receivedLatestTriggerReceipt)))throw Error('Latest trigger receipt regressed');
           }
           catch{return;}
+          let receivedStoryStatus:StoryRuntimeStatus|undefined,requestStoryReceipt:StoryTransportReceipt|undefined;
+          try{
+            if(candidate.storyDefinition&&candidate.storyCapability&&candidate.storyHash){
+              receivedStoryStatus=parseStoryStatus(message.story,candidate.storyDefinition,candidate.storyCapability,candidate.storyHash);
+              const previousRevision=candidate.storyStatus?.storyRevision??0;
+              if(message.type==='ready'){
+                if(receivedStoryStatus.storyRevision!==0||receivedStoryStatus.frame.state!=='normal')throw Error('Story runtime did not initialize in Normal');
+              }else if(receivedStoryStatus.storyRevision<previousRevision||receivedStoryStatus.storyRevision>previousRevision+1)throw Error('Story revision changed unexpectedly');
+              if(message.storyReceipt){
+                requestStoryReceipt=parseStoryReceipt(message.storyReceipt);
+                const target=candidate.storyCommands.get(requestStoryReceipt.commandId);
+                if(!target||target.action.action!==requestStoryReceipt.action||message.storyCommandKey!==target.payloadKey)throw Error('Unexpected Story receipt');
+                validateStoryReceiptTarget(requestStoryReceipt,target,candidate.storyDefinition);
+                const prior=candidate.storyReceipts.get(requestStoryReceipt.commandId);if(prior&&!sameStoryReceipt(prior,requestStoryReceipt))throw Error('Story receipt identity changed');
+                if(requestStoryReceipt.storyRevision>receivedStoryStatus.storyRevision)throw Error('Story receipt exceeds current revision');
+                const requestWait=this.pending.get(message.requestId),duplicate=message.storyCommandDuplicate===true;
+                if(duplicate&&requestWait?.expectedStoryRetry!==true)throw Error('Unexpected Story duplicate response');
+                if(!prior&&!duplicate&&(requestStoryReceipt.storyRevision!==receivedStoryStatus.storyRevision||requestStoryReceipt.frameId!==message.frameId||requestStoryReceipt.timeSeconds!==message.timeSeconds||JSON.stringify(requestStoryReceipt.story)!==JSON.stringify(receivedStoryStatus.frame)))throw Error('Story receipt does not identify the completed frame');
+                if(!duplicate)validateFreshStoryIntent(receivedStoryStatus,target);
+              }
+            }else if(message.story||message.storyReceipt)throw Error('Unexpected Story runtime state');
+          }catch(error){if(message.type==='ready')fail(String(error));return;}
           let applied:ControlValues,effectiveControls:ControlValues,compositionNodeControls:SavedNodeControlSnapshot|undefined,effectiveNodeControls:SavedNodeControlSnapshot|undefined,controlAnimations:readonly ControlAnimationBinding[]=Object.freeze([]),controlAnimationIssues:readonly ControlAnimationIssue[]=Object.freeze([]);
           try {
             applied=validateControlSnapshot(state.controlSchema,state.sdkVersion==='0.1.0'?{intensity:message.intensity}:message.controls);
@@ -377,6 +499,8 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           candidate.playback=message.playback;
           for(const receipt of triggerBindings){candidate.triggerReceipts.set(receipt.commandId,receipt);candidate.triggerSequences.set(receipt.sequence,receipt.commandId);}
           candidate.triggerSequence=receivedTriggerSequence;candidate.latestTriggerReceipt=receivedLatestTriggerReceipt;
+          if(requestStoryReceipt)candidate.storyReceipts.set(requestStoryReceipt.commandId,requestStoryReceipt);
+          candidate.storyStatus=receivedStoryStatus;
           candidate.tempo=receivedTempo;candidate.tempoSequence=message.tempoSequence;
           candidate.lastHeartbeat = performance.now();
           if (BigInt(message.frameId) > BigInt(candidate.frameId)) { candidate.frameId = message.frameId; candidate.lastFrame = performance.now(); }
@@ -398,12 +522,13 @@ export class StandaloneClient implements StudioClient, PresentationPort {
               (wait.expectedAnimationSequence===undefined || (animationSequence===wait.expectedAnimationSequence&&JSON.stringify(controlAnimations)===JSON.stringify(wait.expectedControlAnimations)))) {
             if(wait.expectedTempoSequence!==undefined&&message.tempoSequence!==wait.expectedTempoSequence)return;
             if(wait.expectedTriggerCommandId!==undefined&&(!requestTriggerReceipt||requestTriggerReceipt.commandId!==wait.expectedTriggerCommandId||wait.expectedTriggerTarget?.key!==triggerTargetKey(requestTriggerReceipt.nodePath,requestTriggerReceipt.controlId)))return;
-            clearTimeout(wait.timer); this.pending.delete(message.requestId);this.settleReplacementCommand(message.requestId);wait.resolve(requestTriggerReceipt??message);
+            if(wait.expectedStoryCommandId!==undefined&&(!requestStoryReceipt||requestStoryReceipt.commandId!==wait.expectedStoryCommandId||wait.expectedStoryTarget?.action.action!==requestStoryReceipt.action||message.storyCommandKey!==wait.expectedStoryTarget.payloadKey||!receivedStoryStatus))return;
+            clearTimeout(wait.timer); this.pending.delete(message.requestId);this.settleReplacementCommand(message.requestId);wait.resolve(requestStoryReceipt&&receivedStoryStatus?Object.freeze({receipt:requestStoryReceipt,currentStatus:receivedStoryStatus}):requestTriggerReceipt??message);
           }
         };
         const offscreen = canvas.transferControlToOffscreen();
         worker.postMessage({ type: 'init', requestId: crypto.randomUUID(), instanceId: candidate.instanceId, generation: candidate.generation,
-          revisionId, linked: structuredClone(linked), canvas: offscreen,...state,tempo:{bpm:tempo.bpm,beatPosition:0,beatPhase:0,tempoSequence},tempoSequence,audioSnapshot:this.audioSnapshot,settings: {...DEFAULT_OUTPUT,...output}, playing, performanceMode:this.performanceMode }, [offscreen]);
+          revisionId, linked: structuredClone(linked),story,storyHash,canvas: offscreen,...state,tempo:{bpm:tempo.bpm,beatPosition:0,beatPhase:0,tempoSequence},tempoSequence,audioSnapshot:this.audioSnapshot,settings: {...DEFAULT_OUTPUT,...output}, playing, performanceMode:this.performanceMode }, [offscreen]);
       });
     } catch (error) { this.stop(candidate, String(error)); canvas.remove(); throw error; }
     finally{if(playbackIntent?.synchronize===synchronizeCandidate)playbackIntent.synchronize=undefined;}
@@ -478,7 +603,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     if (this.snapshot.authoring?.playback === 'failed') throw Error('Restart the failed runtime first');
     if (this.pending.has(input.requestId)) throw Error('Request ID already pending');
     if(replacementWrite&&operation.name==='lux.playback'&&[...this.pending.values()].some(wait=>wait.runtime===runtime&&wait.playback))throw Error('Wait for the playback command to complete, then try again.');
-    let message;
+    let message:any,expectedStoryTarget:StoryCommandTarget|undefined,storyRetry=false;
     let replacementPlaybackPrevious:boolean|undefined;
     if (operation.name === 'lux.parameters.set') {
       if (operation.input.expectedRevisionId !== runtime.revisionId) throw Error('Revision changed; read current runtime state');
@@ -540,6 +665,18 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       }
       if(definition?.type!=='trigger')throw Error('Trigger control is unavailable');
       message={type:'trigger',commandId:operation.input.commandId,nodePath,controlId:canonicalControlId};
+    } else if(operation.name==='lux.story.transport'){
+      const story=runtime.storyStatus;
+      if(!story||!runtime.storyHash)throw Error('This visual has no active Story definition');
+      if(operation.input.expectedRevisionId!==runtime.revisionId)throw Error('Revision changed; read current runtime state');
+      if(operation.input.expectedStoryHash!==runtime.storyHash)throw Error('Story definition changed; read current Story status');
+      const {requestId:_requestId,instanceId:_instanceId,expectedGeneration:_generation,expectedRevisionId:_revision,expectedStoryHash:_storyHash,expectedStoryRevision:_expectedStoryRevision,commandId:_commandId,...actionFields}=operation.input;
+      const payloadKey=storyCommandKey(operation.input),existing=runtime.storyCommands.get(operation.input.commandId);
+      if(existing&&existing.payloadKey!==payloadKey)throw Error('Story command ID was already used for another action');
+      if(!existing&&operation.input.expectedStoryRevision!==story.storyRevision)throw Object.assign(Error('Story transport changed; read current status'),{code:'STORY_CHANGED'});
+      const target=existing??Object.freeze({payloadKey,action:actionFields as StoryTransportAction,expectedRevision:operation.input.expectedStoryRevision,before:story});storyRetry=!!existing;expectedStoryTarget=target;
+      if(!existing){if(runtime.storyCommands.size>=16384)throw Error('Story command ledger is full; restart runtime');runtime.storyCommands.set(operation.input.commandId,target);}
+      message={type:'story-transport',commandId:operation.input.commandId,expectedRevisionId:operation.input.expectedRevisionId,expectedStoryHash:operation.input.expectedStoryHash,expectedStoryRevision:operation.input.expectedStoryRevision,...actionFields};
     } else if(operation.name==='lux.tempo.set'||operation.name==='lux.tempo.tap'){
       if(operation.input.expectedRevisionId!==runtime.revisionId)throw Error('Revision changed; read current runtime state');
       if(runtime.tempoCommands>=Number.MAX_SAFE_INTEGER)throw Error('Tempo sequence exhausted; restart runtime');
@@ -559,13 +696,14 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     }
     if(replacementWrite){replacementWrite.settling++;replacementWrite.synchronize?.();}
     const result=new Promise((resolve, reject) => {
-      const triggerMessage=message.type==='trigger';
-      const timer = setTimeout(() => {if(triggerMessage){const wait=this.pending.get(input.requestId);if(wait?.runtime===runtime){this.pending.delete(input.requestId);this.settleReplacementCommand(input.requestId);wait.reject(Object.assign(Error('Trigger result is uncertain; retry the same command ID while this runtime generation remains active.'),{code:'TRIGGER_TIMEOUT'}));}}else this.fault(runtime, 'Runtime command timed out');}, 5000);
+      const triggerMessage=message.type==='trigger',storyMessage=message.type==='story-transport';
+      const timer = setTimeout(() => {if(triggerMessage||storyMessage){const wait=this.pending.get(input.requestId);if(wait?.runtime===runtime){this.pending.delete(input.requestId);this.settleReplacementCommand(input.requestId);wait.reject(Object.assign(Error(`${storyMessage?'Story':'Trigger'} result is uncertain; retry the same command ID while this runtime generation remains active.`),{code:storyMessage?'STORY_TIMEOUT':'TRIGGER_TIMEOUT'}));}}else this.fault(runtime, 'Runtime command timed out');}, 5000);
       this.pending.set(input.requestId, { runtime, kind: 'command', playback: message.type === 'playback', resolve, reject, timer,
         ...('controlSequence' in message ? { expectedControlSequence: message.controlSequence, expectedControls: runtime.desiredControls,expectedNodeControls:runtime.desiredNodeControls } : {}),
         ...('animationSequence' in message?{expectedAnimationSequence:message.animationSequence,expectedControlAnimations:runtime.desiredControlAnimations}:{}) });
       const wait=this.pending.get(input.requestId);if(wait&&message.type==='tempo')wait.expectedTempoSequence=runtime.tempoCommands;
       if(wait&&message.type==='trigger'&&'commandId' in message){wait.expectedTriggerCommandId=(message as {commandId:string}).commandId;wait.expectedTriggerTarget=expectedTriggerTarget;}
+      if(wait&&message.type==='story-transport'&&'commandId' in message){wait.expectedStoryCommandId=(message as {commandId:string}).commandId;wait.expectedStoryTarget=expectedStoryTarget;wait.expectedStoryRetry=storyRetry;}
       try { runtime.worker.postMessage({ ...message, requestId: input.requestId, instanceId: runtime.instanceId, generation: runtime.generation }); }
       catch (error) { this.fault(runtime, String(error)); }
     });

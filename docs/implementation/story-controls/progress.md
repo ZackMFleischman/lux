@@ -13,3 +13,7 @@ C1 ownership: contracts agent owns parameters/index SDK/compilerextractor; runti
 Status: C1 accepted as LUX195 done revision7. Product325be93de6ca0a5e5871b0165358cf91d8cd352b; harness/evidenceae43dbb1f0f1a64865a4ae26df220847581ad05a. Native run1789632976959 and independent source/UI review pass. Installed app unchanged.
 
 C2 active: LUX196 claim eae5a1d7-4e9d-49c2-b563-321eeba70cc2, session6222a3d9-d48b-484b-847e-d086bbd4260e, revision5. Contracts: trigger_contracts (Sol high). Runtime: compact_alert_fix repurposed with focused assignment; Inspector: typed_inspector. Fresh runtime spawn exceeded host thread limit, so existing available contexts are reused. Parent owns MCP/capabilities/docs/examples/export. Story waits on shared SDK/runtime edits; no redundant user approval is required.
+
+C2 accepted: LUX196 done revision7, independent receipt306eee47-f39a-48e7-b70c-b57200f14ca1. Product4a1742bd78d13e4c44d8dbbb57939ea272135e60; harness/evidencea43412cf. Native composite and independent source/UI review passed.
+
+S1 active: LUX197 revision5, claim1373c33a-623d-4878-9458-1e91a637502a, parent session6222a3d9-d48b-484b-847e-d086bbd4260e. Contracts/compiler: trigger_contracts; worker/runtime: compact_alert_fix; native Story UI: typed_inspector; parent: scene persistence, authoring session, MCP, skill, integration. Focused existing contexts reused under host capacity constraint. Approved revised Story contract is authoritative over older finite-only plan.

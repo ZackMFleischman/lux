@@ -49,7 +49,7 @@ async function click(name: string) {
   }
   if (name === 'Close selected panel') {
     await closeLayouts();
-    const titles: Record<string, string> = { source: 'Source', preview: 'Preview', library: 'Library', inspector: 'Inspector', diagnostics: 'Diagnostics', jobs: 'Jobs', graph: 'Graph' };
+    const titles: Record<string, string> = { source: 'Source', preview: 'Preview', library: 'Library', inspector: 'Inspector', story: 'Story', diagnostics: 'Diagnostics', jobs: 'Jobs', graph: 'Graph' };
     const tab = [...document.querySelectorAll('.dv-tab')].find(node => node.textContent?.trim() === titles[selectedPanel]);
     assert.ok(tab, `Expected ${selectedPanel} tab`);
     const close = tab.querySelector('.dv-default-tab-action');
@@ -223,6 +223,19 @@ test('real dock panes preserve canvas, editor undo and runtime subscriptions thr
 });
 
 
+test('Story status opens the singleton Story panel and distinguishes normal from awaiting cue',async()=>{
+  const definition={version:1,beats:[{id:'hold',label:'Hold',timing:{kind:'sustained'}}],sequence:[{id:'hold-a',beatId:'hold',follow:{kind:'manual'}}]};
+  const normal={definition,capability:{},storyHash:'a'.repeat(64),storyRevision:0,frame:{state:'normal',storyEpoch:0},phase:'paused',autoAdvance:false,loop:false,effectiveAdvancing:false,sequence:{state:'detached',occurrenceId:null,index:null,nextOccurrenceId:null,dwellElapsedSeconds:0,dwellRemainingSeconds:null,awaitingCue:false},resumeCandidates:[],disabledReasons:{}};
+  let runtime:any={instanceId:'story-instance',generation:1,revisionId:'story-revision',sceneName:'Story fixture',authority:'studio',playback:'playing',clockEpoch:0,frameId:'1',output:{width:1280,height:720},fault:null,sdkVersion:'0.2.0',controlSchema:[],controlSchemaHash:'b'.repeat(64),controls:{},controlSequence:0,story:normal};
+  let snapshot:any={connection:'connected',message:null,receivedAtMs:1000,authoring:runtime,host:null,jobs:[],visualFps:null,uiFps:null};const listeners=new Set<()=>void>();
+  const client={getSnapshot:()=>snapshot,subscribe:(fn:()=>void)=>{listeners.add(fn);return()=>listeners.delete(fn);},invoke:async()=>{throw Error('opening Story must not invoke transport');}};
+  render(<StudioApp client={client as any} nowMs={1000} sourcePanel={<div>Source fixture</div>}/>);
+  const opener=screen.getByRole('button',{name:'Story status: Normal. Open Story'});fireEvent.click(opener);
+  await waitFor(()=>assert.ok([...document.querySelectorAll('.dv-tab')].find(node=>node.textContent?.trim()==='Story')?.classList.contains('dv-active-tab')));
+  assert.ok(document.querySelector('.story-panel'));
+  await act(async()=>{runtime={...runtime,story:{...normal,storyRevision:1,frame:{state:'active',storyEpoch:1,beatId:'hold',activationId:1,occurrenceId:'hold-a',elapsedSeconds:3,localTimeSeconds:null,progress:null},phase:'running',autoAdvance:true,effectiveAdvancing:true,sequence:{state:'attached',occurrenceId:'hold-a',index:0,nextOccurrenceId:null,dwellElapsedSeconds:0,dwellRemainingSeconds:null,awaitingCue:true}}};snapshot={...snapshot,authoring:runtime};listeners.forEach(fn=>fn());});
+  assert.ok(screen.getByRole('button',{name:'Story status: Awaiting cue. Open Story'}));
+});
 test('group menu targets its owning group, cancels with focus and rejects a vanished target', async () => {
   const { LuxDockLayout } = await import('../../apps/studio/src/layout/LuxDockLayout.tsx');
   const { createStudioPanelRegistry } = await import('../../apps/studio/src/layout/registry.ts');
@@ -394,9 +407,9 @@ test('Graph enters nested components one level at a time and edits an exposed co
 test('View is a compact keyboard menu with recoverable panes and a separate layout dialog', async () => { const { StudioDockShell } = await import('../../apps/studio/src/layout/StudioDockShell.tsx');
   const ui = render(<StudioDockShell compact={false} showInspector={false}
     preview={<p>Preview content</p>} source={<p>Source content</p>} library={<p>Library content</p>}
-    inspector={<p>Inspector content</p>} diagnostics={<p>Diagnostics content</p>} jobs={<p>Jobs content</p>} graph={<p>Graph content</p>} />);
+    inspector={<p>Inspector content</p>} story={<p>Story content</p>} diagnostics={<p>Diagnostics content</p>} jobs={<p>Jobs content</p>} graph={<p>Graph content</p>} />);
   await click('View'); const menu = screen.getByRole('menu', { name: 'View' });
-  assert.equal(within(menu).getAllByRole('menuitem').length, 9); assert.ok(within(menu).getByRole('menuitem', { name: 'Diagnostics' })); assert.ok(within(menu).getByRole('menuitem', { name: 'Keyboard shortcuts' })); assert.equal(screen.queryByLabelText('Move panel'), null);
+  assert.equal(within(menu).getAllByRole('menuitem').length, 10); assert.ok(within(menu).getByRole('menuitem', { name: 'Story' })); assert.ok(within(menu).getByRole('menuitem', { name: 'Diagnostics' })); assert.ok(within(menu).getByRole('menuitem', { name: 'Keyboard shortcuts' })); assert.equal(screen.queryByLabelText('Move panel'), null);
   assert.equal(screen.queryByLabelText('Layout name'), null); const first = within(menu).getByRole('menuitem', { name: 'Preview' }); assert.ok(document.activeElement === first, 'View focuses its first pane item');
   fireEvent.keyDown(first, { key: 'ArrowDown' }); assert.ok(document.activeElement === within(menu).getByRole('menuitem', { name: 'Source' }), 'ArrowDown focuses Source');
   fireEvent.keyDown(document.activeElement!, { key: 'Escape' }); await waitFor(() => assert.ok(document.activeElement === screen.getByRole('button', { name: 'View' }), 'Restore focus to View')); await click('View'); await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: 'Layouts…' })); });

@@ -109,9 +109,9 @@ export function AuthoringApp() {
   }
   function clearDiagnostics() { setDiagnostics([]); setDiagnosticTarget(null); }
   useEffect(() => window.luxAuthoring.onAgentCommand(async command => {
-    if (lookOperation.current && !['read', 'status'].includes(command.method)) throw Error('Wait for the look operation to finish');
-    if (confirmation.isPending() && !['read', 'status', 'capture','library.list','library.read'].includes(command.method)) throw Error('Studio is waiting for a user confirmation');
-    if (['parameters', 'variation', 'playback', 'restart','tempo.set','tempo.tap','trigger'].includes(command.method)) {
+    if (lookOperation.current && !['read', 'status','story.read'].includes(command.method)) throw Error('Wait for the look operation to finish');
+    if (confirmation.isPending() && !['read', 'status','story.read', 'capture','library.list','library.read'].includes(command.method)) throw Error('Studio is waiting for a user confirmation');
+    if (['parameters', 'variation', 'playback', 'restart','tempo.set','tempo.tap','trigger','story.transport'].includes(command.method)) {
       if(!session.getSnapshot().runtimeControlsAvailable)throw Error('Studio is busy with a scene file operation');
       const write = dispatchRuntimeCommand(client, command.method, command.params);
       if (command.method === 'parameters'||command.method==='variation'||command.method==='tempo.set'||command.method==='tempo.tap') {
@@ -130,6 +130,7 @@ export function AuthoringApp() {
     }
     if (command.method === 'status') return agentStatus();
     if (command.method === 'read') return { ...session.read(), status: agentStatus() };
+    if (command.method === 'story.read') return client.readStory(command.params.view);
     if (command.method === 'capture') {
       const capture = await client.capture(), bytes = new Uint8Array(capture.bytes);
       assertAgentCaptureSize(capture.bytes);
@@ -147,7 +148,7 @@ export function AuthoringApp() {
     setError('');
     try {
       if (pendingControlWrites.current.size) await finishControlWrites();
-      await session.build(source, command.params?.expectedDraftVersion,command.params?.libraryLinks);
+      await session.build(source, command.params?.expectedDraftVersion,command.params?.libraryLinks,command.params?.story);
       clearDiagnostics();
       return { draftVersion: workspace.getSnapshot().version, status: agentStatus() };
     } catch (reason) { reportError(reason, command.params?.expectedDraftVersion, source); throw reason; }

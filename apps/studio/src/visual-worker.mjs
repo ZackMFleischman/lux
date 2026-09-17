@@ -13,10 +13,12 @@ import { prepareWorkerControlState } from './controls/worker-control-state.mjs';
 import {prepareWorkerCompositionState} from './controls/worker-composition-state.mjs';
 import {createTempoClock} from './controls/tempo-clock.mjs';
 import {createTriggerLedger} from './controls/trigger-ledger.mjs';
+import {createStoryTransport} from './controls/story-transport.mjs';
 import { createFrameCollector } from '../../../packages/performance/live.mjs';
 import { createGpuPassTimer } from '../../../packages/performance/gpu-pass.mjs';
 import { collectionMode } from '../../../packages/performance/collection-mode.mjs';
-const freeze=Object.freeze, RuntimeError=Error,stringify=JSON.stringify;
+const freeze=Object.freeze, RuntimeError=Error,stringify=JSON.stringify,arrayIncludes=Function.prototype.call.bind(Array.prototype.includes),max=Math.max,define=Object.defineProperty;
+const storyError=(code,message)=>{const error=new RuntimeError(message);define(error,'code',{value:code,enumerable:true});return error;};
 const scenePath=freeze([]);
 const createURL=URL.createObjectURL.bind(URL),revokeURL=URL.revokeObjectURL.bind(URL),RuntimeBlob=Blob;
 const now=performance.now.bind(performance);
@@ -25,13 +27,14 @@ let identity, renderer, device, visual, clock, tempoClock, random, settings, out
 let initializationProbe, material, componentBridge, compositionBridge, authoredCleanup, cleanupPromise, activeOperation;
 let authoredDisposalAttempted=false,terminalError;
 let controlState, frame = 0, tick = 0, lastTime = 0;
-let triggerSequence=0,latestTriggerReceipt,activeTrigger;
+let triggerSequence=0,latestTriggerReceipt,activeTrigger,storyTransport,admittedStoryHash;
 const triggerLedger=createTriggerLedger();
+const storyLedger=createTriggerLedger(),normalStoryFrame=freeze({state:'normal',storyEpoch:0});
 let drawStarted=0,scheduleEpoch=0;
 let performanceMode='routine';
 let stopped = false, externallyDriven=false, timer, heartbeat, telemetryTimer, collector, gpuTimer, gpuCapability, chain = Promise.resolve();
 const send = (type, extra = {}) => post({ type, ...identity, ...extra });
-function state() { const clockState=clock.snapshot(),tempo=tempoClock.snapshot(clockState.timeSeconds);return { ...clockState, tempo,tempoSequence:tempo.tempoSequence, frameId: String(frame),...controlState.state(clockState.timeSeconds,tempo.beatPosition),triggerSequence,...(latestTriggerReceipt?{latestTriggerReceipt}:{}) }; }
+function state(sample) { const clockState=sample??clock.snapshot(),tempo=tempoClock.snapshot(clockState.timeSeconds);return { ...clockState, tempo,tempoSequence:tempo.tempoSequence, frameId: String(frame),...controlState.state(clockState.timeSeconds,tempo.beatPosition),triggerSequence,...(latestTriggerReceipt?{latestTriggerReceipt}:{}),...(storyTransport?{story:storyTransport.status(clockState.timeSeconds,clockState.playback==='playing')}:{}) }; }
 function runOperation(operation) {
   // Device loss bypasses the command queue. Keep the current command's lifetime
   // separate from terminal cleanup so teardown can await it without awaiting itself.
@@ -66,17 +69,17 @@ function failure(error, requestId) {
   if(!terminalError){terminalError=error;send('failure',{requestId,code:'RUNTIME_FAILED',message:String(error?.message||error).slice(0,2000)});}
   void terminalCleanup();
 }
-async function draw(requestId, type = 'frame',extra = {},trigger) {
+async function draw(requestId, type = 'frame',extra = {},trigger,storyCommand,clockSample) {
   requireRunning();
   drawStarted=now();
-  const time = clock.snapshot(),tempo=tempoClock.snapshot(time.timeSeconds);
+  const time = clockSample??clock.snapshot();storyTransport?.beginFrame(time.timeSeconds);const tempo=tempoClock.snapshot(time.timeSeconds),storyFrame=storyTransport?.frame(time.timeSeconds)??normalStoryFrame;
   const profiling=performanceMode==='routine';
   if(profiling)gpuTimer.begin(frame+1);
   const updateStart=profiling?now():0;
   const triggerEvent=trigger?.event,events=triggerEvent&&trigger.target.nodePath.length===0?freeze([triggerEvent]):freeze([]);activeTrigger=trigger;
   await visual.update(freeze({ tick: tick++, timeSeconds: time.timeSeconds,
-    deltaSeconds: triggerEvent&&time.playback==='paused'?0:Math.max(0, time.timeSeconds - lastTime), controls: controlState.values(time.timeSeconds,tempo.beatPosition), events,
-    sampleControl:(controlId,instanceKey)=>controlState.sample(scenePath,controlId,instanceKey,time.timeSeconds,tempo.beatPosition) }));
+    deltaSeconds: (triggerEvent||storyCommand)&&time.playback==='paused'?0:max(0, time.timeSeconds - lastTime), controls: controlState.values(time.timeSeconds,tempo.beatPosition), events,
+    story:storyFrame,sampleControl:(controlId,instanceKey)=>controlState.sample(scenePath,controlId,instanceKey,time.timeSeconds,tempo.beatPosition) }));
   requireRunning();
   const updateEnd=profiling?now():0;
   const renderResult=visual.render(freeze({ width: settings.width, height: settings.height, colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }));
@@ -90,13 +93,14 @@ async function draw(requestId, type = 'frame',extra = {},trigger) {
   requireRunning();
   const completed=now();
   lastTime = time.timeSeconds; frame++;
-  let triggerReceipt;
+  storyTransport?.completeFrame(time.timeSeconds);let triggerReceipt,storyReceipt;
   if(trigger){triggerReceipt=freeze({result:'applied',commandId:trigger.event.commandId,controlId:trigger.target.controlId,nodePath:trigger.target.nodePath,sequence:trigger.event.sequence,frameId:String(frame),timeSeconds:time.timeSeconds});triggerLedger.complete(trigger.entry,triggerReceipt);latestTriggerReceipt=triggerReceipt;}
+  if(storyCommand){const story=storyTransport.status(time.timeSeconds,time.playback==='playing');storyReceipt=freeze({result:'applied',commandId:storyCommand.commandId,action:storyCommand.action,storyRevision:story.storyRevision,frameId:String(frame),timeSeconds:time.timeSeconds,story:story.frame});storyLedger.complete(storyCommand.entry,storyReceipt);}
   activeTrigger=undefined;
   if(profiling){collector.record(completed,frame,updateEnd-updateStart,renderCallEnd-updateEnd,completed-renderEnd,asynchronous,renderEnd-renderCallEnd);gpuTimer.end();}
   else collector.record(completed,frame);
-  send(type, { requestId, ...state(), timeSeconds: time.timeSeconds,...extra,...(triggerReceipt?{triggerReceipt}:{}) });
-  return triggerReceipt;
+  send(type, { requestId, ...state(time), timeSeconds: time.timeSeconds,...extra,...(triggerReceipt?{triggerReceipt}:{}),...(storyReceipt?{storyReceipt,storyCommandKey:storyCommand.payloadKey}:{}) });
+  return triggerReceipt??storyReceipt;
 }
 function schedule() {
   clearTimeout(timer);
@@ -105,7 +109,7 @@ function schedule() {
   // Start-to-start cadence includes update, async render and queue completion.
   // Every actual draw rebases the deadline, so slow work/late timers never build
   // a backlog of missed frames. Keep one asynchronous yield even when overdue.
-  const delay=Math.max(0,drawStarted+1000/settings.fps-now());
+  const delay=max(0,drawStarted+1000/settings.fps-now());
   timer = setTimeout(() => { chain = chain.then(async () => {
     // clearTimeout cannot retract a callback already queued behind a command.
     if (!stopped && epoch===scheduleEpoch && clock.snapshot().playback==='playing') { await runOperation(()=>draw()); schedule(); }
@@ -122,6 +126,8 @@ async function initialize(message) {
   controlState=prepared.admission.kind==='composition'?await prepareWorkerCompositionState(message,prepared.admission):await prepareWorkerControlState(message,prepared.admission);
   controlState.applyAudioSnapshot(message.audioSnapshot??{generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0},{playing:false,timeSeconds:0});
   clock = new RuntimeClock(() => performance.now(), 'paused');tempoClock=createTempoClock({nowMs:now,bpm:message.tempo?.bpm??120,tempoSequence:message.tempoSequence??0}); random = new SeededRandom(settings.seed);
+  storyTransport=prepared.admission.kind==='story'&&prepared.admission.story?createStoryTransport(prepared.admission.story,prepared.admission.storyCapability,prepared.admission.storyHash):undefined;
+  admittedStoryHash=prepared.admission.kind==='story'?prepared.admission.storyHash:undefined;
   /*! lux-worker-liveness-v2: heartbeat starts before authored import/create. */
   let workerHeartbeat=0;
   const beat=()=>send('heartbeat', { frameId: String(frame),workerHeartbeat:++workerHeartbeat });
@@ -240,10 +246,26 @@ onmessage = event => {
       }catch(error){send('command-error',{requestId:message.requestId,code:'TRIGGER_REJECTED',message:String(error?.message||error).slice(0,500)});return;}
       const event=freeze({type:'trigger',controlId:target.controlId,commandId:message.commandId,sequence:++triggerSequence});
       await draw(message.requestId,'status',{},freeze({target,event,entry}));schedule();
+    } else if(message.type==='story-transport'){
+      let admitted;
+      try{
+        if(!storyTransport)throw storyError('STORY_UNAVAILABLE','This visual has no active Story definition');
+        if(typeof message.commandId!=='string'||message.commandId.length<1||message.commandId.length>100)throw storyError('INVALID_COMMAND_ID','Invalid Story command ID');
+        const payloadKey=stringify({expectedRevisionId:message.expectedRevisionId,expectedStoryHash:message.expectedStoryHash,expectedStoryRevision:message.expectedStoryRevision,action:message.action,
+          ...(arrayIncludes(['launch','replay','loop'],message.action)?{beatId:message.beatId}:{}),...(arrayIncludes(['start','resume'],message.action)&&message.occurrenceId!==undefined?{occurrenceId:message.occurrenceId}:{}),
+          ...(message.action==='set-auto-advance'?{enabled:message.enabled}:{}),...(message.action==='seek'?{localTimeSeconds:message.localTimeSeconds}:{})});
+        const existing=storyLedger.lookup(message.commandId,payloadKey);
+        if(existing){if(!existing.receipt)throw storyError('STORY_PENDING','Story command is still pending');send('status',{requestId:message.requestId,...state(),storyReceipt:existing.receipt,storyCommandKey:payloadKey,storyCommandDuplicate:true});return;}
+        if(message.expectedRevisionId!==identity.revisionId||message.expectedStoryHash!==admittedStoryHash)throw storyError('STORY_CHANGED','Story target changed; read current status');
+        if(!storyLedger.hasCapacity())throw storyError('STORY_LEDGER_FULL','Story command ledger is full; restart runtime');
+        const time=clock.snapshot();storyTransport.apply(message,time.timeSeconds);const ledgerAdmission=storyLedger.begin(message.commandId,payloadKey);
+        admitted=freeze({entry:ledgerAdmission.entry,commandId:message.commandId,action:message.action,payloadKey,time});
+      }catch(error){send('command-error',{requestId:message.requestId,code:typeof error?.code==='string'?error.code:'STORY_REJECTED',message:String(error?.message||error).slice(0,500),...(error?.candidates?{candidates:error.candidates}:{})});return;}
+      await draw(message.requestId,'status',{},undefined,admitted,admitted.time);schedule();
     } else if (message.type === 'playback') {
-      if (!['play', 'pause', 'reset'].includes(message.action)) throw Error('Invalid playback command');
+      if (!arrayIncludes(['play', 'pause', 'reset'],message.action)) throw Error('Invalid playback command');
       clearTimeout(timer);
-      if (message.action === 'reset') { clock.reset();tempoClock.reset(0); controlState.resetAnimations?.(0); random.reset(settings.seed); await visual.reset(settings.seed); lastTime = 0; tick = 0; }
+      if (message.action === 'reset') { clock.reset();tempoClock.reset(0); controlState.resetAnimations?.(0);storyTransport?.reset(0); random.reset(settings.seed); await visual.reset(settings.seed); lastTime = 0; tick = 0; }
       else {if(message.action==='pause')controlState.fenceAudioEvents?.();clock[message.action]();}
       await draw(message.requestId, 'status'); schedule();
     } else if (message.type === 'capture') {
@@ -254,7 +276,7 @@ onmessage = event => {
         if(stopped)return;
         const png = encodeCapturedTarget(pixels, settings.width, settings.height);
         const bytes = png.slice().buffer;
-        const {triggerSequence:_triggerSequence,latestTriggerReceipt:_latestTriggerReceipt,...persistentState}=state();
+        const {triggerSequence:_triggerSequence,latestTriggerReceipt:_latestTriggerReceipt,story:_story,...persistentState}=state();
         const metadata = { ...persistentState, timeSeconds: lastTime, width: settings.width, height: settings.height, seed: settings.seed, colorSpace: 'srgb', alphaMode: 'straight' };
         postMessage({ type: 'capture', ...identity, requestId: message.requestId, metadata, bytes }, [bytes]);
       } catch (error) { if(!stopped)send('capture-error', { requestId: message.requestId, message: String(error.message) }); }

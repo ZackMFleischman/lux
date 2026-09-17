@@ -14,6 +14,8 @@ import { readBoundedJson } from './bounded-json.mjs';
 import { sdkSourceFile, sourceArtifactVersion } from './sdk-selection.mjs';
 import { extractControlDeclarations } from './parameter-declarations.mjs';
 import { canonicalControlSchemaJson } from '../../../packages/runtime-contracts/src/parameters.mjs';
+import {extractStoryCapability} from './story-declarations.mjs';
+import {canonicalStoryCapabilityJson} from '../../../packages/runtime-contracts/src/story.mjs';
 import {extractComponentDeclaration} from './component-declarations.mjs';
 import {canonicalComponentMetadataJson} from '../../../packages/runtime-contracts/src/components.mjs';
 import {extractCompositionDeclaration} from './composition-declarations.mjs';
@@ -31,7 +33,7 @@ function diagnostic(error, file) {
 async function main() {
   const { source: raw, dependencyRoot } = await readBoundedJson(process.argv[2], limits.requestBytes);
   const source = validateSource(raw), dependencyHashes = {}, selectedSdk = sdkSourceFile(source.sdkVersion);
-  let controls, component, composition;const asts={};
+  let controls, component, composition, storyCapability;const asts={};
   for (const [name, version] of Object.entries(pinned)) {
     const bytes = await readFile(join(dependencyRoot, name, 'package.json'));
     if (JSON.parse(bytes).version !== version) throw violation(`Install pinned ${name}@${version}`, 'SERVICE_UNAVAILABLE');
@@ -65,7 +67,10 @@ async function main() {
       if (path === source.entry) {
         if (source.sdkVersion === '0.3.0') { component=extractComponentDeclaration(ast); controls=component.controls; }
         else if(source.sdkVersion==='0.4.0') { /* extracted after every module has been parsed */ }
-        else if (source.sdkVersion !== '0.1.0') { controls = extractControlDeclarations(ast); }
+        else if (source.sdkVersion !== '0.1.0') {
+          controls = extractControlDeclarations(ast);
+          if(source.sdkVersion==='0.2.0') storyCapability=extractStoryCapability(ast);
+        }
         else {
         const imported = ast.program.body.flatMap(n => n.type === 'ImportDeclaration' && n.source.value === '@lux/visual-sdk' ? n.specifiers.filter(s => s.type === 'ImportSpecifier' && s.imported.name === 'defineVisual').map(s => s.local.name) : []);
         const declaration = ast.program.body.find(n => n.type === 'ExportDefaultDeclaration')?.declaration;
@@ -84,13 +89,15 @@ async function main() {
   const shared = await readFile(join(root, 'packages/runtime-contracts/src/index.ts'), 'utf8');
   await writeFile(join(workspace, 'types/sdk.ts'), sdk.replace('../../runtime-contracts/src/index.ts', './shared.ts')
     .replaceAll('../../runtime-contracts/src/parameters.mjs', './parameters.js').replaceAll('../../runtime-contracts/src/components.mjs', './components.js')
-    .replaceAll('../../runtime-contracts/src/paths2d.mjs', './paths2d.js').replaceAll('../../runtime-contracts/src/shader-field.mjs', './shader-field.js'));
+    .replaceAll('../../runtime-contracts/src/paths2d.mjs', './paths2d.js').replaceAll('../../runtime-contracts/src/shader-field.mjs', './shader-field.js')
+    .replaceAll('../../runtime-contracts/src/story.mjs','./story.js'));
   await writeFile(join(workspace, 'types/shared.ts'), shared);
   if (source.sdkVersion !== '0.1.0') {
     // Fixed local type copy: emitted SDK resolves only its sibling virtual JS
     // module. No repo-relative path escapes into generated artifact imports.
     await writeFile(join(workspace, 'types/parameters.d.ts'), await readFile(join(root, 'packages/runtime-contracts/src/parameters.d.mts')));
   }
+  if(source.sdkVersion==='0.2.0') await writeFile(join(workspace,'types/story.d.ts'),await readFile(join(root,'packages/runtime-contracts/src/story.d.mts')));
   if (component||composition) {
     await writeFile(join(workspace,'types/components.d.ts'), (await readFile(join(root,'packages/runtime-contracts/src/components.d.mts'),'utf8')).replaceAll('./parameters.mjs','./parameters.js').replaceAll('./paths2d.mjs','./paths2d.js').replaceAll('./shader-field.mjs','./shader-field.js'));
     await writeFile(join(workspace,'types/shader-field.d.ts'), await readFile(join(root,'packages/runtime-contracts/src/shader-field.d.mts')));
@@ -130,8 +137,11 @@ async function main() {
   modules['__lux/sdk.js'] = await readFile(join(workspace, 'out/types/sdk.js'), 'utf8');
   sourceMaps['__lux/sdk.js.map'] = await readFile(join(workspace, 'out/types/sdk.js.map'), 'utf8');
   if (source.sdkVersion !== '0.1.0') modules['__lux/parameters.js'] = await readFile(join(root, 'packages/runtime-contracts/src/parameters.mjs'), 'utf8');
+  if(source.sdkVersion==='0.2.0') modules['__lux/story.js']=await readFile(join(root,'packages/runtime-contracts/src/story.mjs'),'utf8');
   if(component||composition) modules['__lux/components.js']=(await readFile(join(root,'packages/runtime-contracts/src/components.mjs'),'utf8')).replaceAll('./parameters.mjs','./parameters.js');
   const dependencies = {
+    ...(source.sdkVersion==='0.2.0' ? Object.fromEntries(['story.mjs','story.d.mts'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
+    ...(source.sdkVersion==='0.2.0' ? {'compiler/story-declarations.mjs':join(root,'apps/build-worker/src/story-declarations.mjs')} : {}),
     ...((component||composition) ? Object.fromEntries(['components.mjs','components.d.mts','component-profile.mjs'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
     ...((component||composition) ? {'compiler/component-declarations.mjs':join(root,'apps/build-worker/src/component-declarations.mjs')} : {}),
     ...(composition ? Object.fromEntries(['composition-profile.mjs','composition-profile.d.mts','paths2d.mjs','paths2d.d.mts','shader-field.mjs','shader-field.d.mts'].map(name=>['contracts/'+name,join(root,'packages/runtime-contracts/src',name)])) : {}),
@@ -171,11 +181,11 @@ async function main() {
     if (key.startsWith('../')) throw violation('Compiler loaded a declaration outside the pinned dependency root', 'SOURCE_BOUNDARY_VIOLATION');
     dependencyHashes[`declarations/${key}`] = sha(await readFile(path));
   }
-  const version = sourceArtifactVersion(source);
+  const version = storyCapability ? 6 : sourceArtifactVersion(source);
   const assetFields = version === 1 ? {} : { artifactVersion:version, ...await deriveAssets(source.assets ?? {},sha) };
   const parameterFields = version >= 3 ? {controls,controlSchemaHash:sha(canonicalControlSchemaJson(controls))} : {};
   const artifact = artifactBody({ sourceHash: sha(JSON.stringify(source)), entry: source.entry.replace(/\.ts$/, '.js'), modules, sourceMaps,
-    sdkVersion: source.sdkVersion, compilerVersion: pinned.typescript, dependencyHashes, ...assetFields, ...parameterFields, ...(component?{executionModel:'single-image-source-v1',component,componentMetadataHash:sha(canonicalComponentMetadataJson(component))}:{}),...(composition?{executionModel:composition.version===1?'image-chain-v1':'typed-image-graph-v1',composition,compositionHash:sha(canonicalImageCompositionJson(composition))}:{}) });
+    sdkVersion: source.sdkVersion, compilerVersion: pinned.typescript, dependencyHashes, ...assetFields, ...parameterFields, ...(storyCapability?{storyCapability,storyCapabilityHash:sha(canonicalStoryCapabilityJson(storyCapability))}:{}), ...(component?{executionModel:'single-image-source-v1',component,componentMetadataHash:sha(canonicalComponentMetadataJson(component))}:{}),...(composition?{executionModel:composition.version===1?'image-chain-v1':'typed-image-graph-v1',composition,compositionHash:sha(canonicalImageCompositionJson(composition))}:{}) });
   const result = { ok: true, artifact: { ...artifact, bundleHash: sha(JSON.stringify(artifact)) }, diagnostics: [] };
   assertResultBudgets(result);
   return result;

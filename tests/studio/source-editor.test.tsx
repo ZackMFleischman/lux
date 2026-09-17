@@ -421,6 +421,10 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
   const runtime=current.status.authoring;
   await assert.rejects(agentCommand({method:'trigger',params:{commandId:'authoring-route',instanceId:runtime.instanceId,expectedGeneration:runtime.generation,expectedRevisionId:runtime.revisionId,expectedControlSchemaHash:runtime.controlSchemaHash,controlId:'regenerate'}}),
     /Trigger control is unavailable/,'authoring forwards trigger commands to the runtime dispatcher instead of the unsupported-command fallback');
+  await assert.rejects(agentCommand({method:'story.read',params:{view:'status'}}),/does not declare Story capabilities/,
+    'Story reads reach accepted runtime capability validation');
+  await assert.rejects(agentCommand({method:'story.transport',params:{commandId:'story-authoring-route',instanceId:runtime.instanceId,expectedGeneration:runtime.generation,expectedRevisionId:runtime.revisionId,expectedStoryHash:'a'.repeat(64),expectedStoryRevision:0,action:'start'}}),
+    /no active Story definition/,'Story commands reach the runtime dispatcher');
   await act(async () => { await agentCommand({ method: 'build', params: { source: current.source, expectedDraftVersion: current.draftVersion } }); });
   assert.equal(screen.queryByText(/Shortcut compile error/), null);
   assert.ok(screen.getByRole('button', { name: /Problems: 0/ }));

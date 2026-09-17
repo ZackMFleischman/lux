@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import type { StudioClient, StudioOperation, StudioSnapshot, RuntimeView } from '../../apps/studio/src/service-client.ts';
 import type { WindowState } from '../../apps/studio/src/window-client.ts';
+import { image, meta as componentMetadata } from '../runtime/nested-graph-fixtures.ts';
 
 // jsdom models DOM events only. It starts no browser, Electron, canvas or GPU.
 const dom = new JSDOM('<!doctype html><html><head></head><body></body></html>', { url: 'http://studio.test/' });
@@ -203,25 +204,134 @@ test('RTL: an uncertain trigger failure retries manually with the same command I
 });
 
 test('RTL: a selected component trigger targets its canonical node without a persisted value', async () => {
-  const fixture=service(),trigger={id:'reseed',type:'trigger',label:'Reseed component',description:'Start this component with a new seed.',changeCost:'live'};
+  const fixture=service(),leafMetadata=componentMetadata({},{image},{reseed:{type:'trigger',label:'Reseed component'}}),trigger=leafMetadata.controls[0]!;
+  const errors:(string|null)[]=[];
   const rootHash='a'.repeat(64),leafHash='b'.repeat(64),schemaHash='c'.repeat(64),nodeId='11111111-1111-4111-8111-111111111111';
-  const leafMetadata={declarationVersion:1,key:'test/leaf',label:'Leaf',description:'Leaf',tags:[],inputs:{},outputs:{},controls:[trigger],controlDescriptions:{reseed:'Start this component with a new seed.'},lifecycle:{state:'stateful',reset:'seed'}};
-  const rootMetadata={...leafMetadata,key:'test/root',label:'Root',controls:[],controlDescriptions:{}};
+  const rootMetadata=componentMetadata({},{image});
   fixture.publish({sdkVersion:'0.4.0',intensity:undefined,controlSchema:[],controlSchemaHash:'d'.repeat(64),controls:{},controlSequence:0,
-    composition:{graph:{version:2,rootDefinitionHash:rootHash,outputPort:'image'},definitions:{
-      [rootHash]:{kind:'graph',metadata:rootMetadata,body:{nodes:[{id:nodeId,definitionHash:leafHash,controlDefaults:{}}],edges:[],inputBindings:{},outputBindings:{},controlBindings:{}}},
+    composition:{version:2,declaration:{definitions:{leaf:'./leaf.ts'},nodes:[{id:nodeId,definition:'leaf'}],edges:[],output:{nodeId,portId:'image'},expose:[]},definitionNames:{leaf:leafHash},graph:{version:2,rootDefinitionHash:rootHash,outputPort:'image'},definitions:{
+      [rootHash]:{kind:'graph',metadata:rootMetadata,body:{nodes:[{id:nodeId,definitionHash:leafHash,controlDefaults:{}}],edges:[],inputBindings:{},outputBindings:{image:{nodeId,portId:'image'}},controlBindings:{}}},
       [leafHash]:{kind:'code',metadata:leafMetadata},
-    },publicControls:[],publicControlBindings:{},nodes:[{nodePath:[nodeId],definitionHash:leafHash,schema:[trigger],schemaHash}],declaration:{},definitionNames:{}},
+    },publicControls:[],publicControlBindings:{},nodes:[{nodePath:[nodeId],definitionHash:leafHash,schema:[trigger],schemaHash}]},
     nodeControls:{sourceHash:'revision-2',nodes:[{nodePath:[nodeId],definitionHash:leafHash,schema:[trigger],schemaHash,values:{}}]},
   } as any);
   const {ParameterInspector}=await import('../../apps/studio/src/controls/ParameterInspector.tsx'),{StudioController}=await import('../../apps/studio/src/service-client.ts');
-  render(<ParameterInspector runtime={fixture.client.getSnapshot().authoring} available client={fixture.client} controller={new StudioController(fixture.client)} onError={()=>{}} nodePath={[nodeId] as any}/>);
+  render(<ParameterInspector runtime={fixture.client.getSnapshot().authoring} available client={fixture.client} controller={new StudioController(fixture.client)} onError={error=>errors.push(error)} nodePath={[nodeId] as any}/>);
   const action=screen.getByRole('button',{name:'Run Reseed component'});fireEvent.click(action);
-  await waitFor(()=>assert.equal(fixture.calls.length,1));
+  await waitFor(()=>assert.ok(fixture.calls.length||errors.some(Boolean)));
+  assert.deepEqual(errors.filter(Boolean),[]);
   assert.equal(fixture.calls[0]?.name,'lux.node.trigger.fire');
   assert.deepEqual((fixture.calls[0] as any).input.nodePath,[nodeId]);
   assert.equal((fixture.calls[0] as any).input.controlId,'reseed');
   assert.deepEqual(fixture.client.getSnapshot().authoring?.nodeControls?.nodes[0]?.values,{});
+});
+function storyStatus(overrides:Record<string,unknown>={}){
+  const beats=[{id:'arrival',label:'Arrival',timing:{kind:'timed',durationSeconds:10}},{id:'hold',label:'Hold',timing:{kind:'sustained'}}];
+  const sequence=[{id:'arrival-a',beatId:'arrival',follow:{kind:'after',seconds:4}},{id:'hold-a',beatId:'hold',follow:{kind:'manual'}},{id:'hold-b',beatId:'hold',follow:{kind:'after',seconds:5}}];
+  return {definition:{version:1,beats,sequence},storyHash:'a'.repeat(64),storyRevision:4,
+    frame:{state:'normal',storyEpoch:1},phase:'paused',autoAdvance:false,loop:false,effectiveAdvancing:false,
+    sequence:{state:'detached',occurrenceId:null,index:null,nextOccurrenceId:null,dwellElapsedSeconds:0,dwellRemainingSeconds:null,awaitingCue:false},
+    resumeCandidates:[],disabledReasons:{},...overrides} as any;
+}
+
+test('RTL: Story ribbon keeps selection separate from the attached occurrence and shows sustained dwell',async()=>{
+  const status=storyStatus({frame:{state:'active',storyEpoch:2,beatId:'hold',activationId:3,occurrenceId:'hold-a',elapsedSeconds:12,localTimeSeconds:null,progress:null},
+    phase:'running',autoAdvance:true,effectiveAdvancing:true,
+    sequence:{state:'attached',occurrenceId:'hold-a',index:1,nextOccurrenceId:'hold-b',dwellElapsedSeconds:0,dwellRemainingSeconds:null,awaitingCue:true}});
+  const calls:any[]=[];const controller={storyTransport:async(...args:any[])=>{calls.push(args);return {};}} as any;
+  const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
+  render(<StoryPanel status={status} available controller={controller} onError={()=>{}}/>);
+  const ribbon=screen.getByRole('list',{name:'Story sequence'}),rows=within(ribbon).getAllByRole('button');
+  assert.equal(rows.length,3);assert.equal(rows[1]!.getAttribute('aria-current'),'step');assert.equal(rows[1]!.getAttribute('aria-pressed'),'true');
+  fireEvent.click(rows[2]!);
+  assert.equal(rows[2]!.getAttribute('aria-pressed'),'true','selection moves without moving output');
+  assert.equal(rows[1]!.getAttribute('aria-current'),'step','the transport cursor remains on the attached occurrence');
+  assert.equal(calls.length,0);assert.ok(screen.getAllByText('Awaiting cue').length>=2);assert.ok(screen.getByText('Staying on beat'));
+  assert.equal(screen.queryByRole('slider',{name:/Local time/}),null,'sustained beats have no fabricated local timeline');
+  assert.ok(screen.getByRole('button',{name:/Start here: Hold — occurrence 3 of 3/}));
+  assert.ok(screen.getByRole('button',{name:'Return to normal'}));
+});
+
+test('RTL: Story ribbon shows scheduled dwell progress independently of a sustained beat',async()=>{
+  const status=storyStatus({frame:{state:'active',storyEpoch:2,beatId:'hold',activationId:3,occurrenceId:'hold-b',elapsedSeconds:20,localTimeSeconds:null,progress:null},
+    phase:'running',autoAdvance:true,effectiveAdvancing:true,
+    sequence:{state:'attached',occurrenceId:'hold-b',index:2,nextOccurrenceId:null,dwellElapsedSeconds:2,dwellRemainingSeconds:3,awaitingCue:false}});
+  const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
+  render(<StoryPanel status={status} available controller={{storyTransport:async()=>({})} as any} onError={()=>{}}/>);
+  const progress=screen.getByRole('progressbar',{name:'Dwell for Hold — occurrence 3 of 3'});
+  assert.equal(progress.getAttribute('aria-valuenow'),'40');assert.ok(screen.getByText('3.0s remaining'));assert.ok(screen.getByText('Staying on beat'));
+});
+test('RTL: uncertain Story transport exposes an explicit exact retry',async()=>{
+  const status=storyStatus(),calls:any[]=[],pending:{resolve(value:unknown):void;reject(error:unknown):void}[]=[];
+  const controller={storyTransport:(...args:any[])=>{calls.push(args);return new Promise((resolve,reject)=>pending.push({resolve,reject}));}} as any;
+  const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
+  render(<StoryPanel status={status} available controller={controller} onError={()=>{}}/>);
+  fireEvent.click(screen.getByRole('button',{name:'Start story'}));await waitFor(()=>assert.equal(calls.length,1));
+  await act(async()=>pending[0]!.reject(Object.assign(Error('Story receipt timed out.'),{code:'STORY_TIMEOUT'})));
+  assert.equal(calls.length,1,'an uncertain command is never retried automatically');
+  fireEvent.click(await screen.findByRole('button',{name:'Retry start story'}));await waitFor(()=>assert.equal(calls.length,2));
+  assert.deepEqual(calls[1],calls[0],'explicit retry preserves action, command ID and expected revision');
+  await act(async()=>pending[1]!.resolve({receipt:{},currentStatus:status}));
+});
+test('RTL: timed Story scrub admits one seek and replaces the queued target with the latest position',async()=>{
+  let status=storyStatus({storyRevision:7,frame:{state:'active',storyEpoch:2,beatId:'arrival',activationId:4,occurrenceId:null,elapsedSeconds:2,localTimeSeconds:2,progress:.2},phase:'running'});
+  const calls:any[]=[],pending:{resolve(value:unknown):void;reject(error:unknown):void}[]=[];
+  const controller={storyTransport:(...args:any[])=>{calls.push(args);return new Promise((resolve,reject)=>pending.push({resolve,reject}));}} as any;
+  const errors:string[]=[];const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
+  render(<StoryPanel status={status} available controller={controller} onError={error=>errors.push(error)}/>);
+  const slider=screen.getByRole('slider',{name:'Local time for Arrival'}) as HTMLInputElement;
+  fireEvent.change(slider,{target:{value:'3'}});fireEvent.change(slider,{target:{value:'6'}});fireEvent.change(slider,{target:{value:'8'}});
+  await waitFor(()=>assert.equal(calls.length,1));assert.deepEqual(calls[0]![0],{action:'seek',localTimeSeconds:3});assert.equal(calls[0]![2],7);
+  status=storyStatus({...status,storyRevision:8,frame:{...status.frame,localTimeSeconds:3,progress:.3}});
+  await act(async()=>pending[0]!.resolve({result:'applied',commandId:calls[0]![1],action:calls[0]![0],storyRevision:8,frameId:'11',timeSeconds:2,story:status.frame,currentStatus:status}));
+  await waitFor(()=>assert.equal(calls.length,2));assert.deepEqual(calls[1]![0],{action:'seek',localTimeSeconds:8});assert.equal(calls[1]![2],8);
+  fireEvent.pointerDown(slider,{pointerId:1});fireEvent.change(slider,{target:{value:'9'}});fireEvent.keyDown(slider,{key:'Escape'});
+  fireEvent.change(slider,{target:{value:'7'}});fireEvent.pointerUp(slider,{pointerId:1});
+  status=storyStatus({...status,storyRevision:9,frame:{...status.frame,localTimeSeconds:8,progress:.8}});
+  await act(async()=>pending[1]!.resolve({result:'applied',commandId:calls[1]![1],action:calls[1]![0],storyRevision:9,frameId:'12',timeSeconds:2,story:status.frame,currentStatus:status}));
+  await act(async()=>{});assert.equal(calls.length,2,'Escape clears the unsent target');assert.equal(slider.value,'8');assert.deepEqual(errors,[]);
+});
+test('RTL: an acknowledgement from an earlier Story activation cannot overwrite the current scrub',async()=>{
+  const first=storyStatus({storyRevision:7,frame:{state:'active',storyEpoch:2,beatId:'arrival',activationId:4,occurrenceId:null,elapsedSeconds:2,localTimeSeconds:2,progress:.2},phase:'running'});
+  const second=storyStatus({storyRevision:8,frame:{state:'active',storyEpoch:2,beatId:'arrival',activationId:5,occurrenceId:null,elapsedSeconds:6,localTimeSeconds:6,progress:.6},phase:'running'});
+  const calls:any[]=[],pending:{resolve(value:unknown):void}[]=[];
+  const controller={storyTransport:(...args:any[])=>{calls.push(args);return new Promise(resolve=>pending.push({resolve}));}} as any;
+  const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
+  const view=render(<StoryPanel status={first} available controller={controller} onError={()=>{}}/>);
+  fireEvent.change(screen.getByRole('slider',{name:'Local time for Arrival'}),{target:{value:'3'}});
+  await waitFor(()=>assert.equal(calls.length,1));
+  view.rerender(<CacheProvider value={styleCache}><StoryPanel status={second} available controller={controller} onError={()=>{}}/></CacheProvider>);
+  const current=screen.getByRole('slider',{name:'Local time for Arrival'}) as HTMLInputElement;
+  assert.equal(current.value,'6');
+  const acknowledged=storyStatus({...first,storyRevision:9,frame:{...first.frame,localTimeSeconds:3,progress:.3}});
+  await act(async()=>pending[0]!.resolve({receipt:{},currentStatus:acknowledged}));
+  assert.equal(current.value,'6','the old activation acknowledgement cannot replace the new activation position');
+  fireEvent.change(current,{target:{value:'7'}});await waitFor(()=>assert.equal(calls.length,2));
+  assert.deepEqual(calls[1]![0],{action:'seek',localTimeSeconds:7});assert.equal(calls[1]![2],8);
+});
+test('RTL: a rejected seek reconciles a newer revision on the same Story activation',async()=>{
+  const first=storyStatus({storyRevision:7,frame:{state:'active',storyEpoch:2,beatId:'arrival',activationId:4,occurrenceId:null,elapsedSeconds:2,localTimeSeconds:2,progress:.2},phase:'running'});
+  const newer=storyStatus({storyRevision:8,frame:{state:'active',storyEpoch:2,beatId:'arrival',activationId:4,occurrenceId:null,elapsedSeconds:6,localTimeSeconds:6,progress:.6},phase:'paused'});
+  const calls:any[]=[],pending:{resolve(value:unknown):void;reject(error:unknown):void}[]=[];
+  const controller={storyTransport:(...args:any[])=>{calls.push(args);return new Promise((resolve,reject)=>pending.push({resolve,reject}));}} as any,errors:string[]=[];
+  const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
+  const view=render(<StoryPanel status={first} available controller={controller} onError={error=>errors.push(error)}/>);
+  fireEvent.change(screen.getByRole('slider',{name:'Local time for Arrival'}),{target:{value:'3'}});await waitFor(()=>assert.equal(calls.length,1));
+  view.rerender(<CacheProvider value={styleCache}><StoryPanel status={newer} available controller={controller} onError={error=>errors.push(error)}/></CacheProvider>);
+  await act(async()=>pending[0]!.reject(Object.assign(Error('Story changed.'),{code:'STORY_CHANGED'})));
+  const slider=screen.getByRole('slider',{name:'Local time for Arrival'}) as HTMLInputElement;
+  assert.equal(slider.value,'6','a failed stale seek restores the latest authoritative position');
+  fireEvent.change(slider,{target:{value:'7'}});await waitFor(()=>assert.equal(calls.length,2));
+  assert.deepEqual(calls[1]![0],{action:'seek',localTimeSeconds:7});assert.equal(calls[1]![2],8,'the next seek uses the latest rendered revision');
+  assert.deepEqual(errors,['Story changed.']);
+});
+test('RTL: a sub-10ms timed Story beat retains a usable local-time step and readable position',async()=>{
+  const tiny=storyStatus({definition:{version:1,beats:[{id:'spark',label:'Spark',timing:{kind:'timed',durationSeconds:.005}}],sequence:[]},frame:{state:'active',storyEpoch:2,beatId:'spark',activationId:1,occurrenceId:null,elapsedSeconds:.0025,localTimeSeconds:.0025,progress:.5}});
+  const calls:any[]=[],controller={storyTransport:(...args:any[])=>{calls.push(args);return new Promise(()=>{});}} as any;
+  const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');render(<StoryPanel status={tiny} available controller={controller} onError={()=>{}}/>);
+  const slider=screen.getByRole('slider',{name:'Local time for Spark'}) as HTMLInputElement;
+  assert.equal(slider.max,'0.005');assert.equal(slider.step,'0.00005');assert.ok(screen.getByText('2.5ms / 5ms'));
+  fireEvent.change(slider,{target:{value:'.003'}});await waitFor(()=>assert.equal(calls.length,1));assert.deepEqual(calls[0]![0],{action:'seek',localTimeSeconds:.003});
 });
 test('RTL: segmented enum uses one roving tab stop and keyboard selection by stable option ID', async () => {
   const fixture = service();

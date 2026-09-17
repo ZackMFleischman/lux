@@ -5,6 +5,11 @@ import { webcrypto, createHash } from 'node:crypto';
 import { build } from 'esbuild';
 import { fileURLToPath } from 'node:url';
 import { canonicalControlSchemaJson, normalizeControlDeclarations } from '../../packages/runtime-contracts/src/parameters.mjs';
+import {canonicalSceneStoryJson} from '../../packages/runtime-contracts/src/story.mjs';
+import {compileVisual} from '../../apps/build-worker/src/compile.mjs';
+import {linkRuntime} from '../../apps/build-worker/src/link-runtime.mjs';
+import {readFile} from 'node:fs/promises';
+import {resolve} from 'node:path';
 import { decode } from 'fast-png';
 const schema=normalizeControlDeclarations({height:{type:'number',label:'Height',default:1,min:0,max:4},speed:{type:'number',label:'Speed',default:0.5,min:0,max:2}});
 const triggerSchema=normalizeControlDeclarations({height:{type:'number',label:'Height',default:1,min:0,max:4},regenerate:{type:'trigger',label:'Regenerate'}});
@@ -31,7 +36,7 @@ async function fixture(controls=schema,declared=controls,mutation='',sdkVersion=
     export class WebGPURenderer {backend={isWebGPUBackend:true};setSize(){}async init(){}setRenderTarget(){}render(){}dispose(){recordLifecycle('renderer-dispose');}async readRenderTargetPixelsAsync(){const pixels=new Uint8Array(1920*1080*4);pixels.set([188,0,0,128]);return pixels;}}
     export class RenderTarget{texture={};dispose(){recordLifecycle('target-dispose');}} export const SRGBColorSpace='srgb';
     export class MeshBasicNodeMaterial {dispose(){recordLifecycle('material-dispose');}} export class QuadMesh {constructor(material){this.material=material;}render(){}} export const sampleTexture=()=>({});
-    export default {sdkVersion:${JSON.stringify(sdkVersion)},controls:${typeof declared==='string'?declared:JSON.stringify(declared)},async create(){recordCreate();${waitCreate?'await new Promise(()=>{});':''}const instance=${instanceCode};return instance;}};`;
+    export default {sdkVersion:${JSON.stringify(sdkVersion)},controls:${typeof declared==='string'?declared:JSON.stringify(declared)},${lifecycle.storyCapability?`story:${JSON.stringify(lifecycle.storyCapability)},`:''}async create(){recordCreate();${waitCreate?'await new Promise(()=>{});':''}const instance=${instanceCode};return instance;}};`;
   const module=new vm.SourceTextModule(bundle,{context,importModuleDynamically:async()=>{
     imports++;assert.equal(messages[0]?.type,'heartbeat','worker must announce liveness before authored module import');assert.equal(messages[0].workerHeartbeat,1);const visual=new vm.SourceTextModule(visualCode,{context});await visual.link(()=>{throw Error('Unexpected import')});await visual.evaluate();return visual;
   }});
@@ -39,7 +44,7 @@ async function fixture(controls=schema,declared=controls,mutation='',sdkVersion=
   const identity={instanceId:'instance',generation:1,revisionId:'revision'};
   const initial={type:'init',requestId:'init',...identity,moduleSource:'fixture',canvas:{},settings:{width:1920,height:1080,fps:60,seed:0},sdkVersion,controlSchema:controls,controlSchemaHash:hash(canonicalControlSchemaJson(controls)),controls:Object.fromEntries(controls.filter(row=>row.type!=='trigger').map(row=>[row.id,row.default])),playing:false};
   const post=message=>context.deliver(JSON.stringify({...identity,...message}));
-  async function send(message){const before=messages.length;post(message);const response=()=>messages.slice(before).find(row=>row.type!=='heartbeat');for(let i=0;i<200&&!response();i++)await new Promise(resolve=>setImmediate(resolve));assert.ok(response(),'worker must respond');return response();}
+  async function send(message){const before=messages.length;post(message);const response=()=>messages.slice(before).find(row=>row.type!=='heartbeat');for(let i=0;i<2000&&!response();i++)await new Promise(resolve=>setImmediate(resolve));assert.ok(response(),`worker must respond; messages=${JSON.stringify(messages.slice(before))}`);return response();}
   const flush=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};
   return {send,post,initial,events,messages,frames,requested,allocations,scheduled,timers,flush,mutate(code){vm.runInContext(code,context);},async fireTimer(late=0){const [id,timer]=timers.entries().next().value;timers.delete(id);now=Math.max(now,timer.at)+late;timer.fn();await flush();},created:()=>created,imports:()=>imports,telemetry(){now=500;intervals.get(500)?.();return messages.at(-1);},intervals};
 }
@@ -119,6 +124,24 @@ test('paused trigger draws once after hostile intrinsic mutation and duplicate I
  for(const excluded of ['triggerSequence','latestTriggerReceipt','triggerReceipt','commandId','events'])assert.equal(serialized.includes(excluded),false,`capture excludes ${excluded}`);
  const mismatch=await f.send({type:'trigger',requestId:'trigger-a-wrong',commandId:'command-a',nodePath:[],controlId:'height'});
  assert.equal(mismatch.type,'command-error');assert.equal(mismatch.code,'TRIGGER_REJECTED');assert.equal(f.messages.some(message=>message.type==='failure'),false);
+});
+
+test('paused Story commands survive authored intrinsic mutation, draw with zero delta, and dedupe after reset',async()=>{
+ const source={sdkVersion:'0.2.0',entry:'visual.ts',files:{'visual.ts':await readFile('packages/visual-sdk/examples/story.ts','utf8')}},options={dependencyRoot:process.env.LUX_COMPILER_DEPENDENCIES||resolve('node_modules')};
+ const compiled=await compileVisual({source},options);if(!compiled.ok)assert.fail(JSON.stringify(compiled));const linked=await linkRuntime(compiled.artifact,options);
+ const story={version:1,beats:[{id:'arrival',label:'Arrival',timing:{kind:'timed',durationSeconds:4}},{id:'orbit',label:'Orbit',timing:{kind:'sustained'}}],sequence:[{id:'arrival-1',beatId:'arrival',follow:{kind:'manual'}}]},storyHash=hash(canonicalSceneStoryJson(story));
+ const mutation=`const NativeError=Error, nativeFinite=Number.isFinite;
+  Math.min=()=>{throw new NativeError('mutated min')};Math.max=()=>{throw new NativeError('mutated max')};Array.prototype.includes=()=>{throw new NativeError('mutated includes')};
+  Object.freeze=value=>value;Object.defineProperty(Error.prototype,'code',{configurable:true,set(){throw new NativeError('mutated error setter')}});Object.defineProperty(Object.prototype,'pause',{configurable:true,set(){throw new NativeError('mutated object setter')}});
+  globalThis.Number={isFinite:nativeFinite,MAX_SAFE_INTEGER:0};globalThis.Error=()=>new NativeError('mutated Error');`;
+ const f=await fixture(linked.controls,linked.controls,mutation,'0.2.0',false,false,0,false,{storyCapability:linked.storyCapability});
+ const {moduleSource:_,...initial}=f.initial;f.post({...initial,linked,story,storyHash});for(let index=0;index<500&&!f.messages.some(row=>row.type==='ready'||row.type==='failure');index++)await new Promise(resolve=>setTimeout(resolve,10));const ready=f.messages.find(row=>row.type==='ready'||row.type==='failure');assert.equal(ready?.type,'ready',JSON.stringify(ready));assert.equal(ready.story.frame.state,'normal');
+ const applied=await f.send({type:'story-transport',requestId:'story-a',commandId:'command-a',expectedRevisionId:'revision',expectedStoryHash:storyHash,expectedStoryRevision:0,action:'launch',beatId:'arrival'});
+ assert.equal(applied.type,'status',JSON.stringify(applied));assert.equal(applied.storyReceipt.result,'applied');assert.equal(applied.storyReceipt.story.state,'active');assert.equal(applied.storyReceipt.frameId,applied.frameId);assert.equal(applied.storyReceipt.timeSeconds,applied.timeSeconds);
+ assert.equal(f.frames.at(-1).deltaSeconds,0);assert.deepEqual(f.frames.at(-1).story,applied.storyReceipt.story);
+ const frameCount=f.frames.length,reset=await f.send({type:'playback',requestId:'reset',action:'reset'});assert.equal(reset.type,'status',JSON.stringify(reset));assert.equal(reset.story.frame.state,'normal');
+ const duplicate=await f.send({type:'story-transport',requestId:'story-a-retry',commandId:'command-a',expectedRevisionId:'revision',expectedStoryHash:storyHash,expectedStoryRevision:0,action:'launch',beatId:'arrival'});
+ assert.deepEqual(duplicate.storyReceipt,applied.storyReceipt);assert.equal(f.frames.length,frameCount+1,'reset draws once and the duplicate does not replay');
 });
 
 test('worker keeps routine sampling phase through unsampled frame notifications',async()=>{

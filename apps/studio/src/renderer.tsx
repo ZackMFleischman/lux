@@ -9,6 +9,7 @@ import { ParameterInspector, parameterOwner } from './controls/ParameterInspecto
 import type { ControlEdits } from './controls/ParameterInspector.tsx';
 import { PerformanceStatus } from './performance/PerformanceStatus.tsx';
 import { Preview } from './preview.tsx';
+import {StoryPanel,storyStatusLabel} from './story/StoryPanel.tsx';
 import { StudioController } from './service-client.ts';
 import type { ReactNode } from 'react';
 import { StudioDockShell } from './layout/StudioDockShell.tsx';
@@ -92,12 +93,13 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const bindTogglePanel = useCallback((action: null | ((kind: StudioPanelKind) => void)) => { togglePanelRef.current = action; }, []);
   const panelFocus = useRef<HTMLElement | null>(null), fullscreenFocus = useRef<HTMLElement | null>(null), previousFullscreen = useRef(false);
   const shortcutsFocus = useRef<HTMLElement | null>(null);
-  const [jobsRequest, setJobsRequest] = useState(0);
+  const [jobsRequest, setJobsRequest] = useState(0),[storyRequest,setStoryRequest]=useState(0);
   useEffect(() => {
     if (!jobsRequest) return;
     if (openPanelRef.current) openPanelRef.current('jobs');
     else jobsRef.current?.focus();
   }, [jobsRequest]);
+  useEffect(()=>{if(storyRequest)openPanelRef.current?.('story');},[storyRequest]);
   const [fullscreenHint, setFullscreenHint] = useState(false);
   const busy = pendingCommands > 0;
   const [error, setError] = useState<string | null>(null);
@@ -271,6 +273,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
         <section><Disclosure title="Runtime"><dl className="identity"><dt>Authoring revision</dt><dd>{runtime?.revisionId ?? 'Unavailable'}</dd><dt>Instance</dt><dd>{runtime?.instanceId ?? 'Unavailable'}</dd><dt>Generation / clock epoch</dt><dd>{runtime ? `${runtime.generation} / ${runtime.clockEpoch}` : 'Unavailable'}</dd><dt>Completed frame</dt><dd>{runtime?.frameId ?? 'Unavailable'}</dd></dl></Disclosure></section>
         <section><Disclosure title="Host output"><p className="host-revision">{snapshot.host?.revisionId ?? 'No host status available'}</p><p className="hint">Authoring changes do not update a pinned host revision.</p></Disclosure></section>
       </Paper>;
+  const storyPane=<Paper component="aside" square className="story-pane"><StoryPanel key={`${runtime?.instanceId??'none'}:${runtime?.generation??0}:${runtime?.story?.storyHash??'none'}`} status={runtime?.story} previewPlayback={runtime?.playback} available={!!available} controller={controller} onError={message=>setError(message)}/></Paper>;
+  const openStory=()=>{setMaximizedPanel(null);setStoryRequest(value=>value+1);};
   const openJobs = () => { setMaximizedPanel(null); setJobsRequest(value => value + 1); };
   const jobsPane = <section ref={jobsRef} tabIndex={-1} className="diagnostics" aria-label="Jobs and diagnostics"><div className="section-heading"><h2>Jobs & diagnostics</h2><span className="subtle">{snapshot.jobs.length} jobs · {sourceProblemCount} diagnostics</span></div>
       {runtime?.fault && <p className="error" role="alert"><strong>{runtime.fault.code}</strong> · {runtime.fault.message}</p>}
@@ -296,13 +300,14 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
     </header>
     {appError && <Alert severity="error">{appError}</Alert>}
     <div className="workspace">
-      {sourcePanel ? <StudioDockShell onOpenPanelReady={bindOpenPanel} onTogglePanelReady={bindTogglePanel} onActivePanelChange={setFocusedPanel} onShortcutsHelp={openShortcutReference} toolsHost={toolsHost} compact={compact} expandedPanel={expandedPanel} showInspector={showMaximizedInspector} preview={previewPane} source={sourcePanel} library={libraryPanel??<section aria-label="Shared component library">Library unavailable.</section>} inspector={inspectorPane} diagnostics={diagnosticsPane} jobs={jobsPane} graph={<GraphPanel runtime={runtime} selected={selectedNodePath?nodeKey(selectedNodePath):null} onSelect={selectGraphNode}/>} /> : <>{previewPane}{(!compact || showMaximizedInspector) && inspectorPane}{(!compact || showMaximizedInspector) && diagnosticsPane}</>}
+      {sourcePanel ? <StudioDockShell onOpenPanelReady={bindOpenPanel} onTogglePanelReady={bindTogglePanel} onActivePanelChange={setFocusedPanel} onShortcutsHelp={openShortcutReference} toolsHost={toolsHost} compact={compact} expandedPanel={expandedPanel} showInspector={showMaximizedInspector} preview={previewPane} source={sourcePanel} library={libraryPanel??<section aria-label="Shared component library">Library unavailable.</section>} inspector={inspectorPane} story={storyPane} diagnostics={diagnosticsPane} jobs={jobsPane} graph={<GraphPanel runtime={runtime} selected={selectedNodePath?nodeKey(selectedNodePath):null} onSelect={selectGraphNode}/>} /> : <>{previewPane}{(!compact || showMaximizedInspector) && inspectorPane}{(!compact || showMaximizedInspector) && diagnosticsPane}</>}
     </div>
     {!sourcePanel && !compact && jobsPane}
     <footer className="status-bar" hidden={windowState.fullscreen || previewOnly} aria-label="Studio status">
       <button type="button" className={`status-item status-build ${status.build === 'Build failed' ? 'status-error' : ''}`} aria-busy={status.building} aria-label={`Build status: ${status.build}. Open Jobs and diagnostics`} onClick={openJobs}><span aria-hidden="true" className={status.building ? 'status-spinner' : 'status-build-icon'}>{status.building ? '' : '↻'}</span><span aria-live="polite">{status.build}</span></button>
       <button type="button" className={`status-item ${status.problems ? 'status-error' : ''}`} aria-label={`Problems: ${status.problems}. Open Jobs and diagnostics`} onClick={openJobs}><span aria-hidden="true">!</span><span>{status.problems} {status.problems === 1 ? 'problem' : 'problems'}</span></button>
       {sourceChanged && <span className="status-item" title="Build to apply the source edits to Preview">Source changed · Build to update</span>}
+      {runtime?.story&&<button type="button" className="status-item status-story" aria-label={`Story status: ${storyStatusLabel(runtime.story)}. Open Story`} onClick={openStory}><span aria-hidden="true">Story</span><span aria-live="polite">{storyStatusLabel(runtime.story)}</span></button>}
       {['Connecting', 'Disconnected', 'Failed'].includes(status.runtime) && <button type="button" className="status-item status-runtime status-error" aria-label={`Runtime status: ${status.runtime}. Open Jobs and diagnostics`} onClick={openJobs}>{status.runtime}</button>}
     </footer>
   </div></>;

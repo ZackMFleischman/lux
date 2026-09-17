@@ -3,7 +3,7 @@
   "compilerOptions": {
     "paths": { "@lux/visual-sdk": ["./packages/visual-sdk/src/sdk-v2.ts"] }
   },
-  "files": ["packages/visual-sdk/examples/parameters.ts", "packages/visual-sdk/examples/actions.ts"],
+  "files": ["packages/visual-sdk/examples/parameters.ts", "packages/visual-sdk/examples/actions.ts", "packages/visual-sdk/examples/story.ts"],
   "include": [],
   "exclude": []
 }
