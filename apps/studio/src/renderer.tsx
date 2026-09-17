@@ -219,7 +219,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   const previewOutput = runtime?.output;
   const workerFps = snapshot.performance?.worker?.produced;
   const previewFpsValue = runtime?.playback === 'playing' && snapshot.performance?.status === 'live' && workerFps?.availability === 'available' && workerFps.value !== undefined ? `${workerFps.value.toFixed(1)} FPS` : '— FPS';
-  const previewFpsDetail = snapshot.performance?.status === 'live' && workerFps?.availability === 'available' ? 'Measured worker FPS' : 'Worker FPS unavailable or stale';
+  const previewFpsDetail = runtime?.playback !== 'playing' ? 'Paused' : snapshot.performance?.status === 'live' && workerFps?.availability === 'available' ? 'Measured worker FPS' : 'Worker FPS unavailable or stale';
   const presetValue = previewOutput && [[1280,720],[1920,1080],[2560,1440]].some(([width,height]) => width === previewOutput.width && height === previewOutput.height)
     ? `${previewOutput.width}x${previewOutput.height}` : 'custom';
   const resizePreview = (height: number) => {
