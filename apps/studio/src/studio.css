@@ -16,6 +16,8 @@
 
 .studio{height:100%;min-height:0}
 .studio [hidden]{display:none!important}
+
+.studio-pane-host>.inspector{padding-inline:6px}
 .authoring-shell:has(.studio-preview-fullscreen)>.authoring-tools{display:none}
 .studio-preview-fullscreen{position:fixed;inset:0;width:100vw;height:100vh;z-index:2000;background:#000;overflow:hidden}
 .studio-preview-fullscreen .workspace{background:#000;overflow:hidden}
