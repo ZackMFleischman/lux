@@ -247,6 +247,7 @@ test('RTL: Story ribbon keeps selection separate from the attached occurrence an
   assert.equal(rows[2]!.getAttribute('aria-pressed'),'true','selection moves without moving output');
   assert.equal(rows[1]!.getAttribute('aria-current'),'step','the transport cursor remains on the attached occurrence');
   assert.equal(calls.length,0);assert.ok(screen.getAllByText('Awaiting cue').length>=2);assert.ok(screen.getByText('Staying on beat'));
+  assert.ok(screen.getByText('Auto-advance'),'the sequence switch has a visible label');
   const announcement=document.querySelector('.story-transition[aria-live="polite"]')!;assert.ok(announcement);assert.doesNotMatch(announcement.textContent??'',/12\.0s active/,'advancing elapsed time stays outside the live transition announcement');assert.ok(screen.getByText('12.0s active'));
   assert.equal(screen.queryByRole('slider',{name:/Local time/}),null,'sustained beats have no fabricated local timeline');
   assert.ok(screen.getByRole('button',{name:/Start here: Hold — occurrence 3 of 3/}));
@@ -281,6 +282,7 @@ test('RTL: timed Story scrub admits one seek and replaces the queued target with
   const errors:string[]=[];const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
   render(<StoryPanel status={status} available controller={controller} onError={error=>errors.push(error)}/>);
   const slider=screen.getByRole('slider',{name:'Local time for Arrival'}) as HTMLInputElement;
+  const local=document.querySelector('.story-local-time')!,beats=document.querySelector('.story-beats')!;assert.ok(local.compareDocumentPosition(beats)&Node.DOCUMENT_POSITION_FOLLOWING,'active timed controls precede the full Beats list');
   fireEvent.change(slider,{target:{value:'3'}});fireEvent.change(slider,{target:{value:'6'}});fireEvent.change(slider,{target:{value:'8'}});
   await waitFor(()=>assert.equal(calls.length,1));assert.deepEqual(calls[0]![0],{action:'seek',localTimeSeconds:3});assert.equal(calls[0]![2],7);
   status=storyStatus({...status,storyRevision:8,frame:{...status.frame,localTimeSeconds:3,progress:.3}});

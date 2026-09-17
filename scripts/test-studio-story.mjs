@@ -12,7 +12,7 @@ import { resolveStudioSession, studioTestEnvironment } from './studio-session.mj
 const root = resolve(import.meta.dirname, '..').replaceAll('\\', '/');
 const modeArgument = process.argv.find(value => value.startsWith('--focus='));
 const mode = modeArgument?.slice('--focus='.length) ?? 'full';
-assert.ok(['full', 'transport', 'faults', 'layout'].includes(mode), 'Expected --focus=transport, faults, or layout');
+assert.ok(['full', 'transport', 'faults', 'layout', 'tail'].includes(mode), 'Expected --focus=transport, faults, layout, or tail');
 const output = join(root, 'artifacts/studio-story', `native-${Date.now()}-${mode}`);
 await mkdir(output, { recursive: true });
 const env = { ...studioTestEnvironment(), LUX_NODE_EXECUTABLE: process.execPath };
@@ -168,6 +168,12 @@ try {
     await page.getByRole('menuitem', { name: 'Story', exact: true }).click();
     await page.locator('.story-panel').waitFor();
   };
+  const assertPreviewAndStory = async label => {
+    const previewBox = await page.locator('.preview-surface canvas').boundingBox();
+    const storyBox = await page.locator('.story-panel').boundingBox();
+    assert.ok(previewBox && previewBox.width > 0 && previewBox.height > 0, `${label}: Preview canvas must remain visible`);
+    assert.ok(storyBox && storyBox.width > 0 && storyBox.height > 0, `${label}: Story panel must remain visible`);
+  };
 
   const buildButton = page.getByRole('button', { name: 'Build', exact: true });
   await buildButton.waitFor();
@@ -185,6 +191,7 @@ try {
   await page.keyboard.press('Home');
   await statusWhen(next => next.output.width === 640 && next.output.height === 360, '640×360 preview output');
   await openStoryPanel();
+  await assertPreviewAndStory('View menu Story opener');
   assert.equal(await page.locator('.story-ribbon > li').count(), 6);
   assert.equal(await page.locator('.story-dwell-progress').count(), 0);
 
@@ -252,7 +259,9 @@ try {
     await studio('open', { path: scenePath, expectedDraftVersion: restoreRead.draftVersion, discardDirty: true });
     value = await storyWhen(story => story.frame.state === 'normal' && story.definition.sequence.length === 6, 'restore production Story');
     await playPreview();
+  }
 
+  if (mode === 'full' || mode === 'transport' || mode === 'tail') {
     value = await runtime();
     const launchArrival = await transport(value, { action: 'launch', beatId: 'arrival' }, 'qa-story-launch-arrival');
     assert.equal(launchArrival.receipt.story.beatId, 'arrival');
@@ -264,6 +273,7 @@ try {
     assert.equal(seekFirst.currentStatus.phase, 'paused');
     const seekDuplicate = appliedStory(await storyCall('transport', seekArgs));
     assert.deepEqual(seekDuplicate.receipt, seekFirst.receipt, 'Exact retry returns the original completed-frame receipt');
+    await pausePreview();
     const heldSeek = await backingFrame('timed-seek-held');
     const stale = await rawStory('transport', { ...seekArgs, commandId: 'qa-story-stale-seek', localTimeSeconds: 5 });
     assert.equal(stale.isError, true);
@@ -271,6 +281,7 @@ try {
     assert.equal((await backingFrame('timed-seek-after-stale')).sha256, heldSeek.sha256);
     await screenshot('story-timed-paused-seek', 1360, 900);
     report.checks.push('Timed direct seek returns the drawn pose; exact retry is idempotent and stale revision leaves it unchanged');
+    await playPreview();
 
     const beforeReplay = (await runtime()).story.frame.activationId;
     await page.getByRole('button', { name: 'Replay Arrival', exact: true }).click();
@@ -291,20 +302,66 @@ try {
     report.checks.push('Keyboard Return to normal restores the original solar-system behavior without a visual reset command');
   }
 
-  if (mode === 'full' || mode === 'layout') {
+  if (mode === 'full' || mode === 'layout' || mode === 'tail') {
     await pausePreview();
+    if (mode === 'layout') {
+      await page.getByRole('button', { name: /Story status: .*Open Story/ }).click();
+      await sleep(180);
+      await assertPreviewAndStory('status-bar Story opener');
+    }
     await screenshot('story-desktop', 1360, 900);
     await screenshot('story-medium', 1100, 720);
     const ribbon = page.locator('.story-ribbon');
     await ribbon.scrollIntoViewIfNeeded();
     await screenshot('story-compact', 640, 360);
     assert.ok(await ribbon.isVisible());
+    await assertPreviewAndStory('compact Normal layout');
     report.checks.push('Native Story panel and sequence ribbon remain visible at desktop, 1100×720, and 640×360');
     await page.setViewportSize({ width: 1360, height: 900 });
     await sleep(180);
+
+    if (mode === 'layout') {
+      await playPreview();
+      value = await runtime();
+      await transport(value, { action: 'launch', beatId: 'arrival' }, 'qa-layout-launch-arrival');
+      value = await storyWhen(story => story.frame.state === 'active' && story.frame.beatId === 'arrival', 'layout timed launch');
+      await transport(value, { action: 'seek', localTimeSeconds: 6 }, 'qa-layout-seek-arrival');
+      await storyWhen(story => story.phase === 'paused' && story.frame.localTimeSeconds === 6, 'layout timed seek');
+      await pausePreview();
+      await screenshot('story-layout-timed-paused-desktop', 1360, 900);
+      await screenshot('story-layout-timed-paused-medium', 1100, 720);
+      await screenshot('story-layout-timed-paused-compact', 640, 360);
+      await assertPreviewAndStory('compact timed layout');
+
+      await page.setViewportSize({ width: 1360, height: 900 });
+      await playPreview();
+      value = await runtime();
+      await transport(value, { action: 'return-normal' }, 'qa-layout-return-normal');
+      value = await storyWhen(story => story.frame.state === 'normal', 'layout return normal');
+      await transport(value, { action: 'start' }, 'qa-layout-start-sequence');
+      value = await storyWhen(story => story.sequence.state === 'attached' && story.sequence.occurrenceId === 'arrival-1', 'layout attached sequence');
+      await transport(value, { action: 'pause' }, 'qa-layout-pause-sequence');
+      await storyWhen(story => story.phase === 'paused' && story.sequence.state === 'attached', 'layout paused sequence');
+      await pausePreview();
+      await screenshot('story-layout-attached-dwell-desktop', 1360, 900);
+      await screenshot('story-layout-attached-dwell-medium', 1100, 720);
+      await screenshot('story-layout-attached-dwell-compact', 640, 360);
+      await assertPreviewAndStory('compact attached layout');
+      assert.ok(await page.locator('.story-dwell-progress').isVisible());
+      assert.ok(await page.getByText('Auto-advance', { exact: true }).isVisible());
+      const compactOverflow = await page.locator('.story-panel').evaluate(element => ({
+        clientHeight: element.clientHeight,
+        scrollHeight: element.scrollHeight,
+        clientWidth: element.clientWidth,
+        scrollWidth: element.scrollWidth,
+      }));
+      assert.ok(compactOverflow.scrollHeight >= compactOverflow.clientHeight && compactOverflow.scrollWidth >= compactOverflow.clientWidth,
+        'Compact Story layout retains reachable overflow dimensions');
+      report.checks.push('Normal, paused timed seek, and attached dwell remain visible with Preview across desktop, 1100×720, and 640×360');
+    }
   }
 
-  if (mode === 'full' || mode === 'faults') {
+  if (mode === 'full' || mode === 'faults' || mode === 'tail') {
     value = await runtime();
     if (value.story.frame.state !== 'normal') await transport(value, { action: 'return-normal' }, `qa-story-normal-${mode}`);
     await pausePreview();

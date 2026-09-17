@@ -36,3 +36,31 @@ unchanged. Native evidence must be read with that output-size limit.
 
 The original Vinyl Cosmos file is not edited. Migration writes a separate copy.
 Original SHA-256: b18bdd303430c288bd95c156f35a1bfa5c9f24b90745c3a013a0e79a8b27043e.
+
+
+## Native behavior verification
+
+Executor: independent QA agent /root/typed_controls_qa, checkout Electron with
+studioTestEnvironment and the matching external stdio MCP adapter. Preview output
+was 640×360. Product source was 7a5bd180a776a00c12109479493b41882212eb34.
+
+- artifacts/studio-story/native-1789652013988-full/result.json passed selection,
+  sustained hold beyond scheduled dwell, Story versus Preview pause, and explicit
+  repeated-occurrence resume with fresh dwell and automatic advance. Tracked diff
+  was empty. Its final pixel comparison was invalid because Preview ambient time
+  was still running; this run is supporting partial evidence, not fully green.
+- artifacts/studio-story/native-1789652173969-tail/result.json passed the remaining
+  timed seek, exact retry, stale rejection, replay, keyboard loop and Return Normal,
+  save/reopen, and invalid-build/open preservation checks. This run is fully green;
+  its tracked diff was the harness-only Preview-pause/focused-tail correction.
+  Harness SHA256: 1b5d25e03ad2c52b5aa0684c630f343c950fc7ad46fd4640cf8d769caa25c324.
+
+Neither run recorded page errors. Both owned processes exited. The original scene
+SHA remains unchanged. The migrated copy is now also saved outside test artifacts
+at C:/Users/zFlei/repos/lux/visuals/Vinyl Cosmos Story.lux-scene, SHA256
+ d005f1d4127ef6006db5ccf46c69c172bc5a9b567925a35be17e9146c1ec23dc.
+It requires this development build; the installed app is unchanged.
+
+Native screenshot review identified follow-up UI corrections: Story must keep
+Preview visible on first opening, Auto-advance needs a visible label, and timed
+scrubbing must precede the beat catalog. Final layout verification remains pending.
