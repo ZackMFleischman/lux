@@ -111,7 +111,7 @@ export function AuthoringApp() {
   useEffect(() => window.luxAuthoring.onAgentCommand(async command => {
     if (lookOperation.current && !['read', 'status'].includes(command.method)) throw Error('Wait for the look operation to finish');
     if (confirmation.isPending() && !['read', 'status', 'capture','library.list','library.read'].includes(command.method)) throw Error('Studio is waiting for a user confirmation');
-    if (['parameters', 'variation', 'playback', 'restart','tempo.set','tempo.tap'].includes(command.method)) {
+    if (['parameters', 'variation', 'playback', 'restart','tempo.set','tempo.tap','trigger'].includes(command.method)) {
       if(!session.getSnapshot().runtimeControlsAvailable)throw Error('Studio is busy with a scene file operation');
       const write = dispatchRuntimeCommand(client, command.method, command.params);
       if (command.method === 'parameters'||command.method==='variation'||command.method==='tempo.set'||command.method==='tempo.tap') {

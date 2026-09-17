@@ -299,6 +299,7 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
     cancelAnimationFrame: dom.window.cancelAnimationFrame.bind(dom.window),
     ResizeObserver: class { observe() {} unobserve() {} disconnect() {} },
   });
+  Object.defineProperty(globalThis.navigator,'mediaDevices',{configurable:true,value:{enumerateDevices:async()=>[],getUserMedia:async()=>{throw Error('unused');},addEventListener(){},removeEventListener(){}}});
   const source = fixture().getSnapshot().source;
   const builds: unknown[] = [], saves: any[] = [];
   let finish!: () => void, finishSave!: () => void;
@@ -417,6 +418,9 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
   assert.equal(saves.length, 3, 'repeat does not reopen Save as');
   compileSucceeds = true;
   const current = await agentCommand({ method: 'read', params: {} });
+  const runtime=current.status.authoring;
+  await assert.rejects(agentCommand({method:'trigger',params:{commandId:'authoring-route',instanceId:runtime.instanceId,expectedGeneration:runtime.generation,expectedRevisionId:runtime.revisionId,expectedControlSchemaHash:runtime.controlSchemaHash,controlId:'regenerate'}}),
+    /Trigger control is unavailable/,'authoring forwards trigger commands to the runtime dispatcher instead of the unsupported-command fallback');
   await act(async () => { await agentCommand({ method: 'build', params: { source: current.source, expectedDraftVersion: current.draftVersion } }); });
   assert.equal(screen.queryByText(/Shortcut compile error/), null);
   assert.ok(screen.getByRole('button', { name: /Problems: 0/ }));
