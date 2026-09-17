@@ -1,4 +1,4 @@
-# Story implementation evidence (in progress)
+# Story playback implementation evidence
 
 Worktree: `.worktrees/story-controls`, branch `codex/story-controls`.
 LUX197 owns this slice. Approved contract: the linked `story-revised-contract.md`
@@ -29,7 +29,7 @@ The first native run found the authenticated bridge omitted both Story methods.
 Commit d4e179676e243c9be3a1733e0e2bf879597991e0 admits them; the independent bridge
 regression passed 2/2, including unknown-method rejection.
 
-Native acceptance remains in progress. The second run inherited the original
+The second native run inherited the original
 full-HD output and failed the resize setup after an initialization watchdog fault.
 The migrated demonstration copy now starts at 640×360; runtime watchdogs are
 unchanged. Native evidence must be read with that output-size limit.
@@ -61,6 +61,20 @@ at C:/Users/zFlei/repos/lux/visuals/Vinyl Cosmos Story.lux-scene, SHA256
  d005f1d4127ef6006db5ccf46c69c172bc5a9b567925a35be17e9146c1ec23dc.
 It requires this development build; the installed app is unchanged.
 
-Native screenshot review identified follow-up UI corrections: Story must keep
-Preview visible on first opening, Auto-advance needs a visible label, and timed
-scrubbing must precede the beat catalog. Final layout verification remains pending.
+Native screenshot review prompted three corrections in product commit
+b22dc818dbb03553b213de03d1bf34d2443bb270: Story opens in the lower tool group while
+Preview stays visible, Auto-advance has a visible label, and timed scrubbing appears
+before the sequence and beat catalog. Existing open Story docking is preserved.
+
+Final layout run: artifacts/studio-story/native-1789652945952-layout/result.json.
+All checks passed at 1360×900, 1100×720 and 640×360. Nine actual-app screenshots show
+Normal, timed paused seek, and attached dwell. Both the View menu and status opener
+retain nonzero visible Preview and Story panes. Small windows require scrolling
+inside Story; the ribbon and labeled Auto-advance remain reachable. No page errors;
+owned PID35968 exited0. Only the capture harness changed after the product commit:
+final harness SHA256 a70c74b20ec7630706eb3a74d0734fb5752d706503020ee7e2529d0f3e8fd9b1.
+
+This is composite native acceptance evidence across the behavior and final layout
+runs, not a claim that one end-to-end invocation was fully green. The installed app
+and original user scene remain unchanged. SDK0.4 Story, playback speed, scheduled
+multi-visual lifetimes, and Resolume Story export are outside this S1 slice.

@@ -343,12 +343,18 @@ try {
       await transport(value, { action: 'pause' }, 'qa-layout-pause-sequence');
       await storyWhen(story => story.phase === 'paused' && story.sequence.state === 'attached', 'layout paused sequence');
       await pausePreview();
+      const autoAdvance = page.getByText('Auto-advance', { exact: true });
+      await autoAdvance.scrollIntoViewIfNeeded();
       await screenshot('story-layout-attached-dwell-desktop', 1360, 900);
+      await page.setViewportSize({ width: 1100, height: 720 });
+      await autoAdvance.scrollIntoViewIfNeeded();
       await screenshot('story-layout-attached-dwell-medium', 1100, 720);
+      await page.setViewportSize({ width: 640, height: 360 });
+      await autoAdvance.scrollIntoViewIfNeeded();
       await screenshot('story-layout-attached-dwell-compact', 640, 360);
       await assertPreviewAndStory('compact attached layout');
       assert.ok(await page.locator('.story-dwell-progress').isVisible());
-      assert.ok(await page.getByText('Auto-advance', { exact: true }).isVisible());
+      assert.ok(await autoAdvance.isVisible());
       const compactOverflow = await page.locator('.story-panel').evaluate(element => ({
         clientHeight: element.clientHeight,
         scrollHeight: element.scrollHeight,
