@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { legacySourceBundleSchema,assetSourceBundleSchema } from '../../../../packages/runtime-contracts/src/index.ts';
 import {normalizeSceneStory} from '../../../../packages/runtime-contracts/src/story.mjs';
+import {validateStorySceneDocumentV7} from '../../../../packages/core/src/story-scene-v2.ts';
 // Public authoring capabilities are intentionally narrower than internal builds.
 const studioSdkVersion=z.enum(['0.1.0','0.2.0','0.4.0']);
 const sourceBundleSchema=z.union([legacySourceBundleSchema.extend({sdkVersion:studioSdkVersion}),assetSourceBundleSchema.extend({sdkVersion:studioSdkVersion})]);
@@ -18,8 +19,13 @@ export const sceneStoryInputSchema=z.object({version:z.literal(1),
     z.object({kind:z.literal('after'),seconds:z.number().finite().positive()}).strict()
   ])}).strict()).max(1024)
 }).strict().superRefine((value,context)=>{try{normalizeSceneStory(value);}catch(error){context.addIssue({code:z.ZodIssueCode.custom,message:error instanceof Error?error.message:String(error)});}});
-export const sourceBuildInputSchema = z.object({ expectedDraftVersion: z.number().int().nonnegative(),
-  source: sourceBundleSchema,libraryLinks:z.array(libraryLinkInputSchema).optional(),story:sceneStoryInputSchema.nullable().optional() }).strict();
+export const storySceneDocumentInputSchema=z.unknown().transform((value,context)=>{try{return validateStorySceneDocumentV7(value);}catch(error){context.addIssue({code:z.ZodIssueCode.custom,message:error instanceof Error?error.message:String(error)});return z.NEVER;}});
+export const sourceBuildInputObjectSchema = z.object({ expectedDraftVersion: z.number().int().nonnegative(),
+  source:sourceBundleSchema.optional(),document:storySceneDocumentInputSchema.optional(),libraryLinks:z.array(libraryLinkInputSchema).optional(),story:sceneStoryInputSchema.nullable().optional() }).strict();
+export const sourceBuildInputSchema = sourceBuildInputObjectSchema.superRefine((value,context)=>{
+    if((value.source===undefined)===(value.document===undefined))context.addIssue({code:z.ZodIssueCode.custom,message:'Build requires exactly one of source or document'});
+    if(value.document!==undefined&&(value.libraryLinks!==undefined||value.story!==undefined))context.addIssue({code:z.ZodIssueCode.custom,message:'Scene v7 document builds cannot include libraryLinks or Story v1'});
+  });
 const scenePath=z.string().min(1).max(1024).refine(path=>path.toLowerCase().endsWith('.lux-scene'),'Scene path must end in .lux-scene');
 export const sceneSaveInputSchema=z.object({path:scenePath,expectedDraftVersion:z.number().int().nonnegative(),overwrite:z.boolean().optional().default(false)}).strict();
 export const sceneOpenInputSchema=z.object({path:scenePath,expectedDraftVersion:z.number().int().nonnegative(),discardDirty:z.boolean().optional().default(false)}).strict();
@@ -28,9 +34,16 @@ const libraryDependencySchema=z.object({componentId,mountPath,revision:z.number(
 export const libraryCreateInputSchema=z.object({name:z.string().trim().min(1).max(80),description:z.string().trim().min(1).max(512),source:libraryComponentSourceSchema,dependencies:z.array(libraryDependencySchema).optional()}).strict();
 export const libraryReadInputSchema=z.object({id:componentId,revision:z.number().int().positive().optional()}).strict();
 export const libraryUpdateInputSchema=libraryCreateInputSchema.extend({id:componentId,expectedRevision:z.number().int().positive()}).strict();
+const mib=1024*1024;
+// Read keeps one selected source beside a 32 MiB Scene v7 document. Seven MiB
+// covers its worst JSON escaping/assets; thirteen covers bounded runtime status.
+const readResponseBytes=(32+7+13)*mib;
+export const agentTransportLimits=Object.freeze({requestBytes:34*mib,responseBytes:readResponseBytes,readToolResultBytes:2*readResponseBytes});
 export function sourceReadResult(value: unknown) {
-  const result = { content: [{ type: 'text' as const, text: JSON.stringify(value) }] };
-  if (new TextEncoder().encode(JSON.stringify(result)).byteLength > 16 * 1024 * 1024)
-    throw Error('Source read result exceeds 16 MiB');
+  const text=JSON.stringify(value);
+  if(new TextEncoder().encode(text).byteLength>agentTransportLimits.responseBytes)throw Error('Source read JSON exceeds 52 MiB');
+  const result = { content: [{ type: 'text' as const, text }] };
+  if (new TextEncoder().encode(JSON.stringify(result)).byteLength > agentTransportLimits.readToolResultBytes)
+    throw Error('Source read result exceeds 104 MiB');
   return result;
 }

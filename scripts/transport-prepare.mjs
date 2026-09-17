@@ -14,7 +14,7 @@ export function assertNumericExportControls(schema) {
 
 export async function prepareTransportScene(filename, directory = 'artifacts/transport') {
   const { document } = await new SceneFileStore().open(filename);
-  if(document.version===6&&document.story)throw Error('Resolume export does not support Story playback yet');
+  if(document.version===7||document.version===6&&document.story)throw Error('Resolume export does not support Story playback yet');
   if(document.version===3||document.version===6)assertNumericExportControls(document.controls.schema);
   else if(document.version===4||document.version===5)for(const node of document.controls.nodes)assertNumericExportControls(node.schema);
   const { settings } = document;

@@ -1,0 +1,92 @@
+{
+  "format": "lux-scene",
+  "version": 7,
+  "visuals": [
+    {
+      "id": "ambient",
+      "source": {
+        "sdkVersion": "0.2.0",
+        "entry": "visual.ts",
+        "files": {
+          "visual.ts": "import {defineVisual} from '@lux/visual-sdk';\nimport {Scene,Mesh,PlaneGeometry,MeshBasicNodeMaterial,OrthographicCamera} from 'three/webgpu';\nimport {uniform,vec4} from 'three/tsl';\nexport default defineVisual({\n controls:{intensity:{type:'number',label:'Ambient intensity',default:0.6,min:0,max:1,step:0.05},variant:{type:'enum',label:'Ambient variant',default:'calm',presentation:'segmented',options:[{id:'calm',label:'Calm'},{id:'bright',label:'Bright'}]}},\n story:{version:1,beats:{arrival:{kind:'timed',seek:'direct'},hold:{kind:'sustained',seek:'none'}}},\n async create(context){\n  const r=uniform(0.08),g=uniform(0.25),b=uniform(0.65),material=new MeshBasicNodeMaterial();material.fragmentNode=vec4(r,g,b,1);\n  const geometry=new PlaneGeometry(2,2),mesh=new Mesh(geometry,material),scene=new Scene();scene.add(mesh);const camera=new OrthographicCamera(-1,1,1,-1,0,1);\n  return {update(frame){const level=frame.controls.intensity*(frame.controls.variant==='bright'?1:0.72);let phase=0;if(frame.story.state==='active'&&frame.story.beatId==='arrival')phase=frame.story.progress??0;else if(frame.story.state==='active')phase=0.5+Math.sin(frame.timeSeconds*3)*0.15;r.value=Math.min(1,(0.08+phase*0.35)*level);g.value=Math.min(1,(0.25+(1-phase)*0.2)*level);b.value=Math.min(1,(0.65+phase*0.25)*level);},render(target){return context.renderer.render(scene,camera,target);},reset(){},dispose(){geometry.dispose();material.dispose();}};\n }\n});"
+        }
+      },
+      "controls": {
+        "sourceHash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "schema": [],
+        "schemaHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "values": {}
+      },
+      "controlAnimations": []
+    },
+    {
+      "id": "lead",
+      "source": {
+        "sdkVersion": "0.2.0",
+        "entry": "visual.ts",
+        "files": {
+          "visual.ts": "import {defineVisual} from '@lux/visual-sdk';\nimport {Scene,Mesh,PlaneGeometry,MeshBasicNodeMaterial,OrthographicCamera} from 'three/webgpu';\nimport {uniform,vec4} from 'three/tsl';\nexport default defineVisual({\n controls:{intensity:{type:'number',label:'Lead intensity',default:0.6,min:0,max:1,step:0.05},variant:{type:'enum',label:'Lead variant',default:'calm',presentation:'segmented',options:[{id:'calm',label:'Calm'},{id:'bright',label:'Bright'}]}},\n story:{version:1,beats:{arrival:{kind:'timed',seek:'direct'},hold:{kind:'sustained',seek:'none'}}},\n async create(context){\n  const r=uniform(0.75),g=uniform(0.12),b=uniform(0.22),material=new MeshBasicNodeMaterial();material.fragmentNode=vec4(r,g,b,1);\n  const geometry=new PlaneGeometry(2,2),mesh=new Mesh(geometry,material),scene=new Scene();scene.add(mesh);const camera=new OrthographicCamera(-1,1,1,-1,0,1);\n  return {update(frame){const level=frame.controls.intensity*(frame.controls.variant==='bright'?1:0.72);let phase=0;if(frame.story.state==='active'&&frame.story.beatId==='arrival')phase=frame.story.progress??0;else if(frame.story.state==='active')phase=0.5+Math.sin(frame.timeSeconds*3)*0.15;r.value=Math.min(1,(0.75+phase*0.35)*level);g.value=Math.min(1,(0.12+(1-phase)*0.2)*level);b.value=Math.min(1,(0.22+phase*0.25)*level);},render(target){return context.renderer.render(scene,camera,target);},reset(){},dispose(){geometry.dispose();material.dispose();}};\n }\n});"
+        }
+      },
+      "controls": {
+        "sourceHash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "schema": [],
+        "schemaHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "values": {}
+      },
+      "controlAnimations": []
+    }
+  ],
+  "settings": {
+    "width": 640,
+    "height": 360,
+    "fps": 60,
+    "seed": 17
+  },
+  "tempo": {
+    "bpm": 120
+  },
+  "story": {
+    "version": 2,
+    "normalVisualId": "ambient",
+    "crossfadeSeconds": 1.2,
+    "beats": [
+      {
+        "id": "arrival",
+        "label": "Arrival",
+        "timing": {
+          "kind": "timed",
+          "durationSeconds": 4
+        },
+        "visualId": "lead"
+      },
+      {
+        "id": "hold",
+        "label": "Hold",
+        "timing": {
+          "kind": "sustained"
+        },
+        "visualId": "lead"
+      }
+    ],
+    "sequence": [
+      {
+        "id": "ambient-arrival",
+        "beatId": "arrival",
+        "follow": {
+          "kind": "after",
+          "seconds": 12
+        },
+        "visualId": "ambient"
+      },
+      {
+        "id": "lead-hold",
+        "beatId": "hold",
+        "follow": {
+          "kind": "manual"
+        },
+        "visualId": "lead"
+      }
+    ]
+  }
+}

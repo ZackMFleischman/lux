@@ -4,6 +4,7 @@ import {LEGACY_CONTROL_SCHEMA,LEGACY_CONTROL_SCHEMA_HASH,sha256} from './control
 // Object/JSON/Map objects is insufficient: their properties remain mutable.
 import {prepareComponentDefinition} from './worker-component-definition.mjs';
 import {createControlAnimationEvaluator,normalizeControlAnimations} from './control-animation.mjs';
+import {normalizeAudioBandSnapshot} from '../../../../packages/runtime-contracts/src/audio-input.mjs';
 const ownKeys=Reflect.ownKeys, getDescriptor=Object.getOwnPropertyDescriptor;
 const getPrototype=Object.getPrototypeOf, defineProperty=Object.defineProperty;
 const freeze=Object.freeze, createObject=Object.create, isArray=Array.isArray;
@@ -12,6 +13,7 @@ const hasOwn=Function.prototype.call.bind(Object.prototype.hasOwnProperty);
 const isFiniteNumber=Number.isFinite,isSafeInteger=Number.isSafeInteger,RuntimeError=Error;
 function bad(message){throw new RuntimeError(message);}
 function own(input,key){const descriptor=getDescriptor(input,key);if(!descriptor||!descriptor.enumerable||!hasOwn(descriptor,'value'))bad('Control schema requires own data properties');return descriptor.value;}
+function optionalOwn(input,key,fallback){const descriptor=getDescriptor(input,key);if(!descriptor)return fallback;if(!descriptor.enumerable||!hasOwn(descriptor,'value'))bad('Control snapshot requires own data properties');return descriptor.value;}
 function record(input){if(!input||typeof input!=='object'||(getPrototype(input)!==objectPrototype&&getPrototype(input)!==null))bad('Control schema requires plain records');return ownKeys(input);}
 function sameData(actual,expected,depth=0){
   if(actual===expected)return true;
@@ -27,8 +29,8 @@ function sameData(actual,expected,depth=0){
   return true;
 }
 
-/** Must finish before importing user code; post-import methods use captures. */
-export async function prepareWorkerControlState(message,admission){
+/** Must finish before importing user code; createSlot remains safe afterwards. */
+export async function prepareWorkerVisualControlFactory(message,admission){
   const sdkVersion=message.sdkVersion??'0.1.0';
   if(sdkVersion!=='0.1.0'&&sdkVersion!=='0.2.0'&&sdkVersion!=='0.3.0')bad('Unsupported visual SDK');
   const schema=normalizeControlSchema(message.controlSchema??(sdkVersion==='0.1.0'?LEGACY_CONTROL_SCHEMA:undefined));
@@ -39,14 +41,11 @@ export async function prepareWorkerControlState(message,admission){
   }
   if(admission?.kind==='story'&&(sdkVersion!=='0.2.0'||sdkVersion!==admission.sdkVersion||schemaHash!==admission.controlSchemaHash||canonicalControlSchemaJson(schema)!==canonicalControlSchemaJson(admission.controls)))bad('Story linked/message schema or SDK mismatch');
   const componentCheck=sdkVersion==='0.3.0'?prepareComponentDefinition(admission.component):undefined;
-  let values=validateControlSnapshot(schema,message.controls), sequence=0;
+  const initialValues=validateControlSnapshot(schema,message.controls);
   const scenePath=freeze([]),sceneNode=freeze({nodePath:scenePath,definitionHash:schemaHash,schemaHash,schema});
   const publicControlBindings=createObject(objectPrototype);
   for(const control of schema)defineProperty(publicControlBindings,control.id,{value:freeze([freeze({nodePath:scenePath,controlId:control.id,active:true})]),enumerable:true});
   const profile=freeze({nodes:freeze([sceneNode]),publicControls:schema,publicControlBindings:freeze(publicControlBindings)});
-  let animations=normalizeControlAnimations(message.controlAnimations??[],profile),animationSequence=0;
-  const base=freeze({values:()=>values,nodeValues:path=>isArray(path)&&path.length===0?values:freeze(createObject(objectPrototype))});
-  const animated=createControlAnimationEvaluator(profile,base,animations);
   function validateValues(input){
     let persistent=0;for(let index=0;index<schema.length;index++)if(schema[index].type!=='trigger')persistent++;
     if(record(input).length!==persistent)bad('Invalid full control snapshot');
@@ -67,6 +66,18 @@ export async function prepareWorkerControlState(message,admission){
     }
     return freeze(result);
   }
+  const initialAnimations=normalizeControlAnimations(message.controlAnimations??[],profile);
+  const initialAudioSnapshot=normalizeAudioBandSnapshot({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0});
+  function createSlot(snapshot=message){
+  let values=snapshot===message?initialValues:validateValues(own(snapshot,'controls'));
+  let sequence=optionalOwn(snapshot,'controlSequence',0);
+  let animationSequence=optionalOwn(snapshot,'animationSequence',0);
+  if(!isSafeInteger(sequence)||sequence<0||!isSafeInteger(animationSequence)||animationSequence<0)bad('Invalid initial control sequence');
+  const snapshotHash=optionalOwn(snapshot,'controlSchemaHash',schemaHash);
+  if(sdkVersion!=='0.1.0'&&snapshotHash!==schemaHash)bad('Invalid initial control schema');
+  let animations=snapshot===message?initialAnimations:normalizeControlAnimations(optionalOwn(snapshot,'controlAnimations',[]),profile);
+  const base=freeze({values:()=>values,nodeValues:path=>isArray(path)&&path.length===0?values:freeze(createObject(objectPrototype))});
+  const animated=createControlAnimationEvaluator(profile,base,animations,initialAudioSnapshot);
   function checkDefinition(module){
     if(componentCheck)return componentCheck(module);
     const definition=own(module,'default');record(definition);
@@ -98,4 +109,9 @@ export async function prepareWorkerControlState(message,admission){
     state:(timeSeconds=0,beatPosition=0)=>({sdkVersion,controlSchemaHash:schemaHash,controls:values,controlSequence:sequence,effectiveControls:animated.values(timeSeconds,beatPosition),
       controlAnimations:animated.bindings(),controlAnimationIssues:animated.issues(),animationSequence,...(sdkVersion==='0.1.0'?{intensity:values.intensity}:{})}),
   });
+  }
+  return freeze({sdkVersion,controlSchema:schema,controlSchemaHash:schemaHash,createSlot});
 }
+
+/** Compatibility helper for the existing single-slot worker route. */
+export async function prepareWorkerControlState(message,admission){return (await prepareWorkerVisualControlFactory(message,admission)).createSlot();}

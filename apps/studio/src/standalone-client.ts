@@ -1,3 +1,5 @@
+import {StoryDocumentClient} from './story/story-document-client.ts';
+import type {StorySceneDocumentV7} from '../../../packages/core/src/story-scene-v2.ts';
 import type { StudioClient, StudioSnapshot, StudioOperation, RuntimeView,TriggerReceipt,StoryRuntimeStatus,StoryTransportReceipt,StoryTransportAction,SceneStoryV1,StoryCapabilityV1 } from './service-client.ts';
 import { getRuntimeControlState } from './service-client.ts';
 import type { PresentationPort } from './presentation.ts';
@@ -29,6 +31,7 @@ import {canonicalSceneStoryJson,normalizeSceneStory,normalizeStoryCapability,val
 export interface AuthoringApi {
   example(): Promise<SourceBundle>;
   compile(source: SourceBundle): Promise<any>;
+  compileDocument?(document: unknown): Promise<any>;
   smokeResult?(result: unknown): Promise<void>;
   smokeEnabled?(): Promise<boolean>;
   open(): Promise<any>;
@@ -147,16 +150,20 @@ export class StandaloneClient implements StudioClient, PresentationPort {
   private readonly performanceMode:CollectionMode;
   private readonly audioRuntimes=new Set<Running>();
   private audioSnapshot:AudioBandSnapshot;
+  private storyClient:StoryDocumentClient;
   constructor(api: AuthoringApi, options:{codeDeclaredParameters?:boolean;performanceMode?:CollectionMode;audioProvider?:Pick<StudioAudioProvider,'getSnapshot'|'subscribe'>}={}) {
     this.api = api; this.codeDeclaredParameters=options.codeDeclaredParameters===true; this.performanceMode=collectionMode(options.performanceMode);
     this.audioSnapshot=normalizeAudioBandSnapshot(options.audioProvider?.getSnapshot()??{generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0});
+    this.storyClient=new StoryDocumentClient(api,patch=>this.publish(patch),()=>this.audioSnapshot,this.performanceMode);
     options.audioProvider?.subscribe(()=>{
       this.audioSnapshot=normalizeAudioBandSnapshot(options.audioProvider!.getSnapshot());
       for(const runtime of this.audioRuntimes)this.queueAudio(runtime,this.audioSnapshot);
+      this.storyClient.audioChanged();
     });
   }
   getSnapshot = () => this.snapshot;
   readStory(view:'status'|'definition'|'capabilities'){
+    if(this.storyClient.active)return this.storyClient.readStory(view);
     const runtime=this.running,accepted=this.accepted;
     if(!runtime||runtime.terminal||!accepted||runtime!==this.running)throw Error('No working Story runtime');
     const capability=runtime.storyCapability;
@@ -182,6 +189,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     replacement.settling--;replacement.synchronize?.();
   }
   acceptedDocument() {
+    if(this.storyClient.active)return this.storyClient.acceptedDocument();
     const runtime = this.snapshot.authoring;
     if (this.busy || !this.source || !runtime || runtime.playback === 'failed' || this.pending.size) {
       throw Error('Wait for a working preview before saving a look.');
@@ -196,7 +204,14 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       : {sourceHash: runtime.revisionId, schema: state.controlSchema, schemaHash: state.controlSchemaHash, values: state.controls};
     return createSceneDocument(structuredClone(this.source), {...DEFAULT_OUTPUT, ...runtime.output}, controls, [], state.controlAnimations ?? [],normalizeTempoSettings({bpm:runtime.tempo?.bpm??120}),this.accepted?.story??null,this.accepted?.retainStoryVersion??false);
   }
+  async submitDocument(document:StorySceneDocumentV7){
+    if(this.running&&this.storyClient.ownedGenerations)throw Error('Wait for the previous Story generation to finish cleanup');
+    if(this.busy)throw Error('A visual build is already running');this.cancelAutomaticRetry();this.busy=true;
+    try{await this.storyClient.submitDocument(document);if(this.running){this.stop(this.running,'Story scene replaced the visual');this.running.canvas.remove();this.running=null;}this.accepted=null;this.source=null;}finally{this.busy=false;}
+  }
+  selectVisual(id:string){this.storyClient.selectVisual(id);}
   async submit(source: SourceBundle, options:{savedControls?:SavedControlSnapshot;savedControlAnimations?:readonly ControlAnimationBinding[];savedTempo?:SceneTempoSettings;output?:OutputSettings;story?:SceneStoryV1|null}={}): Promise<void> {
+    if(this.storyClient.ownedGenerations>1)throw Error('Wait for Story generation cleanup before changing scene mode');
     if(source.sdkVersion!=='0.1.0'&&source.sdkVersion!=='0.2.0'&&source.sdkVersion!=='0.4.0')throw Error('Unsupported Studio SDK');
     const supportedSdkVersion=source.sdkVersion;
     if(source.sdkVersion==='0.2.0'&&!this.codeDeclaredParameters)throw Error('Code-declared parameters are not enabled in this Studio UI yet');
@@ -261,6 +276,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       }
       await this.start(linked, result.sourceHash,state,migration, {lastFaultAt:null}, playbackIntent.playing, requestedOutput,playbackIntent,
         options.savedControls===undefined&&options.savedControlAnimations===undefined,tempo,tempoSequence,story,storyHash);
+      if(this.storyClient.active)void this.storyClient.deactivate();
       this.previewOutput = requestedOutput;
       this.source = submittedSource;
       let acceptedState=state;const running=this.running;
@@ -271,6 +287,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     finally { if(this.replacementPlayback===playbackIntent)this.replacementPlayback=null;this.busy = false; this.scheduleAutomaticRetry(); }
   }
   private async start(linked: LinkedEnvelope, revisionId: string, state:RuntimeControlState, migration:readonly ControlMigration[]=[],retryPolicy:RetryPolicy={lastFaultAt:null},playingOverride?:boolean, output:Readonly<Pick<OutputSettings,'width'|'height'>>=this.previewOutput,playbackIntent?:ReplacementPlaybackIntent,reconcileRuntime=false,tempo:SceneTempoSettings=normalizeTempoSettings({bpm:this.snapshot.authoring?.tempo?.bpm??120}),tempoSequence=this.snapshot.authoring?.tempoSequence??0,story:SceneStoryV1|null=this.accepted?.story??null,storyHash:string|null=this.accepted?.storyHash??null): Promise<void> {
+    if(this.storyClient.ownedGenerations+(this.running?1:0)>=2)throw Error('Wait for previous Story generation cleanup before starting another preview');
     const compositionState='linkedVersion' in linked&&linked.linkedVersion===5?prepareCompositionControlState(linked.composition):undefined;
     const playing = playingOverride ?? this.snapshot.authoring?.playback === 'playing';
     const canvas = document.createElement('canvas'); canvas.width = output.width; canvas.height = output.height;
@@ -577,6 +594,8 @@ export class StandaloneClient implements StudioClient, PresentationPort {
       throw parsed.error;
     }
     operation = parsed.data;
+    if(this.storyClient.active){if(this.busy&&!this.storyClient.busy)throw Error('Wait for the scene mode change to finish');return this.storyClient.invoke(operation);}
+    if('visualId' in operation.input||'activationId' in operation.input)throw Error('Visual activation guards require a multi-visual Story scene');
     const runtime = this.running, input = operation.input;
     if (this.snapshot.authoring?.authority !== 'studio') throw Error('Authority conflict: Studio cannot control this instance');
     const replacementWrite=this.busy&&this.replacementPlayback&&(
@@ -714,11 +733,13 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     });
   }
   async attach({ target, runtimeKey }: Parameters<PresentationPort['attach']>[0]) {
+    if(this.storyClient.active)return this.storyClient.attach(target,runtimeKey);
     if (!this.running || runtimeKey.instanceId !== this.running.instanceId || runtimeKey.generation !== this.running.generation) throw Error('Preview runtime changed');
     this.target = target; const canvas = this.running.canvas; target.appendChild(canvas);
     return { detach: async () => { if (this.target === target) this.target = null; if (canvas.parentElement === target) canvas.remove(); } };
   }
   async capture(): Promise<{ bytes: ArrayBuffer; metadata: Record<string, unknown> }> {
+    if(this.storyClient.active)return this.storyClient.capture();
     const runtime = this.running;
     if (!runtime || runtime.terminal || this.snapshot.authoring?.playback === 'failed') throw Error('No working visual to capture');
     if ([...this.pending.values()].filter(wait => wait.runtime === runtime && wait.kind === 'capture').length >= 2) throw Error('Capture queue is full; retry after the current capture completes');

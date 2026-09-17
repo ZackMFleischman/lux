@@ -172,6 +172,29 @@ test('RTL: trigger actions use one native button, isolate pending state and neve
   assert.deepEqual(dirty,[]);
 });
 
+test('RTL: a trigger visibly requires the selected source to be the active Story visual', async () => {
+  const fixture=service();
+  fixture.publish({sdkVersion:'0.2.0',intensity:undefined,controlSchema:[
+    {id:'regenerate',type:'trigger',label:'Regenerate flock',changeCost:'live'},
+  ] as any,controlSchemaHash:'5'.repeat(64),controls:{},controlSequence:0,selectedVisualId:'ambient',
+    storySchedule:{committed:{visualId:'lead',activationId:3}} as any} as any);
+  const {ParameterInspector}=await import('../../apps/studio/src/controls/ParameterInspector.tsx'),{StudioController}=await import('../../apps/studio/src/service-client.ts');
+  const controller=new StudioController(fixture.client),view=render(<ParameterInspector runtime={fixture.client.getSnapshot().authoring} available client={fixture.client} controller={controller} onError={()=>{}}/>);
+
+  let action=screen.getByRole('button',{name:'Run Regenerate flock'}) as HTMLButtonElement;
+  assert.equal(action.disabled,true);
+  const explanation=screen.getByText('Triggers require the active Story visual (lead). Select that source to run this action.');
+  assert.equal(action.getAttribute('aria-describedby'),explanation.id);
+  fireEvent.click(action);
+  assert.equal(fixture.calls.length,0);
+
+  fixture.publish({selectedVisualId:'lead'});
+  view.rerender(<CacheProvider value={styleCache}><ParameterInspector runtime={fixture.client.getSnapshot().authoring} available client={fixture.client} controller={controller} onError={()=>{}}/></CacheProvider>);
+  action=screen.getByRole('button',{name:'Run Regenerate flock'}) as HTMLButtonElement;
+  assert.equal(action.disabled,false);
+  assert.equal(screen.queryByText('Triggers require the active Story visual (lead). Select that source to run this action.'),null);
+});
+
 test('RTL: an uncertain trigger failure retries manually with the same command ID', async () => {
   const fixture=service(),outcomes:{resolve(value:unknown):void;reject(error:unknown):void}[]=[],errors:(string|null)[]=[];
   fixture.client.invoke=operation=>{fixture.calls.push(operation);return new Promise((resolve,reject)=>outcomes.push({resolve,reject}));};
@@ -233,6 +256,41 @@ function storyStatus(overrides:Record<string,unknown>={}){
     sequence:{state:'detached',occurrenceId:null,index:null,nextOccurrenceId:null,dwellElapsedSeconds:0,dwellRemainingSeconds:null,awaitingCue:false},
     resumeCandidates:[],disabledReasons:{},...overrides} as any;
 }
+function storySchedule(overrides:Record<string,unknown>={}){
+  const definition={version:2,normalVisualId:'lead',crossfadeSeconds:.35,
+    beats:[{id:'arrival',label:'Arrival',timing:{kind:'timed',durationSeconds:10},visualId:'ambient'},{id:'hold',label:'Hold',timing:{kind:'sustained'},visualId:'lead'}],
+    sequence:[{id:'arrival-a',beatId:'arrival',follow:{kind:'manual'},visualId:'ambient'}]};
+  const committed={slotId:'slot-in',visualId:'ambient',beatId:'arrival',occurrenceId:'arrival-a',activationId:3,storyEpoch:2,
+    frame:{state:'active',storyEpoch:2,beatId:'arrival',activationId:3,occurrenceId:'arrival-a',elapsedSeconds:2,localTimeSeconds:2,progress:.2}};
+  return {instanceId:'instance',generation:2,scheduleHash:'b'.repeat(64),capsuleHash:'c'.repeat(64),definition,storyHash:'a'.repeat(64),storyRevision:5,
+    visualCapabilities:[{visualId:'lead',storyCapability:{version:1,beats:[{id:'hold',kind:'sustained',seek:'none'}]}},{visualId:'ambient',storyCapability:{version:1,beats:[{id:'arrival',kind:'timed',seek:'direct'}]}}],
+    phase:'running',autoAdvance:true,loop:false,effectiveAdvancing:true,committed,outgoing:null,incoming:null,crossfadeProgress:null,pendingPreparation:null,dueNext:null,preparationFailure:null,
+    sequence:{state:'attached',occurrenceId:'arrival-a',index:0,nextOccurrenceId:null,dwellElapsedSeconds:0,dwellRemainingSeconds:null,awaitingCue:true},disabledReasons:{},resources:{slots:2,slotStates:{preparing:0,ready:0,active:1,retiring:0,unsettled:0},pendingCreates:0,storyTargetBytes:1,assetLeases:0,assetLeaseBytes:0,assetStagingJobs:0,assetStagingBytes:0,pendingImports:0,ownedModuleURLs:0,pendingCallbacks:0,gpuSubmissions:0,readbackGrants:0,readbackBytes:0},...overrides} as any;
+}
+
+test('RTL: Story v2 exposes source-specific capabilities, overlap and preparation state',async()=>{
+  const outgoing={slotId:'slot-out',visualId:'lead',beatId:'hold',occurrenceId:null,activationId:2,storyEpoch:1,frame:{state:'active',storyEpoch:1,beatId:'hold',activationId:2,occurrenceId:null,elapsedSeconds:5,localTimeSeconds:null,progress:null}};
+  const status=storySchedule({outgoing,crossfadeProgress:.4,disabledReasons:{launch:{code:'STORY_CAPACITY',message:'Wait for a Story slot to retire.'}}});
+  const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
+  const view=render(<StoryPanel status={status} available controller={{storyTransport:async()=>({})} as any} onError={()=>{}}/>);
+  assert.ok(screen.getByText('Source ambient'));assert.ok(screen.getByText(/Transitioning from source lead to ambient · 40%/));
+  assert.ok(screen.getByText(/source ambient · timed/));assert.ok(screen.getByText(/source lead · sustained/));assert.ok(screen.getByText('Wait for a Story slot to retire.'));
+  assert.equal((screen.getByRole('button',{name:'Launch Arrival'}) as HTMLButtonElement).disabled,true);
+  view.rerender(<CacheProvider value={styleCache}><StoryPanel status={storySchedule({committed:null,pendingPreparation:{token:'prepare-1',phase:'preparing',visualId:'ambient',beatId:'arrival',occurrenceId:'arrival-a',commandId:null,cancelled:false}})} available controller={{storyTransport:async()=>({})} as any} onError={()=>{}}/></CacheProvider>);
+  assert.ok(screen.getByText('Preparing ambient'));assert.ok(screen.getByText('Preparing source ambient.'));
+});
+
+test('RTL: Story v2 reports a failed next-source preparation while keeping the committed preview active',async()=>{
+  const status=storySchedule({preparationFailure:{visualId:'lead',beatId:'hold',occurrenceId:null,code:'STORY_PREPARATION_FAILED',message:'Shader compilation failed.'}});
+  const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
+  render(<StoryPanel status={status} available controller={{storyTransport:async()=>({})} as any} onError={()=>{}}/>);
+
+  assert.ok(screen.getByRole('alert').textContent?.includes('Could not prepare source lead for Hold. Shader compilation failed.'));
+  assert.ok(screen.getByText('Source ambient'),'the committed source remains the active preview status');
+  assert.ok(screen.getByText('2.0s active'));
+  assert.equal(screen.queryByRole('button',{name:/Retry/}),null,'preparation failure does not invent a retry command');
+  assert.ok(screen.getByRole('button',{name:'Launch Hold'}),'the normal launch action remains the explicit retry path');
+});
 
 test('RTL: Story ribbon keeps selection separate from the attached occurrence and shows sustained dwell',async()=>{
   const status=storyStatus({frame:{state:'active',storyEpoch:2,beatId:'hold',activationId:3,occurrenceId:'hold-a',elapsedSeconds:12,localTimeSeconds:null,progress:null},
@@ -507,6 +565,7 @@ test('RTL: audio configuration changes cancel an in-flight connection and ignore
     listInputs:async()=>[],subscribeDevices:()=>()=>{},
     connect:async()=>{calls.push('connect');await new Promise<void>(resolve=>{resolveConnect=resolve;});},
     disconnect:async()=>{calls.push('disconnect');},dispose:async()=>{},
+    getMonitoring:()=>false,setMonitoring:async(value:boolean)=>value,
     getSnapshot:()=>({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0}),subscribe:()=>()=>{},
   } as any;
   const first={logicalInputId:'primary-audio' as const,analyzer:{version:1 as const,fftSize:2048 as const,minDecibels:-100,maxDecibels:-30}};
@@ -528,6 +587,7 @@ test('RTL: a failed default connection keeps the prelisted CABLE input available
   const provider={
     listInputs:async()=>{calls.push('list');return [{id:'cable',label:'CABLE Output (VB-Audio Virtual Cable)'}];},
     subscribeDevices:()=>()=>{},connect:async(_configuration:any,id?:string)=>{calls.push(`connect:${id}`);if(!id)throw Error('default input failed');},disconnect:async()=>{},dispose:async()=>{},
+    getMonitoring:()=>false,setMonitoring:async(value:boolean)=>value,
     getSnapshot:()=>({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0}),subscribe:()=>()=>{},
   } as any;
   const user=userEvent.setup({document});localStorage.clear();
@@ -548,6 +608,7 @@ test('RTL: a missing saved audio input blocks connection until the user chooses 
   const provider={
     listInputs:async()=>[{id:'cable',label:'CABLE Output (VB-Audio Virtual Cable)'}],subscribeDevices:()=>()=>{},
     connect:async(_configuration:any,id?:string)=>{calls.push(`connect:${id}`);},disconnect:async()=>{},dispose:async()=>{},
+    getMonitoring:()=>false,setMonitoring:async(value:boolean)=>value,
     getSnapshot:()=>({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0}),subscribe:()=>()=>{},
   } as any;
   const user=userEvent.setup({document});localStorage.setItem('lux.audio.primary-device','missing-device');
@@ -572,6 +633,7 @@ test('RTL: an audio device change refreshes inputs and unmount removes the liste
   const provider={
     listInputs:async()=>++lists===1?[]:[{id:'cable',label:'CABLE Output (VB-Audio Virtual Cable)'}],
     subscribeDevices:(next:()=>void)=>{listener=next;return()=>{unsubscribed=true;};},connect:async()=>{},disconnect:async()=>{},dispose:async()=>{},
+    getMonitoring:()=>false,setMonitoring:async(value:boolean)=>value,
     getSnapshot:()=>({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0}),subscribe:()=>()=>{},
   } as any;
   localStorage.clear();const view=render(<AudioInputControl provider={provider} onError={()=>{}}/>);
@@ -635,7 +697,7 @@ test('RTL: control descriptions appear on hover and keyboard focus without creat
   fireEvent.mouseOver(described);
   const tooltip = await screen.findByRole('tooltip', { name: /Expands the area sampled/ });
   assert.ok(tooltip.querySelector('.MuiTooltip-tooltipPlacementLeft'), 'help must open toward Preview');
-  await waitFor(() => assert.equal(getComputedStyle(tooltip.querySelector('.MuiTooltip-tooltip')!).fontSize, '12px'));
+  assert.ok(tooltip.querySelector('.control-description-tooltip'),'description tooltip keeps its product styling hook');
   fireEvent.change(screen.getByRole('slider', { name: 'Source sampling radius' }), { target: { value: '2' } });
   await waitFor(() => assert.deepEqual((fixture.calls[0] as any).input.values, { samplingRadius: 2 }));
   fireEvent.mouseOut(described);

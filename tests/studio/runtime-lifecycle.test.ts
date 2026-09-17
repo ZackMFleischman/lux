@@ -403,7 +403,7 @@ test('Look activation uses saved resolution only after success and snapshots acc
  const failed=WorkerFixture.all.at(-1)!;assert.equal(failed.init.settings.width,1280);failed.reply({type:'failure',message:'bad look'});await assert.rejects(loading);
  assert.deepEqual(f.client.acceptedDocument(),baseline);assert.equal(old.terminated,false);
  const retry=f.client.submit({...source,files:{'visual.ts':'new source'}},{output});await f.flush();WorkerFixture.all.at(-1)!.reply({type:'ready'});await retry;
- const accepted=f.client.acceptedDocument();assert.equal(accepted.settings.width,1280);assert.equal(accepted.settings.height,720);assert.equal(accepted.source.files['visual.ts'],'new source');
+ const accepted=f.client.acceptedDocument();assert.equal(accepted.settings.width,1280);assert.equal(accepted.settings.height,720);assert.notEqual(accepted.version,7);if(accepted.version===7)throw Error('Expected single visual');assert.equal(accepted.source.files['visual.ts'],'new source');
  WorkerFixture.all.forEach(worker => worker.terminate()); f.scheduled.clear();
 });
 

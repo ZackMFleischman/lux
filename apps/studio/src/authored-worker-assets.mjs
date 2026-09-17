@@ -4,10 +4,14 @@ import {validateSingleImageProfile} from '../../../packages/runtime-contracts/sr
 import {snapshotRecord} from '../../../apps/build-worker/src/source-policy.mjs';
 import {normalizeImageCompositionProfile} from '../../../packages/runtime-contracts/src/composition-profile.mjs';
 import {normalizeStoryCapability,validateStoryAgainstCapability,canonicalSceneStoryJson} from '../../../packages/runtime-contracts/src/story.mjs';
+import {canonicalControlSchemaJson} from '../../../packages/runtime-contracts/src/parameters.mjs';
+import {prepareWorkerVisualControlFactory} from './controls/worker-control-state.mjs';
+import {prepareStoryAssetLeaseFactory} from './assets/story-asset-leases.mjs';
+import {verifyStoryGenerationPreparation} from './story/story-generation-manifest.mjs';
 
 // This module is loaded in the pristine worker realm. All admission and private
 // store construction finish before invoking the trusted submitted-code importer.
-const freeze=Object.freeze;
+const freeze=Object.freeze,RuntimeError=Error,RuntimeMap=Map,call=Function.prototype.call,mapGet=call.bind(Map.prototype.get),mapSet=call.bind(Map.prototype.set);
 const digest=crypto.subtle.digest.bind(crypto.subtle);
 async function sha256(bytes) {
   const hash=new Uint8Array(await digest('SHA-256',bytes));
@@ -56,3 +60,23 @@ export async function prepareAuthoredModule(message) {
 }
 
 export async function loadAuthoredModule(message,importModule){return (await prepareAuthoredModule(message)).import(importModule);}
+
+/** Complete pristine per-visual admission. Shared module imports happen later. */
+export async function prepareAuthoredGenerationFactories(message,ports){
+ const {identity:rawIdentity,capsule}=message??{},identity=rawIdentity&&freeze({...rawIdentity}),prepared=await verifyStoryGenerationPreparation({manifest:message?.manifest,initialVisualStates:message?.initialVisualStates},capsule),{manifest,initialVisualStates}=prepared;
+ if(!identity||!capsule||identity.capsuleHash!==capsule.capsuleHash||identity.scheduleHash!==manifest.scheduleHash||identity.generation<1)throw new RuntimeError('Invalid authored generation identity');
+ if(!Array.isArray(capsule.visuals)||!Array.isArray(manifest.visuals)||capsule.visuals.length!==manifest.visuals.length||capsule.visuals.length!==initialVisualStates.length)throw new RuntimeError('Authored generation visual sets differ');
+ const states=new RuntimeMap();for(let index=0;index<initialVisualStates.length;index++){const state=initialVisualStates[index];if(!state||typeof state.visualId!=='string'||mapGet(states,state.visualId))throw new RuntimeError('Invalid authored generation initial state');mapSet(states,state.visualId,state);}
+ const visuals=new RuntimeMap();
+ for(let index=0;index<capsule.visuals.length;index++){
+  const linked=capsule.visuals[index],bound=manifest.visuals[index],initial=mapGet(states,linked.id);
+  if(!bound||bound.visualId!==linked.id||bound.entry!==linked.entry||bound.sourceHash!==linked.sourceHash||bound.bundleHash!==linked.bundleHash||bound.controlSchemaHash!==linked.controlSchemaHash||bound.assetSetHash!==linked.assetSetHash||bound.storyCapabilityHash!==(linked.artifactVersion===6?linked.storyCapabilityHash:null)||!initial||initial.sdkVersion!=='0.2.0'||initial.controlSchemaHash!==linked.controlSchemaHash||canonicalControlSchemaJson(initial.controlSchema)!==canonicalControlSchemaJson(linked.controls))throw new RuntimeError(`Authored generation identity mismatch for ${linked.id}`);
+  let entryCodeHash;for(let fileIndex=0;fileIndex<capsule.files.length;fileIndex++)if(capsule.files[fileIndex].path===linked.entry){entryCodeHash=capsule.files[fileIndex].codeHash;break;}
+  if(bound.entryCodeHash!==entryCodeHash)throw new RuntimeError(`Authored generation entry mismatch for ${linked.id}`);
+  const admission=linked.artifactVersion===6?freeze({kind:'story',sdkVersion:'0.2.0',storyCapability:linked.storyCapability,storyCapabilityHash:linked.storyCapabilityHash,controls:linked.controls,controlSchemaHash:linked.controlSchemaHash}):freeze({kind:'visual',sdkVersion:'0.2.0',controls:linked.controls,controlSchemaHash:linked.controlSchemaHash});
+  const controls=await prepareWorkerVisualControlFactory(initial,admission);mapSet(visuals,linked.id,freeze({visualId:linked.id,admission,controls}));
+ }
+ const assets=await prepareStoryAssetLeaseFactory({identity,capsule,broker:ports?.broker,decoder:ports?.decoder,...(ports?.requestId?{requestId:ports.requestId}:{})});
+ return freeze({preparation:prepared,visual(id){const result=mapGet(visuals,id);if(!result)throw new RuntimeError('Unknown authored generation visual');return result;},assets,
+  status(){return freeze({identity,assetResources:assets.status()});},dispose(){return assets.dispose();}});
+}

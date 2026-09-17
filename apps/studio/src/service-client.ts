@@ -1,3 +1,4 @@
+import type {StoryScheduleStatus} from './controls/story-schedule.mjs';
 import type { RuntimeKey, OutputSettings } from '../../../packages/runtime-contracts/src/index.ts';
 import type { ControlValues, ControlMigration } from '../../../packages/runtime-contracts/src/parameters.mjs';
 import { canonicalControlSchemaJson,isNumberControlDefinition, normalizeControlSchema, validateControlSnapshot, validateControlPatch } from '../../../packages/runtime-contracts/src/parameters.mjs';
@@ -18,7 +19,7 @@ export type {SceneStoryV1,StoryCapabilityV1,StoryFrame} from '../../../packages/
  * the status adapter, never uncalibrated GPU/process monotonic ticks. */
 export type Metric = Readonly<{ value: number; sampledAtMs: number; coverage: number }>;
 export type TriggerReceipt=Readonly<{result:'applied';commandId:string;controlId:string;nodePath:NodePath;sequence:number;frameId:string;timeSeconds:number}>;
-export type TriggerCommand=Readonly<{requestId:string;commandId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string;expectedControlSchemaHash:string;controlId:string;nodePath?:NodePath}>;
+export type TriggerCommand=Readonly<{visualId?:string;activationId?:number;requestId:string;commandId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string;expectedControlSchemaHash:string;controlId:string;nodePath?:NodePath}>;
 export function isUncertainTriggerError(error:unknown):boolean{return !!error&&typeof error==='object'&&'code' in error&&(error as {code?:unknown}).code==='TRIGGER_TIMEOUT';}
 export type StoryTransportAction=
  | Readonly<{action:'launch';beatId:string}>|Readonly<{action:'start';occurrenceId?:string}>|Readonly<{action:'pause'}>|Readonly<{action:'play'}>
@@ -29,14 +30,15 @@ export type StoryRuntimeStatus=Readonly<{definition:SceneStoryV1;capability:Stor
  resumeCandidates:readonly string[];disabledReasons:Readonly<Partial<Record<StoryTransportAction['action'],Readonly<{code:string;message:string;candidateOccurrenceIds?:readonly string[]}>>>>}>;
 export type StoryTransportCommand=Readonly<{requestId:string;commandId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string;expectedStoryHash:string;expectedStoryRevision:number}>&StoryTransportAction;
 export type StoryTransportReceipt=Readonly<{result:'applied';commandId:string;action:StoryTransportAction['action'];storyRevision:number;frameId:string;timeSeconds:number;story:StoryFrame}>;
-export type StoryTransportResult=Readonly<{receipt:StoryTransportReceipt;currentStatus:StoryRuntimeStatus}>;
+export type StoryTransportResult=Readonly<{receipt:StoryTransportReceipt;currentStatus:StoryRuntimeStatus|StoryScheduleStatus}>;
 export function isUncertainStoryError(error:unknown):boolean{return !!error&&typeof error==='object'&&'code' in error&&(error as {code?:unknown}).code==='STORY_TIMEOUT';}
 export type RuntimeView = RuntimeKey & Readonly<{
   revisionId: string; sceneName: string; authority: 'studio' | 'host';
   playback: 'playing' | 'paused' | 'starting' | 'failed';
   clockEpoch: number; timeSeconds?:number; frameId: string | null; controlMigration?: readonly ControlMigration[];
   triggerSequence?:number;latestTriggerReceipt?:TriggerReceipt;
-  story?:StoryRuntimeStatus;
+  story?:StoryRuntimeStatus;storySchedule?:StoryScheduleStatus;
+  visualControlMigrations?:readonly (ControlMigration & Readonly<{visualId:string}>)[];selectedVisualId?:string;visualStates?:readonly (RuntimeControlState & Readonly<{visualId:string}>)[];
   tempo?:TempoSnapshot;tempoSequence?:number;
   output: Readonly<Pick<OutputSettings, 'width' | 'height'>>;
   fault: Readonly<{ code: string; message: string }> | null;
@@ -56,6 +58,7 @@ export function getRuntimeControlState(runtime:RuntimeView):RuntimeControlState 
 /** Saved visual edits exclude playback and sampled animation values. */
 export function runtimeEditSignature(runtime: RuntimeView | null): string | null {
   if (!runtime) return null;
+  if(runtime.visualStates)return JSON.stringify({visuals:runtime.visualStates.map(row=>({visualId:row.visualId,controls:row.controls,animations:row.controlAnimations??[]})),tempo:{bpm:runtime.tempo?.bpm??120},output:runtime.output});
   const state = getRuntimeControlState(runtime);
   return JSON.stringify({controls: state.controls, nodes: state.nodeControls?.nodes,
     animations: state.controlAnimations ?? [],tempo:{bpm:runtime.tempo?.bpm??120}, output: runtime.output});
@@ -74,11 +77,11 @@ export type StudioOperation =
   | { name: 'lux.node.parameters.set'; input: { requestId: string; instanceId: string; expectedGeneration: number;
       expectedRevisionId: string; expectedControlSchemaHash:string; nodePath:NodePath; values:ControlValues; mode:'live' } }
   | { name: 'lux.parameters.set'; input: { requestId: string; instanceId: string; expectedGeneration: number;
-      expectedRevisionId: string; expectedControlSchemaHash?:string; values: ControlValues; mode: 'live' } }
+      expectedRevisionId: string; expectedControlSchemaHash?:string; visualId?:string; values: ControlValues; mode: 'live' } }
   | { name: 'lux.node.animation.set'; input: { requestId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string;
-      expectedControlSchemaHash:string;nodePath:NodePath;controlId:string;animation:ControlAnimationBinding|null;restart?:boolean } }
+      expectedControlSchemaHash:string;visualId?:string;nodePath:NodePath;controlId:string;animation:ControlAnimationBinding|null;restart?:boolean } }
   | { name: 'lux.node.variation.set'; input: { requestId:string;instanceId:string;expectedGeneration:number;expectedRevisionId:string;
-      expectedControlSchemaHash:string;nodePath:NodePath;controlId:string;variation:Readonly<{distribution:'random'|'centered'|'spread';amount:number;enabled:boolean}>|null } }
+      expectedControlSchemaHash:string;visualId?:string;nodePath:NodePath;controlId:string;variation:Readonly<{distribution:'random'|'centered'|'spread';amount:number;enabled:boolean}>|null } }
   | { name: 'lux.playback'; input: { requestId: string; instanceId: string; expectedGeneration: number; action: 'play' | 'pause' | 'reset' } }
   | { name: 'lux.runtime.restart'; input: { requestId: string; instanceId: string; expectedGeneration: number } }
   | { name: 'lux.preview.resize'; input: { requestId: string; instanceId: string; expectedGeneration: number; width: number; height: number } }
@@ -137,7 +140,7 @@ export class StudioController {
     const definitionHash=flat?state.controlSchemaHash:node!.definitionHash,schemaHash=flat?state.controlSchemaHash:node!.schemaHash;
     if(animation&&(JSON.stringify(animation.nodePath)!==JSON.stringify(nodePath)||animation.controlId!==controlId||animation.definitionHash!==definitionHash||animation.schemaHash!==schemaHash))throw Error('Animation target identity changed');
     return this.client.invoke({name:'lux.node.animation.set',input:{requestId:this.requestId(),instanceId:target.instanceId,expectedGeneration:target.generation,
-      expectedRevisionId:target.revisionId,expectedControlSchemaHash:schemaHash,nodePath:[...nodePath],controlId,animation,...(restart?{restart:true}:{})}});
+      expectedRevisionId:target.revisionId,expectedControlSchemaHash:schemaHash,...(target.selectedVisualId?{visualId:target.selectedVisualId}:{}),nodePath:[...nodePath],controlId,animation,...(restart?{restart:true}:{})}});
   }
   async setNodeVariation(nodePath:NodePath,controlId:string,variation:Readonly<{distribution:'random'|'centered'|'spread';amount:number;enabled:boolean}>|null):Promise<unknown>{
     const target=this.target(),state=getRuntimeControlState(target),node=target.nodeControls?.nodes.find(row=>JSON.stringify(row.nodePath)===JSON.stringify(nodePath));
@@ -148,25 +151,26 @@ export class StudioController {
     if(variation&&!isNumberControlDefinition(definition!))throw Error('Only number controls support per-instance variation');
     const schemaHash=flat?state.controlSchemaHash:node!.schemaHash;
     return this.client.invoke({name:'lux.node.variation.set',input:{requestId:this.requestId(),instanceId:target.instanceId,expectedGeneration:target.generation,
-      expectedRevisionId:target.revisionId,expectedControlSchemaHash:schemaHash,nodePath:[...nodePath],controlId,variation}});
+      expectedRevisionId:target.revisionId,expectedControlSchemaHash:schemaHash,...(target.selectedVisualId?{visualId:target.selectedVisualId}:{}),nodePath:[...nodePath],controlId,variation}});
   }
   async setParameters(values:ControlValues):Promise<unknown> {
     const target = this.target();
     const state=getRuntimeControlState(target), patch=validateControlPatch(state.controlSchema,values);
     const pending=this.latestParameters?.input;
-    if(pending && (pending.instanceId!==target.instanceId || pending.expectedGeneration!==target.generation || pending.expectedRevisionId!==target.revisionId || pending.expectedControlSchemaHash!==(state.sdkVersion!=='0.1.0'?state.controlSchemaHash:undefined))) throw Error('Runtime target changed while parameters were queued');
+    if(pending && (pending.instanceId!==target.instanceId || pending.expectedGeneration!==target.generation || pending.expectedRevisionId!==target.revisionId || pending.expectedControlSchemaHash!==(state.sdkVersion!=='0.1.0'?state.controlSchemaHash:undefined) || pending.visualId!==target.selectedVisualId)) throw Error('Runtime target changed while parameters were queued');
     this.latestParameters = { name: 'lux.parameters.set', input: {
       requestId: this.requestId(), instanceId: target.instanceId, expectedGeneration: target.generation,
       expectedRevisionId: target.revisionId,...(state.sdkVersion!=='0.1.0'?{expectedControlSchemaHash:state.controlSchemaHash}:{}),
-      values: {...pending?.values,...patch}, mode: 'live',
+      ...(target.selectedVisualId?{visualId:target.selectedVisualId}:{}),values: {...pending?.values,...patch}, mode: 'live',
     } };
     return this.startParameterDrain();
   }
   async fireTrigger(controlId:string,commandId:string):Promise<unknown>{
     const target=this.target(),state=getRuntimeControlState(target),definition=state.controlSchema.find(row=>row.id===controlId);
     if(!definition||(definition as {type:string}).type!=='trigger')throw Error('Scene trigger is unavailable');
+    const activation=target.storySchedule?.committed;if(target.selectedVisualId&&activation?.visualId!==target.selectedVisualId)throw Error('Triggers require the active Story visual');
     return this.client.invoke({name:'lux.trigger.fire',input:{requestId:this.requestId(),commandId,instanceId:target.instanceId,expectedGeneration:target.generation,
-      expectedRevisionId:target.revisionId,expectedControlSchemaHash:state.controlSchemaHash,controlId}});
+      expectedRevisionId:target.revisionId,expectedControlSchemaHash:state.controlSchemaHash,controlId,...(target.selectedVisualId?{visualId:target.selectedVisualId,activationId:activation!.activationId}:{})}});
   }
   async fireNodeTrigger(nodePath:NodePath,controlId:string,commandId:string):Promise<unknown>{
     const target=this.target();if(target.sdkVersion!=='0.4.0'||!target.composition)throw Error('Composition node trigger is unavailable');
@@ -177,7 +181,7 @@ export class StudioController {
       expectedRevisionId:target.revisionId,expectedControlSchemaHash:schemaHash,nodePath:[...nodePath],controlId}});
   }
   async storyTransport(action:StoryTransportAction,commandId:string,expectedStoryRevision?:number):Promise<StoryTransportResult>{
-    const target=this.target(),story=target.story;if(!story)throw Error('This visual has no Story');
+    const target=this.target(),story=target.storySchedule??target.story;if(!story)throw Error('This visual has no Story');
     return this.client.invoke({name:'lux.story.transport',input:{requestId:this.requestId(),commandId,instanceId:target.instanceId,expectedGeneration:target.generation,
       expectedRevisionId:target.revisionId,expectedStoryHash:story.storyHash,expectedStoryRevision:expectedStoryRevision??story.storyRevision,...action}}) as Promise<StoryTransportResult>;
   }

@@ -87,7 +87,9 @@ test('no-overwrite creation is atomic and later token saves remain available', a
     const saved=await store.saveAs(path,document,{overwrite:false});
     await assert.rejects(new SceneFileStore().saveAs(path,document,{overwrite:false}),/already exists/);
     await store.save(saved.token,{...document,controls:{intensity:0.3}});
-    const reopened=(await store.open(path)).document.controls;
+    const reopenedDocument=(await store.open(path)).document;
+    assert.equal(reopenedDocument.version,1);
+    const reopened=reopenedDocument.controls;
     assert.equal('intensity' in reopened?reopened.intensity:undefined,0.3);
   } finally { await rm(folder,{recursive:true,force:true}); }
 });

@@ -276,6 +276,13 @@ acceptance, or supply GPU/UI proof.
 
 ## Implementation contract addendum
 
+The first native probe subsequently failed across independently bundled Three/TSL
+instances. The [shared linker amendment](story-shared-linker-amendment.md) replaces
+the standalone-envelope packaging assumption and narrows the ordering gate for
+independent pure schema work. Its capsule identity and quota rules supersede the
+corresponding executable-packaging details below; Scene/transport/resource rules
+are unchanged.
+
 The coordinator requested this addendum to turn the rulings above into mandatory
 implementation choices. It is planning, not a further review or acceptance round.
 Where the initial proposal leaves alternatives, use this contract.

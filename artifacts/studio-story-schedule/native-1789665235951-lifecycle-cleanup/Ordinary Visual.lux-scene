@@ -1,0 +1,23 @@
+{
+  "format": "lux-scene",
+  "version": 3,
+  "source": {
+    "sdkVersion": "0.2.0",
+    "entry": "visual.ts",
+    "files": {
+      "visual.ts": "import {defineVisual} from '@lux/visual-sdk';\nimport {Scene,Mesh,PlaneGeometry,MeshBasicNodeMaterial,OrthographicCamera} from 'three/webgpu';\nimport {vec4} from 'three/tsl';\nexport default defineVisual({controls:{},async create(context){const material=new MeshBasicNodeMaterial();material.fragmentNode=vec4(0.08,0.12,0.18,1);const geometry=new PlaneGeometry(2,2),mesh=new Mesh(geometry,material),scene=new Scene();scene.add(mesh);const camera=new OrthographicCamera(-1,1,1,-1,0,1);return {update(){},render(target){return context.renderer.render(scene,camera,target);},reset(){},dispose(){geometry.dispose();material.dispose();}};}});"
+    }
+  },
+  "settings": {
+    "width": 640,
+    "height": 360,
+    "fps": 60,
+    "seed": 0
+  },
+  "controls": {
+    "sourceHash": "156afe7be3168eb354c40e68f349eed0ec1d1be4c0fe4544070a3d95f4936df8",
+    "schema": [],
+    "schemaHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "values": {}
+  }
+}

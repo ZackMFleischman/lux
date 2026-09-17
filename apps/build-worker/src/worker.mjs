@@ -105,6 +105,11 @@ async function main() {
   }
   const definitionType=composition?'CompositionDefinition':component?'ComponentDefinition':'VisualDefinition';
   await writeFile(join(workspace, '__lux_check.ts'), `import visual from './source/${source.entry}';\nimport type { ${definitionType} } from '@lux/visual-sdk';\nconst checked: ${definitionType} = visual;\nexport { checked };\n`);
+  const sharedDependencyChecks=[];
+  if(source.sdkVersion==='0.2.0'){
+    await writeFile(join(workspace,'__lux_shared_three_check.ts'),`import 'three/webgpu';\nimport 'three/tsl';\n`);
+    sharedDependencyChecks.push('__lux_shared_three_check.ts');
+  }
   const zod = JSON.parse(await readFile(join(dependencyRoot, 'zod/package.json'), 'utf8'));
   const config = { compilerOptions: { target: 'ES2023', module: 'ESNext', moduleResolution: 'Bundler', strict: true,
     types: [], lib: ['ES2023', 'DOM'], skipLibCheck: true, noEmitOnError: true, sourceMap: true, inlineSources: true,
@@ -112,7 +117,7 @@ async function main() {
     paths: { '@lux/visual-sdk': ['./types/sdk.ts'], zod: [join(dependencyRoot, 'zod', zod.types)],
       'three/webgpu': [join(dependencyRoot, '@types/three/build/three.webgpu.d.ts')],
       'three/tsl': [join(dependencyRoot, '@types/three/build/three.tsl.d.ts')] } },
-    files: [...Object.keys(source.files).map(p => `source/${p}`), '__lux_check.ts'] };
+    files: [...Object.keys(source.files).map(p => `source/${p}`), '__lux_check.ts',...sharedDependencyChecks] };
   await writeFile(join(workspace, 'tsconfig.json'), JSON.stringify(config));
   const { default: getExePath } = await import(pathToFileURL(join(dependencyRoot, 'typescript/lib/getExePath.js')).href);
   const executable = getExePath();

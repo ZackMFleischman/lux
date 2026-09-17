@@ -54,5 +54,6 @@ test('64 animation bindings evaluate and survive scene save/reopen with all base
  assert.equal(worker.values(0).control63,1.5);
  const document=createSceneDocument({sdkVersion:'0.2.0',entry:'visual.ts',files:{'visual.ts':'export {}'}},DEFAULT_OUTPUT,{sourceHash:'a'.repeat(64),schema,schemaHash,values},[],bindings);
  const reopened=await verifySceneDocument(JSON.parse(JSON.stringify(document)));
+ assert.equal(reopened.version,3);
  assert.deepEqual(reopened.controlAnimations,bindings);assert.deepEqual(reopened.controls,document.controls);
 });

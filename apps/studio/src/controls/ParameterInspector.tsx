@@ -85,11 +85,12 @@ function ParameterRow({definition,controlId,description,displayLabel,applied,eff
 }
 
 
-function TriggerParameterRow({definition,controlId,description,displayLabel,owner,available,client,controller,onError,nodePath}:{definition:TriggerControlDefinition;controlId:string;description?:string;displayLabel:string;owner:string|null;available:boolean;client:StudioClient;controller:StudioController;onError:(error:string|null)=>void;nodePath?:NodePath}){
+function TriggerParameterRow({definition,controlId,description,displayLabel,owner,available,disabledReason,client,controller,onError,nodePath}:{definition:TriggerControlDefinition;controlId:string;description?:string;displayLabel:string;owner:string|null;available:boolean;disabledReason?:string;client:StudioClient;controller:StudioController;onError:(error:string|null)=>void;nodePath?:NodePath}){
   const [state,setState]=useState<'ready'|'pending'|'retry'>('ready'),retryCommandId=useRef<string|null>(null),intent=useRef<object|null>(null);
+  const disabledDescriptionId=useId();
   useEffect(()=>()=>{intent.current=null;},[]);
   async function activate(){
-    if(intent.current||state==='pending'||!available||!owner||parameterOwner(client.getSnapshot().authoring,nodePath)!==owner)return;
+    if(intent.current||state==='pending'||!available||!owner||disabledReason||parameterOwner(client.getSnapshot().authoring,nodePath)!==owner)return;
     const commandId=retryCommandId.current??crypto.randomUUID(),pending={};intent.current=pending;setState('pending');onError(null);
     try{
       if(nodePath?.length)await controller.fireNodeTrigger(nodePath,controlId,commandId);else await controller.fireTrigger(controlId,commandId);
@@ -106,8 +107,8 @@ function TriggerParameterRow({definition,controlId,description,displayLabel,owne
   const describedLabel=controlDescription?<Tooltip title={controlDescription} placement="left-start" disableInteractive slotProps={{tooltip:{className:'control-description-tooltip'}}}>{label}</Tooltip>:label;
   const verb=state==='pending'?'Running':state==='retry'?'Retry':'Run';
   return <div className="parameter-row parameter-row-trigger" data-control-id={definition.id}><div className="parameter-heading">{describedLabel}
-    <Button className="parameter-trigger-button" size="small" variant="outlined" disabled={!available||!owner} aria-label={`${verb} ${displayLabel}`} aria-busy={state==='pending'||undefined} aria-disabled={state==='pending'||undefined} onClick={()=>void activate()}>{state==='pending'?'Running…':state==='retry'?'Retry':'Run'}</Button>
-  </div></div>;
+    <Button className="parameter-trigger-button" size="small" variant="outlined" disabled={!available||!owner||!!disabledReason} aria-label={`${verb} ${displayLabel}`} aria-busy={state==='pending'||undefined} aria-disabled={state==='pending'||!!disabledReason||undefined} aria-describedby={disabledReason?disabledDescriptionId:undefined} onClick={()=>void activate()}>{state==='pending'?'Running…':state==='retry'?'Retry':'Run'}</Button>
+  </div>{disabledReason&&<p className="hint parameter-trigger-disabled" id={disabledDescriptionId}>{disabledReason}</p>}</div>;
 }
 
 function TypedParameterRow({definition,controlId,description,displayLabel,applied,owner,available,client,controller,onError,edits,nodePath}:{definition:BooleanControlDefinition|EnumControlDefinition;controlId:string;description?:string;displayLabel:string;applied:boolean|string;owner:string|null;available:boolean;client:StudioClient;controller:StudioController;onError:(error:string|null)=>void;edits?:ControlEdits;nodePath?:NodePath}){
@@ -145,12 +146,15 @@ export function ParameterInspector({runtime,available,client,controller,onError,
   const occurrence=nodePath?compositionOccurrence(runtime,nodePath):undefined;
   if(nodePath&&!occurrence){const issues=runtime.controlAnimationIssues?.filter(row=>samePath(row.nodePath,nodePath))??[];return <><p className="hint">This node is no longer available. Select another node.</p>{issues.map(row=><p key={`${row.controlId}:${row.index}`} role="alert">Animation for {row.controlId} is disabled. {row.message}</p>)}</>;}
   const publicState=getRuntimeControlState(runtime),schema=nodePath?(occurrence?.metadata.controls??[]):publicState.controlSchema,unselectedIssues=nodePath?[]:runtime.controlAnimationIssues??[];
+  const committedVisual=runtime.storySchedule?.committed?.visualId,triggerDisabledReason=!nodePath?.length&&runtime.storySchedule&&runtime.selectedVisualId&&committedVisual!==runtime.selectedVisualId
+    ?committedVisual?`Triggers require the active Story visual (${committedVisual}). Select that source to run this action.`:'Triggers are unavailable until a Story visual is active.'
+    :undefined;
   const counts=new Map<string,number>();for(const definition of schema)counts.set(definition.label,(counts.get(definition.label)??0)+1);const display=(d:ControlDefinition)=>counts.get(d.label)!>1?`${d.id} · ${d.label}`:d.label;
   const renderControl=(definition:ControlDefinition)=>{
     const target=compositionControlTarget(runtime,nodePath??[],definition.id),targetNode=target?visualControlNode(runtime,target.nodePath):undefined,effectiveNode=target?runtime.effectiveNodeControls?.nodes.find(row=>samePath(row.nodePath,target.nodePath)):undefined;
     if(nodePath&&(!target||!targetNode))return <p className="hint" key={definition.id}>This control is no longer available. Rebuild or select another node.</p>;
     const controlId=target?.controlId??definition.id,owner=parameterOwner(runtime,target?.nodePath);
-    if(definition.type==='trigger')return <TriggerParameterRow key={`${selectionOwner}:${definition.id}`} definition={definition} controlId={controlId} description={occurrence?.metadata.controlDescriptions[definition.id]} displayLabel={display(definition)} owner={owner} available={available} client={client} controller={controller} onError={onError} nodePath={target?.nodePath}/>;
+    if(definition.type==='trigger')return <TriggerParameterRow key={`${selectionOwner}:${definition.id}`} definition={definition} controlId={controlId} description={occurrence?.metadata.controlDescriptions[definition.id]} displayLabel={display(definition)} owner={owner} available={available} disabledReason={triggerDisabledReason} client={client} controller={controller} onError={onError} nodePath={target?.nodePath}/>;
     const applied=targetNode?.values[controlId]??publicState.controls[definition.id]!,animation=runtime.controlAnimations?.find(row=>!!target&&samePath(row.nodePath,target.nodePath)&&row.controlId===controlId),issue=runtime.controlAnimationIssues?.find(row=>!!target&&samePath(row.nodePath,target.nodePath)&&row.controlId===controlId)?.message;
     const animationUnavailable=target?undefined:'Animation is unavailable because this control does not map to one component control.';
     if(definition.type!=='number')return <TypedParameterRow key={`${selectionOwner}:${definition.id}`} definition={definition} controlId={controlId} description={occurrence?.metadata.controlDescriptions[definition.id]} displayLabel={display(definition)} applied={applied as boolean|string} owner={owner} available={available} client={client} controller={controller} onError={onError} edits={edits} nodePath={target?.nodePath}/>;

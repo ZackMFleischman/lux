@@ -28,7 +28,8 @@ import type { StudioShortcutActions } from './studio-shortcuts.ts';
 type SourceDiagnosticsView = {
   items: readonly SourceDiagnostic[];
   snapshot: SourceSnapshot;
-  onNavigate(target: { path: string; offset: number }): void;
+  visualSnapshots?:Readonly<Record<string,SourceSnapshot>>;
+  onNavigate(target: { path: string; offset: number;visualId?:string }): void;
 };
 
 export function metricText(metric: Metric | null, nowMs: number): { value: string; detail: string } {
@@ -45,7 +46,7 @@ function MetricView({ label, metric, nowMs }: { label: string; metric: Metric | 
 }
 export type StudioProps = {
   controlEdits?: ControlEdits;
-  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; sourceDiagnostics?: SourceDiagnosticsView; libraryPanel?:ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; previewActions?: ReactNode; shortcutActions?: StudioShortcutActions; appError?: string; sourceChanged?: boolean; controlsAvailable?: boolean;
+  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; sourceDiagnostics?: SourceDiagnosticsView; libraryPanel?:ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; previewActions?: ReactNode; shortcutActions?: StudioShortcutActions; appError?: string; sourceChanged?: boolean; controlsAvailable?: boolean;selectedVisualId?:string;
 };
 export function StudioApp(props: StudioProps) {
   return <ThemeProvider theme={studioTheme}><CssBaseline /><StudioLayout {...props} /></ThemeProvider>;
@@ -73,7 +74,7 @@ export function studioStatus(snapshot: StudioSnapshot, sourceProblemCount = 0): 
     : snapshot.authoring ? sentenceCase(snapshot.authoring.playback) : 'No runtime';
   return { build, building: !!active, problems, runtime };
 }
-function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel,sourceDiagnostics,libraryPanel, appCommands, fileMenu, previewActions, shortcutActions, appError, controlEdits, sourceChanged, controlsAvailable }: StudioProps) {
+function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel,sourceDiagnostics,libraryPanel, appCommands, fileMenu, previewActions, shortcutActions, appError, controlEdits, sourceChanged, controlsAvailable,selectedVisualId }: StudioProps) {
   const [toolsHost, setToolsHost] = useState<HTMLElement | null>(null);
   const [transportMenu, setTransportMenu] = useState<HTMLElement | null>(null);
   const view = useMemo(() => createRendererSnapshot(client), [client]);
@@ -262,7 +263,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
         </div></div>
       </Paper>;
   const inspectorPane = <Paper component="aside" square className="inspector" aria-label="Scene controls">
-        <section><Disclosure title="Controls" defaultOpen className="controls-section" badge={<Chip label="LIVE" />}>
+        <section><Disclosure title="Controls" defaultOpen className="controls-section" badge={<span className="controls-badges"><Chip label="LIVE" />{selectedVisualId?<Chip className="selected-visual-chip" label={`Source ${selectedVisualId}`} />:null}</span>}>
           <InspectorBreadcrumb runtime={runtime} path={selectedNodePath} onSelect={setGraphSelection} />
           <ParameterInspector nodePath={selectedNodePath} runtime={runtime} available={!!available} client={client} controller={controller} onError={setError} edits={controlEdits} />
         </Disclosure></section>
@@ -273,13 +274,14 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
         <section><Disclosure title="Runtime"><dl className="identity"><dt>Authoring revision</dt><dd>{runtime?.revisionId ?? 'Unavailable'}</dd><dt>Instance</dt><dd>{runtime?.instanceId ?? 'Unavailable'}</dd><dt>Generation / clock epoch</dt><dd>{runtime ? `${runtime.generation} / ${runtime.clockEpoch}` : 'Unavailable'}</dd><dt>Completed frame</dt><dd>{runtime?.frameId ?? 'Unavailable'}</dd></dl></Disclosure></section>
         <section><Disclosure title="Host output"><p className="host-revision">{snapshot.host?.revisionId ?? 'No host status available'}</p><p className="hint">Authoring changes do not update a pinned host revision.</p></Disclosure></section>
       </Paper>;
-  const storyPane=<Paper component="aside" square className="story-pane"><StoryPanel key={`${runtime?.instanceId??'none'}:${runtime?.generation??0}:${runtime?.story?.storyHash??'none'}`} status={runtime?.story} previewPlayback={runtime?.playback} available={!!available} controller={controller} onError={message=>setError(message)}/></Paper>;
+  const storyStatus=runtime?.storySchedule??runtime?.story;
+  const storyPane=<Paper component="aside" square className="story-pane"><StoryPanel key={`${runtime?.instanceId??'none'}:${runtime?.generation??0}:${storyStatus?.storyHash??'none'}`} status={storyStatus} previewPlayback={runtime?.playback} available={!!available} controller={controller} onError={message=>setError(message)}/></Paper>;
   const openStory=()=>{setMaximizedPanel(null);setStoryRequest(value=>value+1);};
   const openJobs = () => { setMaximizedPanel(null); setJobsRequest(value => value + 1); };
   const jobsPane = <section ref={jobsRef} tabIndex={-1} className="diagnostics" aria-label="Jobs and diagnostics"><div className="section-heading"><h2>Jobs & diagnostics</h2><span className="subtle">{snapshot.jobs.length} jobs · {sourceProblemCount} diagnostics</span></div>
       {runtime?.fault && <p className="error" role="alert"><strong>{runtime.fault.code}</strong> · {runtime.fault.message}</p>}
       {snapshot.jobs.map(job => <p key={job.jobId} className={job.fault ? 'error' : ''}><span className="tag">{job.state}</span> {job.summary}{job.fault && !sourceDiagnosticFault(job.fault, sourceDiagnostics?.items ?? []) && ` · ${job.fault}`}</p>)}
-      {sourceDiagnostics && <ProblemsPanel diagnostics={sourceDiagnostics.items} snapshot={sourceDiagnostics.snapshot} onNavigate={target => {
+      {sourceDiagnostics && <ProblemsPanel diagnostics={sourceDiagnostics.items} snapshot={sourceDiagnostics.snapshot} visualSnapshots={sourceDiagnostics.visualSnapshots} onNavigate={target => {
         sourceDiagnostics.onNavigate(target); openPanelRef.current?.('source');
       }} />}
       {!runtime?.fault && snapshot.jobs.length === 0 && !sourceProblemCount && <p>{snapshot.message ?? 'No jobs reported.'}</p>}
@@ -307,7 +309,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
       <button type="button" className={`status-item status-build ${status.build === 'Build failed' ? 'status-error' : ''}`} aria-busy={status.building} aria-label={`Build status: ${status.build}. Open Jobs and diagnostics`} onClick={openJobs}><span aria-hidden="true" className={status.building ? 'status-spinner' : 'status-build-icon'}>{status.building ? '' : '↻'}</span><span aria-live="polite">{status.build}</span></button>
       <button type="button" className={`status-item ${status.problems ? 'status-error' : ''}`} aria-label={`Problems: ${status.problems}. Open Jobs and diagnostics`} onClick={openJobs}><span aria-hidden="true">!</span><span>{status.problems} {status.problems === 1 ? 'problem' : 'problems'}</span></button>
       {sourceChanged && <span className="status-item" title="Build to apply the source edits to Preview">Source changed · Build to update</span>}
-      {runtime?.story&&<button type="button" className="status-item status-story" aria-label={`Story status: ${storyStatusLabel(runtime.story)}. Open Story`} onClick={openStory}><span aria-hidden="true">Story</span><span aria-live="polite">{storyStatusLabel(runtime.story)}</span></button>}
+      {storyStatus&&<button type="button" className="status-item status-story" aria-label={`Story status: ${storyStatusLabel(storyStatus)}. Open Story`} onClick={openStory}><span aria-hidden="true">Story</span><span aria-live="polite">{storyStatusLabel(storyStatus)}</span></button>}
       {['Connecting', 'Disconnected', 'Failed'].includes(status.runtime) && <button type="button" className="status-item status-runtime status-error" aria-label={`Runtime status: ${status.runtime}. Open Jobs and diagnostics`} onClick={openJobs}>{status.runtime}</button>}
     </footer>
   </div></>;

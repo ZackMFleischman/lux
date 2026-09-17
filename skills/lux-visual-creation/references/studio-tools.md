@@ -63,8 +63,8 @@ Read live tool schemas if available; these are the checked adapter's contracts. 
 | Tool | Arguments and result |
 | --- | --- |
 | `discover` | `{}` → adapter-checkout SDK source, example, shared types, imports, declared capabilities, and compact Library catalog without component source. No running-app handshake; can succeed with Studio closed. |
-| `read` | `{}` → `{ source, draftVersion, ..., status }`. Complete source; don't truncate assets/files when storing it for an edit. |
-| `build` | `{ expectedDraftVersion, source, libraryLinks?: [{ componentId, mountPath }] }` → `{ draftVersion, status }` after resolving linked component source and candidate promotion. The accepted candidate starts playing by default. A later explicit Pause during the operation wins before promotion. This is a complete replacement. Preserve current links from `read.libraryLinks` unless the requested edit changes them. |
+| `read` | `{}` → `{ source, document, draftVersion, ..., status }`. For Scene versions 1–6, `source` is the complete source bundle and `document` is null. For Scene 7, `document` is the complete authoritative multi-visual scene and `source` is only the selected editor view. |
+| `build` | Exactly one of `{ expectedDraftVersion, source, libraryLinks?, story? }` or `{ expectedDraftVersion, document }` → `{ draftVersion, status }` after candidate promotion. The first form replaces one complete source bundle. The second replaces one complete Scene 7 document and cannot include source, libraryLinks, or Story v1 siblings. The accepted candidate starts playing by default. A later explicit Pause during the operation wins before promotion. |
 | `save` | `{ path, expectedDraftVersion, overwrite?: false }` → saved scene name/token. `path` is an absolute `.lux-scene` path. Existing targets require explicit `overwrite: true`; no-overwrite uses exclusive creation and retains external-change protection. The saved document includes current controls and control animations. |
 | `open` | `{ path, expectedDraftVersion, discardDirty?: false }` → opened scene name/token. `path` is an absolute `.lux-scene` path. Dirty source, controls, or library links require `discardDirty: true`. Invalid reads or failed candidate activation retain the existing draft and preview. |
 | `status` | `{}` → snapshot containing `authoring`, which is null before a working runtime exists. |
@@ -94,7 +94,7 @@ Rebuild/restart changes generation; do not automatically reissue an old action
 under new guards. A timeout is uncertain, so retain the command ID for a same-
 generation retry. Save/open, Looks and captured values contain no action history.
 
-For source edits, `structuredClone(current.source)` is a useful starting point. Modify only the intended entries in `.files`; preserve the remaining bundle. A complete-source build is atomic and version guarded. Typing through Playwright or streaming characters into the user's editor has different concurrency behavior and is not the creation path; token-by-token edit visualization is not exposed by the checked MCP API.
+For a version 1–6 source edit, `structuredClone(current.source)` is a useful starting point. Modify only the intended entries in `.files`; preserve the remaining bundle. For Scene 7, start from `structuredClone(current.document)`, locate the intended row in `document.visuals`, and modify that row's source. Preserve every other visual, saved control cache, control animation, output setting, tempo field, and Story field. Never submit the selected `source` as though it were the whole Scene 7. Both build forms are atomic and version guarded. Legacy source bundles keep their existing source-format size limits. A Scene 7 document is limited to 32 MiB; its local bridge request is limited to 34 MiB. Read JSON has a 52 MiB bound for the document, one selected-source view and runtime metadata; the escaped MCP result is limited to 104 MiB. Typing through Playwright or streaming characters into the user's editor has different concurrency behavior and is not the creation path; token-by-token edit visualization is not exposed by the checked MCP API.
 
 Current tools do not expose export, resolution changes or audio inputs. Number, boolean and enum visual-defined controls are available when reported by the running app parameterKinds capability; color controls are not yet supported. Do not claim a tool result performed those actions. Inspect updated discovery for newer capabilities before concluding they remain unavailable.
 
@@ -126,9 +126,10 @@ Read status for the running app's `parameterKinds`, current `controlSchema`, ins
 
 ## Story playback
 
-When the running app reports Story version1 for SDK0.2 root visuals, use
+When the running app reports Story support for SDK0.2 root visuals, use
 `lux.story.read` (`status`, `definition`, or `capabilities`) and the single
 `lux.story.transport` action DTO. Source builds accept an optional complete
 `story` definition: omission preserves it, null removes it. See
 [Story playback](story-playback.md) for guards, sustained/manual behavior,
-sequence occurrences, timed seeking, and return-to-normal examples.
+sequence occurrences, timed seeking, return-to-normal examples, and complete
+Scene 7 multi-visual document builds.

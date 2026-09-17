@@ -16,7 +16,7 @@ export async function exportSceneDocument(request, { prepare = prepareTransportS
   try {
     const scenePath = join(temporary, 'draft.lux-scene');
     const saved = await new SceneFileStore().saveAs(scenePath, request.document);
-    if(saved.document.version===6&&saved.document.story)throw Error('Resolume export does not support Story playback yet');
+    if(saved.document.version===7||saved.document.version===6&&saved.document.story)throw Error('Resolume export does not support Story playback yet');
     if(saved.document.version===3||saved.document.version===6)assertNumericExportControls(saved.document.controls.schema);
     else if(saved.document.version===4||saved.document.version===5)for(const node of saved.document.controls.nodes)assertNumericExportControls(node.schema);
     const prepared = await prepare(scenePath, join(temporary, 'prepared'));

@@ -20,6 +20,16 @@ const fixture = () => createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'main.
 async function click(element: HTMLElement) { await act(async () => { fireEvent.click(element); }); }
 function view() { return EditorView.findFromDOM(document.querySelector('.cm-editor') as HTMLElement)!; }
 
+test('Story source selector exposes selection and add-source actions without replacing the editor workspace',async()=>{
+  const w=fixture(),selected:string[]=[],added:string[]=[];
+  const ui=render(<SourcePanel workspace={w} readOnly={false} onApply={()=>{}} visualIds={['lead','ambient']} selectedVisualId="lead" onSelectVisual={id=>selected.push(id)} onAddSource={()=>added.push('add')}/>);
+  const picker=screen.getByRole('combobox',{name:'Visual source'}) as HTMLSelectElement;
+  assert.equal(picker.value,'lead');fireEvent.change(picker,{target:{value:'ambient'}});assert.deepEqual(selected,['ambient']);
+  await click(screen.getByRole('button',{name:'Add source'}));assert.deepEqual(added,['add']);
+  ui.rerender(<SourcePanel workspace={w} readOnly onApply={()=>{}} visualIds={['lead','ambient']} selectedVisualId="lead" onSelectVisual={()=>{}} onAddSource={()=>{}}/>);
+  assert.equal((screen.getByRole('combobox',{name:'Visual source'}) as HTMLSelectElement).disabled,true);assert.equal((screen.getByRole('button',{name:'Add source'}) as HTMLButtonElement).disabled,true);
+});
+
 test('native selected-text insertion preserves admission, undo, readonly and composition paths', async () => {
   const w = fixture();
   const ui = render(<SourcePanel workspace={w} readOnly={false} onApply={() => {}} onSave={() => {}} />);
@@ -418,6 +428,13 @@ test('authoring source shortcut compiles the complete edited bundle, exposes err
   assert.equal(saves.length, 3, 'repeat does not reopen Save as');
   compileSucceeds = true;
   const current = await agentCommand({ method: 'read', params: {} });
+  const storyDocument={format:'lux-scene',version:7,visuals:[{id:'ambient',source:{sdkVersion:'0.2.0',entry:'visual.ts',files:{'visual.ts':'export default {}'}},controls:{sourceHash:'a'.repeat(64),schema:[],schemaHash:'b'.repeat(64),values:{}},controlAnimations:[]}],settings:{width:640,height:360,fps:60,seed:0},tempo:{bpm:120},story:{version:2,normalVisualId:'ambient',crossfadeSeconds:.35,beats:[{id:'ambient',label:'Ambient',timing:{kind:'sustained'},visualId:'ambient'}],sequence:[]}};
+  for(const params of [
+    {expectedDraftVersion:current.draftVersion,source:current.source,document:storyDocument},
+    {expectedDraftVersion:current.draftVersion,document:storyDocument,story:null},
+    {expectedDraftVersion:current.draftVersion,document:storyDocument,libraryLinks:[]},
+    {expectedDraftVersion:current.draftVersion,source:current.source,hostile:true},
+  ])await assert.rejects(agentCommand({method:'build',params}),/Build requires exactly one|cannot include|unrecognized/i);
   const runtime=current.status.authoring;
   await assert.rejects(agentCommand({method:'trigger',params:{commandId:'authoring-route',instanceId:runtime.instanceId,expectedGeneration:runtime.generation,expectedRevisionId:runtime.revisionId,expectedControlSchemaHash:runtime.controlSchemaHash,controlId:'regenerate'}}),
     /Trigger control is unavailable/,'authoring forwards trigger commands to the runtime dispatcher instead of the unsupported-command fallback');

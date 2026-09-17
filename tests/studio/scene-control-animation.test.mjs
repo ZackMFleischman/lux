@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {normalizeControlDeclarations,canonicalControlSchemaJson} from '../../packages/runtime-contracts/src/parameters.mjs';
 import {validateControlAnimationBindings} from '../../packages/runtime-contracts/src/control-animation.mjs';
-import {prepareWorkerControlState} from '../../apps/studio/src/controls/worker-control-state.mjs';
+import {prepareWorkerControlState,prepareWorkerVisualControlFactory} from '../../apps/studio/src/controls/worker-control-state.mjs';
 import {LEGACY_CONTROL_SCHEMA_HASH} from '../../apps/studio/src/controls/control-state.ts';
 
 const schema=normalizeControlDeclarations({height:{type:'number',label:'Height',default:1,min:0,max:4},speed:{type:'number',label:'Speed',default:.5,min:0,max:2}});
@@ -105,4 +105,19 @@ test('scene animation evaluation retains captured intrinsics after authored code
  }
  assert.deepEqual(initial,{height:2,speed:.5});
  assert.equal(changed.height,1.5);
+});
+
+test('prepared visual control factory creates a synchronized slot after authored builtin mutation',async()=>{
+ const factory=await prepareWorkerVisualControlFactory({sdkVersion:'0.2.0',controlSchema:schema,controlSchemaHash:schemaHash,controls:{height:1,speed:.5},controlAnimations:[binding()]});
+ const mapGet=Map.prototype.get,mapSet=Map.prototype.set,arrayFind=Array.prototype.find,arrayIterator=Array.prototype[Symbol.iterator],objectKeys=Object.keys,promiseAll=Promise.all;
+ let slot;
+ try{
+  Map.prototype.get=()=>{throw Error('mutated Map.get');};Map.prototype.set=()=>{throw Error('mutated Map.set');};
+  Array.prototype.find=()=>{throw Error('mutated Array.find');};Array.prototype[Symbol.iterator]=()=>{throw Error('mutated Array iterator');};
+  Object.keys=()=>{throw Error('mutated Object.keys');};Promise.all=()=>{throw Error('mutated Promise.all');};
+  slot=factory.createSlot({controlSchemaHash:schemaHash,controls:{height:2,speed:1},controlSequence:7,controlAnimations:[binding({amount:.5})],animationSequence:9});
+ }finally{
+  Map.prototype.get=mapGet;Map.prototype.set=mapSet;Array.prototype.find=arrayFind;Array.prototype[Symbol.iterator]=arrayIterator;Object.keys=objectKeys;Promise.all=promiseAll;
+ }
+ assert.equal(slot.state(0).controlSequence,7);assert.equal(slot.state(0).animationSequence,9);assert.equal(slot.values(0).height,2.5);
 });

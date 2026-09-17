@@ -29,3 +29,14 @@ test('local agent bridge forwards every authoring method and rejects unknown met
     assert.equal(rejected.status,400);assert.match((await rejected.json()).error,/Invalid authoring command/);assert.equal(calls.length,methods.length);
   } finally { bridge.close(); }
 });
+
+test('local agent bridge admits a Scene v7 sized request envelope and rejects bytes above 34 MiB',async()=>{
+ const bridge=await createAgentBridge(async(_method,params:any)=>({length:params.payload.length}));
+ try{
+  const headers={authorization:`Bearer ${bridge.token}`};
+  const accepted='x'.repeat(9*1024*1024),response=await fetch(bridge.url,{method:'POST',headers,body:JSON.stringify({id:'large-valid',method:'build',params:{payload:accepted}})});
+  assert.equal(response.status,200);assert.equal((await response.json()).result.length,accepted.length);
+  const rejected=await fetch(bridge.url,{method:'POST',headers,body:JSON.stringify({id:'too-large',method:'build',params:{payload:'€'.repeat(12*1024*1024)}})});
+  assert.equal(rejected.status,400);assert.match((await rejected.json()).error,/34 MiB/);
+ }finally{bridge.close();}
+});

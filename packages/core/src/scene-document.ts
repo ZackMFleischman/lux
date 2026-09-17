@@ -14,6 +14,9 @@ import {normalizeTempoSettings} from '../../runtime-contracts/src/tempo.mjs';
 import type {SceneTempoSettings} from '../../runtime-contracts/src/tempo.mjs';
 import {normalizeSceneStory} from '../../runtime-contracts/src/story.mjs';
 import type {SceneStoryV1} from '../../runtime-contracts/src/story.mjs';
+import {validateStorySceneDocumentV7,verifyStorySceneDocumentV7} from './story-scene-v2.ts';
+import type {StorySceneDocumentV7} from './story-scene-v2.ts';
+export type {StoryVisualSource,StorySceneDocumentV7} from './story-scene-v2.ts';
 
 const legacySchema = z.object({ format: z.literal('lux-scene'), version: z.literal(1), source: legacySourceBundleSchema.extend({sdkVersion:z.literal('0.1.0')}), settings: outputSettingsSchema, controls: controlValuesSchema }).strict();
 const schema = z.discriminatedUnion('version',[legacySchema,legacySchema.extend({version:z.literal(2),source:assetSourceBundleSchema.extend({sdkVersion:z.literal('0.1.0')})}).strict()]);
@@ -24,7 +27,8 @@ export type SavedNodeControlSnapshot=Readonly<{sourceHash:string;nodes:readonly 
 export type CompositionSceneDocument=Readonly<{format:'lux-scene';version:4;source:SourceBundle;settings:OutputSettings;controls:SavedNodeControlSnapshot;tempo:SceneTempoSettings;controlAnimations:readonly ControlAnimationBinding[]}>;
 export type LinkedCompositionSceneDocument=Readonly<{format:'lux-scene';version:5;source:SourceBundle;settings:OutputSettings;controls:SavedNodeControlSnapshot;libraryLinks:readonly SceneLibraryLink[];tempo:SceneTempoSettings;controlAnimations:readonly ControlAnimationBinding[]}>;
 export type StorySceneDocument = Readonly<Omit<ParameterSceneDocument,'version'> & {version:6;story?:SceneStoryV1}>;
-export type SceneDocument = LegacySceneDocument | ParameterSceneDocument | CompositionSceneDocument | LinkedCompositionSceneDocument | StorySceneDocument;
+export type SingleVisualSceneDocument = LegacySceneDocument | ParameterSceneDocument | CompositionSceneDocument | LinkedCompositionSceneDocument | StorySceneDocument;
+export type SceneDocument = SingleVisualSceneDocument | StorySceneDocumentV7;
 
 /** Synchronous data validation; persisted/admitted caches also require verifySceneDocument. */
 export function validateSavedControlSnapshot(value:unknown): SavedControlSnapshot {
@@ -48,10 +52,12 @@ export function validateSavedNodeControlSnapshot(value:unknown):SavedNodeControl
 export async function verifySavedNodeControlSnapshot(value:unknown):Promise<SavedNodeControlSnapshot>{const snapshot=validateSavedNodeControlSnapshot(value);for(const node of snapshot.nodes)if(await sceneHash(canonicalControlSchemaJson(node.schema))!==node.schemaHash)throw Error('Saved node control schema hash mismatch');return snapshot;}
 export async function verifySceneDocument(value:unknown):Promise<SceneDocument> {
   const document=validateSceneDocument(value);
+  if(document.version===7)return verifyStorySceneDocumentV7(document);
   if(document.version===3||document.version===6) await verifySavedControlSnapshot(document.controls);else if(document.version===4||document.version===5)await verifySavedNodeControlSnapshot(document.controls);
   return document;
 }
 export async function sceneControlSnapshot(document:SceneDocument):Promise<SavedControlSnapshot|SavedNodeControlSnapshot> {
+  if(document.version===7)throw Error('Scene v7 has multiple visual snapshots');
   if(document.version===3||document.version===6) return verifySavedControlSnapshot(document.controls);
   if(document.version===4||document.version===5)return verifySavedNodeControlSnapshot(document.controls);
   const schema=normalizeControlSchema([INTENSITY_CONTROL]);
@@ -61,6 +67,7 @@ export function validateSceneDocument(value: unknown): SceneDocument {
   // Validate raw records before schema cloning can erase inherited/accessor
   // properties and their provenance. Preserve legacy scene source ordering.
   const raw = snapshotRecord(value);
+  if(raw.version===7)return validateStorySceneDocumentV7(value);
   const fields=raw.version===5?['format','version','source','settings','controls','libraryLinks']:['format','version','source','settings','controls'],optional=[...(Object.hasOwn(raw,'controlAnimations')?['controlAnimations']:[]),...(Object.hasOwn(raw,'tempo')?['tempo']:[]),...(raw.version===6&&Object.hasOwn(raw,'story')?['story']:[])];
   if(Object.keys(raw).length!==fields.length+optional.length||fields.some(field=>!Object.hasOwn(raw,field)))throw Error('Missing or unsupported scene fields');
   const source = validateSource(raw.source);
@@ -87,9 +94,11 @@ export function validateSceneDocument(value: unknown): SceneDocument {
   if (snapshot.version === 2 && new TextEncoder().encode(JSON.stringify(snapshot,null,2)+'\n').byteLength > 7340032) throw Error('Scene v2 JSON exceeds 7 MiB');
   return snapshot;
 }
-export function createSceneDocument(source: SourceBundle, settings: OutputSettings, controls: ControlValues | SavedControlSnapshot | SavedNodeControlSnapshot, libraryLinks:readonly SceneLibraryLink[]=[],controlAnimations:readonly ControlAnimationBinding[]=[],tempo:SceneTempoSettings=normalizeTempoSettings(),story:SceneStoryV1|null=null,retainStoryVersion=false): SceneDocument {
+export function createSceneDocument(source: SourceBundle, settings: OutputSettings, controls: ControlValues | SavedControlSnapshot | SavedNodeControlSnapshot, libraryLinks:readonly SceneLibraryLink[]=[],controlAnimations:readonly ControlAnimationBinding[]=[],tempo:SceneTempoSettings=normalizeTempoSettings(),story:SceneStoryV1|null=null,retainStoryVersion=false): SingleVisualSceneDocument {
   if((story||retainStoryVersion)&&source.sdkVersion!=='0.2.0')throw Error('Story scenes require SDK 0.2.0 source');
   const links=validateSceneLibraryLinks(libraryLinks),version=source.sdkVersion==='0.4.0'?(links.length?5:4):source.sdkVersion==='0.2.0' ? (story||retainStoryVersion?6:3) : 'sourceVersion' in source ? 2 : 1;
   if(links.length&&version!==5)throw Error('Library links require SDK 0.4.0 composition source');
-  return validateSceneDocument({format:'lux-scene',version,source,settings,controls,...(version===5?{libraryLinks:links}:{}),...(story?{story}:{}),tempo:normalizeTempoSettings(tempo),...((version===4||version===5||controlAnimations.length)?{controlAnimations}: {})});
+  const document=validateSceneDocument({format:'lux-scene',version,source,settings,controls,...(version===5?{libraryLinks:links}:{}),...(story?{story}:{}),tempo:normalizeTempoSettings(tempo),...((version===4||version===5||controlAnimations.length)?{controlAnimations}: {})});
+  if(document.version===7)throw Error('Single-visual scene construction produced Scene v7');
+  return document;
 }

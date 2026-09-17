@@ -19,6 +19,11 @@ test('default view shows unavailable output and disabled runtime controls rather
   assert.doesNotMatch(html, /<canvas|<img|60 fps|demo scene/i);
 });
 
+test('Inspector identifies the locally selected Story visual',()=>{
+  const html=renderToStaticMarkup(<StudioApp client={createDisconnectedClient()} selectedVisualId="ambient"/>);
+  assert.match(html,/Source ambient/);
+});
+
 test('connected view distinguishes actual zero measurement, stale coverage and host revision', () => {
   const snapshot: StudioSnapshot = {
     connection: 'connected', message: null, receivedAtMs: 1000,

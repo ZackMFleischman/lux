@@ -59,10 +59,10 @@ export function tempoControlValue(base,definition,binding,beatPosition){
  return min(definition.max,max(definition.min,base+binding.amount*wave(binding.shape,cycle)));
 }
 
-export function createControlAnimationEvaluator(profile,base,normalized){
+export function createControlAnimationEvaluator(profile,base,normalized,preparedAudioSnapshot){
  let current=normalized;
  let entries=new RuntimeMap();
- let audioSnapshot=normalizeAudioBandSnapshot({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0});
+ let audioSnapshot=preparedAudioSnapshot??normalizeAudioBandSnapshot({generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0});
  const createEntry=binding=>binding.kind==='audio'?{binding,filtered:0,lastTime:undefined}:binding.kind==='kick'?{binding,phase:'idle',phaseStart:0,startValue:0,peak:0,lastTrigger:undefined,observedGeneration:audioSnapshot.generation,observedKickSequence:audioSnapshot.kickSequence,wasAvailable:audioSnapshot.available}:binding.kind==='tempo'||binding.kind==='variation'?{binding}:{binding,anchorTime:0,frozenElapsed:0};
  for(let index=0;index<normalized.bindings.length;index++){const binding=normalized.bindings[index];mapSet(entries,`${key(binding.nodePath)}:${binding.controlId}`,createEntry(binding));}
  const elapsed=(entry,timeSeconds)=>entry.frozenElapsed+(entry.binding.enabled?max(0,timeSeconds-entry.anchorTime):0);
