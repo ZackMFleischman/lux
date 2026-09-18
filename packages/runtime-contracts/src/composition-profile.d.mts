@@ -1,7 +1,7 @@
 import type {ControlSchema} from './parameters.mjs';
 import type {NestedDefinitions,NestedGraph,PublicControlTarget} from './nested-graph.ts';
 import type {NodePath,DefinitionHash} from './graph.ts';
-export type ImageCompositionDeclaration=Readonly<{definitions:Readonly<Record<string,string>>;nodes:readonly unknown[];edges:readonly unknown[];input?:unknown;output:unknown;expose:readonly unknown[];label?:string}>;
+export type ImageCompositionDeclaration=Readonly<{definitions:Readonly<Record<string,string>>;nodes:readonly unknown[];edges:readonly unknown[];input?:unknown;inputs?:Readonly<Record<string,unknown>>;output:unknown;expose:readonly unknown[];label?:string}>;
 export type ImageCompositionModuleDeclaration=Readonly<{modulePath:string;definitionNames:Readonly<Record<string,DefinitionHash>>;declaration:ImageCompositionDeclaration}>;
 export type ImageCompositionProfile=Readonly<{version:1|2;declaration:ImageCompositionDeclaration;definitionNames:Readonly<Record<string,DefinitionHash>>;moduleDeclarations?:Readonly<Record<DefinitionHash,ImageCompositionModuleDeclaration>>;graph:NestedGraph;definitions:NestedDefinitions;publicControls:ControlSchema;publicControlBindings:Readonly<Record<string,readonly PublicControlTarget[]>>;nodes:readonly Readonly<{nodePath:NodePath;definitionHash:DefinitionHash;schema:ControlSchema;schemaHash:string}>[]}>;
 export function normalizeImageCompositionProfile(input:unknown):ImageCompositionProfile;

@@ -10,6 +10,16 @@ const bad=(v:any,rule?:RegExp)=>assert.throws(()=>admit(v),(e:any)=>e.code==='IN
 test('admits and detaches a source root, preserving exact graph and complete definitions',()=>{
  const v=basic(), result=admit(v); assert.deepEqual(result.graph,v.graph);assert.notEqual(result.definitions,v.definitions);assert.ok(Object.isFrozen(result.definitions[hash(1)]));
 });
+test('readable IDs remain stable across nested node paths and duplicate edges still reject',()=>{
+ const v=twins(),root=v.definitions[hash(1)],child=v.definitions[hash(2)];
+ root.body.nodes[0].id='quasar';root.body.nodes[1].id='background';root.body.outputBindings.a.nodeId='quasar';root.body.outputBindings.b.nodeId='background';root.body.controlBindings.gain[0].nodeId='quasar';
+ child.body.nodes[0].id='quasar.disk';child.body.outputBindings.image.nodeId='quasar.disk';child.body.controlBindings.gain[0].nodeId='quasar.disk';
+ const plan=planNestedGraph(admit(v));assert.deepEqual(plan.nodes.map(node=>node.nodePath),[['quasar','quasar.disk']]);
+ const duplicate=structuredClone(v);root.body.edges=[];duplicate.definitions[hash(1)].body.edges=[
+  {id:'disk-to-bloom',from:{nodeId:'quasar',portId:'a'},to:{nodeId:'background',portId:'a'},delay:'none'},
+  {id:'disk-to-bloom',from:{nodeId:'quasar',portId:'a'},to:{nodeId:'background',portId:'a'},delay:'none'},
+ ];bad(duplicate,/duplicate edge/i);
+});
 test('all catalog recursion, missing writers, binding shape and lifecycle reject before pruning',()=>{
  let v=basic();v.definitions[hash(3)]=graphDef([node(1,3)]);bad(v,/recurs/);
  v=basic();v.definitions[hash(3)]=graphDef([node(1,4)]);v.definitions[hash(4)]=graphDef([node(1,3)]);bad(v,/recurs/);

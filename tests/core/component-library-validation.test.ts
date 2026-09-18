@@ -10,6 +10,7 @@ const options = { dependencyRoot: process.env.LUX_COMPILER_DEPENDENCIES || resol
 const imagePort = `{type:{kind:'image',colorSpace:'linear-srgb',alphaMode:'premultiplied'},label:'Image',description:'Rendered image'}`;
 const pathsPort = `{type:{kind:'paths2d',version:1,coordinateSpace:'canvas-height'},label:'Paths',description:'Tracer paths'}`;
 const signalPort = `{type:{kind:'signal',value:'number',unit:null,clock:'frame'},label:'Signal',description:'Frame signal'}`;
+const shaderFieldPort = "{type:{kind:'shader-field',version:1,abi:'lux/test-field/v1'},label:'Field',description:'Reusable shader field'}";
 
 async function compileForLibrary(source: SourceBundle) {
   const compiled = await compileVisual({ source }, options);
@@ -136,8 +137,16 @@ test('library validation reserves two source-file slots for a composition image 
 
   assert.throws(() => libraryValidationSource(source), /two free source files/i);
 });
-
-const shaderFieldPort = "{type:{kind:'shader-field',version:1,abi:'lux/test-field/v1'},label:'Field',description:'Reusable shader field'}";
+test('library validation closes every typed composition boundary input with an inferred provider',async()=>{
+ const source:SourceBundle={sdkVersion:'0.4.0',entry:'composition.ts',files:{
+  'renderer.ts':`import {defineComponent} from '@lux/visual-sdk';export default defineComponent({metadata:{declarationVersion:1,key:'demo/quasar-renderer',label:'Renderer',description:'Renderer',tags:[],inputs:{image:${imagePort},bodies:${shaderFieldPort}},outputs:{image:${imagePort}},controls:{},controlDescriptions:{},lifecycle:{state:'stateless',reset:'seed'}},async create(){return {update(){},async evaluate(inputs,context){void inputs.image.texture;void inputs.bodies.data.abi;return {image:await context.render({}, {}, 'image')}},reset(){},dispose(){}}}});`,
+  'composition.ts':`import {defineComponent} from '@lux/visual-sdk';import renderer from './renderer.ts';export default defineComponent({definitions:{renderer},nodes:[{id:'quasar.renderer',definition:'renderer'}],edges:[],inputs:{image:{nodeId:'quasar.renderer',portId:'image'},bodies:{nodeId:'quasar.renderer',portId:'bodies'}},output:{nodeId:'quasar.renderer',portId:'image'},expose:[]});`,
+ }};
+ const before=structuredClone(source);let submitted:SourceBundle|undefined;
+ await validateLibraryCandidate(source,async candidate=>{submitted=candidate;return compileForLibrary(candidate);});
+ assert.deepEqual(source,before);assert.equal(Object.keys(submitted?.files??{}).length,4);
+ assert.match(submitted?.files[submitted.entry]??'',/validation\.candidate/);assert.match(submitted?.files[submitted.entry]??'',/portId:"bodies"/);assert.match(Object.values(submitted?.files??{}).join('\n'),/lux\/test-field\/v1/);
+});
 function fieldLeaf(consumer=false): SourceBundle {
   const source=pathGeneratorLeaf();
   let text=source.files[source.entry]!.replace(pathsPort,shaderFieldPort).replace("context.paths('paths',{version:1,paths:[]})","context.shaderField('paths',{version:1,abi:'lux/test-field/v1',fragments:{body:'let field = 1.0;'},values:{scale:1}})");

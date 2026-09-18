@@ -30,6 +30,9 @@ test('discovery exposes real SDK source and the submitted example without execut
   assert.deepEqual(discovery.allowedImports, ['@lux/visual-sdk', 'three/webgpu', 'three/tsl']);
   assert.match(discovery.contractSource, /interface VisualContext/);
   assert.match(discovery.example, /export default defineVisual/);
+  assert.deepEqual(discovery.composition.authoring.graphIds,{kind:'uuid-or-readable-v1',readablePattern:'^[a-z][a-z0-9._-]{0,95}$'});
+  assert.equal(discovery.composition.authoring.componentInputs,'typed-record-v1');
+  assert.equal(discovery.composition.authoring.visualExternalInputs,false);
 });
 
 test('discoverable trigger example compiles its event declaration without a saved value',async()=>{

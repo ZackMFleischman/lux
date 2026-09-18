@@ -1,4 +1,5 @@
 import { parse } from '@babel/parser';
+import { posix } from 'node:path';
 import type { SourceBundle } from '../../runtime-contracts/src/index.ts';
 import { normalizeComponentDeclaration } from '../../runtime-contracts/src/components.mjs';
 import type { ComponentMetadata, PortDeclaration } from '../../runtime-contracts/src/components.mjs';
@@ -11,9 +12,9 @@ type CompileOutcome = Readonly<{
 
 export type LibraryCandidateCompiler = (source: SourceBundle) => Promise<unknown>;
 
-const sourceNodeId = '1176b1f7-9850-4f3c-8275-ec502142d49b';
-const candidateNodeId = '2bfc5c24-4e4f-40c2-9c49-b783602c9f6d';
-const sinkNodeId = '603442bf-69c2-4224-bf59-b53b39a8e00b';
+const sourceNodeId = 'validation.source';
+const candidateNodeId = 'validation.candidate';
+const sinkNodeId = 'validation.sink';
 
 function unwrap(node: any): any {
   while (node && ['TSAsExpression', 'TSSatisfiesExpression', 'TSTypeAssertion', 'ParenthesizedExpression'].includes(node.type)) node = node.expression;
@@ -87,22 +88,77 @@ function componentDeclaration(source: SourceBundle): ComponentMetadata | undefin
 
 function compositionEntry(source: SourceBundle): boolean {
   const program = parsedEntry(source);
-  return !!program && !!sdkCall(program, 'defineComposition');
+  if (!program) return false;
+  if (sdkCall(program, 'defineComposition')) return true;
+  const component = sdkCall(program, 'defineComponent');
+  if (!component) return false;
+  try {
+    const fields = objectRows(component.arguments[0], 'Library component requires an inline definition');
+    return fields.has('definitions') && fields.has('nodes') && fields.has('edges') && fields.has('output') && fields.has('expose');
+  } catch { return false; }
 }
 
-function hasExternalImageInput(source: SourceBundle): boolean {
-  const text = source.files[source.entry];
-  if (typeof text !== 'string') return false;
-  try {
-    const program = parsedEntry(source);
-    const call = program && sdkCall(program, 'defineComposition');
-    const argument = unwrap(call?.arguments[0]);
-    if (!call || argument?.type !== 'ObjectExpression') return false;
-    return argument.properties.some((property: any) => property.type === 'ObjectProperty' && !property.computed
-      && (property.key.type === 'Identifier' ? property.key.name : property.key.type === 'StringLiteral' ? property.key.value : undefined) === 'input');
-  } catch {
-    return false;
+type PortSurface = Readonly<{ inputs: Readonly<Record<string, PortDeclaration>>; outputs: Readonly<Record<string, PortDeclaration>> }>;
+
+function resolveModule(from: string, specifier: string): string {
+  if ((!specifier.startsWith('./') && !specifier.startsWith('../')) || !specifier.endsWith('.ts')) {
+    throw Error('Library composition imports must name relative submitted .ts modules');
   }
+  const path = posix.normalize(posix.join(posix.dirname(from), specifier));
+  if (path.startsWith('../')) throw Error('Library composition imports must remain inside the source bundle');
+  return path;
+}
+
+function modulePorts(source: SourceBundle, path: string, active = new Set<string>()): PortSurface {
+  if (active.has(path)) throw Error('Library composition imports cannot be recursive');
+  const text = source.files[path];
+  if (typeof text !== 'string') throw Error(`Library composition is missing imported module ${path}`);
+  let program: any;
+  try { program = parse(text, { sourceType: 'module', plugins: ['typescript'] }).program; }
+  catch { throw Error(`Library composition cannot parse imported module ${path}`); }
+  const component = sdkCall(program, 'defineComponent');
+  const composition = sdkCall(program, 'defineComposition');
+  if (component) {
+    const fields = objectRows(component.arguments[0], 'Library component requires an inline definition');
+    if (fields.has('metadata') && fields.has('create')) {
+      if (fields.size !== 2 || fields.get('metadata').type !== 'ObjectProperty') throw Error('Library component requires only literal metadata and create fields');
+      const metadata = normalizeComponentDeclaration(literal(fields.get('metadata').value));
+      return { inputs: metadata.inputs, outputs: metadata.outputs };
+    }
+  }
+  const graph = composition ?? component;
+  if (!graph) throw Error(`Library composition dependency ${path} must export a component or composition`);
+  active.add(path);
+  try {
+    const fields = objectRows(graph.arguments[0], 'Library composition requires an inline definition');
+    const definitionsNode = unwrap(fields.get('definitions')?.value);
+    if (definitionsNode?.type !== 'ObjectExpression') throw Error('Library composition definitions must be an inline object');
+    const imports = new Map<string, string>();
+    for (const statement of program.body) if (statement.type === 'ImportDeclaration') {
+      for (const specifier of statement.specifiers) if (specifier.type === 'ImportDefaultSpecifier') imports.set(specifier.local.name, resolveModule(path, statement.source.value));
+    }
+    const definitions = new Map<string, string>();
+    for (const property of definitionsNode.properties) {
+      if (property.type !== 'ObjectProperty' || property.computed || !['Identifier', 'StringLiteral'].includes(property.key?.type)) throw Error('Library composition definitions require literal keys');
+      const key = property.key.name ?? property.key.value, value = unwrap(property.value);
+      if (value?.type !== 'Identifier' || !imports.has(value.name)) throw Error('Library composition definitions must reference default imports');
+      definitions.set(key, imports.get(value.name)!);
+    }
+    const nodes = literal(fields.get('nodes')?.value) as readonly Readonly<{ id: string; definition: string }>[];
+    const nodeDefinitions = new Map(nodes.map(node => [node.id, node.definition]));
+    const targetPort = (target: any, direction: 'inputs' | 'outputs'): PortDeclaration => {
+      const definition = nodeDefinitions.get(target?.nodeId), childPath = definition && definitions.get(definition);
+      if (!childPath) throw Error('Library composition boundary must target an immediate node');
+      const port = modulePorts(source, childPath, active)[direction][target.portId];
+      if (!port) throw Error(`Library composition boundary targets a missing ${direction} port`);
+      return port;
+    };
+    const inputs: Record<string, PortDeclaration> = {};
+    if (fields.has('input')) inputs.image = targetPort(literal(fields.get('input').value), 'inputs');
+    if (fields.has('inputs')) for (const [id, target] of Object.entries(literal(fields.get('inputs').value) as Record<string, unknown>)) inputs[id] = targetPort(target, 'inputs');
+    const output = targetPort(literal(fields.get('output')?.value), 'outputs');
+    return { inputs, outputs: { image: output } };
+  } finally { active.delete(path); }
 }
 
 function harnessPaths(source: SourceBundle, helpers: readonly string[], subject: string): Readonly<{ harness: string; helpers: readonly string[] }> {
@@ -118,24 +174,6 @@ function harnessPaths(source: SourceBundle, helpers: readonly string[], subject:
     }
   }
   throw Error(`Library ${subject} needs ${required === 1 ? 'one' : required === 2 ? 'two' : required} free source file${required === 1 ? '' : 's'} for validation`);
-}
-
-function closedImageSource(): string {
-  const imagePort = `{type:{kind:'image',colorSpace:'linear-srgb',alphaMode:'premultiplied'},label:'Image',description:'Validation image'}`;
-  return `import {defineComponent} from '@lux/visual-sdk';export default defineComponent({metadata:{declarationVersion:1,key:'lux/library-validation-source',label:'Validation image source',description:'Provides a closed compile-only image input.',tags:['internal'],inputs:{},outputs:{image:${imagePort}},controls:{},controlDescriptions:{},lifecycle:{state:'stateless',reset:'seed'}},async create(){return {update(){},async evaluate(_inputs,context){return {image:await context.render({}, {}, 'image')}},reset(){},dispose(){}}}});`;
-}
-
-function closedHarness(entry: string, feedsImageInput: boolean, sourcePath?: string): string {
-  const nodes = feedsImageInput
-    ? `[{id:'${sourceNodeId}',definition:'source'},{id:'${candidateNodeId}',definition:'candidate'}]`
-    : `[{id:'${candidateNodeId}',definition:'candidate'}]`;
-  const edges = feedsImageInput
-    ? `[{id:'369d2be9-9b50-46d2-8ee4-6200f51974c1',from:{nodeId:'${sourceNodeId}',portId:'image'},to:{nodeId:'${candidateNodeId}',portId:'image'},delay:'none'}]`
-    : '[]';
-  const sourceImport = feedsImageInput ? `import source from ${JSON.stringify(`./${sourcePath}`)};` : '';
-  const definitions = feedsImageInput ? '{candidate,source}' : '{candidate}';
-  return `import {defineComposition} from '@lux/visual-sdk';import candidate from ${JSON.stringify(`./${entry}`)};${sourceImport}
-export default defineComposition({label:'Library validation harness',definitions:${definitions},nodes:${nodes},edges:${edges},output:{nodeId:'${candidateNodeId}',portId:'image'},expose:[]});`;
 }
 
 function portSource(port: PortDeclaration): string {
@@ -161,10 +199,10 @@ function imagePortSource(): string {
 }
 
 function edgeId(index: number): string {
-  return `00000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`;
+  return `validation.edge-${index + 1}`;
 }
 
-function typedLeafHarness(entry: string, metadata: ComponentMetadata, providerPath?: string, sinkPath?: string): string {
+function typedLeafHarness(entry: string, metadata: Pick<ComponentMetadata, 'inputs' | 'outputs'>, providerPath?: string, sinkPath?: string): string {
   const inputPorts = Object.entries(metadata.inputs);
   const imageOutput = Object.entries(metadata.outputs).find(([, port]) => port.type.kind === 'image');
   const finalOutput = imageOutput ?? Object.entries(metadata.outputs)[0];
@@ -186,7 +224,7 @@ function typedLeafHarness(entry: string, metadata: ComponentMetadata, providerPa
   return `import {defineComposition} from '@lux/visual-sdk';${imports.join('')}export default defineComposition({label:'Library typed leaf validation harness',definitions:{${definitions.join(',')}},nodes:[${nodes.join(',')}],edges:[${edges.join(',')}],output:${output},expose:[]});`;
 }
 
-function validateTypedPorts(metadata: ComponentMetadata): void {
+function validateTypedPorts(metadata: Pick<ComponentMetadata, 'inputs' | 'outputs'>): void {
   for (const [direction, ports] of [['input', metadata.inputs], ['output', metadata.outputs]] as const) {
     for (const [id, port] of Object.entries(ports)) {
       if (port.type.kind !== 'image' && port.type.kind !== 'paths2d' && port.type.kind !== 'shader-field') {
@@ -231,16 +269,19 @@ export function libraryValidationSource(source: SourceBundle): SourceBundle {
     if (!metadata || isLegacyImageLeaf(metadata)) return { ...source, sdkVersion: '0.3.0' };
     return typedLeafValidationSource(source, metadata);
   }
-  const feedsImageInput = hasExternalImageInput(source);
-  const paths = harnessPaths(source, feedsImageInput ? ['source'] : [], 'composition');
-  const sourcePath = paths.helpers[0];
+  const ports = modulePorts(source, source.entry);
+  validateTypedPorts(ports);
+  const needsProvider = Object.keys(ports.inputs).length > 0;
+  const paths = harnessPaths(source, needsProvider ? ['provider'] : [], 'composition');
+  const providerPath = paths.helpers[0];
   return {
     ...source,
+    sdkVersion: '0.4.0',
     entry: paths.harness,
     files: {
       ...source.files,
-      [paths.harness]: closedHarness(source.entry, feedsImageInput, sourcePath),
-      ...(sourcePath ? { [sourcePath]: closedImageSource() } : {}),
+      [paths.harness]: typedLeafHarness(source.entry, ports, providerPath),
+      ...(providerPath ? { [providerPath]: typedProvider(ports.inputs) } : {}),
     },
   };
 }

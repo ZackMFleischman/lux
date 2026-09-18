@@ -91,3 +91,29 @@ test('recursive extraction accepts a 600-component flat chain while retaining th
  const deep={sdkVersion:'0.4.0',entry:'level0.ts',files:deepFiles},deepAsts=Object.fromEntries(Object.entries(deep.files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})]));
  assert.throws(()=>extractCompositionDeclaration({entry:deep.entry,files:deep.files,asts:deepAsts,hash}),/level budget/i);
 });
+test('typed composition inputs infer child port metadata and readable graph identities',()=>{
+ const imagePort=`{type:{kind:'image',colorSpace:'linear-srgb',alphaMode:'premultiplied'},label:'Image',description:'Background image'}`;
+ const fieldPort=`{type:{kind:'shader-field',version:1,abi:'lux/quasar-bodies/v1'},label:'Bodies',description:'Planet field'}`;
+ const files={
+  'renderer.ts':`import {defineComponent} from '@lux/visual-sdk';export default defineComponent({metadata:{declarationVersion:1,key:'quasar/renderer',label:'Renderer',description:'Renderer',tags:[],inputs:{image:${imagePort},bodies:${fieldPort}},outputs:{image:${imagePort}},controls:{},controlDescriptions:{},lifecycle:{state:'stateless',reset:'seed'}},async create(){return {update(){},async evaluate(inputs,context){void inputs.image.texture;void inputs.bodies.data.abi;return {image:await context.render({}, {}, 'image')}},reset(){},dispose(){}}}});`,
+  'provider.ts':`import {defineComponent} from '@lux/visual-sdk';export default defineComponent({metadata:{declarationVersion:1,key:'quasar/provider',label:'Provider',description:'Provider',tags:[],inputs:{},outputs:{image:${imagePort},bodies:${fieldPort}},controls:{},controlDescriptions:{},lifecycle:{state:'stateless',reset:'seed'}},async create(){return {update(){},async evaluate(_inputs,context){return {image:await context.render({}, {}, 'image'),bodies:context.shaderField('bodies',{version:1,abi:'lux/quasar-bodies/v1',fragments:{},values:{}})}},reset(){},dispose(){}}}});`,
+  'component.ts':`import {defineComponent} from '@lux/visual-sdk';import renderer from './renderer.ts';export default defineComponent({definitions:{renderer},nodes:[{id:'quasar.renderer',definition:'renderer'}],edges:[],inputs:{image:{nodeId:'quasar.renderer',portId:'image'},bodies:{nodeId:'quasar.renderer',portId:'bodies'}},output:{nodeId:'quasar.renderer',portId:'image'},expose:[]});`,
+  'visual.ts':`import {defineVisual} from '@lux/visual-sdk';import provider from './provider.ts';import quasar from './component.ts';export default defineVisual({definitions:{provider,quasar},nodes:[{id:'inputs',definition:'provider'},{id:'quasar',definition:'quasar'}],edges:[{id:'image-to-quasar',from:{nodeId:'inputs',portId:'image'},to:{nodeId:'quasar',portId:'image'},delay:'none'},{id:'bodies-to-quasar',from:{nodeId:'inputs',portId:'bodies'},to:{nodeId:'quasar',portId:'bodies'},delay:'none'}],output:{nodeId:'quasar',portId:'image'},expose:[]});`,
+ };
+ const asts=Object.fromEntries(Object.entries(files).map(([path,text])=>[path,parse(text,{sourceType:'module',plugins:['typescript']})])),profile=extractCompositionDeclaration({entry:'visual.ts',files,asts,hash});
+ const component=Object.values(profile.definitions).find(definition=>definition.kind==='graph'&&definition.metadata.inputs.bodies);
+ assert.deepEqual(Object.keys(component.metadata.inputs),['bodies','image']);
+ assert.equal(component.metadata.inputs.bodies.type.kind,'shader-field');assert.equal(component.metadata.inputs.bodies.type.abi,'lux/quasar-bodies/v1');
+ assert.deepEqual(component.body.inputBindings,{bodies:[{nodeId:'quasar.renderer',portId:'bodies'}],image:[{nodeId:'quasar.renderer',portId:'image'}]});
+ assert.ok(profile.nodes.some(node=>JSON.stringify(node.nodePath)===JSON.stringify(['quasar','quasar.renderer'])));
+});
+test('typed composition inputs reject legacy input conflicts and duplicate boundary targets',()=>{
+ const source=compositionSourceBundle(),base=source.files['composition.ts'];
+ for(const [text,expected] of [
+  [base.replace('output:',`input:{nodeId:'${kaleidoscopeAId}',portId:'image'},inputs:{image:{nodeId:'${kaleidoscopeAId}',portId:'image'}},output:`),/input.*inputs|mutually exclusive/i],
+  [base.replace(`output:`, `inputs:{first:{nodeId:'${kaleidoscopeAId}',portId:'image'},second:{nodeId:'${kaleidoscopeAId}',portId:'image'}},output:`).replace(/input:\{[^}]+\},/,''),/duplicate writer|boundary/i],
+ ]){
+  const files={...source.files,'composition.ts':text},asts=Object.fromEntries(Object.entries(files).map(([path,value])=>[path,parse(value,{sourceType:'module',plugins:['typescript']})]));
+  assert.throws(()=>extractCompositionDeclaration({entry:source.entry,files,asts,hash}),expected);
+ }
+});
