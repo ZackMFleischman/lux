@@ -150,8 +150,11 @@ export function attachPreviewCameraController(
   let values: CameraValues = { ...binding.values };
   let scheduled: number | null = null;
   let observedControlSequence = binding.controlSequence;
+  let issuedSequenceFloor = binding.controlSequence;
   let optimistic = false;
   let writeVersion = 0;
+  let completedWriteVersion = 0;
+  let unsubmitted = false;
   let needsResync = false;
   let disposed = false;
   let active: null | { pointerId: number; mode: 'orbit' | 'pan' | 'roll'; x: number; y: number } = null;
@@ -162,16 +165,31 @@ export function attachPreviewCameraController(
   const report = (reason: unknown) => {
     if (!disposed && sameBinding(cameraControllerBinding(options.getRuntime()), binding)) options.onError(reason);
   };
+  const acknowledge = (result: unknown, submitted: Readonly<CameraValues>, version: number, expectedSequence: number) => {
+    const acknowledged = cameraControllerBinding(result as RuntimeView | null);
+    const acknowledgedSequence = sameBinding(acknowledged, binding) ? acknowledged!.controlSequence : expectedSequence;
+    observedControlSequence = Math.max(observedControlSequence, acknowledgedSequence);
+    issuedSequenceFloor = Math.max(issuedSequenceFloor, acknowledgedSequence);
+    completedWriteVersion = Math.max(completedWriteVersion, version);
+    if (version === writeVersion && !unsubmitted && sameValues(values, submitted) && sameBinding(acknowledged, binding)) {
+      values = { ...acknowledged!.values };
+      optimistic = false;
+      needsResync = false;
+    }
+  };
   const flush = () => {
     scheduled = null;
     if (disposed || !sameBinding(cameraControllerBinding(options.getRuntime()), binding)) return;
     const submitted = { ...values };
     const version = ++writeVersion;
+    const expectedSequence = ++issuedSequenceFloor;
     optimistic = true;
+    unsubmitted = false;
     needsResync = false;
-    void options.write(patch(submitted)).catch(reason => {
+    void options.write(patch(submitted)).then(result => acknowledge(result, submitted, version, expectedSequence)).catch(reason => {
       if (version === writeVersion && sameValues(values, submitted)) {
         optimistic = false;
+        issuedSequenceFloor = observedControlSequence;
         needsResync = true;
       }
       report(reason);
@@ -179,16 +197,24 @@ export function attachPreviewCameraController(
   };
   const queue = () => {
     optimistic = true;
+    unsubmitted = true;
     if (scheduled === null) scheduled = schedule(flush);
   };
   const sync = () => {
     const live = cameraControllerBinding(options.getRuntime());
     if (!sameBinding(live, binding)) return false;
+    if (live!.controlSequence < observedControlSequence) return true;
     if (live!.controlSequence !== observedControlSequence || needsResync) {
+      const newerCompletedState = live!.controlSequence > observedControlSequence &&
+        completedWriteVersion === writeVersion && !unsubmitted;
       observedControlSequence = live!.controlSequence;
+      issuedSequenceFloor = Math.max(issuedSequenceFloor, observedControlSequence);
       needsResync = false;
       if (sameValues(live!.values, values)) optimistic = false;
-      else if (!optimistic) values = { ...live!.values };
+      else if (!optimistic || newerCompletedState) {
+        values = { ...live!.values };
+        optimistic = false;
+      }
     }
     return true;
   };
@@ -270,15 +296,21 @@ export function attachPreviewCameraController(
     active = null;
     if (scheduled !== null) cancel(scheduled);
     scheduled = null;
+    unsubmitted = false;
     values = zeros();
     if (!sameBinding(cameraControllerBinding(options.getRuntime()), binding)) return;
     const submitted = { ...values };
     const version = ++writeVersion;
+    const expectedSequence = ++issuedSequenceFloor;
     optimistic = true;
     needsResync = false;
-    try { await options.write(patch(submitted)); } catch (reason) {
+    try {
+      const result = await options.write(patch(submitted));
+      acknowledge(result, submitted, version, expectedSequence);
+    } catch (reason) {
       if (version === writeVersion && sameValues(values, submitted)) {
         optimistic = false;
+        issuedSequenceFloor = observedControlSequence;
         needsResync = true;
       }
       report(reason);

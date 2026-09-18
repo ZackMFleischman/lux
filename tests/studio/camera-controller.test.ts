@@ -197,7 +197,10 @@ test('preview gestures coalesce writes, stop at stale runtime, and Reset cancels
   let nextFrame = 1;
   const control = attachPreviewCameraController(surface as unknown as HTMLElement, {
     getRuntime: () => current,
-    write: async values => { writes.push({ ...values } as Record<string, number>); },
+    write: async values => {
+      writes.push({ ...values } as Record<string, number>);
+      return runtime({ controls: { ...runtime().controls, ...values }, controlSequence: writes.length });
+    },
     scheduleFrame: callback => { const id = nextFrame++; frames.set(id, callback); return id; },
     cancelFrame: id => { frames.delete(id); },
     onError: error => { throw error; },
@@ -281,6 +284,49 @@ test('an older runtime acknowledgement cannot roll back newer optimistic camera 
   surface.emit('pointermove', { pointerId: 2, clientX: 250, clientY: 0 });
   await flush();
   assert.equal(writes[2]![aliases.yaw], -0.5 * Math.PI);
+
+  control!.dispose();
+});
+
+test('a newer Inspector edit supersedes the latest acknowledged camera gesture', async () => {
+  let current = runtime();
+  const surface = new FakeSurface();
+  const writes: Record<string, number>[] = [];
+  const frames = new Map<number, FrameRequestCallback>();
+  let nextFrame = 1;
+  const control = attachPreviewCameraController(surface as unknown as HTMLElement, {
+    getRuntime: () => current,
+    write: async values => {
+      writes.push({ ...values } as Record<string, number>);
+      return runtime({ controls: { ...runtime().controls, ...values }, controlSequence: writes.length });
+    },
+    scheduleFrame: callback => { const id = nextFrame++; frames.set(id, callback); return id; },
+    cancelFrame: id => { frames.delete(id); },
+    onError: error => { throw error; },
+  });
+  assert.ok(control);
+
+  const flush = async () => {
+    const frame = [...frames.values()][0]!;
+    frames.clear();
+    frame(1);
+    await Promise.resolve();
+    await Promise.resolve();
+  };
+  surface.emit('pointerdown', { pointerId: 1, button: 0, clientX: 0, clientY: 0, shiftKey: false, altKey: false });
+  surface.emit('pointermove', { pointerId: 1, clientX: 100, clientY: 0 });
+  await flush();
+  assert.equal(writes[0]![aliases.yaw], -0.2 * Math.PI);
+
+  current = runtime({
+    controls: { ...runtime().controls, [aliases.yaw]: 0.4 * Math.PI },
+    controlSequence: 2,
+  });
+  surface.emit('pointerup', { pointerId: 1 });
+  surface.emit('pointerdown', { pointerId: 2, button: 0, clientX: 100, clientY: 0, shiftKey: false, altKey: false });
+  surface.emit('pointermove', { pointerId: 2, clientX: 150, clientY: 0 });
+  await flush();
+  assert.equal(writes[1]![aliases.yaw], 0.3 * Math.PI);
 
   control!.dispose();
 });

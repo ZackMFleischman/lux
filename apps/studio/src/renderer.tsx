@@ -213,7 +213,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   }
   function commitTempo(){tempoEditing.current=false;const bpm=Number(tempoDraft);if(!Number.isFinite(bpm)||bpm<20||bpm>300){setTempoDraft(String(runtime?.tempo?.bpm??120));setError('Tempo must be between 20 and 300 BPM.');return;}if(bpm===(runtime?.tempo?.bpm??120))return;const write=controller.setTempoBpm(bpm);controlEdits?.track(write);void command(()=>write);}
   function tapTempo(){const write=controller.tapTempo();controlEdits?.track(write);void command(()=>write);}
-  const writeCameraParameters=useCallback((values:ControlValues)=>{const write=controller.setParameters(values);controlEdits?.track(write);return write;},[controller,controlEdits]);
+  const writeCameraParameters=useCallback((values:ControlValues)=>{const write=controller.setParameters(values);controlEdits?.track(write);return write.then(()=>client.getSnapshot().authoring);},[client,controller,controlEdits]);
   function windowAction(action: () => Promise<void>): void { void action().catch(reason => setError(String(reason))); }
   const compact = previewOnly || maximizedPanel !== null || windowState.fullscreen;
   const expandedPanel: StudioPanelKind = previewOnly || windowState.fullscreen ? 'preview' : maximizedPanel ?? 'preview';
