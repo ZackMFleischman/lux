@@ -109,8 +109,15 @@ function resolveModule(from: string, specifier: string): string {
   return path;
 }
 
-function modulePorts(source: SourceBundle, path: string, active = new Set<string>()): PortSurface {
+function modulePorts(
+  source: SourceBundle,
+  path: string,
+  active = new Set<string>(),
+  memo = new Map<string, PortSurface>(),
+): PortSurface {
   if (active.has(path)) throw Error('Library composition imports cannot be recursive');
+  const cached = memo.get(path);
+  if (cached) return cached;
   const text = source.files[path];
   if (typeof text !== 'string') throw Error(`Library composition is missing imported module ${path}`);
   let program: any;
@@ -123,7 +130,9 @@ function modulePorts(source: SourceBundle, path: string, active = new Set<string
     if (fields.has('metadata') && fields.has('create')) {
       if (fields.size !== 2 || fields.get('metadata').type !== 'ObjectProperty') throw Error('Library component requires only literal metadata and create fields');
       const metadata = normalizeComponentDeclaration(literal(fields.get('metadata').value));
-      return { inputs: metadata.inputs, outputs: metadata.outputs };
+      const surface = { inputs: metadata.inputs, outputs: metadata.outputs };
+      memo.set(path, surface);
+      return surface;
     }
   }
   const graph = composition ?? component;
@@ -149,7 +158,7 @@ function modulePorts(source: SourceBundle, path: string, active = new Set<string
     const targetPort = (target: any, direction: 'inputs' | 'outputs'): PortDeclaration => {
       const definition = nodeDefinitions.get(target?.nodeId), childPath = definition && definitions.get(definition);
       if (!childPath) throw Error('Library composition boundary must target an immediate node');
-      const port = modulePorts(source, childPath, active)[direction][target.portId];
+      const port = modulePorts(source, childPath, active, memo)[direction][target.portId];
       if (!port) throw Error(`Library composition boundary targets a missing ${direction} port`);
       return port;
     };
@@ -157,7 +166,9 @@ function modulePorts(source: SourceBundle, path: string, active = new Set<string
     if (fields.has('input')) inputs.image = targetPort(literal(fields.get('input').value), 'inputs');
     if (fields.has('inputs')) for (const [id, target] of Object.entries(literal(fields.get('inputs').value) as Record<string, unknown>)) inputs[id] = targetPort(target, 'inputs');
     const output = targetPort(literal(fields.get('output')?.value), 'outputs');
-    return { inputs, outputs: { image: output } };
+    const surface = { inputs, outputs: { image: output } };
+    memo.set(path, surface);
+    return surface;
   } finally { active.delete(path); }
 }
 

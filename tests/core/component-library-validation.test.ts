@@ -147,6 +147,45 @@ test('library validation closes every typed composition boundary input with an i
  assert.deepEqual(source,before);assert.equal(Object.keys(submitted?.files??{}).length,4);
  assert.match(submitted?.files[submitted.entry]??'',/validation\.candidate/);assert.match(submitted?.files[submitted.entry]??'',/portId:"bodies"/);assert.match(Object.values(submitted?.files??{}).join('\n'),/lux\/test-field\/v1/);
 });
+
+test('library validation derives a repeatedly referenced child module only once', () => {
+  const inputIds = Array.from({ length: 16 }, (_, index) => `input${index + 1}`);
+  const inputPorts = inputIds.map(id => `${id}:${imagePort}`).join(',');
+  const boundaryInputs = inputIds.map(id => `${id}:{nodeId:'nested',portId:'${id}'}`).join(',');
+  const graph = (childPath: string) => `import {defineComposition} from '@lux/visual-sdk';import child from './${childPath}';
+export default defineComposition({label:'Nested boundary',definitions:{child},nodes:[{id:'nested',definition:'child'}],edges:[],inputs:{${boundaryInputs}},output:{nodeId:'nested',portId:'image'},expose:[]});`;
+  const leaf = `import {defineComponent} from '@lux/visual-sdk';
+export default defineComponent({metadata:{declarationVersion:1,key:'demo/repeated-child',label:'Repeated child',description:'Exercises repeated boundary lookups.',tags:[],inputs:{${inputPorts}},outputs:{image:${imagePort}},controls:{},controlDescriptions:{},lifecycle:{state:'stateless',reset:'seed'}},async create(){return {update(){},async evaluate(_inputs,context){return {image:await context.render({}, {}, 'image')}},reset(){},dispose(){}}}});`;
+  const source: SourceBundle = { sdkVersion: '0.4.0', entry: 'outer.ts', files: {
+    'outer.ts': graph('middle.ts'),
+    'middle.ts': graph('inner.ts'),
+    'inner.ts': graph('leaf.ts'),
+  } };
+  let leafReads = 0;
+  Object.defineProperty(source.files, 'leaf.ts', {
+    enumerable: true,
+    get() {
+      leafReads++;
+      return leaf;
+    },
+  });
+
+  libraryValidationSource(source);
+
+  assert.equal(leafReads, 2, 'one metadata read plus one source-bundle copy');
+});
+
+test('library validation still rejects recursive composition imports with memoized surfaces', () => {
+  const graph = (childPath: string) => `import {defineComposition} from '@lux/visual-sdk';import child from './${childPath}';
+export default defineComposition({label:'Recursive boundary',definitions:{child},nodes:[{id:'nested',definition:'child'}],edges:[],output:{nodeId:'nested',portId:'image'},expose:[]});`;
+  const source: SourceBundle = { sdkVersion: '0.4.0', entry: 'a.ts', files: {
+    'a.ts': graph('b.ts'),
+    'b.ts': graph('a.ts'),
+  } };
+
+  assert.throws(() => libraryValidationSource(source), /imports cannot be recursive/i);
+});
+
 function fieldLeaf(consumer=false): SourceBundle {
   const source=pathGeneratorLeaf();
   let text=source.files[source.entry]!.replace(pathsPort,shaderFieldPort).replace("context.paths('paths',{version:1,paths:[]})","context.shaderField('paths',{version:1,abi:'lux/test-field/v1',fragments:{body:'let field = 1.0;'},values:{scale:1}})");
