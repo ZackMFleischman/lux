@@ -21,7 +21,7 @@ Use the `conductor-work` skill and actual ticket/session/claim state. Read
 Reconcile these checkpoints against the tracker and live agents before dispatch.
 All four roadmap workstreams are authorized; later slices still require their
 documented prerequisites and review. Preserve active ownership, serialize main
-integrations and graphics/Studio/Resolume tests, and do not start a second team.
+integrations, and do not start a second team.
 
 Use up to the current host's available agent limit. Do not impose a lower fixed
 project limit. The user replaced the historical five-context cap on 13 September
@@ -87,6 +87,17 @@ path. Keep project- and role-specific scope local. Ship reviewed fixes when read
 with explicit coordination for affected agents or shared installations. The
 coordinator still owns host capacity and conflicting integrations/resources.
 Do not create a second worker pool, speculative work or a background daemon.
+
+### Graphics QA coordination
+
+The one-native-GPU-test rule is superseded by LUX-P112 and LUX-P117. Routine
+isolated low-resolution functional QA may run concurrently after a current
+resource check. CPU work does not wait for a GPU slot. Reserve an uncontended
+window only for a performance measurement or an observed resource conflict. Keep
+profiles isolated and do not interrupt user apps.
+
+For such an exceptional window, use the canonical Conductor shared-resource
+handoff rule. Lux adds no GPU-specific scheduler or global lock.
 
 ### UI review evidence
 
