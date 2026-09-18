@@ -1,0 +1,31 @@
+.preview-surface.camera-controller-active {
+  cursor: grab;
+  touch-action: none;
+}
+
+.preview-surface.camera-controller-active:active {
+  cursor: grabbing;
+}
+
+.preview-camera-reset.MuiButton-root {
+  position: absolute;
+  z-index: 3;
+  top: 10px;
+  right: 10px;
+  min-width: 0;
+  min-height: 26px;
+  padding: 2px 8px;
+  border-color: #686b7b;
+  background: #171820d9;
+  color: #dddfea;
+  font-size: 10px;
+  line-height: 18px;
+  text-transform: none;
+  backdrop-filter: blur(4px);
+}
+
+.preview-camera-reset.MuiButton-root:hover,
+.preview-camera-reset.MuiButton-root:focus-visible {
+  border-color: #aaa4c8;
+  background: #252632ee;
+}

@@ -2,6 +2,7 @@ import { InspectorBreadcrumb } from './InspectorBreadcrumb.tsx';
 import {GraphPanel,compositionNodeLabel,compositionOccurrence,nodeKey} from './GraphPanel.tsx';
 import {visualSelection} from './visual-model.ts';
 import type {NodePath} from '../../../packages/runtime-contracts/src/graph.ts';
+import type {ControlValues} from '../../../packages/runtime-contracts/src/parameters.mjs';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { Alert, Button, Chip, CssBaseline, Paper, ThemeProvider, IconButton, Tooltip, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions,TextField } from '@mui/material';
 import { studioTheme } from './theme.ts';
@@ -212,6 +213,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
   }
   function commitTempo(){tempoEditing.current=false;const bpm=Number(tempoDraft);if(!Number.isFinite(bpm)||bpm<20||bpm>300){setTempoDraft(String(runtime?.tempo?.bpm??120));setError('Tempo must be between 20 and 300 BPM.');return;}if(bpm===(runtime?.tempo?.bpm??120))return;const write=controller.setTempoBpm(bpm);controlEdits?.track(write);void command(()=>write);}
   function tapTempo(){const write=controller.tapTempo();controlEdits?.track(write);void command(()=>write);}
+  const writeCameraParameters=useCallback((values:ControlValues)=>{const write=controller.setParameters(values);controlEdits?.track(write);return write;},[controller,controlEdits]);
   function windowAction(action: () => Promise<void>): void { void action().catch(reason => setError(String(reason))); }
   const compact = previewOnly || maximizedPanel !== null || windowState.fullscreen;
   const expandedPanel: StudioPanelKind = previewOnly || windowState.fullscreen ? 'preview' : maximizedPanel ?? 'preview';
@@ -247,7 +249,8 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
             <span className="preview-fps" aria-label={`Worker frame rate ${previewFpsValue}`} title={previewFpsDetail}>{previewFpsValue}</span>
           </div>
         </div>
-        <Preview runtime={runtime} port={presentation} moved={!previewOnly && windowState.detached} onError={setError} onDock={() => windows && windowAction(() => windows.dock())} />
+        <Preview runtime={runtime} port={presentation} moved={!previewOnly && windowState.detached} onError={setError}
+          onCameraParameters={writeCameraParameters} onDock={() => windows && windowAction(() => windows.dock())} />
         {runtime?.fault && <Alert severity="error"><strong>{runtime.fault.code}</strong> · {runtime.fault.message}</Alert>}
         {error && <Alert severity="error" role="alert">{error}</Alert>}
         <div className="transport" hidden={windowState.fullscreen} aria-busy={busy}><div className="transport-actions">
