@@ -1093,3 +1093,18 @@ test('RTL: question mark opens the shortcut reference without intercepting text 
   assert.equal(repeatedQuestionMark.defaultPrevented, false, 'repeated question mark is not intercepted');
   assert.equal(screen.getAllByRole('dialog', { name: 'Keyboard shortcuts' }).length, 1);
 });
+
+test('RTL: sequence timing is visible before launch and selection does not alter transport',async()=>{
+  const calls:any[]=[];
+  const {StoryPanel}=await import('../../apps/studio/src/story/StoryPanel.tsx');
+  render(<StoryPanel status={storyStatus()} available controller={{storyTransport:async(...args:any[])=>{calls.push(args);return {};}} as any} onError={()=>{}}/>);
+  const rows=within(screen.getByRole('list',{name:'Story sequence'})).getAllByRole('listitem');
+  assert.match(rows[0]!.textContent??'',/4\.0s/,'show scheduled dwell, not the 10s local beat duration');
+  assert.match(rows[1]!.textContent??'',/Manual cue/,'manual waits are explicit before activation');
+  assert.match(rows[2]!.textContent??'',/5\.0s/);
+  fireEvent.click(within(rows[2]!).getByRole('button'));
+  assert.equal(calls.length,0);
+  fireEvent.click(screen.getByRole('button',{name:/Start here: Hold — occurrence 3 of 3/}));
+  await waitFor(()=>assert.equal(calls.length,1));
+  assert.deepEqual(calls[0][0],{action:'start',occurrenceId:'hold-b'});
+});
