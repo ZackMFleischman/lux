@@ -129,10 +129,17 @@ test('raw JSON byte accounting includes wrapper, Unicode and escaped text at exa
   (m.controls[0] as any).label+=' ';assert.equal(encode(),2097153);invalid(f.graph,f.definitions,/definitions/,/raw JSON byte/);
 });
 test('invalid shared UUID/hash representations reject without applying mapping normalization',()=>{
-  for(const id of [' '+A,A+' ','not-uuid','00000000-0000-4000-8000-00000000000g']){const f=basic();f.graph.nodes[0]!.id=id;invalid(f.graph,f.definitions,/graph.nodes\[0\]/,/UUID/);}
+  for(const id of [' '+A,A+' ','NotReadable','9starts-with-digit','a'.repeat(97),'00000000-0000-4000-8000-00000000000g']){const f=basic();f.graph.nodes[0]!.id=id;invalid(f.graph,f.definitions,/graph.nodes\[0\]/,/identity|identifier|UUID/);}
   for(const bad of [h.toUpperCase(),'b'.repeat(63),'g'.repeat(64)]){const f=basic();f.graph.nodes[0]!.definitionHash=bad;invalid(f.graph,f.definitions,/graph.nodes\[0\]/,/hash/);}
   const f=basic();f.definitions['__proto__']= {kind:'code',metadata:metadata()};invalid(f.graph,f.definitions,/definitions/,/plain/);
-  const g=diamond();g.graph.edges[0]!.id='bad';invalid(g.graph,g.definitions,/graph.edges\[/,/UUID/);
+  const g=diamond();g.graph.edges[0]!.id='Bad';invalid(g.graph,g.definitions,/graph.edges\[/,/identity|identifier|UUID/);
+});
+test('readable graph IDs survive admission while UUID graphs remain unchanged',()=>{
+  const f=basic();f.graph.nodes[0]!.id='quasar.disk';f.graph.finalOutput.nodeId='quasar.disk';
+  const readable=validateGraph(f.graph,f.definitions).graph;
+  assert.equal(readable.nodes[0]!.id,'quasar.disk');assert.equal(readable.finalOutput.nodeId,'quasar.disk');
+  const uuidGraph=basic();assert.deepEqual(validateGraph(uuidGraph.graph,uuidGraph.definitions).graph,uuidGraph.graph);
+  const duplicate=diamond();duplicate.graph.nodes[0]!.id='starfield';duplicate.graph.nodes[1]!.id='starfield';invalid(duplicate.graph,duplicate.definitions,/node/,/duplicate node ID/);
 });
 test('a dense topology remains bounded by the canonical graph byte budget',()=>{
   const f=fanout512(), output='v'.repeat(64), input=(i:number)=>`p${String(i).padStart(63,'0')}`;

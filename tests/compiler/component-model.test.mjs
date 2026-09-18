@@ -33,6 +33,9 @@ test('SDK author helpers normalize graph components and visuals to the existing 
  assert.deepEqual(sdk.defineVisual(body),sdk.defineComposition(body));
  assert.equal(Object.isFrozen(sdk.defineVisual(body)),true);
  assert.throws(()=>sdk.defineVisual({...body,input:body.output}),/external image input|input/i);
+ assert.throws(()=>sdk.defineVisual({...body,inputs:{image:body.output}}),/external input|input/i);
+ assert.throws(()=>sdk.defineComponent({...body,input:body.output,inputs:{image:body.output}}),/mutually exclusive/i);
+ assert.deepEqual(sdk.defineComponent({...body,inputs:{image:body.output}}).inputs,{image:body.output});
  assert.throws(()=>sdk.defineComponent({...body,create(){}}),/fields|only|requires/i);
 });
 

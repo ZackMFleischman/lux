@@ -29,15 +29,17 @@ export interface ComponentInstance<C extends ControlDeclarations=ControlDeclarat
 export interface CodeComponentDefinition<C extends ControlDeclarations=ControlDeclarations,I extends PortDeclarations=LegacyImageInputs,O extends PortDeclarations=LegacyImageOutputs>{readonly kind:'component';readonly sdkVersion:'0.4.0';readonly metadata:Omit<ComponentMetadata,'inputs'|'outputs'>&{readonly inputs:I;readonly outputs:O};create(context:ComponentContext):Promise<ComponentInstance<C,I,O>>}
 type CodeDeclaration<C extends ControlDeclarations,I extends PortDeclarations,O extends PortDeclarations>={readonly metadata:Omit<ComponentDeclaration,'inputs'|'outputs'|'controls'|'controlDescriptions'>&{readonly inputs:I;readonly outputs:O;readonly controls:C & ValidControlDeclarations<C>;readonly controlDescriptions:{readonly [K in keyof C]:string}};create(context:ComponentContext):Promise<ComponentInstance<NoInfer<C>,NoInfer<I>,NoInfer<O>>>};
 type Node={readonly id:string;readonly definition:string};type Ref={readonly nodeId:string;readonly portId:string};type Edge={readonly id:string;readonly from:Ref;readonly to:Ref;readonly delay:'none'};type Exposure={readonly id:string;readonly nodeId:string;readonly controlId:string};
-export interface GraphComponentDefinition{readonly kind:'composition';readonly sdkVersion:'0.4.0';readonly label?:string;readonly definitions:Readonly<Record<string,AnyComponentDefinition<any,any,any>>>;readonly nodes:readonly Node[];readonly edges:readonly Edge[];readonly input?:Ref;readonly output:Ref;readonly expose:readonly Exposure[]}
+type GraphFields={readonly label?:string;readonly definitions:Readonly<Record<string,AnyComponentDefinition<any,any,any>>>;readonly nodes:readonly Node[];readonly edges:readonly Edge[];readonly output:Ref;readonly expose:readonly Exposure[]};
+type GraphBoundary={readonly input?:Ref;readonly inputs?:never}|{readonly input?:never;readonly inputs?:Readonly<Record<string,Ref>>};
+export type GraphComponentDefinition=Readonly<{readonly kind:'composition';readonly sdkVersion:'0.4.0'}&GraphFields&GraphBoundary>;
 /** Compatibility name: existing SDK 0.4 source can access its code factory directly. */
 export type ComponentDefinition<C extends ControlDeclarations=any,I extends PortDeclarations=LegacyImageInputs,O extends PortDeclarations=LegacyImageOutputs>=CodeComponentDefinition<C,I,O>;
 export type AnyComponentDefinition<C extends ControlDeclarations=any,I extends PortDeclarations=LegacyImageInputs,O extends PortDeclarations=LegacyImageOutputs>=CodeComponentDefinition<C,I,O>|GraphComponentDefinition;
 /** Compatibility name for the existing sealed graph representation. */
 export type CompositionDefinition=GraphComponentDefinition;
-export type VisualDefinition=Omit<GraphComponentDefinition,'input'>&{readonly input?:never};
-type GraphDeclaration=Omit<GraphComponentDefinition,'kind'|'sdkVersion'>;
-type VisualDeclaration=Omit<GraphDeclaration,'input'>&{readonly input?:never};
+export type VisualDefinition=Readonly<{readonly kind:'composition';readonly sdkVersion:'0.4.0'}&GraphFields&{readonly input?:never;readonly inputs?:never}>;
+type GraphDeclaration=Readonly<GraphFields&GraphBoundary>;
+type VisualDeclaration=Readonly<GraphFields&{readonly input?:never;readonly inputs?:never}>;
 
 export function defineComponent<const C extends ControlDeclarations,const I extends PortDeclarations,const O extends PortDeclarations>(definition:CodeDeclaration<C,I,O>):CodeComponentDefinition<C,I,O>;
 export function defineComponent(definition:GraphDeclaration):GraphComponentDefinition;
@@ -52,11 +54,11 @@ export function defineComponent(definition:CodeDeclaration<any,any,any>|GraphDec
 /** A runnable graph. External image input requires a future host provider. */
 export function defineVisual(definition:VisualDeclaration):VisualDefinition{
  const graph=defineComposition(definition);
- if(Object.hasOwn(graph,'input'))throw Error('Runnable visuals do not yet support external image input');
+ if(Object.hasOwn(graph,'input')||Object.hasOwn(graph,'inputs'))throw Error('Runnable visuals do not yet support external input');
  return graph as VisualDefinition;
 }
 
 /** Existing source remains valid; prefer defineComponent or defineVisual in new code. */
 export function defineComposition(definition:GraphDeclaration):CompositionDefinition{
- if(!definition||![Object.prototype,null].includes(Object.getPrototypeOf(definition)))throw Error('Expected plain composition definition');const required=['definitions','nodes','edges','output','expose'],allowed=[...required,'input','label'],keys=Reflect.ownKeys(definition);if(keys.some(k=>typeof k!=='string'||!allowed.includes(k))||required.some(k=>!Object.getOwnPropertyDescriptor(definition,k)?.enumerable||!Object.hasOwn(Object.getOwnPropertyDescriptor(definition,k)!,'value'))||keys.some(k=>!Object.getOwnPropertyDescriptor(definition,k)?.enumerable||!Object.hasOwn(Object.getOwnPropertyDescriptor(definition,k)!,'value')))throw Error('Composition requires literal data fields');return Object.freeze({kind:'composition',sdkVersion,...definition});
+ if(!definition||![Object.prototype,null].includes(Object.getPrototypeOf(definition)))throw Error('Expected plain composition definition');const required=['definitions','nodes','edges','output','expose'],allowed=[...required,'input','inputs','label'],keys=Reflect.ownKeys(definition);if(Object.hasOwn(definition,'input')&&Object.hasOwn(definition,'inputs'))throw Error('Composition input and inputs are mutually exclusive');if(keys.some(k=>typeof k!=='string'||!allowed.includes(k))||required.some(k=>!Object.getOwnPropertyDescriptor(definition,k)?.enumerable||!Object.hasOwn(Object.getOwnPropertyDescriptor(definition,k)!,'value'))||keys.some(k=>!Object.getOwnPropertyDescriptor(definition,k)?.enumerable||!Object.hasOwn(Object.getOwnPropertyDescriptor(definition,k)!,'value')))throw Error('Composition requires literal data fields');return Object.freeze({kind:'composition',sdkVersion,...definition});
 }
