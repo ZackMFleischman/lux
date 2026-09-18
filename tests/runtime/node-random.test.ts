@@ -42,6 +42,17 @@ test('accepts frozen depth-eight paths, repeated UUID segments and canonical see
   assert.notEqual(deriveNodeSeed(0,path([A])),deriveNodeSeed(0,path([A,A])));
 });
 
+test('readable nested node paths use an unambiguous deterministic encoding', () => {
+  const ids=['source-group','image-source'],encoded=ids.map(id=>Buffer.from(id));
+  const bytes=Buffer.alloc(22+encoded.reduce((total,id)=>total+1+id.length,0));
+  bytes.write('lux-node-rng-v1\0',0);bytes.writeUInt32LE(0x12345678,16);bytes[20]=ids.length;bytes[21]=0xff;
+  let offset=22;for(const id of encoded){bytes[offset++]=id.length;id.copy(bytes,offset);offset+=id.length;}
+  let hash=2166136261n;for(const byte of bytes)hash=((hash^BigInt(byte))*16777619n)&0xffffffffn;
+  assert.equal(deriveNodeSeed(0x12345678,path(ids)),Number(hash));
+  assert.notEqual(deriveNodeSeed(0,path(['a','bc'])),deriveNodeSeed(0,path(['ab','c'])));
+  assert.deepEqual(words(createNodeRandom(0x12345678,path(ids))),words(createNodeRandom(0x12345678,path(ids))));
+});
+
 test('rejects invalid seeds before path reads or unsigned truncation', () => {
   let reads=0;
   const ids=Object.defineProperty([A],'0',{get(){reads++; return A;}});
@@ -64,7 +75,7 @@ test('rejects malformed path containers and identities without invoking getters'
   for (const bad of [[],new Array(1),accessor,extra,symbol,inherited,overlong,
     Array.from({length:9},()=>A),
     Object.setPrototypeOf([A],null), {0:A,length:1},new String(A),null,A,
-    ['x'.repeat(100000)],['x'.repeat(36)], [A+' '], [123], [new String(A)], ['é'.repeat(36)]]) {
+    ['x'.repeat(100000)],['a'.repeat(97)], ['Uppercase'], ['-bad'], [A+' '], [123], [new String(A)], ['é'.repeat(36)]]) {
     assert.throws(()=>deriveNodeSeed(0,path(bad)));
     assert.throws(()=>createNodeRandom(0,path(bad)));
   }
@@ -92,7 +103,7 @@ test('streams own private state and reset the original seed without external cha
 function typeBoundary(random: ReturnType<typeof createNodeRandom>) {
   // @ts-expect-error reset cannot replace the scene or path seed
   random.reset(123);
-  // @ts-expect-error UUID paths use branded logical identities
+  // @ts-expect-error Node paths use branded logical identities
   deriveNodeSeed(0,['display name']);
 }
 void typeBoundary;

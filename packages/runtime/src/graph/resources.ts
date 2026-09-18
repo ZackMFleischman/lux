@@ -145,8 +145,8 @@ function captureArray(value:unknown,min:number,max:number):unknown[] {
   return result;
 }
 function capturePath(value:NodePath):NodePath {
-  const list=captureArray(value,1,8);for(const part of list)if(typeof part!=='string'||part.length!==36)invalid();
-  // Membership in the authentic admitted plan supplies exact UUID validation.
+  const list=captureArray(value,1,8);for(const part of list)if(typeof part!=='string'||part.length<1||part.length>96)invalid();
+  // Membership in the authentic admitted plan supplies exact NodeId syntax and occurrence ownership.
   return Object.freeze(list) as NodePath;
 }
 function captureImage(h:Host,value:ImageDescriptor):ImageDescriptor {

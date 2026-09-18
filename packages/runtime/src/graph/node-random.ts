@@ -15,26 +15,30 @@ export function deriveNodeSeed(sceneSeed: number, nodePath: NodePath): number {
   const length = Object.getOwnPropertyDescriptor(nodePath, 'length')?.value;
   // Count first: do not inspect children of an overlong path.
   if (!Number.isInteger(length) || length < 1 || length > 8) {
-    throw new TypeError('Node path must contain 1 to 8 UUIDs');
+    throw new TypeError('Node path must contain 1 to 8 node IDs');
   }
   if (Reflect.ownKeys(nodePath).length !== length + 1) {
-    throw new TypeError('Node path must contain only dense UUID elements');
+    throw new TypeError('Node path must contain only dense node ID elements');
   }
   const ids: string[] = [];
   for (let i = 0; i < length; i++) {
     const descriptor = Object.getOwnPropertyDescriptor(nodePath, String(i));
-    if (!descriptor || !Object.hasOwn(descriptor, 'value') || typeof descriptor.value !== 'string' || descriptor.value.length !== 36) {
-      throw new TypeError('Node path elements must be own UUID data properties');
+    if (!descriptor || !Object.hasOwn(descriptor, 'value') || typeof descriptor.value !== 'string') {
+      throw new TypeError('Node path elements must be own node ID data properties');
     }
     // The existing identity schema preserves the exact spelling, including case.
     ids.push(nodeIdSchema.parse(descriptor.value));
   }
-  const bytes = new Uint8Array(21 + 36 * length);
+  const fixedWidth = ids.every(id => id.length === 36);
+  const bytes = new Uint8Array(fixedWidth ? 21 + 36 * length : 22 + ids.reduce((total,id)=>total+1+id.length,0));
   bytes.set(prefix);
   new DataView(bytes.buffer).setUint32(16, sceneSeed === 0 ? 0 : sceneSeed, true);
   bytes[20] = length;
-  for (let i = 0; i < length; i++) {
-    for (let j = 0; j < 36; j++) bytes[21 + i * 36 + j] = ids[i]!.charCodeAt(j);
+  if(fixedWidth){
+    for (let i = 0; i < length; i++) for (let j = 0; j < 36; j++) bytes[21 + i * 36 + j] = ids[i]!.charCodeAt(j);
+  }else{
+    bytes[21]=0xff;let offset=22;
+    for(const id of ids){bytes[offset++]=id.length;for(let j=0;j<id.length;j++)bytes[offset++]=id.charCodeAt(j);}
   }
   let hash = 2166136261;
   for (const byte of bytes) hash = Math.imul(hash ^ byte, 16777619) >>> 0;

@@ -37,6 +37,41 @@ function fullInputs() {
     [f.hash(6)]:{kind:'code',metadata:f.meta({...Object.fromEntries(Array.from({length:15},(_,i)=>[`p${i}`,f.image])),p15:f.signal})}}});
 }
 
+function readableNested(): any {
+  const ref = (nodeId:string, portId='image') => ({nodeId, portId});
+  return f.clone({graph:{version:2,rootDefinitionHash:f.hash(1),outputPort:'image'},definitions:{
+    [f.hash(1)]:f.graphDef([
+      {id:'source-group',definitionHash:f.hash(2),controlDefaults:{}},
+      {id:'final-image',definitionHash:f.hash(4),controlDefaults:{}},
+    ],[{id:'source-to-final',from:ref('source-group'),to:ref('final-image'),delay:'none'}],{},
+    {image:ref('final-image')}),
+    [f.hash(2)]:f.graphDef([
+      {id:'image-source',definitionHash:f.hash(3),controlDefaults:{}},
+    ],[],{},{image:ref('image-source')}),
+    [f.hash(3)]:{kind:'code',metadata:f.meta()},
+    [f.hash(4)]:{kind:'code',metadata:f.meta({image:f.image})},
+  }});
+}
+
+test('nested readable node paths execute through resource capture and backend dispatch', async () => {
+  const produced:{image:R.BackendImage;inputs:readonly R.BackendImage[]}[]=[];
+  const {host,p}=fixture(readableNested(),{produce(image,inputs){produced.push({image,inputs});},capture(){},release(){}});
+  const paths=readGraphRuntimePlan(p).nodes.map(node=>node.nodePath);
+  assert.deepEqual(paths,[['source-group','image-source'],['final-image']]);
+  const frame=R.beginResourceFrame(host,3),caches:R.CachedOutputs[]=[];
+  for(const nodePath of paths){
+    const evaluation=R.openResourceNode(host,frame,nodePath);
+    const image=await evaluation.resources.image('image',descriptor,Object.values(evaluation.inputs));
+    caches.push(await R.completeResourceNode(host,evaluation.scope,{image}));
+  }
+  const output=R.finishResourceFrame(host,frame);
+  assert.deepEqual(produced.map(entry=>entry.image.nodePath),paths);
+  assert.deepEqual(produced[1]!.inputs.map(image=>image.nodePath),[['source-group','image-source']]);
+  for(const cache of caches)R.releaseResourceCache(host,cache);
+  output.release();await R.disposeResourceHost(host);
+  assert.deepEqual(R.readResourceStatus(host).counts,zero);
+});
+
 test('H1 authentic attachment is once; own non-enumerable captures reject accessors without calls',async()=>{
   let calls=0,getters=0;const backend={produce(){calls++;},release(){},capture(){}};
   const host=R.createResourceHost(hidden(profile),hidden(backend));const p=plan(),p2=plan();
