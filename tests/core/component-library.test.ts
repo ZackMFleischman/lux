@@ -72,6 +72,44 @@ test('library writes are atomic, revision guarded, validated before activation, 
   assert.equal(JSON.parse(await readFile(join(root, 'catalog.json'), 'utf8')).format, 'lux-component-library-catalog');
 });
 
+test('library persists and lists more than 32 compact catalog entries', async t => {
+  const directory = await mkdtemp(join(tmpdir(), 'lux-library-capacity-'));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const root = join(directory, 'library');
+  let issued = 0;
+  const store = new ComponentLibraryStore(root, {
+    id: () => `${(++issued).toString(16).padStart(8, '0')}-0000-4000-8000-000000000000`,
+    now: () => '2026-09-17T20:00:00.000Z',
+  });
+  for (let index = 1; index <= 34; index++) {
+    await store.create({ name: `Component ${index}`, description: `Reusable component ${index}.`, source: component() });
+  }
+
+  const reopened = new ComponentLibraryStore(root);
+  assert.equal((await reopened.list()).length, 34);
+  assert.equal((await readLibraryCatalogSummaries(root)).length, 34);
+});
+
+test('library catalog still rejects entry 129', async t => {
+  const directory = await mkdtemp(join(tmpdir(), 'lux-library-capacity-bound-'));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const root = join(directory, 'library'), legacyPath = join(directory, 'component-library.json');
+  const components = Array.from({ length: 128 }, (_, index) =>
+    record(`${(index + 1).toString(16).padStart(8, '0')}-0000-4000-8000-000000000000`));
+  await writeFile(legacyPath, JSON.stringify({ format: 'lux-component-library', version: 1, components }));
+  const store = new ComponentLibraryStore(root, {
+    legacyPath,
+    id: () => '00000081-0000-4000-8000-000000000000',
+  });
+
+  assert.equal((await store.list()).length, 128);
+  await assert.rejects(
+    store.create({ name: 'One too many', description: 'Must remain bounded.', source: component() }),
+    /at most 128 entries/,
+  );
+  assert.equal((await new ComponentLibraryStore(root).list()).length, 128);
+});
+
 test('linked source applies a newer revision while a fork keeps the mounted source and removes its link', async () => {
   const first = { id: '11111111-1111-4111-8111-111111111111', revision: 1, name: 'Shared', description: 'Shared source', updatedAt: '2026-09-13T20:00:00.000Z', source: component() };
   const linked = applyLibraryComponent(scene(), [], first, 'library/shared');

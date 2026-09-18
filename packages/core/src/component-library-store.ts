@@ -8,7 +8,7 @@ import { libraryText, plainLibraryRecord, resolveLibraryComponent, validateLibra
 import type { LibraryComponent, LibraryComponentSummary, LibraryDependency } from './component-library.ts';
 
 const libraryBytes = 8 * 1024 * 1024;
-const componentCount = 32;
+const componentCount = 128;
 const sourcePathPattern = /^(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.ts$/;
 
 type CatalogReference = Readonly<{ id: string; revision: number }>;
@@ -368,7 +368,7 @@ export class ComponentLibraryStore {
     const add = async (candidate: LibraryComponent, kind: 'seed' | 'migration', sourceRoot?: string): Promise<void> => {
       const index = components.findIndex(component => component.id === candidate.id), existing = components[index];
       if (!existing) {
-        if (components.length >= componentCount) throw Error('Component library supports at most 32 entries');
+        if (components.length >= componentCount) throw Error(`Component library supports at most ${componentCount} entries`);
         if (kind === 'seed' && sourceRoot) {
           const revisions = await readSeedHistory(sourceRoot, candidate);
           if (!revisions) {
@@ -462,7 +462,7 @@ export class ComponentLibraryStore {
         updatedAt: this.now(), source: candidateSource, ...(dependencies?.length ? { dependencies } : {}) });
       const expanded = await this.locked(async () => {
         const current = await this.prepareLocked();
-        if (current.components.length >= componentCount) throw Error('Component library supports at most 32 entries');
+        if (current.components.length >= componentCount) throw Error(`Component library supports at most ${componentCount} entries`);
         if (current.components.some(component => component.id === candidate.id)) throw Error('Library component ID already exists');
         return resolveLibraryComponent(candidate, async (id, revision) => {
           const reference = current.catalog.components.find(item => item.id === id);
@@ -473,7 +473,7 @@ export class ComponentLibraryStore {
       await this.validateCandidate(expanded.source);
       return this.locked(async () => {
         const current = await this.prepareLocked();
-        if (current.components.length >= componentCount) throw Error('Component library supports at most 32 entries');
+        if (current.components.length >= componentCount) throw Error(`Component library supports at most ${componentCount} entries`);
         if (current.components.some(component => component.id === candidate.id)) throw Error('Library component ID already exists');
         await writeStoredComponent(this.root, candidate);
         await writeCatalog(this.root, catalog({ format: 'lux-component-library-catalog', version: 1,
