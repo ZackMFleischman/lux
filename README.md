@@ -19,6 +19,8 @@ pnpm test:mcp -- --profile-fixture
 pnpm preflight
 ```
 
+`pnpm typecheck` covers the repository sources, Visual SDK examples, and Studio sources.
+
 `pnpm studio:setup` installs or repairs the exact Electron version pinned in this checkout using Electron's official installer and checksum verification. It reuses Electron's shared download cache (`%LOCALAPPDATA%/electron/Cache` on Windows); no global Electron installation is needed. Each checkout keeps its own dependencies and runtime. See [Electron installation](https://www.electronjs.org/docs/latest/tutorial/installation).
 
 Normal `pnpm studio` and `pnpm studio:creative` launches also prepare a missing runtime before opening Studio. First-use creative startup needs `pnpm install --frozen-lockfile` in the reserved checkout returned by `node scripts/studio-creative.mjs --prepare`; `/start-lux` handles this setup. Existing creative reservations stay pinned. Setup never upgrades the pin or falls back to repairing another checkout's dependencies.
