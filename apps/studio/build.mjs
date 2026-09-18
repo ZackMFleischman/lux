@@ -19,7 +19,8 @@ await build({ ...common, entryPoints: [join(directory, 'src/main.ts')], outfile:
 await build({ ...common, entryPoints: [join(directory, 'src/preload.ts')], outfile: join(dist, 'preload.cjs'),
   platform: 'node', format: 'cjs', target: 'node24', external: ['electron'] });
 await build({ ...common, entryPoints: [join(directory, 'src/entry.tsx')], outfile: join(dist, 'renderer.js'),
-  platform: 'browser', format: 'esm', target: 'chrome140', jsx: 'automatic' });
+  platform: 'browser', format: 'esm', target: 'chrome140', jsx: 'automatic',
+  assetNames: 'assets/[name]-[hash]', loader: { '.woff2': 'file' } });
 await build({ ...common, entryPoints: [join(directory, 'src/visual-worker.mjs')], outfile: join(dist, 'visual-worker.js'),
   platform: 'browser', format: 'esm', target: 'chrome140' });
 await build({ ...common, entryPoints: [join(directory, 'src/source/admission-worker.mjs')], outfile: join(dist, 'source-admission-worker.js'),
@@ -29,6 +30,8 @@ await build({ ...common, entryPoints: [join(directory, 'src/source/image-preview
 await build({ ...common, entryPoints: [join(directory, 'src/assets/story-asset-decoder-worker.mjs')], outfile: join(dist, 'story-asset-decoder-worker.js'),
   platform: 'browser', format: 'esm', target: 'chrome140' });
 await copyFile(join(directory, 'src/index.html'), join(dist, 'index.html'));
+await mkdir(join(dist, 'licenses'), { recursive: true });
+await copyFile(join(directory, 'src/fonts/OFL.txt'), join(dist, 'licenses/Inter-OFL.txt'));
 await copyFile(join(directory, 'assets/branding/lux-icon.png'), join(dist, 'lux-icon.png'));
 await copyFile(join(directory, 'assets/branding/lux-favicon.svg'), join(dist, 'lux-favicon.svg'));
 if (process.argv.includes('--tests')) await build({ ...common,
