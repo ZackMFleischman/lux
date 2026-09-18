@@ -55,6 +55,15 @@ Existing task: 01a0993a-0e08-7ec2-9455-b85075bf2b1c, title Identify parallel Lux
 
 Reserved first integration window: existing coordinator owns LUX-6 on shared main, while this task changes only docs/conductor-onboarding*. Next integrations and every GPU/Studio/Resolume session require root slot arbitration. CPU/native filesystem tests may run independently. C02 owns the narrow project-v1 SDK gate plus its listed compiler/worker changes. Filesystem2a does not edit project contracts. New reliability/inputs plans must avoid those shared files until agreement.
 
+### Superseded GPU coordination note (18 September 2026)
+
+The preceding root-arbitration statement is historical onboarding evidence. LUX-P112
+and LUX-P117 supersede blanket GPU serialization. Routine isolated low-resolution
+functional QA may run concurrently after current resource checks. Reserve an
+uncontended window only for a performance measurement or observed resource conflict.
+Exceptional handoffs use the canonical Conductor shared-resource rule. LUX-P122
+records why this acknowledgement-safe condition remains necessary.
+
 Onboarding identity471445bc-9f1c-4c77-8e8a-3681e5bc95b4; session504a493d-3c7b-4562-846b-5b916f9b1bf4; ticket LUX-1; claim502bd021-88ed-4d09-88fb-75dd6e8ab375. Shared checkout is intentional for docs/tracker-only work; PRIMARY_CHECKOUT warning acknowledged. Mutation requests/payloads/results are in conductor-onboarding/. Operations are sequential and persisted before calls; each successful ticket ID was saved immediately. The invoke helper is a synchronous CLI journal, not a background launcher.
 
 Next safe action: verify actual ticket descriptions/dependencies; submit onboarding checkpoint and stop its session. Start a distinct overall orchestration session, persist a managed-run profile and launch intents for fresh new-lane planning/review contexts. Existing two-lane coordinator remains ordinary tracked work. Full lane completion is not implied by registration or plan readiness.

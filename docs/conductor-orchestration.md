@@ -5,13 +5,27 @@ The user designated task `01a09baf-3806-7eb0-8bed-48b8b7f771cf` as the sole coor
 Use up to the current host limit for future coordination. The current host permits
 eight total contexts, including root. The user explicitly replaced the historical
 five-context cap. Count all delivery, review, observer and unresolved launches.
-Keep one active run and serialize shared integration and graphics tests. Do not
-fill available slots with speculative work. The existing dispatch checkpoint and
-tracker record the transition from the old immutable profile to its successor.
+Keep one active run and serialize shared integration. Coordinate graphics from
+observed resource use, not a presumed global GPU lock. Do not fill available slots
+with speculative work. The existing dispatch checkpoint and tracker record the
+transition from the old immutable profile to its successor.
 
 ## Next usable milestones
 
-Current dispatch order (16 September 2026): finish reviewed component model150 and shared Studio audio151 integration, including the active Inspector pointer regression166. Then prioritize kick response152 and manual/tap tempo153 ahead of Library164/165. Automatic audio beat estimation is not in153; Resolume host/audio/export verification109/111/154 remains deferred. Retain the fresh-start noise-sphere default and Graph instructional-footer removal as bounded polish; preserve saved-scene reopening. Routine native UI checks use640×360 after default startup, with normal window sizes; explicit capture-resolution checks retain1920×1080. Only one native GPU test may run at a time, coordinated directly with the tracer task.
+Current dispatch order (16 September 2026): finish reviewed component model150 and shared Studio audio151 integration, including the active Inspector pointer regression166. Then prioritize kick response152 and manual/tap tempo153 ahead of Library164/165. Automatic audio beat estimation is not in153; Resolume host/audio/export verification109/111/154 remains deferred. Retain the fresh-start noise-sphere default and Graph instructional-footer removal as bounded polish; preserve saved-scene reopening. Routine native UI checks use640×360 after default startup, with normal window sizes; explicit capture-resolution checks retain1920×1080.
+
+### Graphics QA supersession (LUX-P112, LUX-P117, LUX-P122)
+
+This supersedes the former one-native-GPU-test-at-a-time instruction. Routine
+isolated low-resolution functional QA may run concurrently when current resource
+checks permit it. CPU work never waits for a GPU slot. Use an uncontended window
+only for performance evidence or an observed conflict.
+
+For an exceptional window, use the canonical Conductor shared-resource handoff
+rule. Lux adds no GPU-specific scheduler or global lock.
+
+Historical reports retain the old policy as evidence. This current checkpoint
+records that it is superseded.
 
 The user's latest priority is QA and iteration on the normal creative workflow
 before additive features. Exercise start, create/edit, build, inspect, controls,
