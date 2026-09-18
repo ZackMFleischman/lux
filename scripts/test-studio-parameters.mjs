@@ -8,10 +8,14 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 const root = resolve(import.meta.dirname, '..');
 const attempt = await createStudioQaAttempt({ root, expectedWorkspace: root, label: 'parameters' });
 const { directory: folder, env, session: testSession } = attempt;
+const viewport = process.env.LUX_QA_LOW_RES === '1' ? { width: 640, height: 360 } : { width: 1360, height: 900 };
 let app, page, client;
 const report = { ok: false, checks: [], errors: [] };
 try {
-  ({ app, page } = await attempt.launch({ viewport: { width: 1360, height: 900 } })); page.setDefaultTimeout(15000);
+  ({ app, page } = await attempt.launch({ viewport, ready: page => page.waitForFunction(() => {
+    const build = [...document.querySelectorAll('button')].find(button => button.textContent?.trim() === 'Build');
+    return !!build && !build.disabled && window.innerWidth > 0 && window.innerHeight > 0;
+  }) })); page.setDefaultTimeout(15000);
   page.on('pageerror', error => report.errors.push(error.stack ?? error.message));
   await page.getByRole('button', { name: 'Build', exact: true }).waitFor();
   const ownedPid = await app.evaluate(() => process.pid);
