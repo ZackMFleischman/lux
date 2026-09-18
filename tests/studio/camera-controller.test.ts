@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import { compileVisual } from '../../apps/build-worker/src/compile.mjs';
 import { linkRuntime } from '../../apps/build-worker/src/link-runtime.mjs';
 import { validateLibraryCandidate } from '../../packages/core/src/component-library-validation.ts';
+import { discoverVisualSdk } from '../../packages/visual-sdk/src/discovery.mjs';
 import {
   CAMERA_CONTROLLER_ABI,
   readCameraController,
@@ -24,6 +25,15 @@ const cameraHash = 'b'.repeat(64);
 const consumerHash = 'c'.repeat(64);
 const ids = ['yaw', 'pitch', 'panX', 'panY', 'dolly', 'roll'] as const;
 const aliases = Object.fromEntries(ids.map(id => [id, `view-${id}`])) as Record<typeof ids[number], string>;
+
+test('SDK discovery advertises the Studio camera controller convention', async () => {
+  const discovery = await discoverVisualSdk();
+  assert.deepEqual(discovery.composition.cameraController, {
+    abi: CAMERA_CONTROLLER_ABI,
+    controlIds: ids,
+    studioPreviewGestures: true,
+  });
+});
 
 function runtime(overrides: Record<string, unknown> = {}): RuntimeView {
   const cameraControls = ids.map(id => ({ id, type: 'number', label: id, default: 0, min: -10, max: 10, step: 0.01, changeCost: 'live' }));
@@ -130,6 +140,36 @@ test('binding derives arbitrary public aliases only for one connected opted-in c
     targets[0].nodePath = [wrapperNode, ...targets[0].nodePath];
   }
   assert.deepEqual(cameraControllerBinding(nested)?.nodePath, [wrapperNode, cameraNode], 'nested controller exposure resolves to its flattened leaf path');
+
+  const nestedConsumer = structuredClone(runtime()) as any;
+  nestedConsumer.composition.definitions[nestedHash] = {
+    kind: 'graph',
+    metadata: {
+      controls: [],
+      inputs: nestedConsumer.composition.definitions[consumerHash].metadata.inputs,
+      outputs: nestedConsumer.composition.definitions[consumerHash].metadata.outputs,
+    },
+    body: {
+      nodes: [{ id: consumerNode, definitionHash: consumerHash, controlDefaults: {} }],
+      edges: [],
+      inputBindings: { camera: [{ nodeId: consumerNode, portId: 'camera' }] },
+      outputBindings: { image: { nodeId: consumerNode, portId: 'image' } },
+      controlBindings: {},
+    },
+  };
+  nestedConsumer.composition.definitions[rootHash].body.nodes[1] = {
+    id: wrapperNode, definitionHash: nestedHash, controlDefaults: {},
+  };
+  nestedConsumer.composition.definitions[rootHash].body.edges[0].to = { nodeId: wrapperNode, portId: 'camera' };
+  nestedConsumer.composition.definitions[rootHash].body.outputBindings.image = { nodeId: wrapperNode, portId: 'image' };
+  nestedConsumer.composition.nodes[1] = {
+    ...nestedConsumer.composition.nodes[1], nodePath: [wrapperNode, consumerNode],
+  };
+  assert.deepEqual(
+    cameraControllerBinding(nestedConsumer)?.nodePath,
+    [cameraNode],
+    'graph input bindings resolve a root camera edge to the nested leaf consumer',
+  );
 });
 
 class FakeSurface {
@@ -201,4 +241,46 @@ test('preview gestures coalesce writes, stop at stale runtime, and Reset cancels
 
   control!.dispose();
   assert.ok([...surface.listeners.values()].every(listeners => listeners.size === 0), 'dispose removes every preview listener');
+});
+
+test('an older runtime acknowledgement cannot roll back newer optimistic camera motion', async () => {
+  let current = runtime();
+  const surface = new FakeSurface();
+  const writes: Record<string, number>[] = [];
+  const frames = new Map<number, FrameRequestCallback>();
+  let nextFrame = 1;
+  const control = attachPreviewCameraController(surface as unknown as HTMLElement, {
+    getRuntime: () => current,
+    write: async values => { writes.push({ ...values } as Record<string, number>); },
+    scheduleFrame: callback => { const id = nextFrame++; frames.set(id, callback); return id; },
+    cancelFrame: id => { frames.delete(id); },
+    onError: error => { throw error; },
+  });
+  assert.ok(control);
+
+  const flush = async () => {
+    const frame = [...frames.values()][0]!;
+    frames.clear();
+    frame(1);
+    await Promise.resolve();
+  };
+  surface.emit('pointerdown', { pointerId: 1, button: 0, clientX: 0, clientY: 0, shiftKey: false, altKey: false });
+  surface.emit('pointermove', { pointerId: 1, clientX: 100, clientY: 0 });
+  await flush();
+  surface.emit('pointermove', { pointerId: 1, clientX: 200, clientY: 0 });
+  await flush();
+  assert.equal(writes[0]![aliases.yaw], -0.2 * Math.PI);
+  assert.equal(writes[1]![aliases.yaw], -0.4 * Math.PI);
+
+  current = runtime({
+    controls: { ...runtime().controls, [aliases.yaw]: -0.2 * Math.PI },
+    controlSequence: 1,
+  });
+  surface.emit('pointerup', { pointerId: 1 });
+  surface.emit('pointerdown', { pointerId: 2, button: 0, clientX: 200, clientY: 0, shiftKey: false, altKey: false });
+  surface.emit('pointermove', { pointerId: 2, clientX: 250, clientY: 0 });
+  await flush();
+  assert.equal(writes[2]![aliases.yaw], -0.5 * Math.PI);
+
+  control!.dispose();
 });
