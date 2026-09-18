@@ -1,0 +1,39 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "a8f3abee-e469-4b92-8351-891d8768f928",
+  "revision": 1,
+  "name": "Quasar",
+  "description": "Reusable feeding black hole: accretion disk, camera overrides, gravitational lensing, helical polar jets and bloom. Connect a sky image and a compatible world field; View inside to edit the parts.",
+  "updatedAt": "2026-09-18T01:09:30.954Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "quasar.ts",
+    "files": [
+      "accretion-disk.ts",
+      "quasar.ts"
+    ]
+  },
+  "dependencies": [
+    {
+      "componentId": "2a90b085-7a63-4743-a483-cf844a810341",
+      "revision": 1,
+      "mountPath": "camera-controller"
+    },
+    {
+      "componentId": "395b45f3-a6b5-40cf-a801-c43daa0c4eb0",
+      "revision": 1,
+      "mountPath": "lensing"
+    },
+    {
+      "componentId": "41f5fab9-4615-46b7-a204-96cb8ab742d2",
+      "revision": 1,
+      "mountPath": "jets"
+    },
+    {
+      "componentId": "e2d71fed-b771-4d88-8ecd-c6ca2e48494d",
+      "revision": 1,
+      "mountPath": "bloom"
+    }
+  ]
+}

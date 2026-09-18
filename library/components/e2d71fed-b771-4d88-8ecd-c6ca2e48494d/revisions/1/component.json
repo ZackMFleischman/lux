@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "e2d71fed-b771-4d88-8ecd-c6ca2e48494d",
+  "revision": 1,
+  "name": "Quasar Bloom",
+  "description": "Image highlight bloom and exposure with controllable radius; usable on any compatible image.",
+  "updatedAt": "2026-09-18T00:48:34.066Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "quasar-bloom.ts",
+    "files": [
+      "quasar-bloom.ts"
+    ]
+  }
+}

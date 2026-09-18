@@ -27,9 +27,9 @@ export default defineComponent({
     inputs:{image:{type:{kind:'image',colorSpace:'linear-srgb',alphaMode:'premultiplied'},label:'Radiance',description:'Quasar radiance before bloom and exposure.'}},
     outputs:{image:{type:{kind:'image',colorSpace:'linear-srgb',alphaMode:'premultiplied'},label:'Image',description:'Finished quasar image.'}},
     controls:{
-      bloom:{type:'number',label:'Bloom strength',group:'Light',default:0.65,min:0,max:2,step:0.01},
-      softness:{type:'number',label:'Bloom radius',group:'Light',default:18,min:2,max:50,step:1},
-      exposure:{type:'number',label:'Exposure',group:'Light',default:1.15,min:0.3,max:2.5,step:0.01},
+      bloom:{type:'number',label:'Bloom strength',group:'Light',default:0.95,min:0,max:2,step:0.01},
+      softness:{type:'number',label:'Bloom radius',group:'Light',default:21,min:2,max:50,step:1},
+      exposure:{type:'number',label:'Exposure',group:'Light',default:1.14,min:0.3,max:2.5,step:0.01},
     },
     controlDescriptions:{
       bloom:'Amount of soft light spread from the hottest highlights.',

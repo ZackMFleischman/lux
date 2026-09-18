@@ -1,0 +1,17 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "2a90b085-7a63-4743-a483-cf844a810341",
+  "revision": 1,
+  "name": "CameraController",
+  "description": "Additive orbit, pan, dolly and roll for compatible 3D cameras. Includes pose helpers; Studio enables preview gestures when connected and exposed.",
+  "updatedAt": "2026-09-18T01:09:21.342Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "camera-controller.ts",
+    "files": [
+      "camera-controller.ts",
+      "camera-pose.ts"
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "8cf66ffa-8a18-485d-b0aa-28222039bff1",
+  "revision": 1,
+  "name": "Orbiting Worlds",
+  "description": "Three world-space demonstration planets, a ring and a sparse asteroid belt for compatible bent-ray renderers.",
+  "updatedAt": "2026-09-18T00:48:51.364Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "orbiting-worlds.ts",
+    "files": [
+      "orbiting-worlds.ts"
+    ]
+  }
+}

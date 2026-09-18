@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "41f5fab9-4615-46b7-a204-96cb8ab742d2",
+  "revision": 1,
+  "name": "Polar Jets",
+  "description": "World-space helical plasma volume for compatible ray renderers; independent power, width, twist and speed.",
+  "updatedAt": "2026-09-18T00:48:22.147Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "polar-jets.ts",
+    "files": [
+      "polar-jets.ts"
+    ]
+  }
+}

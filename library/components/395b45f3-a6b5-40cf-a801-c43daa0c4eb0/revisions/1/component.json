@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "395b45f3-a6b5-40cf-a801-c43daa0c4eb0",
+  "revision": 1,
+  "name": "Gravitational Lensing",
+  "description": "Gravity and photon-ring shader field for compatible 3D bent-ray renderers.",
+  "updatedAt": "2026-09-18T00:48:11.359Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "gravitational-lensing.ts",
+    "files": [
+      "gravitational-lensing.ts"
+    ]
+  }
+}
