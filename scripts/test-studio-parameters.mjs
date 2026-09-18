@@ -1,22 +1,17 @@
-import { studioTestEnvironment, resolveStudioSession } from './studio-session.mjs';
+import { createStudioQaAttempt } from './studio-qa.mjs';
 import assert from 'node:assert/strict';
-import { _electron } from 'playwright';
-import { installedElectron } from './studio-electron.mjs';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 
-const root = resolve(import.meta.dirname, '..'), folder = join(root, 'artifacts/studio-parameters');
-await mkdir(folder, { recursive: true });
-const env = { ...studioTestEnvironment(), LUX_NODE_EXECUTABLE: process.execPath };
-const testSession = resolveStudioSession({ workspace: root, env });
-delete env.ELECTRON_RUN_AS_NODE; delete env.LUX_STUDIO_SMOKE;
-let app, client;
+const root = resolve(import.meta.dirname, '..');
+const attempt = await createStudioQaAttempt({ root, expectedWorkspace: root, label: 'parameters' });
+const { directory: folder, env, session: testSession } = attempt;
+let app, page, client;
 const report = { ok: false, checks: [], errors: [] };
 try {
-  app = await _electron.launch({ executablePath: installedElectron(root), args: [join(root, 'apps/studio/dist/main.cjs')], cwd: root, env, timeout: 30000 });
-  const page = await app.firstWindow(); page.setDefaultTimeout(15000);
+  ({ app, page } = await attempt.launch({ viewport: { width: 1360, height: 900 } })); page.setDefaultTimeout(15000);
   page.on('pageerror', error => report.errors.push(error.stack ?? error.message));
   await page.getByRole('button', { name: 'Build', exact: true }).waitFor();
   const ownedPid = await app.evaluate(() => process.pid);
@@ -148,5 +143,5 @@ try {
   assert.deepEqual(report.errors, []);
   report.ok = true;
 } catch (error) { report.error = String(error.stack ?? error); console.error(error); process.exitCode = 1; }
-finally { await client?.close(); if (app) { await app.evaluate(({ app }) => app.exit(0)).catch(() => {}); await app.close().catch(() => {}); } await writeFile(join(folder, 'result.json'), JSON.stringify(report, null, 2)); }
+finally { await client?.close(); await attempt.finish({ ok: report.ok, error: report.error ?? null }); await writeFile(join(folder, 'result.json'), JSON.stringify(report, null, 2)); }
 console.log(JSON.stringify(report));

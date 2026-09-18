@@ -1,22 +1,15 @@
-import { studioTestEnvironment, resolveStudioSession } from './studio-session.mjs';
+import { createStudioQaAttempt } from './studio-qa.mjs';
 import assert from 'node:assert/strict';
-import { _electron } from 'playwright';
-import { installedElectron } from './studio-electron.mjs';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
-const output = join(root, 'artifacts/studio-ui/docking');
-await mkdir(output, { recursive: true });
-const env = { ...studioTestEnvironment(), LUX_NODE_EXECUTABLE: process.execPath };
-const testSession = resolveStudioSession({ workspace: root, env });
-delete env.ELECTRON_RUN_AS_NODE;
+const attempt = await createStudioQaAttempt({ root, expectedWorkspace: root, label: 'dock' });
+const { directory: output, env, session: testSession } = attempt;
 const report = { ok: false, checks: [], errors: [] };
 let app, page;
 try {
-  app = await _electron.launch({ executablePath: installedElectron(root),
-    args: [join(root, 'apps/studio/dist/main.cjs')], cwd: root, env, chromiumSandbox: true });
-  page = await app.firstWindow(); page.setDefaultTimeout(15000);
+  ({ app, page } = await attempt.launch({ viewport: { width: 1360, height: 900 } })); page.setDefaultTimeout(15000);
   page.on('pageerror', error => report.errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error' && /Content Security Policy|Refused to (apply|execute|load)/i.test(message.text())) report.errors.push(message.text()); });
   const tools = page.locator('.layout-tools');
@@ -161,7 +154,7 @@ try {
   throw error;
 } finally {
   if (page && !page.isClosed()) await page.evaluate(() => localStorage.removeItem('lux.personal-layout.v1.Automated%20Dock%20QA')).catch(() => {});
-  if (app) { await app.evaluate(({ app }) => app.exit(0)).catch(() => {}); await app.close().catch(() => {}); }
+  await attempt.finish({ ok: report.ok, error: report.failure ?? null });
   await writeFile(join(output, 'result.json'), JSON.stringify(report, null, 2));
 }
 console.log(JSON.stringify(report, null, 2));
