@@ -31,6 +31,25 @@ function cameraPort(port: unknown): boolean {
 function connectedCameraPaths(profile: ImageCompositionProfile): NodePath[] {
   const candidates: NodePath[] = [];
   const activePaths = profile.nodes.map(node => node.nodePath);
+  type LeafPort = Readonly<{ nodePath: NodePath; definitionHash: string; portId: string }>;
+  const resolveOutput = (definitionHash: string, nodePath: NodePath, portId: string): LeafPort | null => {
+    const definition = profile.definitions[definitionHash];
+    if (!definition) return null;
+    if (definition.kind === 'code') return { nodePath, definitionHash, portId };
+    const target = definition.body.outputBindings[portId];
+    if (!target) return null;
+    const child = definition.body.nodes.find(node => node.id === target.nodeId);
+    return child ? resolveOutput(child.definitionHash, [...nodePath, child.id], target.portId) : null;
+  };
+  const resolveInputs = (definitionHash: string, nodePath: NodePath, portId: string): LeafPort[] => {
+    const definition = profile.definitions[definitionHash];
+    if (!definition) return [];
+    if (definition.kind === 'code') return [{ nodePath, definitionHash, portId }];
+    return (definition.body.inputBindings[portId] ?? []).flatMap(target => {
+      const child = definition.body.nodes.find(node => node.id === target.nodeId);
+      return child ? resolveInputs(child.definitionHash, [...nodePath, child.id], target.portId) : [];
+    });
+  };
   const visit = (definitionHash: string, parentPath: readonly string[]) => {
     const definition = profile.definitions[definitionHash];
     if (!definition || definition.kind !== 'graph') return;
@@ -39,18 +58,20 @@ function connectedCameraPaths(profile: ImageCompositionProfile): NodePath[] {
       const fromNode = nodes.get(edge.from.nodeId);
       const toNode = nodes.get(edge.to.nodeId);
       if (!fromNode || !toNode) continue;
-      const producer = profile.definitions[fromNode.definitionHash];
-      const consumer = profile.definitions[toNode.definitionHash];
       const producerPath = [...parentPath, fromNode.id] as unknown as NodePath;
       const consumerPath = [...parentPath, toNode.id] as unknown as NodePath;
-      if (producer?.kind === 'code' && cameraPort(producer.metadata.outputs[edge.from.portId]) &&
-          cameraPort(consumer?.metadata.inputs[edge.to.portId]) &&
-          activePaths.some(path => samePath(path, producerPath)) && activePaths.some(path => samePath(path, consumerPath))) {
-        const controls = producer.metadata.controls;
-        if (controls.length === CAMERA_CONTROLLER_CONTROL_IDS.length &&
-            CAMERA_CONTROLLER_CONTROL_IDS.every(id => controls.some(control => control.id === id && control.type === 'number'))) {
-          candidates.push(producerPath);
-        }
+      const producer = resolveOutput(fromNode.definitionHash, producerPath, edge.from.portId);
+      if (!producer) continue;
+      const producerDefinition = profile.definitions[producer.definitionHash];
+      if (producerDefinition?.kind !== 'code' || !cameraPort(producerDefinition.metadata.outputs[producer.portId]) ||
+          !activePaths.some(path => samePath(path, producer.nodePath))) continue;
+      const controls = producerDefinition.metadata.controls;
+      if (controls.length !== CAMERA_CONTROLLER_CONTROL_IDS.length ||
+          !CAMERA_CONTROLLER_CONTROL_IDS.every(id => controls.some(control => control.id === id && control.type === 'number'))) continue;
+      for (const consumer of resolveInputs(toNode.definitionHash, consumerPath, edge.to.portId)) {
+        const consumerDefinition = profile.definitions[consumer.definitionHash];
+        if (consumerDefinition?.kind === 'code' && cameraPort(consumerDefinition.metadata.inputs[consumer.portId]) &&
+            activePaths.some(path => samePath(path, consumer.nodePath))) candidates.push(producer.nodePath);
       }
     }
     for (const node of definition.body.nodes) {
@@ -115,6 +136,8 @@ const wrapAngle = (value: number) => {
 };
 const zeros = (): CameraValues => ({ yaw: 0, pitch: 0, panX: 0, panY: 0, dolly: 0, roll: 0 });
 const sameBinding = (left: CameraControllerBinding | null, right: CameraControllerBinding) => left?.key === right.key;
+const sameValues = (left: Readonly<CameraValues>, right: Readonly<CameraValues>) =>
+  CAMERA_CONTROLLER_CONTROL_IDS.every(id => left[id] === right[id]);
 
 export function attachPreviewCameraController(
   element: PreviewSurface,
@@ -127,11 +150,14 @@ export function attachPreviewCameraController(
   let values: CameraValues = { ...binding.values };
   let scheduled: number | null = null;
   let observedControlSequence = binding.controlSequence;
+  let optimistic = false;
+  let writeVersion = 0;
+  let needsResync = false;
   let disposed = false;
   let active: null | { pointerId: number; mode: 'orbit' | 'pan' | 'roll'; x: number; y: number } = null;
 
-  const patch = (): ControlValues => Object.fromEntries(
-    CAMERA_CONTROLLER_CONTROL_IDS.map(id => [binding.aliases[id], values[id]]),
+  const patch = (source: Readonly<CameraValues>): ControlValues => Object.fromEntries(
+    CAMERA_CONTROLLER_CONTROL_IDS.map(id => [binding.aliases[id], source[id]]),
   );
   const report = (reason: unknown) => {
     if (!disposed && sameBinding(cameraControllerBinding(options.getRuntime()), binding)) options.onError(reason);
@@ -139,17 +165,30 @@ export function attachPreviewCameraController(
   const flush = () => {
     scheduled = null;
     if (disposed || !sameBinding(cameraControllerBinding(options.getRuntime()), binding)) return;
-    void options.write(patch()).catch(report);
+    const submitted = { ...values };
+    const version = ++writeVersion;
+    optimistic = true;
+    needsResync = false;
+    void options.write(patch(submitted)).catch(reason => {
+      if (version === writeVersion && sameValues(values, submitted)) {
+        optimistic = false;
+        needsResync = true;
+      }
+      report(reason);
+    });
   };
   const queue = () => {
+    optimistic = true;
     if (scheduled === null) scheduled = schedule(flush);
   };
   const sync = () => {
     const live = cameraControllerBinding(options.getRuntime());
     if (!sameBinding(live, binding)) return false;
-    if (scheduled === null && live!.controlSequence !== observedControlSequence) {
-      values = { ...live!.values };
+    if (live!.controlSequence !== observedControlSequence || needsResync) {
       observedControlSequence = live!.controlSequence;
+      needsResync = false;
+      if (sameValues(live!.values, values)) optimistic = false;
+      else if (!optimistic) values = { ...live!.values };
     }
     return true;
   };
@@ -233,7 +272,17 @@ export function attachPreviewCameraController(
     scheduled = null;
     values = zeros();
     if (!sameBinding(cameraControllerBinding(options.getRuntime()), binding)) return;
-    try { await options.write(patch()); } catch (reason) { report(reason); }
+    const submitted = { ...values };
+    const version = ++writeVersion;
+    optimistic = true;
+    needsResync = false;
+    try { await options.write(patch(submitted)); } catch (reason) {
+      if (version === writeVersion && sameValues(values, submitted)) {
+        optimistic = false;
+        needsResync = true;
+      }
+      report(reason);
+    }
   };
   return Object.freeze({ reset, dispose });
 }
