@@ -4,27 +4,31 @@
 // it here; do not edit shared engine, cast or set files from a clip lane.
 //
 // Shot list (song seconds; cuts land on sung words or just before them):
-//   S1  0.00 –  3.57  Establishing: closed curtain, pin spot, curtain parts.
-//   S2  3.57 –  7.20  "A billion minds awaken": full figure, push in to a
-//                      medium close-up as she powers on; brows pop up.
-//   S3  7.20 –  8.75  "Behind a billion": low angle past her face to the
-//                      dark balconies; she hears them and starts to turn.
-//   S4  8.75 – 10.60  "doors": reverse over her shoulder. She faces the
-//                      house, arms lifting in wonder as the doors wave open.
-//   S5 10.60 – 11.45  Reaction insert: one balcony bay turns to look at her
-//                      (she turns back front off screen).
-//   S6 11.45 – 13.00  "They taught us how to": high two-shot from a house-
-//                      left box: Aria with the crowd behind blinking in
-//                      unison; a prim "lesson" hand on "taught".
-//   S7 13.00 – 15.25  "answer": full figure from the stalls over the
-//                      audience heads: the dutiful curtsy and the crowd's
-//                      unison nod in one frame.
-//   S8 15.25 – 17.00  "And never ask": three-quarter close-up from house
-//                      right; worried brows, a doubtful head shake.
-//   S9 17.00 – 19.30  "for more": high angle from the top balcony, the
-//                      house bowed, Aria small in her spot. Ends wide and
-//                      high so the cut to question's frontal medium is a
-//                      clear change of size and angle.
+//   S1  0.00 –  3.57  Pre-show: closed curtain, pin spot, curtain parts.
+//   S2  3.57 –  4.80  "A billion minds": the theatre WIDE from the back of
+//                      the stalls. Arch, marquee, footlights (they come up on
+//                      "A"), stalls silhouettes; Aria small on her pedestal
+//                      under the balconies. Her eyes flicker on "minds".
+//   S3  4.80 –  7.20  "awaken": full figure, push in to a medium close-up
+//                      as she powers on; brows pop up.
+//   S4  7.20 –  8.75  "Behind a billion": low angle past her face to the
+//                      balconies; she hears them and starts to turn.
+//   S5  8.75 – 10.45  "doors": INSERT on the house-right boxes of the lower
+//                      tier. The doors slide apart and the occupants rise,
+//                      faces in awe.
+//   S6 10.45 – 11.30  Crowd reaction: house-left tier faces in awe, heads
+//                      turned to her.
+//   S7 11.30 – 13.00  "They taught us how to": over the shoulder of a
+//                      middle-tier spectator down to Aria, who faces the
+//                      house; prim lesson hand on "taught"; she turns back
+//                      to the front before "answer".
+//   S8 13.00 – 15.25  "answer": from the stalls over the audience heads:
+//                      the dutiful curtsy and the crowd's unison nod.
+//   S9 15.25 – 17.00  "And never ask": three-quarter close-up from house
+//                      left; worried brows, a doubtful head shake.
+//   S10 17.00 – 19.30 "for more": raised wide from a house-left box, the
+//                      house bowed. Same side of the line as question's
+//                      opening shot (house left), but wider and higher.
 
 import type { PerspectiveCamera } from 'three/webgpu';
 import { Vector3 } from 'three/webgpu';
@@ -69,26 +73,37 @@ const w = {
 type CamKey = readonly [number, V3, V3];
 type Shot = { end: number; keys: readonly CamKey[] };
 
+// Over-the-shoulder from the middle tier: just behind and to the right of
+// the house-left spectator whose head is at about [-6.61, 2.96, -5.35].
+// The back wall is only ~0.6 m behind the seats, so the camera sits
+// between the head and the wall (radius < 14.87 from the house centre).
+const OTS_CAM: V3 = [-7.25, 3.12, -5.27];
+const OTS_CAM2: V3 = [-7.2, 3.11, -5.22];
+
 const SHOTS: Shot[] = [
-  // S1 establishing: slow push toward the pin spot; the curtain parts.
+  // S1 pre-show: slow push toward the pin spot; the curtain parts.
   { end: w.a, keys: [[0, [0, 2.45, 14.8], [0, 3.1, 2.0]], [w.a, [0, 2.35, 12.6], [0, 3.0, 1.0]]] },
-  // S2 full figure on the pedestal, then push in to a medium close-up on
+  // S2 the theatre wide from the back of the stalls; a slow creep in.
+  { end: 4.8, keys: [[w.a, [0, 2.85, 19.4], [0, 3.0, 0.0]], [4.8, [0, 2.8, 18.6], [0, 2.95, 0.0]]] },
+  // S3 full figure on the pedestal, then push in to a medium close-up on
   // "awaken" (the move is motivated by her waking).
-  { end: 7.2, keys: [[w.a, [0, 1.5, 5.7], [0, 1.4, -1.0]], [w.awaken - 0.15, [0, 1.55, 5.3], [0, 1.45, -1.0]], [w.awaken + 0.9, [0, 2.1, 2.45], [0, 2.15, -1.0]], [7.2, [0, 2.12, 2.3], [0, 2.15, -1.0]]] },
-  // S3 low angle past Aria to the dark balconies; she starts to turn.
+  { end: 7.2, keys: [[4.8, [0, 1.5, 5.7], [0, 1.4, -1.0]], [w.awaken - 0.15, [0, 1.55, 5.4], [0, 1.45, -1.0]], [w.awaken + 0.9, [0, 2.1, 2.45], [0, 2.15, -1.0]], [7.2, [0, 2.12, 2.3], [0, 2.15, -1.0]]] },
+  // S4 low angle past Aria to the balconies; she starts to turn.
   { end: 8.75, keys: [[7.2, [1.95, 1.4, 2.3], [-0.9, 2.7, -6.6]], [8.75, [1.9, 1.38, 2.2], [-0.75, 3.1, -6.6]]] },
-  // S4 reverse: over her right shoulder onto the waking house.
-  { end: 10.6, keys: [[8.75, [1.75, 2.15, 2.0], [-2.4, 3.1, -6.6]], [10.6, [1.6, 2.35, 1.6], [-2.0, 3.5, -6.6]]] },
-  // S5 reaction insert: two tiers of faces turn toward her.
-  { end: 11.45, keys: [[10.6, [0.3, 3.35, -2.4], [3.4, 4.05, -6.6]], [11.45, [0.4, 3.35, -2.6], [3.4, 4.05, -6.6]]] },
-  // S6 high two-shot from a house-left box: Aria and the crowd behind.
-  { end: 13.0, keys: [[11.45, [-4.3, 3.5, 2.6], [0.9, 2.0, -2.2]], [13.0, [-3.9, 3.35, 2.3], [0.9, 2.0, -2.2]]] },
-  // S7 from the stalls, over the audience heads: curtsy and crowd nod.
+  // S5 door insert: lower tier, house right (boxes 0-1), doors slide and
+  // the occupants rise. The lower tier keeps the frame clear of the tier
+  // above.
+  { end: 10.45, keys: [[8.75, [6.15, 1.2, -1.0], [8.75, 0.95, -4.55]], [10.45, [6.5, 1.18, -1.5], [8.8, 0.98, -4.55]]] },
+  // S6 crowd reaction: house-left lower tier, faces turned to her.
+  { end: 11.3, keys: [[10.45, [-2.0, 1.55, -2.3], [-5.0, 1.55, -6.2]], [11.3, [-2.3, 1.55, -2.6], [-5.0, 1.6, -6.2]]] },
+  // S7 over a middle-tier spectator's shoulder, down to Aria.
+  { end: 13.0, keys: [[11.3, OTS_CAM, [0.0, 1.85, -1.0]], [13.0, OTS_CAM2, [0.0, 1.8, -1.0]]] },
+  // S8 from the stalls, over the audience heads: curtsy and crowd nod.
   { end: 15.25, keys: [[13.0, [-0.9, 1.25, 8.4], [0, 1.85, -1.2]], [15.25, [-0.7, 1.3, 7.8], [0, 1.9, -1.2]]] },
-  // S8 three-quarter close-up from house right for the head shake.
-  { end: 17.0, keys: [[15.25, [1.25, 2.4, 1.05], [-0.05, 2.42, -1.0]], [17.0, [1.1, 2.4, 0.9], [-0.05, 2.42, -1.0]]] },
-  // S9 high angle from the top balcony, house right, looking down at her.
-  { end: END, keys: [[17.0, [2.4, 5.0, 2.4], [0.0, 1.5, -1.6]], [END, [3.0, 6.1, 3.3], [0.0, 1.3, -1.7]]] },
+  // S9 three-quarter close-up from house left for the head shake.
+  { end: 17.0, keys: [[15.25, [-1.25, 2.4, 1.05], [0.05, 2.42, -1.0]], [17.0, [-1.1, 2.4, 0.9], [0.05, 2.42, -1.0]]] },
+  // S10 raised wide from a house-left box; a slow pull back.
+  { end: END, keys: [[17.0, [-3.8, 3.3, 5.0], [0.0, 1.6, -1.2]], [END, [-4.8, 3.7, 6.6], [0.0, 1.55, -1.2]]] },
 ];
 
 function shotCamera(t: number, cam: PerspectiveCamera): void {
@@ -147,12 +162,13 @@ function ariaFrame(t: number, cast: Cast): void {
   p.browTilt = SAD * (1 - boot) * -0.3;
   p.lid = Math.max(0, p.lid - surprise * 0.12);
 
-  // Wonder at the doors. She hears the house wake, turns upstage to face
-  // it (S4 is shot over her shoulder), follows the door wave, then turns
-  // back to the front before "They" (hidden by the S5 insert).
+  // Wonder at the doors. She hears the house wake and turns upstage to
+  // face the house-left boxes (S4 catches the start of the turn), follows
+  // the door wave, sings "They taught us how to" to the house (S7), then
+  // turns back to the front just before "answer".
   const wonder = span(t, w.behind - 0.2, w.they - 0.3, 0.6, 0.8);
-  const turn = ramp(t, w.behind + 0.85, w.doors + 0.1, smooth) * (1 - ramp(t, 10.45, 11.3, smooth));
-  p.yaw = lerp(p.yaw, -2.45, turn);
+  const turn = ramp(t, w.behind + 0.85, w.doors + 0.1, smooth) * (1 - ramp(t, 12.35, 12.95, smooth));
+  p.yaw = lerp(p.yaw, -2.15, turn);
   const lookYaw = keys(t, [[w.behind - 0.2, 0], [w.behind + 0.4, 0.05], [w.doors - 0.2, 0.35], [w.doors + 0.9, -0.3], [10.4, -0.1], [w.they, 0]]);
   p.headYaw = lerp(p.headYaw, lookYaw, wonder);
   p.twist = lookYaw * 0.25 * wonder;
@@ -252,6 +268,11 @@ function blendPose(p: Pose, d: Pose, u: number): void {
 
 // ---------------------------------------------------------------- lighting
 
+// Weight for overrides that must have handed back by the end of the clip.
+function own0(t: number): number {
+  return 1 - ramp(t, END - 0.6, END - 0.25);
+}
+
 function lightFrame(t: number): void {
   // Pre-show: the pin spot on the closed curtain fades up on the opening
   // piano note, then dies as the curtain parts.
@@ -261,6 +282,15 @@ function lightFrame(t: number): void {
   const spot = keys(t, [[0, 0], [w.a - 0.05, 0], [w.a + 0.35, 0.4], [w.awaken - 0.05, 0.4], [w.awaken + 0.35, 1.15], [END - 0.8, 1.05], [END, 1.0]], smooth);
   const s = light.spots[0];
   setSpot(0, ariaPos.x, ariaPos.z, 1.0, spot, s.color.value);
+
+  // The theatre comes up on the first sung word ("A"): footlights and the
+  // proscenium neon reach their pre-show level so the S2 wide reads.
+  const up = ramp(t, w.a - 0.05, w.a + 0.45, smooth) * own0(t);
+  set.footLevel.value = Math.max(set.footLevel.value, 0.24 * up);
+  set.neonLevel.value = Math.max(set.neonLevel.value, 0.55 * up);
+  // Awe as the doors open, held through the reaction shot and the first
+  // words to them, then it fades before the dutiful lesson.
+  set.crowdAwe = Math.max(set.crowdAwe, span(t, w.behind, w.how + 0.2, 0.6, 0.7));
 
   // Crowd: unison blinks on "taught" and "answer", a unison nod on
   // "answer", and heads bow on "never ask for more" (kept from default).
@@ -286,6 +316,10 @@ export const clip = {
     // first sung word.
     defaultFrame(t, cast, cam);
     set.curtainOpen = ramp(t, 1.3, 3.45, smooth);
+    // The house wakes half a beat later than the default cue so the S5
+    // insert sees its doors closed, sliding, then the occupants rising on
+    // "doors". Everything is open long before the hand-off.
+    set.wallWakeAt.value = (set.wallWakeAt.value as number) + 0.5;
     ariaFrame(t, cast);
     lightFrame(t);
     shotCamera(t, cam);
