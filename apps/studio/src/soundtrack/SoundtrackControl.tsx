@@ -102,7 +102,7 @@ export function SoundtrackControl({ player, api, soundtrack, origin, disabled, o
       slotProps={{ paper: { className: 'soundtrack-popover', role: 'dialog', 'aria-labelledby': `${titleId}-title`, id: titleId } as object }}
       onKeyDown={event => { if (event.key === 'Escape') event.stopPropagation(); }}>
       <h2 id={`${titleId}-title`} className="soundtrack-title">Soundtrack</h2>
-      <p className="soundtrack-file" role="status" aria-live="polite"><span className="soundtrack-file-name" title={soundtrack?.absolutePath}>{name ?? 'No file linked'}</span><span className="soundtrack-state">{stateText}</span></p>
+      <p className="soundtrack-file" role="status" aria-live="polite"><span className="soundtrack-file-name" title={soundtrack?.absolutePath}>{name ?? 'No file linked'}</span>{soundtrack && <span className="soundtrack-state">{stateText}</span>}</p>
       {warning && status.message && <Alert severity="warning" className="soundtrack-message">{status.message}</Alert>}
       <div className="soundtrack-actions">
         <Button size="small" variant="outlined" color="inherit" disabled={!api || choosing} onClick={() => void choose()}>{choosing ? 'Choosing…' : soundtrack ? (warning ? 'Relink file…' : 'Replace file…') : 'Choose soundtrack…'}</Button>

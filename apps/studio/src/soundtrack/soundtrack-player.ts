@@ -19,6 +19,8 @@ export type SoundtrackAudioContext = {
   createGain(): GainNodeLike;
   createBufferSource(): SourceNodeLike;
   decodeAudioData(data: ArrayBuffer): Promise<SoundtrackBuffer>;
+  /** When present, maps the context time now leaving the speakers to performance.now(). */
+  getOutputTimestamp?(): { contextTime?: number; performanceTime?: number };
 };
 export type SoundtrackClockView = Readonly<{
   instanceId: string; generation: number; clockEpoch: number;
@@ -30,15 +32,20 @@ export type SoundtrackStatus = Readonly<{
   file: string | null; state: SoundtrackLinkState; message: string | null;
   offsetSeconds: number; volume: number; muted: boolean; durationSeconds: number | null;
   playing: boolean; positionSeconds: number | null; expectedSeconds: number | null; driftSeconds: number | null;
-  contextState: string | null; starts: number;
+  contextState: string | null; outputLatencySeconds: number | null; starts: number;
 }>;
 
 /** Link and settings only; stable between changes so React can subscribe to it. */
 export type SoundtrackView = Pick<SoundtrackStatus, 'file' | 'state' | 'message' | 'offsetSeconds' | 'volume' | 'muted' | 'durationSeconds'>;
 export const soundtrackDriftToleranceSeconds = 0.05;
+/** Frames arrive after they are sampled; the least-delayed recent frame best estimates scene time now. */
+const sceneWindowMs = 1000;
+/** Just after a start the first scene sample may be a late frame; settle to a tighter bound once. */
+const settleMs = 1000, settleToleranceSeconds = 0.02;
 
 export class SoundtrackPlayer {
   private readonly createContext: () => SoundtrackAudioContext;
+  private readonly now: () => number;
   private readonly tolerance: number;
   private context: SoundtrackAudioContext | null = null;
   private gain: GainNodeLike | null = null;
@@ -48,16 +55,19 @@ export class SoundtrackPlayer {
   private link: { file: string | null; state: SoundtrackLinkState; message: string | null } = { file: null, state: 'none', message: null };
   private runtime: SoundtrackClockView | null = null;
   private startedKey: string | null = null;
-  private startedAt = { contextTime: 0, position: 0 };
-  private lastExpected: number | null = null;
-  private lastDrift: number | null = null;
+  private startedAt = { outputTime: 0, position: 0 };
+  private outputLatency: number | null = null;
+  private sceneKey: string | null = null;
+  private sceneSamples: { atMs: number; offsetSeconds: number }[] = [];
   private driftSamples = 0;
   private starts = 0;
+  private startedAtMs = 0;
   private readonly listeners = new Set<() => void>();
   private view: SoundtrackView = this.createView();
 
-  constructor(options: { createContext: () => SoundtrackAudioContext; driftToleranceSeconds?: number }) {
+  constructor(options: { createContext: () => SoundtrackAudioContext; driftToleranceSeconds?: number; now?: () => number }) {
     this.createContext = options.createContext;
+    this.now = options.now ?? (() => performance.now());
     this.tolerance = options.driftToleranceSeconds ?? soundtrackDriftToleranceSeconds;
   }
 
@@ -112,34 +122,56 @@ export class SoundtrackPlayer {
     const reseek = next.offsetSeconds !== this.settings.offsetSeconds;
     this.settings = next;
     this.applyGain();
-    if (reseek) { this.stopSource(); this.update(this.runtime); }
+    if (reseek && this.source && this.startedKey) { const key = this.startedKey, expected = this.expected(); this.stopSource();
+      if (expected !== null && this.buffer && expected < this.buffer.duration) this.start(expected, key); }
     this.notify();
   }
 
   /** Follow one Studio runtime snapshot. Call on every published frame. */
   update(runtime: SoundtrackClockView | null): void {
     this.runtime = runtime;
-    const buffer = this.buffer;
-    if (!buffer || !runtime || runtime.playback !== 'playing' || typeof runtime.timeSeconds !== 'number' || !Number.isFinite(runtime.timeSeconds)) {
-      this.lastExpected = null; this.stopSource(); return;
+    if (!runtime || runtime.playback !== 'playing' || typeof runtime.timeSeconds !== 'number' || !Number.isFinite(runtime.timeSeconds)) {
+      this.sceneKey = null; this.sceneSamples = []; this.stopSource(); return;
     }
-    const expected = this.settings.offsetSeconds + Math.max(0, runtime.timeSeconds);
-    this.lastExpected = expected;
-    if (expected >= buffer.duration) { this.stopSource(); return; }
+    // Reset, rebuild and restart change this key; their clocks restart independently.
+    const key = `${runtime.instanceId}:${runtime.generation}:${runtime.clockEpoch}`, now = this.now();
+    if (key !== this.sceneKey) { this.sceneKey = key; this.sceneSamples = []; }
+    this.sceneSamples.push({ atMs: now, offsetSeconds: Math.max(0, runtime.timeSeconds) - now / 1000 });
+    while (this.sceneSamples.length > 1 && now - this.sceneSamples[0]!.atMs > sceneWindowMs) this.sceneSamples.shift();
+    const buffer = this.buffer, expected = this.expected();
+    if (!buffer || expected === null || expected >= buffer.duration) { this.stopSource(); return; }
     const context = this.audio();
     if (context.state === 'suspended') void context.resume().catch(() => {});
-    const key = `${runtime.instanceId}:${runtime.generation}:${runtime.clockEpoch}`;
     if (!this.source || this.startedKey !== key) { this.start(expected, key); return; }
-    const drift = this.position()! - expected;
-    this.lastDrift = drift;
-    // One late frame is not drift. Two consecutive samples beyond tolerance are.
-    if (Math.abs(drift) > this.tolerance) { if (++this.driftSamples >= 2) this.start(expected, key); }
+    // A brief audio or frame hiccup is not drift. Two consecutive samples beyond tolerance are.
+    const tolerance = now - this.startedAtMs < settleMs ? Math.min(this.tolerance, settleToleranceSeconds) : this.tolerance;
+    if (Math.abs(this.position()! - expected) > tolerance) { if (++this.driftSamples >= 2) this.start(expected, key); }
     else this.driftSamples = 0;
   }
 
+  /** Song position that matches scene time now, or null while scene time is unknown or paused. */
+  private expected(): number | null {
+    if (!this.sceneSamples.length) return null;
+    let offset = -Infinity;
+    for (const sample of this.sceneSamples) offset = Math.max(offset, sample.offsetSeconds);
+    return this.settings.offsetSeconds + offset + this.now() / 1000;
+  }
+
+  /** Context time now audible at the output. currentTime advances in device-sized
+   * blocks (tens of milliseconds on some Windows devices) and leads the speakers by
+   * the output latency, so prefer the output timestamp extrapolated to now. */
+  private audibleTime(context: SoundtrackAudioContext): number {
+    const stamp = context.getOutputTimestamp?.();
+    if (stamp && typeof stamp.contextTime === 'number' && typeof stamp.performanceTime === 'number' && stamp.contextTime > 0 && stamp.performanceTime > 0) {
+      const estimate = stamp.contextTime + Math.max(0, this.now() - stamp.performanceTime) / 1000;
+      if (Number.isFinite(estimate)) return Math.min(estimate, context.currentTime);
+    }
+    return context.currentTime;
+  }
+  /** Song position currently heard. */
   private position(): number | null {
     if (!this.source || !this.context) return null;
-    return this.startedAt.position + (this.context.currentTime - this.startedAt.contextTime);
+    return this.startedAt.position + (this.audibleTime(this.context) - this.startedAt.outputTime);
   }
 
   private start(position: number, key: string): void {
@@ -147,27 +179,34 @@ export class SoundtrackPlayer {
     const context = this.audio(), source = context.createBufferSource();
     source.buffer = this.buffer;
     source.connect(this.gain);
-    source.start(0, position);
+    // Audio scheduled now is heard after the output latency. Start that far into the
+    // song so what the user hears matches the current scene time.
+    const when = context.currentTime, audible = this.audibleTime(context), lead = Math.min(0.5, Math.max(0, when - audible));
+    this.outputLatency = lead;
+    source.start(when, position + lead);
     this.source = source; this.startedKey = key;
-    this.startedAt = { contextTime: context.currentTime, position };
-    this.lastDrift = 0; this.driftSamples = 0; this.starts++;
+    this.startedAt = { outputTime: audible, position };
+    this.driftSamples = 0; this.starts++; this.startedAtMs = this.now();
   }
 
   private stopSource(): void {
     const source = this.source;
-    this.source = null; this.startedKey = null; this.lastDrift = null; this.driftSamples = 0;
+    this.source = null; this.startedKey = null; this.driftSamples = 0;
     if (!source) return;
     try { source.stop(); } catch { /* A source that already ended cannot stop again. */ }
     source.disconnect();
   }
 
+  /** Live probe: heard position, scene-matched position and their difference now. */
   status(): SoundtrackStatus {
+    const position = this.position(), expected = this.source ? this.expected() : null;
     return Object.freeze({
       file: this.link.file, state: this.link.state, message: this.link.message,
       offsetSeconds: this.settings.offsetSeconds, volume: this.settings.volume, muted: this.settings.muted,
       durationSeconds: this.buffer?.duration ?? null,
-      playing: !!this.source, positionSeconds: this.position(), expectedSeconds: this.lastExpected, driftSeconds: this.lastDrift,
-      contextState: this.context?.state ?? null, starts: this.starts,
+      playing: !!this.source, positionSeconds: position, expectedSeconds: expected,
+      driftSeconds: position !== null && expected !== null ? position - expected : null,
+      contextState: this.context?.state ?? null, outputLatencySeconds: this.outputLatency, starts: this.starts,
     });
   }
 

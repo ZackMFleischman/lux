@@ -45,7 +45,7 @@ const client = new StandaloneClient(window.luxAuthoring, { codeDeclaredParameter
 // The soundtrack follows the runtime clock in every scene mode; Studio time stays authoritative.
 const soundtrackPlayer=new SoundtrackPlayer({createContext:()=>new AudioContext()});
 client.subscribe(()=>soundtrackPlayer.update(client.getSnapshot().authoring));
-function soundtrackStatus(){const{file,state,message,offsetSeconds,volume,muted,durationSeconds,playing,positionSeconds,driftSeconds,contextState}=soundtrackPlayer.status();return file||state!=='none'?{file,state,message,offsetSeconds,volume,muted,durationSeconds,playing,positionSeconds,driftSeconds,contextState}:null;}
+function soundtrackStatus(){const status=soundtrackPlayer.status();return status.file||status.state!=='none'?status:null;}
 const agentStatus = () => ({ ...client.getSnapshot(), capabilities: studioCapabilities, soundtrack: soundtrackStatus() });
 const idleRecording = Object.freeze({ phase: 'idle' }) as PreviewRecorderSnapshot;
 const subscribeIdle = () => () => {};
