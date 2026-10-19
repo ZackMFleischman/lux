@@ -123,7 +123,7 @@ export function makeAria(): Rig {
   rig.props.haloLight = new Mesh();
   rig.props.haloLight.userData.material = halo;
   addEyes(rig, 0.07, 0.1, 0.24, 0.27, toon(0xefe9dc));
-  addPlateMouth(rig, rig.head, 0.16, 0.1, 0.1, 0.285, 0xc9bfdc, 0x6f5f8f, 2, true);
+  addPlateMouth(rig, rig.head, 0.17, 0.11, 0.09, 0.29, 0xb79ad8, 0xe9e2f4, 1, true);
   rig.head.scale.setScalar(1.35);
   return rig;
 }
@@ -189,9 +189,9 @@ export function makeBarnaby(): Rig {
   }
   addEyes(rig, 0.07, 0.16, 0.44, 0.31, copper);
   for (const side of [-1, 1]) {
-    place(new Mesh(ring(0.1, 0.014), brass), rig.head, side * 0.16, 0.44, 0.36);
+    place(new Mesh(ring(0.1, 0.016), toon(0x2a1a10, { shadow: 0 })), rig.head, side * 0.16, 0.44, 0.36);
   }
-  place(new Mesh(rod(0.01, 0.01, 0.12), brass), rig.head, 0, 0.45, 0.36, 0, 0, Math.PI / 2);
+  place(new Mesh(rod(0.012, 0.012, 0.12), toon(0x2a1a10, { shadow: 0 })), rig.head, 0, 0.45, 0.36, 0, 0, Math.PI / 2);
   for (const side of [-1, 1]) {
     place(new Mesh(can(0.11, 0.08), copperDark), rig.head, side * 0.4, 0.42, 0, 0, 0, Math.PI / 2);
   }
@@ -260,68 +260,75 @@ export function makeKid(kind: 'pip' | 'dot'): Rig {
   return rig;
 }
 
+// The clockwork king: a tall, upright walnut case with a clock face for a
+// chest, a small brass dome head, a crown and a red cape.
 export function makeKing(): Rig {
-  const gold = toon(0xc49a3c, { shine: 0.7 });
-  const enamel = toon(0x3b4f86, { shine: 0.6 });
-  const silver = toon(0x9aa2b3, { shine: 0.5 });
-  const ermine = toon(0xebe6da);
+  const walnut = toon(0x6b4128, { shine: 0.35 });
+  const brass = toon(0xd2a43c, { shine: 0.7 });
   const rig = skeleton({
     name: 'Rex',
     hipHeight: 0.72,
     torsoY: 0,
-    neckY: 0.96,
-    shoulder: [0.48, 0.76, 0],
-    armRadius: [0.072, 0.066],
-    armMaterial: silver,
-    handMaterial: silver,
-    handSize: 0.2,
-    armHang: 0.55,
+    neckY: 1.12,
+    shoulder: [0.36, 0.96, 0],
+    armRadius: [0.06, 0.056],
+    armMaterial: brass,
+    handMaterial: brass,
+    handSize: 0.19,
+    armHang: 0.6,
     legs: {
-      hip: [0.2, 0, 0.1],
-      radius: [0.08, 0.075],
-      material: toon(0x55306f),
-      foot: boot(toon(0x2a1a33), 0.32),
-      stance: 0.26,
+      hip: [0.16, 0, 0.1],
+      radius: [0.07, 0.066],
+      material: toon(0x3d2416),
+      foot: boot(toon(0x231510), 0.3),
+      stance: 0.22,
     },
   });
-  // Round enamel belly with a gold sash and medal.
-  place(new Mesh(blob(0.98, 0.98, 0.8, 2.6), enamel), rig.torso, 0, 0.44, 0.02);
-  place(new Mesh(rbox(0.16, 0.92, 0.05), gold), rig.torso, 0.08, 0.46, 0.38, 0, 0, -0.55);
-  place(new Mesh(can(0.07, 0.03), toon(0x9c2f3d)), rig.torso, -0.2, 0.62, 0.4, Math.PI / 2);
-  const capeMaterial = toon(0x55306f);
+  // Tall clock case with brass trims.
+  place(new Mesh(rbox(0.66, 1.12, 0.5), walnut), rig.torso, 0, 0.56, 0);
+  place(new Mesh(rbox(0.76, 0.1, 0.56), brass), rig.torso, 0, 1.12, 0);
+  place(new Mesh(rbox(0.72, 0.08, 0.54), brass), rig.torso, 0, 0.02, 0);
+  // Clock face on the chest.
+  place(new Mesh(can(0.24, 0.05), brass), rig.torso, 0, 0.7, 0.25, Math.PI / 2);
+  place(new Mesh(can(0.205, 0.05), toon(0xf1e9d2, { shadow: 0.4 })), rig.torso, 0, 0.7, 0.27, Math.PI / 2);
+  const hands = place(new Group(), rig.torso, 0, 0.7, 0.3);
+  place(new Mesh(rbox(0.02, 0.15, 0.015), toon(0x1a1410, { shadow: 0 })), hands, 0, 0.06, 0);
+  place(new Mesh(rbox(0.02, 0.11, 0.015), toon(0x1a1410, { shadow: 0 })), hands, 0.04, -0.03, 0.005, 0, 0, 1.0);
+  rig.props.clockHands = hands;
+  // Pendulum window.
+  place(new Mesh(rbox(0.3, 0.3, 0.04), toon(0x2b1a12, { shadow: 0 })), rig.torso, 0, 0.28, 0.25);
+  const pendulum = place(new Group(), rig.torso, 0, 0.42, 0.28);
+  place(new Mesh(rod(0.008, 0.008, 0.2, 8), brass), pendulum, 0, -0.1, 0);
+  place(new Mesh(can(0.05, 0.02), brass), pendulum, 0, -0.2, 0, Math.PI / 2);
+  rig.props.pendulum = pendulum;
+  // Red cape over the shoulders, open at the front.
+  const capeMaterial = toon(0x9b2230);
   capeMaterial.side = DoubleSide;
-  place(new Mesh(lathe('king-cape2', [[0.3, 0.9], ...bell(0.46, 0.8, 0.86, -0.7, 1.3, 10)], 40, 1.15, Math.PI * 2 - 2.3), capeMaterial), rig.torso, 0, 0, -0.08);
-  place(new Mesh(ring(0.42, 0.09), ermine), rig.torso, 0, 0.9, -0.02, Math.PI / 2);
-  // Tall enamel egg head with wide round eyes, a gold moustache plate,
-  // a monocle and a round speaker mouth.
-  const headEnamel = toon(0x4a63a8, { shine: 0.7 });
-  place(new Mesh(blob(0.62, 0.74, 0.56, 2.2), headEnamel), rig.head, 0, 0.36, 0);
-  rig.jaw.position.set(0, 0.16, 0.18);
-  place(new Mesh(can(0.085, 0.04), toon(0x1c2340, { shadow: 0 })), rig.jaw, 0, -0.02, 0.07, Math.PI / 2);
-  const mesh = toon(0xc9c4b4, { shadow: 0.4 });
-  place(new Mesh(can(0.07, 0.03), mesh), rig.jaw, 0, -0.02, 0.085, Math.PI / 2);
+  place(new Mesh(lathe('king-cape3', [[0.3, 1.12], ...bell(0.42, 0.62, 1.06, -0.7, 1.3, 10)], 72, 1.25, Math.PI * 2 - 2.5), capeMaterial), rig.torso, 0, 0, -0.04);
+  // Small brass dome head with wide eyes and a round speaker mouth.
+  place(new Mesh(can(0.07, 0.12), brass), rig.torso, 0, 1.18, 0);
+  place(new Mesh(can(0.24, 0.22), brass), rig.head, 0, 0.18, 0);
+  place(new Mesh(dome(0.24, 0.8), brass), rig.head, 0, 0.29, 0);
+  rig.jaw.position.set(0, 0.1, 0.18);
+  place(new Mesh(can(0.06, 0.04), toon(0x241318, { shadow: 0 })), rig.jaw, 0, 0, 0.06, Math.PI / 2);
+  place(new Mesh(can(0.05, 0.03), toon(0xc9c4b4, { shadow: 0.4 })), rig.jaw, 0, 0, 0.075, Math.PI / 2);
   rig.mouthOpen = 1.2;
-  addEyes(rig, 0.085, 0.13, 0.42, 0.25, headEnamel);
-  for (const side of [-1, 1]) {
-    place(new Mesh(blob(0.24, 0.08, 0.06, 2.2), toon(0xe0b84a, { shine: 0.5 })), rig.head, side * 0.12, 0.27, 0.27, 0, 0, side * -0.3);
-  }
-  place(new Mesh(ring(0.1, 0.014), toon(0xe0b84a)), rig.head, 0.13, 0.42, 0.33);
-  const crown = place(new Group(), rig.head, 0, 0.66, 0);
-  const crownGold = toon(0xe0b84a, { shine: 0.8 });
-  place(new Mesh(can(0.27, 0.16, 6), crownGold), crown, 0, 0.08, 0);
+  addEyes(rig, 0.065, 0.1, 0.25, 0.2, brass);
+  const crown = place(new Group(), rig.head, 0, 0.45, 0);
+  const crownGold = toon(0xe8bd45, { shine: 0.8 });
+  place(new Mesh(can(0.2, 0.12, 6), crownGold), crown, 0, 0.06, 0);
   for (let i = 0; i < 6; i += 1) {
-    const a = (i / 6) * Math.PI * 2 + Math.PI / 6;
-    const spike = place(new Group(), crown, Math.sin(a) * 0.23, 0.2, Math.cos(a) * 0.23);
-    place(new Mesh(rod(0.0, 0.06, 0.16, 4), crownGold), spike, 0, 0.0, 0);
-    place(new Mesh(ball(0.03, 10), glow(i % 2 ? 0xe0405a : 0x58c8e8, 1.0)), spike, 0, 0.1, 0);
+    const ang = (i / 6) * Math.PI * 2 + Math.PI / 6;
+    const spike = place(new Group(), crown, Math.sin(ang) * 0.17, 0.16, Math.cos(ang) * 0.17);
+    place(new Mesh(rod(0.0, 0.05, 0.13, 4), crownGold), spike, 0, 0.0, 0);
+    place(new Mesh(ball(0.025, 12), glow(i % 2 ? 0xe0405a : 0x58c8e8, 1.0)), spike, 0, 0.08, 0);
   }
   const sceptre = new Group();
-  place(new Mesh(rod(0.03, 0.03, 1.0, 10), gold), sceptre, 0, 0.1, 0);
-  place(new Mesh(ball(0.08, 16), glow(0xe0506a, 1.0)), sceptre, 0, 0.64, 0);
+  place(new Mesh(rod(0.03, 0.03, 1.0, 12), brass), sceptre, 0, 0.1, 0);
+  place(new Mesh(ball(0.08, 24), glow(0xe0506a, 1.0)), sceptre, 0, 0.64, 0);
   rig.hands[1].add(sceptre);
   sceptre.position.set(0, -0.15, 0);
   rig.props.sceptre = sceptre;
-  rig.head.scale.setScalar(1.25);
   return rig;
 }
 

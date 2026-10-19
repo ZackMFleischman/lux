@@ -16,9 +16,9 @@ export function buildThrone(): Group {
   const gold = toon(0xdcaa45);
   const velvet = toon(0xa0182e);
   // Stepped dais.
-  place(inked(lathe('dais-low', [[0, 0], [1.9, 0], [1.9, 0.3], [0, 0.3]], 48), toon(0x3a1d4a)), outer, 0, 0, 0);
+  place(inked(lathe('dais-low', [[0, 0], [1.9, 0], [1.9, 0.3], [0, 0.3]], 96), toon(0x3a1d4a)), outer, 0, 0, 0);
   place(inked(ring(1.9, 0.04), gold), outer, 0, 0.3, 0, Math.PI / 2);
-  place(inked(lathe('dais-high', [[0, 0], [1.45, 0], [1.45, 0.3], [0, 0.3]], 48), toon(0x4c2560)), outer, 0, 0.3, 0);
+  place(inked(lathe('dais-high', [[0, 0], [1.45, 0], [1.45, 0.3], [0, 0.3]], 96), toon(0x4c2560)), outer, 0, 0.3, 0);
   place(inked(ring(1.45, 0.04), gold), outer, 0, 0.6, 0, Math.PI / 2);
   place(inked(lathe('throne-base', [[0, 0.3], [0.95, 0.3], [1.05, 0.2], [1.0, 0.0], [0, 0]], 40), gold), throne, 0, 0, 0);
   place(inked(blob(1.2, 0.5, 1.0, 4), velvet), throne, 0, 0.55, 0.05);

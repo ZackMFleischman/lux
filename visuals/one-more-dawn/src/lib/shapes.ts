@@ -55,7 +55,7 @@ export function rod(rTop: number, rBottom: number, h: number, segments = 18): Bu
 }
 
 export function ring(r: number, tube: number, arc = Math.PI * 2): BufferGeometry {
-  return cached(`ring:${r}:${tube}:${arc}`, () => new TorusGeometry(r, tube, 10, 32, arc));
+  return cached(`ring:${r}:${tube}:${arc}`, () => new TorusGeometry(r, tube, 16, 96, arc));
 }
 
 // Lathe from [radius, height] pairs; used for skirts, hats, gowns, throne.

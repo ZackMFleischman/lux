@@ -4,7 +4,7 @@
 import { BufferAttribute, BufferGeometry, Mesh, MeshBasicNodeMaterial, Object3D, Vector3 } from 'three/webgpu';
 
 const RINGS = 18;
-const SIDES = 16;
+const SIDES = 24;
 
 export class Hose {
   readonly geometry = new BufferGeometry();

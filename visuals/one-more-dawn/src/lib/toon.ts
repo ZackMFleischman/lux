@@ -91,7 +91,8 @@ export function toon(hex: number, options: ToonOptions = {}): MeshBasicNodeMater
   const shadowAmount = options.shadow ?? 1;
   const shadow = base.mul(mix(vec3(1, 1, 1), light.shadowTint, shadowAmount));
   const tone: Node = mix(shadow, base, lit);
-  const light3: Node = light.fill.add(light.key).add(spotLight());
+  // Cap the light so bright fills keep a visible shadow tone in a spot.
+  const light3: Node = light.fill.add(light.key).add(spotLight()).min(vec3(1.08, 1.08, 1.08));
   let color: Node = tone.mul(light3);
   const shine = options.shine ?? 0;
   if (shine > 0) {
