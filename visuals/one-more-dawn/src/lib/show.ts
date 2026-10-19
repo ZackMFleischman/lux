@@ -252,7 +252,7 @@ export function lighting(t: number, stagePos: { aria: Vector3; barnaby: Vector3;
 
   set.starLevel.value = keys(t, [[0, 0.25], [cue.dream - 1, 0.25], [cue.dream + 2, 1.3], [cue.introEnd, 1.3], [cue.bandIn + 2, 0.5]]);
   set.dreamStar.value = keys(t, [[0, 0], [cue.why, 0], [cue.dreamHeld - 1, 0.7], [cue.dreamHeld + 0.8, 1.5], [cue.introEnd + 0.8, 0.9], [cue.bandIn + 2, 0.2]]);
-  setColor(set.skyHorizon.value, new Color(0.06, 0.03, 0.14), new Color(0.35, 0.12, 0.2), toDawn * (1 - toWarm * 0.5), 1);
+  setColor(set.skyHorizon.value, new Color(0.03, 0.03, 0.1), new Color(0.28, 0.1, 0.18), toDawn * (1 - toWarm * 0.5), 1);
 }
 
 // ---------------------------------------------------------------- camera

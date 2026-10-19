@@ -100,7 +100,7 @@ export function toon(hex: number, options: ToonOptions = {}): MeshBasicNodeMater
     // faces up-left toward the viewer, so it stays put like a drawn decal.
     const nv: Node = normalize(transformedNormalView);
     const bean = smoothstep(0.962, 0.965, dot(nv, normalize(vec3(-0.45, 0.55, 0.7))));
-    color = mix(color, base.mul(0.5).add(vec3(0.55, 0.55, 0.52)).mul(light.key.add(light.fill).add(spotLight()).min(1.2)), bean.mul(shine));
+    color = mix(color, vec3(1.0, 0.98, 0.94).mul(light.key.add(light.fill).add(spotLight()).min(1.0)), bean.mul(shine));
   }
   const emissive = options.emissive ?? 0;
   if (emissive > 0) {

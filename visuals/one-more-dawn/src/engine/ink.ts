@@ -34,7 +34,7 @@ export default defineComponent({
     controls: {
       lineWidth: { type: 'number', label: 'Line weight', default: 4.4, min: 0, max: 8, step: 0.1, unit: 'px', group: 'Ink' },
       setLine: { type: 'number', label: 'Set line weight', default: 0.5, min: 0, max: 1, step: 0.01, group: 'Ink' },
-      crease: { type: 'number', label: 'Crease lines', default: 0.45, min: 0, max: 1, step: 0.01, group: 'Ink' },
+      crease: { type: 'number', label: 'Crease lines', default: 0.3, min: 0, max: 1, step: 0.01, group: 'Ink' },
     },
     controlDescriptions: {
       lineWidth: 'Width of performer ink lines at 1080p output, in pixels. Scales with output height.',
@@ -110,7 +110,7 @@ export default defineComponent({
     const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
     let lineWidth = 4.4;
     let setLine = 0.5;
-    let crease = 0.45;
+    let crease = 0.3;
     void context;
     return {
       update(frame) {

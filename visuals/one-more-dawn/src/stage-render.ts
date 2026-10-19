@@ -103,7 +103,7 @@ export default defineComponent({
           s.mesh.scale.setScalar(1 - Math.min(0.4, lift * 0.8));
         }
         set.hazeLevel.value = frame.controls.haze;
-        stage.update(t);
+        stage.update(t, t < 41 ? aria.root.position.x : barnaby.root.position.x);
         // Fade from black at the top and to black after the final tableau.
         const fade = Math.min(1, t / 0.6) * (frame.controls.loop ? Math.min(1, (CLIP_END - t) / 0.7) : 1);
         light.key.value.multiplyScalar(fade);

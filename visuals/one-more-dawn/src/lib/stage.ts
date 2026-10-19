@@ -51,6 +51,7 @@ import {
   vec3,
   vec4,
 } from 'three/tsl';
+import { buildCrowd, crowdState } from './crowd.ts';
 import { ball, blob, lathe, ring, rod } from './shapes.ts';
 import { glow, inked, light, place, spotLight, spotPool, toon, u } from './toon.ts';
 
@@ -76,8 +77,8 @@ export const set = {
   wallEyeLevel: u(1),
   starLevel: u(0.3),
   dreamStar: u(0),
-  skyTop: u(new Color(0.01, 0.01, 0.04)),
-  skyHorizon: u(new Color(0.08, 0.04, 0.16)),
+  skyTop: u(new Color(0.004, 0.006, 0.03)),
+  skyHorizon: u(new Color(0.03, 0.03, 0.1)),
   hazeLevel: u(0.6),
 };
 
@@ -271,7 +272,7 @@ function skyMaterial(): MeshBasicNodeMaterial {
   const h = hash(cell.x.add(cell.y.mul(733)).add(91));
   const sp = fract(st).sub(vec2(hash(cell.x.add(cell.y.mul(733)).add(7)), hash(cell.x.add(cell.y.mul(733)).add(13))).mul(0.6).add(0.2));
   const twinkle = sin(set.now.mul(h.mul(3).add(1)).add(h.mul(40))).mul(0.35).add(0.65);
-  const star = smoothstep(0.09, 0.0, length(sp)).mul(step(0.86, h)).mul(twinkle).mul(set.starLevel);
+  const star = smoothstep(0.07, 0.03, length(sp)).mul(step(0.93, h)).mul(twinkle).mul(set.starLevel);
   color = color.add(vec3(0.85, 0.9, 1.0).mul(star).mul(smoothstep(0.02, 0.15, elev)));
   // Ringed planet.
   const planetDir = normalize(vec3(0.42, 0.3, -1));
@@ -320,7 +321,7 @@ function beamMaterial(spot: (typeof light.spots)[number]): MeshBasicNodeMaterial
 export function contactShadow(width: number, depth: number): Mesh {
   const material = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false });
   const d = length(uv().sub(0.5).mul(2));
-  const alpha = smoothstep(1.0, 0.96, d).mul(0.38);
+  const alpha = smoothstep(1.0, 0.96, d).mul(0.5);
   material.colorNode = vec4(0.04, 0.02, 0.03, alpha);
   const mesh = new Mesh(new PlaneGeometry(width, depth), material);
   mesh.rotation.x = -Math.PI / 2;
@@ -336,7 +337,7 @@ export interface Stage {
   beams: Mesh[];
   cars: Object3D[];
   lift: Group;
-  update(t: number): void;
+  update(t: number, focusX?: number): void;
   dispose(): void;
 }
 
@@ -358,14 +359,9 @@ export function buildStage(): Stage {
   root.add(far);
 
   // Near tier of doors behind the stage.
-  // Curved tier of doors wrapping the back of the stage.
-  const wallGeometry = keep(new CylinderGeometry(14, 14, 5.6, 96, 1, true, Math.PI - 0.95, 1.9));
-  const wall = new Mesh(wallGeometry, doorWallMaterial({ cols: 19, rows: 5, delay: 0, spread: 0.16, dim: 0.95, center: [9.5, 1.3] }, BackSide));
-  wall.position.set(0, 2.8, 7.4);
-  root.add(wall);
-  const wallCap = new Mesh(keep(new CylinderGeometry(14.1, 14.1, 0.22, 96, 1, true, Math.PI - 0.95, 1.9)), toon(0x2a2440));
-  wallCap.material.side = BackSide;
-  place(wallCap, root, 0, 5.65, 7.4);
+  // Opera-house balconies with the robot crowd (replaces the pod wall).
+  const crowd = buildCrowd();
+  root.add(crowd.root);
 
   // Stage floor, apron and footlights.
   const floorGeometry = keep(new PlaneGeometry(24, 10.4));
@@ -550,8 +546,14 @@ export function buildStage(): Stage {
     beams,
     cars,
     lift,
-    update(t: number) {
+    update(t: number, focusX = 0) {
       set.now.value = t;
+      crowdState.wakeAt.value = set.wallWakeAt.value;
+      crowdState.wallLevel.value = set.wallLevel.value;
+      crowdState.eyesOpen = Math.min(1, Math.max(0, (set.wallEyeLevel.value - 0.1) / 0.4));
+      crowdState.lookX = set.wallLook.value.x;
+      crowdState.lookY = set.wallLook.value.y;
+      crowd.update(t, focusX);
       pedestal.position.y = -set.pedestalDrop * 0.45;
       pedestal.visible = set.pedestalDrop < 0.999;
       const open = set.curtainOpen;
@@ -594,6 +596,7 @@ export function buildStage(): Stage {
       });
     },
     dispose() {
+      crowd.dispose();
       for (const d of disposables) {
         d.dispose();
       }

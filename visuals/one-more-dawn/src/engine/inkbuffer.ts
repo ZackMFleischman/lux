@@ -9,8 +9,8 @@
 // thinner interior seams. Neighbouring parts only need different IDs, so
 // IDs are assigned round-robin with a stride.
 
-import { Material, Mesh, MeshBasicNodeMaterial, Object3D } from 'three/webgpu';
-import { normalize, transformedNormalView, vec4 } from 'three/tsl';
+import { InstancedMesh, Material, Mesh, MeshBasicNodeMaterial, Object3D } from 'three/webgpu';
+import { float, instanceIndex, normalize, transformedNormalView, vec4 } from 'three/tsl';
 
 export type LineClass = 'figure' | 'set' | 'none';
 
@@ -45,21 +45,23 @@ export class InkBuffer {
       }
       const here: LineClass = (mesh.userData.line as LineClass | undefined) ?? inherited(mesh, cls);
       const color = mesh.material;
-      const data = here === 'none' ? null : this.material(this.nextId(here), color as Material);
+      const instanced = (mesh as InstancedMesh).isInstancedMesh === true;
+      const data = here === 'none' ? null : this.material(this.nextId(here, instanced), color as Material, instanced);
       this.entries.push({ mesh, color, data, visible: true });
     });
   }
 
-  private nextId(cls: LineClass): number {
+  private nextId(cls: LineClass, instanced = false): number {
     if (cls === 'figure') {
       this.figureCounter += 1;
       return 129 + this.group * 15 + ((this.figureCounter * 7) % 15);
     }
     this.setCounter += 1;
-    return 1 + ((this.setCounter * 29) % 127);
+    // Instanced set meshes add up to 13 per instance, so keep their base low.
+    return instanced ? 1 + ((this.setCounter * 29) % 110) : 1 + ((this.setCounter * 29) % 127);
   }
 
-  private material(id: number, source: Material): MeshBasicNodeMaterial {
+  private material(id: number, source: Material, instanced = false): MeshBasicNodeMaterial {
     const material = new MeshBasicNodeMaterial({ side: source.side });
     const from = source as MeshBasicNodeMaterial;
     if (from.positionNode) {
@@ -70,7 +72,10 @@ export class InkBuffer {
       material.alphaTest = from.alphaTest;
     }
     const n = normalize(transformedNormalView);
-    material.colorNode = vec4(n.xy.mul(0.5).add(0.5), id / 255, 1);
+    // Instances get their own IDs so neighbours in one InstancedMesh still
+    // get a line between them.
+    const idNode = instanced ? float(id).add(instanceIndex.toFloat().mul(7).mod(13)).div(255) : float(id / 255);
+    material.colorNode = vec4(n.xy.mul(0.5).add(0.5), idNode, 1);
     material.toneMapped = false;
     this.made.push(material);
     return material;
