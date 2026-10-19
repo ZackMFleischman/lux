@@ -1,1 +1,1 @@
-export const assetLimits = Object.freeze({ count: 4, imageBytes: 786486, totalBytes: 1048576, rgbaBytes: 2097152, dimension: 512, pathCharacters: 240 });
+export const assetLimits = Object.freeze({ count: 64, imageBytes: 67108864, totalBytes: 268435456, rgbaBytes: 536870912, dimension: 8192, pathCharacters: 240 });

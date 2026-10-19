@@ -1,6 +1,6 @@
 import { validateSourceAssets, snapshotSourceAssetRecords } from '../../../packages/assets/src/index.mjs';
 import { sdkSourceFile } from './sdk-selection.mjs';
-export const limits = Object.freeze({ sourceBytes: 1048576, files: 32, diagnosticBytes: 131072, compileMs: 30000, outputBytes: 4194304, sourceJsonBytes: 6291456, requestBytes: 8388608 });
+export const limits = Object.freeze({ sourceBytes: 8388608, files: 256, diagnosticBytes: 131072, compileMs: 120000, outputBytes: 67108864, sourceJsonBytes: 402653184, requestBytes: 402653184 });
 export function violation(message, code = 'SOURCE_BOUNDARY_VIOLATION') { return Object.assign(new Error(message), { code }); }
 export function validateSource(source) {
   const envelope = validateSourceEnvelope(source);
