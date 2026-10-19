@@ -3,27 +3,35 @@ import assert from 'node:assert/strict';
 import { SoundtrackPlayer } from '../../apps/studio/src/soundtrack/soundtrack-player.ts';
 import type { SoundtrackAudioContext, SoundtrackClockView } from '../../apps/studio/src/soundtrack/soundtrack-player.ts';
 
-type FakeSource = { buffer: unknown; started: [number, number] | null; stopped: boolean; disconnected: boolean; connected: unknown;
-  connect(target: unknown): void; start(when: number, offset: number): void; stop(): void; disconnect(): void };
+type FakeSource = { buffer: unknown; started: [number, number] | null; stopped: boolean; stopAt?: number; disconnected: boolean; connected: unknown; onended?: (() => void) | null;
+  connect(target: unknown): void; start(when: number, offset: number): void; stop(when?: number): void; disconnect(): void };
+type FakeGain = { gain: { value: number; ramps: [string, number, number][]; setValueAtTime(value: number, time: number): void;
+  linearRampToValueAtTime(value: number, time: number): void; cancelScheduledValues(time: number): void }; connected: unknown; disconnected: boolean;
+  connect(target: unknown): void; disconnect(): void };
+function fakeGain(): FakeGain {
+  return { gain: { value: 1, ramps: [], setValueAtTime(value, time) { this.ramps.push(['set', value, time]); },
+    linearRampToValueAtTime(value, time) { this.ramps.push(['ramp', value, time]); this.value = value; }, cancelScheduledValues() {} },
+    connected: null, disconnected: false, connect(target) { this.connected = target; }, disconnect() { this.disconnected = true; } };
+}
 /** Audio clock and performance clock advance together unless a test makes the audio slip. */
 function fakeAudio() {
   const sources: FakeSource[] = [];
-  const gain = { gain: { value: 1 }, connected: null as unknown, connect(target: unknown) { this.connected = target; } };
+  const gains: FakeGain[] = [];
   const clocks = { nowMs: 50_000 };
   const context = {
     currentTime: 100, state: 'suspended' as string, destination: { kind: 'destination' }, resumes: 0,
     async resume() { this.resumes++; this.state = 'running'; },
-    createGain: () => gain,
+    createGain: () => { const created = fakeGain(); gains.push(created); return created; },
     createBufferSource: () => {
       const source: FakeSource = { buffer: null, started: null, stopped: false, disconnected: false, connected: null,
         connect(target) { this.connected = target; }, start(when, offset) { this.started = [when, offset]; },
-        stop() { this.stopped = true; }, disconnect() { this.disconnected = true; } };
+        stop(when) { this.stopped = true; this.stopAt = when; }, disconnect() { this.disconnected = true; } };
       sources.push(source); return source;
     },
     decodeAudioData: async (data: ArrayBuffer) => ({ duration: data.byteLength }),
   };
   const advance = (seconds: number, audioSeconds = seconds) => { clocks.nowMs += seconds * 1000; context.currentTime += audioSeconds; };
-  return { context, gain, sources, clocks, advance, active: () => sources.filter(source => source.started && !source.stopped) };
+  return { context, gains, sources, clocks, advance, active: () => sources.filter(source => source.started && !source.stopped) };
 }
 const clock = (patch: Partial<SoundtrackClockView> = {}): SoundtrackClockView =>
   ({ instanceId: 'runtime-a', generation: 1, clockEpoch: 0, playback: 'playing', timeSeconds: 0, ...patch });
@@ -37,14 +45,17 @@ const near = (actual: number | null | undefined, expected: number, message?: str
   assert.ok(actual !== null && actual !== undefined && Math.abs(actual - expected) < 1e-6, message ?? `${actual} != ${expected}`);
 
 test('play starts the song at scene time plus offset and pause stops it', () => {
-  const { player, sources, active, context, gain, advance } = setup();
+  const { player, sources, active, context, gains, advance } = setup();
   player.update(clock({ playback: 'paused', timeSeconds: 0 }));
   assert.equal(sources.length, 0, 'paused runtime does not start audio');
   player.update(clock({ timeSeconds: 2 }));
   assert.equal(active().length, 1);
   near(sources[0]!.started![1], 2);
-  assert.equal(sources[0]!.connected, gain);
-  assert.equal(gain.connected, context.destination);
+  const envelope = gains[1]!;
+  assert.equal(sources[0]!.connected, envelope, 'each source has its own fade envelope');
+  assert.equal(envelope.connected, gains[0]);
+  assert.equal(gains[0]!.connected, context.destination);
+  assert.deepEqual(envelope.gain.ramps, [['set', 0, 100], ['ramp', 1, 100.015]], 'start fades in over 15 ms');
   assert.equal(context.resumes, 1, 'a suspended context resumes when playback starts');
   advance(1); player.update(clock({ timeSeconds: 2.99 }));
   assert.equal(sources.length, 1, 'small differences do not re-seek');
@@ -52,7 +63,12 @@ test('play starts the song at scene time plus offset and pause stops it', () => 
   near(player.status().positionSeconds, 3);
   player.update(clock({ playback: 'paused', timeSeconds: 3.01 }));
   assert.equal(active().length, 0);
-  assert.equal(sources[0]!.stopped && sources[0]!.disconnected, true);
+  assert.equal(sources[0]!.stopped, true);
+  near(sources[0]!.stopAt, context.currentTime + 0.015);
+  assert.deepEqual(envelope.gain.ramps.at(-1), ['ramp', 0, context.currentTime + 0.015], 'stop fades out before the source stops');
+  assert.equal(sources[0]!.disconnected, false, 'nodes stay connected until the fade ends');
+  sources[0]!.onended?.();
+  assert.equal(sources[0]!.disconnected && envelope.disconnected, true);
   assert.equal(player.status().playing, false);
   // Resume continues from the paused scene time, not from wall-clock time.
   advance(5); player.update(clock({ timeSeconds: 3.01 }));
@@ -100,18 +116,18 @@ test('late frames never re-seek; audio slipping beyond 50 ms on consecutive fram
 });
 
 test('offset, volume and mute apply without changing scene playback', () => {
-  const { player, sources, gain, advance } = setup(60);
+  const audio = setup(60), { player, sources, advance } = audio;
   player.setSettings({ offsetSeconds: 12.5 });
   player.update(clock({ timeSeconds: 1 }));
   near(sources[0]!.started![1], 13.5);
   player.setSettings({ volume: 0.25 });
-  assert.equal(gain.gain.value, 0.25);
+  assert.equal(audio.gains[0]!.gain.value, 0.25);
   assert.equal(sources.length, 1, 'volume does not re-seek');
   player.setSettings({ muted: true });
-  assert.equal(gain.gain.value, 0);
+  assert.equal(audio.gains[0]!.gain.value, 0);
   assert.equal(player.status().playing, true, 'muted audio stays in sync');
   player.setSettings({ muted: false });
-  assert.equal(gain.gain.value, 0.25);
+  assert.equal(audio.gains[0]!.gain.value, 0.25);
   advance(1); player.setSettings({ offsetSeconds: 2 });
   near(sources[1]!.started![1], 4, 'offset change re-seeks immediately to offset + scene time now');
   advance(1); player.update(clock({ generation: 2, timeSeconds: 58.5 }));
@@ -170,4 +186,16 @@ test('a start from a late frame settles to the timely scene estimate within the 
   advance(1 / 60, 1 / 60 - 0.035); player.update(clock({ timeSeconds: 5.035 + 73 / 60 }));
   advance(1 / 60); player.update(clock({ timeSeconds: 5.035 + 74 / 60 }));
   assert.equal(sources.length, 2);
+});
+
+test('decoded audio longer than 20 minutes or above 1.5 GB of PCM is rejected', async () => {
+  const audio = fakeAudio();
+  let decoded = { duration: 21 * 60, length: 21 * 60 * 48000, numberOfChannels: 2 };
+  const context = Object.assign(audio.context, { decodeAudioData: async () => decoded });
+  const player = new SoundtrackPlayer({ createContext: () => context as unknown as SoundtrackAudioContext });
+  await assert.rejects(player.decode(new Uint8Array(4)), /limited to 20 minutes and 1.5 GB/);
+  decoded = { duration: 10 * 60, length: 10 * 60 * 384000, numberOfChannels: 2 };
+  await assert.rejects(player.decode(new Uint8Array(4)), /1.5 GB/);
+  decoded = { duration: 323, length: 323 * 48000, numberOfChannels: 2 };
+  assert.equal((await player.decode(new Uint8Array(4))).duration, 323);
 });

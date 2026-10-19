@@ -2,14 +2,17 @@
  * Scene time is authoritative: the player never changes runtime playback. It
  * follows (playback, timeSeconds, clockEpoch, generation) from Studio snapshots
  * and starts, stops or re-seeks one AudioBufferSourceNode to match. */
-export type SoundtrackBuffer = Readonly<{ duration: number }>;
-type GainNodeLike = { gain: { value: number }; connect(target: unknown): unknown };
+export type SoundtrackBuffer = Readonly<{ duration: number; length?: number; numberOfChannels?: number }>;
+type AudioParamLike = { value: number; setValueAtTime?(value: number, time: number): unknown;
+  linearRampToValueAtTime?(value: number, time: number): unknown; cancelScheduledValues?(time: number): unknown };
+type GainNodeLike = { gain: AudioParamLike; connect(target: unknown): unknown; disconnect?(): void };
 type SourceNodeLike = {
   buffer: SoundtrackBuffer | null;
   connect(target: unknown): unknown;
   start(when?: number, offset?: number): void;
   stop(when?: number): void;
   disconnect(): void;
+  onended?: ((event: Event) => void) | null;
 };
 export type SoundtrackAudioContext = {
   readonly currentTime: number;
@@ -26,7 +29,7 @@ export type SoundtrackClockView = Readonly<{
   instanceId: string; generation: number; clockEpoch: number;
   playback: 'playing' | 'paused' | 'starting' | 'failed'; timeSeconds?: number;
 }>;
-export type SoundtrackLinkState = 'none' | 'loading' | 'loaded' | 'missing' | 'mismatch' | 'error';
+export type SoundtrackLinkState = 'none' | 'loading' | 'loaded' | 'unavailable' | 'error';
 export type SoundtrackSettings = Readonly<{ offsetSeconds: number; volume: number; muted: boolean }>;
 export type SoundtrackStatus = Readonly<{
   file: string | null; state: SoundtrackLinkState; message: string | null;
@@ -38,6 +41,11 @@ export type SoundtrackStatus = Readonly<{
 /** Link and settings only; stable between changes so React can subscribe to it. */
 export type SoundtrackView = Pick<SoundtrackStatus, 'file' | 'state' | 'message' | 'offsetSeconds' | 'volume' | 'muted' | 'durationSeconds'>;
 export const soundtrackDriftToleranceSeconds = 0.05;
+/** Decoded PCM is float32 per channel: cap what a small compressed file can expand to. */
+export const soundtrackMaxDecodedSeconds = 20 * 60;
+export const soundtrackMaxDecodedBytes = 1.5 * 1024 ** 3;
+/** Short gain ramps at every start, stop and re-seek avoid clicks. */
+const fadeSeconds = 0.015;
 /** Frames arrive after they are sampled; the least-delayed recent frame best estimates scene time now. */
 const sceneWindowMs = 1000;
 /** Just after a start the first scene sample may be a late frame; settle to a tighter bound once. */
@@ -50,6 +58,7 @@ export class SoundtrackPlayer {
   private context: SoundtrackAudioContext | null = null;
   private gain: GainNodeLike | null = null;
   private source: SourceNodeLike | null = null;
+  private envelope: GainNodeLike | null = null;
   private buffer: SoundtrackBuffer | null = null;
   private settings: SoundtrackSettings = Object.freeze({ offsetSeconds: 0, volume: 1, muted: false });
   private link: { file: string | null; state: SoundtrackLinkState; message: string | null } = { file: null, state: 'none', message: null };
@@ -91,9 +100,18 @@ export class SoundtrackPlayer {
   private applyGain(): void { if (this.gain) this.gain.gain.value = this.settings.muted ? 0 : this.settings.volume; }
 
   /** Decodes file bytes. The caller's buffer is copied because decoding detaches it. */
-  decode(bytes: ArrayBuffer | Uint8Array): Promise<SoundtrackBuffer> {
-    const copy = bytes instanceof Uint8Array ? bytes.slice().buffer : bytes.slice(0);
-    return this.audio().decodeAudioData(copy);
+  /** Decodes file bytes and takes ownership of them: decoding detaches the buffer.
+   * Only a view over part of a larger buffer is copied first. Rejects decoded audio
+   * longer than 20 minutes or larger than 1.5 GiB of PCM. */
+  async decode(bytes: ArrayBuffer | Uint8Array): Promise<SoundtrackBuffer> {
+    const data = bytes instanceof Uint8Array
+      ? (bytes.byteOffset === 0 && bytes.byteLength === bytes.buffer.byteLength && bytes.buffer instanceof ArrayBuffer ? bytes.buffer : bytes.slice().buffer)
+      : bytes;
+    const decoded = await this.audio().decodeAudioData(data);
+    const pcmBytes = (decoded.length ?? 0) * (decoded.numberOfChannels ?? 0) * 4;
+    if (decoded.duration > soundtrackMaxDecodedSeconds || pcmBytes > soundtrackMaxDecodedBytes)
+      throw Error(`Soundtracks are limited to 20 minutes and 1.5 GB of decoded audio; this file decodes to ${Math.round(decoded.duration / 60)} minutes.`);
+    return decoded;
   }
 
   /** Call from a user gesture; Chromium may keep a new AudioContext suspended until one. */
@@ -176,25 +194,32 @@ export class SoundtrackPlayer {
 
   private start(position: number, key: string): void {
     this.stopSource();
-    const context = this.audio(), source = context.createBufferSource();
+    const context = this.audio(), source = context.createBufferSource(), envelope = context.createGain();
     source.buffer = this.buffer;
-    source.connect(this.gain);
+    source.connect(envelope); envelope.connect(this.gain);
     // Audio scheduled now is heard after the output latency. Start that far into the
     // song so what the user hears matches the current scene time.
     const when = context.currentTime, audible = this.audibleTime(context), lead = Math.min(0.5, Math.max(0, when - audible));
     this.outputLatency = lead;
+    envelope.gain.value = 0;
+    envelope.gain.setValueAtTime?.(0, when); envelope.gain.linearRampToValueAtTime?.(1, when + fadeSeconds);
     source.start(when, position + lead);
-    this.source = source; this.startedKey = key;
+    this.source = source; this.envelope = envelope; this.startedKey = key;
     this.startedAt = { outputTime: audible, position };
     this.driftSamples = 0; this.starts++; this.startedAtMs = this.now();
   }
 
   private stopSource(): void {
-    const source = this.source;
-    this.source = null; this.startedKey = null; this.driftSamples = 0;
+    const source = this.source, envelope = this.envelope;
+    this.source = null; this.envelope = null; this.startedKey = null; this.driftSamples = 0;
     if (!source) return;
-    try { source.stop(); } catch { /* A source that already ended cannot stop again. */ }
-    source.disconnect();
+    const release = () => { source.onended = null; source.disconnect(); envelope?.disconnect?.(); };
+    const now = this.context?.currentTime ?? 0, gain = envelope?.gain;
+    if (gain?.linearRampToValueAtTime) {
+      gain.cancelScheduledValues?.(now); gain.setValueAtTime?.(gain.value, now); gain.linearRampToValueAtTime(0, now + fadeSeconds);
+    }
+    source.onended = release;
+    try { source.stop(gain?.linearRampToValueAtTime ? now + fadeSeconds : undefined); } catch { release(); }
   }
 
   /** Live probe: heard position, scene-matched position and their difference now. */

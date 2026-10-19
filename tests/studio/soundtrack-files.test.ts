@@ -38,7 +38,7 @@ test('choose reads the file, hashes it and enforces type and size limits', async
   } finally { await rm(folder, { recursive: true, force: true }); }
 });
 
-test('linked soundtracks resolve relative first, then absolute, and report missing or changed files', async () => {
+test('linked soundtracks resolve relative first, then absolute, and report missing or changed files identically', async () => {
   const folder = await mkdtemp(join(tmpdir(), 'lux-soundtrack-linked-'));
   try {
     await mkdir(join(folder, 'show', 'audio'), { recursive: true }); await mkdir(join(folder, 'library'));
@@ -51,17 +51,20 @@ test('linked soundtracks resolve relative first, then absolute, and report missi
     let loaded = await files.loadLinked('scene-token');
     assert.equal(loaded.status, 'loaded');
     assert.equal(loaded.status === 'loaded' && loaded.absolutePath, relativeSong, 'scene-relative path wins');
+    assert.equal(loaded.status === 'loaded' && loaded.bytes.buffer.byteLength, 3, 'the result carries exactly the file bytes');
     await rename(relativeSong, join(folder, 'moved.mp3'));
     loaded = await files.loadLinked('scene-token');
     assert.equal(loaded.status === 'loaded' && loaded.absolutePath, absoluteSong, 'absolute path is the fallback');
     await writeFile(absoluteSong, new Uint8Array([1]));
     loaded = await files.loadLinked('scene-token');
-    assert.equal(loaded.status, 'mismatch');
-    assert.match('message' in loaded ? loaded.message : '', /changed since it was linked/);
+    assert.equal(loaded.status, 'unavailable');
+    const changedMessage = 'message' in loaded ? loaded.message : '';
+    assert.match(changedMessage, /missing, unreadable or changed since it was linked/);
     await rm(absoluteSong);
     loaded = await files.loadLinked('scene-token');
-    assert.equal(loaded.status, 'missing');
-    assert.match('message' in loaded ? loaded.message : '', /was not found/);
+    assert.equal(loaded.status, 'unavailable');
+    assert.equal('message' in loaded ? loaded.message : '', changedMessage, 'missing and changed files are indistinguishable');
+    assert.doesNotMatch(changedMessage, /library|show/, 'the message names no folder');
     files.remember('scene-token', scene, {});
     await assert.rejects(files.loadLinked('scene-token'), /no linked soundtrack/);
   } finally { await rm(folder, { recursive: true, force: true }); }

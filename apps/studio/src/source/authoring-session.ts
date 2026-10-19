@@ -78,6 +78,9 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
   // Looks and exports ignore the soundtrack; saved scenes carry it.
   function linked<T extends SceneDocument>(document:T):T{return state.soundtrack?withSceneSoundtrack(document,state.soundtrack):document;}
   function openedSoundtrack(document:SceneDocument,fileToken:string){return {soundtrack:document.soundtrack??null,soundtrackOrigin:document.soundtrack?fileToken:null};}
+  // A Look becomes a new untitled scene without a soundtrack. Keeping the previous scene's song
+  // would play it over an unrelated Look and save it into the next file without a dirty mark.
+  const lookSoundtrack=Object.freeze({soundtrack:null,soundtrackOrigin:null});
   function localDraftVersion(){return storySourceCatalog?.getSnapshot().version??workspace.getSnapshot().version;}
   function currentDraftVersion(){const local=localDraftVersion();if(local!==observedWorkspaceVersion){draftVersion+=local>observedWorkspaceVersion?local-observedWorkspaceVersion:1;observedWorkspaceVersion=local;}return draftVersion;}
   function requireDraftVersion(expected:number){if(!Number.isSafeInteger(expected)||expected!==currentDraftVersion())throw Error('Editor changed; read its source again');}
@@ -240,7 +243,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         const look = await ports.readLook(id);
         const document = await verifySceneDocument(look.document);
         requireDraftVersion(expectedVersion);
-        if(document.version===7){await submitStoryDocument(document,currentDraftVersion(),storySourceCatalog?.getSnapshot().selectedVisualId);token=undefined;storySourceCatalog!.markSaved(storySourceCatalog!.getSnapshot().version);update({name:look.name,controlsDirty:false,libraryDirty:false,libraryUpdates:[],libraryFallbacks:[]});return look;}
+        if(document.version===7){await submitStoryDocument(document,currentDraftVersion(),storySourceCatalog?.getSnapshot().selectedVisualId);token=undefined;storySourceCatalog!.markSaved(storySourceCatalog!.getSnapshot().version);update({name:look.name,controlsDirty:false,libraryDirty:false,libraryUpdates:[],libraryFallbacks:[],...lookSoundtrack});return look;}
         if (document.version === 5 && document.libraryLinks.length) throw Error('This look is not a frozen snapshot');
         const savedControls = await sceneControlSnapshot(document);
         requireDraftVersion(expectedVersion);
@@ -253,7 +256,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         pendingDocumentAnimations = null;
         pendingDocumentTempo=null;
         workspace.markSaved(workspace.getSnapshot().version);
-        update({name: look.name, controlsDirty: false, libraryDirty: false, libraryUpdates: [], libraryFallbacks: []});
+        update({name: look.name, controlsDirty: false, libraryDirty: false, libraryUpdates: [], libraryFallbacks: [], ...lookSoundtrack});
         return look;
       });
     },

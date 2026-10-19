@@ -8,7 +8,8 @@ import { soundtrackFileName, soundtrackMaxOffsetSeconds } from '../../../../pack
 export type SoundtrackControlProps = {
   player: SoundtrackPlayer; api?: SoundtrackClient;
   soundtrack: SceneSoundtrack | null; origin: string | null; disabled?: boolean;
-  onChange(next: SceneSoundtrack | null): void; onResolved(absolutePath: string): void; onError(message: string): void;
+  /** Returns false when the scene rejected the change; the player then keeps its current audio. */
+  onChange(next: SceneSoundtrack | null): boolean; onResolved(absolutePath: string): void; onError(message: string): void;
 };
 
 function NoteIcon() {
@@ -26,11 +27,12 @@ export function SoundtrackControl({ player, api, soundtrack, origin, disabled, o
   const [choosing, setChoosing] = useState(false);
   const [offsetDraft, setOffsetDraft] = useState(String(soundtrack?.offsetSeconds ?? 0));
   const [volumeDraft, setVolumeDraft] = useState(soundtrack?.volume ?? 1);
+  const [offsetError, setOffsetError] = useState<string | null>(null);
   const offsetEditing = useRef(false), buttonRef = useRef<HTMLButtonElement>(null);
   const titleId = useId();
   const callbacks = useRef({ onResolved, onError }); callbacks.current = { onResolved, onError };
 
-  useEffect(() => { if (!offsetEditing.current) setOffsetDraft(String(soundtrack?.offsetSeconds ?? 0)); setVolumeDraft(soundtrack?.volume ?? 1); },
+  useEffect(() => { if (!offsetEditing.current) { setOffsetDraft(String(soundtrack?.offsetSeconds ?? 0)); setOffsetError(null); } setVolumeDraft(soundtrack?.volume ?? 1); },
     [soundtrack?.offsetSeconds, soundtrack?.volume]);
   useEffect(() => { player.setSettings({ offsetSeconds: soundtrack?.offsetSeconds ?? 0, volume: soundtrack?.volume ?? 1 }); },
     [player, soundtrack?.offsetSeconds, soundtrack?.volume]);
@@ -46,7 +48,7 @@ export function SoundtrackControl({ player, api, soundtrack, origin, disabled, o
     player.setBuffer(null); player.setLink(name, 'loading');
     void api.loadLinked(origin).then(async result => {
       if (cancelled) return;
-      if (result.status !== 'loaded') { player.setLink(name, result.status === 'unreadable' ? 'error' : result.status, result.message); return; }
+      if (result.status !== 'loaded') { player.setLink(name, 'unavailable', result.message); return; }
       const buffer = await player.decode(result.bytes);
       if (cancelled) return;
       player.setBuffer(buffer); player.setLink(name, 'loaded');
@@ -64,27 +66,30 @@ export function SoundtrackControl({ player, api, soundtrack, origin, disabled, o
       let buffer;
       try { buffer = await player.decode(file.bytes); }
       catch { throw Error(`Lux could not decode ${file.name}. Use an MP3, WAV, OGG or M4A file.`); }
+      // The scene must accept the link before the player switches audio.
+      if (!onChange({ path: file.absolutePath, absolutePath: file.absolutePath, sha256: file.sha256,
+        offsetSeconds: soundtrack?.offsetSeconds ?? 0, volume: soundtrack?.volume ?? 1 })) return;
       player.setBuffer(buffer); player.setLink(file.name, 'loaded');
-      onChange({ path: file.absolutePath, absolutePath: file.absolutePath, sha256: file.sha256,
-        offsetSeconds: soundtrack?.offsetSeconds ?? 0, volume: soundtrack?.volume ?? 1 });
     } catch (error) { onError(error instanceof Error ? error.message : String(error)); }
     finally { setChoosing(false); }
   }
-  function remove() { setAnchor(null); player.setBuffer(null); player.setLink(null, 'none'); onChange(null); }
+  function remove() { if (!onChange(null)) return; setAnchor(null); player.setBuffer(null); player.setLink(null, 'none'); }
   function commitOffset() {
     offsetEditing.current = false;
     if (!soundtrack) return;
     const value = Number(offsetDraft);
     if (offsetDraft.trim() === '' || !Number.isFinite(value) || value < 0 || value > soundtrackMaxOffsetSeconds) {
-      setOffsetDraft(String(soundtrack.offsetSeconds)); onError('Soundtrack offset must be between 0 and 86400 seconds.'); return;
+      setOffsetError('Enter 0 to 86400 seconds'); return;
     }
-    if (value !== soundtrack.offsetSeconds) onChange({ ...soundtrack, offsetSeconds: value });
+    setOffsetError(null);
+    if (value !== soundtrack.offsetSeconds && !onChange({ ...soundtrack, offsetSeconds: value })) setOffsetDraft(String(soundtrack.offsetSeconds));
   }
   function commitVolume(value: number) { if (soundtrack && value !== soundtrack.volume) onChange({ ...soundtrack, volume: value }); }
 
   const name = soundtrack ? soundtrackFileName(soundtrack) : null;
-  const warning = status.state === 'missing' || status.state === 'mismatch' || status.state === 'error';
-  const stateText = !soundtrack ? 'No soundtrack' : status.state === 'loading' ? 'Loading…' : warning ? (status.state === 'mismatch' ? 'File changed' : status.state === 'missing' ? 'File missing' : 'Unavailable')
+  const warning = status.state === 'unavailable' || status.state === 'error';
+  const folder = soundtrack ? soundtrack.absolutePath.split(/[\\/]/).slice(-2, -1)[0] ?? '' : '';
+  const stateText = !soundtrack ? 'No soundtrack' : status.state === 'loading' ? 'Loading…' : warning ? (status.state === 'unavailable' ? 'File unavailable' : 'Cannot play')
     : status.muted ? 'Muted' : 'Linked';
   const label = name ? `Soundtrack: ${name}. ${stateText}` : 'Soundtrack: none';
   return <span className="soundtrack-control" data-soundtrack-state={soundtrack ? status.state : 'none'}>
@@ -103,15 +108,16 @@ export function SoundtrackControl({ player, api, soundtrack, origin, disabled, o
       onKeyDown={event => { if (event.key === 'Escape') event.stopPropagation(); }}>
       <h2 id={`${titleId}-title`} className="soundtrack-title">Soundtrack</h2>
       <p className="soundtrack-file" role="status" aria-live="polite"><span className="soundtrack-file-name" title={soundtrack?.absolutePath}>{name ?? 'No file linked'}</span>{soundtrack && <span className="soundtrack-state">{stateText}</span>}</p>
-      {warning && status.message && <Alert severity="warning" className="soundtrack-message">{status.message}</Alert>}
+      {warning && status.message && <Alert severity="warning" className="soundtrack-message">{status.message}
+        {soundtrack && <Tooltip title={soundtrack.absolutePath}><span className="soundtrack-location" tabIndex={0} aria-label={`Last linked at ${soundtrack.absolutePath}`}>Last linked in folder “{folder || soundtrack.absolutePath}”</span></Tooltip>}</Alert>}
       <div className="soundtrack-actions">
         <Button size="small" variant="outlined" color="inherit" disabled={!api || choosing} onClick={() => void choose()}>{choosing ? 'Choosing…' : soundtrack ? (warning ? 'Relink file…' : 'Replace file…') : 'Choose soundtrack…'}</Button>
         {soundtrack && <Button size="small" color="inherit" onClick={remove}>Remove</Button>}
       </div>
       {soundtrack && <div className="soundtrack-settings">
         <TextField size="small" type="number" label="Offset (seconds)" value={offsetDraft}
-          helperText="Song position at scene time 0"
-          onFocus={() => { offsetEditing.current = true; }} onChange={event => { offsetEditing.current = true; setOffsetDraft(event.target.value); }}
+          error={!!offsetError} helperText={offsetError ?? 'Song position at scene time 0'}
+          onFocus={() => { offsetEditing.current = true; }} onChange={event => { offsetEditing.current = true; setOffsetError(null); setOffsetDraft(event.target.value); }}
           onBlur={commitOffset} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); commitOffset(); } }}
           slotProps={{ htmlInput: { min: 0, max: soundtrackMaxOffsetSeconds, step: 0.01, 'aria-label': 'Soundtrack offset seconds' } }} />
         <label className="soundtrack-volume"><span>Volume</span>
@@ -122,7 +128,7 @@ export function SoundtrackControl({ player, api, soundtrack, origin, disabled, o
         </label>
         <FormControlLabel control={<Switch size="small" checked={status.muted} onChange={event => player.setSettings({ muted: event.target.checked })} />} label="Mute (this session only)" />
       </div>}
-      <p className="soundtrack-hint">Plays with Play, pauses with Pause and restarts with Reset. Saved with the scene; Looks ignore it.</p>
+      <p className="soundtrack-hint">Plays with Play, pauses with Pause and restarts with Reset. Follows scene time; Story beat seek and replay do not move it. Saved with the scene; loading a Look removes it.</p>
     </Popover>
   </span>;
 }

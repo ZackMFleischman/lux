@@ -9,7 +9,8 @@ import type { SceneSoundtrack } from '../../../../packages/core/src/scene-soundt
  * either chooses through a native dialog or loads the soundtrack recorded in a
  * scene this process opened, identified by that scene's file token. */
 export type SoundtrackFile = Readonly<{ name: string; absolutePath: string; sha256: string; bytes: Uint8Array }>;
-export type SoundtrackLoad = Readonly<({ status: 'loaded' } & SoundtrackFile) | { status: 'missing' | 'mismatch' | 'unreadable'; name: string; message: string }>;
+/** Missing, changed and unreadable files share one status so a scene cannot probe which paths exist. */
+export type SoundtrackLoad = Readonly<({ status: 'loaded' } & SoundtrackFile) | { status: 'unavailable'; name: string; message: string }>;
 type Linked = { scenePath: string; soundtrack: Pick<SceneSoundtrack, 'path' | 'absolutePath' | 'sha256'> };
 
 async function readBounded(path: string, limit: number): Promise<Buffer> {
@@ -17,17 +18,20 @@ async function readBounded(path: string, limit: number): Promise<Buffer> {
   try {
     const size = (await file.stat()).size;
     if (size > limit) throw Object.assign(Error(`Soundtrack exceeds ${Math.round(limit / 1048576)} MiB`), { code: 'ETOOBIG' });
-    const buffer = Buffer.alloc(size + 1);
+    // One unpooled file-sized allocation, so the IPC result carries no slack or neighbouring bytes.
+    const buffer = Buffer.allocUnsafeSlow(size);
     let offset = 0;
-    while (offset < buffer.length) {
-      const { bytesRead } = await file.read(buffer, offset, buffer.length - offset, null);
+    while (offset < size) {
+      const { bytesRead } = await file.read(buffer, offset, size - offset, null);
       if (!bytesRead) break; offset += bytesRead;
     }
-    if (offset > size || offset > limit) throw Object.assign(Error('Soundtrack changed while it was read'), { code: 'ETOOBIG' });
-    return buffer.subarray(0, offset);
+    if (offset !== size || (await file.read(Buffer.alloc(1), 0, 1, null)).bytesRead) throw Object.assign(Error('Soundtrack changed while it was read'), { code: 'ECHANGED' });
+    return buffer;
   } finally { await file.close(); }
 }
 const sha256 = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
+/** A view over the same memory; IPC serialization makes the only copy. */
+const view = (bytes: Buffer) => new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength);
 
 export function createSoundtrackFiles(options: { choosePath(): Promise<string | null>; limit?: number }) {
   const limit = options.limit ?? soundtrackByteLimit;
@@ -43,29 +47,22 @@ export function createSoundtrackFiles(options: { choosePath(): Promise<string | 
       if (!path) return null;
       if (!soundtrackHasSupportedExtension(path)) throw Error('Choose an MP3, WAV, OGG, M4A, AAC or FLAC file');
       const absolutePath = resolve(path), bytes = await readBounded(absolutePath, limit);
-      return Object.freeze({ name: soundtrackFileName({ absolutePath }), absolutePath, sha256: sha256(bytes), bytes: new Uint8Array(bytes) });
+      return Object.freeze({ name: soundtrackFileName({ absolutePath }), absolutePath, sha256: sha256(bytes), bytes: view(bytes) });
     },
     async loadLinked(token: unknown): Promise<SoundtrackLoad> {
       if (typeof token !== 'string') throw Error('Invalid scene token');
       const entry = linked.get(token);
       if (!entry) throw Error('This scene has no linked soundtrack');
       const name = soundtrackFileName(entry.soundtrack);
-      let changed = false, unreadable: string | null = null;
       for (const candidate of soundtrackCandidates(entry.soundtrack, entry.scenePath)) {
         if (!soundtrackHasSupportedExtension(candidate)) continue;
         let bytes: Buffer;
-        try { bytes = await readBounded(candidate, limit); }
-        catch (error) {
-          const code = (error as NodeJS.ErrnoException).code;
-          if (code !== 'ENOENT' && code !== 'ENOTDIR') unreadable = String((error as Error).message ?? error);
-          continue;
-        }
-        if (sha256(bytes) !== entry.soundtrack.sha256) { changed = true; continue; }
-        return Object.freeze({ status: 'loaded', name, absolutePath: candidate, sha256: entry.soundtrack.sha256, bytes: new Uint8Array(bytes) });
+        try { bytes = await readBounded(candidate, limit); } catch { continue; }
+        if (sha256(bytes) !== entry.soundtrack.sha256) continue;
+        return Object.freeze({ status: 'loaded', name, absolutePath: candidate, sha256: entry.soundtrack.sha256, bytes: view(bytes) });
       }
-      if (changed) return Object.freeze({ status: 'mismatch', name, message: `${name} changed since it was linked. Choose it again to relink.` });
-      if (unreadable) return Object.freeze({ status: 'unreadable', name, message: `${name} could not be read: ${unreadable}` });
-      return Object.freeze({ status: 'missing', name, message: `${name} was not found next to the scene or at ${entry.soundtrack.absolutePath}. Choose it again to relink.` });
+      return Object.freeze({ status: 'unavailable', name,
+        message: `${name} is missing, unreadable or changed since it was linked. Choose it again to relink.` });
     },
   };
 }

@@ -51,3 +51,19 @@ test('opening a scene adopts its soundtrack with the file token; resolution upda
   assert.equal(session.getSnapshot().soundtrack, null);
   assert.equal(session.getSnapshot().soundtrackOrigin, null);
 });
+
+test('loading a Look clears the previous scene soundtrack so it is neither played nor saved', async () => {
+  const saved: any[] = [];
+  const look = { format: 'lux-look', version: 1, id: 'look', revision: 1, name: 'Warm', updatedAt: '2026-10-18T00:00:00Z',
+    document: createSceneDocument(source(), output, { intensity: .5 }) };
+  const session = createAuthoringSession(createSourceWorkspace(source()), { submit: async () => {},
+    save: async request => { saved.push(request.document); return { token: 'saved', name: 'warm.lux-scene' }; },
+    getControls: () => ({ intensity: .5 }), getOutput: () => output, readLook: async () => look as any });
+  session.setSoundtrack(song);
+  await session.loadLook('look');
+  assert.equal(session.getSnapshot().soundtrack, null);
+  assert.equal(session.getSnapshot().soundtrackOrigin, null);
+  assert.equal(session.getSnapshot().controlsDirty, false);
+  await session.save(true);
+  assert.equal(Object.hasOwn(saved[0], 'soundtrack'), false);
+});

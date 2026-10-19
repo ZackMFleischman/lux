@@ -26,10 +26,10 @@ function fakePlayer() {
     decodeAudioData: async (data: ArrayBuffer) => ({ duration: data.byteLength }) };
   return { player: new SoundtrackPlayer({ createContext: () => context as unknown as SoundtrackAudioContext }), gain };
 }
-function Harness({ player, api, initial = null, origin = null, changes }: { player: SoundtrackPlayer; api: SoundtrackClient; initial?: SceneSoundtrack | null; origin?: string | null; changes: (SceneSoundtrack | null)[] }) {
+function Harness({ player, api, initial = null, origin = null, changes, accept = () => true }: { player: SoundtrackPlayer; api: SoundtrackClient; initial?: SceneSoundtrack | null; origin?: string | null; changes: (SceneSoundtrack | null)[]; accept?: (next: SceneSoundtrack | null) => boolean }) {
   const [soundtrack, setSoundtrack] = useState<SceneSoundtrack | null>(initial);
   return <div className="transport"><SoundtrackControl player={player} api={api} soundtrack={soundtrack} origin={origin}
-    onChange={next => { changes.push(next); setSoundtrack(next); }} onResolved={() => {}} onError={message => { if (message) throw Error(message); }} /></div>;
+    onChange={next => { if (!accept(next)) return false; changes.push(next); setSoundtrack(next); return true; }} onResolved={() => {}} onError={message => { if (message) throw Error(message); }} /></div>;
 }
 
 test('soundtrack control links a file, edits offset and volume, mutes and removes it by keyboard', async () => {
@@ -65,12 +65,39 @@ test('soundtrack control links a file, edits offset and volume, mutes and remove
 test('a missing linked file shows a non-blocking warning and offers relink', async () => {
   const { player } = fakePlayer(), user = userEvent.setup({ document });
   const api: SoundtrackClient = { choose: async () => null,
-    loadLinked: async token => ({ status: 'missing', name: 'dawn.mp3', message: `dawn.mp3 was not found (${token}). Choose it again to relink.` }) };
+    loadLinked: async token => ({ status: 'unavailable', name: 'dawn.mp3', message: `dawn.mp3 is missing, unreadable or changed since it was linked (${token}).` }) };
   const linked = { path: 'audio/dawn.mp3', absolutePath: 'C:\\music\\dawn.mp3', sha256: 'd'.repeat(64), offsetSeconds: 0, volume: 1 };
   render(<Harness player={player} api={api} initial={linked} origin="scene-1" changes={[]} />);
-  const button = await screen.findByRole('button', { name: 'Soundtrack: dawn.mp3. File missing' });
+  const button = await screen.findByRole('button', { name: 'Soundtrack: dawn.mp3. File unavailable' });
   await user.click(button);
-  assert.ok((await screen.findByRole('alert')).textContent?.includes('was not found (scene-1)'));
+  const alert = await screen.findByRole('alert');
+  assert.ok(alert.textContent?.includes('changed since it was linked (scene-1)'));
+  assert.ok(alert.textContent?.includes('Last linked in folder “music”'), 'the alert shows the folder name, not the full path');
+  assert.ok(screen.getByLabelText('Last linked at C:\\music\\dawn.mp3'));
   assert.ok(screen.getByRole('button', { name: 'Relink file…' }));
-  assert.equal(player.status().state, 'missing');
+  assert.equal(player.status().state, 'unavailable');
+});
+
+test('invalid offsets show inline, and a rejected link leaves the player unchanged', async () => {
+  const { player } = fakePlayer(), user = userEvent.setup({ document }), changes: (SceneSoundtrack | null)[] = [];
+  let accept = true;
+  const api: SoundtrackClient = { choose: async () => ({ name: 'other.mp3', absolutePath: 'C:\\music\\other.mp3', sha256: 'e'.repeat(64), bytes: new Uint8Array(500) }),
+    loadLinked: async () => assert.fail('no reload') };
+  render(<Harness player={player} api={api} changes={changes} accept={() => accept} />);
+  await user.click(screen.getByRole('button', { name: 'Soundtrack: none' }));
+  await user.click(await screen.findByRole('button', { name: 'Choose soundtrack…' }));
+  await waitFor(() => assert.equal(changes.length, 1));
+  const offset = screen.getByRole('spinbutton', { name: 'Soundtrack offset seconds' });
+  await user.clear(offset); await user.type(offset, '-3{Enter}');
+  assert.equal(offset.getAttribute('aria-invalid'), 'true');
+  assert.ok(screen.getByText('Enter 0 to 86400 seconds'));
+  assert.equal(changes.length, 1, 'an invalid offset is not saved');
+  await user.clear(offset); await user.type(offset, '4{Enter}');
+  assert.equal(offset.getAttribute('aria-invalid'), 'false');
+  assert.equal(changes.at(-1)?.offsetSeconds, 4);
+  accept = false;
+  await user.click(screen.getByRole('button', { name: 'Replace file…' }));
+  await new Promise(resolve => setTimeout(resolve, 20));
+  assert.equal(player.status().durationSeconds, 500, 'the rejected file never reached the player');
+  assert.equal(changes.length, 2);
 });

@@ -345,7 +345,7 @@ export function AuthoringApp() {
     <LooksDialog open={looksOpen} onClose={() => setLooksOpen(false)} onClosed={() => fileSummary.current?.focus()} client={window.luxLooks} onSave={saveLook} onLoad={loadLook} />
     <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} shortcutActions={shortcutActions}
       transportActions={<SoundtrackControl player={soundtrackPlayer} api={window.luxSoundtrack} soundtrack={io.soundtrack} origin={io.soundtrackOrigin} disabled={io.busy}
-        onChange={next => { try { session.setSoundtrack(next); } catch (reason) { setError(String(reason)); } }} onResolved={path => session.soundtrackResolved(path)} onError={setError} />}
+        onChange={next => { try { session.setSoundtrack(next); return true; } catch (reason) { setError(String(reason)); return false; } }} onResolved={path => session.soundtrackResolved(path)} onError={setError} />}
       previewActions={<PreviewCaptureActions available={previewAvailable} status={recording}
       onSaveFrame={savePreviewFrame} onStart={startPreviewRecording} onStop={stopPreviewRecording} />} sourceChanged={draft.hasRunningSource && !draft.runningMatchesDraft} appCommands={commands} appError={error} controlEdits={controlEdits} controlsAvailable={io.runtimeControlsAvailable} libraryPanel={libraryPanel}
       selectedVisualId={sourceCatalog?.selectedVisualId} sourceDiagnostics={{ items: diagnostics, snapshot: draft,visualSnapshots:sourceCatalog?Object.fromEntries(sourceCatalog.sources.map(row=>[row.id,Object.freeze({...row.snapshot,version:sourceCatalog.version})])):undefined, onNavigate: target => {
