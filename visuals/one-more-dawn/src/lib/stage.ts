@@ -96,7 +96,7 @@ function floorMaterial(): MeshBasicNodeMaterial {
   const material = new MeshBasicNodeMaterial();
   // Painted stage: warm boards that darken toward the back wall, plank
   // strokes, a darker band at the lip and hard-edged spot pools.
-  const px = positionWorld.x.div(1.4);
+  const px = positionWorld.x.div(0.95);
   const along = fract(px);
   const width = fwidth(px).mul(1.2);
   const plankLine = smoothstep(width, float(0), along.min(float(1).sub(along)));
@@ -107,7 +107,7 @@ function floorMaterial(): MeshBasicNodeMaterial {
   const plankTone = step(0.6, hash(floor(px).add(31))).mul(0.12).add(0.94);
   const scuffCell = floor(positionWorld.xz.mul(vec2(1.1, 0.8)));
   const scuffP = fract(positionWorld.xz.mul(vec2(1.1, 0.8))).sub(0.5);
-  const scuff = smoothstep(0.1, 0.08, length(scuffP.mul(vec2(1, 3)))).mul(step(0.86, hash(scuffCell.x.add(scuffCell.y.mul(97)))));
+  const scuff = smoothstep(0.1, 0.08, length(scuffP.mul(vec2(1, 3)))).mul(step(0.72, hash(scuffCell.x.add(scuffCell.y.mul(97)))));
   const backBand = step(positionWorld.z, -5.6);
   const painted = mix(board.mul(plankTone), board.mul(0.8), scuff);
   const wood = mix(mix(mix(painted, board.mul(0.62), plankLine), board.mul(0.55), backBand), vec3(0.24, 0.13, 0.08), lip);
@@ -136,7 +136,7 @@ function curtainMaterial(folds: number, fringe: boolean): MeshBasicNodeMaterial 
     color = mix(color, vec3(0.75, 0.52, 0.18).mul(light.fill.mul(2).add(light.key.mul(0.6)).add(set.footLevel.mul(0.5))), gold);
   }
   // Pre-show pin spot on the closed curtain.
-  const pin = smoothstep(1.55, 0.95, length(positionWorld.xy.sub(vec2(0, 2.3)))).mul(set.curtainPin);
+  const pin = smoothstep(1.32, 1.28, length(positionWorld.xy.sub(vec2(0, 2.3)))).mul(set.curtainPin);
   color = color.add(velvet.mul(1.1).add(sheen).add(vec3(0.16, 0.11, 0.08)).mul(pin));
   material.colorNode = vec4(color, 1);
   return material;
@@ -277,13 +277,15 @@ function skyMaterial(): MeshBasicNodeMaterial {
   // Ringed planet.
   const planetDir = normalize(vec3(0.42, 0.3, -1));
   const pd = dot(dir, planetDir);
-  const planet = smoothstep(0.9965, 0.9969, pd);
+  const planet = smoothstep(0.99665, 0.99672, pd);
+  const planetInk = smoothstep(0.99645, 0.99652, pd).sub(planet);
   const pshade = dot(dir.sub(planetDir), normalize(vec3(-1, 0.6, 0))).mul(18).add(0.5);
   const planetColor = mix(vec3(0.5, 0.22, 0.42), vec3(1.0, 0.62, 0.55), smoothstep(0.3, 0.45, pshade));
   const rp = dir.sub(planetDir);
   const ringD = abs(length(vec2(rp.x.add(rp.y.mul(0.6)), rp.y.mul(4.2))).sub(0.12));
   const ringMask = smoothstep(0.012, 0.006, ringD).mul(float(1).sub(planet.mul(step(0.0, rp.y))));
   color = mix(color, planetColor, planet);
+  color = mix(color, vec3(0.06, 0.04, 0.08), planetInk);
   const ringInk = smoothstep(0.016, 0.012, ringD).sub(smoothstep(0.012, 0.009, ringD)).max(0).mul(float(1).sub(planet.mul(step(0.0, rp.y))));
   color = mix(color, vec3(0.95, 0.78, 0.55), ringMask.mul(0.85));
   color = mix(color, vec3(0.08, 0.05, 0.08), ringInk);
@@ -382,9 +384,9 @@ export function buildStage(): Stage {
 
   // Robot audience silhouettes in the stalls.
   const headGeometry = blob(0.5, 0.46, 0.42, 2.6);
-  const audience = new InstancedMesh(headGeometry, toon(0x0c0a14), 46);
+  const audience = new InstancedMesh(headGeometry, toon(0x262a4a), 46);
   const shoulderGeometry = blob(0.9, 0.5, 0.5, 2.8);
-  const shoulders = new InstancedMesh(shoulderGeometry, toon(0x09070f), 46);
+  const shoulders = new InstancedMesh(shoulderGeometry, toon(0x1d203a), 46);
   const holder = new Object3D();
   let n = 0;
   for (let row = 0; row < 2; row += 1) {
@@ -406,7 +408,7 @@ export function buildStage(): Stage {
     }
   }
   root.add(audience, shoulders);
-  const antennaTips = new InstancedMesh(ball(0.05, 8), glow(0xff5a8a, 0.45), 12);
+  const antennaTips = new InstancedMesh(ball(0.06, 16), toon(0x8a90b0), 12);
   for (let i = 0; i < 12; i += 1) {
     const k = (i * 7) % 46;
     const m = new Object3D();
@@ -416,10 +418,10 @@ export function buildStage(): Stage {
     m.updateMatrix();
     antennaTips.setMatrixAt(i, m.matrix);
   }
-  void antennaTips;
+  root.add(antennaTips);
 
   // Proscenium: deco pillars, header with a ringed-planet crest.
-  const deco = toon(0x173e4c);
+  const deco = toon(0x2f6a7a);
   const gold = toon(0xdcaa45);
   const neonCyan = glow(0x5ff2ff, 0);
   const neonPink = glow(0xff5fc8, 0);

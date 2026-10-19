@@ -230,7 +230,7 @@ export function lighting(t: number, stagePos: { aria: Vector3; barnaby: Vector3;
   setSpot(4, 0, 1.0, 4.2, wars * (0.45 + warsFlash), red);
 
   set.footLevel.value = keys(t, [[0, 0], [2.5, 0], [6, 0.25], [19.3, 0.25], [21.5, 0.08], [cue.bandIn - 0.3, 0.1], [cue.bandIn + 0.6, 0.85], [cue.chain, 0.85], [cue.chain + 0.5, 0.45], [cue.reign, 0.4]]) * (0.85 + lvl * 0.3);
-  set.marqueeLevel.value = keys(t, [[0, 0.15], [cue.bandIn - 0.2, 0.15], [cue.bandIn + 0.4, 1.0], [cue.chain, 1.0], [cue.chain + 0.5, 0.45], [cue.kingdoms, 0.45]]) + span(t, cue.kingdoms - 0.1, cue.kings + 1.5, 0.2, 1.2) * 0.6;
+  set.marqueeLevel.value = keys(t, [[0, 0.55], [cue.bandIn - 0.2, 0.55], [cue.bandIn + 0.4, 1.0], [cue.chain, 1.0], [cue.chain + 0.5, 0.45], [cue.kingdoms, 0.45]]) + span(t, cue.kingdoms - 0.1, cue.kings + 1.5, 0.2, 1.2) * 0.6;
   set.marqueeChase.value = t * (t > cue.bandIn ? 2.6 : 0.6);
   set.neonLevel.value = keys(t, [[0, 0.0], [2.5, 0.0], [6.0, 0.6], [19.3, 0.6], [21.5, 0.25], [cue.bandIn, 0.3], [cue.bandIn + 0.5, 1.2]]) * (0.85 + lvl * 0.3);
   set.hazeLevel.value = 0.75;

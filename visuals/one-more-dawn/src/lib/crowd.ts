@@ -93,7 +93,9 @@ function backWallMaterial(tier: number): MeshBasicNodeMaterial {
   const panelLine = step(abs(fx), 0.006).mul(inDoor);
   const wallTone = mix(vec3(0.2, 0.1, 0.24), vec3(0.08, 0.13, 0.24), float(tier % 2));
   const doorTone = mix(vec3(0.32, 0.2, 0.36), vec3(0.18, 0.26, 0.4), float(tier % 2)).mul(float(1).sub(panelLine.mul(0.5)));
-  const room = vec3(1.0, 0.82, 0.52).mul(smoothstep(0.0, 0.8, fy).mul(0.3).add(0.7));
+  const roomTone = mix(mix(vec3(0.62, 0.42, 0.24), vec3(0.42, 0.36, 0.42), step(0.5, hash(box.mul(3).add(tier * 5)))), vec3(0.36, 0.42, 0.38), step(0.8, hash(box.mul(7).add(tier * 11))));
+  const poster = step(abs(fx.add(0.1)), 0.06).mul(step(abs(fy.sub(0.5)), 0.12)).mul(step(0.5, hash(box.add(tier * 31))));
+  const room = mix(roomTone, vec3(0.75, 0.3, 0.25), poster.mul(0.8));
   const lit = light.fill.mul(1.6).add(light.key.mul(0.15)).max(vec3(0.5, 0.5, 0.55));
   let color: Node = wallTone.mul(lit);
   color = mix(color, vec3(0.75, 0.55, 0.22).mul(lit), frame);
@@ -115,7 +117,7 @@ export function buildCrowd(): Crowd {
     owned.push(x);
     return x;
   };
-  const front = toon(0x5b2350);
+  const front = toon(0x4c2f45);
   const gold = toon(0xd2a43c, { shine: 0.5 });
   const column = toon(0x6a3a5e);
 
@@ -132,9 +134,9 @@ export function buildCrowd(): Crowd {
     const parapet = new Mesh(keep(new CylinderGeometry(r, r, parapetH, 120, 1, true, Math.PI - ARC, ARC * 2)), parapetMat);
     parapet.position.set(0, tier.floor + parapetH / 2, CENTER_Z);
     root.add(parapet);
-    const rail = new Mesh(keep(new TorusGeometry(r, 0.05, 10, 160, ARC * 2)), gold);
+    const rail = new Mesh(keep(new TorusGeometry(r, 0.07, 12, 160, ARC * 2)), gold);
     rail.rotation.set(Math.PI / 2, 0, Math.PI / 2 - ARC + Math.PI);
-    rail.position.set(0, tier.floor + parapetH, CENTER_Z);
+    rail.position.set(0, tier.floor + parapetH - 0.03, CENTER_Z);
     root.add(rail);
     const under = new Mesh(keep(new CylinderGeometry(r + 0.02, r + 0.02, 0.12, 120, 1, true, Math.PI - ARC, ARC * 2)), toon(0x1c0d1c, { shadow: 0 }));
     under.material.side = DoubleSide;
@@ -172,7 +174,7 @@ export function buildCrowd(): Crowd {
     }
   });
   const n = seats.length;
-  const palette = [0x3f6fa8, 0xb4552f, 0x6f7a8c, 0x4c8f4a, 0xc9a23a, 0x7b4f9e, 0x2f8f8a, 0xa8434f];
+  const palette = [0x7d828c, 0x8a5a3c, 0x6f7a5a, 0x5f7f86, 0xa88a4a, 0x8c8f96, 0x7a5f72, 0x9a4f3f, 0x6a7078, 0x4f7f9a];
   const tints = new Float32Array(n * 3);
   const c = new Color();
   for (let i = 0; i < n; i += 1) {
@@ -191,10 +193,12 @@ export function buildCrowd(): Crowd {
     new InstancedMesh(rbox(0.34, 0.24, 0.28), headMat, n),
   ];
   const domes = new InstancedMesh(dome(0.15, 0.7, 32), headMat, n);
-  const eyes = new InstancedMesh(blob(0.07, 0.085, 0.04, 2.2), toon(0xf4f1e8, { shadow: 0.3 }), n * 2);
-  const pupils = new InstancedMesh(ball(0.017, 12), toon(0x101010, { shadow: 0 }), n * 2);
+  const eyes = new InstancedMesh(blob(0.085, 0.1, 0.04, 2.2), toon(0xf4f1e8, { shadow: 0.3 }), n * 2);
+  const pupils = new InstancedMesh(ball(0.013, 12), toon(0x101010, { shadow: 0 }), n * 2);
+  const mouths = new InstancedMesh(rbox(0.13, 0.035, 0.03), toon(0x1c1216, { shadow: 0 }), n);
+  const brows = new InstancedMesh(rbox(0.2, 0.025, 0.03), toon(0x2a2228, { shadow: 0 }), n);
   const antennas = new InstancedMesh(ball(0.03, 12), toon(0xe0b84a), n);
-  for (const m of [bodies, ...heads, domes, eyes, pupils, antennas]) {
+  for (const m of [bodies, ...heads, domes, eyes, pupils, antennas, mouths, brows]) {
     m.frustumCulled = false;
     root.add(m);
   }
@@ -248,6 +252,18 @@ export function buildCrowd(): Crowd {
         o.updateMatrix();
         o.matrix.premultiply(head.matrix);
         antennas.setMatrixAt(i, i % 3 === 0 ? o.matrix : hidden.matrix);
+        const faceZ = kind === 1 ? 0.15 : kind === 2 ? 0.145 : 0.155;
+        o.position.set(0, -0.08, faceZ);
+        o.rotation.set(0, 0, 0);
+        o.scale.set(1, 1, 1);
+        o.updateMatrix();
+        o.matrix.premultiply(head.matrix);
+        mouths.setMatrixAt(i, o.matrix);
+        o.position.set(0, 0.085, faceZ);
+        o.rotation.set(0, 0, (i % 5 - 2) * 0.06);
+        o.updateMatrix();
+        o.matrix.premultiply(head.matrix);
+        brows.setMatrixAt(i, o.matrix);
         const open = crowdState.eyesOpen * ease;
         for (let e = 0; e < 2; e += 1) {
           const side = e === 0 ? -1 : 1;
@@ -264,7 +280,7 @@ export function buildCrowd(): Crowd {
           pupils.setMatrixAt(i * 2 + e, o.matrix);
         }
       });
-      for (const m of [bodies, ...heads, domes, eyes, pupils, antennas]) {
+      for (const m of [bodies, ...heads, domes, eyes, pupils, antennas, mouths, brows]) {
         m.instanceMatrix.needsUpdate = true;
       }
     },
