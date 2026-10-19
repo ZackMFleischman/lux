@@ -151,3 +151,78 @@ export function drawCrowd(layer: DrawnLayer, s: CrowdState): void {
   });
   layer.update();
 }
+
+export interface Hole {
+  x: number;
+  y: number;
+  rx: number;
+  ry: number;
+  a?: number;
+}
+
+// Theatre "focus" shade: darkens the whole set by `amount` except soft
+// elliptical holes (lit areas), then lays a black fade on top.
+// Layer covers the 16x9 frame (centre origin), normal blending.
+export function drawShade(layer: DrawnLayer, amount: number, holes: readonly Hole[], black: number): void {
+  const { ctx, canvas, ppu } = layer;
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  if (amount > 0.002) {
+    ctx.fillStyle = `rgba(6,4,14,${amount})`;
+    ctx.fillRect(0, 0, W, H);
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    for (const h of holes) {
+      ctx.save();
+      ctx.translate((h.x + 8) * ppu, (4.5 - h.y) * ppu);
+      ctx.scale(1, h.ry / h.rx);
+      const r = h.rx * ppu;
+      ctx.fillStyle = rad(ctx, 0, 0, 0, r, [[0, `rgba(0,0,0,${h.a ?? 1})`], [0.55, `rgba(0,0,0,${0.9 * (h.a ?? 1)})`], [1, 'rgba(0,0,0,0)']]);
+      ctx.beginPath();
+      ctx.arc(0, 0, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+  if (black > 0.002) {
+    ctx.fillStyle = `rgba(0,0,0,${Math.min(1, black)})`;
+    ctx.fillRect(0, 0, W, H);
+  }
+  layer.update();
+}
+
+// Big warm bloom used for the star-flash transition (additive, world space).
+export function drawFlash(layer: DrawnLayer, x: number, y: number, radius: number, level: number): void {
+  if (level <= 0.002) return;
+  const { ctx, ppu } = layer;
+  const cx = (x + 8) * ppu, cy = (4.5 - y) * ppu, r = radius * ppu;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.fillStyle = rad(ctx, cx, cy, 0, r, [[0, `rgba(255,250,230,${level})`], [0.35, `rgba(255,220,150,${0.75 * level})`], [1, 'rgba(255,190,90,0)']]);
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+// Pulsing red/blue markers on the verse plate's war-table hologram.
+export function drawTableGlow(layer: DrawnLayer, t: number, level: number): void {
+  if (level <= 0.002) return;
+  const { ctx, ppu } = layer;
+  const marks: readonly (readonly [number, number, string])[] = [
+    [5.86, -0.15, '255,70,70'], [6.48, -0.27, '255,70,70'], [6.98, -0.12, '255,70,70'], [6.4, 0.05, '255,90,90'],
+    [5.62, 0.05, '90,170,255'], [6.25, 0.28, '90,170,255'], [7.3, 0.22, '90,170,255'],
+  ];
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  marks.forEach(([x, y, c], i) => {
+    const pulse = 0.55 + 0.45 * Math.sin(t * 5 + i * 1.3);
+    const cx = (x + 8) * ppu, cy = (4.5 - y) * ppu, r = 0.22 * ppu;
+    ctx.fillStyle = rad(ctx, cx, cy, 0, r, [[0, `rgba(${c},${0.9 * level * pulse})`], [1, `rgba(${c},0)`]]);
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.restore();
+}

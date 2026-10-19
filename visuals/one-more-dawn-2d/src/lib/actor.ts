@@ -12,7 +12,8 @@ export interface Actor {
   layer: DrawnLayer;
   reflect: Node;
   draw(paint: (ctx: Ctx) => void): void;
-  place(footX: number, footY: number): void;
+  place(footX: number, footY: number, scale?: number): void;
+  fade(v: number): void;
   setVisible(on: boolean): void;
   dispose(): void;
 }
@@ -59,13 +60,21 @@ export function actor(scene: Scene, ppu: number, o: ActorOptions): Actor {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       layer.update();
     },
-    place(footX, footY) {
-      layer.mesh.position.x = footX - o.footX + o.width / 2;
-      layer.mesh.position.y = footY + centreAboveFeet;
+    place(footX, footY, scale = 1) {
+      layer.mesh.scale.set(scale, scale, 1);
+      layer.mesh.position.x = footX + (o.width / 2 - o.footX) * scale;
+      layer.mesh.position.y = footY + centreAboveFeet * scale;
       if (mirror) {
+        mirror.scale.set(scale, scale, 1);
         mirror.position.x = layer.mesh.position.x;
-        mirror.position.y = footY - centreAboveFeet;
+        mirror.position.y = footY - centreAboveFeet * scale;
       }
+    },
+    fade(v) {
+      layer.opacity.value = v;
+      reflect.value = (o.reflection ?? 0) * v;
+      layer.mesh.visible = v > 0.002;
+      if (mirror) mirror.visible = v > 0.002;
     },
     setVisible(on) {
       layer.mesh.visible = on;
