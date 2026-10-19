@@ -157,7 +157,7 @@ export default defineVisual({
               // Cool light from the lift shaft on the rising figure.
               const y0 = -(1 - rise) * 470;
               const up = ctx.createLinearGradient(0, y0, 0, y0 - 280);
-              up.addColorStop(0, 'rgba(150,225,255,0.6)');
+              up.addColorStop(0, 'rgba(150,225,255,0.32)');
               up.addColorStop(1, 'rgba(150,225,255,0)');
               ctx.globalCompositeOperation = 'source-atop';
               ctx.fillStyle = up;

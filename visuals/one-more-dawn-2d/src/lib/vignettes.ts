@@ -37,6 +37,7 @@ export function drawFamily(ctx: Ctx, t: number): void {
   boy.mouth = singing; boy.notes = notes;
   boy.look = 0.4;
   const helper = mini(150, 1.12);
+  helper.bob = 25;
   helper.lean = -0.14;
   helper.armL = 1.5 - walk * 0.3;
   helper.armR = 0.6 + singing * 1.6;
@@ -50,19 +51,19 @@ export function drawFamily(ctx: Ctx, t: number): void {
 export function drawThrone(ctx: Ctx, t: number): void {
   const rise = ramp(t, 55.2, 56.0);
   const pass = ramp(t, 58.0, 59.6);
-  const king = mini(18, 1.0);
-  king.bob = 20 - rise * 8;
-  king.armL = 0.6 + rise * 0.5 + (1 - pass) * 0.6;
-  king.armR = 0.6 + rise * 0.4 + pass * 0.6;
-  king.look = 1;
-  const helper = mini(98, 1.15);
-  helper.bob = 40;
+  const king = mini(70, 1.0);
+  king.bob = 2 - rise * 6;
+  king.armL = 0.6 + rise * 0.6 + pass * 0.5;
+  king.armR = 0.6 + rise * 0.3;
+  king.look = -1;
+  const helper = mini(-34, 1.15);
+  helper.bob = 0;
   helper.armL = 0.3 + pass * 1.0;
   helper.armR = 0.3 + pass * 1.6;
-  const gx = 34 + pass * 56, gy = -78 + pass * 18 - Math.sin(pass * Math.PI) * 25;
+  const gx = 48 - pass * 66, gy = -78 + pass * 18 - Math.sin(pass * Math.PI) * 25;
   const globeOn = ramp(t, 54.8, 55.6);
   drawKing(ctx, king);
-  drawHelper(ctx, helper, { ...faceFrom(pass > 0.5 ? 'wonder' : 'dutiful'), lookX: -0.6, lookY: -0.2 });
+  drawHelper(ctx, helper, { ...faceFrom(pass > 0.5 ? 'wonder' : 'dutiful'), lookX: 0.6, lookY: -0.2 });
   if (globeOn > 0) drawGlobe(ctx, gx, gy, 13, t * 1.2, globeOn * (0.4 + pass * 0.6));
 }
 
