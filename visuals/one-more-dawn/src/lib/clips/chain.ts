@@ -144,8 +144,9 @@ const BL: VKey[] = [
   [T.hands + 0.6, [-0.19, 0.4, 0.58]],
   [60.95, [-0.36, 0.3, 0.66]], // show it to the children
   [T.chain - 0.02, [-0.36, 0.3, 0.66]],
-  [T.chain + 0.1, [-0.66, 0.55, 0.4], easeOut], // yanked by the chain
-  [T.chain + 0.55, [-0.32, 0.38, 0.58]],
+  [T.chain + 0.1, [-0.8, 0.74, 0.4], easeOut], // yanked out by the chain
+  [T.chain + 0.9, [-0.74, 0.68, 0.44]], // held taut, straining
+  [63.95, [-0.4, 0.42, 0.56]],
   [64.1, [-0.18, 0.42, 0.5]], // protective, at the chest
   [T.wars - 0.2, [-0.18, 0.42, 0.5]],
   [T.wars + 0.05, [-0.22, 0.26, 0.46]], // anticipation
@@ -166,14 +167,16 @@ const BR: VKey[] = [
   [END, [0.6, 0.0, 0.22]],
 ];
 // Globe position in Barnaby's torso space while it rests at his side.
-const GLOBE_SIDE: V3 = [0.64, 0.2, 0.28];
+const GLOBE_SIDE: V3 = [0.66, 0.3, 0.3];
+// Globe held to his chest in the right hand while the chain holds the left.
+const GLOBE_CHEST: V3 = [0.02, 0.6, 0.74];
 // Right hand differs while showing the globe and on the jolt.
 const BR_SHOW: VKey[] = [
   [60.5, [0.19, 0.4, 0.58]],
   [60.95, [0.04, 0.3, 0.7]],
   [T.chain - 0.02, [0.04, 0.3, 0.7]],
-  [T.chain + 0.1, [-0.16, 0.44, 0.6], easeOut],
-  [T.chain + 0.55, [0.06, 0.38, 0.6]],
+  [T.chain + 0.1, [0.0, 0.36, 0.66], easeOut],
+  [T.chain + 0.9, [0.04, 0.36, 0.64]],
   [64.1, [0.18, 0.42, 0.5]],
 ];
 
@@ -194,7 +197,7 @@ function barnaby(t: number, rig: Rig, out: Pose): void {
     [T.begged + 0.3, -0.3],
     [66.4, -0.05],
     [T.brk, -0.05],
-    [T.reign - 0.15, -1.5],
+    [T.reign - 0.15, -1.22], // three-quarter profile so the bow and face read
   ]);
   // Old-timer stoop, breathing.
   p.lean = 0.12 + Math.sin(t * 1.3) * 0.015;
@@ -224,8 +227,11 @@ function barnaby(t: number, rig: Rig, out: Pose): void {
   // The bow on "reign": a waist bend with a knee dip, a nod of the head,
   // settled by 70.6 s and held still through the fade.
   const bow = ekeys(t, [[T.reign - 0.05, 0], [T.reign + 0.6, 1.06, easeOut], [T.reign + 1.05, 1]]);
-  p.lean += bow * 0.36;
-  p.lift -= bow * 0.075;
+  p.lean += bow * 0.22;
+  p.lift -= bow * 0.1;
+  // Hips go back as the chest goes forward, so the bend reads at the waist.
+  p.x -= Math.sin(p.yaw) * bow * 0.08;
+  p.z -= Math.cos(p.yaw) * bow * 0.08;
   p.squash -= bow * 0.03;
   p.bendL = 0.5;
   const calm = ramp(t, T.reign + 0.6, T.reign + 1.1);
@@ -258,8 +264,8 @@ function barnaby(t: number, rig: Rig, out: Pose): void {
     [T.never + 0.35, 0.12],
     [T.brk + 0.4, 0.04],
     [T.reign + 0.05, 0.02],
-    [T.reign + 0.5, 0.42, easeOut], // the nod
-    [T.reign + 0.95, 0.32],
+    [T.reign + 0.5, 0.4, easeOut], // the nod
+    [T.reign + 0.95, 0.3],
   ]);
   p.headYaw = ekeys(t, [
     [START, 0],
@@ -409,9 +415,9 @@ function guard(t: number, rig: Rig, out: Pose, side: -1 | 1): void {
   p.lift -= ekeys(t, [[66.2, 0], [66.3, 1], [66.5, 0]]) * 0.04;
   // Facing: march in profile; square off at Barnaby in profile for the
   // stand-off; after "never" turn three-quarters toward him and stand down.
-  const face = -side * Math.PI / 2;
+  const face = -side * (Math.PI / 2 + 0.25 * ramp(t, 66.0, 66.6));
   const ease = ekeys(t, [[T.never + 0.15, 0], [T.brk + 0.1, 1]]);
-  p.yaw = lerp(face, -side * 1.0, ease);
+  p.yaw = lerp(face, -side * 1.3, ease);
   // Aim on "wars": a pull back, then a snap with overshoot; lowered on "never".
   const aim = ekeys(t, [[T.wars - 0.3, 0], [T.wars - 0.08, -0.12], [T.wars + 0.12, 1, backOut], [T.never - 0.05, 1], [T.never + 0.4, 0]]);
   const a = clamp01(aim);
@@ -478,8 +484,8 @@ function shotCamera(t: number, cam: PerspectiveCamera): void {
     // Close insert: the wrist, the end of the chain and his face together.
     // Holds through the snap, then eases out to a medium as he looks up.
     const out = ramp(t, 63.4, 64.42, smooth);
-    camLook.copy(wristW).lerp(faceW, 0.35 + out * 0.25);
-    camPos.copy(camLook).add(tmpC.set(lerp(0.15, 0.35, out), lerp(0.25, 0.2, out), lerp(1.55, 2.6, out)));
+    camLook.copy(wristW).lerp(faceW, 0.42 + out * 0.2);
+    camPos.copy(camLook).add(tmpC.set(lerp(-1.0, -0.2, out), lerp(0.95, 0.35, out), lerp(1.75, 2.8, out)));
   }
   // Gentle hand-held drift, as in the rest of the show.
   const drift = 1 - ramp(t, 70.2, 70.7);
@@ -507,6 +513,19 @@ const kingWorld = new Vector3(0, 0, -4.4);
 const light2 = new Color(1.0, 0.82, 0.6);
 const neutral = new Color();
 
+// The shared Chain faces each torus along the path, which reads as a coil.
+// Turn every link so its plane contains the path and stretch it into an
+// oval, so neighbours interlock like a real chain. (Requested upstream.)
+function linkUp(cast: Cast): void {
+  for (const link of cast.chain.group.children) {
+    if (!link.visible) {
+      continue;
+    }
+    link.rotateY(Math.PI / 2);
+    link.scale.x *= 1.55;
+  }
+}
+
 function put(rig: Rig, a: Pose, b: Pose, w: number): void {
   blendPose(outP, a, b, w);
   applyPose(rig, outP);
@@ -523,8 +542,8 @@ export const clip = {
     // Aria glides to the foot of the throne so the stand-off has room.
     ariaPose(t, cast.aria, base.aria);
     copyPose(base.aria, mine.aria);
-    const AX: Key[] = [[START, -5.2], [58.3, -5.2], [60.6, -1.5]];
-    const AZ: Key[] = [[START, -3.3], [58.3, -3.3], [60.6, -2.6]];
+    const AX: Key[] = [[START, -5.2], [58.3, -5.2], [60.6, -2.4]];
+    const AZ: Key[] = [[START, -3.3], [58.3, -3.3], [60.6, -2.2]];
     mine.aria.x = keys(t, AX, smooth);
     mine.aria.z = keys(t, AZ, smooth);
     const ariaMoving = clamp01(speedOf(t, AX, AZ) / 1.2);
@@ -605,6 +624,11 @@ export const clip = {
     handsMid.z += 0.06;
     tmpB.set(barnWorld.x + 0.1 + Math.sin(t * 2.1) * 0.18 * (1 - descend) * ramp(t, 57.7, 58.3), 7.5, barnWorld.z + 0.5);
     globe.group.position.copy(tmpB).lerp(handsMid, descend);
+    const hold = span(t, T.chain - 0.02, 64.0, 0.12, 0.45);
+    if (hold > 0) {
+      const chest = cast.barnaby.torso.localToWorld(tmpC.set(GLOBE_CHEST[0], GLOBE_CHEST[1], GLOBE_CHEST[2]));
+      globe.group.position.lerp(chest, hold);
+    }
     // During the bow the globe lowers to his side in the right hand.
     const lower = ramp(t, T.reign + 0.2, T.reign + 0.8, smooth);
     if (lower > 0) {
@@ -628,6 +652,7 @@ export const clip = {
     const reveal = ramp(t, T.us, T.chain, (u: number) => u * u);
     const sag = ekeys(t, [[START, 0.9], [T.us, 0.9], [T.chain - 0.05, 0.55], [T.chain + 0.1, 0.1, easeOut], [T.chain + 0.5, 0.22], [64.6, 0.5]]);
     cast.chain.update(tip, wrist, reveal, sag);
+    linkUp(cast);
     wristW.copy(wrist);
     cast.barnaby.head.localToWorld(faceW.set(0, 0.42, 0.3));
 
