@@ -97,7 +97,7 @@ export function makeAria(): Rig {
     torsoY: 0,
     neckY: 0.74,
     shoulder: [0.24, 0.5, 0],
-    armRadius: [0.05, 0.045],
+    armRadius: [0.046, 0.032],
     armMaterial: teal,
     handMaterial: pearl,
     handSize: 0.15,
@@ -141,7 +141,7 @@ export function makeBarnaby(): Rig {
     torsoY: 0,
     neckY: 1.0,
     shoulder: [0.44, 0.78, 0],
-    armRadius: [0.075, 0.068],
+    armRadius: [0.07, 0.052],
     armMaterial: copper,
     handMaterial: copper,
     handSize: 0.21,
@@ -173,28 +173,28 @@ export function makeBarnaby(): Rig {
   place(new Mesh(can(0.14, 0.14), copperDark), rig.torso, 0, 0.95, 0);
   // Head: broad box with a dome cap, heavy brow, round eye sockets,
   // spectacles and a hinged vent-grille jaw.
-  place(new Mesh(rbox(0.74, 0.5, 0.6), copper), rig.head, 0, 0.42, 0);
-  place(new Mesh(dome(0.33, 0.55), copper), rig.head, 0, 0.66, 0);
-  place(new Mesh(rbox(0.7, 0.09, 0.14), copperDark), rig.head, 0, 0.58, 0.27);
+  place(new Mesh(can(0.36, 0.5, 64), copper), rig.head, 0, 0.42, 0);
+  place(new Mesh(dome(0.36, 0.6), copper), rig.head, 0, 0.66, 0);
+  place(new Mesh(rbox(0.6, 0.09, 0.14), copperDark), rig.head, 0, 0.58, 0.3);
   rig.jaw.position.set(0, 0.2, 0.0);
-  place(new Mesh(rbox(0.66, 0.2, 0.58), copper), rig.jaw, 0, -0.07, 0.02);
+  place(new Mesh(can(0.33, 0.2, 64), copper), rig.jaw, 0, -0.07, 0.0);
   // Old radio vent plate on the jaw.
-  place(new Mesh(rbox(0.42, 0.15, 0.04), toon(0xd9cdb0, { shadow: 0.5 })), rig.jaw, 0, -0.06, 0.31);
+  place(new Mesh(rbox(0.36, 0.15, 0.04), toon(0xd9cdb0, { shadow: 0.5 })), rig.jaw, 0, -0.06, 0.32);
   for (let i = 0; i < 3; i += 1) {
-    place(new Mesh(rbox(0.34, 0.018, 0.02), toon(0x5a3a26, { shadow: 0 })), rig.jaw, 0, -0.02 - i * 0.04, 0.335);
+    place(new Mesh(rbox(0.3, 0.018, 0.02), toon(0x5a3a26, { shadow: 0 })), rig.jaw, 0, -0.02 - i * 0.04, 0.345);
   }
-  place(new Mesh(rbox(0.6, 0.12, 0.5), toon(0x241318, { shadow: 0 })), rig.head, 0, 0.18, 0.04);
+  place(new Mesh(can(0.31, 0.12, 64), toon(0x241318, { shadow: 0 })), rig.head, 0, 0.18, 0);
   rig.mouthOpen = 1;
   for (const side of [-1, 1]) {
-    place(new Mesh(can(0.1, 0.06), copperDark), rig.head, side * 0.16, 0.44, 0.29, Math.PI / 2);
+    place(new Mesh(can(0.1, 0.06), copperDark), rig.head, side * 0.15, 0.44, 0.31, Math.PI / 2);
   }
-  addEyes(rig, 0.07, 0.16, 0.44, 0.31, copper);
+  addEyes(rig, 0.07, 0.15, 0.44, 0.33, copper);
   for (const side of [-1, 1]) {
-    place(new Mesh(ring(0.1, 0.016), toon(0x2a1a10, { shadow: 0 })), rig.head, side * 0.16, 0.44, 0.36);
+    place(new Mesh(ring(0.1, 0.016), toon(0x2a1a10, { shadow: 0 })), rig.head, side * 0.15, 0.44, 0.38);
   }
-  place(new Mesh(rod(0.012, 0.012, 0.12), toon(0x2a1a10, { shadow: 0 })), rig.head, 0, 0.45, 0.36, 0, 0, Math.PI / 2);
+  place(new Mesh(rod(0.012, 0.012, 0.1), toon(0x2a1a10, { shadow: 0 })), rig.head, 0, 0.45, 0.38, 0, 0, Math.PI / 2);
   for (const side of [-1, 1]) {
-    place(new Mesh(can(0.11, 0.08), copperDark), rig.head, side * 0.4, 0.42, 0, 0, 0, Math.PI / 2);
+    place(new Mesh(can(0.11, 0.08), copperDark), rig.head, side * 0.38, 0.42, 0, 0, 0, Math.PI / 2);
   }
   const tip = place(new Group(), rig.head, 0.06, 0.82, 0, 0, 0, -0.25);
   const bulb = antenna(tip, 0.2, 0xffb85a, 0.055, 0x6f4429);
@@ -213,14 +213,14 @@ export function makeKid(kind: 'pip' | 'dot'): Rig {
     torsoY: 0,
     neckY: 0.46,
     shoulder: [0.2, 0.34, 0],
-    armRadius: [0.042, 0.04],
+    armRadius: [0.036, 0.027],
     armMaterial: shell,
     handMaterial: shell,
     handSize: 0.12,
-    armHang: 0.36,
+    armHang: 0.46,
     legs: {
       hip: [0.09, 0, 0],
-      radius: [0.045, 0.042],
+      radius: [0.04, 0.03],
       material: shell,
       foot: boot(toon(kind === 'pip' ? 0xa83f3a : 0xb6465f), 0.2),
       stance: 0.11,
@@ -343,7 +343,7 @@ export function makeGuard(seed: number): Rig {
     torsoY: 0,
     neckY: 0.82,
     shoulder: [0.3, 0.66, 0],
-    armRadius: [0.055, 0.05],
+    armRadius: [0.052, 0.04],
     armMaterial: coat,
     handMaterial: white,
     handSize: 0.15,

@@ -103,7 +103,13 @@ function floorMaterial(): MeshBasicNodeMaterial {
   const depth = step(-2.6, positionWorld.z);
   const board = mix(vec3(0.3, 0.18, 0.11), vec3(0.5, 0.31, 0.19), depth);
   const lip = step(2.9, positionWorld.z);
-  const wood = mix(mix(board, board.mul(0.62), plankLine), vec3(0.24, 0.13, 0.08), lip);
+  const plankTone = step(0.6, hash(floor(px).add(31))).mul(0.12).add(0.94);
+  const scuffCell = floor(positionWorld.xz.mul(vec2(1.1, 0.8)));
+  const scuffP = fract(positionWorld.xz.mul(vec2(1.1, 0.8))).sub(0.5);
+  const scuff = smoothstep(0.1, 0.08, length(scuffP.mul(vec2(1, 3)))).mul(step(0.86, hash(scuffCell.x.add(scuffCell.y.mul(97)))));
+  const backBand = step(positionWorld.z, -5.6);
+  const painted = mix(board.mul(plankTone), board.mul(0.8), scuff);
+  const wood = mix(mix(mix(painted, board.mul(0.62), plankLine), board.mul(0.55), backBand), vec3(0.24, 0.13, 0.08), lip);
   let pools: Node = vec3(0, 0, 0);
   for (const spot of light.spots) {
     pools = pools.add(spot.color.mul(spotPool(spot)));
@@ -160,9 +166,7 @@ function doorWallMaterial(spec: DoorWallSpec, side: typeof DoubleSide | typeof B
   const centerCol = colsRow.mul(spec.center[0] / spec.cols);
   const dist = length(vec2(cell.x.sub(centerCol), cell.y.sub(spec.center[1]).mul(1.7)));
   const wake = set.wallWakeAt.add(spec.delay).add(dist.mul(spec.spread)).add(h.mul(0.6));
-  // A few doors only ever open halfway, as if jammed.
-  const jammed = mix(float(1), float(0.45), step(0.9, hash(cell.x.mul(5).add(cell.y.mul(71)))));
-  const open = smoothstep(wake, wake.add(0.55), set.now).mul(jammed);
+  const open = smoothstep(wake, wake.add(0.55), set.now);
   const p = f.sub(vec2(0.5, 0.44));
   const halfW = h2.mul(0.1).add(0.2);
   const halfH = h.mul(0.06).add(0.3);
@@ -206,13 +210,23 @@ function doorWallMaterial(spec: DoorWallSpec, side: typeof DoubleSide | typeof B
   // A little robot occupant in each pod: head, shoulders and an antenna,
   // in one of a few painted colours, lit from behind by the pod light.
   const occupantTone = mix(mix(vec3(0.27, 0.36, 0.44), vec3(0.42, 0.3, 0.25), step(0.4, h)), vec3(0.38, 0.38, 0.42), step(0.75, h));
-  const headD = roundBox(p.sub(vec2(0, 0.02)), vec2(0.15, 0.13), 0.06);
-  const shoulderD = roundBox(p.sub(vec2(0, -0.27)), vec2(0.24, 0.12), 0.08);
-  const antennaD = max(abs(p.x).sub(0.008), abs(p.y.sub(0.2)).sub(0.06));
-  const bulbD = length(p.sub(vec2(0, 0.27))).sub(0.025);
-  const occupant = smoothstep(0.006, -0.006, min(min(headD, shoulderD), min(antennaD, bulbD)));
+  // Five head types: round, tall capsule, wide box, square, dome.
+  const kind = hash(cell.x.mul(19).add(cell.y.mul(53)).add(7));
+  const dRound = length(p.sub(vec2(0, 0.02))).sub(0.15);
+  const dTall = roundBox(p.sub(vec2(0, 0.04)), vec2(0.12, 0.16), 0.11);
+  const dWide = roundBox(p.sub(vec2(0, 0.02)), vec2(0.18, 0.11), 0.03);
+  const dSquare = roundBox(p.sub(vec2(0, 0.02)), vec2(0.13, 0.13), 0.02);
+  const dDome = max(length(p.sub(vec2(0, -0.05))).sub(0.18), float(-0.07).sub(p.y));
+  const headD = mix(mix(mix(mix(dRound, dTall, step(0.2, kind)), dWide, step(0.4, kind)), dSquare, step(0.6, kind)), dDome, step(0.8, kind));
+  const shoulderD = roundBox(p.sub(vec2(0, -0.29)), vec2(0.24, 0.12), 0.08);
+  const antennaD = max(abs(p.x).sub(0.008), abs(p.y.sub(0.22)).sub(0.05)).add(step(0.5, hash(cell.x.add(cell.y.mul(9)))).mul(10));
+  const bulbD = length(p.sub(vec2(0, 0.28))).sub(0.025).add(step(0.5, hash(cell.x.add(cell.y.mul(9)))).mul(10));
+  const occD = min(min(headD, shoulderD), min(antennaD, bulbD));
+  const occupant = smoothstep(0.006, -0.006, occD);
+  const occLine = smoothstep(0.016, 0.008, abs(occD));
   const glowBack = set.wallInterior.mul(interiorGrad).mul(set.wallLevel);
-  const interior = mix(glowBack, occupantTone.mul(set.wallLevel.mul(0.8).add(0.2)), occupant);
+  const painted = mix(occupantTone, occupantTone.mul(0.25), occLine);
+  const interior = mix(glowBack, painted, max(occupant, occLine));
   const lightAmt = light.fill.mul(1.6).add(light.key.mul(0.12));
   let color: Node = wall.mul(lightAmt).mul(float(1).sub(inside).sub(frame));
   color = color.add(frameColor.mul(frame));
@@ -269,8 +283,8 @@ function beamMaterial(spot: (typeof light.spots)[number]): MeshBasicNodeMaterial
   const edge = smoothstep(0.08, 0.16, abs(dot(normalize(normalView), v)));
   const along = uv().y;
   // uv.y runs from the floor (0) to the lamp (1): brightest low, fading up.
-  const fade = smoothstep(0.0, 0.05, along).mul(smoothstep(1.0, 0.2, along).mul(0.85).add(0.15));
-  const amount = edge.mul(fade).mul(spot.shape.w).mul(set.hazeLevel).mul(0.07);
+  const fade = smoothstep(0.0, 0.04, along);
+  const amount = edge.mul(fade).mul(spot.shape.w).mul(set.hazeLevel).mul(0.055);
   // Pale, warm beam colour so the haze never greys out the set.
   const tone = mix(spot.color, vec3(1.0, 0.72, 0.4), 0.6);
   material.colorNode = vec4(tone.mul(amount), 1);
@@ -321,7 +335,7 @@ export function buildStage(): Stage {
   // Near tier of doors behind the stage.
   // Curved tier of doors wrapping the back of the stage.
   const wallGeometry = keep(new CylinderGeometry(14, 14, 5.6, 96, 1, true, Math.PI - 0.95, 1.9));
-  const wall = new Mesh(wallGeometry, doorWallMaterial({ cols: 13, rows: 4, delay: 0, spread: 0.22, dim: 0.72, center: [6.5, 1.0] }, BackSide));
+  const wall = new Mesh(wallGeometry, doorWallMaterial({ cols: 13, rows: 4, delay: 0, spread: 0.22, dim: 0.95, center: [6.5, 1.0] }, BackSide));
   wall.position.set(0, 2.8, 7.4);
   root.add(wall);
   const wallCap = new Mesh(keep(new CylinderGeometry(14.1, 14.1, 0.22, 96, 1, true, Math.PI - 0.95, 1.9)), toon(0x2a2440));

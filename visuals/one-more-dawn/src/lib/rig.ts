@@ -68,6 +68,7 @@ export interface Rig {
   arms: [Hose, Hose];
   legs: [Hose, Hose] | null;
   hands: [Group, Group];
+  elbows: [Mesh, Mesh];
   feet: [Group, Group] | null;
   hipHeight: number;
   rest: Pose;
@@ -187,6 +188,9 @@ export function skeleton(spec: SkeletonSpec): Rig {
   for (const s of shoulders) {
     place(new Mesh(ball(spec.armRadius[0] * 1.55), spec.armMaterial), torso, s.x, s.y, s.z);
   }
+  const elbowSize = (spec.armRadius[0] + spec.armRadius[1]) * 0.62;
+  const elbows: [Mesh, Mesh] = [new Mesh(ball(elbowSize), spec.armMaterial), new Mesh(ball(elbowSize), spec.armMaterial)];
+  torso.add(elbows[0], elbows[1]);
   let legs: [Hose, Hose] | null = null;
   let feet: [Group, Group] | null = null;
   let hipAnchors: [Vector3, Vector3] | null = null;
@@ -219,6 +223,7 @@ export function skeleton(spec: SkeletonSpec): Rig {
     arms,
     legs,
     hands,
+    elbows,
     feet,
     hipHeight: spec.hipHeight,
     rest,
@@ -283,6 +288,8 @@ export function applyPose(rig: Rig, pose: Pose): void {
     sC.set(target[0], target[1], target[2]);
     bendPoint(sB, sA, sC, i === 0 ? pose.bendL : pose.bendR, side);
     rig.arms[i].update(sA, sB, sC);
+    // Joint cap at the middle of the hose curve.
+    rig.elbows[i].position.set(0, 0, 0).addScaledVector(sA, 0.25).addScaledVector(sB, 0.5).addScaledVector(sC, 0.25);
     const h = rig.hands[i];
     h.position.copy(sC);
     rig.arms[i].endTangent(sT);

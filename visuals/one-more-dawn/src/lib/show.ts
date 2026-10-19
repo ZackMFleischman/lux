@@ -239,7 +239,7 @@ export function lighting(t: number, stagePos: { aria: Vector3; barnaby: Vector3;
   // "taught us how to answer", dims for the soprano's question, then glows
   // warm amber behind the verse.
   set.wallWakeAt.value = cue.doors;
-  set.wallLevel.value = keys(t, [[0, 1], [19.3, 1], [22, 0.16], [cue.bandIn - 0.5, 0.16], [cue.bandIn + 1, 0.32], [cue.chain, 0.32], [cue.chain + 0.5, 0.2], [cue.reign, 0.2]]);
+  set.wallLevel.value = keys(t, [[0, 1], [19.3, 1], [22, 0.16], [cue.bandIn - 0.5, 0.16], [cue.bandIn + 1, 0.6], [cue.chain, 0.6], [cue.chain + 0.5, 0.4], [cue.reign, 0.4]]);
   set.wallEyeLevel.value = keys(t, [[0, 1], [19.3, 1], [22, 0.12], [cue.bandIn, 0.12], [cue.bandIn + 1, 0.42], [cue.begged, 0.42], [cue.wars, 0.75]]);
   set.wallInterior.value.setRGB(0.95, 0.82, 0.55);
   set.wallEyes.value.setRGB(1.0, 0.98, 0.92);
