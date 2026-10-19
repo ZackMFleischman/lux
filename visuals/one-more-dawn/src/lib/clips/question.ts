@@ -187,9 +187,8 @@ function ariaActing(t: number, p: Pose): void {
   const held = span(t, WORD.forW - 0.1, END + 1, 0.6, 0.5);
   const thinkFace = span(t, WORD.a - 0.15, WORD.ifWe + 0.1, 0.35, 0.4);
   p.brow = 0.1 * scan - 0.15 * thinkFace + 0.8 * wonder + 0.25 * yearn + 0.9 * found + 0.75 * held;
-  // Rendered check: on Aria's rig a negative browTilt lifts the inner ends
-  // (worried); positive reads stern. Keep worry/yearning negative here.
-  p.browTilt = -(0.1 * thinkFace + 0.1 * wonder + 0.8 * yearn + 0.2 * found + 0.5 * held);
+  // Positive browTilt lifts the inner ends (worried, yearning).
+  p.browTilt = 0.1 * thinkFace + 0.1 * wonder + 0.8 * yearn + 0.2 * found + 0.5 * held;
   // Extra head tilt on the question and a lift into the held note.
   p.headRoll += thinkFace * 0.12 + held * Math.sin((t - WORD.forW) * 0.9) * 0.06;
   p.lid = Math.max(0, p.lid - wonder * 0.14 + thinkFace * 0.08 + yearn * 0.06 - found * 0.14 + held * 0.32);
