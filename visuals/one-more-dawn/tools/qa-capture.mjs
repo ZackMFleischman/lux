@@ -64,7 +64,7 @@ try {
       built = json(await call('lux.studio.build', { expectedDraftVersion: draft, source }));
       break;
     } catch (error) {
-      if (attempt >= 4 || !/exceeded|timed out|deadline/i.test(String(error))) throw error;
+      if (attempt >= 4 || !/exceeded|timed out|deadline|stopped making progress/i.test(String(error))) throw error;
       console.error(`build attempt ${attempt} timed out; retrying`);
     }
   }
