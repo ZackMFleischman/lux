@@ -245,7 +245,9 @@ export function buildCrowd(): Crowd {
         const yaw = baseYaw + diff * 0.6 + Math.sin(t * 0.7 + i) * 0.08;
         head.position.set(base.x, torsoY + 0.36 * seat.scale, base.z);
         const headScale = seat.scale * 1.1;
-        head.rotation.set(-0.12 + crowdState.lookY * 0.2, yaw, Math.sin(t * 0.9 + i * 1.7) * 0.06);
+        // Positive look.y means looking up, negative looking down (matches the
+        // pupils and the cue sheet).
+        head.rotation.set(-0.12 - crowdState.lookY * 0.2, yaw, Math.sin(t * 0.9 + i * 1.7) * 0.06);
         head.scale.setScalar(headScale);
         head.updateMatrix();
         const kind = kindOf(i);

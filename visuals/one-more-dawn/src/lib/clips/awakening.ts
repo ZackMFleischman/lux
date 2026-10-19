@@ -210,13 +210,12 @@ function lightFrame(t: number): void {
   // "answer", and heads bow on "never ask for more" (kept from default).
   const blink = (at: number) => span(t, at, at + 0.16, 0.06, 0.08);
   const closed = Math.max(blink(w.taught), blink(w.answer), blink(w.answer + 0.3));
-  // In crowd.ts a positive look.y pitches the heads down (the pupils move
-  // the other way, so the eyes are half closed while the heads are bowed).
+  // Negative look.y bows the heads and drops the pupils.
   const own = 1 - ramp(t, w.moreEnd, END - 0.15);
   const look = set.wallLook.value;
   const nod = span(t, w.answer, w.answer + 0.6, 0.1, 0.35);
   const bow = span(t, w.and + 0.1, END + 1, 0.9, 0.1);
-  look.y = lerp(look.y, nod * 1.6 + bow * 2.4, own);
+  look.y = lerp(look.y, -(nod * 1.6 + bow * 2.4), own);
   set.wallEyeLevel.value = lerp(set.wallEyeLevel.value, lerp(lerp(set.wallEyeLevel.value, 0.08, closed), 0.32, bow), own);
 }
 
