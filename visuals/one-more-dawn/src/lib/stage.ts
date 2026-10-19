@@ -299,7 +299,7 @@ function skyMaterial(): MeshBasicNodeMaterial {
   const qr = length(q);
   const qa = atan(q.y, q.x).add(1.5708);
   const lobe = pow(abs(cos(qa.mul(2.5))), 3).mul(0.6).add(0.4);
-  const starSize = set.dreamStar.min(1.6).mul(0.75);
+  const starSize = set.dreamStar.min(1.6).mul(1.15);
   const sd = qr.sub(lobe.mul(starSize));
   const starFill = smoothstep(0.04, -0.04, sd).mul(step(0.05, set.dreamStar));
   const starInk = smoothstep(0.16, 0.1, abs(sd.sub(0.08))).mul(step(0.05, set.dreamStar));
