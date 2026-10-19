@@ -82,7 +82,8 @@ export default defineComponent({
         const figure: Node = max(figC, step(0.5, k.b));
         const silhouette: Node = step(0.5, abs(groupOf(k.b).sub(gC))).mul(figure);
         const interior: Node = idEdge.mul(float(1).sub(silhouette)).mul(figC).mul(ring < 1 ? 1 : 0);
-        const creaseEdge: Node = step(creaseLimit, float(1).sub(dot(nC, normalOf(k)))).mul(float(1).sub(idEdge)).mul(figC).mul(ring < 1 ? 1 : 0);
+        const facing: Node = step(0.45, nC.z).mul(step(0.45, normalOf(k).z));
+        const creaseEdge: Node = step(creaseLimit, float(1).sub(dot(nC, normalOf(k)))).mul(float(1).sub(idEdge)).mul(figC).mul(facing).mul(ring < 1 ? 1 : 0);
         silHits = silHits.add(silhouette);
         innerHits = innerHits.add(max(interior, creaseEdge));
       }

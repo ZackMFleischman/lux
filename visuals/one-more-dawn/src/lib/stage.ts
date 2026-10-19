@@ -101,7 +101,7 @@ function floorMaterial(): MeshBasicNodeMaterial {
   const plankLine = smoothstep(width, float(0), along.min(float(1).sub(along)));
   // Two painted bands instead of a gradient: shadowed upstage, lit downstage.
   const depth = step(-2.6, positionWorld.z);
-  const board = mix(vec3(0.34, 0.19, 0.1), vec3(0.6, 0.36, 0.19), depth);
+  const board = mix(vec3(0.4, 0.21, 0.09), vec3(0.7, 0.42, 0.2), depth);
   const lip = step(2.9, positionWorld.z);
   const plankTone = step(0.6, hash(floor(px).add(31))).mul(0.12).add(0.94);
   const scuffCell = floor(positionWorld.xz.mul(vec2(1.1, 0.8)));
@@ -114,7 +114,7 @@ function floorMaterial(): MeshBasicNodeMaterial {
   for (const spot of light.spots) {
     pools = pools.add(spot.color.mul(spotPool(spot)));
   }
-  const lit = light.fill.mul(1.5).add(light.key.mul(0.42)).add(pools.mul(0.18)).min(vec3(1.25, 1.25, 1.25)).add(vec3(1.0, 0.7, 0.45).mul(lip).mul(set.footLevel).mul(0.4));
+  const lit = light.fill.mul(1.5).add(light.key.mul(0.42)).add(pools.mul(0.32)).min(vec3(1.25, 1.25, 1.25)).add(vec3(1.0, 0.7, 0.45).mul(lip).mul(set.footLevel).mul(0.4));
   material.colorNode = vec4(wood.mul(lit), 1);
   return material;
 }
@@ -182,22 +182,22 @@ function doorWallMaterial(spec: DoorWallSpec, side: typeof DoubleSide | typeof B
   // Split doors slide apart to reveal the interior.
   const revealed = smoothstep(open.mul(halfW).add(0.004), open.mul(halfW).sub(0.004), abs(p.x)).mul(inside);
   const blinkPhase = mix(h, float(0), set.wallBlinkSync);
-  const blink = smoothstep(0.0, 0.03, abs(fract(set.now.mul(0.23).add(blinkPhase)).sub(0.5)));
+  const blink = smoothstep(0.0, 0.03, abs(fract(set.now.mul(0.23).add(blinkPhase)).sub(0.5))).mul(smoothstep(0.1, 0.5, set.wallEyeLevel));
   const eyeP = vec2(abs(p.x).sub(0.095), p.y.sub(0.04).div(blink.mul(0.85).add(0.15)));
   const eyes = smoothstep(0.088, 0.078, length(eyeP.mul(vec2(1.2, 1)))).mul(revealed);
   const lookJitter = vec2(h2.sub(0.5).mul(0.03), h.sub(0.5).mul(0.02));
   const pupilP = vec2(abs(p.x.sub(set.wallLook.x.mul(0.03)).sub(lookJitter.x)).sub(0.095), p.y.sub(0.04).sub(set.wallLook.y.mul(0.03)).sub(lookJitter.y));
   const pupil = smoothstep(0.03, 0.022, length(pupilP)).mul(eyes);
   // Muted painted palette per cell and per row.
-  const plum = vec3(0.17, 0.1, 0.24);
-  const slate = vec3(0.08, 0.14, 0.22);
-  const umber = vec3(0.2, 0.11, 0.08);
+  const plum = vec3(0.22, 0.11, 0.32);
+  const slate = vec3(0.07, 0.17, 0.3);
+  const umber = vec3(0.26, 0.12, 0.07);
   const wallTone = mix(mix(plum, slate, step(0.4, rowHash)), umber, step(0.8, rowHash));
   // Hard painted shadow under each ledge and a thin ledge strip.
   const ledge = step(f.y, 0.035);
   const ledgeShadow = step(0.83, f.y);
   const rivet = smoothstep(0.022, 0.014, length(vec2(abs(f.x.sub(0.5)).sub(0.46), f.y.sub(0.08))));
-  const baseBand = smoothstep(0.12, 0.0, uv().y).mul(0.5);
+  const baseBand = step(uv().y, 0.05).mul(0.55);
   const wall = mix(wallTone, wallTone.mul(0.55), max(ledgeShadow, rivet)).mul(float(1).sub(ledge)).add(vec3(0.07, 0.06, 0.08).mul(ledge)).mul(float(1).sub(baseBand));
   const doorA = vec3(0.24, 0.31, 0.42);
   const doorB = vec3(0.42, 0.25, 0.18);
@@ -225,15 +225,24 @@ function doorWallMaterial(spec: DoorWallSpec, side: typeof DoubleSide | typeof B
   const occD = min(min(headD, shoulderD), min(antennaD, bulbD));
   const occupant = smoothstep(0.006, -0.006, occD);
   const occLine = smoothstep(0.016, 0.008, abs(occD));
-  const glowBack = set.wallInterior.mul(interiorGrad).mul(set.wallLevel.mul(0.5).add(0.5));
+  const glowBack = set.wallInterior.mul(interiorGrad);
   const painted = mix(occupantTone, occupantTone.mul(0.25), occLine);
   const interior = mix(glowBack, painted, max(occupant, occLine));
   const lightAmt = light.fill.mul(1.6).add(light.key.mul(0.12)).max(vec3(0.55, 0.55, 0.6));
   let color: Node = wall.mul(lightAmt).mul(float(1).sub(inside).sub(frame));
   color = color.add(frameColor.mul(frame));
   color = color.add(mix(panel.mul(lightAmt), interior, revealed).mul(inside));
-  color = mix(color, set.wallEyes.mul(set.wallEyeLevel).mul(1.2), eyes.mul(set.wallEyeLevel.min(1)));
-  color = mix(color, vec3(0.02, 0.02, 0.05), pupil.mul(set.wallEyeLevel.min(1)));
+  color = mix(color, set.wallEyes, eyes);
+  color = mix(color, vec3(0.02, 0.02, 0.05), pupil);
+  // Railings along each tier with posts, and an occasional warm sconce.
+  const railY = f.y.sub(0.1);
+  const rail = smoothstep(0.012, 0.004, abs(railY)).mul(float(1).sub(inside));
+  const post = smoothstep(0.012, 0.004, abs(fract(st.x.mul(2)).sub(0.5)).mul(0.5)).mul(step(f.y, 0.1)).mul(float(1).sub(inside));
+  const sconceP = vec2(f.x.sub(0.98).mul(2.2), f.y.sub(0.72));
+  const sconce = smoothstep(0.05, 0.04, length(sconceP)).mul(step(0.7, hash(cell.x.mul(29).add(cell.y.mul(5)))));
+  color = mix(color, wallTone.mul(0.3), max(rail, post));
+  color = mix(color, vec3(1.0, 0.82, 0.5), sconce);
+  color = color.mul(set.wallLevel.mul(0.55).add(0.45));
   material.colorNode = vec4(color.mul(spec.dim), 1);
   return material;
 }

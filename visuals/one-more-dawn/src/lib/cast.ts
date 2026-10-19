@@ -130,7 +130,8 @@ export function makeAria(): Rig {
 }
 
 export function makeBarnaby(): Rig {
-  const copper = toon(P.copper, { shine: 0.55 });
+  const copper = toon(P.copper);
+  const copperHead = toon(P.copper, { shine: 0.55 });
   const copperDark = toon(P.copperDark);
   const vest = toon(P.waistcoat);
   const trousers = toon(0x3a3a45);
@@ -173,8 +174,8 @@ export function makeBarnaby(): Rig {
   place(new Mesh(can(0.14, 0.14), copperDark), rig.torso, 0, 0.95, 0);
   // Head: broad box with a dome cap, heavy brow, round eye sockets,
   // spectacles and a hinged vent-grille jaw.
-  place(new Mesh(can(0.36, 0.5, 64), copper), rig.head, 0, 0.42, 0);
-  place(new Mesh(dome(0.36, 0.6), copper), rig.head, 0, 0.66, 0);
+  place(new Mesh(can(0.36, 0.5, 64), copperHead), rig.head, 0, 0.42, 0);
+  place(new Mesh(dome(0.36, 0.6), copperHead), rig.head, 0, 0.66, 0);
   place(new Mesh(rbox(0.6, 0.09, 0.14), copperDark), rig.head, 0, 0.58, 0.3);
   rig.jaw.position.set(0, 0.2, 0.0);
   place(new Mesh(can(0.33, 0.2, 64), copper), rig.jaw, 0, -0.07, 0.0);
@@ -371,7 +372,8 @@ export function makeGuard(seed: number): Rig {
   addPlateMouth(rig, rig.head, 0.18, 0.1, 0.07, 0.225, 0xd9d4c2, 0x55606e, 2);
   place(new Mesh(can(0.2, 0.46, 20), toon(0x1c1c28)), rig.head, 0, 0.64, -0.02);
   place(new Mesh(can(0.205, 0.06, 20), toon(P.gold)), rig.head, 0, 0.44, -0.02);
-  place(new Mesh(blob(0.12, 0.3, 0.12, 1.8), white), rig.head, 0, 0.98, -0.02);
+  place(new Mesh(rod(0.012, 0.012, 0.08, 8), white), rig.head, 0, 0.9, -0.02);
+  place(new Mesh(ball(0.075, 24), white), rig.head, 0, 0.98, -0.02);
   const rifle = new Group();
   place(new Mesh(rbox(0.07, 0.9, 0.07), toon(0x6b4428)), rifle, 0, 0.2, 0);
   place(new Mesh(rod(0.016, 0.016, 0.3, 8), steel), rifle, 0, 0.78, 0);
