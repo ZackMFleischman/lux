@@ -1,0 +1,107 @@
+// Second render of the same scene for the ink pass: every visible mesh
+// writes its view-space normal (rg) and a line ID (b). The ink component
+// draws a line wherever the ID changes (silhouettes, overlaps, part seams)
+// or the normal folds sharply (creases), at a fixed pixel width.
+//
+// IDs 1..127 belong to the set (thin coloured lines), 129..254 to
+// performers and props (full-weight dark ink). Neighbouring parts only
+// need different IDs, so IDs are assigned round-robin with a stride.
+
+import { Material, Mesh, MeshBasicNodeMaterial, Object3D } from 'three/webgpu';
+import { normalize, transformedNormalView, vec4 } from 'three/tsl';
+
+export type LineClass = 'figure' | 'set' | 'none';
+
+interface Entry {
+  mesh: Mesh;
+  color: Material | Material[];
+  data: MeshBasicNodeMaterial | null;
+  visible: boolean;
+}
+
+export class InkBuffer {
+  private readonly entries: Entry[] = [];
+  private readonly made: MeshBasicNodeMaterial[] = [];
+  private figureCounter = 0;
+  private setCounter = 0;
+
+  // Registers every mesh below root. A mesh can override its class with
+  // `mesh.userData.line = 'figure' | 'set' | 'none'`; meshes registered
+  // under an earlier root are skipped.
+  register(root: Object3D, cls: LineClass): void {
+    const seen = new Set(this.entries.map(e => e.mesh));
+    root.traverse(object => {
+      const mesh = object as Mesh;
+      if (!mesh.isMesh || seen.has(mesh)) {
+        return;
+      }
+      const here: LineClass = (mesh.userData.line as LineClass | undefined) ?? inherited(mesh, cls);
+      const color = mesh.material;
+      const data = here === 'none' ? null : this.material(this.nextId(here), color as Material);
+      this.entries.push({ mesh, color, data, visible: true });
+    });
+  }
+
+  private nextId(cls: LineClass): number {
+    if (cls === 'figure') {
+      this.figureCounter += 1;
+      return 129 + ((this.figureCounter * 37) % 126);
+    }
+    this.setCounter += 1;
+    return 1 + ((this.setCounter * 29) % 127);
+  }
+
+  private material(id: number, source: Material): MeshBasicNodeMaterial {
+    const material = new MeshBasicNodeMaterial({ side: source.side });
+    const from = source as MeshBasicNodeMaterial;
+    if (from.positionNode) {
+      material.positionNode = from.positionNode;
+    }
+    if (from.opacityNode) {
+      material.opacityNode = from.opacityNode;
+      material.alphaTest = from.alphaTest;
+    }
+    const n = normalize(transformedNormalView);
+    material.colorNode = vec4(n.xy.mul(0.5).add(0.5), id / 255, 1);
+    material.toneMapped = false;
+    this.made.push(material);
+    return material;
+  }
+
+  // Swap to the data materials; transparent and unlined meshes are hidden.
+  toData(): void {
+    for (const e of this.entries) {
+      e.visible = e.mesh.visible;
+      if (e.data) {
+        e.mesh.material = e.data;
+      } else {
+        e.mesh.visible = false;
+      }
+    }
+  }
+
+  toColor(): void {
+    for (const e of this.entries) {
+      e.mesh.material = e.color;
+      e.mesh.visible = e.visible;
+    }
+  }
+
+  dispose(): void {
+    for (const m of this.made) {
+      m.dispose();
+    }
+  }
+}
+
+function inherited(mesh: Object3D, fallback: LineClass): LineClass {
+  let p: Object3D | null = mesh.parent;
+  while (p) {
+    const cls = p.userData.line as LineClass | undefined;
+    if (cls) {
+      return cls;
+    }
+    p = p.parent;
+  }
+  return fallback;
+}
