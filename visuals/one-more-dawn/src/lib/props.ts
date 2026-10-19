@@ -72,7 +72,7 @@ export class Chain {
   constructor(count = 26) {
     const material = toon(0xb8bccb);
     for (let i = 0; i < count; i += 1) {
-      const link = inked(ring(0.085, 0.021), material);
+      const link = inked(ring(0.055, 0.013), material);
       this.links.push(link);
       this.group.add(link);
     }

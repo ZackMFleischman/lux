@@ -34,6 +34,9 @@ export interface Pose {
   lookX: number;
   lookY: number;
   eyeGlow: number;
+  // Brows: raise (-1 frown .. 1 surprised) and tilt (+ sad/worried, - stern).
+  brow: number;
+  browTilt: number;
   handL: V3;
   handR: V3;
   bendL: number;
@@ -59,6 +62,7 @@ export interface Rig {
   head: Group;
   jaw: Group;
   mouth: Object3D | null;
+  brows: [Object3D, Object3D] | null;
   // Split mouth: plates move apart and the dark interior grows when singing.
   plates: { upper: Object3D; lower: Object3D; inner: Object3D; gap: number } | null;
   mouthOpen: number;
@@ -114,6 +118,8 @@ export function blankPose(): Pose {
     lookX: 0,
     lookY: 0,
     eyeGlow: 1,
+    brow: 0,
+    browTilt: 0,
     handL: [0, 0, 0],
     handR: [0, 0, 0],
     bendL: 0.75,
@@ -216,6 +222,7 @@ export function skeleton(spec: SkeletonSpec): Rig {
     head,
     jaw,
     mouth: null,
+    brows: null,
     plates: null,
     mouthOpen: 1,
     eyes: [],
@@ -264,7 +271,7 @@ export function applyPose(rig: Rig, pose: Pose): void {
   rig.torso.rotation.set(pose.lean, pose.twist, pose.tilt, 'YXZ');
   rig.head.rotation.set(pose.headPitch, pose.headYaw, pose.headRoll, 'YXZ');
   const open = Math.max(0, Math.min(1, pose.mouth));
-  rig.jaw.rotation.x = open * 0.38 * rig.mouthOpen;
+  rig.jaw.rotation.x = open * 0.5 * rig.mouthOpen;
   if (rig.mouth) {
     rig.mouth.scale.set(1 - open * 0.2, 0.15 + open * 0.85, 1);
   }
@@ -278,6 +285,15 @@ export function applyPose(rig: Rig, pose: Pose): void {
   for (const e of rig.eyes) {
     e.pupil.rotation.set(-pose.lookY * 0.45, pose.lookX * 0.5, 0);
     e.lid.rotation.x = -1.4 + closed * 2.95;
+  }
+  if (rig.brows) {
+    // Brows lift a little with the open mouth so singing reads on the face.
+    const raise = Math.max(-1, Math.min(1, pose.brow + open * 0.35));
+    rig.brows.forEach((b, i) => {
+      const side = i === 0 ? -1 : 1;
+      b.position.y = (b.userData.baseY as number) + raise * 0.035;
+      b.rotation.z = side * (pose.browTilt * 0.35 - raise * 0.08);
+    });
   }
   for (const g of rig.glows) {
     g.userData.level.value = pose.eyeGlow;

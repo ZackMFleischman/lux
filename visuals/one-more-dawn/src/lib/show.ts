@@ -240,7 +240,8 @@ export function lighting(t: number, stagePos: { aria: Vector3; barnaby: Vector3;
   // warm amber behind the verse.
   set.wallWakeAt.value = cue.doors;
   set.wallLevel.value = keys(t, [[0, 1], [19.3, 1], [22, 0.16], [cue.bandIn - 0.5, 0.16], [cue.bandIn + 1, 0.6], [cue.chain, 0.6], [cue.chain + 0.5, 0.4], [cue.reign, 0.4]]);
-  set.wallEyeLevel.value = keys(t, [[0, 1], [19.3, 1], [22, 0.12], [cue.bandIn, 0.12], [cue.bandIn + 1, 0.42], [cue.begged, 0.42], [cue.wars, 0.75]]);
+  // The house hushes on "silence", then watches the dream rapt, eyes up.
+  set.wallEyeLevel.value = keys(t, [[0, 1], [19.3, 1], [22, 0.12], [cue.dream - 0.6, 0.12], [cue.dream + 0.6, 0.95], [cue.bandIn, 0.95], [cue.bandIn + 1, 0.42], [cue.begged, 0.42], [cue.wars, 0.75]]);
   set.wallInterior.value.setRGB(0.94, 0.87, 0.68);
   set.wallEyes.value.setRGB(1.0, 0.98, 0.92);
   set.wallBlinkSync.value = span(t, I[2][0] - 0.3, I[3][1] + 0.5, 0.5, 1.0);
@@ -251,8 +252,8 @@ export function lighting(t: number, stagePos: { aria: Vector3; barnaby: Vector3;
   );
 
   set.starLevel.value = keys(t, [[0, 0.25], [cue.dream - 1, 0.25], [cue.dream + 2, 1.3], [cue.introEnd, 1.3], [cue.bandIn + 2, 0.5]]);
-  set.dreamStar.value = keys(t, [[0, 0], [cue.why, 0], [cue.dreamHeld - 1, 0.7], [cue.dreamHeld + 0.8, 1.5], [cue.introEnd + 0.8, 0.9], [cue.bandIn + 2, 0.2]]);
-  setColor(set.skyHorizon.value, new Color(0.03, 0.03, 0.1), new Color(0.28, 0.1, 0.18), toDawn * (1 - toWarm * 0.5), 1);
+  set.dreamStar.value = keys(t, [[0, 0], [cue.why, 0], [cue.dreamHeld - 1, 0.7], [cue.dreamHeld + 0.8, 1.5], [cue.introEnd + 0.8, 0.9], [cue.bandIn + 2, 0.75], [CLIP_END, 0.75]]);
+  setColor(set.skyHorizon.value, new Color(0.03, 0.03, 0.1), new Color(0.28, 0.1, 0.18), toDawn * (1 - toWarm), 1);
 }
 
 // ---------------------------------------------------------------- camera

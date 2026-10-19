@@ -58,7 +58,7 @@ export default defineComponent({
     king.root.position.set(0, DAIS, 0.1);
     stage.lift.add(king.root);
     const globe = buildGlobe();
-    const chain = new Chain(24);
+    const chain = new Chain(40);
     scene.add(aria.root, barnaby.root, pip.root, dot.root, guards[0].root, guards[1].root, globe.group, chain.group);
 
     const shadows = [
@@ -105,7 +105,7 @@ export default defineComponent({
         set.hazeLevel.value = frame.controls.haze;
         stage.update(t, t < 41 ? aria.root.position.x : barnaby.root.position.x);
         // Fade from black at the top and to black after the final tableau.
-        const fade = Math.min(1, t / 0.6) * (frame.controls.loop ? Math.min(1, (CLIP_END - t) / 0.7) : 1);
+        const fade = Math.min(1, t / 0.6) * (frame.controls.loop ? Math.min(1, (CLIP_END - t) / 1.6) : 1);
         light.key.value.multiplyScalar(fade);
         light.fill.value.multiplyScalar(fade);
         set.footLevel.value *= fade;

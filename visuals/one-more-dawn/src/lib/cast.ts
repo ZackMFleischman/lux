@@ -32,6 +32,18 @@ function boot(material: MeshBasicNodeMaterial, size: number): () => Group {
   };
 }
 
+// Expressive brow bars above the eyes (posed via Pose.brow / browTilt).
+function addBrows(rig: Rig, width: number, spread: number, y: number, z: number, hex = 0x241a1c): void {
+  const brows: Group[] = [];
+  for (const side of [-1, 1]) {
+    const g = place(new Group(), rig.head, side * spread, y, z);
+    g.userData.baseY = y;
+    g.add(new Mesh(rbox(width, width * 0.22, 0.04), toon(hex, { shadow: 0 })));
+    brows.push(g);
+  }
+  rig.brows = [brows[0], brows[1]];
+}
+
 function addEyes(rig: Rig, radius: number, spread: number, y: number, z: number, lid: MeshBasicNodeMaterial): void {
   for (const side of [-1, 1]) {
     const e = eye(radius, lid);
@@ -65,7 +77,7 @@ function addPlateMouth(rig: Rig, parent: Group, w: number, h: number, y: number,
   };
   const upper = half(1);
   const lower = half(-1);
-  rig.plates = { upper, lower, inner, gap: h * 0.9 };
+  rig.plates = { upper, lower, inner, gap: h * 1.6 };
   rig.mouthOpen = 0;
 }
 
@@ -116,14 +128,16 @@ export function makeAria(): Rig {
   place(new Mesh(can(0.24, 0.46), pearl), rig.head, 0, 0.24, 0);
   place(new Mesh(can(0.255, 0.05), gold), rig.head, 0, 0.02, 0);
   place(new Mesh(can(0.255, 0.05), gold), rig.head, 0, 0.47, 0);
-  place(new Mesh(rod(0.03, 0.2, 0.18, 32), teal), rig.head, 0, 0.58, 0);
+  // Wide-brimmed cone hat so it reads from low angles too.
+  place(new Mesh(rod(0.03, 0.29, 0.28, 40), teal), rig.head, 0, 0.62, 0);
   place(new Mesh(rbox(0.36, 0.3, 0.06), toon(0xf3eedf, { shadow: 0.4 })), rig.head, 0, 0.24, 0.22);
-  const antennaGroup = place(new Group(), rig.head, 0, 0.66, 0);
+  const antennaGroup = place(new Group(), rig.head, 0, 0.75, 0);
   rig.props.antenna = antennaGroup;
   const halo = antenna(antennaGroup, 0.1, 0xbfeaf2, 0.05);
   rig.props.haloLight = new Mesh();
   rig.props.haloLight.userData.material = halo;
   addEyes(rig, 0.065, 0.09, 0.28, 0.26, toon(0xf3eedf));
+  addBrows(rig, 0.11, 0.09, 0.375, 0.26, 0x2f6f6a);
   addPlateMouth(rig, rig.head, 0.11, 0.065, 0.165, 0.256, 0x8fd0ca, 0x1e5f5a, 1, true);
   rig.head.scale.setScalar(1.3);
   return rig;
@@ -131,7 +145,7 @@ export function makeAria(): Rig {
 
 export function makeBarnaby(): Rig {
   const copper = toon(P.copper);
-  const copperHead = toon(P.copper, { shine: 0.55 });
+  const copperHead = toon(P.copper, { shine: 0.3 });
   const copperDark = toon(P.copperDark);
   const vest = toon(P.waistcoat);
   const trousers = toon(0x3a3a45);
@@ -190,6 +204,7 @@ export function makeBarnaby(): Rig {
     place(new Mesh(can(0.1, 0.06), copperDark), rig.head, side * 0.15, 0.44, 0.31, Math.PI / 2);
   }
   addEyes(rig, 0.07, 0.15, 0.44, 0.33, copper);
+  addBrows(rig, 0.17, 0.15, 0.55, 0.36, 0x5a2e16);
   for (const side of [-1, 1]) {
     place(new Mesh(ring(0.1, 0.016), toon(0x2a1a10, { shadow: 0 })), rig.head, side * 0.15, 0.44, 0.38);
   }
