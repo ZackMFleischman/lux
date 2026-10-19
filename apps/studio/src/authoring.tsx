@@ -36,10 +36,17 @@ import { shortcutHint } from './studio-shortcuts.ts';
 import type { StudioShortcutActions, StudioShortcutCommand } from './studio-shortcuts.ts';
 import {createStudioAudioRuntime} from './audio/studio-audio-runtime.ts';
 import {AudioInputControl} from './audio/AudioInputControl.tsx';
+import {SoundtrackPlayer} from './soundtrack/soundtrack-player.ts';
+import {SoundtrackControl} from './soundtrack/SoundtrackControl.tsx';
+import './soundtrack/soundtrack-client.ts';
 const audioProvider=createStudioAudioRuntime({permissions:window.luxAudioPermissions,mediaDevices:navigator.mediaDevices,
   createContext:()=>new AudioContext(),scheduler:{request:callback=>requestAnimationFrame(callback),cancel:id=>cancelAnimationFrame(id)}});
 const client = new StandaloneClient(window.luxAuthoring, { codeDeclaredParameters: true,audioProvider });
-const agentStatus = () => ({ ...client.getSnapshot(), capabilities: studioCapabilities });
+// The soundtrack follows the runtime clock in every scene mode; Studio time stays authoritative.
+const soundtrackPlayer=new SoundtrackPlayer({createContext:()=>new AudioContext()});
+client.subscribe(()=>soundtrackPlayer.update(client.getSnapshot().authoring));
+function soundtrackStatus(){const{file,state,message,offsetSeconds,volume,muted,durationSeconds,playing,positionSeconds,driftSeconds,contextState}=soundtrackPlayer.status();return file||state!=='none'?{file,state,message,offsetSeconds,volume,muted,durationSeconds,playing,positionSeconds,driftSeconds,contextState}:null;}
+const agentStatus = () => ({ ...client.getSnapshot(), capabilities: studioCapabilities, soundtrack: soundtrackStatus() });
 const idleRecording = Object.freeze({ phase: 'idle' }) as PreviewRecorderSnapshot;
 const subscribeIdle = () => () => {};
 const getIdleRecording = () => idleRecording;
@@ -164,6 +171,9 @@ export function AuthoringApp() {
     void confirmation.confirm('close').then(discard => window.luxConfirmation!.reply(id, discard)).catch(reason => setError(String(reason)));
   }), [confirmation.confirm]);
   useEffect(() => { void window.luxAuthoring.dirty(dirty); }, [dirty]);
+  // Chromium can hold a new AudioContext suspended until a user gesture such as Play.
+  useEffect(() => { const unlock = () => soundtrackPlayer.unlock(); window.addEventListener('pointerdown', unlock, true); window.addEventListener('keydown', unlock, true);
+    return () => { window.removeEventListener('pointerdown', unlock, true); window.removeEventListener('keydown', unlock, true); }; }, []);
   const runtime = runtimeSnapshot.authoring;
   const audioSource=runtime?.controlAnimations?.find(binding=>binding.kind==='audio'||binding.kind==='kick')?.source;
   const audioConfiguration=audioSource?{logicalInputId:audioSource.logicalInputId,analyzer:audioSource.analyzer}:undefined;
@@ -333,7 +343,10 @@ export function AuthoringApp() {
     {confirmation.dialog}
     <ExportDialog disabled={busy || composing.current} open={exportOpen} onClose={() => setExportOpen(false)} onClosed={() => fileSummary.current?.focus()} defaultName={io.name} create={async name => { if (pendingControlWrites.current.size) await finishControlWrites(); return session.exportSource(name); }} />
     <LooksDialog open={looksOpen} onClose={() => setLooksOpen(false)} onClosed={() => fileSummary.current?.focus()} client={window.luxLooks} onSave={saveLook} onLoad={loadLook} />
-    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} shortcutActions={shortcutActions} previewActions={<PreviewCaptureActions available={previewAvailable} status={recording}
+    <StudioApp client={client} presentation={client} windows={windows} fileMenu={fileMenu} shortcutActions={shortcutActions}
+      transportActions={<SoundtrackControl player={soundtrackPlayer} api={window.luxSoundtrack} soundtrack={io.soundtrack} origin={io.soundtrackOrigin} disabled={io.busy}
+        onChange={next => { try { session.setSoundtrack(next); } catch (reason) { setError(String(reason)); } }} onResolved={path => session.soundtrackResolved(path)} onError={setError} />}
+      previewActions={<PreviewCaptureActions available={previewAvailable} status={recording}
       onSaveFrame={savePreviewFrame} onStart={startPreviewRecording} onStop={stopPreviewRecording} />} sourceChanged={draft.hasRunningSource && !draft.runningMatchesDraft} appCommands={commands} appError={error} controlEdits={controlEdits} controlsAvailable={io.runtimeControlsAvailable} libraryPanel={libraryPanel}
       selectedVisualId={sourceCatalog?.selectedVisualId} sourceDiagnostics={{ items: diagnostics, snapshot: draft,visualSnapshots:sourceCatalog?Object.fromEntries(sourceCatalog.sources.map(row=>[row.id,Object.freeze({...row.snapshot,version:sourceCatalog.version})])):undefined, onNavigate: target => {
         if(target.visualId&&target.visualId!==session.getSnapshot().storySourceCatalog?.getSnapshot().selectedVisualId)session.selectVisual(target.visualId);

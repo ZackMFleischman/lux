@@ -5,6 +5,7 @@ import type { ComponentLibraryClient } from './library-client.ts';
 import type { LookClient } from './look-client.ts';
 import type { PreviewCaptureClient } from './preview-capture-client.ts';
 import type { StudioAudioPermissionClient } from './audio/audio-permission-client.ts';
+import type { SoundtrackClient } from './soundtrack/soundtrack-client.ts';
 const lookApi: LookClient = {
   list: () => ipcRenderer.invoke('studio:looks', 'list'),
   read: id => ipcRenderer.invoke('studio:looks', 'read', id),
@@ -82,3 +83,8 @@ const audioPermissionApi: StudioAudioPermissionClient = {
   disconnect: () => ipcRenderer.invoke('studio:audio-permission', 'disconnect'),
 };
 contextBridge.exposeInMainWorld('luxAudioPermissions', Object.freeze(audioPermissionApi));
+const soundtrackApi: SoundtrackClient = {
+  choose: () => ipcRenderer.invoke('studio:soundtrack', 'choose'),
+  loadLinked: sceneToken => ipcRenderer.invoke('studio:soundtrack', 'load-linked', sceneToken),
+};
+contextBridge.exposeInMainWorld('luxSoundtrack', Object.freeze(soundtrackApi));
