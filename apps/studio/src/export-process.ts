@@ -1,11 +1,13 @@
 import { spawn } from 'node:child_process';
 import { isAbsolute, join, relative, resolve, sep } from 'node:path';
 import type { StudioExportRequest, StudioExportResult } from './export-client.ts';
-export const exportLimits = Object.freeze({ requestBytes: 8388608, responseBytes: 65536, timeoutMs: 180000 });
+import { limits as sourceLimits } from '../../build-worker/src/source-policy.mjs';
+// A request carries one single-visual scene document; the child compiles, links and packages it.
+export const exportLimits = Object.freeze({ requestBytes: sourceLimits.sceneFileBytes + 1048576, responseBytes: 65536, timeoutMs: Math.max(180000, sourceLimits.buildMs + 60000) });
 type ChildRequest = StudioExportRequest & { outputDirectory: string };
 function encode(value: unknown) {
   const json = JSON.stringify(value);
-  if (!json || Buffer.byteLength(json) > exportLimits.requestBytes) throw Error('Export request exceeds 8 MiB');
+  if (!json || Buffer.byteLength(json) > exportLimits.requestBytes) throw Error(`Export request exceeds ${(exportLimits.requestBytes / 1048576).toFixed(1)} MiB`);
   return json;
 }
 function admit(value: unknown): StudioExportRequest {

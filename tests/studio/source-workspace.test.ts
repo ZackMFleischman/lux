@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createSourceWorkspace } from '../../apps/studio/src/source/workspace.ts';
+import { limits } from '../../apps/build-worker/src/source-policy.mjs';
 const source = () => ({ sdkVersion: '0.1.0' as const, entry: 'main.ts', files: { 'main.ts': 'export {}', 'lib/color.ts': 'export const red = 1' } });
 test('helper drafts survive navigation and dirty compares complete saved content', () => {
   const w = createSourceWorkspace(source());
@@ -58,10 +59,10 @@ test('new files share compiler path and complete UTF-8 budget admission', () => 
   for (const path of ['../bad.ts', '/bad.ts', 'Main.ts', 'con.ts', '__lux.ts', 'bad.js', 'a\\b.ts']) {
     assert.throws(() => w.addFile(path, '')); }
   assert.throws(() => w.addFile('main.ts', 'overwrite'));
-  assert.throws(() => w.addFile('big.ts', 'é'.repeat(524288)));
+  assert.throws(() => w.addFile('big.ts', 'é'.repeat(limits.sourceBytes / 2)));
   assert.throws(() => w.edit('main.ts', '\ud800'));
   assert.throws(() => createSourceWorkspace({ ...source(), entry: 'missing.ts' }));
-  const boundary = createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'a.ts', files: { 'a.ts': 'é'.repeat(524288) } });
-  assert.equal(boundary.getSnapshot().source.files['a.ts']!.length, 524288);
+  const boundary = createSourceWorkspace({ sdkVersion: '0.1.0', entry: 'a.ts', files: { 'a.ts': 'é'.repeat(limits.sourceBytes / 2) } });
+  assert.equal(boundary.getSnapshot().source.files['a.ts']!.length, limits.sourceBytes / 2);
   assert.throws(() => boundary.edit('a.ts', boundary.getSnapshot().source.files['a.ts'] + 'a'));
 });

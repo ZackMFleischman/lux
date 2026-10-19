@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as codec from '../../packages/assets/src/jpeg.mjs';
+import { assetLimits } from '../../packages/assets/src/limits.mjs';
 import { fixture,segment,insert,exif,findSegment,restartGray,progressiveGray,refinementOverflow } from './jpeg-fixtures.mjs';
 
 test('baseline and progressive independent JPEG fixtures decode opaque sRGB', () => {
@@ -41,7 +42,7 @@ test('JPEG rejects invalid marker boundaries, frame dimensions, sampling, tables
 
 test('JPEG pixel/file budgets are checked before decoder allocation', () => {
   assert.throws(()=>codec.decodeJpeg(fixture('gray'),{maxRgbaBytes:23}),{code:'QUOTA_EXCEEDED'});
-  assert.throws(()=>codec.decodeJpeg(new Uint8Array(786487)),{code:'QUOTA_EXCEEDED'});
+  assert.throws(()=>codec.decodeJpeg(new Uint8Array(assetLimits.imageBytes+1)),{code:'QUOTA_EXCEEDED'});
 });
 
 test('grayscale restart decoding handles a final partial interval', () => {

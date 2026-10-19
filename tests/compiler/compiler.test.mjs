@@ -3,14 +3,14 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { compileVisual } from '../../apps/build-worker/src/compile.mjs';
-import { validateSource } from '../../apps/build-worker/src/source-policy.mjs';
+import { validateSource, limits } from '../../apps/build-worker/src/source-policy.mjs';
 
 const dependencyRoot = process.env.LUX_COMPILER_DEPENDENCIES || resolve('node_modules');
 const example = () => readFile(new URL('../../packages/visual-sdk/examples/intensity.ts', import.meta.url), 'utf8');
 const request = text => ({ source: { sdkVersion: '0.1.0', entry: 'main.ts', files: { 'main.ts': text } } });
 
 test('source admission rejects invalid UTF8, traversal, collision and byte/file budgets', () => {
-  for (const files of [{ '../bad.ts': '' }, { 'C:/bad.ts': '' }, { 'MAIN.ts': '', 'main.ts': '' }, { 'main.ts': '\ud800' }, { 'main.ts': 'x'.repeat(1048577) }, Object.fromEntries(Array.from({ length: 33 }, (_, i) => [`f${i}.ts`, '']))]) {
+  for (const files of [{ '../bad.ts': '' }, { 'C:/bad.ts': '' }, { 'MAIN.ts': '', 'main.ts': '' }, { 'main.ts': '\ud800' }, { 'main.ts': 'x'.repeat(limits.sourceBytes + 1) }, Object.fromEntries(Array.from({ length: limits.files + 1 }, (_, i) => [`f${i}.ts`, '']))]) {
     assert.throws(() => validateSource({ sdkVersion: '0.1.0', entry: Object.keys(files)[0], files }));
   }
   assert.throws(() => validateSource({ sdkVersion: '9', entry: 'main.ts', files: { 'main.ts': '' } }), /SDK/);

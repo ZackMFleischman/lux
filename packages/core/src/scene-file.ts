@@ -3,17 +3,21 @@ import { dirname, join, resolve, relative, isAbsolute, sep } from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import { validateSceneDocument as document, verifySceneDocument, withSceneSoundtrack } from './scene-document.ts';
 import type { SceneSoundtrack } from './scene-soundtrack.ts';
+import { limits as sourceLimits } from '../../../apps/build-worker/src/source-policy.mjs';
+import { storyLifecycleLimits } from '../../runtime-contracts/src/story.mjs';
+import { formatBytes } from '../../assets/src/index.mjs';
 export { createSceneDocument } from './scene-document.ts';
 export type { SceneDocument } from './scene-document.ts';
-const legacyCap = 8388608, storyCap = 33554432, hash = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
+// Read cap covers every version; per-version caps are applied after parsing.
+const legacyCap = sourceLimits.sceneFileBytes, storyCap = Math.max(storyLifecycleLimits.sceneBytes, legacyCap), hash = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
 async function boundedRead(path: string): Promise<Buffer> {
   const file = await open(path, 'r');
   try {
     const size = (await file.stat()).size;
-    if (size > storyCap) throw Error('Scene file exceeds 32 MiB');
+    if (size > storyCap) throw Error(`Scene file exceeds ${formatBytes(storyCap)}`);
     let buffer = Buffer.alloc(Math.min(storyCap + 1, Math.max(65536, size + 1))), offset = 0;
     while (true) {
-      if (offset > storyCap) throw Error('Scene file exceeds 32 MiB');
+      if (offset > storyCap) throw Error(`Scene file exceeds ${formatBytes(storyCap)}`);
       if (offset === buffer.length) {
         const next = Buffer.alloc(Math.min(storyCap + 1, buffer.length * 2));
         buffer.copy(next); buffer = next;
@@ -21,7 +25,7 @@ async function boundedRead(path: string): Promise<Buffer> {
       const { bytesRead } = await file.read(buffer, offset, buffer.length - offset, null);
       if (!bytesRead) break; offset += bytesRead;
     }
-    if (offset > storyCap) throw Error('Scene file exceeds 32 MiB'); return buffer.subarray(0, offset);
+    if (offset > storyCap) throw Error(`Scene file exceeds ${formatBytes(storyCap)}`); return buffer.subarray(0, offset);
   } finally { await file.close(); }
 }
 /** Stores the soundtrack path relative to the scene file when both share a root. */
@@ -46,8 +50,8 @@ export class SceneFileStore {
   async open(path: string) {
     const bytes = await boundedRead(resolve(path));
     const snapshot = await verifySceneDocument(JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes)));
-    if (snapshot.version !== 7 && bytes.length > legacyCap) throw Error('Scene file exceeds 8 MiB');
-    if (snapshot.version >= 2 && snapshot.version !== 7 && bytes.length > 7340032) throw Error(`Scene v${snapshot.version} JSON exceeds 7 MiB`);
+    if (snapshot.version !== 7 && bytes.length > legacyCap) throw Error(`Scene file exceeds ${formatBytes(legacyCap)}`);
+    if (snapshot.version >= 2 && snapshot.version !== 7 && bytes.length > sourceLimits.sceneJsonBytes) throw Error(`Scene v${snapshot.version} JSON exceeds ${formatBytes(sourceLimits.sceneJsonBytes)}`);
     const token = randomUUID(), fileHash = hash(bytes); this.bindings.set(token, { path: resolve(path), hash: fileHash });
     return { token, document: snapshot, fileHash, name: path.split(/[\\/]/).pop()! };
   }
@@ -61,7 +65,7 @@ export class SceneFileStore {
       // targets merely because the replacement uses the new scene format.
       if (existing.length > legacyCap) {
         const previous = await verifySceneDocument(JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(existing)));
-        if (previous.version !== 7) throw Error('Scene file exceeds 8 MiB');
+        if (previous.version !== 7) throw Error(`Scene file exceeds ${formatBytes(legacyCap)}`);
       }
       initial = hash(existing);
     } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
@@ -76,8 +80,8 @@ export class SceneFileStore {
       const binding = this.bindings.get(token); if (!binding) throw Error('Unknown scene document');
       const located = snapshot.soundtrack ? withSceneSoundtrack(snapshot, soundtrackForScene(snapshot.soundtrack, binding.path)) : snapshot;
       const bytes = Buffer.from(JSON.stringify(located, null, 2) + '\n');
-      const cap = snapshot.version === 7 ? storyCap : legacyCap;
-      if (bytes.length > cap) throw Error(`Scene file exceeds ${snapshot.version === 7 ? 32 : 8} MiB`);
+      const cap = snapshot.version === 7 ? storyLifecycleLimits.sceneBytes : legacyCap;
+      if (bytes.length > cap) throw Error(`Scene file exceeds ${formatBytes(cap)}`);
       let current: string | null = null;
       try { current = hash(await boundedRead(binding.path)); } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
       if (current !== binding.hash) throw Error('Scene changed outside Lux; use Save as to preserve both versions');

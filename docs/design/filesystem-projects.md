@@ -374,8 +374,8 @@ Disk full before head replacement leaves acceptance unchanged. Failure after rep
 | Initial bound | Contract |
 | --- | --- |
 | Working project | At most 8 scenes, 32 local definitions, 256 authored `.ts` files and 8 MiB total authored UTF-8; metadata total 1 MiB |
-| Scene compiler closure | Existing 32 files / 1 MiB source; 128 KiB diagnostics; 30-second compile; 5-second smoke; existing linker/output/request caps |
-| Assets | At most 64 project asset records / 16 MiB original bytes; each scene closure retains current 4-image / 1 MiB original / 2 MiB decoded RGBA caps, 512-pixel dimension and per-image decoder bound |
+| Scene compiler closure | Compiler source limits (currently 128 files / 4 MiB source); 128 KiB diagnostics; 120-second compile; 5-second smoke; existing linker/output/request caps |
+| Assets | At most 256 project asset records / 256 MiB original bytes; each scene closure retains the per-source asset caps (currently 64 images / 32 MiB per original / 128 MiB originals / 512 MiB decoded RGBA, 8192-pixel dimension) from `packages/assets/src/limits.mjs` |
 | Dependencies | At most 16 package pins / 32 MiB vendored package bytes; declaration pack separately capped at 256 MiB / 4096 files and never counted as authored source |
 | Work | One running and one queued apply per project; smoke scenes serially; 5-minute total job limit; one staged inventory request at a time |
 | Storage | Accepted objects/history quota 1 GiB per project, candidates/cache 256 MiB; preflight worst-case writes before starting |

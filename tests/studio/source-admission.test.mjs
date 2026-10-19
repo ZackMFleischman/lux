@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { workerFactory } from './fixtures/admission-worker-factory.mjs';
 import * as admission from '../../apps/studio/src/source/admission.mjs';
+import { limits } from '../../apps/build-worker/src/source-policy.mjs';
 const red = 'Qk06AAAAAAAAADYAAAAoAAAAAQAAAAEAAAABABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AA==';
 const source = (data = red) => ({sourceVersion:2,sdkVersion:'0.1.0',entry:'main.ts',files:{'main.ts':'export {}'},assets:{'assets/red.bmp':{mediaType:'image/bmp',encoding:'base64',data}}});
 
@@ -40,7 +41,7 @@ test('timeouts, worker failures and forged responses terminate without creating 
     assert.equal(factory.created.length,1); assert.equal(factory.created[0].terminated,true); await factory.created[0].exited;
   }
   const session = admission.createSourceAdmissionSession(), factory = workerFactory('hang');
-  for (const timeout of [0,5001,1.5,NaN]) await assert.rejects(session.admitAsync(source(),factory,timeout));
+  for (const timeout of [0,limits.compileMs+1,1.5,NaN]) await assert.rejects(session.admitAsync(source(),factory,timeout));
   assert.equal(factory.created.length,0);
   const pending = session.admitAsync(source(),factory,100);
   await assert.rejects(session.admitAsync(source(),factory,100),/busy/);

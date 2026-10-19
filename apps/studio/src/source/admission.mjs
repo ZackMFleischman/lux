@@ -1,5 +1,6 @@
 // Session-local ownership and asynchronous source admission.
-import { validateSource,validateSourceEnvelope,snapshotRecord,violation } from '../../../build-worker/src/source-policy.mjs';
+import { validateSource,validateSourceEnvelope,snapshotRecord,violation,limits } from '../../../build-worker/src/source-policy.mjs';
+const admissionMs = 60000;
 
 function freezeSource(source) {
   Object.freeze(source.files);
@@ -53,9 +54,11 @@ export function createSourceAdmissionSession() {
       if (source.sourceVersion === 2) next.assets = source.assets;
       return remember(next);
     },
-    async admitAsync(source, createWorker, timeoutMs = 2000) {
+    // Decoding a full asset budget (128 MiB of originals) takes seconds, not
+    // milliseconds; the deadline still bounds a hung worker.
+    async admitAsync(source, createWorker, timeoutMs = admissionMs) {
       if (pending) throw violation('Source admission is busy','SOURCE_ADMISSION_BUSY');
-      if (typeof createWorker !== 'function' || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 5000) throw violation('Source admission requires a worker and a 1–5000 ms timeout');
+      if (typeof createWorker !== 'function' || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > limits.compileMs) throw violation(`Source admission requires a worker and a 1–${limits.compileMs} ms timeout`);
       pending = true;
       try {
         const snapshot = freezeSource(validateSourceEnvelope(source));

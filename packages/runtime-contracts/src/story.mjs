@@ -1,11 +1,19 @@
 // Pure Story metadata policy. Source capability, persisted Scene definition,
 // runtime transport and UI selection remain distinct contracts.
 export const storyLimits=Object.freeze({beats:128,occurrences:1024,id:128,label:160});
+// This module is embedded verbatim as __lux/story.js, so it cannot import the
+// asset limits. Byte budgets below are derived from packages/assets/src/limits.mjs
+// (tests/assets/limits-derivation.test.mjs asserts each relation):
+// linkedEnvelopeBytes = assetJsonBytes + 16 MiB code; sceneBytes = 224 MiB keeps a
+// Studio read (scene + selected source) below V8's ~512 Mi char string limit;
+// aggregateLinkedEnvelopeBytes = sceneBytes + 32 MiB code; asset staging is one
+// source's originals + decoded RGBA, backed by two slots per generation and two
+// generations per client.
 export const storyLifecycleLimits=Object.freeze({
- sceneBytes:33554432,aggregateSourceTextBytes:8388608,linkedEnvelopeBytes:16777216,aggregateLinkedEnvelopeBytes:67108864,scheduleMetadataBytes:1048576,
+ sceneBytes:234881024,aggregateSourceTextBytes:16777216,linkedEnvelopeBytes:195799724,aggregateLinkedEnvelopeBytes:268435456,scheduleMetadataBytes:1048576,
  visuals:8,slotsPerGeneration:2,generationsPerClient:2,pendingCreatesPerGeneration:1,readyInactiveSlotsPerGeneration:1,
  lookaheadSeconds:5,preparationMs:5000,commandReceiptMs:8000,cleanupMs:5000,
- assetBackingPerGeneration:6291456,assetBackingPerClient:12582912,assetStagingPerClient:3145728,
+ assetBackingPerGeneration:1342177280,assetBackingPerClient:2684354560,assetStagingPerClient:671088640,
  storyTargetBytesPerGeneration:201326592,storyTargetBytesPerClient:402653184,readbackBytesPerClient:33554432,pngBytes:41943040,
 });
 const reserved=new Set(['constructor','prototype','__proto__']);

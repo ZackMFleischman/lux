@@ -45,7 +45,7 @@ test('rejects malformed BMP headers, unsupported variants and trailing pixels', 
 });
 
 test('base64 rejects noncanonical alphabets, padding and overlong input before decoding', () => {
-  for (const value of ['', 'A', 'AA', 'AAA', 'A===', 'AA=A', 'AAAA=', 'AB==', 'AAB=', ' AA==', 'AA==\n', '_A==', '-A==', 'data:image/bmp;base64,AA==', 'A'.repeat(1048652)]) {
+  for (const value of ['', 'A', 'AA', 'AAA', 'A===', 'AA=A', 'AAAA=', 'AB==', 'AAB=', ' AA==', 'AA==\n', '_A==', '-A==', 'data:image/bmp;base64,AA==', 'A'.repeat(Math.ceil(api.assetLimits.imageBytes / 3) * 4 + 4)]) {
     assert.throws(() => api.decodeCanonicalBase64(value), undefined, value.slice(0,30));
   }
   assert.deepEqual([...api.decodeCanonicalBase64('AA==')], [0]);
@@ -85,8 +85,10 @@ test('all declared images count towards rejection quotas and records are canonic
   assert(Object.isFrozen(admitted)); assert(Object.isFrozen(admitted['assets/Z.bmp']));
   input['assets/Z.bmp'].data = '';
   assert.notEqual(admitted['assets/Z.bmp'].data, '');
-  assert.throws(() => api.validateSourceAssets(Object.fromEntries([1,2,3,4,5].map(i=>[`assets/a${i}.bmp`,descriptor(bmp())]))), {code:'QUOTA_EXCEEDED'});
-  assert.throws(() => api.validateSourceAssets({'assets/a.bmp':descriptor(bmp(512,512)), 'assets/b.bmp':descriptor(bmp(512,256))}), {code:'QUOTA_EXCEEDED'});
+  assert.throws(() => api.validateSourceAssets(Object.fromEntries(Array.from({length:api.assetLimits.count+1},(_,i)=>[`assets/a${i}.bmp`,descriptor(bmp())]))), {code:'QUOTA_EXCEEDED'});
+  // Five ~27 MB originals exceed the 128 MiB aggregate although each is within the per-image limit.
+  const large = descriptor(bmp(3000,3000));
+  assert.throws(() => api.validateSourceAssets(Object.fromEntries([1,2,3,4,5].map(i=>[`assets/big${i}.bmp`,large]))), {code:'QUOTA_EXCEEDED'});
   assert.throws(() => api.validateSourceAssets({'assets/a.bmp':descriptor(bmp()), 'assets/unused.bmp':descriptor(Buffer.from('broken'))}));
 });
 

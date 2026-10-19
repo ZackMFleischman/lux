@@ -42,6 +42,15 @@ export function paddedPng(length: number): Uint8Array {
   view.setUint32(size + 8, (crc ^ 0xffffffff) >>> 0);
   const result = new Uint8Array(length); result.set(base.subarray(0, 33)); result.set(chunk, 33); result.set(base.subarray(33), 33 + chunk.length); return result;
 }
+/** Valid originals whose lengths sum exactly to total, each within the per-image limit: BMPs plus one padded PNG. */
+export function exactOriginals(total: number, imageBytes: number): Uint8Array[] {
+  const width = 4096, row = width * 3, tallest = Math.floor((imageBytes - 54) / row), out: Uint8Array[] = [];
+  let remaining = total;
+  while (remaining > imageBytes) { const image = bmp(width, tallest); out.push(image); remaining -= image.length; }
+  if (remaining >= 54 + row + 2048) { const image = bmp(width, Math.floor((remaining - 2048 - 54) / row)); out.push(image); remaining -= image.length; }
+  out.push(paddedPng(remaining));
+  return out;
+}
 export function imageDescriptor(data = bmp(), id = ids.image, extension = 'bmp', mediaType: 'image/bmp' | 'image/png' | 'image/jpeg' = 'image/bmp'): AssetManifest['assets'][string] {
   return { path: `assets/files/${id}/image.${extension}`, mediaType, sha256: hash(data), byteLength: data.length, interpretation: { colorSpace: 'srgb', alpha: 'straight' } };
 }

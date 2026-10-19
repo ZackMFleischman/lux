@@ -1,7 +1,7 @@
 import {verifyLinked} from '../../../apps/build-worker/src/artifact-identity.mjs';
 import {verifyDerivedAssets,createReadonlyAssetMap,createReadonlyImageMap} from '../../../packages/assets/src/index.mjs';
 import {validateSingleImageProfile} from '../../../packages/runtime-contracts/src/component-profile.mjs';
-import {snapshotRecord} from '../../../apps/build-worker/src/source-policy.mjs';
+import {snapshotRecord,limits as sourceLimits} from '../../../apps/build-worker/src/source-policy.mjs';
 import {normalizeImageCompositionProfile} from '../../../packages/runtime-contracts/src/composition-profile.mjs';
 import {normalizeStoryCapability,validateStoryAgainstCapability,canonicalSceneStoryJson} from '../../../packages/runtime-contracts/src/story.mjs';
 import {canonicalControlSchemaJson} from '../../../packages/runtime-contracts/src/parameters.mjs';
@@ -17,15 +17,15 @@ async function sha256(bytes) {
   const hash=new Uint8Array(await digest('SHA-256',bytes));
   return Array.from(hash,byte=>byte.toString(16).padStart(2,'0')).join('');
 }
-const limit=16777216;
+const limit=sourceLimits.linkedBytes,limitText=`Linked payload exceeds ${(limit/1048576).toFixed(1)} MiB`;
 export async function prepareAuthoredModule(message) {
   message=snapshotRecord(message);
   let moduleSource,assets,images,admission=freeze({kind:'legacy'});
   if(Object.hasOwn(message,'linked')) {
     if(['moduleSource','assets','linkedVersion','artifactVersion','sourceVersion','assetSetHash'].some(key=>Object.hasOwn(message,key))) throw Error('Ambiguous linked module initialization');
-    if(new TextEncoder().encode(JSON.stringify(message.linked)).byteLength>limit) throw Error('Linked payload exceeds 16 MiB');
+    if(new TextEncoder().encode(JSON.stringify(message.linked)).byteLength>limit) throw Error(limitText);
     const linked=await verifyLinked(message.linked,sha256);
-    if(new TextEncoder().encode(JSON.stringify(linked)).byteLength>limit) throw Error('Linked payload exceeds 16 MiB');
+    if(new TextEncoder().encode(JSON.stringify(linked)).byteLength>limit) throw Error(limitText);
     const sourceAssets=linked.linkedVersion>=2 ? (await verifyDerivedAssets(linked.assets,linked.assetSetHash,sha256)).sourceAssets : {};
     assets=createReadonlyAssetMap(sourceAssets);
     images=createReadonlyImageMap(sourceAssets);

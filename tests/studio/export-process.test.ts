@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { createExportService, runExportChild } from '../../apps/studio/src/export-process.ts';
+import { createExportService, runExportChild, exportLimits } from '../../apps/studio/src/export-process.ts';
 const document = { format: 'lux-scene', version: 1, source: { sdkVersion: '0.1.0', entry: 'main.ts', files: { 'main.ts': '', 'lib/color.ts': '🌈' } },
   settings: { width: 1920, height: 1080, fps: 60, seed: 0 }, controls: { intensity: 0.75 } };
 test('export owns an isolated full document across folder selection and excludes overlapping jobs', async () => {
@@ -21,7 +21,7 @@ test('export owns an isolated full document across folder selection and excludes
 test('invalid names and oversized JSON never open a dialog; failed export releases exclusion', async () => {
   let dialogs = 0;
   const service = createExportService({ chooseDirectory: async () => { dialogs++; return 'folder'; }, run: async () => { throw Error('packaging failed'); } });
-  for (const value of [null, { name: '', document }, { name: 'x'.repeat(81), document }, { name: 'bad\nname', document }, { name: 'name', document, outputDirectory: 'injected' }, { name: 'name', document: { text: 'x'.repeat(8388608) } }]) {
+  for (const value of [null, { name: '', document }, { name: 'x'.repeat(81), document }, { name: 'bad\nname', document }, { name: 'name', document, outputDirectory: 'injected' }, { name: 'name', document: { text: 'x'.repeat(exportLimits.requestBytes) } }]) {
     await assert.rejects(service.create(value)); }
   assert.equal(dialogs, 0);
   await assert.rejects(service.create({ name: 'Valid', document }), /packaging failed/);

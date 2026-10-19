@@ -42,7 +42,7 @@ export async function compileVisual(request, options = {}) {
     boundedJson({source},limits.requestBytes);
   } catch (error) { return failure(error.code || 'SOURCE_BOUNDARY_VIOLATION', error.message); }
   const timeoutMs = options.timeoutMs ?? limits.compileMs;
-  if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > limits.compileMs) return failure('QUOTA_EXCEEDED', 'Compile deadline must be 1–30000 ms');
+  if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > limits.compileMs) return failure('QUOTA_EXCEEDED', `Compile deadline must be 1–${limits.compileMs} ms`);
   if (process.platform !== 'win32') return failure('SERVICE_UNAVAILABLE', 'Compiler requires the Windows Job Object supervisor');
   const directory = await mkdtemp(join(tmpdir(), 'lux-compile-'));
   let cleanupConfirmed = false, keepEvidence = false;
@@ -55,8 +55,8 @@ export async function compileVisual(request, options = {}) {
     await writeFile(input, boundedJson({ source, dependencyRoot },limits.requestBytes));
     const config = join(directory, 'config.json');
     await writeFile(config, JSON.stringify({ executable: process.execPath,
-      commandLine: [process.execPath, '--max-old-space-size=256', join(here, 'worker.mjs'), input].map(quote).join(' '),
-      cwd: directory, directory, timeoutMs, memoryLimitBytes: 1073741824 }));
+      commandLine: [process.execPath, `--max-old-space-size=${limits.workerHeapMiB}`, join(here, 'worker.mjs'), input].map(quote).join(' '),
+      cwd: directory, directory, timeoutMs, memoryLimitBytes: limits.workerMemoryBytes }));
     await new Promise((done, reject) => {
       const child = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', join(root, 'scripts/experiment-job.ps1'), '-Config', config], {
         windowsHide: true, stdio: ['ignore', 'ignore', 'pipe'], env: { SystemRoot: process.env.SystemRoot, TEMP: process.env.TEMP, TMP: process.env.TMP, PATH: process.env.PATH },

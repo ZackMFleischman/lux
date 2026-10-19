@@ -4,6 +4,8 @@ import { mkdtemp, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { SceneFileStore, createSceneDocument } from '../../packages/core/src/scene-file.ts';
+import { limits as sourceLimits } from '../../apps/build-worker/src/source-policy.mjs';
+
 import {validateSceneDocument} from '../../packages/core/src/scene-document.ts';
 import { sourceBundleSchema } from '../../packages/runtime-contracts/src/index.ts';
 import { createHash } from 'node:crypto';
@@ -45,8 +47,8 @@ test('scene v3 rejects malformed caches and schema hashes before replacing files
     }
     await writeFile(path,JSON.stringify({...next,controls:{...controls,schemaHash:'b'.repeat(64)}}));
     await assert.rejects(store.open(path),/schema hash/i);
-    await writeFile(path,' '.repeat(7340032)+JSON.stringify(next));
-    await assert.rejects(store.open(path),/7 MiB/);
+    await writeFile(path,' '.repeat(sourceLimits.sceneJsonBytes)+JSON.stringify(next));
+    await assert.rejects(store.open(path),/JSON exceeds/);
   } finally { await rm(folder,{recursive:true,force:true}); }
 });
 
@@ -65,8 +67,8 @@ test('scene v2 preserves image bytes and rejects version pairs before replacing 
     }
     const inherited = {...next,source:{...source,assets:{'assets/red.bmp':Object.create(source.assets['assets/red.bmp'])}}};
     assert.throws(()=>validateSceneDocument(inherited));
-    await writeFile(path,' '.repeat(7340032)+JSON.stringify(next));
-    await assert.rejects(store.open(path),/7 MiB/);
+    await writeFile(path,' '.repeat(sourceLimits.sceneJsonBytes)+JSON.stringify(next));
+    await assert.rejects(store.open(path),/JSON exceeds/);
   } finally { await rm(folder,{recursive:true,force:true}); }
 });
 test('scene files roundtrip Unicode drafts, settings and controls; external edits conflict', async () => {

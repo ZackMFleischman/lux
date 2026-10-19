@@ -24,7 +24,7 @@ test('envelope snapshots descriptors, SDK versions and path/serialized budgets w
     {...source(),assets:{...source().assets,'assets/Red.bmp':source().assets['assets/red.bmp']}},
     {...source(),assets:{'assets/red.bmp':{mediaType:'image/bmp',encoding:'base64',get data(){throw Error('getter invoked');}}}},
   ]) assert.throws(()=>policy.validateSourceEnvelope(bad));
-  assert.throws(()=>policy.validateSourceEnvelope(source('A'.repeat(1048652))),{code:'QUOTA_EXCEEDED'});
+  assert.throws(()=>policy.validateSourceEnvelope(source('A'.repeat(Math.ceil(policy.limits.sourceJsonBytes/4)*4+4))),{code:'QUOTA_EXCEEDED'});
   const OriginalDataView = globalThis.DataView;
   try {
     globalThis.DataView = class { constructor() { throw Error('image-header decoding disabled'); } };

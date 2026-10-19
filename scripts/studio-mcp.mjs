@@ -2,7 +2,9 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {z} from 'zod';
 import { sourceBuildInputObjectSchema,sourceBuildInputSchema,sourceReadResult,libraryCreateInputSchema,libraryReadInputSchema,libraryUpdateInputSchema,sceneSaveInputSchema,sceneOpenInputSchema,agentTransportLimits } from '../apps/studio/src/source/agent-contract.ts';
-import { assetLimits } from '../packages/assets/src/index.mjs';
+import { assetLimits, formatBytes } from '../packages/assets/src/index.mjs';
+import { limits as sourceLimits } from '../apps/build-worker/src/source-policy.mjs';
+import { storyLifecycleLimits } from '../packages/runtime-contracts/src/story.mjs';
 import { resolve } from 'node:path';
 import { createStudioConnection, resolveStudioSession, studioAppData } from './studio-session.mjs';
 import { createLibraryContext, resolveMcpStandardLibrary } from './studio-library-context.mjs';
@@ -45,9 +47,9 @@ server.registerTool('lux.studio.discover', { description: 'Read the exact visual
     composition: 'SDK 0.4 supports image-chain-v1 and typed-image-graph-v1 (image, paths2d and shader-field ports, acyclic fan-out). Selected leaf controls are public aliases; values remain owned by stable node identity.' },
   sourceDocuments: { versions:[1,2],sceneVersions:[1,2,3,4,5,6,7],multiVisualSceneVersion:7,replacement: 'For Scene v1-v6 submit complete source and preserve sourceVersion/assets. For Scene v7 submit the complete read.document; source is only the selected editor view.',
     assetPlayback: true, assetExport: true, assetFormats: ['image/bmp', 'image/png', 'image/jpeg'], decodedImages: 'context.images: top-down sRGB straight-alpha RGBA' , assetDimension: assetLimits.dimension, assetCount: assetLimits.count,
-    assetFileBytes: assetLimits.imageBytes, assetTotalBytes: assetLimits.totalBytes,
-    sourceV2JsonBytes:6291456,sceneV7JsonBytes:33554432,requestBytes:agentTransportLimits.requestBytes,readJsonBytes:agentTransportLimits.responseBytes,readToolResultBytes:agentTransportLimits.readToolResultBytes } }));
-server.registerTool('lux.studio.read', { description: 'Read the current draft and version. For single-visual scenes source is authoritative. For Scene v7 document is the complete authoritative scene and source is the selected editor view. Preserve every document field. The JSON response is limited to 52 MiB and the escaped tool result to 104 MiB.', inputSchema: {} }, async () => sourceReadResult(await call('read')));
+    assetFileBytes: assetLimits.imageBytes, assetTotalBytes: assetLimits.totalBytes, assetDecodedRgbaBytes: assetLimits.rgbaBytes,
+    sourceFiles:sourceLimits.files,sourceTextBytes:sourceLimits.sourceBytes,sourceV2JsonBytes:sourceLimits.sourceJsonBytes,sceneJsonBytes:sourceLimits.sceneJsonBytes,sceneV7JsonBytes:storyLifecycleLimits.sceneBytes,requestBytes:agentTransportLimits.requestBytes,readJsonBytes:agentTransportLimits.responseBytes,readToolResultBytes:agentTransportLimits.readToolResultBytes } }));
+server.registerTool('lux.studio.read', { description: `Read the current draft and version. For single-visual scenes source is authoritative. For Scene v7 document is the complete authoritative scene and source is the selected editor view. Preserve every document field. The JSON response is limited to ${formatBytes(agentTransportLimits.responseBytes)} and the escaped tool result to ${formatBytes(agentTransportLimits.readToolResultBytes)}.`, inputSchema: {} }, async () => sourceReadResult(await call('read')));
 server.registerTool('lux.studio.status', { description: 'Read actual standalone preview status.', inputSchema: {} }, async () => text(await call('status')));
 server.registerTool('lux.studio.build', { description: 'Compile and preview one complete replacement. Read first; expectedDraftVersion prevents overwriting intervening edits. Pass source (plus optional libraryLinks/Story v1) for single-visual scenes, or pass the complete Scene v7 document with no source/libraryLinks/story siblings. For Scene v7, preserve all visuals, sources, caches, animations, settings, tempo and Story v2. Successful builds return Story to Normal. Failed builds retain the working preview.',
   inputSchema: sourceBuildInputObjectSchema.shape }, async input => {const parsed=sourceBuildInputSchema.parse(input);if(parsed.story!==undefined||parsed.document!==undefined)await requireStoryCapability();return text(await call('build', parsed));});

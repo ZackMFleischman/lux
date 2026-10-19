@@ -1,6 +1,7 @@
 import {outputSettingsSchema,hashSchema} from '../../runtime-contracts/src/index.ts';
 import type {SourceBundle,OutputSettings} from '../../runtime-contracts/src/index.ts';
 import {validateSource,snapshotRecord} from '../../../apps/build-worker/src/source-policy.mjs';
+import {formatBytes} from '../../assets/src/index.mjs';
 import {normalizeControlSchema,validateControlSnapshot,canonicalControlSchemaJson} from '../../runtime-contracts/src/parameters.mjs';
 import {validateControlAnimationBindings} from '../../runtime-contracts/src/control-animation.mjs';
 import type {ControlAnimationBinding} from '../../runtime-contracts/src/control-animation.mjs';
@@ -69,7 +70,7 @@ export function validateStorySceneDocumentV7(value:unknown):StorySceneDocumentV7
   if(source.sdkVersion!=='0.2.0')invalid(`Scene v7 visual ${id} requires SDK 0.2.0 source`);
   for(const text of Object.values(source.files)){
    const bytes=encoder.encode(text).byteLength;
-   if(aggregateSourceTextBytes>storyLifecycleLimits.aggregateSourceTextBytes-bytes)invalid('Scene v7 aggregate source text exceeds 8 MiB');
+   if(aggregateSourceTextBytes>storyLifecycleLimits.aggregateSourceTextBytes-bytes)invalid(`Scene v7 aggregate source text exceeds ${formatBytes(storyLifecycleLimits.aggregateSourceTextBytes)}`);
    aggregateSourceTextBytes+=bytes;
   }
   if(row.controlAnimations===undefined)invalid(`Scene v7 visual ${id} requires controlAnimations`);
@@ -83,7 +84,7 @@ export function validateStorySceneDocumentV7(value:unknown):StorySceneDocumentV7
  const story=normalizeSceneStoryV2(raw.story),referenced=[story.normalVisualId,...story.beats.map(beat=>beat.visualId),...story.sequence.map(occurrence=>occurrence.visualId)];
  for(const id of referenced)if(!seen.has(id))invalid(`Scene v7 Story references unknown visual ID ${id}`);
  const result=Object.freeze({format:'lux-scene' as const,version:7 as const,visuals:Object.freeze(visuals),settings:Object.freeze(outputSettingsSchema.parse(snapshotRecord(raw.settings))),tempo:normalizeTempoSettings(raw.tempo),story,...(Object.hasOwn(raw,'soundtrack')?{soundtrack:normalizeSceneSoundtrack(raw.soundtrack)}:{})});
- if(encoder.encode(JSON.stringify(result,null,2)+'\n').byteLength>storyLifecycleLimits.sceneBytes)invalid('Scene v7 JSON exceeds 32 MiB');
+ if(encoder.encode(JSON.stringify(result,null,2)+'\n').byteLength>storyLifecycleLimits.sceneBytes)invalid(`Scene v7 JSON exceeds ${formatBytes(storyLifecycleLimits.sceneBytes)}`);
  return result;
 }
 

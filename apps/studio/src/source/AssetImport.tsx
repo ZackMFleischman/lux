@@ -1,6 +1,6 @@
 import { useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { Alert, Button, IconButton, Tooltip } from '@mui/material';
-import { assetLimits, validateAssetPath, type SourceAssets } from '../../../../packages/assets/src/index.mjs';
+import { assetLimits, formatBytes, validateAssetPath, type SourceAssets } from '../../../../packages/assets/src/index.mjs';
 import { sourceAssets } from './source-equality.ts';
 import type { SourceWorkspace } from './workspace.ts';
 import { Disclosure } from '../Disclosure.tsx';
@@ -16,9 +16,9 @@ export function AssetImport({workspace,readOnly=false,selectedPath=null,children
     const before=workspace.getSnapshot(),next:Record<string,SourceAssets[string]>={...sourceAssets(before.source)};
     setReading(true);setError('');
     try {
-      if(files.length>assetLimits.count)throw Error('Import at most four images');
+      if(files.length>assetLimits.count)throw Error(`Import at most ${assetLimits.count} images`);
       for(const file of files) {
-        if(file.size>assetLimits.imageBytes)throw Error('Image exceeds the original-byte limit');
+        if(file.size>assetLimits.imageBytes)throw Error(`Image exceeds the ${formatBytes(assetLimits.imageBytes)} original-byte limit`);
         const match=file.name.toLowerCase().match(/\.(bmp|png|jpe?g)$/);
         if(!match)throw Error('Choose a BMP, PNG or JPEG image');
         const extension=match[1]!,mediaType=extension==='bmp'?'image/bmp':extension==='png'?'image/png':'image/jpeg';

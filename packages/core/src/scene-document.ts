@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { legacySourceBundleSchema, assetSourceBundleSchema, outputSettingsSchema, controlValuesSchema, INTENSITY_CONTROL, hashSchema } from '../../runtime-contracts/src/index.ts';
 import type { SourceBundle, OutputSettings, ControlValues } from '../../runtime-contracts/src/index.ts';
-import { validateSource, snapshotRecord } from '../../../apps/build-worker/src/source-policy.mjs';
+import { validateSource, snapshotRecord, limits as sourceLimits } from '../../../apps/build-worker/src/source-policy.mjs';
+import { formatBytes } from '../../assets/src/index.mjs';
 import { normalizeControlSchema, validateControlSnapshot, canonicalControlSchemaJson } from '../../runtime-contracts/src/parameters.mjs';
 import type { ControlSchema, ControlValues as ParameterValues } from '../../runtime-contracts/src/parameters.mjs';
 import { nodeIdSchema } from '../../runtime-contracts/src/identities.ts';
@@ -82,22 +83,22 @@ export function validateSceneDocument(value: unknown): SceneDocument {
   if(raw.version===6) {
     if(raw.format!=='lux-scene'||source.sdkVersion!=='0.2.0')throw Error('Scene v6 requires SDK 0.2.0 source');
     const result:StorySceneDocument=Object.freeze({format:'lux-scene',version:6,source,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedControlSnapshot(raw.controls),tempo,...animations,...(Object.hasOwn(raw,'story')?{story:normalizeSceneStory(raw.story)}:{}),...soundtrack});
-    if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>7340032)throw Error('Scene v6 JSON exceeds 7 MiB');
+    if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>sourceLimits.sceneJsonBytes)throw Error(`Scene v6 JSON exceeds ${formatBytes(sourceLimits.sceneJsonBytes)}`);
     return result;
   }
   if(raw.version===3) {
     if(raw.format!=='lux-scene' || source.sdkVersion!=='0.2.0') throw Error('Scene v3 requires SDK 0.2.0 source');
     const result:ParameterSceneDocument=Object.freeze({format:'lux-scene',version:3,source:source as SourceBundle,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedControlSnapshot(raw.controls),tempo,...animations,...soundtrack});
-    if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>7340032) throw Error('Scene v3 JSON exceeds 7 MiB');
+    if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>sourceLimits.sceneJsonBytes) throw Error(`Scene v3 JSON exceeds ${formatBytes(sourceLimits.sceneJsonBytes)}`);
     return result;
   }
-  if(raw.version===4){if(raw.format!=='lux-scene'||source.sdkVersion!=='0.4.0')throw Error('Scene v4 requires SDK 0.4.0 source');const result:CompositionSceneDocument=Object.freeze({format:'lux-scene',version:4,source,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedNodeControlSnapshot(raw.controls),tempo,controlAnimations:validateControlAnimationBindings(raw.controlAnimations??[]),...soundtrack});if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>7340032)throw Error('Scene v4 JSON exceeds 7 MiB');return result;}
-  if(raw.version===5){if(raw.format!=='lux-scene'||source.sdkVersion!=='0.4.0')throw Error('Scene v5 requires SDK 0.4.0 source');const result:LinkedCompositionSceneDocument=Object.freeze({format:'lux-scene',version:5,source,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedNodeControlSnapshot(raw.controls),libraryLinks:validateSceneLibraryLinks(raw.libraryLinks),tempo,controlAnimations:validateControlAnimationBindings(raw.controlAnimations??[]),...soundtrack});if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>7340032)throw Error('Scene v5 JSON exceeds 7 MiB');return result;}
+  if(raw.version===4){if(raw.format!=='lux-scene'||source.sdkVersion!=='0.4.0')throw Error('Scene v4 requires SDK 0.4.0 source');const result:CompositionSceneDocument=Object.freeze({format:'lux-scene',version:4,source,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedNodeControlSnapshot(raw.controls),tempo,controlAnimations:validateControlAnimationBindings(raw.controlAnimations??[]),...soundtrack});if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>sourceLimits.sceneJsonBytes)throw Error(`Scene v4 JSON exceeds ${formatBytes(sourceLimits.sceneJsonBytes)}`);return result;}
+  if(raw.version===5){if(raw.format!=='lux-scene'||source.sdkVersion!=='0.4.0')throw Error('Scene v5 requires SDK 0.4.0 source');const result:LinkedCompositionSceneDocument=Object.freeze({format:'lux-scene',version:5,source,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedNodeControlSnapshot(raw.controls),libraryLinks:validateSceneLibraryLinks(raw.libraryLinks),tempo,controlAnimations:validateControlAnimationBindings(raw.controlAnimations??[]),...soundtrack});if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>sourceLimits.sceneJsonBytes)throw Error(`Scene v5 JSON exceeds ${formatBytes(sourceLimits.sceneJsonBytes)}`);return result;}
   const {controlAnimations:_animations,tempo:_tempo,soundtrack:_soundtrack,...legacyRaw}=raw;
   const result = schema.parse({...legacyRaw,source:raw.version===2 ? source : raw.source,
     settings:snapshotRecord(raw.settings),controls:snapshotRecord(raw.controls)});
   const snapshot = {...result,...(result.version===2?{source:source as Extract<LegacySceneDocument,{version:2}>['source']} : {}),tempo,...animations,...soundtrack};
-  if (snapshot.version === 2 && new TextEncoder().encode(JSON.stringify(snapshot,null,2)+'\n').byteLength > 7340032) throw Error('Scene v2 JSON exceeds 7 MiB');
+  if (snapshot.version === 2 && new TextEncoder().encode(JSON.stringify(snapshot,null,2)+'\n').byteLength > sourceLimits.sceneJsonBytes) throw Error(`Scene v2 JSON exceeds ${formatBytes(sourceLimits.sceneJsonBytes)}`);
   return snapshot;
 }
 export function createSceneDocument(source: SourceBundle, settings: OutputSettings, controls: ControlValues | SavedControlSnapshot | SavedNodeControlSnapshot, libraryLinks:readonly SceneLibraryLink[]=[],controlAnimations:readonly ControlAnimationBinding[]=[],tempo:SceneTempoSettings=normalizeTempoSettings(),story:SceneStoryV1|null=null,retainStoryVersion=false): SingleVisualSceneDocument {

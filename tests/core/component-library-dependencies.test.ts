@@ -9,6 +9,8 @@ import {
   type LibraryDependency,
 } from '../../packages/core/src/component-library.ts';
 import { ComponentLibraryStore } from '../../packages/core/src/component-library-store.ts';
+import { limits as sourceLimits } from '../../apps/build-worker/src/source-policy.mjs';
+
 import type { SourceBundle } from '../../packages/runtime-contracts/src/index.ts';
 
 const ids = Array.from({ length: 12 }, (_, index) =>
@@ -119,10 +121,10 @@ test('resolution rejects overlapping mounts, authored-file collisions, and expan
     source: source('export default 1;', { 'shared/owned.ts': 'export const owned = true;' }) };
   await assert.rejects(resolveLibraryComponent(localCollision, async () => leaf), /conflict/i);
 
-  const extraFiles = Object.fromEntries(Array.from({ length: 31 }, (_, index) => [`part-${index}.ts`, 'export {};']));
+  const extraFiles = Object.fromEntries(Array.from({ length: sourceLimits.files - 1 }, (_, index) => [`part-${index}.ts`, 'export {};']));
   const largeLeaf = { ...leaf, source: source('export default 3;', extraFiles) };
   const overFiles = component(0, 'export default 1;', [{ componentId: leaf.id, revision: 1, mountPath: 'shared' }]);
-  await assert.rejects(resolveLibraryComponent(overFiles, async () => largeLeaf), /32 source files|quota/i);
+  await assert.rejects(resolveLibraryComponent(overFiles, async () => largeLeaf), new RegExp(`${sourceLimits.files} source files|quota`, 'i'));
 });
 
 test('resolution accepts more than eight sibling dependencies within source quotas', async () => {

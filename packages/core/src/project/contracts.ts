@@ -6,13 +6,17 @@ import { projectIdSchema, sceneIdSchema, componentIdSchema, assetIdSchema } from
 import { validateSavedControlSnapshot, verifySavedControlSnapshot, sceneHash } from '../scene-document.ts';
 import type { SavedControlSnapshot } from '../scene-document.ts';
 import { assetLimits } from '../../../assets/src/index.mjs';
+import { limits as sourceLimits } from '../../../../apps/build-worker/src/source-policy.mjs';
 import { metadataLimits, parseMetadataJson, snapshotJsonData, byteRecord } from './bounded-json.ts';
 import { metadataPath, sourcePath, logicalAssetPath, uniquePaths } from './metadata-paths.ts';
 
 export { metadataLimits, parseMetadataJson };
 export type SavedControlIntent = SavedControlSnapshot;
 export type Hash = z.infer<typeof hashSchema>;
-export const projectLimits = Object.freeze({ scenes: 8, components: 32, authoredFiles: 256, authoredBytes: 8388608, assets: 64, assetBytes: 16777216, packages: 16, packageBytes: 33554432, closureFiles: 32, closureSourceBytes: 1048576 });
+// A scene closure becomes one source bundle, so it shares the source and asset
+// budgets. A project holds several scenes' assets: up to four sources' counts
+// and two sources' original bytes.
+export const projectLimits = Object.freeze({ scenes: 8, components: 32, authoredFiles: 256, authoredBytes: 8388608, assets: 4 * assetLimits.count, assetBytes: 2 * assetLimits.totalBytes, packages: 16, packageBytes: 33554432, closureFiles: sourceLimits.files, closureSourceBytes: sourceLimits.sourceBytes });
 const exactVersion = z.string().regex(/^(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$/);
 const packageId = z.string().regex(/^[a-z][a-z0-9-]{0,63}\/[a-z][a-z0-9-]{0,63}$/);
 const exportId = z.string().regex(/^[a-z][A-Za-z0-9_]{0,63}$/);

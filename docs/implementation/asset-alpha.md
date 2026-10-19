@@ -15,6 +15,8 @@ Use signature plus declared media type plus extension agreement, never extension
 alone. Keep canonical base64, own-data records, case-fold uniqueness, four assets,
 512-by-512 dimensions, 786,486 bytes per encoded image file, 1 MiB total original
 file bytes and 2 MiB total RGBA. Existing JSON/process/output caps stay unchanged.
+(Historical plan. October 2026 raised these budgets; `packages/assets/src/limits.mjs`
+is the current source of truth.)
 A poorly compressed image can exceed its file cap even below maximum dimensions.
 
 Recommend pinned **fast-png 8.0.0**, **pako 2.1.0**, and **jpeg-js 0.4.4**, behind

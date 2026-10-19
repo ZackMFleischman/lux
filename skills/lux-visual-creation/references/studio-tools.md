@@ -32,7 +32,7 @@ const selectedSessionId = process.env.LUX_STUDIO_SESSION_ID; // Retain the previ
 const call = async (name, args = {}) => {
   const result = await client.callTool(
     { name: `lux.studio.${name}`, arguments: args }, undefined,
-    { timeout: 75000 }
+    { timeout: 270000 } // A build with many large images can take minutes; Studio bounds each operation at 240 s.
   );
   if (result.isError) throw new Error(JSON.stringify(result.content));
   return result;

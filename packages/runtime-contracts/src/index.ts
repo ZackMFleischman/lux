@@ -45,7 +45,7 @@ export const legacyCompiledArtifactSchema = z.object({
   modules: z.record(z.string()), sourceMaps: z.record(z.string()),
   dependencyHashes: z.record(hashSchema), sdkVersion: z.literal(SDK_VERSION), compilerVersion: z.string().min(1),
 }).strict();
-export const derivedAssetSchema = sourceAssetSchema.extend({byteLength:z.number().int().positive(),sha256:hashSchema,width:z.number().int().min(1).max(512),height:z.number().int().min(1).max(512)}).strict();
+export const derivedAssetSchema = sourceAssetSchema.extend({byteLength:z.number().int().positive(),sha256:hashSchema,width:z.number().int().min(1).max(8192),height:z.number().int().min(1).max(8192)}).strict(); // assetLimits.dimension; this file is embedded in compiler workspaces and cannot import it
 export const assetCompiledArtifactSchema = legacyCompiledArtifactSchema.extend({artifactVersion:z.literal(2),assets:z.record(derivedAssetSchema),assetSetHash:hashSchema}).strict();
 // Pure parameter policy and identity verification enforce cross-field ranges,
 // own-property provenance, canonical metadata bytes and hashes at admission.

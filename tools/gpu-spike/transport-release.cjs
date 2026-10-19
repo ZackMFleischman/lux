@@ -2,9 +2,14 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+// One linked envelope (source-policy limits.linkedBytes, which carries the
+// base64 image originals) plus 4 MiB for the release envelope and settings.
+// CommonJS copies ship in exported packages, so the value is stated here and
+// tests/assets/limits-derivation.test.mjs keeps it equal to the derived budget.
+const maxReleaseBytes = 195799724 + 4 * 1024 * 1024;
 function readTransportRelease(filename) {
   const stat = fs.statSync(filename);
-  if (!stat.isFile() || stat.size > 20 * 1024 * 1024) throw Error('Invalid transport release size');
+  if (!stat.isFile() || stat.size > maxReleaseBytes) throw Error('Invalid transport release size');
   const bytes = fs.readFileSync(filename);
   if (path.basename(filename) !== hash(bytes) + '.json') throw Error('Transport release content hash mismatch');
   const release = JSON.parse(bytes);
@@ -25,4 +30,4 @@ function readTransportRelease(filename) {
   if (hash(JSON.stringify(body)) !== linked.linkedHash) throw Error('Linked module hash mismatch');
   return release;
 }
-module.exports = { readTransportRelease, hash };
+module.exports = { readTransportRelease, hash, maxReleaseBytes };

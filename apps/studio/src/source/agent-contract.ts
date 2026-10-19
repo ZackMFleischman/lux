@@ -1,5 +1,8 @@
 import { z } from 'zod';
 import { legacySourceBundleSchema,assetSourceBundleSchema } from '../../../../packages/runtime-contracts/src/index.ts';
+import {storyLifecycleLimits} from '../../../../packages/runtime-contracts/src/story.mjs';
+import {limits as sourceLimits} from '../../../build-worker/src/source-policy.mjs';
+import {formatBytes} from '../../../../packages/assets/src/index.mjs';
 import {normalizeSceneStory} from '../../../../packages/runtime-contracts/src/story.mjs';
 import {validateStorySceneDocumentV7} from '../../../../packages/core/src/story-scene-v2.ts';
 // Public authoring capabilities are intentionally narrower than internal builds.
@@ -35,15 +38,24 @@ export const libraryCreateInputSchema=z.object({name:z.string().trim().min(1).ma
 export const libraryReadInputSchema=z.object({id:componentId,revision:z.number().int().positive().optional()}).strict();
 export const libraryUpdateInputSchema=libraryCreateInputSchema.extend({id:componentId,expectedRevision:z.number().int().positive()}).strict();
 const mib=1024*1024;
-// Read keeps one selected source beside a 32 MiB Scene v7 document. Seven MiB
-// covers its worst JSON escaping/assets; thirteen covers bounded runtime status.
-const readResponseBytes=(32+7+13)*mib;
-export const agentTransportLimits=Object.freeze({requestBytes:34*mib,responseBytes:readResponseBytes,readToolResultBytes:2*readResponseBytes});
+// Read returns the complete Scene v7 document beside its selected editor source
+// plus at most 13 MiB of bounded runtime status. The escaped MCP tool result
+// re-escapes only code text and JSON punctuation (base64 needs no escaping), so
+// it stays below V8's ~512 Mi char string limit. Build requests carry at most a
+// complete Scene v7 document or one source. The operation deadline covers a full
+// compile+link plus admission of the largest asset budget.
+const readResponseBytes=storyLifecycleLimits.sceneBytes+sourceLimits.sourceJsonBytes+13*mib;
+export const agentTransportLimits=Object.freeze({requestBytes:Math.max(storyLifecycleLimits.sceneBytes,sourceLimits.sourceJsonBytes)+2*mib,responseBytes:readResponseBytes,
+  readToolResultBytes:readResponseBytes+2*(storyLifecycleLimits.aggregateSourceTextBytes+sourceLimits.sourceBytes)+8*mib,
+  operationMs:sourceLimits.agentOperationMs});
+/** Studio main-process compile child: request and stdout bounds, and its deadline. */
+export const studioCompileLimits=Object.freeze({requestBytes:sourceLimits.requestBytes,storyRequestBytes:storyLifecycleLimits.sceneBytes+2*mib,
+  resultBytes:sourceLimits.linkedBytes+2*mib,storyResultBytes:sourceLimits.sharedCapsuleBytes+2*mib,deadlineMs:sourceLimits.buildMs});
 export function sourceReadResult(value: unknown) {
   const text=JSON.stringify(value);
-  if(new TextEncoder().encode(text).byteLength>agentTransportLimits.responseBytes)throw Error('Source read JSON exceeds 52 MiB');
+  if(new TextEncoder().encode(text).byteLength>agentTransportLimits.responseBytes)throw Error(`Source read JSON exceeds ${formatBytes(agentTransportLimits.responseBytes)}`);
   const result = { content: [{ type: 'text' as const, text }] };
   if (new TextEncoder().encode(JSON.stringify(result)).byteLength > agentTransportLimits.readToolResultBytes)
-    throw Error('Source read result exceeds 104 MiB');
+    throw Error(`Source read result exceeds ${formatBytes(agentTransportLimits.readToolResultBytes)}`);
   return result;
 }

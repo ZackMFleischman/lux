@@ -1,4 +1,5 @@
 import { limits, violation } from './source-policy.mjs';
+import { formatBytes } from '../../../packages/assets/src/index.mjs';
 
 const jsonBytes = value => Buffer.byteLength(JSON.stringify(value), 'utf8');
 const truncated = Object.freeze({ code: 'DIAGNOSTICS_TRUNCATED', message: 'Additional diagnostics omitted to keep the serialized result within 128 KiB.' });
@@ -20,5 +21,5 @@ export function boundDiagnostics(diagnostics) {
 export function assertResultBudgets(result) {
   if (!Array.isArray(result?.diagnostics)) throw violation('Compiler result is missing its diagnostics array', 'SERVICE_UNAVAILABLE');
   if (jsonBytes(result.diagnostics) > limits.diagnosticBytes) throw violation('Serialized compiler diagnostics exceed 128 KiB', 'QUOTA_EXCEEDED');
-  if (result.ok === true && jsonBytes(result.artifact) > limits.outputBytes) throw violation('Final serialized artifact exceeds 4 MiB', 'QUOTA_EXCEEDED');
+  if (result.ok === true && jsonBytes(result.artifact) > limits.outputBytes) throw violation(`Final serialized artifact exceeds ${formatBytes(limits.outputBytes)}`, 'QUOTA_EXCEEDED');
 }

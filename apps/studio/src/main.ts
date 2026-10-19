@@ -10,6 +10,7 @@ import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
 import { SceneFileStore } from '../../../packages/core/src/scene-file.ts';
 import { createAgentBridge } from './agent-bridge.ts';
+import { agentTransportLimits, studioCompileLimits } from './source/agent-contract.ts';
 import { observeFullscreen } from './fullscreen.ts';
 import { createExportService, runExportChild } from './export-process.ts';
 import { createCloseConfirmation } from './close-confirmation.ts';
@@ -86,7 +87,7 @@ function trusted(event: Electron.IpcMainInvokeEvent): boolean {
 async function compile(source: unknown, shared = false): Promise<unknown> {
   if (compiling) throw Error('Another compile is in progress');
   const encoded = JSON.stringify(source);
-  if (!encoded || Buffer.byteLength(encoded) > (shared ? 33554432 : 8388608)) throw Error('Source request exceeds its limit');
+  if (!encoded || Buffer.byteLength(encoded) > (shared ? studioCompileLimits.storyRequestBytes : studioCompileLimits.requestBytes)) throw Error('Source request exceeds its limit');
   const executable = process.env.LUX_NODE_EXECUTABLE;
   if (!executable) throw Error('Start Studio with pnpm studio');
   compiling = true;
@@ -94,8 +95,8 @@ async function compile(source: unknown, shared = false): Promise<unknown> {
     const child = spawn(executable, [join(workspace, shared ? 'scripts/studio-compile-story.mjs' : 'scripts/studio-compile.mjs')], { cwd: workspace, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
     if (shared) child.stdout.setEncoding('utf8');
     let output = '', bytes = 0;
-    const timer = setTimeout(() => { child.kill(); reject(Error('Compile/link deadline exceeded')); }, 75000);
-    child.stdout.on('data', chunk => { bytes += typeof chunk === 'string' ? Buffer.byteLength(chunk, 'utf8') : chunk.length; if (bytes > (shared ? 68157440 : 18000000)) { child.kill(); reject(Error('Compile result exceeded its limit')); } else output += chunk; });
+    const timer = setTimeout(() => { child.kill(); reject(Error('Compile/link deadline exceeded')); }, studioCompileLimits.deadlineMs);
+    child.stdout.on('data', chunk => { bytes += typeof chunk === 'string' ? Buffer.byteLength(chunk, 'utf8') : chunk.length; if (bytes > (shared ? studioCompileLimits.storyResultBytes : studioCompileLimits.resultBytes)) { child.kill(); reject(Error('Compile result exceeded its limit')); } else output += chunk; });
     child.stderr.resume();
     child.once('error', error => { clearTimeout(timer); reject(error); });
     child.once('close', code => { clearTimeout(timer); try { if (code !== 0) throw Error('Compiler process failed'); done(JSON.parse(output)); } catch (error) { reject(error); } });
@@ -317,7 +318,7 @@ app.whenReady().then(async () => {
     }
     if (!mainWindow || mainWindow.isDestroyed()) { reject(Error('Studio is closed')); return; }
     const id = randomBytes(16).toString('hex');
-    const timer = setTimeout(() => { agentRequests.delete(id); reject(Error('Studio did not finish the operation in time')); }, 70000);
+    const timer = setTimeout(() => { agentRequests.delete(id); reject(Error('Studio did not finish the operation in time')); }, agentTransportLimits.operationMs);
     agentRequests.set(id, { resolve: result => resolve(method === 'status' ? { ...(result as object), studioSession } : result), reject, timer }); mainWindow.webContents.send('studio:agent-command', { id, method, params });
   }));
   app.once('will-quit', () => { bridge.close(); for (const pending of agentRequests.values()) { clearTimeout(pending.timer); pending.reject(Error('Studio closed')); } agentRequests.clear(); });
