@@ -180,7 +180,9 @@ export function buildCrowd(): Crowd {
   const tints = new Float32Array(n * 3);
   const c = new Color();
   for (let i = 0; i < n; i += 1) {
-    c.setHex(palette[(i * 5 + Math.floor(i / 7)) % palette.length]);
+    // Shuffle colours per seat so no balcony bay repeats its neighbour.
+    const shuffled = Math.floor(Math.abs(Math.sin(i * 91.7 + 13.1) * 43758.5453)) % palette.length;
+    c.setHex(palette[shuffled]);
     tints.set([c.r, c.g, c.b], i * 3);
   }
   const tintAttr = new InstancedBufferAttribute(tints, 3);
@@ -207,7 +209,7 @@ export function buildCrowd(): Crowd {
     m.frustumCulled = false;
     root.add(m);
   }
-  const kindOf = (i: number) => (i * 7 + Math.floor(i / 3)) % 3;
+  const kindOf = (i: number) => Math.floor(Math.abs(Math.sin(i * 37.3 + 4.7) * 24634.6345)) % 3;
 
   const o = new Object3D();
   const head = new Object3D();

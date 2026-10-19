@@ -124,7 +124,7 @@ export function makeAria(): Rig {
   rig.props.haloLight = new Mesh();
   rig.props.haloLight.userData.material = halo;
   addEyes(rig, 0.065, 0.09, 0.28, 0.26, toon(0xf3eedf));
-  addPlateMouth(rig, rig.head, 0.13, 0.08, 0.13, 0.27, 0x8fd0ca, 0x1e5f5a, 1, true);
+  addPlateMouth(rig, rig.head, 0.11, 0.065, 0.165, 0.256, 0x8fd0ca, 0x1e5f5a, 1, true);
   rig.head.scale.setScalar(1.3);
   return rig;
 }

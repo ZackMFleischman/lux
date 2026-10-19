@@ -284,7 +284,7 @@ function skyMaterial(): MeshBasicNodeMaterial {
   const planetColor = mix(vec3(0.5, 0.22, 0.42), vec3(1.0, 0.62, 0.55), smoothstep(0.3, 0.45, pshade));
   const rp = dir.sub(planetDir);
   const ringD = abs(length(vec2(rp.x.add(rp.y.mul(0.6)), rp.y.mul(4.2))).sub(0.12));
-  const ringMask = smoothstep(0.012, 0.006, ringD).mul(float(1).sub(planet.mul(step(0.0, rp.y))));
+  const ringMask = smoothstep(0.0105, 0.0095, ringD).mul(float(1).sub(planet.mul(step(0.0, rp.y))));
   color = mix(color, planetColor, planet);
   color = mix(color, vec3(0.06, 0.04, 0.08), planetInk);
   const ringInk = smoothstep(0.016, 0.012, ringD).sub(smoothstep(0.012, 0.009, ringD)).max(0).mul(float(1).sub(planet.mul(step(0.0, rp.y))));
@@ -451,7 +451,7 @@ export function buildStage(): Stage {
   }
   // Dark house walls either side of the proscenium.
   for (const side of [-1, 1]) {
-    place(inked(blob(12, 14, 0.6, 8), toon(0x120c1c)), root, side * 14.2, 4.5, 4.1);
+    place(inked(blob(12, 14, 0.6, 8), toon(0x4a1a24)), root, side * 14.2, 4.5, 4.1);
   }
   const header = new Group();
   header.position.set(0, 6.75, 3.8);
