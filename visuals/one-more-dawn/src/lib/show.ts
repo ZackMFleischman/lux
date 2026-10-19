@@ -184,8 +184,8 @@ export function lighting(t: number, stagePos: { aria: Vector3; barnaby: Vector3;
     [cue.awaken - 0.3, 0],
     [cue.awaken + 0.4, 1.1],
     [19.3, 1.0],
-    [21.5, 1.45],
-    [cue.introEnd - 0.4, 1.45],
+    [21.5, 1.15],
+    [cue.introEnd - 0.4, 1.15],
     [cue.bandIn + 1.5, 0.45],
     [CLIP_END, 0.35],
   ]);

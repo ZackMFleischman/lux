@@ -114,7 +114,7 @@ function floorMaterial(): MeshBasicNodeMaterial {
   for (const spot of light.spots) {
     pools = pools.add(spot.color.mul(spotPool(spot)));
   }
-  const lit = light.fill.mul(1.5).add(light.key.mul(0.42)).add(pools.mul(0.32)).min(vec3(1.25, 1.25, 1.25)).add(vec3(1.0, 0.7, 0.45).mul(lip).mul(set.footLevel).mul(0.4));
+  const lit = light.fill.mul(1.5).add(light.key.mul(0.42)).max(vec3(0.42, 0.4, 0.42)).add(pools.mul(0.32)).min(vec3(1.25, 1.25, 1.25)).add(vec3(1.0, 0.7, 0.45).mul(lip).mul(set.footLevel).mul(0.4));
   material.colorNode = vec4(wood.mul(lit), 1);
   return material;
 }
@@ -168,8 +168,8 @@ function doorWallMaterial(spec: DoorWallSpec, side: typeof DoubleSide | typeof B
   const wake = set.wallWakeAt.add(spec.delay).add(dist.mul(spec.spread)).add(h.mul(0.6));
   const open = smoothstep(wake, wake.add(0.55), set.now);
   const p = f.sub(vec2(0.5, 0.44));
-  const halfW = h2.mul(0.06).add(0.27);
-  const halfH = h.mul(0.04).add(0.36);
+  const halfW = h2.mul(0.05).add(0.25);
+  const halfH = h.mul(0.03).add(0.31);
   const box = roundBox(p, vec2(halfW, halfH), 0.1);
   const arch = max(roundBox(p.sub(vec2(0, -0.08)), vec2(halfW, halfH.sub(0.08)), 0.02), length(p.sub(vec2(0, 0.1)).mul(vec2(1, 1.3))).sub(halfW).mul(step(0.1, p.y)));
   const port = length(p.sub(vec2(0, 0.02))).sub(halfW.mul(1.15));
@@ -205,12 +205,14 @@ function doorWallMaterial(spec: DoorWallSpec, side: typeof DoubleSide | typeof B
   const doorD = vec3(0.34, 0.3, 0.42);
   const panelBase = mix(mix(mix(doorA, doorB, step(0.3, h2)), doorC, step(0.6, h2)), doorD, step(0.85, h2));
   const panelLine = smoothstep(0.012, 0.0, abs(p.x)).mul(inside).mul(float(1).sub(revealed));
-  const panel = panelBase.mul(float(1).sub(panelLine.mul(0.5)));
+  const streak = step(abs(p.x.add(p.y.mul(0.6)).sub(0.08)), 0.025).mul(0.35);
+  const panel = mix(panelBase.mul(float(1).sub(panelLine.mul(0.5))), vec3(0.85, 0.95, 1.0), streak);
   const frameColor = wallTone.mul(0.4);
   const interiorGrad = step(0.0, p.y).mul(0.25).add(0.75);
   // A little robot occupant in each pod: head, shoulders and an antenna,
   // in one of a few painted colours, lit from behind by the pod light.
-  const occupantTone = mix(mix(vec3(0.25, 0.42, 0.58), vec3(0.62, 0.32, 0.2), step(0.4, h)), vec3(0.42, 0.44, 0.5), step(0.75, h));
+  const hue = hash(cell.x.mul(41).add(cell.y.mul(13)).add(3));
+  const occupantTone = mix(mix(mix(mix(mix(vec3(0.25, 0.42, 0.58), vec3(0.62, 0.32, 0.2), step(0.2, hue)), vec3(0.42, 0.44, 0.5), step(0.38, hue)), vec3(0.3, 0.55, 0.3), step(0.55, hue)), vec3(0.75, 0.62, 0.22), step(0.72, hue)), vec3(0.5, 0.32, 0.62), step(0.86, hue));
   // Five head types: round, tall capsule, wide box, square, dome.
   const kind = hash(cell.x.mul(19).add(cell.y.mul(53)).add(7));
   const dRound = length(p.sub(vec2(0, 0.02))).sub(0.15);
@@ -222,7 +224,11 @@ function doorWallMaterial(spec: DoorWallSpec, side: typeof DoubleSide | typeof B
   const shoulderD = roundBox(p.sub(vec2(0, -0.29)), vec2(0.24, 0.12), 0.08);
   const antennaD = max(abs(p.x).sub(0.008), abs(p.y.sub(0.22)).sub(0.05)).add(step(0.5, hash(cell.x.add(cell.y.mul(9)))).mul(10));
   const bulbD = length(p.sub(vec2(0, 0.28))).sub(0.025).add(step(0.5, hash(cell.x.add(cell.y.mul(9)))).mul(10));
-  const occD = min(min(headD, shoulderD), min(antennaD, bulbD));
+  const wave = step(0.55, hash(cell.x.mul(7).add(cell.y.mul(17))));
+  const armD = roundBox(vec2(abs(p.x).sub(0.24), p.y.add(0.12)).mul(vec2(1, 1)), vec2(0.035, 0.12), 0.03).add(float(1).sub(wave).mul(10));
+  const hatPick = hash(cell.x.mul(23).add(cell.y.mul(61)));
+  const topHat = min(roundBox(p.sub(vec2(0, 0.22)), vec2(0.09, 0.08), 0.01), roundBox(p.sub(vec2(0, 0.15)), vec2(0.15, 0.015), 0.01)).add(step(hatPick, 0.75).mul(10));
+  const occD = min(min(min(headD, shoulderD), min(antennaD, bulbD)), min(armD, topHat));
   const occupant = smoothstep(0.006, -0.006, occD);
   const occLine = smoothstep(0.016, 0.008, abs(occD));
   const glowBack = set.wallInterior.mul(interiorGrad);
@@ -241,6 +247,13 @@ function doorWallMaterial(spec: DoorWallSpec, side: typeof DoubleSide | typeof B
   const sconceP = vec2(f.x.sub(0.98).mul(2.2), f.y.sub(0.72));
   const sconce = smoothstep(0.05, 0.04, length(sconceP)).mul(step(0.7, hash(cell.x.mul(29).add(cell.y.mul(5)))));
   color = mix(color, wallTone.mul(0.3), max(rail, post));
+  const pipeY = f.y.sub(0.93);
+  const pipe = step(abs(pipeY), 0.025).mul(float(1).sub(inside));
+  const pipeTone = mix(vec3(0.42, 0.36, 0.3), vec3(0.62, 0.55, 0.45), step(0.0, pipeY));
+  color = mix(color, pipeTone, pipe);
+  const bulbP = vec2(fract(st.x.mul(4)).sub(0.5).mul(0.25), f.y.sub(0.02));
+  const rimBulb = smoothstep(0.014, 0.009, length(bulbP));
+  color = mix(color, vec3(1.0, 0.85, 0.55), rimBulb);
   color = mix(color, vec3(1.0, 0.82, 0.5), sconce);
   color = color.mul(set.wallLevel.mul(0.55).add(0.45));
   material.colorNode = vec4(color.mul(spec.dim), 1);
@@ -270,7 +283,9 @@ function skyMaterial(): MeshBasicNodeMaterial {
   const ringD = abs(length(vec2(rp.x.add(rp.y.mul(0.6)), rp.y.mul(4.2))).sub(0.12));
   const ringMask = smoothstep(0.012, 0.006, ringD).mul(float(1).sub(planet.mul(step(0.0, rp.y))));
   color = mix(color, planetColor, planet);
+  const ringInk = smoothstep(0.016, 0.012, ringD).sub(smoothstep(0.012, 0.009, ringD)).max(0).mul(float(1).sub(planet.mul(step(0.0, rp.y))));
   color = mix(color, vec3(0.95, 0.78, 0.55), ringMask.mul(0.85));
+  color = mix(color, vec3(0.08, 0.05, 0.08), ringInk);
   // The "dream" star the soprano reaches for.
   const dreamDir = normalize(vec3(0.16, 0.42, -1));
   const dd = float(1).sub(dot(dir, dreamDir)).mul(9000);
@@ -293,7 +308,7 @@ function beamMaterial(spot: (typeof light.spots)[number]): MeshBasicNodeMaterial
   const edge = smoothstep(0.08, 0.16, abs(dot(normalize(normalView), v)));
   const along = uv().y;
   // uv.y runs from the floor (0) to the lamp (1): brightest low, fading up.
-  const fade = smoothstep(0.0, 0.04, along);
+  const fade = smoothstep(0.08, 0.16, along);
   const amount = edge.mul(fade).mul(spot.shape.w).mul(set.hazeLevel).mul(0.04);
   // Pale, warm beam colour so the haze never greys out the set.
   const tone = mix(spot.color, vec3(1.0, 0.72, 0.4), 0.6);
@@ -345,7 +360,7 @@ export function buildStage(): Stage {
   // Near tier of doors behind the stage.
   // Curved tier of doors wrapping the back of the stage.
   const wallGeometry = keep(new CylinderGeometry(14, 14, 5.6, 96, 1, true, Math.PI - 0.95, 1.9));
-  const wall = new Mesh(wallGeometry, doorWallMaterial({ cols: 13, rows: 4, delay: 0, spread: 0.22, dim: 0.95, center: [6.5, 1.0] }, BackSide));
+  const wall = new Mesh(wallGeometry, doorWallMaterial({ cols: 19, rows: 5, delay: 0, spread: 0.16, dim: 0.95, center: [9.5, 1.3] }, BackSide));
   wall.position.set(0, 2.8, 7.4);
   root.add(wall);
   const wallCap = new Mesh(keep(new CylinderGeometry(14.1, 14.1, 0.22, 96, 1, true, Math.PI - 0.95, 1.9)), toon(0x2a2440));

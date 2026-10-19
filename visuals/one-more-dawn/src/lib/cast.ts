@@ -315,7 +315,8 @@ export function makeKing(): Rig {
   place(new Mesh(can(0.06, 0.04), toon(0x241318, { shadow: 0 })), rig.jaw, 0, 0, 0.06, Math.PI / 2);
   place(new Mesh(can(0.05, 0.03), toon(0xc9c4b4, { shadow: 0.4 })), rig.jaw, 0, 0, 0.075, Math.PI / 2);
   rig.mouthOpen = 1.2;
-  addEyes(rig, 0.065, 0.1, 0.25, 0.2, brass);
+  place(new Mesh(rbox(0.34, 0.22, 0.05), toon(0xf1e6c8, { shadow: 0.4 })), rig.head, 0, 0.22, 0.22);
+  addEyes(rig, 0.065, 0.09, 0.25, 0.24, toon(0xf1e6c8));
   const crown = place(new Group(), rig.head, 0, 0.45, 0);
   const crownGold = toon(0xe8bd45, { shine: 0.8 });
   place(new Mesh(can(0.2, 0.12, 6), crownGold), crown, 0, 0.06, 0);

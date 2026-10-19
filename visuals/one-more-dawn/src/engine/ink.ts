@@ -32,7 +32,7 @@ export default defineComponent({
       image: { type: { kind: 'image', colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }, label: 'Image', description: 'Colour with ink lines.' },
     },
     controls: {
-      lineWidth: { type: 'number', label: 'Line weight', default: 4.0, min: 0, max: 8, step: 0.1, unit: 'px', group: 'Ink' },
+      lineWidth: { type: 'number', label: 'Line weight', default: 4.4, min: 0, max: 8, step: 0.1, unit: 'px', group: 'Ink' },
       setLine: { type: 'number', label: 'Set line weight', default: 0.5, min: 0, max: 1, step: 0.01, group: 'Ink' },
       crease: { type: 'number', label: 'Crease lines', default: 0.45, min: 0, max: 1, step: 0.01, group: 'Ink' },
     },
@@ -76,7 +76,7 @@ export default defineComponent({
     let innerHits: Node = float(0);
     let setHits: Node = float(0);
     for (const [dx, dy] of DIRECTIONS) {
-      for (const ring of [1, 0.5]) {
+      for (const ring of [1, 0.38]) {
         const k: Node = read(vec2(dx, dy).mul(figureRadius.mul(ring)).mul(px));
         const idEdge: Node = step(0.0025, abs(k.b.sub(idC)));
         const figure: Node = max(figC, step(0.5, k.b));
@@ -108,7 +108,7 @@ export default defineComponent({
     const scene = new Scene();
     scene.add(new Mesh(geometry, material));
     const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    let lineWidth = 4.0;
+    let lineWidth = 4.4;
     let setLine = 0.5;
     let crease = 0.45;
     void context;
