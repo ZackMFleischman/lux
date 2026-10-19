@@ -93,11 +93,16 @@ function roundBox(p: Node, b: Node, r: number): Node {
 
 function floorMaterial(): MeshBasicNodeMaterial {
   const material = new MeshBasicNodeMaterial();
-  // Flat painted boards: one colour, sparse crisp seams, hard-edged pools.
-  const along = fract(positionWorld.x.div(0.9));
-  const seamWidth = fwidth(positionWorld.x.div(0.9)).mul(1.2);
-  const seam = smoothstep(seamWidth, float(0), along.min(float(1).sub(along)));
-  const wood = mix(vec3(0.36, 0.22, 0.14), vec3(0.2, 0.12, 0.08), seam.mul(0.8));
+  // Painted boards: flat colour with sparse, lighter plank strokes of
+  // varying length (never a CG grid), hard-edged pools and a footlight band.
+  const px = positionWorld.x.div(0.9);
+  const plank = floor(px);
+  const along = fract(px);
+  const segment = floor(positionWorld.z.div(2.3).add(hash(plank).mul(3)));
+  const show = step(0.45, hash(plank.mul(17).add(segment.mul(131))));
+  const width = fwidth(px).mul(1.1);
+  const stroke = smoothstep(width, float(0), along.min(float(1).sub(along))).mul(show);
+  const wood = mix(vec3(0.36, 0.22, 0.14), vec3(0.45, 0.29, 0.19), stroke.mul(0.7));
   let pools: Node = vec3(0, 0, 0);
   for (const spot of light.spots) {
     pools = pools.add(spot.color.mul(spotPool(spot)));
@@ -155,11 +160,17 @@ function doorWallMaterial(spec: DoorWallSpec, side: typeof DoubleSide | typeof B
   const centerCol = colsRow.mul(spec.center[0] / spec.cols);
   const dist = length(vec2(cell.x.sub(centerCol), cell.y.sub(spec.center[1]).mul(1.7)));
   const wake = set.wallWakeAt.add(spec.delay).add(dist.mul(spec.spread)).add(h.mul(0.6));
-  const open = smoothstep(wake, wake.add(0.55), set.now);
+  // A few doors only ever open halfway, as if jammed.
+  const jammed = mix(float(1), float(0.45), step(0.9, hash(cell.x.mul(5).add(cell.y.mul(71)))));
+  const open = smoothstep(wake, wake.add(0.55), set.now).mul(jammed);
   const p = f.sub(vec2(0.5, 0.44));
   const halfW = h2.mul(0.1).add(0.2);
   const halfH = h.mul(0.06).add(0.3);
-  const d = roundBox(p, vec2(halfW, halfH), 0.1);
+  const box = roundBox(p, vec2(halfW, halfH), 0.1);
+  const arch = max(roundBox(p.sub(vec2(0, -0.08)), vec2(halfW, halfH.sub(0.08)), 0.02), length(p.sub(vec2(0, 0.1)).mul(vec2(1, 1.3))).sub(halfW).mul(step(0.1, p.y)));
+  const port = length(p.sub(vec2(0, 0.02))).sub(halfW.mul(1.15));
+  const shapePick = hash(cell.x.mul(11).add(cell.y.mul(37)));
+  const d = mix(mix(box, arch, step(0.55, shapePick)), port, step(0.85, shapePick));
   const aa = fwidth(d).mul(0.6);
   const inside = smoothstep(aa, aa.negate(), d);
   const frame = smoothstep(aa, aa.negate(), d.sub(0.03)).sub(inside);
@@ -179,14 +190,16 @@ function doorWallMaterial(spec: DoorWallSpec, side: typeof DoubleSide | typeof B
   // Hard painted shadow under each ledge and a thin ledge strip.
   const ledge = step(f.y, 0.035);
   const ledgeShadow = step(0.83, f.y);
-  const wall = mix(wallTone, wallTone.mul(0.55), ledgeShadow).mul(float(1).sub(ledge)).add(vec3(0.07, 0.06, 0.08).mul(ledge));
+  const rivet = smoothstep(0.022, 0.014, length(vec2(abs(f.x.sub(0.5)).sub(0.46), f.y.sub(0.08))));
+  const baseBand = smoothstep(0.22, 0.0, uv().y).mul(0.6);
+  const wall = mix(wallTone, wallTone.mul(0.55), max(ledgeShadow, rivet)).mul(float(1).sub(ledge)).add(vec3(0.07, 0.06, 0.08).mul(ledge)).mul(float(1).sub(baseBand));
   const doorA = vec3(0.3, 0.33, 0.36);
   const doorB = vec3(0.36, 0.29, 0.24);
   const doorC = vec3(0.26, 0.3, 0.27);
   const panelBase = mix(mix(doorA, doorB, step(0.45, h2)), doorC, step(0.8, h2));
   const panelLine = smoothstep(0.012, 0.0, abs(p.x)).mul(inside).mul(float(1).sub(revealed));
   const panel = panelBase.mul(float(1).sub(panelLine.mul(0.5)));
-  const frameColor = wallTone.mul(0.35);
+  const frameColor = wallTone.mul(0.22);
   const interiorGrad = step(0.0, p.y).mul(0.25).add(0.75);
   const interior = set.wallInterior.mul(interiorGrad).mul(set.wallLevel).mul(h.mul(0.35).add(0.65));
   const lightAmt = light.fill.mul(1.6).add(light.key.mul(0.12));
@@ -241,12 +254,12 @@ function beamMaterial(spot: (typeof light.spots)[number]): MeshBasicNodeMaterial
     side: DoubleSide,
   });
   const v = normalize(positionView.negate());
-  const edge = smoothstep(0.05, 0.12, abs(dot(normalize(normalView), v)));
+  const edge = pow(abs(dot(normalize(normalView), v)), 1.6);
   const along = uv().y;
   const fade = smoothstep(0.0, 0.25, along).mul(smoothstep(1.0, 0.75, along).mul(0.6).add(0.4));
-  const amount = edge.mul(fade).mul(spot.shape.w).mul(set.hazeLevel).mul(0.1);
+  const amount = edge.mul(fade).mul(spot.shape.w).mul(set.hazeLevel).mul(0.13);
   // Pale, warm beam colour so the haze never greys out the set.
-  const tone = mix(spot.color, vec3(1.0, 0.93, 0.8), 0.55);
+  const tone = mix(spot.color, vec3(1.0, 0.85, 0.6), 0.5);
   material.colorNode = vec4(tone.mul(amount), 1);
   return material;
 }
@@ -355,7 +368,7 @@ export function buildStage(): Stage {
     m.updateMatrix();
     antennaTips.setMatrixAt(i, m.matrix);
   }
-  root.add(antennaTips);
+  void antennaTips;
 
   // Proscenium: deco pillars, header with a ringed-planet crest.
   const deco = toon(0x173e4c);

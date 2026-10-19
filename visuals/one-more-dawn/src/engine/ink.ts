@@ -7,7 +7,7 @@
 
 import { defineComponent } from '@lux/visual-sdk';
 import { DataTexture, Mesh, MeshBasicNodeMaterial, OrthographicCamera, PlaneGeometry, Scene, Texture, Vector2 } from 'three/webgpu';
-import { abs, clamp, dot, float, max, mix, sqrt, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl';
+import { abs, clamp, dot, float, floor, max, mix, sqrt, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl';
 
 // TSL node typings are too narrow for freely composed shader graphs.
 type Node = any;
@@ -32,8 +32,8 @@ export default defineComponent({
       image: { type: { kind: 'image', colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }, label: 'Image', description: 'Colour with ink lines.' },
     },
     controls: {
-      lineWidth: { type: 'number', label: 'Line weight', default: 2.4, min: 0, max: 8, step: 0.1, unit: 'px', group: 'Ink' },
-      setLine: { type: 'number', label: 'Set line weight', default: 0.6, min: 0, max: 1, step: 0.01, group: 'Ink' },
+      lineWidth: { type: 'number', label: 'Line weight', default: 3.4, min: 0, max: 8, step: 0.1, unit: 'px', group: 'Ink' },
+      setLine: { type: 'number', label: 'Set line weight', default: 0.5, min: 0, max: 1, step: 0.01, group: 'Ink' },
       crease: { type: 'number', label: 'Crease lines', default: 0.35, min: 0, max: 1, step: 0.01, group: 'Ink' },
     },
     controlDescriptions: {
@@ -66,8 +66,12 @@ export default defineComponent({
     const idC: Node = centre.b;
     const nC: Node = normalOf(centre);
     const figC: Node = step(0.5, idC);
+    // Performer group (0..7) from the ID; -1 for the set.
+    const groupOf = (id: Node): Node => mix(float(-1), floor(id.mul(255).sub(129).div(15)), step(0.5, id));
+    const gC: Node = groupOf(idC);
 
-    // Performer lines: ID changes or creases where either side is a figure.
+    // Silhouettes: group changes, full width. Interior seams and creases
+    // inside one performer: inner ring only, so they draw thinner.
     let figureHits: Node = float(0);
     let setHits: Node = float(0);
     for (const [dx, dy] of DIRECTIONS) {
@@ -75,8 +79,10 @@ export default defineComponent({
         const k: Node = read(vec2(dx, dy).mul(figureRadius.mul(ring)).mul(px));
         const idEdge: Node = step(0.0025, abs(k.b.sub(idC)));
         const figure: Node = max(figC, step(0.5, k.b));
-        const creaseEdge: Node = step(creaseLimit, float(1).sub(dot(nC, normalOf(k)))).mul(float(1).sub(idEdge)).mul(figC);
-        figureHits = figureHits.add(max(idEdge.mul(figure), creaseEdge));
+        const silhouette: Node = step(0.5, abs(groupOf(k.b).sub(gC))).mul(figure);
+        const interior: Node = idEdge.mul(float(1).sub(silhouette)).mul(figC).mul(ring < 1 ? 1 : 0);
+        const creaseEdge: Node = step(creaseLimit, float(1).sub(dot(nC, normalOf(k)))).mul(float(1).sub(idEdge)).mul(figC).mul(ring < 1 ? 1 : 0);
+        figureHits = figureHits.add(max(silhouette, max(interior, creaseEdge)));
       }
       const s: Node = read(vec2(dx, dy).mul(setRadius).mul(px));
       const setEdge: Node = step(0.0025, abs(s.b.sub(idC))).mul(float(1).sub(max(figC, step(0.5, s.b))));
@@ -87,7 +93,7 @@ export default defineComponent({
     const setInk: Node = clamp(setHits.div(2.5), 0, 1).mul(0.85);
     const base: Node = colorSample.rgb;
     const setTone: Node = base.mul(vec3(0.32, 0.27, 0.36));
-    const ink: Node = vec3(0.045, 0.03, 0.05);
+    const ink: Node = vec3(0.05, 0.035, 0.03);
     let color: Node = mix(base, setTone, setInk);
     color = mix(color, ink, figureInk);
 
@@ -98,8 +104,8 @@ export default defineComponent({
     const scene = new Scene();
     scene.add(new Mesh(geometry, material));
     const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    let lineWidth = 2.4;
-    let setLine = 0.6;
+    let lineWidth = 3.4;
+    let setLine = 0.5;
     let crease = 0.35;
     void context;
     return {

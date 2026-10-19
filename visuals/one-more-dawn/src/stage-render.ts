@@ -78,9 +78,14 @@ export default defineComponent({
     for (const b of stage.beams) {
       b.userData.line = 'none';
     }
-    for (const figure of [aria.root, barnaby.root, pip.root, dot.root, king.root, guards[0].root, guards[1].root, globe.group, chain.group, throne]) {
+    // One line group per performer; the king shares his with the throne and
+    // the hand props share one group.
+    for (const figure of [aria.root, barnaby.root, pip.root, dot.root, king.root, guards[0].root, guards[1].root]) {
       ink.register(figure, 'figure');
     }
+    ink.register(throne, 'figure', false);
+    ink.register(globe.group, 'figure');
+    ink.register(chain.group, 'figure', false);
     ink.register(scene, 'set');
 
     const cast: Cast = { aria, barnaby, pip, dot, king, guards, throne, globe, chain, lift: stage.lift, pedestal: stage.pedestal };

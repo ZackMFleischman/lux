@@ -262,6 +262,8 @@ export function makeKid(kind: 'pip' | 'dot'): Rig {
 
 export function makeKing(): Rig {
   const gold = toon(0xc49a3c, { shine: 0.7 });
+  const enamel = toon(0x3b4f86, { shine: 0.6 });
+  const silver = toon(0x9aa2b3, { shine: 0.5 });
   const ermine = toon(0xebe6da);
   const rig = skeleton({
     name: 'Rex',
@@ -270,8 +272,8 @@ export function makeKing(): Rig {
     neckY: 0.96,
     shoulder: [0.48, 0.76, 0],
     armRadius: [0.072, 0.066],
-    armMaterial: gold,
-    handMaterial: gold,
+    armMaterial: silver,
+    handMaterial: silver,
     handSize: 0.2,
     armHang: 0.55,
     legs: {
@@ -282,8 +284,10 @@ export function makeKing(): Rig {
       stance: 0.26,
     },
   });
-  place(new Mesh(rbox(0.94, 0.96, 0.74), gold), rig.torso, 0, 0.44, 0.02);
-  place(new Mesh(rbox(0.5, 0.36, 0.06), toon(0x9c2f3d)), rig.torso, 0, 0.5, 0.39);
+  // Round enamel belly with a gold sash and medal.
+  place(new Mesh(blob(0.98, 0.98, 0.8, 2.6), enamel), rig.torso, 0, 0.44, 0.02);
+  place(new Mesh(rbox(0.16, 0.92, 0.05), gold), rig.torso, 0.08, 0.46, 0.38, 0, 0, -0.55);
+  place(new Mesh(can(0.07, 0.03), toon(0x9c2f3d)), rig.torso, -0.2, 0.62, 0.4, Math.PI / 2);
   const capeMaterial = toon(0x55306f);
   capeMaterial.side = DoubleSide;
   place(new Mesh(lathe('king-cape2', [[0.3, 0.9], ...bell(0.46, 0.8, 0.86, -0.7, 1.3, 10)], 40, 1.15, Math.PI * 2 - 2.3), capeMaterial), rig.torso, 0, 0, -0.08);
@@ -350,6 +354,10 @@ export function makeGuard(seed: number): Rig {
   }
   place(new Mesh(rbox(0.64, 0.08, 0.48), toon(0x15151c)), rig.torso, 0, 0.02, 0);
   place(new Mesh(rbox(0.44, 0.4, 0.42), steel), rig.head, 0, 0.2, 0);
+  for (const side of [-1, 1]) {
+    place(new Mesh(can(0.07, 0.05), toon(P.gold)), rig.head, side * 0.23, 0.22, 0, 0, 0, Math.PI / 2);
+    place(new Mesh(rbox(0.025, 0.36, 0.03), toon(0x1c1c28)), rig.head, side * 0.22, 0.2, 0.1, 0, 0, side * 0.08);
+  }
   addEyes(rig, 0.07, 0.1, 0.25, 0.22, steel);
   addPlateMouth(rig, rig.head, 0.18, 0.1, 0.07, 0.225, 0xd9d4c2, 0x55606e, 2);
   place(new Mesh(can(0.2, 0.46, 20), toon(0x1c1c28)), rig.head, 0, 0.64, -0.02);

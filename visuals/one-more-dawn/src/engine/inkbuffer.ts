@@ -3,9 +3,11 @@
 // draws a line wherever the ID changes (silhouettes, overlaps, part seams)
 // or the normal folds sharply (creases), at a fixed pixel width.
 //
-// IDs 1..127 belong to the set (thin coloured lines), 129..254 to
-// performers and props (full-weight dark ink). Neighbouring parts only
-// need different IDs, so IDs are assigned round-robin with a stride.
+// IDs 1..127 belong to the set (thin coloured lines). IDs 129..248 belong
+// to up to eight performer groups of 15 IDs each: lines between groups (or
+// against the set) are full-weight silhouettes, lines inside one group are
+// thinner interior seams. Neighbouring parts only need different IDs, so
+// IDs are assigned round-robin with a stride.
 
 import { Material, Mesh, MeshBasicNodeMaterial, Object3D } from 'three/webgpu';
 import { normalize, transformedNormalView, vec4 } from 'three/tsl';
@@ -24,11 +26,17 @@ export class InkBuffer {
   private readonly made: MeshBasicNodeMaterial[] = [];
   private figureCounter = 0;
   private setCounter = 0;
+  private groups = 0;
+  private group = 0;
 
   // Registers every mesh below root. A mesh can override its class with
   // `mesh.userData.line = 'figure' | 'set' | 'none'`; meshes registered
   // under an earlier root are skipped.
-  register(root: Object3D, cls: LineClass): void {
+  register(root: Object3D, cls: LineClass, newGroup = true): void {
+    if (cls === 'figure' && newGroup) {
+      this.group = Math.min(7, this.groups);
+      this.groups += 1;
+    }
     const seen = new Set(this.entries.map(e => e.mesh));
     root.traverse(object => {
       const mesh = object as Mesh;
@@ -45,7 +53,7 @@ export class InkBuffer {
   private nextId(cls: LineClass): number {
     if (cls === 'figure') {
       this.figureCounter += 1;
-      return 129 + ((this.figureCounter * 37) % 126);
+      return 129 + this.group * 15 + ((this.figureCounter * 7) % 15);
     }
     this.setCounter += 1;
     return 1 + ((this.setCounter * 29) % 127);

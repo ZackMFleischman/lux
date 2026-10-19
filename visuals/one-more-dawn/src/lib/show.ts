@@ -172,6 +172,8 @@ function lighting(t: number, stagePos: { aria: Vector3; barnaby: Vector3; king: 
   tmpB.copy(tmpA).lerp(warm, toWarm).lerp(steel, toSteel * 0.6);
   const warsFlash = span(t, cue.wars - 0.05, cue.wars + 0.6, 0.05, 0.5) * 0.9;
   tmpB.lerp(red, warsFlash * 0.7);
+  // Keep character colours steady between cues: the key is mostly neutral.
+  tmpB.lerp(new Color(1, 0.97, 0.92), 0.65);
   light.key.value.copy(tmpB).multiplyScalar(keyLevel * (0.92 + lvl * 0.15));
   setColor(light.fill.value, new Color(0.05, 0.05, 0.12), new Color(0.12, 0.08, 0.08), toWarm, 1);
   light.fill.value.multiplyScalar(0.6 + 0.6 * ramp(t, 2.5, 6) + toWarm * 0.3);
