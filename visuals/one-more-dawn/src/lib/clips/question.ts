@@ -4,8 +4,9 @@
 // it here; do not edit shared engine, cast or set files from a clip lane.
 //
 // Shot list (song seconds):
-//   S1 19.30–23.50  Medium-wide frontal push-in. The house hushes; Aria hops
-//                   off her pedestal and glides forward into her spot.
+//   S1 19.30–23.50  Low three-quarter medium from house left, pushing in.
+//                   The house hushes; Aria hops off her pedestal and glides
+//                   forward into her spot.
 //   S2 23.50–27.94  Three-quarter medium close-up. "A question came to me":
 //                   hand to chin, then hand to chest on "me".
 //   S3 27.94–32.90  Low-angle wide. "If we can dream of everything": arms
@@ -17,7 +18,7 @@
 //                   back and reaches for the star. Held tableau at the end.
 
 import { Color, Vector3, type PerspectiveCamera } from 'three/webgpu';
-import { applyPose, blankPose, copyPose, type Pose, type V3 } from '../rig.ts';
+import { applyPose, blankPose, copyPose, type Pose, type Rig, type V3 } from '../rig.ts';
 import { cue, defaultFrame, lighting, mixV, setSpot, sing, blinkAt, v3, ariaPose, dawn, type Cast } from '../show.ts';
 import { SOPRANO_WORDS as SW } from '../song.ts';
 import { set } from '../stage.ts';
@@ -174,9 +175,51 @@ function ariaActing(t: number, p: Pose): void {
   p.lid = 0.14 + scan * 0.1 + wistful * 0.28 - surprise * 0.12 + blinkAt(t, 0.3) * (1 - reach);
   p.eyeGlow = 1.1 + surprise * 0.3 + reach * 0.3;
 
+  // --- Brows and lids: the face carries each line.
+  // Silence: soft and attentive. Question: a puzzled tilt with one brow
+  // raised (the asymmetric part is applied after the pose, see quizzical()).
+  // Dream: wide-eyed wonder. Why: worried, yearning brows and heavy lids.
+  // Dream a dream: surprise as she finds the star. Me: brows high and
+  // pleading, eyes half-closed into the held note.
+  const wonder = span(t, WORD.dream1 - 0.15, WORD.everythingEnd + 0.5, 0.35, 0.9);
+  const yearn = span(t, WORD.why - 0.25, WORD.dream2 + 0.2, 0.35, 0.5);
+  const found = span(t, WORD.dream2 + 0.1, WORD.forW, 0.3, 0.6);
+  const held = span(t, WORD.forW - 0.1, END + 1, 0.6, 0.5);
+  const thinkFace = span(t, WORD.a - 0.15, WORD.ifWe + 0.1, 0.35, 0.4);
+  p.brow = 0.1 * scan - 0.15 * thinkFace + 0.8 * wonder + 0.25 * yearn + 0.9 * found + 0.75 * held;
+  // Positive browTilt lifts the inner ends (worried, yearning).
+  p.browTilt = 0.1 * thinkFace + 0.1 * wonder + 0.8 * yearn + 0.2 * found + 0.5 * held;
+  // Extra head tilt on the question and a lift into the held note.
+  p.headRoll += thinkFace * 0.12 + held * Math.sin((t - WORD.forW) * 0.9) * 0.06;
+  p.lid = Math.max(0, p.lid - wonder * 0.14 + thinkFace * 0.08 + yearn * 0.06 - found * 0.14 + held * 0.32);
+  p.lookY -= held * 0.3;
+
   // --- Singing (soprano word timings).
   p.mouth = sing(t, SW);
   p.headPitch -= p.mouth * 0.04;
+}
+
+// Puzzled look on "a question came to me": one brow arches high while the
+// other eye narrows. Applied on top of applyPose (which sets brows and lids
+// symmetrically every frame).
+function quizzical(t: number, rig: Rig): void {
+  const q = span(t, WORD.a - 0.1, WORD.me1 + 0.3, 0.35, 0.45);
+  if (q <= 0.001) {
+    return;
+  }
+  if (rig.brows) {
+    const up = rig.brows[1];
+    up.position.y += q * 0.055;
+    up.rotation.z += q * 0.22;
+    const down = rig.brows[0];
+    down.position.y -= q * 0.02;
+    down.rotation.z += q * 0.12;
+  }
+  const squint = rig.eyes[0];
+  if (squint) {
+    const now = squint.lid.rotation.x;
+    squint.lid.rotation.x = lerp(now, Math.max(now, -1.4 + 0.42 * 2.95), q);
+  }
 }
 
 // ------------------------------------------------------------------ camera
@@ -195,12 +238,14 @@ const S3A: V3 = [0.6, 1.7, 4.9];
 const S3B: V3 = [0.9, 0.65, 5.6];
 const S5A: V3 = [1.15, 2.2, 3.9];
 const S5B: V3 = [1.05, 2.18, 3.55];
-const S6A: V3 = [1.2, 1.0, 8.0];
-const S6B: V3 = [0.95, 1.05, 6.4];
+const S6A: V3 = [1.15, 0.9, 7.0];
+const S6B: V3 = [0.95, 0.95, 5.7];
 
 const SHOTS: Shot[] = [
   // S1: the hush; push in as she comes forward.
-  { a: START, b: 23.5, p0: [0, 1.85, 6.9], l0: [0, 1.5, -0.8], p1: [0.1, 1.85, 5.9], l1: [0, 1.55, 0.6] },
+  // Three-quarter from house left, slightly low, so it cuts cleanly from
+  // the frontal tableau that ends the awakening clip.
+  { a: START, b: 23.5, p0: [-2.5, 1.35, 3.1], l0: [0, 1.95, -1.0], p1: [-1.7, 1.6, 4.25], l1: [0.15, 2.0, 0.75] },
   // S2: the question, three-quarter medium close-up from house right.
   { a: 23.5, b: WORD.ifWe, p0: [1.15, 2.1, 4.3], l0: [0.35, 2.0, 0.9], p1: [0.9, 2.08, 3.75], l1: [0.3, 2.05, 0.9] },
   // S3: boom down from eye level to a low angle as her arms open; the
@@ -213,7 +258,7 @@ const SHOTS: Shot[] = [
   { a: 34.9, b: 37.45, p0: S5A, l0: aim(S5A, -8, 7), p1: S5B, l1: aim(S5B, -8, 8.5) },
   // S6: hero low angle, Aria left third, star right third; push in on the
   // held note.
-  { a: 37.45, b: END, p0: S6A, l0: aim(S6A, -2.5, 10.5), p1: S6B, l1: aim(S6B, -2.5, 11.5) },
+  { a: 37.45, b: END, p0: S6A, l0: aim(S6A, -3.5, 12), p1: S6B, l1: aim(S6B, -3.5, 13.5) },
 ];
 
 const camPos = new Vector3();
@@ -246,13 +291,20 @@ function cueLights(t: number, edge: number): void {
   lighting(t, { aria: ariaWorld, barnaby: barnWorld, king: kingWorld });
   // Default values (already set by lighting) for the hand-off blend.
   const dStars = set.starLevel.value as number;
-  const dStar = set.dreamStar.value as number;
   // Stars bloom on "dream"; the dream star is found on the second "dream"
   // and flares on the held "me".
   const stars = keys(t, [[START, 0.25], [WORD.dream1 - 0.1, 0.3], [WORD.dream1 + 1.4, 1.35], [END, 1.35]]);
-  const star = keys(t, [[START, 0], [WORD.dream2, 0], [WORD.dream2 + 0.9, 0.75], [WORD.me2, 0.9], [WORD.me2 + 0.7, 1.55], [END, 1.45]]);
+  // The flare peaks on the held "me" and comes down to the level the next
+  // clip keeps in the sky (0.75), so the cut at 40.3 matches.
+  const star = keys(t, [[START, 0], [WORD.dream2, 0], [WORD.dream2 + 0.9, 0.75], [WORD.me2, 0.9], [WORD.me2 + 0.7, 1.4], [END - 1.0, 1.25], [END - 0.5, 0.9], [END, 0.75]]);
   set.starLevel.value = lerp(dStars, stars, edge);
-  set.dreamStar.value = lerp(dStar, star, edge);
+  set.dreamStar.value = star;
+  // The house watches the dream rapt: eyes wide, heads and pupils lifted
+  // toward the star from "dream" to the end of the held note.
+  const rapt = span(t, WORD.dream1 - 0.6, END + 2, 0.9, 0.5);
+  set.wallEyeLevel.value = Math.max(set.wallEyeLevel.value as number, 0.95 * rapt);
+  const look = set.wallLook.value;
+  look.y = lerp(look.y, lerp(look.y, 1.5, rapt), edge);
   // Aria's follow spot: tightens on "question", opens on "dream", warms
   // toward dawn on "me".
   const r = keys(t, [[START, 1.0], [WORD.a, 1.0], [WORD.question + 0.4, 0.82], [WORD.dream1 - 0.1, 0.82], [WORD.dream1 + 0.6, 1.0], [WORD.why, 1.0], [WORD.why + 0.6, 0.88], [WORD.me2, 0.88], [WORD.me2 + 0.8, 1.0], [END, 0.98]]);
@@ -298,7 +350,13 @@ export const clip = {
     out.headPitch = lerp(base.headPitch, out.headPitch, settle);
     out.headRoll = lerp(base.headRoll, out.headRoll, settle);
     out.lean = lerp(base.lean, out.lean, settle);
+    out.brow = lerp(base.brow, out.brow, settle);
+    out.browTilt = lerp(base.browTilt, out.browTilt, settle);
+    out.lid = lerp(base.lid, out.lid, settle);
+    out.lookX = lerp(base.lookX, out.lookX, settle);
+    out.lookY = lerp(base.lookY, out.lookY, settle);
     applyPose(rig, out);
+    quizzical(t, rig);
     ariaWorld.set(out.x, 0, out.z);
     rig.props.antenna.rotation.z = Math.sin(t * 2.1) * 0.06 - out.headRoll * 0.5;
     const halo = rig.props.haloLight.userData.material;
