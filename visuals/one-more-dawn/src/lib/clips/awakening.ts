@@ -41,7 +41,7 @@ const END = 19.3;
 // The rig's browTilt renders + as stern (inner ends down) and - as
 // worried, opposite to the Pose comment; every tilt below is written as
 // "+ worried" and multiplied by SAD so a later rig fix is a one-line change.
-const SAD = -1;
+const SAD = 1;
 // Word cues used in this clip.
 const w = {
   a: SW[0][0], // "A" 3.57
