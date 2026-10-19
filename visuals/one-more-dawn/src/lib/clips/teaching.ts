@@ -75,7 +75,7 @@ function unwrapTo(angle: number, ref: number): number {
 
 function blendPose(out: Pose, def: Pose, mine: Pose, w: number): void {
   const k = clamp01(w);
-  const num = ['x', 'z', 'lift', 'lean', 'tilt', 'twist', 'squash', 'headYaw', 'headPitch', 'headRoll', 'mouth', 'lid', 'lookX', 'lookY', 'eyeGlow', 'bendL', 'bendR'] as const;
+  const num = ['x', 'z', 'lift', 'lean', 'tilt', 'twist', 'squash', 'headYaw', 'headPitch', 'headRoll', 'mouth', 'lid', 'lookX', 'lookY', 'eyeGlow', 'brow', 'browTilt', 'bendL', 'bendR'] as const;
   for (const n of num) {
     out[n] = lerp(def[n], mine[n], k);
   }
@@ -202,17 +202,53 @@ function barnaby(t: number, rig: Rig, def: Pose, p: Pose): void {
   p.bendL = 0.5 + wide * 0.3;
   p.bendR = 0.5 + wide * 0.3;
 
-  // Head: warm and wistful; look at the kids, up into the light, then at
-  // the throne.
+  // Head: warm and wistful; look at the kids, up into the light, then
+  // warily up at the throne.
   const toKids = span(t, T.children - 0.3, T.singEnd + 0.35, 0.4, 0.5);
   const toKing = span(t, T.kingdoms - 0.4, END + 1, 0.5, 0.5);
-  p.headYaw = toKids * -0.35 + toKing * -0.45;
-  p.headPitch = heart * -0.08 - wide * 0.2 - toKing * 0.12 + toKids * 0.1 + bow * 0.18;
-  p.headPitch -= p.mouth * 0.06;
-  p.headRoll = Math.sin(t * 1.1) * 0.04 + heart * 0.08 + p.mouth * Math.sin(t * 3.0) * 0.03;
-  p.lookX = toKids * -0.4 + toKing * -0.3;
-  p.lookY = wide * 0.4 + toKing * 0.35 - toKids * 0.3;
-  p.lid = 0.36 + heart * 0.25 + rise * 0.15 + blinkAt(t);
+  // Delight while the kids walk, dance and sing: a head bob on the beat.
+  const delight = span(t, T.children - 0.2, T.they - 0.1, 0.35, 0.4);
+  const bob = Math.sin((t - T.walk) * 7.5);
+  // Pride on "helped them teach": chin up, chest out.
+  const proud = span(t, T.helped - 0.1, T.children - 0.1, 0.3, 0.4);
+  p.lean -= proud * 0.04;
+  p.headYaw = toKids * -0.35 + toKing * -0.5;
+  p.headPitch = heart * -0.04 - proud * 0.1 - wide * 0.24 - toKing * 0.2 + toKids * 0.08 + bow * 0.12;
+  p.headPitch += delight * bob * 0.06;
+  // The speaker mouth is small: let the head ride each sung syllable.
+  p.headPitch -= p.mouth * 0.12;
+  p.headRoll = Math.sin(t * 1.1) * 0.04 + heart * 0.16 + gather * 0.12 + p.mouth * Math.sin(t * 3.0) * 0.05;
+  p.headRoll += delight * Math.sin((t - T.walk) * 3.75) * 0.1;
+  p.lookX = toKids * -0.4 + toKing * -0.35;
+  p.lookY = wide * 0.45 + toKing * 0.55 - toKids * 0.3;
+
+  // Brows (raise -1..1, tilt + worried / - stern). Cheerful stroll,
+  // tender on "I", proud on "helped", delighted with the kids, an
+  // open-hearted lift on "trusted us with everything", then a deferential,
+  // wary look up at the king.
+  const stroll = 1 - ramp(t, 43.6, 44.2);
+  const wary = span(t, T.their - 0.1, END + 1, 0.4, 0.5);
+  const kingsBeat = span(t, T.kings - 0.1, END + 1, 0.25, 0.5);
+  let brow = 0.25 * stroll + inhale * 0.35;
+  let tiltB = 0;
+  brow = lerp(brow, 0.25, heart);
+  tiltB = lerp(tiltB, 0.45, heart);
+  brow = lerp(brow, 0.5, proud);
+  tiltB = lerp(tiltB, -0.15, proud);
+  brow = lerp(brow, 0.75 + Math.abs(bob) * 0.15, delight);
+  tiltB = lerp(tiltB, 0.1, delight);
+  brow = lerp(brow, 0.3, gather);
+  tiltB = lerp(tiltB, 0.6, gather);
+  brow = lerp(brow, 0.95, wide);
+  tiltB = lerp(tiltB, 0.3, wide);
+  brow = lerp(brow, 0.15, wary);
+  tiltB = lerp(tiltB, 0.7, wary);
+  brow = lerp(brow, -0.25, kingsBeat);
+  tiltB = lerp(tiltB, 0.55, kingsBeat);
+  p.brow = brow;
+  p.browTilt = tiltB;
+  // Eyes: soft and smiling on "I", wide on "everything", hooded with the bow.
+  p.lid = 0.24 + heart * 0.05 + gather * 0.04 - wide * 0.12 - proud * 0.06 - delight * 0.06 - toKing * 0.06 + kingsBeat * 0.14 + blinkAt(t);
   p.visible = t > START - 0.5;
 }
 
@@ -371,6 +407,19 @@ function kid(t: number, rig: Rig, def: Pose, p: Pose, which: 0 | 1): { x: number
   const bow = ramp(t, T.kings, T.kings + 0.3, backOut);
   p.lean += bow * 0.5;
 
+  // Faces (the kids have eyes and lids, no brows): a curious head cock
+  // while waiting, eyes down to their feet on "walk", bright eyes on the
+  // "ta-da" and the sung note, wide eyes for Barnaby, the rumble and the king.
+  p.headRoll += wait * Math.sin((t - k.arrive) * 2.2 + which) * 0.16 * k.sign;
+  p.headPitch += toddle * 0.16;
+  p.lookY -= toddle * 0.45;
+  // Lowered lids read as bored on these faces, so joy stays wide-eyed and
+  // Pip beams up into the held "sing".
+  p.lid = clamp01(def.lid * (1 - Math.max(tada, adore, startle, awe) * 0.8) + bow * 0.3);
+  p.lookY += (which === 0 ? singing * 0.5 : 0) + tada * 0.1;
+  p.headRoll += singing * Math.sin((t - T.sing) * 3.2 + which * 1.5) * 0.12;
+  p.headPitch -= startle * 0.15;
+
   p.yaw = yaw;
   p.visible = t > k.enter;
   if (rig.props.propeller) {
@@ -406,18 +455,36 @@ interface Shot {
   to: [V3, V3];
 }
 
+// Look point from a camera position and a heading (degrees; az > 0 is
+// screen right, el > 0 is up).
+function aim(c: V3, az: number, el: number): V3 {
+  const a = (az * Math.PI) / 180;
+  const e = (el * Math.PI) / 180;
+  return [c[0] + Math.sin(a) * Math.cos(e) * 10, c[1] + Math.sin(e) * 10, c[2] - Math.cos(a) * Math.cos(e) * 10];
+}
+
+// The dream star sits ~22 deg up, ~9 deg right. A1 keeps the previous
+// shot's low angle so it stays in the upper right for the first beat.
+const A1P: V3 = [1.0, 1.0, 9.0];
+const A1Q: V3 = [1.05, 1.08, 8.8];
+const A2P: V3 = [0.9, 2.15, 9.5];
+
 const SHOTS: Shot[] = [
-  // A: wide, energetic push-in on the band entrance; the apron lip is the
-  // bottom of frame, so the stalls stay out of shot.
-  { at: START, from: [[0.4, 3.0, 10.6], [0.6, 2.0, -1.5]], to: [[0.9, 2.6, 9.4], [1.1, 1.75, -1.0]] },
+  // A1: the band hits; same low hero angle as the cut-in, the star high
+  // in frame, the house warms up around Aria.
+  { at: START, from: [A1P, aim(A1P, -1, 12)], to: [A1Q, aim(A1Q, -1, 11)] },
+  // A2: crane up and tilt down into the wide as Barnaby strolls on; the
+  // apron lip is the bottom of frame, so the stalls stay out of shot.
+  { at: 41.45, from: [A1Q, aim(A1Q, -1, 11)], to: [A2P, [1.15, 1.8, -1.0]] },
   // B: medium on Barnaby, room on the left for the kids' entrance.
   { at: 44.15, from: [[1.2, 1.6, 6.9], [1.45, 1.45, 0.3]], to: [[1.3, 1.55, 6.3], [1.45, 1.42, 0.4]] },
   // C: low two-shot, kids featured, Barnaby conducting on the right.
   { at: 47.95, from: [[0.85, 1.2, 6.7], [1.0, 1.15, 0.6]], to: [[0.95, 1.15, 6.2], [1.0, 1.15, 0.7]] },
   // D: low hero medium on Barnaby for the big gesture.
   { at: 51.25, from: [[1.2, 1.0, 7.0], [1.35, 1.7, 0.4]], to: [[1.3, 1.15, 6.4], [1.45, 1.8, 0.3]] },
-  // E: the reveal – the throne rises centre, kids left, Barnaby right.
-  { at: 54.15, from: [[-0.85, 1.65, 8.7], [0.2, 1.3, -2.5]], to: [[-0.9, 1.8, 8.3], [0.2, 1.5, -2.8]] },
+  // E: the reveal – the throne rises centre, Aria far left, kids
+  // left of centre (clear of Aria), Barnaby right.
+  { at: 54.15, from: [[-1.75, 1.65, 8.7], [0.35, 1.3, -2.5]], to: [[-1.8, 1.8, 8.3], [0.35, 1.5, -2.8]] },
 ];
 
 const camPos = new Vector3();
