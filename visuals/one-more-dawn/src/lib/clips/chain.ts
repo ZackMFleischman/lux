@@ -42,6 +42,7 @@ import {
   type Cast,
 } from '../show.ts';
 import { set } from '../stage.ts';
+import { light } from '../toon.ts';
 
 const START = 57.4;
 const END = 72.5;
@@ -104,7 +105,7 @@ function ekeys(t: number, list: readonly (readonly [number, number, Ease?])[]): 
 
 const mirror = (v: V3): V3 => [-v[0], v[1], v[2]];
 
-const NUM: (keyof Pose)[] = ['x', 'z', 'yaw', 'lift', 'lean', 'tilt', 'twist', 'squash', 'headYaw', 'headPitch', 'headRoll', 'mouth', 'lid', 'lookX', 'lookY', 'eyeGlow', 'bendL', 'bendR'];
+const NUM: (keyof Pose)[] = ['x', 'z', 'yaw', 'lift', 'lean', 'tilt', 'twist', 'squash', 'headYaw', 'headPitch', 'headRoll', 'mouth', 'lid', 'lookX', 'lookY', 'eyeGlow', 'brow', 'browTilt', 'bendL', 'bendR'];
 
 function blendPose(out: Pose, a: Pose, b: Pose, w: number): void {
   const o = out as unknown as Record<string, number>;
@@ -151,10 +152,21 @@ const BL: VKey[] = [
   [T.wars + 0.35, [-0.22, 1.95, 0.12], backOut], // the future held high
   [T.brk, [-0.22, 1.88, 0.12]],
   [T.brk + 0.55, [-0.18, 0.52, 0.52]],
-  [T.reign + 0.5, [-0.2, 0.42, 0.74], backOut], // offered to the throne
-  [END, [-0.2, 0.42, 0.74]],
+  [T.reign - 0.05, [-0.18, 0.5, 0.56]],
+  // The bow: the chained left hand opens out, then sweeps across his chest.
+  [T.reign + 0.22, [-0.52, 0.62, 0.46]],
+  [T.reign + 0.7, [0.1, 0.56, 0.48], backOut],
+  [END, [0.1, 0.56, 0.48]],
 ];
-const BR: VKey[] = BL.map(([t, v, e]) => [t, mirror(v), e] as VKey);
+const BR: VKey[] = [
+  ...BL.filter(([t]) => t < T.reign).map(([t, v, e]) => [t, mirror(v), e] as VKey),
+  // The right hand lowers the globe to his side and holds it there.
+  [T.reign + 0.25, [0.36, 0.32, 0.46]],
+  [T.reign + 0.8, [0.6, 0.0, 0.22]],
+  [END, [0.6, 0.0, 0.22]],
+];
+// Globe position in Barnaby's torso space while it rests at his side.
+const GLOBE_SIDE: V3 = [0.64, 0.2, 0.28];
 // Right hand differs while showing the globe and on the jolt.
 const BR_SHOW: VKey[] = [
   [60.5, [0.19, 0.4, 0.58]],
@@ -182,7 +194,7 @@ function barnaby(t: number, rig: Rig, out: Pose): void {
     [T.begged + 0.3, -0.3],
     [66.4, -0.05],
     [T.brk, -0.05],
-    [T.reign - 0.15, -1.6],
+    [T.reign - 0.15, -1.5],
   ]);
   // Old-timer stoop, breathing.
   p.lean = 0.12 + Math.sin(t * 1.3) * 0.015;
@@ -209,10 +221,17 @@ function barnaby(t: number, rig: Rig, out: Pose): void {
   p.lift -= Math.max(0, brace) * 0.05;
   p.lift += Math.max(0, -brace) * 0.05;
   p.lean -= Math.max(0, -brace) * 0.15;
-  // The bow on "reign", held through the fade.
-  const bow = ekeys(t, [[T.reign - 0.05, 0], [T.reign + 0.55, 1.08, easeOut], [T.reign + 1.0, 1]]);
-  p.lean += bow * 0.6;
-  p.lift -= bow * 0.09;
+  // The bow on "reign": a waist bend with a knee dip, a nod of the head,
+  // settled by 70.6 s and held still through the fade.
+  const bow = ekeys(t, [[T.reign - 0.05, 0], [T.reign + 0.6, 1.06, easeOut], [T.reign + 1.05, 1]]);
+  p.lean += bow * 0.36;
+  p.lift -= bow * 0.075;
+  p.squash -= bow * 0.03;
+  p.bendL = 0.5;
+  const calm = ramp(t, T.reign + 0.6, T.reign + 1.1);
+  // Breathing settles so the final tableau holds still.
+  p.lean -= Math.sin(t * 1.3) * 0.015 * calm;
+  p.lift -= Math.sin(t * 1.6) * 0.008 * calm;
   const handL = track(t, BL);
   const handR = t < 60.5 || t > 64.1 ? track(t, BR) : track(t, BR_SHOW);
   p.handL = handL;
@@ -238,7 +257,9 @@ function barnaby(t: number, rig: Rig, out: Pose): void {
     [T.never, -0.3],
     [T.never + 0.35, 0.12],
     [T.brk + 0.4, 0.04],
-    [T.reign + 0.6, 0.26],
+    [T.reign + 0.05, 0.02],
+    [T.reign + 0.5, 0.42, easeOut], // the nod
+    [T.reign + 0.95, 0.32],
   ]);
   p.headYaw = ekeys(t, [
     [START, 0],
@@ -258,6 +279,8 @@ function barnaby(t: number, rig: Rig, out: Pose): void {
     [T.never + 0.2, -0.3],
     [T.never + 0.45, 0.3],
     [T.brk + 0.2, 0],
+    [T.reign, 0],
+    [T.reign + 0.6, 0.12],
   ]);
   p.headRoll = Math.sin(t * 1.1) * 0.03 + span(t, T.chain + 0.5, T.begged, 0.5, 0.4) * 0.14 - span(t, T.hands, 60.6, 0.3, 0.4) * 0.08;
   p.lookX = p.headYaw * 0.5;
@@ -265,8 +288,20 @@ function barnaby(t: number, rig: Rig, out: Pose): void {
   // Heavier lids when wistful and in the bow; wide on the jolt.
   p.lid = 0.36 + wistful * 0.18 + bow * 0.2 - span(t, T.chain, T.chain + 0.5, 0.05, 0.3) * 0.3 + blinkAt(t, 0.9);
   p.mouth = sing(t, W);
-  p.headPitch -= p.mouth * 0.06;
+  p.headPitch -= p.mouth * 0.06 * (1 - calm);
   p.headRoll += p.mouth * Math.sin(t * 3.0) * 0.03;
+  p.headRoll *= 1 - calm * 0.7;
+  // Brows: wistful on "kept us on a chain", a start on the snap, alarm when
+  // the rifles come up on "wars", then resolve with the globe held high,
+  // humble on "reign".
+  const wist = span(t, T.yet - 0.1, T.begged, 0.4, 0.5);
+  const start = span(t, T.chain, T.chain + 0.5, 0.05, 0.4);
+  const alarm = span(t, T.wars - 0.15, T.wars + 0.45, 0.1, 0.25);
+  const resolve = span(t, T.wars + 0.35, T.brk + 0.3, 0.2, 0.4);
+  const humble = ramp(t, T.reign - 0.1, T.reign + 0.6);
+  p.brow = wist * 0.15 + start * 0.85 + alarm * 0.9 - resolve * 0.55 + humble * 0.1 - p.mouth * 0.35 * (alarm + resolve);
+  p.browTilt = wist * 0.75 * (1 - start) + alarm * 0.45 - resolve * 0.65 + humble * 0.5;
+  p.lid += alarm * -0.2 + resolve * 0.05 + humble * 0.1;
 }
 
 // ---------------------------------------------------------------- children
@@ -278,10 +313,10 @@ interface KidPlan {
 }
 
 const KIDS: [KidPlan, KidPlan] = [
-  // Pip: in from the left to Barnaby's side, then shelters downstage right.
-  { xs: [[START, -2.7], [58.15, -2.7], [60.15, 0.75], [64.55, 0.75], [65.4, 2.85], [T.brk + 0.2, 2.85], [T.reign, 3.6]], zs: [[START, 0.55], [58.15, 0.55], [60.15, 0.95], [64.55, 0.95], [65.4, 1.95], [T.brk + 0.2, 1.95], [T.reign, 1.2]], delay: 0.12 },
+  // Pip: in from the left to Barnaby's side, then shelters behind him.
+  { xs: [[START, -2.7], [58.15, -2.7], [60.15, 0.75], [64.55, 0.75], [65.4, 2.75], [T.brk + 0.2, 2.75], [T.reign, 3.5]], zs: [[START, 0.55], [58.15, 0.55], [60.15, 0.95], [64.55, 0.95], [65.4, 0.6], [T.brk + 0.2, 0.6], [T.reign, 1.0]], delay: 0.12 },
   // Dot: the smaller one, closer to Barnaby.
-  { xs: [[START, -1.45], [58.3, -1.45], [60.0, 1.35], [64.5, 1.35], [65.3, 3.45], [T.brk + 0.3, 3.45], [T.reign + 0.1, 4.15]], zs: [[START, 0.95], [58.3, 0.95], [60.0, 1.15], [64.5, 1.15], [65.3, 1.75], [T.brk + 0.3, 1.75], [T.reign + 0.1, 1.15]], delay: 0 },
+  { xs: [[START, -1.45], [58.3, -1.45], [60.0, 1.35], [64.5, 1.35], [65.3, 3.2], [T.brk + 0.3, 3.2], [T.reign + 0.1, 4.0]], zs: [[START, 0.95], [58.3, 0.95], [60.0, 1.15], [64.5, 1.15], [65.3, 0.85], [T.brk + 0.3, 0.85], [T.reign + 0.1, 0.95]], delay: 0 },
 ];
 
 function kid(t: number, rig: Rig, out: Pose, which: 0 | 1): void {
@@ -361,38 +396,46 @@ function kid(t: number, rig: Rig, out: Pose, which: 0 | 1): void {
 function guard(t: number, rig: Rig, out: Pose, side: -1 | 1): void {
   const p = copyPose(rig.rest, out);
   const enter = side < 0 ? 63.5 : 64.15;
-  const xs: Key[] = [[START, side * 8.6], [enter, side < 0 ? -8.6 : 8.2], [66.25, side < 0 ? -2.4 : 5.2]];
-  const zs: Key[] = [[START, 1.3], [66.25, 1.3]];
+  // March in, halt facing Barnaby, step in on "wars", back off on "never".
+  const halt = side < 0 ? -0.3 : 4.75;
+  const xs: Key[] = [[START, side * 8.6], [enter, side < 0 ? -8.6 : 8.2], [66.25, halt], [T.wars - 0.1, halt], [T.wars + 0.25, halt - side * 0.28], [T.never, halt - side * 0.28], [T.brk, halt]];
+  const zs: Key[] = [[START, 1.45], [66.25, 1.45]];
   p.x = keys(t, xs, smooth);
   p.z = keys(t, zs, smooth);
-  const moving = clamp01(speedOf(t, xs, zs) / 1.2);
+  const moving = clamp01(speedOf(t, xs, zs) / 1.2) * (t < 66.3 ? 1 : 0);
   const phase = travelled(t, xs, zs) * 5.2;
   walk(p, rig, phase, moving, 0.17, 0.24);
-  // Halt with a stamp; snap to attention facing front on "break".
+  // Halt with a stamp.
   p.lift -= ekeys(t, [[66.2, 0], [66.3, 1], [66.5, 0]]) * 0.04;
-  const face = side > 0 ? -Math.PI / 2 : Math.PI / 2;
-  const front = ekeys(t, [[T.brk - 0.05, 0], [T.brk + 0.28, 1, backOut]]);
-  p.yaw = lerp(face, 0, front);
-  // Aim on "wars": a pull back, then a snap with overshoot.
-  const aim = ekeys(t, [[T.wars - 0.3, 0], [T.wars - 0.08, -0.12], [T.wars + 0.12, 1, backOut], [T.never - 0.05, 1], [T.never + 0.35, 0]]);
+  // Facing: march in profile; square off at Barnaby in profile for the
+  // stand-off; after "never" turn three-quarters toward him and stand down.
+  const face = -side * Math.PI / 2;
+  const ease = ekeys(t, [[T.never + 0.15, 0], [T.brk + 0.1, 1]]);
+  p.yaw = lerp(face, -side * 1.0, ease);
+  // Aim on "wars": a pull back, then a snap with overshoot; lowered on "never".
+  const aim = ekeys(t, [[T.wars - 0.3, 0], [T.wars - 0.08, -0.12], [T.wars + 0.12, 1, backOut], [T.never - 0.05, 1], [T.never + 0.4, 0]]);
   const a = clamp01(aim);
   const swing = Math.sin(phase) * moving;
   p.handL = mixV([-0.25, 0.32, 0.2], [-0.25, 0.72, 0.42], a);
   p.handR = mixV([0.36, 0.02, swing * 0.2], [-0.1, 0.62, 0.45], a);
-  // Salute on "reign".
+  // Snap to attention and salute on "reign".
   const salute = ekeys(t, [[T.reign + 0.05, 0], [T.reign + 0.35, 1, backOut]]);
   p.handR = mixV(p.handR, [0.2, 1.22, 0.22], salute);
   p.bendL = 0.4;
   p.bendR = 0.4 + salute * 0.3;
   rig.props.rifle.rotation.x = lerp(-0.1, Math.PI - 0.12, aim);
-  p.lean = aim * 0.08 + moving * 0.03;
-  // Waver on "But": look up at the globe, then stand down, sheepish.
+  // Lean into the confrontation, then a sheepish slump after "never".
+  const sheepish = span(t, T.never + 0.1, T.reign, 0.3, 0.3);
+  p.lean = aim * 0.16 + moving * 0.03 + sheepish * 0.08;
+  p.squash = 1 + span(t, T.never - 0.05, T.never + 0.35, 0.05, 0.3) * 0.06 + salute * 0.03;
+  // Head: glare down the barrel, waver up at the globe on "But never",
+  // drop sheepishly, then chin up for the salute.
   const waver = span(t, T.but, T.never + 0.4, 0.2, 0.3);
-  const sheepish = span(t, T.never + 0.1, T.brk, 0.2, 0.15);
-  p.headPitch = -0.05 - waver * 0.3 + sheepish * 0.25;
-  p.squash = 1 + span(t, T.never - 0.05, T.never + 0.35, 0.05, 0.3) * 0.06 + span(t, T.brk, T.brk + 0.3, 0.05, 0.2) * 0.04;
-  p.lid = 0.25 + blinkAt(t, 4 + side) - span(t, T.wars, T.wars + 0.6, 0.05, 0.3) * 0.2;
-  p.mouth = span(t, T.wars - 0.05, T.wars + 0.55, 0.05, 0.3) * 0.65;
+  p.headPitch = -0.05 + aim * 0.08 - waver * 0.3 + sheepish * 0.3 - salute * 0.05;
+  p.headYaw = waver * side * 0.3;
+  p.lookY = waver * 0.5 - sheepish * 0.4;
+  p.lid = 0.25 + blinkAt(t, 4 + side) - span(t, T.wars, T.wars + 0.6, 0.05, 0.3) * 0.2 + sheepish * 0.2;
+  p.mouth = span(t, T.wars - 0.05, T.wars + 0.55, 0.05, 0.3) * 0.75;
   p.visible = t > enter - 0.1;
 }
 
@@ -405,18 +448,21 @@ const SHOTS: Shot[] = [
   { at: START, to: 60.4, p0: [2.6, 1.8, 6.2], l0: [2.5, 2.2, 0.3], p1: [1.85, 1.6, 5.3], l1: [1.75, 1.7, 0.4] },
   // B: low wide on the throne: the sceptre rises, the chain whips out.
   { at: 60.65, to: 62.45, p0: [1.2, 1.75, 0.1], l0: [0.6, 2.05, -4.3], p1: [1.05, 1.7, -0.4], l1: [0.6, 2.05, -4.3] },
-  // C: insert on the wrist; eases out to a medium on his face.
-  { at: 62.45, to: 64.42, p0: [0.7, 2.25, 3.9], l0: [1.85, 1.5, 0.7], p1: [0.95, 2.1, 4.5], l1: [1.75, 1.65, 0.1] },
-  // E: wide stand-off, slow push.
-  { at: T.begged, to: 67.2, p0: [1.4, 2.25, 10.0], l0: [1.4, 1.75, -1.0], p1: [1.4, 2.05, 8.4], l1: [1.4, 1.75, -1.0] },
+  // C: insert on the wrist (follows the real wrist; see shotCamera).
+  { at: 62.45, to: 64.42, p0: [0, 0, 0], l0: [0, 0, 0], p1: [0, 0, 0], l1: [0, 0, 0] },
+  // E: the stand-off, slow push.
+  { at: T.begged, to: 67.2, p0: [2.2, 2.2, 9.6], l0: [2.2, 1.7, -0.6], p1: [2.2, 1.95, 8.0], l1: [2.2, 1.65, -0.6] },
   // F: low hero medium, the globe held high.
   { at: 67.2, to: T.brk, p0: [1.95, 1.2, 5.6], l0: [1.95, 2.15, 0.9], p1: [1.95, 1.2, 5.3], l1: [1.95, 2.2, 0.9] },
-  // G: final tableau.
-  { at: T.brk, to: END, p0: [0.9, 2.45, 9.6], l0: [0.9, 1.72, -1.6], p1: [0.9, 2.35, 9.0], l1: [0.9, 1.75, -1.6] },
+  // G: final tableau; the push ends at 70.6 and the frame holds.
+  { at: T.brk, to: 70.6, p0: [1.7, 2.4, 10.2], l0: [1.6, 1.7, -1.4], p1: [1.7, 2.3, 9.4], l1: [1.6, 1.72, -1.4] },
 ];
 
 const camPos = new Vector3();
 const camLook = new Vector3();
+const wristW = new Vector3();
+const faceW = new Vector3();
+const tmpC = new Vector3();
 
 function shotCamera(t: number, cam: PerspectiveCamera): void {
   let shot = SHOTS[0];
@@ -425,19 +471,21 @@ function shotCamera(t: number, cam: PerspectiveCamera): void {
       shot = s;
     }
   }
-  let u: number;
-  if (shot === SHOTS[2]) {
-    // Hold the insert through the snap, then ease out.
-    u = ramp(t, 63.3, 64.42, smooth);
-  } else {
-    u = ramp(t, shot.at, shot.to, shot.ease ?? smooth);
-  }
+  const u = ramp(t, shot.at, shot.to, shot.ease ?? smooth);
   camPos.set(lerp(shot.p0[0], shot.p1[0], u), lerp(shot.p0[1], shot.p1[1], u), lerp(shot.p0[2], shot.p1[2], u));
   camLook.set(lerp(shot.l0[0], shot.l1[0], u), lerp(shot.l0[1], shot.l1[1], u), lerp(shot.l0[2], shot.l1[2], u));
+  if (shot === SHOTS[2]) {
+    // Close insert: the wrist, the end of the chain and his face together.
+    // Holds through the snap, then eases out to a medium as he looks up.
+    const out = ramp(t, 63.4, 64.42, smooth);
+    camLook.copy(wristW).lerp(faceW, 0.35 + out * 0.25);
+    camPos.copy(camLook).add(tmpC.set(lerp(0.15, 0.35, out), lerp(0.25, 0.2, out), lerp(1.55, 2.6, out)));
+  }
   // Gentle hand-held drift, as in the rest of the show.
-  camPos.x += noise1(t * 0.25, 1) * 0.04;
-  camPos.y += noise1(t * 0.21, 2) * 0.03;
-  camLook.x += noise1(t * 0.2, 3) * 0.02;
+  const drift = 1 - ramp(t, 70.2, 70.7);
+  camPos.x += noise1(t * 0.25, 1) * 0.04 * drift;
+  camPos.y += noise1(t * 0.21, 2) * 0.03 * drift;
+  camLook.x += noise1(t * 0.2, 3) * 0.02 * drift;
   // Hit on the chain snap and on "wars".
   const hit = Math.exp(-Math.max(0, t - T.chain) * 9) * (t >= T.chain ? 1 : 0) * 0.025 + Math.exp(-Math.max(0, t - T.wars) * 7) * (t >= T.wars ? 1 : 0) * 0.04;
   camLook.x += Math.sin(t * 61) * hit;
@@ -457,6 +505,7 @@ const ariaWorld = new Vector3();
 const barnWorld = new Vector3();
 const kingWorld = new Vector3(0, 0, -4.4);
 const light2 = new Color(1.0, 0.82, 0.6);
+const neutral = new Color();
 
 function put(rig: Rig, a: Pose, b: Pose, w: number): void {
   blendPose(outP, a, b, w);
@@ -485,6 +534,12 @@ export const clip = {
     const heart = span(t, T.reign, END + 2, 0.6, 0.5);
     mine.aria.handR = mixV(mine.aria.handR, [0.02, 0.38, 0.28], heart);
     mine.aria.headPitch += heart * 0.12;
+    // Brows: worried for him on the chain, alarm on "wars", soft on "reign".
+    const aWorry = span(t, T.yet, T.wars, 0.4, 0.3);
+    const aAlarm = span(t, T.wars - 0.1, T.reign, 0.1, 0.6);
+    mine.aria.brow = aWorry * 0.2 + aAlarm * 0.7 + heart * 0.2;
+    mine.aria.browTilt = aWorry * 0.6 + aAlarm * 0.5 + heart * 0.45;
+    mine.aria.headRoll += aWorry * 0.1 + heart * 0.12;
     put(cast.aria, base.aria, mine.aria, w);
     ariaWorld.set(outP.x, 0, outP.z);
 
@@ -518,6 +573,18 @@ export const clip = {
     ]);
     mine.king.lean += span(t, 60.6, T.chain + 0.6, 0.4, 0.5) * 0.08 - ekeys(t, [[T.chain - 0.05, 0], [T.chain + 0.1, 1], [T.chain + 0.5, 0]]) * 0.06;
     mine.king.headPitch -= span(t, T.yet, T.chain + 0.8, 0.3, 0.5) * 0.12;
+    // Reactions: smug narrowed eyes on the chain, wide alarm when the
+    // rifles come up on "wars", a satisfied half-lidded nod on "reign".
+    const smug = span(t, T.yet, T.begged, 0.3, 0.6);
+    const kAlarm = span(t, T.wars - 0.05, T.never + 0.2, 0.08, 0.5);
+    const content = ramp(t, T.reign, T.reign + 0.6);
+    mine.king.lid = lerp(lerp(lerp(mine.king.lid, 0.66, smug), 0.0, kAlarm), 0.6, content) + blinkAt(t, 3.3) * (1 - content);
+    mine.king.lookX = 0.3 + smug * 0.35 + content * 0.2;
+    mine.king.lookY = kAlarm * 0.35 - content * 0.2;
+    mine.king.lean -= kAlarm * 0.06;
+    mine.king.headPitch -= kAlarm * 0.1;
+    mine.king.headYaw += content * 0.15;
+    mine.king.mouth = kAlarm * 0.35;
     put(cast.king, base.king, mine.king, w);
 
     guardPose(t, cast.guards[0], base.g0, -1);
@@ -538,10 +605,16 @@ export const clip = {
     handsMid.z += 0.06;
     tmpB.set(barnWorld.x + 0.1 + Math.sin(t * 2.1) * 0.18 * (1 - descend) * ramp(t, 57.7, 58.3), 7.5, barnWorld.z + 0.5);
     globe.group.position.copy(tmpB).lerp(handsMid, descend);
+    // During the bow the globe lowers to his side in the right hand.
+    const lower = ramp(t, T.reign + 0.2, T.reign + 0.8, smooth);
+    if (lower > 0) {
+      const side = cast.barnaby.torso.localToWorld(tmpC.set(GLOBE_SIDE[0], GLOBE_SIDE[1], GLOBE_SIDE[2]));
+      globe.group.position.lerp(side, lower);
+    }
     globe.group.position.y += Math.sin(t * 2.6) * 0.04 * (1 - descend);
     // Float down beside his face (toward his reaching left hand), then glide in.
     globe.group.position.x -= 1.0 * ramp(t, 57.7, 58.4) * (1 - ramp(descend, 0.93, 1));
-    globe.group.rotation.y = t * 0.6;
+    globe.group.rotation.y = t * 0.6 - ramp(t, 70.2, END) * (t - 70.2) * 0.45;
     globe.glowLevel.value = 0.8
       + span(t, T.hands - 0.1, T.hands + 1.2, 0.1, 0.9) * 0.8
       - span(t, T.chain, T.begged, 0.1, 0.6) * 0.3
@@ -555,6 +628,8 @@ export const clip = {
     const reveal = ramp(t, T.us, T.chain, (u: number) => u * u);
     const sag = ekeys(t, [[START, 0.9], [T.us, 0.9], [T.chain - 0.05, 0.55], [T.chain + 0.1, 0.1, easeOut], [T.chain + 0.5, 0.22], [64.6, 0.5]]);
     cast.chain.update(tip, wrist, reveal, sag);
+    wristW.copy(wrist);
+    cast.barnaby.head.localToWorld(faceW.set(0, 0.42, 0.3));
 
     lighting(t, { aria: ariaWorld, barnaby: barnWorld, king: kingWorld });
     // Children's pool follows them; the red stand-off wash centres on the
@@ -563,9 +638,17 @@ export const clip = {
     const kidsZ = (cast.pip.root.position.z + cast.dot.root.position.z) / 2;
     const kidLevel = keys(t, [[START, 1.0], [T.begged, 1.0], [T.begged + 0.6, 0.75], [T.reign, 0.75], [T.reign + 0.5, 0.9]]);
     setSpot(2, lerp(-2.05, kidsX, w), lerp(0.7, kidsZ, w), lerp(1.6, 1.2, w), kidLevel, light2);
-    const warWash = span(t, T.begged - 0.2, T.never + 0.6, 0.6, 0.8);
-    const flash = span(t, T.wars - 0.05, T.wars + 0.6, 0.05, 0.5) * 0.9;
-    setSpot(4, 1.4, 1.3, 4.2, warWash * (0.45 + flash), red);
+    // No red floor wash: the stand-off reads through staging. Spot 4 off.
+    setSpot(4, 1.4, 1.3, 4.2, 0, red);
+    // Keep the key neutral so Aria's white and the cast colours hold from
+    // 57.4 to the fade; a brief neutral pop marks "wars".
+    const k = light.key.value;
+    const level = (k.r + k.g + k.b) / 3;
+    const pop = 1 + span(t, T.wars - 0.05, T.wars + 0.4, 0.04, 0.35) * 0.25;
+    neutral.setRGB(1, 0.97, 0.92).multiplyScalar((level / 0.963) * pop * keys(t, [[T.reign, 1], [T.reign + 0.6, 1.3]]));
+    k.lerp(neutral, w);
+    // Aria's follow spot was dawn pink; keep it a neutral white.
+    light.spots[0].color.value.lerp(neutral.setRGB(1.0, 0.97, 0.93), w);
     // Footlights dip for the wide stand-off and warm up for the tableau.
     set.footLevel.value *= 1 + span(t, T.reign, END + 2, 0.8, 0.5) * 0.35;
 
