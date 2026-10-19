@@ -285,6 +285,19 @@ export const clip = {
     out.z = lerp(base.z, mine.z, edge);
     out.yaw = lerp(base.yaw, mine.yaw, edge);
     out.lift = lerp(base.lift, mine.lift, edge);
+    // At the end of the held note the whole body (arms and head included)
+    // settles into the next clip's opening pose so the cut has no jump.
+    const settle = 1 - ramp(t, END - 0.6, END - 0.25);
+    for (let k = 0; k < 3; k += 1) {
+      out.handL[k] = lerp(base.handL[k], out.handL[k], settle);
+      out.handR[k] = lerp(base.handR[k], out.handR[k], settle);
+    }
+    out.bendL = lerp(base.bendL, out.bendL, settle);
+    out.bendR = lerp(base.bendR, out.bendR, settle);
+    out.headYaw = lerp(base.headYaw, out.headYaw, settle);
+    out.headPitch = lerp(base.headPitch, out.headPitch, settle);
+    out.headRoll = lerp(base.headRoll, out.headRoll, settle);
+    out.lean = lerp(base.lean, out.lean, settle);
     applyPose(rig, out);
     ariaWorld.set(out.x, 0, out.z);
     rig.props.antenna.rotation.z = Math.sin(t * 2.1) * 0.06 - out.headRoll * 0.5;
