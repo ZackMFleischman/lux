@@ -72,27 +72,30 @@ export default defineComponent({
 
     // Silhouettes: group changes, full width. Interior seams and creases
     // inside one performer: inner ring only, so they draw thinner.
-    let figureHits: Node = float(0);
+    let silHits: Node = float(0);
+    let innerHits: Node = float(0);
     let setHits: Node = float(0);
     for (const [dx, dy] of DIRECTIONS) {
-      for (const ring of [1, 0.55]) {
+      for (const ring of [1, 0.5]) {
         const k: Node = read(vec2(dx, dy).mul(figureRadius.mul(ring)).mul(px));
         const idEdge: Node = step(0.0025, abs(k.b.sub(idC)));
         const figure: Node = max(figC, step(0.5, k.b));
         const silhouette: Node = step(0.5, abs(groupOf(k.b).sub(gC))).mul(figure);
         const interior: Node = idEdge.mul(float(1).sub(silhouette)).mul(figC).mul(ring < 1 ? 1 : 0);
         const creaseEdge: Node = step(creaseLimit, float(1).sub(dot(nC, normalOf(k)))).mul(float(1).sub(idEdge)).mul(figC).mul(ring < 1 ? 1 : 0);
-        figureHits = figureHits.add(max(silhouette, max(interior, creaseEdge)));
+        silHits = silHits.add(silhouette);
+        innerHits = innerHits.add(max(interior, creaseEdge));
       }
       const s: Node = read(vec2(dx, dy).mul(setRadius).mul(px));
       const setEdge: Node = step(0.0025, abs(s.b.sub(idC))).mul(float(1).sub(max(figC, step(0.5, s.b))));
       setHits = setHits.add(setEdge);
     }
     // Coverage-style anti-aliasing from the number of differing samples.
-    const figureInk: Node = clamp(figureHits.div(2), 0, 1);
+    // Silhouettes at full weight; interior seams about half as heavy.
+    const figureInk: Node = max(clamp(silHits.div(2), 0, 1), clamp(innerHits.div(3), 0, 1).mul(0.9));
     const setInk: Node = clamp(setHits.div(2.5), 0, 1).mul(0.85);
     const base: Node = colorSample.rgb;
-    const setTone: Node = base.mul(vec3(0.32, 0.27, 0.36));
+    const setTone: Node = base.mul(vec3(0.16, 0.13, 0.18));
     const ink: Node = vec3(0.01, 0.007, 0.009);
     let color: Node = mix(base, setTone, setInk);
     color = mix(color, ink, figureInk);

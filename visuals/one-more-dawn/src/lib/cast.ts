@@ -178,11 +178,11 @@ export function makeBarnaby(): Rig {
   place(new Mesh(rbox(0.6, 0.09, 0.14), copperDark), rig.head, 0, 0.58, 0.3);
   rig.jaw.position.set(0, 0.2, 0.0);
   place(new Mesh(can(0.33, 0.2, 64), copper), rig.jaw, 0, -0.07, 0.0);
-  // Old radio vent plate on the jaw.
-  place(new Mesh(rbox(0.36, 0.15, 0.04), toon(0xd9cdb0, { shadow: 0.5 })), rig.jaw, 0, -0.06, 0.32);
-  for (let i = 0; i < 3; i += 1) {
-    place(new Mesh(rbox(0.3, 0.018, 0.02), toon(0x5a3a26, { shadow: 0 })), rig.jaw, 0, -0.02 - i * 0.04, 0.345);
-  }
+  // Round speaker dial on the jaw: cream cone with concentric rings.
+  place(new Mesh(can(0.11, 0.04, 48), toon(0x8a4722)), rig.jaw, 0, -0.07, 0.32, Math.PI / 2);
+  place(new Mesh(can(0.09, 0.04, 48), toon(0xe7dcc0, { shadow: 0.5 })), rig.jaw, 0, -0.07, 0.335, Math.PI / 2);
+  place(new Mesh(ring(0.055, 0.008), toon(0x5a3a26, { shadow: 0 })), rig.jaw, 0, -0.07, 0.356);
+  place(new Mesh(ball(0.02, 16), toon(0x5a3a26, { shadow: 0 })), rig.jaw, 0, -0.07, 0.355);
   place(new Mesh(can(0.31, 0.12, 64), toon(0x241318, { shadow: 0 })), rig.head, 0, 0.18, 0);
   rig.mouthOpen = 1;
   for (const side of [-1, 1]) {
