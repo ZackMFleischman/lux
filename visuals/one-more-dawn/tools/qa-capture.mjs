@@ -106,8 +106,11 @@ try {
       built = json(await call('lux.studio.build', { expectedDraftVersion: draft, source }));
       break;
     } catch (error) {
-      if (attempt >= 4 || !/exceeded|timed out|deadline|stopped making progress/i.test(String(error))) throw error;
-      console.error(`build attempt ${attempt} timed out; retrying`);
+      // A timed-out build keeps running inside Studio; wait for it to settle
+      // before retrying instead of colliding with it.
+      if (attempt >= 8 || !/exceeded|timed out|deadline|stopped making progress|already running/i.test(String(error))) throw error;
+      console.error(`build attempt ${attempt} did not finish; waiting before retry`);
+      await new Promise(r => setTimeout(r, 15000));
     }
   }
   // The expensive phase is over; let the next lane build while we capture.
