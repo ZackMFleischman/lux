@@ -12,8 +12,8 @@ import {
   Vector3,
 } from 'three/webgpu';
 import { Hose } from './hose.ts';
-import { ball, blob, ring } from './shapes.ts';
-import { glow, inked, place, toon } from './toon.ts';
+import { ball, blob, can, rbox } from './shapes.ts';
+import { glow, place, toon } from './toon.ts';
 
 export type V3 = [number, number, number];
 
@@ -130,39 +130,33 @@ export function copyPose(from: Pose, to: Pose): Pose {
   return to;
 }
 
-// Three-fingered cartoon mitt. The group's local -Y points along the arm.
+// Chunky mitten hand with a wrist cuff. The group's local -Y points along
+// the arm.
 export function hand(material: MeshBasicNodeMaterial, size: number): Group {
   const group = new Group();
-  place(inked(blob(size, size * 0.95, size * 0.62, 2.2), material), group, 0, -size * 0.35, 0);
-  for (let i = 0; i < 3; i += 1) {
-    const finger = inked(blob(size * 0.28, size * 0.62, size * 0.28, 2), material);
-    place(finger, group, (i - 1) * size * 0.3, -size * 0.85, 0, 0, 0, (i - 1) * 0.18);
-  }
-  const thumb = inked(blob(size * 0.3, size * 0.5, size * 0.3, 2), material);
-  place(thumb, group, size * 0.5, -size * 0.45, size * 0.1, 0, 0, 0.9);
+  place(new Mesh(can(size * 0.42, size * 0.3), material), group, 0, -size * 0.05, 0);
+  place(new Mesh(rbox(size * 0.95, size * 0.95, size * 0.55), material), group, 0, -size * 0.6, 0);
+  place(new Mesh(rbox(size * 0.9, size * 0.42, size * 0.5), material), group, 0, -size * 1.12, 0.02, 0.15);
+  place(new Mesh(rbox(size * 0.3, size * 0.6, size * 0.36), material), group, size * 0.52, -size * 0.6, size * 0.08, 0, 0, 0.55);
   return group;
 }
 
-// Cartoon eye: white, pupil with catchlight, and an upper lid that closes.
-export function eye(radius: number, lidMaterial: MeshBasicNodeMaterial, pupilHex = 0x141020): Eye {
+// Broadcast-cartoon eye: white oval, small solid pupil, heavy upper lid in
+// the face colour. The ink pass draws the lid and sclera lines.
+export function eye(radius: number, lidMaterial: MeshBasicNodeMaterial, _pupilHex = 0x111111): Eye {
   const group = new Group();
-  group.add(inked(ball(radius, 24), toon(0xfbfbff)));
+  group.add(new Mesh(blob(radius * 1.7, radius * 2.1, radius * 1.1, 2.2), toon(0xf4f1e8, { shadow: 0.35 })));
   const pupil = new Group();
-  const iris = new Mesh(blob(radius * 0.95, radius * 0.95, radius * 0.4, 2), toon(pupilHex, { shadow: 0 }));
-  iris.position.z = radius * 0.8;
-  pupil.add(iris);
-  const shine = new Mesh(ball(radius * 0.17, 10), glow(0xffffff, 1.1));
-  shine.position.set(radius * 0.24, radius * 0.27, radius * 0.99);
-  pupil.add(shine);
+  const dot = new Mesh(ball(radius * 0.26, 14), toon(0x101010, { shadow: 0 }));
+  dot.position.z = radius * 0.52;
+  pupil.add(dot);
   group.add(pupil);
   const lid = new Group();
-  const lidGeometry = new SphereGeometry(radius * 1.08, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2);
+  const lidGeometry = new SphereGeometry(radius * 1.12, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2);
+  lidGeometry.scale(0.86, 1.0, 0.56);
   const lidMat = lidMaterial.clone();
   lidMat.side = DoubleSide;
   lid.add(new Mesh(lidGeometry, lidMat));
-  const edge = new Mesh(ring(radius * 1.08, radius * 0.075), toon(0x151018));
-  edge.rotation.x = Math.PI / 2;
-  lid.add(edge);
   group.add(lid);
   return { group, pupil, lid };
 }
@@ -186,7 +180,7 @@ export function skeleton(spec: SkeletonSpec): Rig {
   hands[1].scale.x = -1;
   torso.add(hands[0], hands[1]);
   for (const s of shoulders) {
-    place(inked(ball(spec.armRadius[0] * 1.7), spec.armMaterial), torso, s.x, s.y, s.z);
+    place(new Mesh(ball(spec.armRadius[0] * 1.55), spec.armMaterial), torso, s.x, s.y, s.z);
   }
   let legs: [Hose, Hose] | null = null;
   let feet: [Group, Group] | null = null;

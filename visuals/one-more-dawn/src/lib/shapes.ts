@@ -81,3 +81,34 @@ export function bell(r0: number, r1: number, y0: number, y1: number, flare = 1.6
 }
 
 export const UP = new Vector3(0, 1, 0);
+
+// Hard-surface kit: rounded box (small bevel), bevelled can, dome.
+export function rbox(w: number, h: number, d: number): BufferGeometry {
+  return blob(w, h, d, 9, 40);
+}
+
+export function can(r: number, h: number, segments = 32): BufferGeometry {
+  return cached(`can:${r}:${h}:${segments}`, () => {
+    const bevel = Math.min(r, h) * 0.12;
+    const profile: [number, number][] = [
+      [0, -h / 2],
+      [r - bevel, -h / 2],
+      [r, -h / 2 + bevel],
+      [r, h / 2 - bevel],
+      [r - bevel, h / 2],
+      [0, h / 2],
+    ];
+    const geometry = new LatheGeometry(profile.map(([x, y]) => new Vector2(x, y)), segments);
+    geometry.computeVertexNormals();
+    return geometry;
+  });
+}
+
+export function dome(r: number, squash = 1, segments = 32): BufferGeometry {
+  return cached(`dome:${r}:${squash}:${segments}`, () => {
+    const geometry = new SphereGeometry(r, segments, Math.round(segments / 2), 0, Math.PI * 2, 0, Math.PI / 2);
+    geometry.scale(1, squash, 1);
+    geometry.computeVertexNormals();
+    return geometry;
+  });
+}

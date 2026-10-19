@@ -49,10 +49,10 @@ function spotUniforms() {
 }
 
 export const light = {
-  keyDir: u(new Vector3(-0.45, 0.75, 0.6).normalize()),
+  keyDir: u(new Vector3(-0.75, 0.6, 0.45).normalize()),
   key: u(new Color(1, 1, 1)),
   fill: u(new Color(0.12, 0.12, 0.2)),
-  shadowTint: u(new Color(0.6, 0.52, 0.74)),
+  shadowTint: u(new Color(0.58, 0.5, 0.66)),
   spots: [spotUniforms(), spotUniforms(), spotUniforms(), spotUniforms(), spotUniforms()],
 };
 
