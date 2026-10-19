@@ -252,7 +252,7 @@ export function lighting(t: number, stagePos: { aria: Vector3; barnaby: Vector3;
   );
 
   set.starLevel.value = keys(t, [[0, 0.25], [cue.dream - 1, 0.25], [cue.dream + 2, 1.3], [cue.introEnd, 1.3], [cue.bandIn + 2, 0.5]]);
-  set.dreamStar.value = keys(t, [[0, 0], [cue.why, 0], [cue.dreamHeld - 1, 0.7], [cue.dreamHeld + 0.8, 1.5], [cue.introEnd + 0.8, 0.9], [cue.bandIn + 2, 0.75], [CLIP_END, 0.75]]);
+  set.dreamStar.value = keys(t, [[0, 0], [cue.why, 0], [cue.dreamHeld - 1, 0.7], [cue.dreamHeld + 0.8, 1.5], [cue.bandIn - 0.5, 0.9], [cue.bandIn - 0.05, 0.75], [CLIP_END, 0.75]]);
   setColor(set.skyHorizon.value, new Color(0.03, 0.03, 0.1), new Color(0.28, 0.1, 0.18), toDawn * (1 - toWarm), 1);
 }
 
@@ -336,8 +336,9 @@ export function ariaPose(t: number, rig: Rig, out: Pose): Vector3 {
   const clasp = span(t, cue.doors + 0.5, I[3][0] + 0.6, 0.8, 0.8);
   const chin = span(t, cue.question - 0.2, cue.dream + 0.2, 0.7, 0.6);
   const wide = span(t, cue.dream, cue.why + 0.5, 0.9, 0.7);
-  const heart = span(t, cue.why + 0.2, cue.introEnd + 1.2, 0.6, 0.9);
-  const reach = span(t, SOPRANO_WORDS[SOPRANO_WORDS.length - 3][0], cue.introEnd + 1.2, 1.2, 0.9);
+  // Arms come down before the band enters so the hand-off pose is at rest.
+  const heart = span(t, cue.why + 0.2, cue.bandIn - 0.05, 0.6, 0.9);
+  const reach = span(t, SOPRANO_WORDS[SOPRANO_WORDS.length - 3][0], cue.bandIn - 0.05, 1.2, 0.9);
   let L = rest.L;
   let R = rest.R;
   L = mixV(L, chestL, clasp);
