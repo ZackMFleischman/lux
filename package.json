@@ -35,7 +35,8 @@
     "test:studio:cpu": "node apps/studio/test-cpu.mjs",
     "test:studio:smoke": "node apps/studio/build.mjs && node scripts/studio.mjs --smoke",
     "test:studio:mcp": "node apps/studio/build.mjs && node scripts/test-studio-mcp.mjs",
-    "test:studio:ui": "node apps/studio/build.mjs && node scripts/test-studio-ui.mjs"
+    "test:studio:ui": "node apps/studio/build.mjs && node scripts/test-studio-ui.mjs",
+    "test:studio:soundtrack": "node apps/studio/build.mjs && node scripts/test-studio-soundtrack.mjs"
   },
   "dependencies": {
     "@codemirror/commands": "6.11.0",

@@ -21,6 +21,8 @@ import { PreviewCaptureFileStore } from './preview-capture-files.ts';
 import type { VideoCaptureSettings } from './preview-capture-files.ts';
 import { resolveStandardLibrary } from './standard-library.ts';
 import { createAudioPermissionBroker } from './audio/audio-permission-broker.ts';
+import { createSoundtrackFiles, createSoundtrackIpcHandler } from './soundtrack/soundtrack-files.ts';
+import { soundtrackExtensions } from '../../../packages/core/src/scene-soundtrack.ts';
 
 // This process owns presentation windows only. It never creates a render service,
 // starts an authoring instance, or terminates a host-owned process.
@@ -54,6 +56,16 @@ const closeConfirmation = createCloseConfirmation(() => randomBytes(16).toString
 const agentRequests = new Map<string, { resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
 const exportShutdown = new AbortController();
 const previewCaptures = new PreviewCaptureFileStore();
+const soundtracks = createSoundtrackFiles({ choosePath: async () => {
+  if (!mainWindow || mainWindow.isDestroyed() || closing) throw Error('Studio is closing');
+  const selection = await dialog.showOpenDialog(mainWindow, { title: 'Choose soundtrack', properties: ['openFile'], filters: [{ name: 'Audio', extensions: [...soundtrackExtensions] }] });
+  return selection.canceled ? null : selection.filePaths[0] ?? null;
+} });
+async function openScene(path: string) {
+  const opened = await files.open(path);
+  soundtracks.remember(opened.token, path, opened.document);
+  return opened;
+}
 const exportService = createExportService({
   chooseDirectory: async () => {
     if (!mainWindow || mainWindow.isDestroyed() || closing) throw Error('Studio is closing');
@@ -212,6 +224,8 @@ app.whenReady().then(async () => {
     }
     throw Error('Unsupported preview capture action');
   });
+  ipcMain.handle('studio:soundtrack', createSoundtrackIpcHandler(soundtracks, (event: Electron.IpcMainInvokeEvent) =>
+    trusted(event) && BrowserWindow.fromWebContents(event.sender) === mainWindow));
   ipcMain.handle('studio:audio-permission', (event, action: unknown, value: unknown) => {
     if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted audio permission sender');
     if (action === 'discover') return audioPermissions.discover(event.sender);
@@ -243,11 +257,11 @@ app.whenReady().then(async () => {
     if (action === 'open') {
       const result = await dialog.showOpenDialog(mainWindow!, { properties: ['openFile'], filters: [{ name: 'Lux visual', extensions: ['lux-scene'] }] });
       if (result.canceled || !result.filePaths[0]) return null;
-      return files.open(result.filePaths[0]);
+      return openScene(result.filePaths[0]);
     }
     if (action === 'open-path') {
       if (typeof value !== 'string' || !isAbsolute(value) || !value.toLowerCase().endsWith('.lux-scene')) throw Error('Use an absolute .lux-scene path');
-      return files.open(value);
+      return openScene(value);
     }
     if (action === 'save') {
       const request = value as { token?: string; document?: unknown; saveAs?: boolean };

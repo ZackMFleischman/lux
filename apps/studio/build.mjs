@@ -52,3 +52,6 @@ if (process.argv.includes('--tests')) await build({ ...common,
 if (process.argv.includes('--tests')) await build({ ...common,
   entryPoints: [join(root, 'tests/studio/preview-capture-menu.test.tsx')], outfile: join(dist, 'preview-capture-menu.test.mjs'),
   platform: 'node', format: 'esm', packages: 'external', plugins: [testCss], target: 'node24', jsx: 'automatic' });
+if (process.argv.includes('--tests')) await build({ ...common,
+  entryPoints: [join(root, 'tests/studio/soundtrack-control.test.tsx')], outfile: join(dist, 'soundtrack-control.test.mjs'),
+  platform: 'node', format: 'esm', packages: 'external', plugins: [testCss], target: 'node24', jsx: 'automatic' });

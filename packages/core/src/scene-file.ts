@@ -1,7 +1,8 @@
 import { open, rename, unlink, readFile, link } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, resolve, relative, isAbsolute, sep } from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
-import { validateSceneDocument as document, verifySceneDocument } from './scene-document.ts';
+import { validateSceneDocument as document, verifySceneDocument, withSceneSoundtrack } from './scene-document.ts';
+import type { SceneSoundtrack } from './scene-soundtrack.ts';
 export { createSceneDocument } from './scene-document.ts';
 export type { SceneDocument } from './scene-document.ts';
 const legacyCap = 8388608, storyCap = 33554432, hash = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
@@ -22,6 +23,19 @@ async function boundedRead(path: string): Promise<Buffer> {
     }
     if (offset > storyCap) throw Error('Scene file exceeds 32 MiB'); return buffer.subarray(0, offset);
   } finally { await file.close(); }
+}
+/** Stores the soundtrack path relative to the scene file when both share a root. */
+export function soundtrackForScene(soundtrack: SceneSoundtrack, scenePath: string): SceneSoundtrack {
+  if (!isAbsolute(soundtrack.absolutePath)) return soundtrack;
+  const fromScene = relative(dirname(resolve(scenePath)), soundtrack.absolutePath);
+  const path = fromScene && !isAbsolute(fromScene) ? fromScene.split(sep).join('/') : soundtrack.absolutePath;
+  return path === soundtrack.path ? soundtrack : Object.freeze({ ...soundtrack, path });
+}
+/** Candidate files for a saved soundtrack: the scene-relative path first, then the absolute fallback. */
+export function soundtrackCandidates(soundtrack: Pick<SceneSoundtrack, 'path' | 'absolutePath'>, scenePath: string): string[] {
+  const candidates = [isAbsolute(soundtrack.path) ? soundtrack.path : resolve(dirname(resolve(scenePath)), soundtrack.path)];
+  if (isAbsolute(soundtrack.absolutePath)) candidates.push(resolve(soundtrack.absolutePath));
+  return [...new Set(candidates)];
 }
 type Binding = { path: string; hash: string | null; noOverwrite?: boolean };
 export class SceneFileStore {
@@ -60,7 +74,8 @@ export class SceneFileStore {
     const execute = async () => {
       await verifySceneDocument(snapshot);
       const binding = this.bindings.get(token); if (!binding) throw Error('Unknown scene document');
-      const bytes = Buffer.from(JSON.stringify(snapshot, null, 2) + '\n');
+      const located = snapshot.soundtrack ? withSceneSoundtrack(snapshot, soundtrackForScene(snapshot.soundtrack, binding.path)) : snapshot;
+      const bytes = Buffer.from(JSON.stringify(located, null, 2) + '\n');
       const cap = snapshot.version === 7 ? storyCap : legacyCap;
       if (bytes.length > cap) throw Error(`Scene file exceeds ${snapshot.version === 7 ? 32 : 8} MiB`);
       let current: string | null = null;
@@ -73,7 +88,7 @@ export class SceneFileStore {
         try { await file.writeFile(bytes); await file.sync(); } finally { await file.close(); }
         if(binding.noOverwrite){await link(temporary,binding.path);binding.noOverwrite=false;committed=true;await unlink(temporary).catch(()=>{});}else {await this.replace(temporary,binding.path);committed = true;}
         binding.hash = hash(bytes);
-        return { token, document: snapshot, fileHash: binding.hash, name: binding.path.split(/[\\/]/).pop()!, committed: true as const };
+        return { token, document: located, fileHash: binding.hash, name: binding.path.split(/[\\/]/).pop()!, committed: true as const };
       } finally { if (!committed) await unlink(temporary).catch(() => {}); }
     };
     const task = this.queue.then(execute, execute); this.queue = task.catch(() => {}); return task;

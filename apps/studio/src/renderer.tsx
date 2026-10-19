@@ -47,7 +47,7 @@ function MetricView({ label, metric, nowMs }: { label: string; metric: Metric | 
 }
 export type StudioProps = {
   controlEdits?: ControlEdits;
-  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; sourceDiagnostics?: SourceDiagnosticsView; libraryPanel?:ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; previewActions?: ReactNode; shortcutActions?: StudioShortcutActions; appError?: string; sourceChanged?: boolean; controlsAvailable?: boolean;selectedVisualId?:string;
+  client: StudioClient; presentation?: PresentationPort; windows?: StudioWindowClient; previewOnly?: boolean; nowMs?: number; sourcePanel?: ReactNode; sourceDiagnostics?: SourceDiagnosticsView; libraryPanel?:ReactNode; appCommands?: ReactNode; fileMenu?: ReactNode; previewActions?: ReactNode; transportActions?: ReactNode; shortcutActions?: StudioShortcutActions; appError?: string; sourceChanged?: boolean; controlsAvailable?: boolean;selectedVisualId?:string;
 };
 export function StudioApp(props: StudioProps) {
   return <ThemeProvider theme={studioTheme}><CssBaseline /><StudioLayout {...props} /></ThemeProvider>;
@@ -75,7 +75,7 @@ export function studioStatus(snapshot: StudioSnapshot, sourceProblemCount = 0): 
     : snapshot.authoring ? sentenceCase(snapshot.authoring.playback) : 'No runtime';
   return { build, building: !!active, problems, runtime };
 }
-function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel,sourceDiagnostics,libraryPanel, appCommands, fileMenu, previewActions, shortcutActions, appError, controlEdits, sourceChanged, controlsAvailable,selectedVisualId }: StudioProps) {
+function StudioLayout({ client, presentation, windows, previewOnly = false, nowMs, sourcePanel,sourceDiagnostics,libraryPanel, appCommands, fileMenu, previewActions, transportActions, shortcutActions, appError, controlEdits, sourceChanged, controlsAvailable,selectedVisualId }: StudioProps) {
   const [toolsHost, setToolsHost] = useState<HTMLElement | null>(null);
   const [transportMenu, setTransportMenu] = useState<HTMLElement | null>(null);
   const view = useMemo(() => createRendererSnapshot(client), [client]);
@@ -263,6 +263,7 @@ function StudioLayout({ client, presentation, windows, previewOnly = false, nowM
           </IconButton></span></Tooltip>
           <span className="tempo-label">BPM</span><TextField className="tempo-bpm" size="small" type="number" value={tempoDraft} disabled={!available} onFocus={()=>{tempoEditing.current=true;}} onChange={event=>{tempoEditing.current=true;setTempoDraft(event.target.value);}} onBlur={commitTempo} onKeyDown={event=>{if(event.key==='Enter'){event.preventDefault();commitTempo();}else if(event.key==='Escape'){tempoEditing.current=false;setTempoDraft(String(runtime?.tempo?.bpm??120));}}} slotProps={{htmlInput:{min:20,max:300,step:.1,'aria-label':'Tempo BPM'}}}/>
           <Button size="small" aria-label="Tap tempo" disabled={!available} onClick={tapTempo}>Tap</Button>
+          {transportActions}
           <Tooltip title="More playback actions"><IconButton aria-label="More playback actions" aria-haspopup="menu" aria-expanded={!!transportMenu} onClick={event => setTransportMenu(event.currentTarget)}>...</IconButton></Tooltip>
           <Menu anchorEl={transportMenu} open={!!transportMenu} onClose={() => setTransportMenu(null)} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); setTransportMenu(null); } }}>
             <MenuItem disabled={!available} onClick={() => { setTransportMenu(null); void command(() => controller.restart()); }}>Restart runtime</MenuItem>

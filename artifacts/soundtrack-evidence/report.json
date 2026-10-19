@@ -1,0 +1,171 @@
+{
+  "ok": true,
+  "profile": "test-ff795d8b-b3dc-49fd-99cc-27985c0abbe8",
+  "song": "C:\\Users\\zFlei\\repos\\lux\\assets\\audio\\One More Dawn - Disney Tones.mp3",
+  "source": "1a725cc6ac61ef0788afbcfbf5dc0a87cddf2dab",
+  "checks": [
+    "Transport shows an empty Soundtrack control before linking",
+    "Linked One More Dawn - Disney Tones.mp3; decoded 323.20 s",
+    "Play: heard 4.900 s vs scene-matched 4.901 s (drift -0.7 ms); Chromium reports audible output",
+    "Steady 3 s: max |drift| 1.8 ms over 40 samples, 0 re-seeks, output latency lead 52.4 ms",
+    "Pause stops the source and Chromium reports no audible output",
+    "Resume continues at scene 10.520 s (paused at 9.710 s) in sync (drift -3.5 ms)",
+    "Reset returns audio to 0.906 s with clock epoch 1 (drift -11.3 ms)",
+    "Rebuild: generation 3 → 4; audio restarts with the new clock at 1.093 s (drift -18.7 ms)",
+    "Offset 30 s: audio 32.451 s for scene-matched 32.451 s (drift -0.2 ms)",
+    "Mute keeps the source synced at zero gain (session only)",
+    "Saved scene stores audio/dawn.mp3 relative to the scene plus absolute path, sha256, offset and volume",
+    "Reopened scene loads its soundtrack and plays in sync (audio 32.098 s) (drift 0.2 ms)",
+    "Missing file: preview keeps running, transport shows a warning and the popover offers Relink file…",
+    "At a 1024 px window the transport row and soundtrack control end inside the window; no horizontal page overflow"
+  ],
+  "samples": [
+    {
+      "label": "after Play",
+      "playback": "playing",
+      "generation": 3,
+      "clockEpoch": 0,
+      "sceneSeconds": 4.81439999999106,
+      "audioSeconds": 4.900099999997018,
+      "expectedSeconds": 4.900799999997016,
+      "driftSeconds": -0.0006999999999983686,
+      "contextState": "running",
+      "outputLatencySeconds": 0.05244466666368641,
+      "starts": 1,
+      "staleReads": 0,
+      "audible": true
+    },
+    {
+      "label": "after Pause",
+      "playback": "paused",
+      "generation": 3,
+      "clockEpoch": 0,
+      "sceneSeconds": 9.70979999999702,
+      "audioSeconds": null,
+      "expectedSeconds": null,
+      "driftSeconds": null,
+      "contextState": "running",
+      "outputLatencySeconds": 0.05244466666368641,
+      "starts": 1,
+      "staleReads": 0,
+      "audible": false,
+      "audibleAfterPause": false
+    },
+    {
+      "label": "after resume",
+      "playback": "playing",
+      "generation": 3,
+      "clockEpoch": 0,
+      "sceneSeconds": 10.519700000002981,
+      "audioSeconds": 10.530451000008936,
+      "expectedSeconds": 10.533999999999999,
+      "driftSeconds": -0.003548999991062729,
+      "contextState": "running",
+      "outputLatencySeconds": 0.04599300001191864,
+      "starts": 3,
+      "staleReads": 0,
+      "audible": true
+    },
+    {
+      "label": "after Reset",
+      "playback": "playing",
+      "generation": 3,
+      "clockEpoch": 1,
+      "sceneSeconds": 0.901699999988079,
+      "audioSeconds": 0.905690999997022,
+      "expectedSeconds": 0.9170000000000016,
+      "driftSeconds": -0.01130900000297963,
+      "contextState": "running",
+      "outputLatencySeconds": 0.0456669999999999,
+      "starts": 5,
+      "staleReads": 0,
+      "audible": true
+    },
+    {
+      "label": "after rebuild",
+      "playback": "playing",
+      "generation": 4,
+      "clockEpoch": 0,
+      "sceneSeconds": 1.0950999999940396,
+      "audioSeconds": 1.0928280000089394,
+      "expectedSeconds": 1.1115000000149067,
+      "driftSeconds": -0.01867200000596725,
+      "contextState": "running",
+      "outputLatencySeconds": 0.043214666657728884,
+      "starts": 8,
+      "staleReads": 0,
+      "audible": true
+    },
+    {
+      "label": "after offset 30 s",
+      "playback": "playing",
+      "generation": 4,
+      "clockEpoch": 0,
+      "sceneSeconds": 2.4000999999940396,
+      "audioSeconds": 32.451038,
+      "expectedSeconds": 32.45119999998808,
+      "driftSeconds": -0.000161999988080197,
+      "contextState": "running",
+      "outputLatencySeconds": 0.04567166666666367,
+      "starts": 9,
+      "staleReads": 0,
+      "audible": true
+    },
+    {
+      "label": "after reopen",
+      "playback": "playing",
+      "generation": 5,
+      "clockEpoch": 0,
+      "sceneSeconds": 2.0729000000059603,
+      "audioSeconds": 32.097724,
+      "expectedSeconds": 32.0975,
+      "driftSeconds": 0.00022400000000288856,
+      "contextState": "running",
+      "outputLatencySeconds": 0.04773633332736438,
+      "starts": 12,
+      "staleReads": 0,
+      "audible": true
+    }
+  ],
+  "errors": [],
+  "pid": 3624,
+  "duration": 323.2,
+  "steadyDrift": {
+    "samples": 40,
+    "maxAbsSeconds": 0.0018220000059550046,
+    "meanSeconds": 0.0011984500023810352,
+    "reseeks": 0,
+    "outputLatencySeconds": 0.05244466666368641
+  },
+  "savedSoundtrack": {
+    "path": "audio/dawn.mp3",
+    "absolutePath": "C:\\Users\\zFlei\\AppData\\Local\\Temp\\lux-soundtrack-qa-GwGLJh\\show\\audio\\dawn.mp3",
+    "sha256": "c232d98d042bfdd5883f30c2bed16755071b924479b01df386d80ae85bbb7859",
+    "offsetSeconds": 30,
+    "volume": 1
+  },
+  "narrowViewport": {
+    "viewport": {
+      "width": 1024,
+      "height": 760
+    },
+    "scroll": {
+      "width": 1024,
+      "client": 1024
+    }
+  },
+  "narrowLayout": {
+    "transport": {
+      "x": 284,
+      "y": 468,
+      "width": 569,
+      "height": 36
+    },
+    "control": {
+      "x": 516.5125122070312,
+      "y": 472.3999938964844,
+      "width": 148.5250244140625,
+      "height": 28
+    }
+  }
+}

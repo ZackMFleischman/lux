@@ -4,6 +4,9 @@ import type { Look, LookSummary, SaveLook } from '../../../../packages/core/src/
 import type { SceneDocument } from '../../../../packages/core/src/scene-file.ts';
 import { createSceneDocument, verifySceneDocument, verifySavedControlSnapshot, verifySavedNodeControlSnapshot, validateSavedControlSnapshot, validateSavedNodeControlSnapshot, sceneControlSnapshot, sceneSourceHash, sceneHash } from '../../../../packages/core/src/scene-document.ts';
 import type { SavedControlSnapshot, SavedNodeControlSnapshot } from '../../../../packages/core/src/scene-document.ts';
+import { withSceneSoundtrack } from '../../../../packages/core/src/scene-document.ts';
+import { normalizeSceneSoundtrack } from '../../../../packages/core/src/scene-soundtrack.ts';
+import type { SceneSoundtrack } from '../../../../packages/core/src/scene-soundtrack.ts';
 import type { SourceWorkspace } from './workspace.ts';
 import {createStorySourceWorkspace} from './story-source-workspace.ts';
 import type {StorySourceWorkspace} from './story-source-workspace.ts';
@@ -49,8 +52,10 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
   let token: string | undefined;
   type LibraryUpdate=Readonly<{componentId:string;name:string;resolvedRevision:number;availableRevision:number}>;
   type LibraryFallback=Readonly<{componentId:string;resolvedRevision:number;message:string}>;
-  type SessionState=Readonly<{busy:boolean;runtimeControlsAvailable:boolean;name:string;controlsDirty:boolean;libraryDirty:boolean;libraryUpdates:readonly LibraryUpdate[];libraryFallbacks:readonly LibraryFallback[];activeWorkspace:SourceWorkspace;storySourceCatalog:StorySourceWorkspace|null}>;
-  let state:SessionState=Object.freeze({busy:false,runtimeControlsAvailable:true,name:'Untitled',controlsDirty:false,libraryDirty:false,libraryUpdates:Object.freeze([]),libraryFallbacks:Object.freeze([]),activeWorkspace:workspace,storySourceCatalog:null});
+  type SessionState=Readonly<{busy:boolean;runtimeControlsAvailable:boolean;name:string;controlsDirty:boolean;libraryDirty:boolean;libraryUpdates:readonly LibraryUpdate[];libraryFallbacks:readonly LibraryFallback[];activeWorkspace:SourceWorkspace;storySourceCatalog:StorySourceWorkspace|null;
+    /** soundtrackOrigin is the file token of the opened scene that supplied the soundtrack; null when chosen in this session. */
+    soundtrack:SceneSoundtrack|null;soundtrackOrigin:string|null}>;
+  let state:SessionState=Object.freeze({busy:false,runtimeControlsAvailable:true,name:'Untitled',controlsDirty:false,libraryDirty:false,libraryUpdates:Object.freeze([]),libraryFallbacks:Object.freeze([]),activeWorkspace:workspace,storySourceCatalog:null,soundtrack:null,soundtrackOrigin:null});
   let controlsVersion = 0;
   let libraryLinks:readonly SceneLibraryLink[]=Object.freeze([]);
   let story:SceneStoryV1|null=null;
@@ -70,6 +75,12 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
     update({ busy: true,runtimeControlsAvailable });
     try { return await operation(); } finally { update({ busy: false,runtimeControlsAvailable:true }); }
   }
+  // Looks and exports ignore the soundtrack; saved scenes carry it.
+  function linked<T extends SceneDocument>(document:T):T{return state.soundtrack?withSceneSoundtrack(document,state.soundtrack):document;}
+  function openedSoundtrack(document:SceneDocument,fileToken:string){return {soundtrack:document.soundtrack??null,soundtrackOrigin:document.soundtrack?fileToken:null};}
+  // A Look becomes a new untitled scene without a soundtrack. Keeping the previous scene's song
+  // would play it over an unrelated Look and save it into the next file without a dirty mark.
+  const lookSoundtrack=Object.freeze({soundtrack:null,soundtrackOrigin:null});
   function localDraftVersion(){return storySourceCatalog?.getSnapshot().version??workspace.getSnapshot().version;}
   function currentDraftVersion(){const local=localDraftVersion();if(local!==observedWorkspaceVersion){draftVersion+=local>observedWorkspaceVersion?local-observedWorkspaceVersion:1;observedWorkspaceVersion=local;}return draftVersion;}
   function requireDraftVersion(expected:number){if(!Number.isSafeInteger(expected)||expected!==currentDraftVersion())throw Error('Editor changed; read its source again');}
@@ -199,6 +210,18 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
       const snapshot=workspace.getSnapshot(),source=structuredClone(snapshot.source);return {source,document:null,draftVersion:currentDraftVersion(),libraryLinks:structuredClone(libraryLinks),story:structuredClone(story)};
     },
     controlsChanged() { if (pendingDocumentControls) return; controlsVersion++; update({ controlsDirty: true }); },
+    /** Links, edits or removes the scene soundtrack. This is a saved scene edit. */
+    setSoundtrack(value:SceneSoundtrack|null){
+      const next=value?normalizeSceneSoundtrack(value):null;
+      if(JSON.stringify(next)===JSON.stringify(state.soundtrack))return;
+      // Keep the origin for offset/volume edits so an in-flight load of the same file continues.
+      controlsVersion++;update({soundtrack:next,soundtrackOrigin:next&&next.sha256===state.soundtrack?.sha256?state.soundtrackOrigin:null,controlsDirty:true});
+    },
+    /** Records where an opened soundtrack was found, so later saves keep a valid relative path. Not an edit. */
+    soundtrackResolved(absolutePath:string){
+      const current=state.soundtrack;if(!current||current.absolutePath===absolutePath)return;
+      update({soundtrack:normalizeSceneSoundtrack({...current,absolutePath})});
+    },
     build(source: SourceBundle, expectedVersion: number,requested?:readonly Readonly<{componentId:string;mountPath:string}>[],requestedStory?:SceneStoryV1|null) {
       return exclusive(()=>{requireDraftVersion(expectedVersion);if(storySourceCatalog)throw Error('Scene v7 requires a whole document build');return buildLinked(source,workspace.getSnapshot().version,requested,requestedStory);},true);
     },
@@ -220,7 +243,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         const look = await ports.readLook(id);
         const document = await verifySceneDocument(look.document);
         requireDraftVersion(expectedVersion);
-        if(document.version===7){await submitStoryDocument(document,currentDraftVersion(),storySourceCatalog?.getSnapshot().selectedVisualId);token=undefined;storySourceCatalog!.markSaved(storySourceCatalog!.getSnapshot().version);update({name:look.name,controlsDirty:false,libraryDirty:false,libraryUpdates:[],libraryFallbacks:[]});return look;}
+        if(document.version===7){await submitStoryDocument(document,currentDraftVersion(),storySourceCatalog?.getSnapshot().selectedVisualId);token=undefined;storySourceCatalog!.markSaved(storySourceCatalog!.getSnapshot().version);update({name:look.name,controlsDirty:false,libraryDirty:false,libraryUpdates:[],libraryFallbacks:[],...lookSoundtrack});return look;}
         if (document.version === 5 && document.libraryLinks.length) throw Error('This look is not a frozen snapshot');
         const savedControls = await sceneControlSnapshot(document);
         requireDraftVersion(expectedVersion);
@@ -233,7 +256,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         pendingDocumentAnimations = null;
         pendingDocumentTempo=null;
         workspace.markSaved(workspace.getSnapshot().version);
-        update({name: look.name, controlsDirty: false, libraryDirty: false, libraryUpdates: [], libraryFallbacks: []});
+        update({name: look.name, controlsDirty: false, libraryDirty: false, libraryUpdates: [], libraryFallbacks: [], ...lookSoundtrack});
         return look;
       });
     },
@@ -249,14 +272,14 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
     save(saveAs = false) {
       return exclusive(async () => {
         if(storySourceCatalog){
-          await ports.settleControls?.();currentDraftVersion();const controlVersion=controlsVersion,catalogVersion=storySourceCatalog.getSnapshot().version,document=assembledStoryDocument();
+          await ports.settleControls?.();currentDraftVersion();const controlVersion=controlsVersion,catalogVersion=storySourceCatalog.getSnapshot().version,document=linked(assembledStoryDocument());
           const result=await ports.save({token,saveAs,document});
           if(result){token=result.token;if(storySourceCatalog.getSnapshot().version===catalogVersion)storySourceCatalog.markSaved(catalogVersion);storyDocument=document;update({name:result.name,controlsDirty:controlsVersion!==controlVersion,libraryDirty:false});}
           return result;
         }
         const snapshot = workspace.getSnapshot(), controlVersion = controlsVersion;
         const source=structuredClone(snapshot.source);
-        const document = createSceneDocument(source, ports.getOutput?.()??{ ...DEFAULT_OUTPUT }, await documentControls(source),libraryLinks,validateControlAnimationBindings(pendingDocumentAnimations??ports.getControlAnimations?.()??[]),normalizeTempoSettings(pendingDocumentTempo??ports.getTempo?.()),story,retainStoryVersion);
+        const document = linked(createSceneDocument(source, ports.getOutput?.()??{ ...DEFAULT_OUTPUT }, await documentControls(source),libraryLinks,validateControlAnimationBindings(pendingDocumentAnimations??ports.getControlAnimations?.()??[]),normalizeTempoSettings(pendingDocumentTempo??ports.getTempo?.()),story,retainStoryVersion));
         const result = await ports.save({ token, saveAs, document });
         if (result) { token = result.token; workspace.markSaved(snapshot.version);
           update({ name: result.name, controlsDirty: controlsVersion !== controlVersion,libraryDirty:false }); }
@@ -268,13 +291,13 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         if(!ports.savePath)throw Error('Path save is unavailable');
         await ports.settleControls?.();
         if(storySourceCatalog){
-          requireDraftVersion(expectedVersion);const controlVersion=controlsVersion,catalogVersion=storySourceCatalog.getSnapshot().version,document=assembledStoryDocument(),result=await ports.savePath({path,document,overwrite});
+          requireDraftVersion(expectedVersion);const controlVersion=controlsVersion,catalogVersion=storySourceCatalog.getSnapshot().version,document=linked(assembledStoryDocument()),result=await ports.savePath({path,document,overwrite});
           if(!result)return null;token=result.token;if(storySourceCatalog.getSnapshot().version===catalogVersion)storySourceCatalog.markSaved(catalogVersion);storyDocument=document;update({name:result.name,controlsDirty:controlsVersion!==controlVersion,libraryDirty:false});
           return {name:result.name,path,draftVersion:currentDraftVersion()};
         }
         requireDraftVersion(expectedVersion);const snapshot=workspace.getSnapshot();
         const controlVersion=controlsVersion,source=structuredClone(snapshot.source);
-        const document=createSceneDocument(source,ports.getOutput?.()??{...DEFAULT_OUTPUT},await documentControls(source),libraryLinks,validateControlAnimationBindings(pendingDocumentAnimations??ports.getControlAnimations?.()??[]),normalizeTempoSettings(pendingDocumentTempo??ports.getTempo?.()),story,retainStoryVersion);
+        const document=linked(createSceneDocument(source,ports.getOutput?.()??{...DEFAULT_OUTPUT},await documentControls(source),libraryLinks,validateControlAnimationBindings(pendingDocumentAnimations??ports.getControlAnimations?.()??[]),normalizeTempoSettings(pendingDocumentTempo??ports.getTempo?.()),story,retainStoryVersion));
         const result=await ports.savePath({path,document,overwrite});
         if(!result)return null;
         token=result.token;workspace.markSaved(snapshot.version);update({name:result.name,controlsDirty:controlsVersion!==controlVersion,libraryDirty:false});
@@ -289,7 +312,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         const result=await ports.openPath(path);if(!result)return null;
         const document=await verifySceneDocument(result.document);
         requireDraftVersion(expectedVersion);
-        if(document.version===7){await submitStoryDocument(document,expectedVersion,storySourceCatalog?.getSnapshot().selectedVisualId);token=result.token;storySourceCatalog!.markSaved(storySourceCatalog!.getSnapshot().version);update({name:result.name,controlsDirty:false,libraryDirty:false,libraryUpdates:Object.freeze([]),libraryFallbacks:Object.freeze([])});return {name:result.name,path,draftVersion:currentDraftVersion()};}
+        if(document.version===7){await submitStoryDocument(document,expectedVersion,storySourceCatalog?.getSnapshot().selectedVisualId);token=result.token;storySourceCatalog!.markSaved(storySourceCatalog!.getSnapshot().version);update({name:result.name,controlsDirty:false,libraryDirty:false,libraryUpdates:Object.freeze([]),libraryFallbacks:Object.freeze([]),...openedSoundtrack(document,result.token)});return {name:result.name,path,draftVersion:currentDraftVersion()};}
         if(document.settings.fps!==60||document.settings.seed!==0)throw Error('This build supports 60 fps with seed 0');
         const savedControls=await sceneControlSnapshot(document),savedAnimations=document.controlAnimations??Object.freeze([]),savedLinks=document.version===5?document.libraryLinks:Object.freeze([]);
         requireDraftVersion(expectedVersion);
@@ -297,7 +320,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         requireDraftVersion(expectedVersion);
         await submitLegacySource(resolution.source,expectedVersion,{savedControls,savedControlAnimations:savedAnimations,savedTempo:document.tempo,output:document.settings,story:document.version===6?document.story??null:null});
         token=result.token;libraryLinks=resolution.links;story=document.version===6?document.story??null:null;retainStoryVersion=document.version===6;pendingDocumentControls=null;pendingDocumentAnimations=null;pendingDocumentTempo=null;
-        update({name:result.name,controlsDirty:false,libraryDirty:JSON.stringify(resolution.links)!==JSON.stringify(savedLinks),libraryUpdates:Object.freeze([]),libraryFallbacks:resolution.fallbacks});
+        update({name:result.name,controlsDirty:false,libraryDirty:JSON.stringify(resolution.links)!==JSON.stringify(savedLinks),libraryUpdates:Object.freeze([]),libraryFallbacks:resolution.fallbacks,...openedSoundtrack(document,result.token)});
         return {name:result.name,path,draftVersion:currentDraftVersion()};
       });
     },
@@ -308,7 +331,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         const result = await ports.open(); if (!result) return null;
         const document = await verifySceneDocument(result.document);
         requireDraftVersion(expectedVersion);
-        if(document.version===7){await submitStoryDocument(document,currentDraftVersion(),storySourceCatalog?.getSnapshot().selectedVisualId);token=result.token;storySourceCatalog!.markSaved(storySourceCatalog!.getSnapshot().version);update({name:result.name,controlsDirty:false,libraryDirty:false,libraryUpdates:Object.freeze([]),libraryFallbacks:Object.freeze([])});return result;}
+        if(document.version===7){await submitStoryDocument(document,currentDraftVersion(),storySourceCatalog?.getSnapshot().selectedVisualId);token=result.token;storySourceCatalog!.markSaved(storySourceCatalog!.getSnapshot().version);update({name:result.name,controlsDirty:false,libraryDirty:false,libraryUpdates:Object.freeze([]),libraryFallbacks:Object.freeze([]),...openedSoundtrack(document,result.token)});return result;}
         if (document.settings.fps !== 60 || document.settings.seed !== 0)
           throw Error('This build supports 60 fps with seed 0');
         const savedControls=await sceneControlSnapshot(document);
@@ -333,7 +356,7 @@ export function createAuthoringSession(workspace: SourceWorkspace, ports: Ports)
         const normalized=accepted?(acceptedSource.sdkVersion==='0.4.0'?validateSavedNodeControlSnapshot(accepted):validateSavedControlSnapshot(accepted)):undefined;
         const controlsDirty=!!normalized&&JSON.stringify(normalized)!==JSON.stringify(savedControls);
         if(controlsDirty)controlsVersion++;
-        update({name:result.name,controlsDirty,libraryDirty:JSON.stringify(acceptedLinks)!==JSON.stringify(savedLinks),libraryUpdates:Object.freeze([]),libraryFallbacks:fallbacks});
+        update({name:result.name,controlsDirty,libraryDirty:JSON.stringify(acceptedLinks)!==JSON.stringify(savedLinks),libraryUpdates:Object.freeze([]),libraryFallbacks:fallbacks,...openedSoundtrack(document,result.token)});
         return result;
       });
     },

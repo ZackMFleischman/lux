@@ -17,15 +17,20 @@ import type {SceneStoryV1} from '../../runtime-contracts/src/story.mjs';
 import {validateStorySceneDocumentV7,verifyStorySceneDocumentV7} from './story-scene-v2.ts';
 import type {StorySceneDocumentV7} from './story-scene-v2.ts';
 export type {StoryVisualSource,StorySceneDocumentV7} from './story-scene-v2.ts';
+import {normalizeSceneSoundtrack} from './scene-soundtrack.ts';
+import type {SceneSoundtrack} from './scene-soundtrack.ts';
+export type {SceneSoundtrack} from './scene-soundtrack.ts';
+/** Optional on every scene version; absent means no soundtrack and leaves saved bytes unchanged. */
+type Soundtracked=Readonly<{soundtrack?:SceneSoundtrack}>;
 
 const legacySchema = z.object({ format: z.literal('lux-scene'), version: z.literal(1), source: legacySourceBundleSchema.extend({sdkVersion:z.literal('0.1.0')}), settings: outputSettingsSchema, controls: controlValuesSchema }).strict();
 const schema = z.discriminatedUnion('version',[legacySchema,legacySchema.extend({version:z.literal(2),source:assetSourceBundleSchema.extend({sdkVersion:z.literal('0.1.0')})}).strict()]);
 export type SavedControlSnapshot = Readonly<{sourceHash:string;schema:ControlSchema;schemaHash:string;values:ParameterValues}>;
-type LegacySceneDocument = z.infer<typeof schema> & Readonly<{tempo:SceneTempoSettings;controlAnimations?:readonly ControlAnimationBinding[]}>;
-export type ParameterSceneDocument = Readonly<{format:'lux-scene';version:3;source:SourceBundle;settings:OutputSettings;controls:SavedControlSnapshot;tempo:SceneTempoSettings;controlAnimations?:readonly ControlAnimationBinding[]}>;
+type LegacySceneDocument = z.infer<typeof schema> & Readonly<{tempo:SceneTempoSettings;controlAnimations?:readonly ControlAnimationBinding[]}> & Soundtracked;
+export type ParameterSceneDocument = Readonly<{format:'lux-scene';version:3;source:SourceBundle;settings:OutputSettings;controls:SavedControlSnapshot;tempo:SceneTempoSettings;controlAnimations?:readonly ControlAnimationBinding[]}>&Soundtracked;
 export type SavedNodeControlSnapshot=Readonly<{sourceHash:string;nodes:readonly Readonly<{nodePath:NodePath;definitionHash:DefinitionHash;schema:ControlSchema;schemaHash:string;values:ParameterValues}>[]}>;
-export type CompositionSceneDocument=Readonly<{format:'lux-scene';version:4;source:SourceBundle;settings:OutputSettings;controls:SavedNodeControlSnapshot;tempo:SceneTempoSettings;controlAnimations:readonly ControlAnimationBinding[]}>;
-export type LinkedCompositionSceneDocument=Readonly<{format:'lux-scene';version:5;source:SourceBundle;settings:OutputSettings;controls:SavedNodeControlSnapshot;libraryLinks:readonly SceneLibraryLink[];tempo:SceneTempoSettings;controlAnimations:readonly ControlAnimationBinding[]}>;
+export type CompositionSceneDocument=Readonly<{format:'lux-scene';version:4;source:SourceBundle;settings:OutputSettings;controls:SavedNodeControlSnapshot;tempo:SceneTempoSettings;controlAnimations:readonly ControlAnimationBinding[]}>&Soundtracked;
+export type LinkedCompositionSceneDocument=Readonly<{format:'lux-scene';version:5;source:SourceBundle;settings:OutputSettings;controls:SavedNodeControlSnapshot;libraryLinks:readonly SceneLibraryLink[];tempo:SceneTempoSettings;controlAnimations:readonly ControlAnimationBinding[]}>&Soundtracked;
 export type StorySceneDocument = Readonly<Omit<ParameterSceneDocument,'version'> & {version:6;story?:SceneStoryV1}>;
 export type SingleVisualSceneDocument = LegacySceneDocument | ParameterSceneDocument | CompositionSceneDocument | LinkedCompositionSceneDocument | StorySceneDocument;
 export type SceneDocument = SingleVisualSceneDocument | StorySceneDocumentV7;
@@ -68,29 +73,30 @@ export function validateSceneDocument(value: unknown): SceneDocument {
   // properties and their provenance. Preserve legacy scene source ordering.
   const raw = snapshotRecord(value);
   if(raw.version===7)return validateStorySceneDocumentV7(value);
-  const fields=raw.version===5?['format','version','source','settings','controls','libraryLinks']:['format','version','source','settings','controls'],optional=[...(Object.hasOwn(raw,'controlAnimations')?['controlAnimations']:[]),...(Object.hasOwn(raw,'tempo')?['tempo']:[]),...(raw.version===6&&Object.hasOwn(raw,'story')?['story']:[])];
+  const fields=raw.version===5?['format','version','source','settings','controls','libraryLinks']:['format','version','source','settings','controls'],optional=[...(Object.hasOwn(raw,'controlAnimations')?['controlAnimations']:[]),...(Object.hasOwn(raw,'tempo')?['tempo']:[]),...(raw.version===6&&Object.hasOwn(raw,'story')?['story']:[]),...(Object.hasOwn(raw,'soundtrack')?['soundtrack']:[])];
   if(Object.keys(raw).length!==fields.length+optional.length||fields.some(field=>!Object.hasOwn(raw,field)))throw Error('Missing or unsupported scene fields');
   const source = validateSource(raw.source);
   const animations=Object.hasOwn(raw,'controlAnimations')?{controlAnimations:validateControlAnimationBindings(raw.controlAnimations)}:{};
   const tempo=normalizeTempoSettings(raw.tempo);
+  const soundtrack=Object.hasOwn(raw,'soundtrack')?{soundtrack:normalizeSceneSoundtrack(raw.soundtrack)}:{};
   if(raw.version===6) {
     if(raw.format!=='lux-scene'||source.sdkVersion!=='0.2.0')throw Error('Scene v6 requires SDK 0.2.0 source');
-    const result:StorySceneDocument=Object.freeze({format:'lux-scene',version:6,source,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedControlSnapshot(raw.controls),tempo,...animations,...(Object.hasOwn(raw,'story')?{story:normalizeSceneStory(raw.story)}:{})});
+    const result:StorySceneDocument=Object.freeze({format:'lux-scene',version:6,source,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedControlSnapshot(raw.controls),tempo,...animations,...(Object.hasOwn(raw,'story')?{story:normalizeSceneStory(raw.story)}:{}),...soundtrack});
     if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>7340032)throw Error('Scene v6 JSON exceeds 7 MiB');
     return result;
   }
   if(raw.version===3) {
     if(raw.format!=='lux-scene' || source.sdkVersion!=='0.2.0') throw Error('Scene v3 requires SDK 0.2.0 source');
-    const result:ParameterSceneDocument=Object.freeze({format:'lux-scene',version:3,source:source as SourceBundle,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedControlSnapshot(raw.controls),tempo,...animations});
+    const result:ParameterSceneDocument=Object.freeze({format:'lux-scene',version:3,source:source as SourceBundle,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedControlSnapshot(raw.controls),tempo,...animations,...soundtrack});
     if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>7340032) throw Error('Scene v3 JSON exceeds 7 MiB');
     return result;
   }
-  if(raw.version===4){if(raw.format!=='lux-scene'||source.sdkVersion!=='0.4.0')throw Error('Scene v4 requires SDK 0.4.0 source');const result:CompositionSceneDocument=Object.freeze({format:'lux-scene',version:4,source,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedNodeControlSnapshot(raw.controls),tempo,controlAnimations:validateControlAnimationBindings(raw.controlAnimations??[])});if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>7340032)throw Error('Scene v4 JSON exceeds 7 MiB');return result;}
-  if(raw.version===5){if(raw.format!=='lux-scene'||source.sdkVersion!=='0.4.0')throw Error('Scene v5 requires SDK 0.4.0 source');const result:LinkedCompositionSceneDocument=Object.freeze({format:'lux-scene',version:5,source,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedNodeControlSnapshot(raw.controls),libraryLinks:validateSceneLibraryLinks(raw.libraryLinks),tempo,controlAnimations:validateControlAnimationBindings(raw.controlAnimations??[])});if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>7340032)throw Error('Scene v5 JSON exceeds 7 MiB');return result;}
-  const {controlAnimations:_animations,tempo:_tempo,...legacyRaw}=raw;
+  if(raw.version===4){if(raw.format!=='lux-scene'||source.sdkVersion!=='0.4.0')throw Error('Scene v4 requires SDK 0.4.0 source');const result:CompositionSceneDocument=Object.freeze({format:'lux-scene',version:4,source,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedNodeControlSnapshot(raw.controls),tempo,controlAnimations:validateControlAnimationBindings(raw.controlAnimations??[]),...soundtrack});if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>7340032)throw Error('Scene v4 JSON exceeds 7 MiB');return result;}
+  if(raw.version===5){if(raw.format!=='lux-scene'||source.sdkVersion!=='0.4.0')throw Error('Scene v5 requires SDK 0.4.0 source');const result:LinkedCompositionSceneDocument=Object.freeze({format:'lux-scene',version:5,source,settings:outputSettingsSchema.parse(snapshotRecord(raw.settings)),controls:validateSavedNodeControlSnapshot(raw.controls),libraryLinks:validateSceneLibraryLinks(raw.libraryLinks),tempo,controlAnimations:validateControlAnimationBindings(raw.controlAnimations??[]),...soundtrack});if(new TextEncoder().encode(JSON.stringify(result,null,2)+'\n').byteLength>7340032)throw Error('Scene v5 JSON exceeds 7 MiB');return result;}
+  const {controlAnimations:_animations,tempo:_tempo,soundtrack:_soundtrack,...legacyRaw}=raw;
   const result = schema.parse({...legacyRaw,source:raw.version===2 ? source : raw.source,
     settings:snapshotRecord(raw.settings),controls:snapshotRecord(raw.controls)});
-  const snapshot = {...result,...(result.version===2?{source:source as Extract<LegacySceneDocument,{version:2}>['source']} : {}),tempo,...animations};
+  const snapshot = {...result,...(result.version===2?{source:source as Extract<LegacySceneDocument,{version:2}>['source']} : {}),tempo,...animations,...soundtrack};
   if (snapshot.version === 2 && new TextEncoder().encode(JSON.stringify(snapshot,null,2)+'\n').byteLength > 7340032) throw Error('Scene v2 JSON exceeds 7 MiB');
   return snapshot;
 }
@@ -101,4 +107,9 @@ export function createSceneDocument(source: SourceBundle, settings: OutputSettin
   const document=validateSceneDocument({format:'lux-scene',version,source,settings,controls,...(version===5?{libraryLinks:links}:{}),...(story?{story}:{}),tempo:normalizeTempoSettings(tempo),...((version===4||version===5||controlAnimations.length)?{controlAnimations}: {})});
   if(document.version===7)throw Error('Single-visual scene construction produced Scene v7');
   return document;
+}
+/** Returns the document with its soundtrack replaced or removed. Validation is unchanged. */
+export function withSceneSoundtrack<T extends SceneDocument>(document:T,soundtrack:SceneSoundtrack|null):T{
+  const {soundtrack:_previous,...rest}=document as T&Soundtracked;
+  return validateSceneDocument(soundtrack?{...rest,soundtrack}:rest) as T;
 }
