@@ -4,8 +4,10 @@
 // it here; do not edit shared engine, cast or set files from a clip lane.
 //
 // Shot list (song seconds):
-//   A  40.30 – 44.15  Wide: the band kicks in, lights warm, Aria retires
-//                     upstage left, Barnaby strolls on from stage right.
+//   A  40.30 – 44.15  High wide from house left (a clear cut away from the
+//                     close hero shot before it): the band kicks in, the
+//                     whole stage, the dream star still in the sky; Aria
+//                     retires upstage, Barnaby strolls on from stage right.
 //   B  44.15 – 47.95  Medium on Barnaby: "I helped them teach their
 //                     children"; the two kids race in and skid to his side.
 //   C  47.95 – 51.25  Low medium two-shot: "To walk, to dance, to sing";
@@ -13,7 +15,9 @@
 //   D  51.25 – 54.15  Low hero medium on Barnaby: "They trusted us with
 //                     everything"; arms burst wide, kids look up at him.
 //   E  54.15 – 57.40  Reveal: the throne rises through the trap on
-//                     "kingdoms", the kids scurry clear and bow on "kings".
+//                     "kingdoms", the kids scurry clear; all three bow
+//                     from the waist on "kings"; Barnaby rises and opens a
+//                     hand to the throne for the hand-off.
 
 import { Color, Vector3, type PerspectiveCamera } from 'three/webgpu';
 import { applyPose, blankPose, copyPose, type Pose, type Rig, type V3 } from '../rig.ts';
@@ -31,6 +35,7 @@ import {
   walk,
   type Cast,
 } from '../show.ts';
+import { set } from '../stage.ts';
 import { backOut, clamp01, easeOut, keys, lerp, noise1, ramp, smooth, span, type Key } from '../time.ts';
 
 const START = 40.3;
@@ -56,11 +61,12 @@ const T = {
   kings: W[21][0], // 56.52
 };
 
-// Hand-off envelope: 0 in the first/last 0.25 s (pure defaultFrame), 1 inside.
-const OUT_A = END - 0.55;
-const OUT_B = END - 0.25;
+// Hand-off envelope: 0 in the first 0.25 s (pure defaultFrame), 1 inside,
+// and a blend back to defaultFrame over the last 0.25 s that holds the
+// clip's pose for most of that time (exactly defaultFrame at END).
 function inside(t: number): number {
-  return ramp(t, START + 0.25, START + 0.5) * (1 - ramp(t, OUT_A, OUT_B, smooth));
+  const out = ramp(t, END - 0.25, END, (u: number) => u * u);
+  return ramp(t, START + 0.25, START + 0.5) * (1 - out);
 }
 
 // Snap into a pose with a little overshoot, then release.
@@ -194,9 +200,17 @@ function barnaby(t: number, rig: Rig, def: Pose, p: Pose): void {
   // "kingdoms": a slow, grand sweep up toward the rising throne.
   const behold = span(t, T.kingdoms - 0.3, END - 0.3, 0.45, 0.5);
   L = mixV(L, v3(-0.92, 1.05, 0.42), behold);
-  // "kings": a small deferential bow.
-  const bow = span(t, T.kings - 0.05, END, 0.3, 0.6);
-  p.lean += bow * 0.16;
+  // "kings": a courtly bow from the waist – right hand to the heart, left
+  // arm swept out low, a knee dip and a nod – then he rises and opens the
+  // left hand toward the throne, ready for the globe.
+  const bowDown = ramp(t, T.kings - 0.08, T.kings + 0.3, easeOut);
+  const bowUp = ramp(t, END - 0.5, END - 0.12, smooth);
+  const bow = bowDown * (1 - bowUp);
+  R = mixV(R, v3(0.14, 0.5, 0.46), bow);
+  L = mixV(L, v3(-0.95, 0.42, 0.2), bow);
+  L = mixV(L, v3(-0.85, 0.8, 0.45), bowDown * bowUp);
+  p.lean += bow * 0.42;
+  p.lift -= bow * 0.05;
   p.handL = L;
   p.handR = R;
   p.bendL = 0.5 + wide * 0.3;
@@ -213,14 +227,14 @@ function barnaby(t: number, rig: Rig, def: Pose, p: Pose): void {
   const proud = span(t, T.helped - 0.1, T.children - 0.1, 0.3, 0.4);
   p.lean -= proud * 0.04;
   p.headYaw = toKids * -0.35 + toKing * -0.5;
-  p.headPitch = heart * -0.04 - proud * 0.1 - wide * 0.24 - toKing * 0.2 + toKids * 0.08 + bow * 0.12;
+  p.headPitch = heart * -0.04 - proud * 0.1 - wide * 0.24 - toKing * 0.2 + toKids * 0.08 + bow * 0.4;
   p.headPitch += delight * bob * 0.06;
   // The speaker mouth is small: let the head ride each sung syllable.
   p.headPitch -= p.mouth * 0.12;
   p.headRoll = Math.sin(t * 1.1) * 0.04 + heart * 0.16 + gather * 0.12 + p.mouth * Math.sin(t * 3.0) * 0.05;
   p.headRoll += delight * Math.sin((t - T.walk) * 3.75) * 0.1;
   p.lookX = toKids * -0.4 + toKing * -0.35;
-  p.lookY = wide * 0.45 + toKing * 0.55 - toKids * 0.3;
+  p.lookY = wide * 0.45 + toKing * 0.55 - toKids * 0.3 - bow * 0.7;
 
   // Brows (raise -1..1, tilt + worried / - stern). Cheerful stroll,
   // tender on "I", proud on "helped", delighted with the kids, an
@@ -404,8 +418,21 @@ function kid(t: number, rig: Rig, def: Pose, p: Pose, which: 0 | 1): { x: number
   p.handR = mixV(p.handR, v3(0.1, 0.5, 0.24), awe);
   const rise = span(t, T.kings - 0.25, T.kings, 0.15, 0.05);
   p.lift += rise * 0.03;
-  const bow = ramp(t, T.kings, T.kings + 0.3, backOut);
+  // The bow on "kings": a bend at the waist (the rig pushes the hips
+  // back), a knee dip and a tucked head. Pip folds one arm across his
+  // tummy and sweeps the other back; Dot curtseys, hands out at her skirt.
+  const bow = ramp(t, T.kings + which * 0.1, T.kings + 0.3 + which * 0.1, backOut);
   p.lean += bow * 0.5;
+  p.lift -= bow * (which === 0 ? 0.03 : 0.05);
+  p.headPitch += bow * 0.4;
+  p.lookY -= bow * 0.5;
+  if (which === 0) {
+    p.handR = mixV(p.handR, v3(0.06, 0.2, 0.24), bow);
+    p.handL = mixV(p.handL, v3(-0.42, 0.24, -0.2), bow);
+  } else {
+    p.handL = mixV(p.handL, v3(-0.38, 0.12, 0.1), bow);
+    p.handR = mixV(p.handR, v3(0.38, 0.12, 0.1), bow);
+  }
 
   // Faces (the kids have eyes and lids, no brows): a curious head cock
   // while waiting, eyes down to their feet on "walk", bright eyes on the
@@ -463,19 +490,17 @@ function aim(c: V3, az: number, el: number): V3 {
   return [c[0] + Math.sin(a) * Math.cos(e) * 10, c[1] + Math.sin(e) * 10, c[2] - Math.cos(a) * Math.cos(e) * 10];
 }
 
-// The dream star sits ~22 deg up, ~9 deg right. A1 keeps the previous
-// shot's low angle so it stays in the upper right for the first beat.
-const A1P: V3 = [1.0, 1.0, 9.0];
-const A1Q: V3 = [1.05, 1.08, 8.8];
-const A2P: V3 = [0.9, 2.15, 9.5];
+// The dream star sits ~22 deg up, ~9 deg right of straight upstage. The
+// previous clip ends on a close, low, frontal hero shot of Aria, so A cuts
+// to a high wide from house left (about 30 deg round and far wider); the
+// star stays in the sky, upper left of frame.
+const AP0: V3 = [-5.8, 2.1, 12.8];
+const AP1: V3 = [-5.8, 2.3, 11.4];
 
 const SHOTS: Shot[] = [
-  // A1: the band hits; same low hero angle as the cut-in, the star high
-  // in frame, the house warms up around Aria.
-  { at: START, from: [A1P, aim(A1P, -1, 12)], to: [A1Q, aim(A1Q, -1, 11)] },
-  // A2: crane up and tilt down into the wide as Barnaby strolls on; the
-  // apron lip is the bottom of frame, so the stalls stay out of shot.
-  { at: 41.45, from: [A1Q, aim(A1Q, -1, 11)], to: [A2P, [1.15, 1.8, -1.0]] },
+  // A: the band hits; the whole stage from house left, then a slow pan
+  // right that picks up Barnaby and follows him to his mark.
+  { at: START, from: [AP0, aim(AP0, 25, 7)], to: [AP1, aim(AP1, 31, 3)] },
   // B: medium on Barnaby, room on the left for the kids' entrance.
   { at: 44.15, from: [[1.2, 1.6, 6.9], [1.45, 1.45, 0.3]], to: [[1.3, 1.55, 6.3], [1.45, 1.42, 0.4]] },
   // C: low two-shot, kids featured, Barnaby conducting on the right.
@@ -569,6 +594,13 @@ export const clip = {
     kidMix.copy(kidWarm).lerp(kidBright, bloom);
     const cx = lerp(-2.05, (pipX + dotX) * 0.5, w);
     setSpot(2, cx, lerp(0.7, 1.1, w), lerp(1.6, 1.5, w), pool * (1 + bloom * 0.35), kidMix);
+
+    // The house: delight from the children's entrance through "every-",
+    // then awe from the trap's rumble as the king rises.
+    const awe = span(t, T.their - 0.1, END + 2, 0.35, 0.5);
+    const joy = span(t, T.children - 0.2, T.their + 0.2, 0.5, 0.6) * (1 - awe);
+    set.crowdJoy = lerp(set.crowdJoy, joy, w);
+    set.crowdAwe = lerp(set.crowdAwe, Math.max(set.crowdAwe, awe), w);
 
     // Camera: this clip cuts in and out on its boundaries.
     camera(t, cam);
