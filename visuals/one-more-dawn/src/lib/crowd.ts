@@ -231,13 +231,16 @@ export function buildCrowd(): Crowd {
         const ease = rise * rise * (3 - 2 * rise);
         arcPoint(seat.theta, seat.r, seat.y, base);
         // Seated torso sinks below the parapet until its door opens.
-        const torsoY = seat.y + 0.62 + (ease - 1) * 0.9;
+        // Until its door opens a spectator sits low behind the parapet and is
+        // hidden entirely, so nobody hangs below the tier floor.
+        const torsoY = seat.y + 0.62 + (ease - 1) * 0.5;
+        const seated = ease > 0.02;
         o.position.set(base.x, torsoY, base.z);
         o.rotation.set(0, Math.atan2(-base.x, CENTER_Z - base.z), 0);
         const build = (i * 13) % 3;
         o.scale.set(seat.scale * (build === 0 ? 1.25 : build === 1 ? 0.85 : 1.0), seat.scale * (build === 1 ? 1.2 : 0.95), seat.scale);
         o.updateMatrix();
-        bodies.setMatrixAt(i, o.matrix);
+        bodies.setMatrixAt(i, seated ? o.matrix : hidden.matrix);
         // Head turns toward the performer (three-quarter views) with a sway.
         // Face the house centre, then turn 60% of the way toward the
         // performer (angle difference wrapped to -PI..PI).
@@ -254,7 +257,7 @@ export function buildCrowd(): Crowd {
         head.scale.setScalar(headScale);
         head.updateMatrix();
         const kind = kindOf(i);
-        heads.forEach((m, k) => m.setMatrixAt(i, k === kind ? head.matrix : hidden.matrix));
+        heads.forEach((m, k) => m.setMatrixAt(i, k === kind && seated ? head.matrix : hidden.matrix));
         o.position.set(0, 0.14, 0);
         o.rotation.set(0, 0, 0);
         o.scale.setScalar(1);
@@ -264,7 +267,7 @@ export function buildCrowd(): Crowd {
         o.position.set(0.1, 0.17, 0);
         o.updateMatrix();
         o.matrix.premultiply(head.matrix);
-        antennas.setMatrixAt(i, i % 6 === 0 && kind === 0 ? o.matrix : hidden.matrix);
+        antennas.setMatrixAt(i, seated && i % 6 === 0 && kind === 0 ? o.matrix : hidden.matrix);
         const faceZ = kind === 1 ? 0.14 : kind === 2 ? 0.15 : 0.125;
         const awe = crowdState.awe * (0.75 + 0.25 * Math.sin(i * 3.1));
         const joy = crowdState.joy * (0.75 + 0.25 * Math.cos(i * 2.3));
@@ -273,13 +276,13 @@ export function buildCrowd(): Crowd {
         o.scale.set(1 - awe * 0.45 + joy * 0.3, 1 + awe * 2.2 + joy * 0.8, 1);
         o.updateMatrix();
         o.matrix.premultiply(head.matrix);
-        mouths.setMatrixAt(i, o.matrix);
+        mouths.setMatrixAt(i, seated ? o.matrix : hidden.matrix);
         // Neutral brows sit level; awe and joy lift them.
         o.position.set(0, 0.09 + (awe + joy) * 0.03, faceZ);
         o.rotation.set(0, 0, (i % 5 - 2) * 0.025 * (1 - Math.min(1, awe + joy)));
         o.updateMatrix();
         o.matrix.premultiply(head.matrix);
-        brows.setMatrixAt(i, o.matrix);
+        brows.setMatrixAt(i, seated ? o.matrix : hidden.matrix);
         const open = crowdState.eyesOpen * ease;
         for (let e = 0; e < 2; e += 1) {
           const side = e === 0 ? -1 : 1;
@@ -288,12 +291,12 @@ export function buildCrowd(): Crowd {
           o.scale.set(1, Math.max(0.08, open), 1);
           o.updateMatrix();
           o.matrix.premultiply(head.matrix);
-          eyes.setMatrixAt(i * 2 + e, o.matrix);
+          eyes.setMatrixAt(i * 2 + e, seated ? o.matrix : hidden.matrix);
           o.position.set(side * 0.07 + crowdState.lookX * 0.01, 0.02 + crowdState.lookY * 0.012, faceZ + 0.012);
           o.scale.set(1, Math.max(0.05, open), 1);
           o.updateMatrix();
           o.matrix.premultiply(head.matrix);
-          pupils.setMatrixAt(i * 2 + e, o.matrix);
+          pupils.setMatrixAt(i * 2 + e, seated ? o.matrix : hidden.matrix);
         }
       });
       for (const m of [bodies, ...heads, domes, eyes, pupils, antennas, mouths, brows]) {
