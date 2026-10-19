@@ -4,6 +4,8 @@
 //        [--controls '{"startAt":0}'] [--width 1920 --height 1080] [--pool 3]
 //   node scripts/lux-render.mjs video --src <dir> --out <file.mp4> --range 0:72.5:24
 //        [--audio <song.mp3> --audio-start 0] [--controls ...] [--keep-frames <dir>]
+//   node scripts/lux-render.mjs sheet --src <dir> --out sheet.png (--times | --range) [--cols 4 --tile 480]
+//        [--crop w,h,x,y] [--width 640 --height 360]   (one tiled review image)
 //   node scripts/lux-render.mjs status | stop
 //
 // The first call compiles the source (cached by content hash) and starts a
@@ -46,13 +48,27 @@ async function bundleSource(dir) {
   const walk = async d => {
     for (const name of (await readdir(d)).sort()) {
       const p = join(d, name);
-      if ((await stat(p)).isDirectory()) await walk(p);
+      if ((await stat(p)).isDirectory()) { if (name !== 'assets') await walk(p); }
       else if (p.endsWith('.ts')) files[relative(dir, p).split(sep).join('/')] = await readFile(p, 'utf8');
     }
   };
   await walk(dir);
   const sdkVersion = Object.values(files).some(s => s.includes('defineComponent')) ? '0.4.0' : '0.2.0';
-  return { sdkVersion, entry: 'visual.ts', files };
+  // Images in <src>/assets/ become source-v2 assets (logical path assets/...).
+  const assets = {};
+  const types = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.bmp': 'image/bmp' };
+  const assetDir = join(dir, 'assets');
+  const walkAssets = async d => {
+    for (const name of (await readdir(d)).sort()) {
+      const p = join(d, name);
+      if ((await stat(p)).isDirectory()) { await walkAssets(p); continue; }
+      const ext = name.slice(name.lastIndexOf('.')).toLowerCase();
+      if (!types[ext]) continue;
+      assets[relative(dir, p).split(sep).join('/')] = { mediaType: types[ext], encoding: 'base64', data: (await readFile(p)).toString('base64') };
+    }
+  };
+  if (existsSync(assetDir)) await walkAssets(assetDir);
+  return Object.keys(assets).length ? { sdkVersion, sourceVersion: 2, entry: 'visual.ts', files, assets } : { sdkVersion, entry: 'visual.ts', files };
 }
 
 // Compile + link once per source content; repeat renders skip both.
@@ -101,8 +117,18 @@ async function endpoint() {
 // Rebuild the pool's worker bundle when the Studio worker source is newer.
 async function ensureWorkerBundle() {
   const bundle = join(root, 'apps/render-pool/dist/worker.js');
-  const source = join(root, 'apps/studio/src/visual-worker.mjs');
-  if (existsSync(bundle) && (await stat(bundle)).mtimeMs >= (await stat(source)).mtimeMs) return false;
+  // The bundle inlines the Studio worker, runtime and asset decoders.
+  const newest = async dir => {
+    let latest = 0;
+    for (const name of await readdir(dir)) {
+      const p = join(dir, name), info = await stat(p);
+      latest = Math.max(latest, info.isDirectory() ? await newest(p) : info.mtimeMs);
+    }
+    return latest;
+  };
+  const sources = ['apps/studio/src', 'packages/runtime/src', 'packages/assets/src', 'packages/runtime-contracts/src'];
+  const latest = Math.max(...await Promise.all(sources.map(d => newest(join(root, d)))));
+  if (existsSync(bundle) && (await stat(bundle)).mtimeMs >= latest) return false;
   const built = spawnSync(process.execPath, [join(root, 'apps/render-pool/build.mjs')], { cwd: root, encoding: 'utf8' });
   if (built.status !== 0) throw Error(`render pool worker build failed: ${built.stderr}`);
   return true;
@@ -197,6 +223,26 @@ if (import.meta.url === `file:///${process.argv[1].replaceAll('\\', '/')}` || pr
       });
       console.log(JSON.stringify({ ...result, wallMs: Date.now() - started }));
       if (result.failed.length) process.exitCode = 1;
+    } else if (command === 'sheet') {
+      // Render frames and tile them into one review image (cheap to inspect).
+      const times = timesFrom(args);
+      const out = resolve(args.out);
+      const frameDir = join(stateDir, 'sheet', createHash('sha256').update(out + Date.now()).digest('hex').slice(0, 8));
+      const result = await renderFrames({
+        src: args.src, out: frameDir, times, controls: args.controls ? JSON.parse(args.controls) : {},
+        width: Number(args.width ?? 640), height: Number(args.height ?? 360), pool: Number(args.pool ?? 3),
+      });
+      const cols = Number(args.cols ?? 4), tile = Number(args.tile ?? 480);
+      const crop = args.crop ? `crop=${String(args.crop).split(',').join(':')},` : '';
+      const inputs = times.flatMap(t => ['-i', join(frameDir, `t${t.toFixed(4).padStart(9, '0')}.png`)]);
+      const scaled = times.map((_, i) => `[${i}]${crop}scale=${tile}:-2[s${i}]`).join(';');
+      const rows = Math.ceil(times.length / cols);
+      const layout = times.map((_, i) => `${(i % cols)}*w0_${Math.floor(i / cols)}*h0`).map(l => l.replace(/(\d+)\*w0/, (m, n) => n === '0' ? '0' : Array(Number(n)).fill('w0').join('+')).replace(/(\d+)\*h0/, (m, n) => n === '0' ? '0' : Array(Number(n)).fill('h0').join('+'))).join('|');
+      const graph = times.length === 1 ? `${scaled};[s0]copy` : `${scaled};${times.map((_, i) => `[s${i}]`).join('')}xstack=inputs=${times.length}:layout=${layout}:fill=black`;
+      const made = spawnSync('ffmpeg', ['-v', 'error', '-y', ...inputs, '-filter_complex', graph, '-frames:v', '1', out], { encoding: 'utf8' });
+      await import('node:fs/promises').then(fs => fs.rm(frameDir, { recursive: true, force: true }));
+      if (made.status !== 0) throw Error(`ffmpeg sheet failed: ${made.stderr.slice(-600)}`);
+      console.log(JSON.stringify({ sheet: out, frames: times.length, rows, failed: result.failed.length }));
     } else if (command === 'video') {
       const started = Date.now();
       const range = String(args.range ?? '').split(':').map(Number);

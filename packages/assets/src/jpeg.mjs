@@ -79,7 +79,7 @@ function inspect(bytes, maxRgbaBytes) {
       const height = view.getUint16(start+1), width = view.getUint16(start+3), count = bytes[start+5];
       exact(6+count*3);
       if (bytes[start] !== 8 || ![1,3].includes(count)) fail('only 8-bit grayscale and three-component JPEG supported');
-      if (width < 1 || height < 1 || width > 512 || height > 512) fail('dimensions must be 1..512');
+      if (width < 1 || height < 1 || width > assetLimits.dimension || height > assetLimits.dimension) fail(`dimensions must be 1..${assetLimits.dimension}`);
       if (width*height*4 > maxRgbaBytes) fail('RGBA allocation budget exceeded',true);
       const components = new Map(); let maxH = 1, maxV = 1, blocks = 0;
       for (let i = 0; i < count; i++) {
@@ -189,7 +189,7 @@ function decode(bytes, options = {}) {
   if (byteLength > assetLimits.imageBytes) fail('file exceeds image byte limit',true);
   const original = new Uint8Array(byteLength); Reflect.apply(typedArraySet,original,[bytes]);
   const info = inspect(original,maxRgbaBytes);
-  const raw = decodeJpegJs(original,{useTArray:true,formatAsRGBA:true,tolerantDecoding:false,maxResolutionInMP:0.262144,maxMemoryUsageInMB:32,colorTransform:info.colorTransform});
+  const raw = decodeJpegJs(original,{useTArray:true,formatAsRGBA:true,tolerantDecoding:false,maxResolutionInMP:(assetLimits.dimension*assetLimits.dimension)/1e6,maxMemoryUsageInMB:Math.ceil(assetLimits.rgbaBytes/1048576)+64,colorTransform:info.colorTransform});
   if (raw.width !== info.width || raw.height !== info.height || !(raw.data instanceof Uint8Array) || raw.data.length !== info.width*info.height*4) fail('decoder output mismatch');
   for (let i = 3; i < raw.data.length; i += 4) if (raw.data[i] !== 255) fail('JPEG decoder returned nonopaque alpha');
   const swapped = info.orientation >= 5, width = swapped ? info.height : info.width, height = swapped ? info.width : info.height;
