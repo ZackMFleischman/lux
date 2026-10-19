@@ -1,0 +1,58 @@
+<!doctype html>
+<!-- Render pool page: hosts one unchanged Lux visual worker and renders frames
+     at exact times on request. No Studio UI, no default scene. -->
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' blob:; worker-src 'self' blob:; style-src 'unsafe-inline'; connect-src 'none'">
+<style>html,body{margin:0;background:transparent}canvas{display:block}</style>
+<canvas width="64" height="64"></canvas>
+<script type="module">
+let worker, identity, current;
+const pending = new Map();
+function request(message, transfer = [], timeoutMs = 120000) {
+  const requestId = crypto.randomUUID();
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => { pending.delete(requestId); reject(Error(`render pool: ${message.type} did not answer within ${timeoutMs} ms`)); }, timeoutMs);
+    pending.set(requestId, { resolve, reject, timer });
+    worker.postMessage({ ...message, ...identity, requestId }, transfer);
+  });
+}
+function onMessage({ data }) {
+  if (data.type === 'failure' && !data.requestId) {
+    for (const [id, wait] of pending) { clearTimeout(wait.timer); pending.delete(id); wait.reject(Error(data.message)); }
+    return;
+  }
+  const wait = pending.get(data.requestId);
+  if (!wait) return;
+  clearTimeout(wait.timer); pending.delete(data.requestId);
+  if (data.type === 'failure' || data.type === 'capture-error') wait.reject(Error(data.message));
+  else wait.resolve(data);
+}
+async function dispose() {
+  if (!worker) return;
+  try { await request({ type: 'dispose' }, [], 15000); } catch { /* the worker closes itself */ }
+  worker.terminate(); worker = undefined; current = undefined;
+}
+// job: {key, linked, settings, sdkVersion, controlSchema, controlSchemaHash, controls, nodeControls}
+window.prepare = async job => {
+  if (current === job.key && worker) return 'warm';
+  await dispose();
+  worker = new Worker('../dist/worker.js', { type: 'module' });
+  worker.onmessage = onMessage;
+  worker.onerror = event => onMessage({ data: { type: 'failure', message: event.message || 'worker error' } });
+  identity = { instanceId: crypto.randomUUID(), generation: 1, revisionId: job.key };
+  const previous = document.querySelector('canvas'), fresh = previous.cloneNode();
+  previous.replaceWith(fresh);
+  const canvas = fresh.transferControlToOffscreen();
+  await request({ type: 'init', linked: job.linked, settings: job.settings, sdkVersion: job.sdkVersion,
+    controlSchema: job.controlSchema, controlSchemaHash: job.controlSchemaHash, controls: job.controls,
+    ...(job.nodeControls ? { nodeControls: job.nodeControls } : {}), canvas, playing: false, externallyDriven: true,
+    performanceMode: 'baseline' }, [canvas], job.initTimeoutMs ?? 180000);
+  current = job.key;
+  return 'cold';
+};
+window.renderFrame = async timeSeconds => {
+  const result = await request({ type: 'render-frame', timeSeconds });
+  return new Uint8Array(result.bytes);
+};
+window.releaseVisual = dispose;
+</script>

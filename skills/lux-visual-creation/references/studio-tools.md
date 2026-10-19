@@ -126,6 +126,18 @@ Library create/update accept optional `dependencies` rows `{componentId, revisio
 
 Read status for the running app's `parameterKinds`, current `controlSchema`, instance/generation/revision and schema hash. Use the existing `lux.studio.parameters` tool for all persistent types: `values: { speed: 0.8, trails: true, palette: "warm" }`, with the current required guards and `mode: "live"`. Enum values are option IDs, never labels or indices. The authoritative schema rejects incorrect value types, unknown IDs and absent options. Inspect the applied response; a submitted patch is not evidence of a rendered frame. Re-read after a stale guard rather than replaying old intent against an unrelated visual. No tool per switch or option is needed. Source declaration changes still use complete guarded build and scene save/open.
 
+## Offline frames and video (no Studio launch)
+
+For QA strips, contact sheets and videos, use the warm headless render pool instead of launching an isolated Studio per capture:
+
+```text
+pnpm render render --src <source dir> --out <frame dir> --times 1,2.5,10        # or --range 0:72.5:24
+pnpm render video  --src <source dir> --out clip.mp4 --range 0:72.5:24 --audio song.mp3 [--audio-start 0]
+pnpm render status | stop
+```
+
+It compiles once per source content (cached), keeps N hidden render windows warm (default 3), renders at exact times with a true seek (no playback, reset or `startAt` tricks) and writes PNGs straight to disk. The pool exits after 20 idle minutes and never touches the user's Studio or profile. Output matches the Studio preview because it runs the same visual worker. Pass public control values with `--controls '{"id":value}'`. Story scenes are not supported offline yet; use Studio for them. This is a terminal workflow; the MCP `capture` tool still captures the live preview.
+
 ## Story playback
 
 When the running app reports Story support for SDK0.2 root visuals, use

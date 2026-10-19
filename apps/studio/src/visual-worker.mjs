@@ -365,6 +365,17 @@ onmessage = event => {
       if (message.action === 'reset') { clock.reset();tempoClock.reset(0); controlState.resetAnimations?.(0);storyTransport?.reset(0); random.reset(settings.seed); await visual.reset(settings.seed); lastTime = 0; tick = 0; }
       else {if(message.action==='pause')controlState.fenceAudioEvents?.();clock[message.action]();}
       await draw(message.requestId, 'status'); schedule();
+    } else if (message.type === 'render-frame') {
+      // Offline rendering (render pool): seek to an exact time, draw once and
+      // return the encoded frame in one round trip. Does not touch playback.
+      if(storyGeneration)throw new RuntimeError('Story scenes cannot be rendered offline yet');
+      const timeSeconds=Number(message.timeSeconds);
+      if(!Number.isFinite(timeSeconds)||timeSeconds<0)throw new RuntimeError('Invalid frame time');
+      await draw(undefined,'status',{},undefined,undefined,freeze({...clock.snapshot(),playback:'paused',timeSeconds}));
+      const pixels=await renderer.readRenderTargetPixelsAsync(outputTarget,0,0,settings.width,settings.height);
+      if(stopped)return;
+      const png=encodeCapturedTarget(pixels,settings.width,settings.height),bytes=png.slice().buffer;
+      postMessage({type:'frame-png',...identity,requestId:message.requestId,timeSeconds,bytes},[bytes]);
     } else if (message.type === 'capture') {
       try {
         if(storyGeneration){

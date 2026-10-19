@@ -99,6 +99,11 @@ profiles isolated and do not interrupt user apps.
 For such an exceptional window, use the canonical Conductor shared-resource
 handoff rule. Lux adds no GPU-specific scheduler or global lock.
 
+For offline frame QA and video, render through the warm headless pool
+(`pnpm render …`, see `skills/lux-visual-creation/references/studio-tools.md`)
+instead of launching an isolated Studio per capture. Parallel agents share one
+pool per checkout. Give every parallel agent its own scratch folder.
+
 ### UI review evidence
 
 For UI changes, capture the affected area in the actual running application.
