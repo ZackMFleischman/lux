@@ -32,7 +32,7 @@ export function disposeShapes(): void {
 
 // Superellipsoid: e = 2 is an ellipsoid, larger values give a "squircle"
 // box. w, h, d are full sizes.
-export function blob(w: number, h: number, d: number, e = 2, segments = 28): BufferGeometry {
+export function blob(w: number, h: number, d: number, e = 2, segments = 44): BufferGeometry {
   return cached(`blob:${w}:${h}:${d}:${e}:${segments}`, () => {
     const geometry = new SphereGeometry(1, segments, Math.round(segments * 0.75));
     const p = geometry.getAttribute('position') as BufferAttribute;
@@ -46,7 +46,7 @@ export function blob(w: number, h: number, d: number, e = 2, segments = 28): Buf
   });
 }
 
-export function ball(r: number, segments = 20): BufferGeometry {
+export function ball(r: number, segments = 36): BufferGeometry {
   return cached(`ball:${r}:${segments}`, () => new SphereGeometry(r, segments, Math.round(segments * 0.75)));
 }
 
@@ -59,7 +59,7 @@ export function ring(r: number, tube: number, arc = Math.PI * 2): BufferGeometry
 }
 
 // Lathe from [radius, height] pairs; used for skirts, hats, gowns, throne.
-export function lathe(name: string, profile: readonly (readonly [number, number])[], segments = 36, phiStart = 0, phiLength = Math.PI * 2): BufferGeometry {
+export function lathe(name: string, profile: readonly (readonly [number, number])[], segments = 72, phiStart = 0, phiLength = Math.PI * 2): BufferGeometry {
   return cached(`lathe:${name}`, () => {
     // LatheGeometry faces outward when the profile runs bottom to top.
     const ordered = profile[0][1] > profile[profile.length - 1][1] ? [...profile].reverse() : profile;
@@ -84,10 +84,10 @@ export const UP = new Vector3(0, 1, 0);
 
 // Hard-surface kit: rounded box (small bevel), bevelled can, dome.
 export function rbox(w: number, h: number, d: number): BufferGeometry {
-  return blob(w, h, d, 9, 40);
+  return blob(w, h, d, 9, 56);
 }
 
-export function can(r: number, h: number, segments = 32): BufferGeometry {
+export function can(r: number, h: number, segments = 64): BufferGeometry {
   return cached(`can:${r}:${h}:${segments}`, () => {
     const bevel = Math.min(r, h) * 0.12;
     const profile: [number, number][] = [
@@ -104,7 +104,7 @@ export function can(r: number, h: number, segments = 32): BufferGeometry {
   });
 }
 
-export function dome(r: number, squash = 1, segments = 32): BufferGeometry {
+export function dome(r: number, squash = 1, segments = 64): BufferGeometry {
   return cached(`dome:${r}:${squash}:${segments}`, () => {
     const geometry = new SphereGeometry(r, segments, Math.round(segments / 2), 0, Math.PI * 2, 0, Math.PI / 2);
     geometry.scale(1, squash, 1);

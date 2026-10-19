@@ -21,7 +21,7 @@ const V = VERSE1_LINES;
 const W = BARITONE_WORDS;
 
 // Named word times used as cues.
-const cue = {
+export const cue = {
   awaken: SOPRANO_WORDS[3][0],
   doors: SOPRANO_WORDS[4][0],
   question: I[5][0],
@@ -63,7 +63,7 @@ export interface Cast {
 }
 
 // Mouth opening from word timings: syllable-like pulses, held notes stay open.
-function sing(t: number, words: readonly (readonly [number, number])[], power = 1): number {
+export function sing(t: number, words: readonly (readonly [number, number])[], power = 1): number {
   let open = 0;
   for (const [a, b] of words) {
     if (t < a - 0.08 || t > b + 0.12) {
@@ -80,33 +80,33 @@ function sing(t: number, words: readonly (readonly [number, number])[], power = 
   return open * (0.7 + 0.3 * levelAt(t)) * power;
 }
 
-function blinkAt(t: number, seed: number): number {
+export function blinkAt(t: number, seed: number): number {
   const period = 3.1 + seed * 0.7;
   const phase = (t + seed * 1.37) % period;
   return phase < 0.14 ? Math.sin((phase / 0.14) * Math.PI) : 0;
 }
 
-function v3(x: number, y: number, z: number): V3 {
+export function v3(x: number, y: number, z: number): V3 {
   return [x, y, z];
 }
 
-function mixV(a: V3, b: V3, u: number): V3 {
+export function mixV(a: V3, b: V3, u: number): V3 {
   return [lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u)];
 }
 
 // Stateless walk: phase from distance travelled along keyed straight paths.
-function travelled(t: number, xs: readonly Key[], zs: readonly Key[]): number {
+export function travelled(t: number, xs: readonly Key[], zs: readonly Key[]): number {
   return Math.abs(keys(t, xs, smooth) - xs[0][1]) + Math.abs(keys(t, zs, smooth) - zs[0][1]);
 }
 
-function speedOf(t: number, xs: readonly Key[], zs: readonly Key[]): number {
+export function speedOf(t: number, xs: readonly Key[], zs: readonly Key[]): number {
   const dt = 0.06;
   const dx = keys(t + dt, xs, smooth) - keys(t - dt, xs, smooth);
   const dz = keys(t + dt, zs, smooth) - keys(t - dt, zs, smooth);
   return Math.hypot(dx, dz) / (2 * dt);
 }
 
-function walk(pose: Pose, rig: Rig, phase: number, amount: number, stride: number, step: number): void {
+export function walk(pose: Pose, rig: Rig, phase: number, amount: number, stride: number, step: number): void {
   if (!rig.feet || amount <= 0.001) {
     return;
   }
@@ -122,28 +122,28 @@ function walk(pose: Pose, rig: Rig, phase: number, amount: number, stride: numbe
 
 // ---------------------------------------------------------------- lighting
 
-const cool = new Color(0.55, 0.65, 1.0);
-const moon = new Color(0.35, 0.42, 0.8);
-const warm = new Color(1.0, 0.78, 0.5);
-const gold = new Color(1.0, 0.86, 0.55);
-const dawn = new Color(1.0, 0.62, 0.62);
-const red = new Color(1.0, 0.18, 0.15);
-const steel = new Color(0.55, 0.62, 0.85);
+export const cool = new Color(0.55, 0.65, 1.0);
+export const moon = new Color(0.35, 0.42, 0.8);
+export const warm = new Color(1.0, 0.78, 0.5);
+export const gold = new Color(1.0, 0.86, 0.55);
+export const dawn = new Color(1.0, 0.62, 0.62);
+export const red = new Color(1.0, 0.18, 0.15);
+export const steel = new Color(0.55, 0.62, 0.85);
 const tmpA = new Color();
 const tmpB = new Color();
 
-function setColor(target: Color, a: Color, b: Color, u: number, scale: number): void {
+export function setColor(target: Color, a: Color, b: Color, u: number, scale: number): void {
   target.copy(a).lerp(b, clamp01(u)).multiplyScalar(scale);
 }
 
-function setSpot(i: number, x: number, z: number, r: number, level: number, color: Color, height = 9.5): void {
+export function setSpot(i: number, x: number, z: number, r: number, level: number, color: Color, height = 9.5): void {
   const s = light.spots[i];
   s.shape.value.set(x, z, r, level);
   s.color.value.copy(color);
   s.height.value = height;
 }
 
-function lighting(t: number, stagePos: { aria: Vector3; barnaby: Vector3; king: Vector3 }): void {
+export function lighting(t: number, stagePos: { aria: Vector3; barnaby: Vector3; king: Vector3 }): void {
   const lvl = levelAt(t);
   // Overall key light by section.
   const keyLevel = keys(t, [
@@ -241,8 +241,8 @@ function lighting(t: number, stagePos: { aria: Vector3; barnaby: Vector3; king: 
   set.wallWakeAt.value = cue.doors;
   set.wallLevel.value = keys(t, [[0, 1], [19.3, 1], [22, 0.16], [cue.bandIn - 0.5, 0.16], [cue.bandIn + 1, 0.32], [cue.chain, 0.32], [cue.chain + 0.5, 0.2], [cue.reign, 0.2]]);
   set.wallEyeLevel.value = keys(t, [[0, 1], [19.3, 1], [22, 0.12], [cue.bandIn, 0.12], [cue.bandIn + 1, 0.42], [cue.begged, 0.42], [cue.wars, 0.75]]);
-  setColor(set.wallInterior.value, new Color(0.45, 0.8, 1.0), new Color(1.0, 0.68, 0.32), toWarm, 1);
-  setColor(set.wallEyes.value, new Color(0.75, 1.0, 1.0), new Color(1.0, 0.95, 0.75), toWarm, 1);
+  set.wallInterior.value.setRGB(0.95, 0.82, 0.55);
+  set.wallEyes.value.setRGB(1.0, 0.98, 0.92);
   set.wallBlinkSync.value = span(t, I[2][0] - 0.3, I[3][1] + 0.5, 0.5, 1.0);
   const look = set.wallLook.value;
   look.set(
@@ -260,7 +260,7 @@ function lighting(t: number, stagePos: { aria: Vector3; barnaby: Vector3; king: 
 const camPos = new Vector3();
 const camLook = new Vector3();
 
-function camera(t: number, cam: PerspectiveCamera): void {
+export function camera(t: number, cam: PerspectiveCamera): void {
   const shots: [number, [number, number, number], [number, number, number]][] = [
     [0, [0, 2.9, 19.0], [0, 3.4, 2.0]],
     [3.0, [0, 2.85, 18.6], [0, 3.2, 1.0]],
@@ -300,7 +300,7 @@ function camera(t: number, cam: PerspectiveCamera): void {
 
 const scratch = blankPose();
 
-function ariaPose(t: number, rig: Rig, out: Pose): Vector3 {
+export function ariaPose(t: number, rig: Rig, out: Pose): Vector3 {
   const p = copyPose(rig.rest, out);
   const r = rig.rest;
   const onPedestal = 1 - ramp(t, I[4][0] - 0.2, I[4][0] + 1.2);
@@ -380,7 +380,7 @@ function ariaPose(t: number, rig: Rig, out: Pose): Vector3 {
   return new Vector3(p.x, 0, p.z);
 }
 
-function barnabyPose(t: number, rig: Rig, out: Pose): Vector3 {
+export function barnabyPose(t: number, rig: Rig, out: Pose): Vector3 {
   const p = copyPose(rig.rest, out);
   const r = rig.rest;
   // Enters from stage right; steps forward between the soldiers; bows.
@@ -450,7 +450,7 @@ function barnabyPose(t: number, rig: Rig, out: Pose): Vector3 {
   return new Vector3(p.x, 0, p.z);
 }
 
-function kidPose(t: number, rig: Rig, out: Pose, which: 0 | 1): void {
+export function kidPose(t: number, rig: Rig, out: Pose, which: 0 | 1): void {
   const p = copyPose(rig.rest, out);
   const r = rig.rest;
   const home = which === 0 ? -2.7 : -1.45;
@@ -515,7 +515,7 @@ function kidPose(t: number, rig: Rig, out: Pose, which: 0 | 1): void {
   void r;
 }
 
-function kingPose(t: number, rig: Rig, out: Pose, liftY: number): void {
+export function kingPose(t: number, rig: Rig, out: Pose, liftY: number): void {
   const p = copyPose(rig.rest, out);
   p.x = 0;
   p.z = 0.1;
@@ -539,7 +539,7 @@ function kingPose(t: number, rig: Rig, out: Pose, liftY: number): void {
   p.visible = liftY > -3.8;
 }
 
-function guardPose(t: number, rig: Rig, out: Pose, side: -1 | 1): void {
+export function guardPose(t: number, rig: Rig, out: Pose, side: -1 | 1): void {
   const p = copyPose(rig.rest, out);
   const enter = cue.begged - 0.3 + (side > 0 ? 0.15 : 0);
   const xKeys: Key[] = [[0, side * 9.5], [enter, side * 9.5], [enter + 1.8, side * 2.9]];
@@ -587,7 +587,9 @@ const poses = {
   g1: blankPose(),
 };
 
-export function runShow(t: number, cast: Cast, cam: PerspectiveCamera): void {
+// The original full-length staging. Clips start from this and override
+// whatever they own (see director.ts and clips/).
+export function defaultFrame(t: number, cast: Cast, cam: PerspectiveCamera): void {
   // Curtains part on the first sung line.
   set.curtainOpen = ramp(t, cue.awaken - 2.2, cue.doors + 0.2, smooth);
   set.pedestalDrop = ramp(t, cue.bandIn + 1.0, cue.bandIn + 3.2, smooth);

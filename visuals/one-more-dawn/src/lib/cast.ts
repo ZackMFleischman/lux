@@ -14,12 +14,12 @@ import { glow, place, toon } from './toon.ts';
 
 const P = {
   ink: 0x15121a,
-  pearl: 0xd8d5e0,
-  lavender: 0x9a8cbc,
-  gold: 0xc9a24f,
-  copper: 0xb36f3e,
-  copperDark: 0x7f4a2b,
-  waistcoat: 0x6d2933,
+  pearl: 0xe2dff0,
+  lavender: 0x9a82d0,
+  gold: 0xd9aa3c,
+  copper: 0xc8702f,
+  copperDark: 0x8a4722,
+  waistcoat: 0x84222f,
   teal: 0x4f8f8c,
   steel: 0x8f98a8,
 };
@@ -204,8 +204,8 @@ export function makeBarnaby(): Rig {
 }
 
 export function makeKid(kind: 'pip' | 'dot'): Rig {
-  const shell = toon(kind === 'pip' ? 0x5b9893 : 0xcf8a74, { shine: 0.4 });
-  const outfit = toon(kind === 'pip' ? 0x46609a : 0xcfa845);
+  const shell = toon(kind === 'pip' ? 0x3fa59c : 0xe58466, { shine: 0.4 });
+  const outfit = toon(kind === 'pip' ? 0x3a5fb4 : 0xe8b83a);
   const rig = skeleton({
     name: kind === 'pip' ? 'Pip' : 'Dot',
     hipHeight: 0.4,
@@ -243,10 +243,10 @@ export function makeKid(kind: 'pip' | 'dot'): Rig {
     const cap = toon(0xa83f3a);
     place(new Mesh(dome(0.225, 0.62), cap), rig.head, 0, 0.4, 0);
     place(new Mesh(rbox(0.22, 0.03, 0.16), cap), rig.head, 0, 0.4, 0.22);
-    place(new Mesh(rod(0.012, 0.012, 0.1), toon(0xcfa845)), rig.head, 0, 0.59, 0);
+    place(new Mesh(rod(0.012, 0.012, 0.1), toon(0xe8b83a)), rig.head, 0, 0.59, 0);
     const prop = place(new Group(), rig.head, 0, 0.64, 0);
     for (const side of [-1, 1]) {
-      place(new Mesh(rbox(0.2, 0.02, 0.07), toon(0xcfa845)), prop, side * 0.1, 0, 0, 0.3 * side);
+      place(new Mesh(rbox(0.2, 0.02, 0.07), toon(0xe8b83a)), prop, side * 0.1, 0, 0, 0.3 * side);
     }
     rig.props.propeller = prop;
   } else {
@@ -292,20 +292,21 @@ export function makeKing(): Rig {
   capeMaterial.side = DoubleSide;
   place(new Mesh(lathe('king-cape2', [[0.3, 0.9], ...bell(0.46, 0.8, 0.86, -0.7, 1.3, 10)], 40, 1.15, Math.PI * 2 - 2.3), capeMaterial), rig.torso, 0, 0, -0.08);
   place(new Mesh(ring(0.42, 0.09), ermine), rig.torso, 0, 0.9, -0.02, Math.PI / 2);
-  // Round bronze head with a regal brow plate (deliberately not a box).
-  const bronze = toon(0x9c6b34, { shine: 0.6 });
-  place(new Mesh(can(0.32, 0.5, 40), bronze), rig.head, 0, 0.3, 0);
-  place(new Mesh(dome(0.32, 0.45), bronze), rig.head, 0, 0.55, 0);
-  rig.jaw.position.set(0, 0.1, 0);
-  place(new Mesh(can(0.3, 0.16, 40), toon(0x7f5428)), rig.jaw, 0, -0.04, 0.02);
-  // Horizontal gold bars across the jaw.
-  for (let i = 0; i < 3; i += 1) {
-    place(new Mesh(rbox(0.3, 0.025, 0.03), toon(0xe0b84a, { shadow: 0.4 })), rig.jaw, 0, -0.0 - i * 0.04, 0.31);
+  // Tall enamel egg head with wide round eyes, a gold moustache plate,
+  // a monocle and a round speaker mouth.
+  const headEnamel = toon(0x4a63a8, { shine: 0.7 });
+  place(new Mesh(blob(0.62, 0.74, 0.56, 2.2), headEnamel), rig.head, 0, 0.36, 0);
+  rig.jaw.position.set(0, 0.16, 0.18);
+  place(new Mesh(can(0.085, 0.04), toon(0x1c2340, { shadow: 0 })), rig.jaw, 0, -0.02, 0.07, Math.PI / 2);
+  const mesh = toon(0xc9c4b4, { shadow: 0.4 });
+  place(new Mesh(can(0.07, 0.03), mesh), rig.jaw, 0, -0.02, 0.085, Math.PI / 2);
+  rig.mouthOpen = 1.2;
+  addEyes(rig, 0.085, 0.13, 0.42, 0.25, headEnamel);
+  for (const side of [-1, 1]) {
+    place(new Mesh(blob(0.24, 0.08, 0.06, 2.2), toon(0xe0b84a, { shine: 0.5 })), rig.head, side * 0.12, 0.27, 0.27, 0, 0, side * -0.3);
   }
-  rig.mouthOpen = 0.9;
-  addEyes(rig, 0.07, 0.13, 0.36, 0.3, bronze);
-  place(new Mesh(rbox(0.5, 0.07, 0.1), toon(0x5e3b1a)), rig.head, 0, 0.47, 0.29, 0.2);
-  const crown = place(new Group(), rig.head, 0, 0.57, 0);
+  place(new Mesh(ring(0.1, 0.014), toon(0xe0b84a)), rig.head, 0.13, 0.42, 0.33);
+  const crown = place(new Group(), rig.head, 0, 0.66, 0);
   const crownGold = toon(0xe0b84a, { shine: 0.8 });
   place(new Mesh(can(0.27, 0.16, 6), crownGold), crown, 0, 0.08, 0);
   for (let i = 0; i < 6; i += 1) {
@@ -326,7 +327,7 @@ export function makeKing(): Rig {
 
 export function makeGuard(seed: number): Rig {
   const steel = toon(P.steel, { shine: 0.6 });
-  const coat = toon(0xa5352f);
+  const coat = toon(0xc4302a);
   const white = toon(0xe6e2d6);
   const rig = skeleton({
     name: `Guard${seed}`,

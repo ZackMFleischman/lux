@@ -98,7 +98,7 @@ export function toon(hex: number, options: ToonOptions = {}): MeshBasicNodeMater
     // Painted cartoon highlight: a hard "bean" where the view-space normal
     // faces up-left toward the viewer, so it stays put like a drawn decal.
     const nv: Node = normalize(transformedNormalView);
-    const bean = smoothstep(0.935, 0.95, dot(nv, normalize(vec3(-0.45, 0.55, 0.7))));
+    const bean = smoothstep(0.946, 0.95, dot(nv, normalize(vec3(-0.45, 0.55, 0.7))));
     color = mix(color, base.mul(0.35).add(vec3(0.75, 0.75, 0.72)).mul(light.key.add(light.fill).add(spotLight()).min(1.4)), bean.mul(shine));
   }
   const emissive = options.emissive ?? 0;

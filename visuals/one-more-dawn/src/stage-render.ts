@@ -9,7 +9,8 @@ import { makeAria, makeBarnaby, makeGuard, makeKid, makeKing } from './lib/cast.
 import { Chain, DAIS, buildGlobe, buildThrone } from './lib/props.ts';
 import { disposeRig } from './lib/rig.ts';
 import { disposeShapes } from './lib/shapes.ts';
-import { runShow, type Cast } from './lib/show.ts';
+import { runShow } from './lib/director.ts';
+import type { Cast } from './lib/show.ts';
 import { CLIP_END } from './lib/song.ts';
 import { buildStage, contactShadow, set } from './lib/stage.ts';
 import { light } from './lib/toon.ts';

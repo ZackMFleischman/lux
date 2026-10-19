@@ -32,7 +32,7 @@ export default defineComponent({
       image: { type: { kind: 'image', colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }, label: 'Image', description: 'Colour with ink lines.' },
     },
     controls: {
-      lineWidth: { type: 'number', label: 'Line weight', default: 3.4, min: 0, max: 8, step: 0.1, unit: 'px', group: 'Ink' },
+      lineWidth: { type: 'number', label: 'Line weight', default: 4.0, min: 0, max: 8, step: 0.1, unit: 'px', group: 'Ink' },
       setLine: { type: 'number', label: 'Set line weight', default: 0.5, min: 0, max: 1, step: 0.01, group: 'Ink' },
       crease: { type: 'number', label: 'Crease lines', default: 0.35, min: 0, max: 1, step: 0.01, group: 'Ink' },
     },
@@ -89,11 +89,11 @@ export default defineComponent({
       setHits = setHits.add(setEdge);
     }
     // Coverage-style anti-aliasing from the number of differing samples.
-    const figureInk: Node = clamp(figureHits.div(3), 0, 1);
+    const figureInk: Node = clamp(figureHits.div(2), 0, 1);
     const setInk: Node = clamp(setHits.div(2.5), 0, 1).mul(0.85);
     const base: Node = colorSample.rgb;
     const setTone: Node = base.mul(vec3(0.32, 0.27, 0.36));
-    const ink: Node = vec3(0.05, 0.035, 0.03);
+    const ink: Node = vec3(0.01, 0.007, 0.009);
     let color: Node = mix(base, setTone, setInk);
     color = mix(color, ink, figureInk);
 
@@ -104,7 +104,7 @@ export default defineComponent({
     const scene = new Scene();
     scene.add(new Mesh(geometry, material));
     const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    let lineWidth = 3.4;
+    let lineWidth = 4.0;
     let setLine = 0.5;
     let crease = 0.35;
     void context;
