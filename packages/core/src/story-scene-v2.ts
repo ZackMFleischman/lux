@@ -9,6 +9,8 @@ import type {SceneTempoSettings} from '../../runtime-contracts/src/tempo.mjs';
 import {normalizeSceneStoryV2,storyLifecycleLimits} from '../../runtime-contracts/src/story.mjs';
 import type {SceneStoryV2} from '../../runtime-contracts/src/story.mjs';
 import type {SavedControlSnapshot} from './scene-document.ts';
+import {normalizeSceneSoundtrack} from './scene-soundtrack.ts';
+import type {SceneSoundtrack} from './scene-soundtrack.ts';
 
 export type StoryVisualSource=Readonly<{
  id:string;
@@ -18,7 +20,7 @@ export type StoryVisualSource=Readonly<{
 }>;
 export type StorySceneDocumentV7=Readonly<{
  format:'lux-scene';version:7;visuals:readonly StoryVisualSource[];
- settings:OutputSettings;tempo:SceneTempoSettings;story:SceneStoryV2;
+ settings:OutputSettings;tempo:SceneTempoSettings;story:SceneStoryV2;soundtrack?:SceneSoundtrack;
 }>;
 
 const stableId=/^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/;
@@ -52,7 +54,10 @@ async function sha256(value:string):Promise<string>{
 }
 
 export function validateStorySceneDocumentV7(value:unknown):StorySceneDocumentV7{
- const raw=snapshotRecord(value,['format','version','visuals','settings','tempo','story']);
+ // soundtrack is optional and keeps version 7; files without it are unchanged.
+ const fields=['format','version','visuals','settings','tempo','story'];
+ if(value&&typeof value==='object'&&Object.hasOwn(value,'soundtrack'))fields.push('soundtrack');
+ const raw=snapshotRecord(value,fields);
  if(raw.format!=='lux-scene'||raw.version!==7)invalid('Expected lux-scene version 7');
  const rows=dense(raw.visuals,'Scene v7 visuals');
  if(rows.length<1||rows.length>storyLifecycleLimits.visuals)invalid('Scene v7 must contain 1–8 visuals');
@@ -77,7 +82,7 @@ export function validateStorySceneDocumentV7(value:unknown):StorySceneDocumentV7
  }
  const story=normalizeSceneStoryV2(raw.story),referenced=[story.normalVisualId,...story.beats.map(beat=>beat.visualId),...story.sequence.map(occurrence=>occurrence.visualId)];
  for(const id of referenced)if(!seen.has(id))invalid(`Scene v7 Story references unknown visual ID ${id}`);
- const result=Object.freeze({format:'lux-scene' as const,version:7 as const,visuals:Object.freeze(visuals),settings:Object.freeze(outputSettingsSchema.parse(snapshotRecord(raw.settings))),tempo:normalizeTempoSettings(raw.tempo),story});
+ const result=Object.freeze({format:'lux-scene' as const,version:7 as const,visuals:Object.freeze(visuals),settings:Object.freeze(outputSettingsSchema.parse(snapshotRecord(raw.settings))),tempo:normalizeTempoSettings(raw.tempo),story,...(Object.hasOwn(raw,'soundtrack')?{soundtrack:normalizeSceneSoundtrack(raw.soundtrack)}:{})});
  if(encoder.encode(JSON.stringify(result,null,2)+'\n').byteLength>storyLifecycleLimits.sceneBytes)invalid('Scene v7 JSON exceeds 32 MiB');
  return result;
 }
