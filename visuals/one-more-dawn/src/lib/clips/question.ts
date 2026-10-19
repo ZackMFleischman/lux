@@ -4,18 +4,18 @@
 // it here; do not edit shared engine, cast or set files from a clip lane.
 //
 // Shot list (song seconds):
-//   S1 19.30–23.50  Low three-quarter medium from house left, pushing in.
-//                   The house hushes; Aria hops off her pedestal and glides
-//                   forward into her spot.
-//   S2 23.50–27.94  Three-quarter medium close-up. "A question came to me":
-//                   hand to chin, then hand to chest on "me".
-//   S3 27.94–32.90  Low-angle wide. "If we can dream of everything": arms
-//                   open on "dream" and the camera tilts up into the stars.
-//   S4 32.90–34.90  Frontal medium close-up. "Why can't I": hands to heart.
-//   S5 34.90–37.45  Close profile from house right. "dream a dream": she turns
-//                   upstage and finds the dream star above the sleeping house.
-//   S6 37.45–40.30  Low-angle hero shot, push-in on the held "me": she turns
-//                   back and reaches for the star. Held tableau at the end.
+//   S1  19.30–23.50  Low three-quarter medium from house left, pushing in;
+//                    she faces screen right. She hops off the pedestal.
+//   S2  23.50–27.94  Near-frontal medium close-up, "a question came to me".
+//   S3  27.94–30.75  Low-angle wide; arms open on "dream", the dream star
+//                    is born small in the sky.
+//   S3R 30.75–32.90  Reaction insert: the house in awe, looking up.
+//   S4  32.90–34.76  Three-quarter close-up from house left, "why can't I".
+//   S5  34.76–37.45  Over a stalls spectator's head: she lifts her eyes to
+//                    the star above her.
+//   S6  37.45–40.30  Payoff: camera solved from her reaching hand so the
+//                    star sits just beyond her fingertips; push in on the
+//                    held "me", then settle for the hand-off.
 
 import { Color, Vector3, type PerspectiveCamera } from 'three/webgpu';
 import { applyPose, blankPose, copyPose, type Pose, type Rig, type V3 } from '../rig.ts';
@@ -70,9 +70,11 @@ function ariaActing(t: number, p: Pose): void {
   p.lift += 0.03 * Math.sin(t * 1.4) * ramp(t, 22.2, 23.2);
 
   // --- Facing: front, a turn upstage to find the star, back to the house.
+  // On "dream a dream" she turns three-quarters to house right and lifts
+  // her eyes to the star; then back to the front for the reach.
   const turnAway = ramp(t, WORD.dream2 - 0.05, WORD.dream2 + 0.8, backOut);
-  const turnBack = ramp(t, 36.85, 37.75, smooth);
-  p.yaw = 1.1 * turnAway * (1 - turnBack) + Math.sin(t * 0.7) * 0.03 * ramp(t, 22.4, 23.0);
+  const turnBack = ramp(t, 36.95, 37.85, smooth);
+  p.yaw = 0.45 * turnAway * (1 - turnBack) + Math.sin(t * 0.7) * 0.03 * ramp(t, 22.4, 23.0);
   p.yaw += span(t, WORD.dream1, WORD.everythingEnd + 0.6, 0.8, 1.0) * 0.12 * Math.sin((t - WORD.dream1) * 1.3);
 
   // --- Hands.
@@ -155,7 +157,7 @@ function ariaActing(t: number, p: Pose): void {
   p.headYaw = scan * Math.sin((t - 20.8) * 1.5) * 0.35;
   p.headPitch = scan * 0.04;
   // Question: tilt, eyes up and to the side.
-  p.headRoll = think * 0.22 - toChest * 0.12 + Math.sin(t * 0.9) * 0.03;
+  p.headRoll = think * 0.14 - toChest * 0.08 + Math.sin(t * 0.9) * 0.03;
   p.headYaw += think * 0.18 - toChest * 0.1;
   p.headPitch -= think * 0.08;
   // Dream: chin up to the stars.
@@ -165,8 +167,8 @@ function ariaActing(t: number, p: Pose): void {
   p.headPitch += wistful * 0.14;
   p.headRoll += wistful * -0.1;
   const findStar = span(t, WORD.dream2, WORD.forW, 0.5, 0.6);
-  p.headPitch -= findStar * 0.28 + reach * 0.22;
-  p.headYaw += findStar * 0.5 * (1 - turnBack) + reach * 0.15;
+  p.headPitch -= findStar * 0.3 + reach * 0.22;
+  p.headYaw += findStar * 0.2 * (1 - turnBack) + reach * 0.12;
 
   p.lookX = p.headYaw * 0.5 + think * 0.5;
   p.lookY = think * 0.7 + wide * 0.5 + settle * 0.6 + findStar * 0.6 + reach * 0.8 - wistful * 0.4;
@@ -190,7 +192,7 @@ function ariaActing(t: number, p: Pose): void {
   // Positive browTilt lifts the inner ends (worried, yearning).
   p.browTilt = 0.1 * thinkFace + 0.1 * wonder + 0.8 * yearn + 0.2 * found + 0.5 * held;
   // Extra head tilt on the question and a lift into the held note.
-  p.headRoll += thinkFace * 0.12 + held * Math.sin((t - WORD.forW) * 0.9) * 0.06;
+  p.headRoll += thinkFace * 0.06 + held * Math.sin((t - WORD.forW) * 0.9) * 0.06;
   p.lid = Math.max(0, p.lid - wonder * 0.14 + thinkFace * 0.08 + yearn * 0.06 - found * 0.14 + held * 0.32);
   p.lookY -= held * 0.3;
 
@@ -236,40 +238,84 @@ function aim(c: V3, az: number, el: number): V3 {
 
 const S3A: V3 = [0.6, 1.7, 4.9];
 const S3B: V3 = [0.9, 0.65, 5.6];
-const S5A: V3 = [1.15, 2.2, 3.9];
-const S5B: V3 = [1.05, 2.18, 3.55];
-const S6A: V3 = [1.15, 0.9, 7.0];
-const S6B: V3 = [0.95, 0.95, 5.7];
+// Crowd reaction: on the stage, looking up into the house-left balconies.
+const SRA: V3 = [0.9, 2.2, -2.0];
+const SRB: V3 = [0.75, 2.05, -2.35];
+// Over the shoulder of a spectator in the stalls; the star rises above her.
+const SOA: V3 = [-0.2, -0.05, 7.4];
+const SOB: V3 = [-0.17, -0.03, 7.28];
 
 const SHOTS: Shot[] = [
   // S1: the hush; push in as she comes forward.
-  // Three-quarter from house left, slightly low, so it cuts cleanly from
-  // the frontal tableau that ends the awakening clip.
-  { a: START, b: 23.5, p0: [-2.5, 1.35, 3.1], l0: [0, 1.95, -1.0], p1: [-1.7, 1.6, 4.25], l1: [0.15, 2.0, 0.75] },
-  // S2: the question, three-quarter medium close-up from house right.
-  { a: 23.5, b: WORD.ifWe, p0: [1.15, 2.1, 4.3], l0: [0.35, 2.0, 0.9], p1: [0.9, 2.08, 3.75], l1: [0.3, 2.05, 0.9] },
+  // Three-quarter from house left, slightly low; she faces screen right.
+  { a: START, b: 23.5, p0: [-2.5, 1.35, 3.1], l0: [0, 1.95, -1.0], p1: [-1.7, 1.6, 4.25], l1: [0.55, 2.0, 0.75] },
+  // S2: the question, near-frontal medium close-up just below eye level.
+  { a: 23.5, b: WORD.ifWe, p0: [0.55, 1.9, 4.2], l0: [0.15, 2.05, 0.9], p1: [0.45, 1.92, 3.7], l1: [0.12, 2.08, 0.9] },
   // S3: boom down from eye level to a low angle as her arms open; the
-  // stars fill the top of frame.
-  { a: WORD.ifWe, b: 32.9, p0: S3A, l0: [0.2, 1.9, 0], p1: S3B, l1: aim(S3B, -2, 14), ease: (u: number) => ramp(u, 0.12, 0.62) },
-  // S4: frontal medium close-up, hands to heart.
-  { a: 32.9, b: 34.9, p0: [0.15, 1.85, 3.7], l0: [0.0, 1.95, 0.9], p1: [0.12, 1.88, 3.3], l1: [0.0, 2.0, 0.9] },
-  // S5: close from house right; in profile she finds the star over the
-  // sleeping house.
-  { a: 34.9, b: 37.45, p0: S5A, l0: aim(S5A, -8, 7), p1: S5B, l1: aim(S5B, -8, 8.5) },
-  // S6: hero low angle, Aria left third, star right third; push in on the
-  // held note.
-  { a: 37.45, b: END, p0: S6A, l0: aim(S6A, -3.5, 12), p1: S6B, l1: aim(S6B, -3.5, 13.5) },
+  // stars fill the top of frame and the dream star is born.
+  { a: WORD.ifWe, b: 30.75, p0: S3A, l0: [0.2, 1.9, 0], p1: S3B, l1: aim(S3B, -1, 15), ease: (u: number) => ramp(u, 0.1, 0.7) },
+  // S3R: reaction insert, the house in awe looking up at the sky.
+  { a: 30.75, b: 32.9, p0: SRA, l0: aim(SRA, -38, 9), p1: SRB, l1: aim(SRB, -36, 11) },
+  // S4: three-quarter close-up from house left, hands to heart.
+  { a: 32.9, b: WORD.dream2, p0: [-1.15, 2.05, 3.25], l0: [0.05, 2.22, 0.9], p1: [-1.0, 2.07, 2.95], l1: [0.05, 2.24, 0.9] },
+  // S5: from the stalls, over a spectator's head; she turns and lifts
+  // her eyes to the star, which sits above her in frame.
+  { a: WORD.dream2, b: 37.45, p0: SOA, l0: aim(SOA, 4, 9), p1: SOB, l1: aim(SOB, 4, 10) },
+  // S6 (payoff) is solved from her reaching hand, see payoffCam().
 ];
+const PAYOFF = 37.45;
 
 const camPos = new Vector3();
 const camLook = new Vector3();
 
+// The dream star's sky direction (stage.ts) as azimuth/elevation degrees.
+const STAR_AZ = (Math.atan2(0.16, 1) * 180) / Math.PI;
+const STAR_EL = (Math.atan2(0.42, Math.hypot(0.16, 1)) * 180) / Math.PI;
+// Where the fingertips sit relative to the star (degrees, camera view):
+// just below and left of it, along the line of her arm.
+const TIP_DAZ = -2.8;
+const TIP_DEL = -6.6;
+
+// Reaching hand (world) at the peak of the reach; the payoff camera is
+// solved from it so the star sits just beyond her fingertips.
+const handRef = new Vector3();
+let handRefReady = false;
+const refBase = blankPose();
+const refPose = blankPose();
+const REF_T = 39.35;
+
+function solveHandRef(rig: Rig): void {
+  ariaPose(REF_T, rig, refBase);
+  copyPose(refBase, refPose);
+  ariaActing(REF_T, refPose);
+  applyPose(rig, refPose);
+  rig.root.updateWorldMatrix(true, true);
+  rig.hands[1].getWorldPosition(handRef);
+  handRefReady = true;
+}
+
+function payoffCam(t: number): void {
+  // Push in from a low medium to a close two-shot of face, hand and star.
+  const u = ramp(t, PAYOFF, 39.7, smooth);
+  const d = lerp(6.6, 3.0, u);
+  const az = ((STAR_AZ + TIP_DAZ) * Math.PI) / 180;
+  const el = ((STAR_EL + TIP_DEL) * Math.PI) / 180;
+  camPos.set(handRef.x - Math.sin(az) * Math.cos(el) * d, handRef.y - Math.sin(el) * d, handRef.z + Math.cos(az) * Math.cos(el) * d);
+  // Frame centre: between her face and the star.
+  const look = aim([camPos.x, camPos.y, camPos.z], STAR_AZ - 3, lerp(14, 13, u));
+  camLook.set(look[0], look[1], look[2]);
+}
+
 function shoot(t: number, cam: PerspectiveCamera): void {
-  const s = SHOTS.find(x => t < x.b) ?? SHOTS[SHOTS.length - 1];
-  const raw = clamp01((t - s.a) / (s.b - s.a));
-  const u = s.ease ? s.ease(raw) : smooth(raw);
-  camPos.set(lerp(s.p0[0], s.p1[0], u), lerp(s.p0[1], s.p1[1], u), lerp(s.p0[2], s.p1[2], u));
-  camLook.set(lerp(s.l0[0], s.l1[0], u), lerp(s.l0[1], s.l1[1], u), lerp(s.l0[2], s.l1[2], u));
+  if (t >= PAYOFF && handRefReady) {
+    payoffCam(t);
+  } else {
+    const s = SHOTS.find(x => t < x.b) ?? SHOTS[SHOTS.length - 1];
+    const raw = clamp01((t - s.a) / (s.b - s.a));
+    const u = s.ease ? s.ease(raw) : smooth(raw);
+    camPos.set(lerp(s.p0[0], s.p1[0], u), lerp(s.p0[1], s.p1[1], u), lerp(s.p0[2], s.p1[2], u));
+    camLook.set(lerp(s.l0[0], s.l1[0], u), lerp(s.l0[1], s.l1[1], u), lerp(s.l0[2], s.l1[2], u));
+  }
   // Gentle hand-held drift, smaller on the close shots.
   const near = camPos.distanceTo(camLook) < 4.5 ? 0.5 : 1;
   camPos.x += noise1(t * 0.25, 1) * 0.04 * near;
@@ -296,9 +342,13 @@ function cueLights(t: number, edge: number): void {
   const stars = keys(t, [[START, 0.25], [WORD.dream1 - 0.1, 0.3], [WORD.dream1 + 1.4, 1.35], [END, 1.35]]);
   // The flare peaks on the held "me" and comes down to the level the next
   // clip keeps in the sky (0.75), so the cut at 40.3 matches.
-  const star = keys(t, [[START, 0], [WORD.dream2, 0], [WORD.dream2 + 0.9, 0.75], [WORD.me2, 0.9], [WORD.me2 + 0.7, 1.4], [END - 1.0, 1.25], [END - 0.5, 0.9], [END, 0.75]]);
+  // Born small on the first "dream", found on "dream a dream", peaks at
+  // the reach on the held "me" (sized for the payoff framing).
+  const star = keys(t, [[START, 0], [WORD.dream1 - 0.05, 0], [WORD.dream1 + 0.6, 0.4], [WORD.everythingEnd, 0.55], [WORD.dream2, 0.6], [WORD.dream2 + 0.9, 0.9], [WORD.me2, 1.05], [WORD.me2 + 0.6, 1.6], [END - 0.75, 1.6], [END - 0.3, 0.85], [END, 0.75]]);
   set.starLevel.value = lerp(dStars, stars, edge);
   set.dreamStar.value = star;
+  // The house is in awe from the first "dream" to the end of the held note.
+  set.crowdAwe = Math.max(set.crowdAwe, lerp(0, span(t, WORD.dream1 - 0.3, END + 2, 0.6, 0.5), edge));
   // The house watches the dream rapt: eyes wide, heads and pupils lifted
   // toward the star from "dream" to the end of the held note.
   const rapt = span(t, WORD.dream1 - 0.6, END + 2, 0.9, 0.5);
@@ -323,6 +373,9 @@ export const clip = {
   end: END,
   frame(t: number, cast: Cast, cam: PerspectiveCamera): void {
     defaultFrame(t, cast, cam);
+    if (!handRefReady) {
+      solveHandRef(cast.aria);
+    }
     // Hand-off weight: 0 in the first/last 0.25 s, 1 inside.
     const edge = ramp(t, START + 0.25, START + 0.45) * (1 - ramp(t, END - 0.6, END - 0.25));
     const rig = cast.aria;
