@@ -6,10 +6,12 @@
 // Usage (from the checkout root, after `node apps/studio/build.mjs`):
 //   node visuals/one-more-dawn/tools/qa-capture.mjs <outDir> <t1> <t2> ...
 // Options via env: SHOW_SRC (default visuals/one-more-dawn/src),
-//   QA_WIDTH/QA_HEIGHT (default 1280x720 output via preview size is not
-//   changed; captures use the scene's output resolution).
+//   QA_BUILD_SLOTS (default 2): how many captures may be in the expensive
+//   launch + first-build phase at once, machine-wide. Everything else
+//   (frame captures, other lanes' editing) runs fully in parallel.
 
-import { mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { join, relative, resolve, sep } from 'node:path';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
@@ -36,10 +38,50 @@ async function bundle(dir) {
   return { sdkVersion: '0.4.0', entry: 'visual.ts', files };
 }
 
+// Machine-wide build gate. Concurrent cold starts compete for the GPU and
+// overrun Studio's visual start-up deadline, so only a few captures may be
+// launching/building at once. A slot is a directory created atomically;
+// slots left by dead processes (or older than 10 minutes) are reclaimed.
+const slotRoot = join(tmpdir(), 'lux-dawn-qa-build-slots');
+const slotCount = Math.max(1, Number(process.env.QA_BUILD_SLOTS ?? 2));
+const alive = pid => {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return error.code === 'EPERM';
+  }
+};
+async function acquireBuildSlot() {
+  await mkdir(slotRoot, { recursive: true });
+  const started = Date.now();
+  for (;;) {
+    for (let i = 0; i < slotCount; i += 1) {
+      const dir = join(slotRoot, `slot-${i}`);
+      try {
+        await mkdir(dir);
+        await writeFile(join(dir, 'owner.json'), JSON.stringify({ pid: process.pid, at: Date.now() }));
+        if (Date.now() - started > 1000) console.error(`build slot ${i} acquired after ${Math.round((Date.now() - started) / 1000)} s`);
+        return async () => rm(dir, { recursive: true, force: true });
+      } catch (error) {
+        if (error.code !== 'EEXIST') throw error;
+        try {
+          const owner = JSON.parse(await readFile(join(dir, 'owner.json'), 'utf8'));
+          if (!alive(owner.pid) || Date.now() - owner.at > 10 * 60 * 1000) await rm(dir, { recursive: true, force: true });
+        } catch {
+          // Owner file not written yet or already removed; check again next pass.
+        }
+      }
+    }
+    await new Promise(r => setTimeout(r, 1500));
+  }
+}
+
 await mkdir(outDir, { recursive: true });
 const attempt = await createStudioQaAttempt({ root, label: 'dawn-capture', evidenceRoot: join(root, 'artifacts', 'one-more-dawn-qa') });
 const client = new Client({ name: 'dawn-qa', version: '1.0.0' });
 let ok = false;
+let releaseSlot = await acquireBuildSlot();
 try {
   await attempt.launch({ viewport: { width: 1280, height: 800 }, timeoutMs: 90000 });
   await client.connect(new StdioClientTransport({
@@ -68,6 +110,9 @@ try {
       console.error(`build attempt ${attempt} timed out; retrying`);
     }
   }
+  // The expensive phase is over; let the next lane build while we capture.
+  await releaseSlot();
+  releaseSlot = async () => {};
   let a = built.status.authoring;
   const guard = () => ({ instanceId: a.instanceId, expectedGeneration: a.generation });
   a = json(await call('lux.studio.playback', { ...guard(), action: 'pause' })).status.authoring;
@@ -88,6 +133,7 @@ try {
   console.error(String(error.stack ?? error));
   process.exitCode = 1;
 } finally {
+  await releaseSlot().catch(() => {});
   await client.close().catch(() => {});
   await attempt.finish({ ok });
 }
