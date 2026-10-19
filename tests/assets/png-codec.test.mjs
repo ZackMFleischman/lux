@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { deflateSync, inflateSync, constants } from 'node:zlib';
 import { unzlibSync } from 'fflate';
 import * as codec from '../../packages/assets/src/png.mjs';
+import { assetLimits } from '../../packages/assets/src/limits.mjs';
 import { png, chunk, u32 } from './png-fixtures.mjs';
 
 test('PNG returns straight sRGB alpha and preserves caller bytes', () => {
@@ -31,11 +32,11 @@ test('packed indexed rows restart at each odd row boundary at every supported de
 
 test('strict chunk boundaries, CRC, dimensions, palette and unsupported modes fail', () => {
   const badCrc = png(); badCrc[29] ^= 1;
-  const cases = [badCrc,png().subarray(0,-1),Buffer.concat([png(),Buffer.from([0])]),png({width:513}),png({width:0}),png({depth:16}),png({interlace:1}),
+  const cases = [badCrc,png().subarray(0,-1),Buffer.concat([png(),Buffer.from([0])]),png({width:assetLimits.dimension+1}),png({width:0}),png({depth:16}),png({interlace:1}),
     png({before:[chunk('acTL',new Uint8Array(8))]}),png({before:[chunk('iCCP',[1])]}),png({before:[chunk('zTXt',[1])]}),png({before:[chunk('iTXt',[1])]}),png({before:[chunk('ABCD')]}),
     png({before:[chunk('sRGB',[0]),chunk('sRGB',[0])]}),png({before:[chunk('gAMA',u32(100000))]}),png({before:[chunk('tRNS',[0,1])]}),
     png({type:3,rows:[0,0]}),png({type:3,rows:[0,1],before:[chunk('PLTE',[255,0,0])]}),
-    png({before:[chunk('tEXt',new Uint8Array(65537))]}),png({after:Array.from({length:254},()=>chunk('tEXt',[65,0]))}),
+    png({before:[chunk('tEXt',new Uint8Array(65537))]}),png({after:Array.from({length:Math.ceil(assetLimits.imageBytes/1024)+256},()=>chunk('IDAT'))}),
     png({after:[chunk('tEXt',[65,0]),chunk('IDAT')]}),
   ];
   for (const [index,bytes] of cases.entries()) assert.throws(()=>codec.decodePng(bytes),{code:'ASSET_BOUNDARY_VIOLATION'},`case ${index}`);
@@ -66,7 +67,7 @@ test('admitted metadata remains bounded and sRGB declarations are explicit', () 
   for (const before of [[chunk('PLTE',[1,2])],[chunk('PLTE',new Uint8Array(771))],[chunk('PLTE',[1,2,3]),chunk('tRNS',[0,1])]]) {
     assert.throws(()=>codec.decodePng(png({type:3,rows:[0,0],before})),{code:'ASSET_BOUNDARY_VIOLATION'});
   }
-  assert.throws(()=>codec.decodePng(new Uint8Array(786487)),{code:'QUOTA_EXCEEDED'});
+  assert.throws(()=>codec.decodePng(new Uint8Array(assetLimits.imageBytes+1)),{code:'QUOTA_EXCEEDED'});
 });
 
 test('accepted zlib corpus agrees with independent native inflate and fflate', () => {
@@ -109,8 +110,8 @@ test('RGBA allocation budget is enforced before decode and metadata retains orig
   assert.throws(()=>codec.decodePng(bytes,{maxRgbaBytes:3}),{code:'QUOTA_EXCEEDED'});
   assert.deepEqual(codec.validatePng(bytes),{width:1,height:1,byteLength:bytes.length,rgbaByteLength:4});
   class DisguisedBytes extends Uint8Array { get byteLength() { return 1; } }
-  assert.throws(()=>codec.decodePng(new DisguisedBytes(786487)),{code:'QUOTA_EXCEEDED'});
-  const backing = new ArrayBuffer(bytes.length,{maxByteLength:800000});
+  assert.throws(()=>codec.decodePng(new DisguisedBytes(assetLimits.imageBytes+1)),{code:'QUOTA_EXCEEDED'});
+  const backing = new ArrayBuffer(bytes.length,{maxByteLength:assetLimits.imageBytes+16});
   const growing = new Uint8Array(backing); growing.set(bytes);
-  assert.throws(()=>codec.decodePng(growing,{get maxRgbaBytes() { backing.resize(786487); return 2097152; }}),{code:'QUOTA_EXCEEDED'});
+  assert.throws(()=>codec.decodePng(growing,{get maxRgbaBytes() { backing.resize(assetLimits.imageBytes+1); return assetLimits.rgbaBytes; }}),{code:'QUOTA_EXCEEDED'});
 });

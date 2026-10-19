@@ -16,7 +16,7 @@ function record(value,fields,label){
 }
 async function sha256(bytes){const value=new Uint8Array(await digest('SHA-256',bytes));return Array.from(value,byte=>byte.toString(16).padStart(2,'0')).join('');}
 function mediaFor(path){return path.endsWith('.bmp')?'image/bmp':path.endsWith('.png')?'image/png':'image/jpeg';}
-function charge(encodedBytes,rgbaBytes){const totalBytes=encodedBytes+rgbaBytes;if(!Number.isSafeInteger(totalBytes)||totalBytes>assetLimits.totalBytes+assetLimits.rgbaBytes)fail('Asset staging charge exceeds 3 MiB','QUOTA_EXCEEDED');return freeze({encodedBytes,rgbaBytes,totalBytes});}
+function charge(encodedBytes,rgbaBytes){const totalBytes=encodedBytes+rgbaBytes;if(!Number.isSafeInteger(totalBytes)||totalBytes>assetLimits.totalBytes+assetLimits.rgbaBytes)fail(`Asset staging charge exceeds ${(assetLimits.totalBytes+assetLimits.rgbaBytes)/1048576} MiB`,'QUOTA_EXCEEDED');return freeze({encodedBytes,rgbaBytes,totalBytes});}
 function identity(value){
  const row=record(value,['instanceId','generation','scheduleHash','capsuleHash'],'Story asset generation identity');
  if(typeof row.instanceId!=='string'||!row.instanceId||!Number.isSafeInteger(row.generation)||row.generation<1||typeof row.scheduleHash!=='string'||!/^[a-f0-9]{64}$/.test(row.scheduleHash)||typeof row.capsuleHash!=='string'||!/^[a-f0-9]{64}$/.test(row.capsuleHash))fail('Invalid Story asset generation identity');
@@ -27,7 +27,7 @@ export async function decodeStoryAssets(input){
  const request=record(input,['kind','mode','requestId','identity','stagingGrantId','decoderVersion','visualId','assetSetHash','assets'],'Story asset decode request');
  if(request.kind!=='story-assets-decode'||!['verify','lease'].includes(request.mode)||typeof request.requestId!=='string'||!request.requestId||typeof request.stagingGrantId!=='string'||!request.stagingGrantId||request.decoderVersion!==storyAssetDecoderVersion||typeof request.visualId!=='string'||!request.visualId||typeof request.assetSetHash!=='string'||!/^[a-f0-9]{64}$/.test(request.assetSetHash))fail('Invalid Story asset decode request');
  const admittedIdentity=identity(request.identity),assets=record(request.assets,ownKeys(request.assets),'derived asset set'),paths=ownKeys(assets);
- if(paths.length>assetLimits.count)fail('At most four image assets are supported','QUOTA_EXCEEDED');
+ if(paths.length>assetLimits.count)fail(`At most ${assetLimits.count} image assets are supported`,'QUOTA_EXCEEDED');
  for(let index=0;index<paths.length;index++)if(typeof paths[index]!=='string')fail('Invalid derived asset path');
  paths.sort();const rows=[],identityRows=[];let encodedBytes=0,rgbaBytes=0;
  for(let index=0;index<paths.length;index++){

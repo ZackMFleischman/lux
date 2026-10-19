@@ -1,8 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { StandaloneClient } from '../../apps/studio/src/standalone-client.ts';
-import { sourceBuildInputSchema, sourceReadResult } from '../../apps/studio/src/source/agent-contract.ts';
+import { sourceBuildInputSchema, sourceReadResult, agentTransportLimits } from '../../apps/studio/src/source/agent-contract.ts';
 import { sourceBundleSchema } from '../../packages/runtime-contracts/src/index.ts';
+import { formatBytes } from '../../packages/assets/src/index.mjs';
 import { createAgentBridge } from '../../apps/studio/src/agent-bridge.ts';
 import { mkdtemp, rm, access } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -21,7 +22,7 @@ test('MCP full-source schema preserves v2 and rejects omitted assets or unknown 
   assert.equal(sourceBuildInputSchema.safeParse({ source: { ...source, other: true }, expectedDraftVersion: 3 }).success, false);
   assert.deepEqual(JSON.parse(sourceReadResult({ source, draftVersion: 3 }).content[0]!.text), { source, draftVersion: 3 });
   assert.doesNotThrow(() => sourceReadResult({ text: '\\'.repeat(8 * 1024 * 1024) }));
-  assert.throws(() => sourceReadResult({ text: '€'.repeat(18 * 1024 * 1024) }), /52 MiB/);
+  assert.throws(() => sourceReadResult({ text: '€'.repeat(Math.ceil(agentTransportLimits.responseBytes / 3) + 1) }), new RegExp(`exceeds ${formatBytes(agentTransportLimits.responseBytes)}`));
 });
 test('v2 source reaches preview compilation and compiler failure keeps the current preview', async () => {
   let compiled = false;
@@ -36,14 +37,14 @@ test('source and linked versions must match before creating a preview worker',as
   assert.equal(client.getSnapshot().authoring,null);
 });
 test('agent bridge round-trips complete Unicode source and rejects oversized read responses', async () => {
-  const bridge = await createAgentBridge(async method => method === 'read' ? { value: '€'.repeat(18 * 1024 * 1024) } : source);
+  const bridge = await createAgentBridge(async method => method === 'read' ? { value: '€'.repeat(Math.ceil(agentTransportLimits.responseBytes / 3) + 1) } : source);
   try {
     const headers = { authorization: `Bearer ${bridge.token}` };
     const response = await fetch(bridge.url, { method: 'POST', headers, body: JSON.stringify({ id: 'source', method: 'build', params: { source } }) });
     assert.deepEqual((await response.json()).result, source);
     const rejected = await fetch(bridge.url, { method: 'POST', headers, body: JSON.stringify({ id: 'large', method: 'read' }) });
     assert.equal(rejected.status, 400);
-    assert.match((await rejected.json()).error, /52 MiB/);
+    assert.match((await rejected.json()).error, new RegExp(`exceeds ${formatBytes(agentTransportLimits.responseBytes)}`));
     const malformed = Buffer.concat([Buffer.from('{"id":"bad","method":"build","params":{"text":"'), Buffer.from([0xc3]), Buffer.from('"}}')]);
     assert.equal((await fetch(bridge.url, { method: 'POST', headers, body: malformed })).status, 400);
   } finally { bridge.close(); }

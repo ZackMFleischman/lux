@@ -1,6 +1,10 @@
 // Opt-in bounded JPEG adapter; existing asset admission remains BMP-only.
 import decodeJpegJs from 'jpeg-js/lib/decoder.js';
 import { assetLimits } from './limits.mjs';
+// jpeg-js charges ~4 bytes per coefficient sample (Int32 blocks), 1 byte per
+// component line sample, 3 bytes per component pixel and 4 bytes of RGBA: at
+// most about 24 bytes per pixel for three full-resolution components.
+const decoderBudget = Object.freeze({ megapixels: assetLimits.dimension ** 2 / 1e6, memoryMiB: Math.ceil(assetLimits.dimension ** 2 * 24 / 1048576) });
 
 const typedArrayByteLength = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(Uint8Array.prototype),'byteLength').get;
 const typedArraySet = Uint8Array.prototype.set;
@@ -157,7 +161,8 @@ function inspect(bytes, maxRgbaBytes) {
         while (bytes[p] === 255) p++;
         const next = bytes[p];
         if (next >= 0xd0 && next <= 0xd7) {
-          countMarker();
+          // RST markers are bounded by the MCU-derived restart count below,
+          // not the segment-marker cap: large images can carry many.
           if (!restartInterval || next !== 0xd0+(restarts%8) || prefix === entropyStart) fail('invalid restart sequence');
           restarts++; p++; entropyStart = p; continue;
         }
@@ -186,10 +191,10 @@ function decode(bytes, options = {}) {
   const maxRgbaBytes = options.maxRgbaBytes ?? assetLimits.rgbaBytes;
   if (!Number.isSafeInteger(maxRgbaBytes) || maxRgbaBytes < 0 || maxRgbaBytes > assetLimits.rgbaBytes) fail('invalid RGBA budget');
   const byteLength = Reflect.apply(typedArrayByteLength,bytes,[]);
-  if (byteLength > assetLimits.imageBytes) fail('file exceeds image byte limit',true);
+  if (byteLength > assetLimits.imageBytes) fail(`file exceeds the ${assetLimits.imageBytes} byte image limit`,true);
   const original = new Uint8Array(byteLength); Reflect.apply(typedArraySet,original,[bytes]);
   const info = inspect(original,maxRgbaBytes);
-  const raw = decodeJpegJs(original,{useTArray:true,formatAsRGBA:true,tolerantDecoding:false,maxResolutionInMP:(assetLimits.dimension*assetLimits.dimension)/1e6,maxMemoryUsageInMB:Math.ceil(assetLimits.rgbaBytes/1048576)+64,colorTransform:info.colorTransform});
+  const raw = decodeJpegJs(original,{useTArray:true,formatAsRGBA:true,tolerantDecoding:false,maxResolutionInMP:decoderBudget.megapixels,maxMemoryUsageInMB:decoderBudget.memoryMiB,colorTransform:info.colorTransform});
   if (raw.width !== info.width || raw.height !== info.height || !(raw.data instanceof Uint8Array) || raw.data.length !== info.width*info.height*4) fail('decoder output mismatch');
   for (let i = 3; i < raw.data.length; i += 4) if (raw.data[i] !== 255) fail('JPEG decoder returned nonopaque alpha');
   const swapped = info.orientation >= 5, width = swapped ? info.height : info.width, height = swapped ? info.width : info.height;

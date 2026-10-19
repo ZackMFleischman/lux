@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validateSource } from '../../apps/build-worker/src/source-policy.mjs';
+import { validateSource, limits } from '../../apps/build-worker/src/source-policy.mjs';
 import { sourceBundleSchema } from '../../packages/runtime-contracts/src/index.ts';
 export const redAsset = { mediaType:'image/bmp', encoding:'base64', data:'Qk06AAAAAAAAADYAAAAoAAAAAQAAAAEAAAABABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AA==' };
 export const assetSource = () => ({sourceVersion:2,sdkVersion:'0.1.0',entry:'a.ts',files:{'a.ts':'','Z.ts':''},assets:{'assets/red.bmp':{...redAsset}}});
@@ -21,6 +21,8 @@ test('source v2 is strict and ASCII canonical while legacy normalization stays b
 });
 
 test('source v2 charges exact escaped compact JSON and validates unused image bytes', () => {
-  assert.throws(()=>validateSource({...assetSource(),files:{'a.ts':'\0'.repeat(1048576)}}),{code:'QUOTA_EXCEEDED'});
+  // The compact JSON budget covers worst-case 6x escaping of the full code budget beside the assets.
+  assert.equal(validateSource({...assetSource(),files:{'a.ts':'\0'.repeat(limits.sourceBytes)}}).sourceVersion,2);
+  assert.throws(()=>validateSource({...assetSource(),files:{'a.ts':'\0'.repeat(limits.sourceBytes+1)}}),{code:'QUOTA_EXCEEDED'});
   assert.throws(()=>validateSource({...assetSource(),assets:{'assets/red.bmp':{...redAsset,data:'broken'}}}),{code:'SOURCE_BOUNDARY_VIOLATION'});
 });

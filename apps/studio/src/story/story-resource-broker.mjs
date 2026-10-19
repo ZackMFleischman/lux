@@ -1,4 +1,6 @@
 import {storyAssetDecoderVersion,storyAssetLeaseKey} from '../assets/story-asset-leases.mjs';
+import {storyLifecycleLimits} from '../../../../packages/runtime-contracts/src/story.mjs';
+import {assetLimits} from '../../../../packages/assets/src/limits.mjs';
 
 /** Client-side accounting of Lux-owned backing. Forced termination never releases a grant.
  * reserveGeneration accepts visuals only from the host's verified capsule, whose hash
@@ -33,11 +35,11 @@ export function createStoryResourceBroker(){
     encodedBytes+=integer(asset.byteLength,'asset bytes');rgbaBytes+=integer(asset.width*asset.height*4,'RGBA bytes');
     assets[path]=Object.freeze(Object.fromEntries(assetFields.map(field=>[field,asset[field]])));
    }
-   if(encodedBytes>1048576||rgbaBytes>2097152)fail('Asset charge exceeds source bounds');
+   if(encodedBytes>assetLimits.totalBytes||rgbaBytes>assetLimits.rgbaBytes)fail('Asset charge exceeds source bounds');
    rows.set(row.id,{assetSetHash:row.assetSetHash,assets:Object.freeze(assets),charge:Object.freeze({encodedBytes,rgbaBytes,totalBytes:encodedBytes+rgbaBytes})});
   }
   const fixed=Object.freeze({...identity});usedIdentities.add(key(identity));generations.set(key(identity),{identity:fixed,width,height,storyTargetBytes,assetLeaseBytes:0,visuals:rows,leases:new Map(),unreclaimed:false});
-  return Object.freeze({identity:fixed,width,height,maxSlots:2,maxPendingCreates:1,storyTargetBytes,assetLeaseBytes:6291456});
+  return Object.freeze({identity:fixed,width,height,maxSlots:2,maxPendingCreates:1,storyTargetBytes,assetLeaseBytes:storyLifecycleLimits.assetBackingPerGeneration});
  }
  function handle(request){
   const g=get(request.identity);if(g.unreclaimed)fail('Generation is unreclaimed');
@@ -72,7 +74,7 @@ export function createStoryResourceBroker(){
    }else{
     if(staging.decode?.phase!=='decoded'||staging.decode.mode!=='lease')fail('Lease transfer requires settled successful lease decode');
     if(request.leaseKey!==storyAssetLeaseKey(staging.assetSetHash)||[...g.leases.values()].some(row=>row.leaseKey===request.leaseKey))fail('Invalid or duplicate lease key');
-    const bytes=staging.charge.totalBytes;if(g.assetLeaseBytes+bytes>6291456||total('assetLeaseBytes')+bytes>12582912)fail('Asset lease capacity exceeded');
+    const bytes=staging.charge.totalBytes;if(g.assetLeaseBytes+bytes>storyLifecycleLimits.assetBackingPerGeneration||total('assetLeaseBytes')+bytes>storyLifecycleLimits.assetBackingPerClient)fail('Asset lease capacity exceeded');
     const leaseGrantId=fresh();g.leases.set(leaseGrantId,{leaseKey:request.leaseKey,charge:staging.charge});g.assetLeaseBytes+=bytes;
     response={...base,kind:'story-asset-lease-granted',grantId:request.grantId,leaseGrantId,leaseKey:request.leaseKey,charge:staging.charge};staging=null;
    }

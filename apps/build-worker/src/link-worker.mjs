@@ -160,7 +160,7 @@ async function link() {
     ...(artifact.artifactVersion===5 ? {sdkVersion:artifact.sdkVersion,executionModel:artifact.executionModel,composition:artifact.composition,compositionHash:artifact.compositionHash}: {}),
     ...(artifact.artifactVersion===6 ? {sdkVersion:artifact.sdkVersion,storyCapability:artifact.storyCapability,storyCapabilityHash:artifact.storyCapabilityHash}: {}) });
   const linked = { ...body, linkedHash: hash(JSON.stringify(body)) };
-  if (Buffer.byteLength(JSON.stringify(linked), 'utf8') > 16777216 - 128) throw violation('Linked ESM result exceeds 16 MiB', 'QUOTA_EXCEEDED');
+  if (Buffer.byteLength(JSON.stringify(linked), 'utf8') > limits.linkedBytes - 128) throw violation(`Linked ESM result exceeds ${(limits.linkedBytes / 1048576).toFixed(1)} MiB`, 'QUOTA_EXCEEDED');
   return linked;
 }
 let result;

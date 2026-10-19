@@ -8,10 +8,11 @@ import { assertResultBudgets } from './result-budget.mjs';
 import { violation, limits } from './source-policy.mjs';
 import { verifyArtifact, verifyLinked } from './artifact-identity.mjs';
 import { readBoundedJson, boundedJson } from './bounded-json.mjs';
+import { formatBytes } from '../../../packages/assets/src/index.mjs';
 const hash = value => createHash('sha256').update(value).digest('hex');
 
 const here = dirname(fileURLToPath(import.meta.url)), root = resolve(here, '../../..');
-export const linkedByteLimit = 16777216;
+export const linkedByteLimit = limits.linkedBytes;
 const quote = value => '"' + value.replace(/(\\*)"/g, '$1$1\\"').replace(/(\\+)$/g, '$1$1') + '"';
 
 /** Trusted service API. No worker path, command, or resolution hooks come from source.
@@ -27,25 +28,25 @@ export async function linkRuntime(artifact, options = {}) {
     const input = join(directory, 'input.json'), config = join(directory, 'config.json');
     await writeFile(input, boundedJson({ artifact, dependencyRoot: resolve(options.dependencyRoot || join(root, 'node_modules')) },limits.requestBytes));
     await writeFile(config, JSON.stringify({ executable: process.execPath,
-      commandLine: [process.execPath, '--max-old-space-size=256', join(here, 'link-worker.mjs'), input].map(quote).join(' '),
-      cwd: directory, directory, timeoutMs: 30000, memoryLimitBytes: 1073741824 }));
+      commandLine: [process.execPath, `--max-old-space-size=${limits.workerHeapMiB}`, join(here, 'link-worker.mjs'), input].map(quote).join(' '),
+      cwd: directory, directory, timeoutMs: limits.linkMs, memoryLimitBytes: limits.workerMemoryBytes }));
     await new Promise((done, reject) => {
       const child = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', join(root, 'scripts/experiment-job.ps1'), '-Config', config], {
         windowsHide: true, stdio: ['ignore', 'ignore', 'ignore'],
         env: { SystemRoot: process.env.SystemRoot, TEMP: process.env.TEMP, TMP: process.env.TMP, PATH: process.env.PATH },
       });
-      const timer = setTimeout(() => { child.kill(); reject(violation('Linker supervisor deadline; cleanup unconfirmed', 'SERVICE_UNAVAILABLE')); }, 45000);
+      const timer = setTimeout(() => { child.kill(); reject(violation('Linker supervisor deadline; cleanup unconfirmed', 'SERVICE_UNAVAILABLE')); }, limits.linkMs + 15000);
       child.once('error', error => { clearTimeout(timer); reject(error); });
       child.once('close', code => { clearTimeout(timer); code === 0 ? done() : reject(violation('Linker supervisor failed; cleanup unconfirmed', 'SERVICE_UNAVAILABLE')); });
     });
     const job = await readBoundedJson(join(directory, 'result.json'),limits.diagnosticBytes);
     cleanup = job.cleanupComplete === true;
     if (!cleanup) throw violation('Linker cleanup unconfirmed', 'SERVICE_UNAVAILABLE');
-    if (job.timeout) throw violation('Runtime linking exceeded 30 seconds', 'TIMEOUT');
+    if (job.timeout) throw violation(`Runtime linking exceeded ${limits.linkMs / 1000} seconds`, 'TIMEOUT');
     const resultPath = join(directory, 'link-result.json');
     const result = await readBoundedJson(resultPath,linkedByteLimit);
     if (!result.ok) { if (result.code === 'SERVICE_UNAVAILABLE') keep = true; throw violation(result.message, result.code); }
-    if (Buffer.byteLength(JSON.stringify(result.linked), 'utf8') > linkedByteLimit) throw violation('Linked result exceeds 16 MiB', 'QUOTA_EXCEEDED');
+    if (Buffer.byteLength(JSON.stringify(result.linked), 'utf8') > linkedByteLimit) throw violation(`Linked result exceeds ${formatBytes(linkedByteLimit)}`, 'QUOTA_EXCEEDED');
     return await verifyLinked(result.linked,hash,artifact);
   } catch (error) {
     if (!cleanup || keep) { keep = true; error.message += `; retained evidence: ${directory}`; }

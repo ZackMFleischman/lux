@@ -3,6 +3,7 @@ import { createInitializationProbe } from './initialization-probe.mjs';
 // Generated modules run only in this dedicated browser worker. No Node or
 // desktop bridge is exposed here. The parent owns termination and promotion.
 import { RuntimeClock } from '../../../packages/runtime/src/clock.ts';
+import { storyLifecycleLimits } from '../../../packages/runtime-contracts/src/story.mjs';
 import { SeededRandom } from '../../../packages/runtime/src/seed.ts';
 import {createSingleImageVisual,componentDisposer,captureComponentInstance} from '../../../packages/runtime/src/components/single-image.ts';
 import {createImageCompositionVisual} from '../../../packages/runtime/src/components/image-chain.ts';
@@ -151,7 +152,7 @@ async function initialize(message) {
     storyMode=true;
     const storyIdentity=freeze({instanceId:message.instanceId,generation:message.generation,scheduleHash:message.scheduleHash,capsuleHash:message.capsuleHash});
     const grant=message.reservationGrant;
-    if(!grant||grant.identity?.instanceId!==storyIdentity.instanceId||grant.identity?.generation!==storyIdentity.generation||grant.identity?.scheduleHash!==storyIdentity.scheduleHash||grant.identity?.capsuleHash!==storyIdentity.capsuleHash||grant.width!==settings.width||grant.height!==settings.height||grant.maxSlots!==2||grant.maxPendingCreates!==1||grant.storyTargetBytes!==24*settings.width*settings.height||grant.assetLeaseBytes!==6291456)throw new RuntimeError('Invalid Story generation reservation grant');
+    if(!grant||grant.identity?.instanceId!==storyIdentity.instanceId||grant.identity?.generation!==storyIdentity.generation||grant.identity?.scheduleHash!==storyIdentity.scheduleHash||grant.identity?.capsuleHash!==storyIdentity.capsuleHash||grant.width!==settings.width||grant.height!==settings.height||grant.maxSlots!==2||grant.maxPendingCreates!==1||grant.storyTargetBytes!==24*settings.width*settings.height||grant.assetLeaseBytes!==storyLifecycleLimits.assetBackingPerGeneration)throw new RuntimeError('Invalid Story generation reservation grant');
     externallyDriven=message.externallyDriven===true;performanceMode=collectionMode(message.performanceMode);
     clock=new RuntimeClock(()=>performance.now(),'paused');tempoClock=createTempoClock({nowMs:now,bpm:message.tempo?.bpm??120,tempoSequence:message.tempoSequence??0});random=new SeededRandom(settings.seed);
     let workerHeartbeat=0;const beat=()=>send('heartbeat',{frameId:String(frame),workerHeartbeat:++workerHeartbeat});heartbeat=setInterval(beat,250);beat();

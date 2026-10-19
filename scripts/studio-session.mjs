@@ -3,6 +3,7 @@ import { realpathSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { homedir, tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { limits as sourceLimits } from '../apps/build-worker/src/source-policy.mjs';
 
 export function canonicalWorkspace(workspace) {
   const path = realpathSync(workspace);
@@ -55,7 +56,8 @@ function validateEndpoint(endpoint, session) {
 }
 
 /** One adapter stays bound to one process lifetime, even if its endpoint is replaced. */
-export function createStudioConnection(session, { timeoutMs = 75000 } = {}) {
+// Outlast Studio's own operation deadline so its error, not an abort, reports a slow build.
+export function createStudioConnection(session, { timeoutMs = sourceLimits.agentOperationMs + 15000 } = {}) {
   let bound, connecting;
   const readEndpoint = async () => validateEndpoint(JSON.parse(await readFile(session.endpointPath, 'utf8')), session);
   const request = async (endpoint, method, params = {}) => {

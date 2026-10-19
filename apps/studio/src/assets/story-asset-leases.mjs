@@ -1,4 +1,5 @@
 import {storyLifecycleLimits} from '../../../../packages/runtime-contracts/src/story.mjs';
+import {assetLimits} from '../../../../packages/assets/src/limits.mjs';
 
 export const storyAssetDecoderVersion='lux-story-assets-v1';
 const call=Function.prototype.call,freeze=Object.freeze,create=Object.create,RuntimeError=Error,RuntimeTypeError=TypeError,RuntimeMap=Map,RuntimeSet=Set,Bytes=Uint8Array;
@@ -18,10 +19,10 @@ function checkedCharge(assets){
  for(let index=0;index<paths.length;index++){
   const row=record(field(assets,paths[index])),bytes=field(row,'byteLength'),width=field(row,'width'),height=field(row,'height');
   if(!Number.isSafeInteger(bytes)||bytes<1||!Number.isSafeInteger(width)||width<1||!Number.isSafeInteger(height)||height<1)bad('Invalid Story asset charge');
-  const pixels=width*height*4;if(!Number.isSafeInteger(pixels)||encodedBytes>1048576-bytes||rgbaBytes>2097152-pixels)bad('Story asset charge exceeds per-source bounds');
+  const pixels=width*height*4;if(!Number.isSafeInteger(pixels)||encodedBytes>assetLimits.totalBytes-bytes||rgbaBytes>assetLimits.rgbaBytes-pixels)bad('Story asset charge exceeds per-source bounds');
   encodedBytes+=bytes;rgbaBytes+=pixels;
  }
- const totalBytes=encodedBytes+rgbaBytes;if(totalBytes>storyLifecycleLimits.assetStagingPerClient)bad('Story asset staging charge exceeds 3 MiB');
+ const totalBytes=encodedBytes+rgbaBytes;if(totalBytes>storyLifecycleLimits.assetStagingPerClient)bad(`Story asset staging charge exceeds ${storyLifecycleLimits.assetStagingPerClient/1048576} MiB`);
  return freeze({encodedBytes,rgbaBytes,totalBytes});
 }
 function copy(bytes){const result=new Bytes(bytes.byteLength);for(let index=0;index<bytes.byteLength;index++)result[index]=bytes[index];return result;}

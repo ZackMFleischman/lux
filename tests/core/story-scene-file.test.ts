@@ -4,6 +4,8 @@ import {mkdtemp,readFile,writeFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {SceneFileStore} from '../../packages/core/src/scene-file.ts';
+import {storyLifecycleLimits} from '../../packages/runtime-contracts/src/story.mjs';
+import {limits as sourceLimits} from '../../apps/build-worker/src/source-policy.mjs';
 import {sceneHash,sceneSourceHash} from '../../packages/core/src/scene-document.ts';
 
 async function scene(large=false){
@@ -40,8 +42,8 @@ test('Story read cap and invalid source references preserve existing files',asyn
   const saved=await store.saveAs(path,value);const original=await readFile(path);
   const invalid=structuredClone(value);invalid.story.sequence[0]!.visualId='missing';
   await assert.rejects(async()=>store.save(saved.token,invalid));assert.deepEqual(await readFile(path),original);
-  const tooLarge=join(folder,'too-large.lux-scene');await writeFile(tooLarge,' '.repeat(33554432)+JSON.stringify(value));
-  await assert.rejects(store.open(tooLarge),/32 MiB/);
+  const tooLarge=join(folder,'too-large.lux-scene');await writeFile(tooLarge,' '.repeat(storyLifecycleLimits.sceneBytes)+JSON.stringify(value));
+  await assert.rejects(store.open(tooLarge),/Scene file exceeds 224 MiB/);
  }finally{await rm(folder,{recursive:true,force:true});}
 });
 
@@ -50,10 +52,11 @@ test('legacy files retain their existing raw byte limits',async()=>{
  try{
   const path=join(folder,'legacy.lux-scene');
   const value={format:'lux-scene',version:1,source:{sdkVersion:'0.1.0',entry:'visual.ts',files:{'visual.ts':'// draft'}},settings:{width:640,height:360,fps:60,seed:0},controls:{intensity:.5}};
-  await writeFile(path,' '.repeat(8388608)+JSON.stringify(value));
-  await assert.rejects(new SceneFileStore().open(path),/8 MiB/);
+  const legacyCap=sourceLimits.sceneFileBytes,legacyMessage=new RegExp(`Scene file exceeds ${(legacyCap/1048576).toFixed(1)} MiB`);
+  await writeFile(path,' '.repeat(legacyCap)+JSON.stringify(value));
+  await assert.rejects(new SceneFileStore().open(path),legacyMessage);
   const original=await readFile(path);
-  await assert.rejects(new SceneFileStore().saveAs(path,await scene(),{overwrite:true}),/8 MiB/);
+  await assert.rejects(new SceneFileStore().saveAs(path,await scene(),{overwrite:true}),legacyMessage);
   assert.deepEqual(await readFile(path),original);
  }finally{await rm(folder,{recursive:true,force:true});}
 });

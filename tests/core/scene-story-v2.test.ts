@@ -5,6 +5,7 @@ import {
  createStorySceneDocumentV7,validateStorySceneDocumentV7,verifyStorySceneDocumentV7,
 } from '../../packages/core/src/story-scene-v2.ts';
 import {validateSceneDocument,verifySceneDocument,sceneControlSnapshot} from '../../packages/core/src/scene-document.ts';
+import {storyLifecycleLimits} from '../../packages/runtime-contracts/src/story.mjs';
 
 const settings={width:640,height:360,fps:60,seed:0};
 const tempo={bpm:120};
@@ -74,11 +75,11 @@ test('Scene v7 rejects unsupported fields and accessors without invoking them',(
 });
 
 test('Scene v7 accepts the aggregate source boundary and rejects a source overflow',()=>{
- const maximum=Array.from({length:8},(_,index)=>visual(`v${index}`,'x'.repeat(1024*1024)));
+ const perVisual=storyLifecycleLimits.aggregateSourceTextBytes/8,maximum=Array.from({length:8},(_,index)=>visual(`v${index}`,'x'.repeat(perVisual)));
  const quotaStory={...story,normalVisualId:'v0',beats:story.beats.map((beat,index)=>({...beat,visualId:`v${index}`})),sequence:story.sequence.map((row,index)=>({...row,visualId:`v${index}`}))};
  assert.equal(createStorySceneDocumentV7(maximum,settings,tempo,quotaStory).visuals.length,8);
- const overflow=[visual('v0','x'.repeat(1024*1024+1)),...maximum.slice(1)];
- assert.throws(()=>createStorySceneDocumentV7(overflow,settings,tempo,quotaStory),/source|1 MiB|quota/i);
+ const overflow=[visual('v0','x'.repeat(perVisual+1)),...maximum.slice(1)];
+ assert.throws(()=>createStorySceneDocumentV7(overflow,settings,tempo,quotaStory),/aggregate source text exceeds 16 MiB/i);
 });
 import {exportSceneDocument} from '../../scripts/studio-export.mjs';
 import {tmpdir} from 'node:os';

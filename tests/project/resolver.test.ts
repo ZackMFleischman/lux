@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { prepareProjectResolution, resolveProject, affectedScenes, mapProjectDiagnostic } from '../../packages/core/src/project/resolver.ts';
-import { resolutionFixture, ids, bytes, model, inputFor, packageFixture, pinFor, hash, bmp, imageDescriptor, local, definition, paddedPng } from './resolver-fixtures.ts';
+import { resolutionFixture, ids, bytes, model, inputFor, packageFixture, pinFor, hash, bmp, imageDescriptor, local, definition, paddedPng, exactOriginals } from './resolver-fixtures.ts';
+import { projectLimits } from '../../packages/core/src/project/contracts.ts';
+import { assetLimits } from '../../packages/assets/src/limits.mjs';
 import { toolchain } from './fixtures.ts';
 import { validateSource } from '../../apps/build-worker/src/source-policy.mjs';
 import { componentIdSchema, sceneIdSchema, assetIdSchema } from '../../packages/runtime-contracts/src/identities.ts';
@@ -122,18 +124,20 @@ test('image originals and asset origins are exact, including unbound images', as
 });
 test('source closure byte ceiling includes unimported helpers and preserves equality', async () => {
   const m = model(); m.files['components/a/src/main.ts'] = bytes(''); m.files['components/b/src/main.ts'] = bytes('');
-  m.files['components/helper/src/helper.ts'] = bytes(' '.repeat(1048576)); await prepare(m);
-  m.files['components/helper/src/helper.ts'] = bytes(' '.repeat(1048577)); await assert.rejects(prepare(m), { code: 'QUOTA_EXCEEDED' });
+  m.files['components/helper/src/helper.ts'] = bytes(' '.repeat(projectLimits.closureSourceBytes)); await prepare(m);
+  m.files['components/helper/src/helper.ts'] = bytes(' '.repeat(projectLimits.closureSourceBytes + 1)); await assert.rejects(prepare(m), { code: 'QUOTA_EXCEEDED' });
 });
-test('32 source files pass and 33 reject through the authoritative metadata closure quota', async () => {
-  const m = model(); m.components[0]!.files = Array.from({ length: 31 }, (_, i) => i ? `src/f${i}.ts` : 'src/main.ts');
+test('closure-limit source files pass and one more rejects through the authoritative metadata closure quota', async () => {
+  const m = model(); m.components[0]!.files = Array.from({ length: projectLimits.closureFiles - 1 }, (_, i) => i ? `src/f${i}.ts` : 'src/main.ts');
   for (const p of m.components[0]!.files) m.files[`components/a/${p}`] = bytes('');
   await prepare(m); m.components[0]!.files.push('src/last.ts'); m.files['components/a/src/last.ts'] = bytes('');
   await assert.rejects(prepare(m), (e: unknown) => { assert.match((e as Error).message, /closure quota/); return true; });
 });
 test('compressed PNG proves decoded RGBA ceiling independent of original-byte ceiling', async () => {
-  const m = model(), b = encodePng({ width: 512, height: 512, data: new Uint8Array(512 * 512 * 4), channels: 4, depth: 8 });
-  assert.ok(b.length * 3 < 1048576);
+  // Two aliases of one maximum-size image exactly fill the decoded RGBA budget.
+  const side = assetLimits.dimension; assert.equal(2 * side * side * 4, assetLimits.rgbaBytes);
+  const m = model(), b = encodePng({ width: side, height: side, data: new Uint8Array(side * side * 4), channels: 4, depth: 8 });
+  assert.ok(b.length * 3 < assetLimits.totalBytes);
   const d = imageDescriptor(b, ids.image, 'png', 'image/png'); m.assets.assets[ids.image] = d; m.files[d.path] = b;
   m.components[0]!.assets = { 'assets/one.png': ids.image, 'assets/two.png': ids.image }; await prepare(m);
   const smallId = assetIdSchema.parse('44000000-0000-4000-8000-000000000002');
@@ -204,38 +208,37 @@ test('aggregate vendored ceiling includes actual manifest bytes separately from 
   pkg.files['LICENSE.txt'] = new Uint8Array(pkg.files['LICENSE.txt'].length + 1); pkg.manifest.files['LICENSE.txt'] = hash(pkg.files['LICENSE.txt']);
   await assert.rejects(prepare(m), { code: 'QUOTA_EXCEEDED' });
 });
-test('16 MiB exact project images are valid originals; next byte rejects through metadata quota', async () => {
-  const m = model(); let total = 0;
-  for (let i = 0; i < 23; i++) {
-    const id = assetIdSchema.parse(`66000000-0000-4000-8000-${String(i + 1).padStart(12, '0')}`);
-    const data = i < 21 ? bmp(512, 512) : i === 21 ? bmp(256, 256) : paddedPng(16777216 - total);
-    const d = imageDescriptor(data, id, i === 22 ? 'png' : 'bmp', i === 22 ? 'image/png' : 'image/bmp');
-    m.assets.assets[id] = d; m.files[d.path] = data; total += data.length;
+test('exact project asset budget originals are valid; next byte rejects through metadata quota', async () => {
+  const m = model(), originals = exactOriginals(projectLimits.assetBytes, assetLimits.imageBytes); let total = 0, last = '';
+  for (const [i, data] of originals.entries()) {
+    const id = assetIdSchema.parse(`66000000-0000-4000-8000-${String(i + 1).padStart(12, '0')}`), png = i === originals.length - 1;
+    const d = imageDescriptor(data, id, png ? 'png' : 'bmp', png ? 'image/png' : 'image/bmp');
+    m.assets.assets[id] = d; m.files[d.path] = data; total += data.length; last = id;
   }
-  assert.equal(total, 16777216); await prepare(m);
-  const id = assetIdSchema.parse('66000000-0000-4000-8000-000000000023'), old = m.assets.assets[id]!;
+  assert.equal(total, projectLimits.assetBytes); await prepare(m);
+  const id = assetIdSchema.parse(last), old = m.assets.assets[id]!;
   const data = paddedPng(old.byteLength + 1), d = imageDescriptor(data, id, 'png', 'image/png'); m.assets.assets[id] = d; m.files[d.path] = data;
   await assert.rejects(prepare(m), (error: unknown) => { assert.match((error as Error).message, /Project asset quota exceeded/); return true; });
 });
-test('64 images pass and a 65th rejects even while unused', async () => {
+test('project image count passes and one more rejects even while unused', async () => {
   const m = model(), data = bmp();
-  for (let i = 0; i < 65; i++) {
+  for (let i = 0; i <= projectLimits.assets; i++) {
     const id = assetIdSchema.parse(`66000000-0000-4000-8000-${String(i + 1).padStart(12, '0')}`), d = imageDescriptor(data, id);
     m.assets.assets[id] = d; m.files[d.path] = data;
-    if (i === 63) await prepare(m);
+    if (i === projectLimits.assets - 1) await prepare(m);
   }
   await assert.rejects(prepare(m), (error: unknown) => { assert.match((error as Error).message, /asset count limit/); return true; });
 });
-test('four alias bindings pass and fifth rejects, even for the same tiny original', async () => {
+test('per-source alias bindings pass and one more rejects, even for the same tiny original', async () => {
   const m = model(), b = bmp(), d = imageDescriptor(b); m.assets.assets[ids.image] = d; m.files[d.path] = b;
-  for (let i = 0; i < 5; i++) { m.components[0]!.assets[`assets/a${i}.bmp`] = ids.image; if (i === 3) await prepare(m); }
+  for (let i = 0; i <= assetLimits.count; i++) { m.components[0]!.assets[`assets/a${i}.bmp`] = ids.image; if (i === assetLimits.count - 1) await prepare(m); }
   await assert.rejects(prepare(m), (error: unknown) => { assert.match((error as Error).message, /closure quota/); return true; });
 });
 test('dimensions and image-byte ceiling retain actual decoder and metadata owners', async () => {
-  const m = model(), b = bmp(512, 512), d = imageDescriptor(b); assert.equal(b.length, 786486); m.assets.assets[ids.image] = d; m.files[d.path] = b; await prepare(m);
-  m.files[d.path] = new Uint8Array(786487); d.byteLength = 786487; d.sha256 = hash(m.files[d.path]!);
+  const m = model(), b = bmp(512, 512), d = imageDescriptor(b); m.assets.assets[ids.image] = d; m.files[d.path] = b; await prepare(m);
+  m.files[d.path] = new Uint8Array(assetLimits.imageBytes + 1); d.byteLength = assetLimits.imageBytes + 1; d.sha256 = hash(m.files[d.path]!);
   await assert.rejects(prepare(m), { code: 'PROJECT_INVALID' });
-  const png = encodePng({ width: 513, height: 1, channels: 4, depth: 8, data: new Uint8Array(513 * 4) });
+  const png = encodePng({ width: assetLimits.dimension + 1, height: 1, channels: 4, depth: 8, data: new Uint8Array((assetLimits.dimension + 1) * 4) });
   const next = imageDescriptor(png, ids.image, 'png', 'image/png'); delete m.files[d.path]; m.assets.assets[ids.image] = next; m.files[next.path] = png;
   await assert.rejects(prepare(m), { code: 'ASSET_BOUNDARY_VIOLATION' });
 });
@@ -247,22 +250,22 @@ test('JPEG originals validate through the existing codec; corrupt unbound bytes 
 });
 test('cross-package closure byte accounting includes all declared source originals', async () => {
   const m = model(), pkg = packageFixture(); m.packages.push(pkg);
-  pkg.files['src/main.ts'] = bytes(' '.repeat(524288)); pkg.files['src/helper.ts'] = bytes('');
+  const half = projectLimits.closureSourceBytes / 2;
+  pkg.files['src/main.ts'] = bytes(' '.repeat(half)); pkg.files['src/helper.ts'] = bytes('');
   pkg.manifest.files = Object.fromEntries(Object.entries(pkg.files).map(([p, b]) => [p, hash(b)]));
   m.components[0]!.references = [{ kind: 'package', packageId: pkg.manifest.packageId, exportId: 'main' }];
-  m.files['components/a/src/main.ts'] = bytes(' '.repeat(524288)); await prepare(m);
-  m.files['components/a/src/main.ts'] = bytes(' '.repeat(524289)); await assert.rejects(prepare(m), { code: 'QUOTA_EXCEEDED' });
+  m.files['components/a/src/main.ts'] = bytes(' '.repeat(half)); await prepare(m);
+  m.files['components/a/src/main.ts'] = bytes(' '.repeat(half + 1)); await assert.rejects(prepare(m), { code: 'QUOTA_EXCEEDED' });
 });
-test('exact 1 MiB binding originals passes, next byte fails independently of decoded RGBA', async () => {
-  const m = model(), lengths: number[] = [];
-  for (let i = 0; i < 4; i++) {
-    const id = assetIdSchema.parse(`77000000-0000-4000-8000-${String(i + 1).padStart(12, '0')}`);
-    const data = i < 2 ? bmp(512, 256) : i === 2 ? bmp(256, 256) : paddedPng(1048576 - lengths.reduce((a, b) => a + b, 0));
-    const ext = i === 3 ? 'png' : 'bmp', d = imageDescriptor(data, id, ext, i === 3 ? 'image/png' : 'image/bmp');
-    m.assets.assets[id] = d; m.files[d.path] = data; m.components[0]!.assets[`assets/binding${i}.${ext}`] = id; lengths.push(data.length);
+test('exact per-source binding originals pass, next byte fails independently of decoded RGBA', async () => {
+  const m = model(), originals = exactOriginals(assetLimits.totalBytes, assetLimits.imageBytes);
+  for (const [i, data] of originals.entries()) {
+    const id = assetIdSchema.parse(`77000000-0000-4000-8000-${String(i + 1).padStart(12, '0')}`), png = i === originals.length - 1;
+    const ext = png ? 'png' : 'bmp', d = imageDescriptor(data, id, ext, png ? 'image/png' : 'image/bmp');
+    m.assets.assets[id] = d; m.files[d.path] = data; m.components[0]!.assets[`assets/binding${i}.${ext}`] = id;
   }
-  assert.deepEqual(lengths, [393270, 393270, 196662, 65374]); await prepare(m);
-  const id = assetIdSchema.parse('77000000-0000-4000-8000-000000000004'), data = paddedPng(65375), d = imageDescriptor(data, id, 'png', 'image/png');
+  assert.equal(originals.reduce((sum, data) => sum + data.length, 0), assetLimits.totalBytes); await prepare(m);
+  const filler = originals.at(-1)!, id = assetIdSchema.parse(`77000000-0000-4000-8000-${String(originals.length).padStart(12, '0')}`), data = paddedPng(filler.length + 1), d = imageDescriptor(data, id, 'png', 'image/png');
   m.assets.assets[id] = d; m.files[d.path] = data;
   await assert.rejects(prepare(m), (error: unknown) => { assert.match((error as Error).message, /closure quota/); return true; });
 });

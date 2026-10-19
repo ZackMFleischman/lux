@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url';
 import { SceneFileStore } from '../packages/core/src/scene-file.ts';
 import { prepareTransportScene, assertNumericExportControls } from './transport-prepare.mjs';
 import { exportResolume } from './export-resolume.mjs';
+import { exportLimits } from '../apps/studio/src/export-process.ts';
 
 /** Child-process entry point. No generated source is evaluated in this process. */
 export async function exportSceneDocument(request, { prepare = prepareTransportScene, exporter = exportResolume } = {}) {
@@ -31,7 +32,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
   try {
     const chunks = []; let bytes = 0;
     for await (const chunk of process.stdin) {
-      bytes += chunk.length; if (bytes > 8388608) throw Error('Export request exceeds 8 MiB'); chunks.push(chunk);
+      bytes += chunk.length; if (bytes > exportLimits.requestBytes) throw Error('Export request exceeds its limit'); chunks.push(chunk);
     }
     const request = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(Buffer.concat(chunks)));
     const result = await exportSceneDocument(request);

@@ -1,6 +1,7 @@
 import { createServer } from 'node:http';
 import { randomBytes } from 'node:crypto';
 import {agentTransportLimits} from './source/agent-contract.ts';
+import {formatBytes} from '../../../packages/assets/src/index.mjs';
 export async function createAgentBridge(invoke: (method: string, params: unknown) => Promise<unknown>) {
   const token = randomBytes(32).toString('hex');
   const requests = new Map<string, { body: string; result: Promise<unknown> }>();
@@ -10,7 +11,7 @@ export async function createAgentBridge(invoke: (method: string, params: unknown
     if (request.method !== 'POST' || request.url !== '/' || request.headers.origin || request.headers.authorization !== `Bearer ${token}`) { response.writeHead(403).end('{"error":"Forbidden"}'); return; }
     const chunks: Buffer[] = []; let bytes = 0;
     try {
-      for await (const chunk of request) { bytes += chunk.length; if (bytes > agentTransportLimits.requestBytes) throw Error('Request exceeds 34 MiB'); chunks.push(chunk); }
+      for await (const chunk of request) { bytes += chunk.length; if (bytes > agentTransportLimits.requestBytes) throw Error(`Request exceeds ${formatBytes(agentTransportLimits.requestBytes)}`); chunks.push(chunk); }
       const body = new TextDecoder('utf-8', { fatal: true }).decode(Buffer.concat(chunks));
       const command = JSON.parse(body);
       if (!command || Object.keys(command).some(key => !['id', 'method', 'params'].includes(key)) || typeof command.id !== 'string' || command.id.length > 100 || !['read', 'build', 'capture', 'status', 'parameters','trigger', 'variation', 'playback', 'restart','tempo.set','tempo.tap','story.read','story.transport', 'scene.save', 'scene.open', 'library.list', 'library.read', 'library.create', 'library.update'].includes(command.method)) throw Error('Invalid authoring command');
@@ -24,11 +25,11 @@ export async function createAgentBridge(invoke: (method: string, params: unknown
         if (requests.size > 8) requests.delete(requests.keys().next().value!);
       }
       const encoded = JSON.stringify({ ok: true, result: await entry.result });
-      if (Buffer.byteLength(encoded) > agentTransportLimits.responseBytes) throw Error('Authoring response exceeds 52 MiB');
+      if (Buffer.byteLength(encoded) > agentTransportLimits.responseBytes) throw Error(`Authoring response exceeds ${formatBytes(agentTransportLimits.responseBytes)}`);
       response.end(encoded);
     } catch (error) { response.writeHead(400).end(JSON.stringify({ ok: false, error: String((error as Error).message).slice(0, 2000) })); }
   });
-  server.requestTimeout = 80000;
+  server.requestTimeout = agentTransportLimits.operationMs + 10000;
   await new Promise<void>((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
   const address = server.address(); if (!address || typeof address === 'string') throw Error('Local authoring listener failed');
   return { url: `http://127.0.0.1:${address.port}/`, token, close: () => { server.closeAllConnections(); server.close(); } };

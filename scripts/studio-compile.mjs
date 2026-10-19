@@ -1,8 +1,9 @@
 import { compileVisual } from '../apps/build-worker/src/compile.mjs';
 import { linkRuntime } from '../apps/build-worker/src/link-runtime.mjs';
+import { limits } from '../apps/build-worker/src/source-policy.mjs';
 let input = '', bytes = 0;
 try {
-  for await (const chunk of process.stdin) { bytes += chunk.length; if (bytes > 8388608) throw Error('Source request too large'); input += chunk; }
+  for await (const chunk of process.stdin) { bytes += chunk.length; if (bytes > limits.requestBytes) throw Error('Source request too large'); input += chunk; }
   const source = JSON.parse(input);
   const result = await compileVisual({ source });
   if (!result.ok) process.stdout.write(JSON.stringify(result));

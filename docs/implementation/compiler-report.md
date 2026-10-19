@@ -17,8 +17,8 @@ owns scene/candidate IDs, admission queues, candidate smoke and activation.
 `options.dependencyRoot` is a trusted service configuration, never an authoring
 request field. It defaults to this checkout's `node_modules`; this development
 environment uses the coordinator's central installed dependency directory.
-`options.timeoutMs` defaults to 30000 and accepts explicit 1–30000 ms values for
-bounded CPU tests. The caller cannot select a worker executable or command.
+`options.timeoutMs` defaults to `limits.compileMs` (120000) and accepts explicit
+values from 1 ms up to that deadline for bounded CPU tests. The caller cannot select a worker executable or command.
 
 `packages/visual-sdk/src/index.ts` provides `defineVisual`, VisualDefinition,
 VisualInstance, VisualContext, FrameContext and runtime-owned OutputTarget types.
@@ -45,7 +45,7 @@ const result = await compileVisual({ source: {
 
 ## Source boundary and actual compilation
 
-Admission validates well-formed UTF-8 strings, aggregate 1 MiB and 32-file caps,
+Admission validates well-formed UTF-8 strings, aggregate 4 MiB and 128-file caps,
 an existing entry, and unique case-folded module paths before disk materialization.
 The initial path subset is ASCII letters/digits/underscore/hyphen directory and
 file stems, with `.ts` suffixes and at most 240 characters per path. Absolute/traversal paths, Windows device names,
@@ -86,8 +86,9 @@ bytes. Artifact dependency hashes are integrity metadata, not a runtime loader.
 The trusted compiler worker and native TypeScript descendants run inside the
 existing Windows Job Object helper, invoked directly without taking the exclusive
 GPU experiment lock. The target is created suspended and assigned before resume.
-Compiler jobs set a **1 GiB job-wide memory cap**, **256 MiB Node heap**, and a
-30-second child lifetime ceiling. Source is never evaluated in this or the caller
+Compiler jobs set a **4 GiB job-wide memory cap** (the supervisor maximum),
+**2 GiB Node heap**, and a 120-second child lifetime ceiling, sized so a full
+128 MiB image budget can be parsed and decoded. Source is never evaluated in this or the caller
 process. A visual with an infinite `create` loop compiles as data; only a future
 sandboxed runtime can exercise its initialization watchdog.
 
@@ -136,8 +137,8 @@ SDK, contract, declaration and runtime dependency byte, then snapshots allowed
 modules into an esbuild virtual namespace. There is no resolver filesystem/network
 fallback. Generated dynamic imports, privileged imports and relative escapes fail.
 Input source-map comments are removed using AST ranges; the returned external map
-does not cause a runtime fetch. Output JSON is capped at 16 MiB and the parent
-checks its identity and hash. Job limits match compilation: 30 seconds, 1 GiB job
-memory and 256 MiB Node heap. This is CPU linking evidence, not runtime sandbox,
+does not cause a runtime fetch. Output JSON is capped at `limits.linkedBytes` (the
+base64 asset budget plus 16 MiB of code) and the parent checks its identity and
+hash. Job limits: 60 seconds, 4 GiB job memory and 2 GiB Node heap. This is CPU linking evidence, not runtime sandbox,
 initialization, frame or GPU acceptance. Dependency installations are trusted,
 immutable service inputs; hashes provide byte attribution, not package signatures.

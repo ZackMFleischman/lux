@@ -1,6 +1,8 @@
 export const limits: Readonly<{
   sourceBytes: number; files: number; diagnosticBytes: number;
-  compileMs: number; outputBytes: number; sourceJsonBytes: number; requestBytes: number;
+  compileMs: number; linkMs: number; buildMs: number; agentOperationMs: number; outputBytes: number; linkedBytes: number;
+  sourceJsonBytes: number; requestBytes: number; sceneJsonBytes: number; sceneFileBytes: number;
+  workerHeapMiB: number; workerMemoryBytes: number; sharedCapsuleBytes: number; sharedRequestBytes: number;
 }>;
 export function violation(message: string, code?: string): Error & { code: string };
 export function validateSource(source: unknown): import('../../../packages/runtime-contracts/src/index.ts').SourceBundle;

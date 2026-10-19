@@ -25,9 +25,12 @@ export interface DerivedAssetSet {
 /** Trusted boundary callback; returns SHA-256 of exact bytes as lowercase hex. */
 export type HashBytes = (bytes: Uint8Array) => string | Promise<string>;
 export const assetLimits: Readonly<{
-  count: 4; imageBytes: 786486; totalBytes: 1048576;
-  rgbaBytes: 2097152; dimension: 512; pathCharacters: 240;
+  count: number; imageBytes: number; totalBytes: number;
+  rgbaBytes: number; dimension: number; pathCharacters: number;
 }>;
+/** Compact JSON bytes of one source's complete asset record (base64 plus per-record overhead). */
+export const assetJsonBytes: number;
+export function formatBytes(bytes: number): string;
 export function validateAssetPath(path: unknown): string;
 export function decodeCanonicalBase64(data: unknown): Uint8Array;
 export function validateBmp(bytes: Uint8Array): BmpInfo;

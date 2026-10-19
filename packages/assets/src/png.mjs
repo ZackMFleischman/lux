@@ -5,6 +5,10 @@ import ZStream from 'pako/lib/zlib/zstream.js';
 import { assetLimits } from './limits.mjs';
 
 const signature = [137, 80, 78, 71, 13, 10, 26, 10];
+// Encoders commonly split IDAT into 8 KiB chunks (libpng's default), so a file
+// at the byte limit can carry thousands of chunks. Each chunk costs at least
+// 12 file bytes; this cap keeps the walk bounded for 1 KiB chunk streams.
+const maxChunks = Math.ceil(assetLimits.imageBytes / 1024) + 256;
 const allowedChunks = new Set(['IHDR','PLTE','tRNS','IDAT','IEND','sRGB','gAMA','cHRM','pHYs','tEXt','tIME']);
 const srgbChromaticity = [31270,32900,64000,33000,30000,60000,15000,6000];
 const typedArrayByteLength = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(Uint8Array.prototype),'byteLength').get;
@@ -61,7 +65,7 @@ function inspect(bytes, maxRgbaBytes) {
   let at = 8, count = 0, ancillary = 0, idatLength = 0, phase = 0;
   let width, height, depth, type, channels, rowBytes, palette, transparency;
   while (at < bytes.length) {
-    if (++count > 256) fail('too many chunks');
+    if (++count > maxChunks) fail(`more than ${maxChunks} chunks`);
     if (bytes.length - at < 12) fail('truncated chunk');
     const length = view.getUint32(at), start = at + 8, end = start + length;
     if (length > bytes.length - at - 12) fail('chunk length exceeds file');
@@ -82,7 +86,7 @@ function inspect(bytes, maxRgbaBytes) {
         exact(13);
         width = view.getUint32(start); height = view.getUint32(start+4);
         depth = bytes[start+8]; type = bytes[start+9];
-        if (width < 1 || height < 1 || width > assetLimits.dimension || height > assetLimits.dimension) fail('dimensions must be 1..512');
+        if (width < 1 || height < 1 || width > assetLimits.dimension || height > assetLimits.dimension) fail(`dimensions must be 1..${assetLimits.dimension}`);
         channels = ({0:1,2:3,3:1,4:2,6:4})[type];
         if (!channels || !(type === 3 ? [1,2,4,8].includes(depth) : depth === 8)) fail('unsupported color type or bit depth');
         if (bytes[start+10] || bytes[start+11] || bytes[start+12]) fail('unsupported compression, filter or interlace mode');
@@ -161,7 +165,7 @@ function decode(bytes, options = {}) {
   const maxRgbaBytes = options.maxRgbaBytes ?? assetLimits.rgbaBytes;
   if (!Number.isSafeInteger(maxRgbaBytes) || maxRgbaBytes < 0 || maxRgbaBytes > assetLimits.rgbaBytes) fail('invalid RGBA budget');
   const byteLength = Reflect.apply(typedArrayByteLength,bytes,[]);
-  if (byteLength > assetLimits.imageBytes) fail('file exceeds image byte limit',true);
+  if (byteLength > assetLimits.imageBytes) fail(`file exceeds the ${assetLimits.imageBytes} byte image limit`,true);
   // Both parsers see the same private immutable snapshot, including for SAB input.
   // A length-tracking source may grow concurrently: destination allocation uses
   // the checked length, and intrinsic set rejects a source that outgrew it.

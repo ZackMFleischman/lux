@@ -24,15 +24,15 @@ Logical paths start with `assets/`. Each segment uses ASCII letters, digits, `_`
 
 | Admission limit | Maximum |
 | --- | ---: |
-| Images per source | 4 |
-| Width and height | 512 each |
-| Original bytes per image | 786,486 |
-| Original bytes across all images | 1,048,576 (1 MiB) |
-| Decoded RGBA bytes across all images | 2,097,152 (2 MiB), counting `width × height × 4` |
-| Complete compact source-v2 JSON | 6 MiB |
-| Build request / complete escaped read tool result | 8 MiB / 16 MiB |
+| Images per source | 64 |
+| Width and height | 8192 each |
+| Original bytes per image | 33,554,432 (32 MiB) |
+| Original bytes across all images | 134,217,728 (128 MiB) |
+| Decoded RGBA bytes across all images | 536,870,912 (512 MiB), counting `width × height × 4` |
+| Complete compact source-v2 JSON | about 195 MiB (`sourceV2JsonBytes`) |
+| Single-visual scene JSON / Scene v7 JSON | about 196 MiB / 224 MiB |
 
-All limits apply together; four 512×512 images exceed the decoded-memory limit. Code separately allows 32 TypeScript files and 1 MiB aggregate UTF-8. Resize or explicitly convert an image before import when the task permits it; do not disguise an unsupported file by renaming its extension.
+All limits apply together. For example, sixteen 2752×1536 painted plates (about 16 MiB of RGBA each) fit; two 8192×8192 images use the whole decoded-RGBA budget. A Scene v7 document holds every visual's assets, so the 224 MiB scene limit also bounds images across visuals (about 168 MiB of originals in total). Code separately allows 128 TypeScript files and 4 MiB aggregate UTF-8. `discover` reports the running Studio's exact values (`assetCount`, `assetDimension`, `assetFileBytes`, `assetTotalBytes`, `assetDecodedRgbaBytes`, `sourceV2JsonBytes`, `sceneV7JsonBytes`, `requestBytes`, `readJsonBytes`); an older open Studio keeps its older limits. Decoding is CPU work: each multi-megapixel JPEG takes about a second per admission, so builds with many large images take tens of seconds. Resize or explicitly convert an image before import when the task permits it; do not disguise an unsupported file by renaming its extension.
 
 Supported profiles are deliberately bounded:
 

@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { parseMetadataJson, metadataLimits, validateMetadata, admitProjectMetadata, hashMetadata, hashInventory, hashPackage } from '../../packages/core/src/project/contracts.ts';
 import { fixture, documents, ids, h, hash, toolchain, legacyControls } from './fixtures.ts';
+import { projectLimits } from '../../packages/core/src/project/contracts.ts';
+import { assetLimits } from '../../packages/assets/src/limits.mjs';
 import {sourceBundleSchema,sourceSdkVersionSchema} from '../../packages/runtime-contracts/src/index.ts';
 import {componentFileSchema,codeExportSchema,dependencyLockSchema} from '../../packages/core/src/project/contracts.ts';
 import type {ComponentFile,CodeExport} from '../../packages/core/src/project/contracts.ts';
@@ -187,11 +189,11 @@ test('unused package asset aliases and absent declaration pins fail admission', 
 });
 test('closure limits count transitive source files and distinct image bindings', async () => {
   const f = fixture();
-  f.components[0]!.files = ['src/main.ts', ...Array.from({ length: 29 }, (_, index) => `src/helper${index}.ts`)];
-  // 30 + 2 + 1 transitive files exceed the existing compiler limit of 32.
+  f.components[0]!.files = ['src/main.ts', ...Array.from({ length: projectLimits.closureFiles - 3 }, (_, index) => `src/helper${index}.ts`)];
+  // These files plus 2 + 1 transitive files exceed the compiler's source file limit by one.
   await assert.rejects(admitProjectMetadata(documents(f), toolchain), /closure quota/i);
   f.components[0]!.files.pop(); await admitProjectMetadata(documents(f), toolchain);
-  for (let index = 0; index < 4; index++) f.components[0]!.assets[`assets/spark${index}.png`] = ids.asset;
+  for (let index = 0; index < assetLimits.count; index++) f.components[0]!.assets[`assets/spark${index}.png`] = ids.asset;
   await assert.rejects(admitProjectMetadata(documents(f), toolchain), /closure quota/i);
 });
 test('admission rejects incomplete control values and mismatched exact dependency pins', async () => {

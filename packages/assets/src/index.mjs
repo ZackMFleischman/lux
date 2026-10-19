@@ -1,8 +1,8 @@
 // Pure bounded asset admission. No Node, browser codec, filesystem or network APIs.
-import { assetLimits } from './limits.mjs';
+import { assetLimits, assetJsonBytes, formatBytes } from './limits.mjs';
 import { decodePng } from './png.mjs';
 import { decodeJpeg } from './jpeg.mjs';
-export { assetLimits };
+export { assetLimits, assetJsonBytes, formatBytes };
 const admissions = new WeakMap();
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 const sourceFields = ['mediaType', 'encoding', 'data'];
@@ -45,40 +45,50 @@ function validateMedia(path, descriptor) {
   if (descriptor.mediaType !== expected || descriptor.encoding !== 'base64') fail('Image extension/media type must match and encoding must be base64',path);
 }
 
+const base64Values = new Int16Array(128).fill(-1);
+for (let i = 0; i < alphabet.length; i++) base64Values[alphabet.charCodeAt(i)] = i;
+
+// Linear, allocation-bounded decode: one output array, no regex backtracking
+// stack and no re-encoded copy, so 32 MiB originals stay cheap to admit.
 export function decodeCanonicalBase64(data) {
   if (typeof data !== 'string' || !data.length) fail('Asset base64 must be a nonempty string');
-  if (data.length > Math.ceil(assetLimits.imageBytes / 3) * 4) fail('Encoded asset exceeds image byte limit', undefined, true);
-  if (data.length % 4 || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(data)) fail('Asset base64 is not canonical');
+  if (data.length > Math.ceil(assetLimits.imageBytes / 3) * 4) fail(`Encoded asset exceeds the ${formatBytes(assetLimits.imageBytes)} image byte limit`, undefined, true);
+  if (data.length % 4) fail('Asset base64 is not canonical');
   const padding = data.endsWith('==') ? 2 : data.endsWith('=') ? 1 : 0;
   const length = data.length / 4 * 3 - padding;
-  if (!length || length > assetLimits.imageBytes) fail('Decoded asset exceeds image byte limit', undefined, true);
-  const bytes = new Uint8Array(length);
+  if (!length || length > assetLimits.imageBytes) fail(`Decoded asset exceeds the ${formatBytes(assetLimits.imageBytes)} image byte limit`, undefined, true);
+  const value = index => {
+    const code = data.charCodeAt(index), digit = code < 128 ? base64Values[code] : -1;
+    if (digit < 0) fail('Asset base64 is not canonical');
+    return digit;
+  };
+  const bytes = new Uint8Array(length), full = data.length - (padding ? 4 : 0);
   let at = 0;
-  for (let i = 0; i < data.length; i += 4) {
-    const a = alphabet.indexOf(data[i]), b = alphabet.indexOf(data[i + 1]);
-    const c = data[i + 2] === '=' ? 0 : alphabet.indexOf(data[i + 2]);
-    const d = data[i + 3] === '=' ? 0 : alphabet.indexOf(data[i + 3]);
-    bytes[at++] = (a << 2) | (b >> 4);
-    if (at < length) bytes[at++] = (b << 4) | (c >> 2);
-    if (at < length) bytes[at++] = (c << 6) | d;
+  for (let i = 0; i < full; i += 4) {
+    const n = (value(i) << 18) | (value(i + 1) << 12) | (value(i + 2) << 6) | value(i + 3);
+    bytes[at++] = n >> 16; bytes[at++] = (n >> 8) & 255; bytes[at++] = n & 255;
   }
-  // Re-encoding also rejects nonzero pad bits (AB==, AAB=).
-  let encoded = '';
-  for (let i = 0; i < length; i += 3) {
-    const a = bytes[i], b = bytes[i + 1] ?? 0, c = bytes[i + 2] ?? 0;
-    encoded += alphabet[a >> 2] + alphabet[((a & 3) << 4) | (b >> 4)] + (i + 1 < length ? alphabet[((b & 15) << 2) | (c >> 6)] : '=') + (i + 2 < length ? alphabet[c & 63] : '=');
+  if (padding) {
+    const i = full, a = value(i), b = value(i + 1);
+    if (padding === 2) {
+      if (data[i + 2] !== '=' || (b & 15)) fail(b & 15 ? 'Asset base64 has noncanonical pad bits' : 'Asset base64 is not canonical');
+      bytes[at++] = (a << 2) | (b >> 4);
+    } else {
+      const c = value(i + 2);
+      if (c & 3) fail('Asset base64 has noncanonical pad bits');
+      bytes[at++] = (a << 2) | (b >> 4); bytes[at++] = ((b & 15) << 4) | (c >> 2);
+    }
   }
-  if (encoded !== data) fail('Asset base64 has noncanonical pad bits');
   return bytes;
 }
 
 export function validateBmp(bytes) {
   if (!(bytes instanceof Uint8Array) || bytes.byteLength < 54) fail('Truncated BMP header');
-  if (bytes.byteLength > assetLimits.imageBytes) fail('BMP exceeds image byte limit', undefined, true);
+  if (bytes.byteLength > assetLimits.imageBytes) fail(`BMP exceeds the ${formatBytes(assetLimits.imageBytes)} image byte limit`, undefined, true);
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   if (bytes[0] !== 0x42 || bytes[1] !== 0x4d || view.getUint32(2, true) !== bytes.byteLength || view.getUint16(6, true) || view.getUint16(8, true) || view.getUint32(10, true) !== 54 || view.getUint32(14, true) !== 40) fail('Unsupported BMP file header');
   const width = view.getInt32(18, true), height = view.getInt32(22, true);
-  if (width < 1 || height < 1 || width > assetLimits.dimension || height > assetLimits.dimension) fail('BMP dimensions must be positive and at most 512');
+  if (width < 1 || height < 1 || width > assetLimits.dimension || height > assetLimits.dimension) fail(`BMP dimensions must be positive and at most ${assetLimits.dimension}`);
   if (view.getUint16(26, true) !== 1 || view.getUint16(28, true) !== 24 || view.getUint32(30, true) !== 0 || view.getUint32(46, true) || view.getUint32(50, true)) fail('BMP must be opaque 24-bit BI_RGB without a palette');
   const stride = Math.ceil(width * 3 / 4) * 4, payload = stride * height, rgbaByteLength = width * height * 4;
   if (!Number.isSafeInteger(payload) || !Number.isSafeInteger(rgbaByteLength) || bytes.byteLength !== 54 + payload || (view.getUint32(34, true) !== 0 && view.getUint32(34, true) !== payload)) fail('BMP pixel payload size mismatch');
@@ -99,7 +109,7 @@ export function decodeBmp(bytes) {
 // callers crossing a trust boundary must still use validateSourceAssets.
 export function snapshotSourceAssetRecords(input) {
   const records = dataRecord(input), keys = Object.keys(records).sort();
-  if (keys.length > assetLimits.count) fail('At most four image assets are supported',undefined,true);
+  if (keys.length > assetLimits.count) fail(`At most ${assetLimits.count} image assets are supported`,undefined,true);
   const seen = new Set(), result = {};
   for (const path of keys) {
     validateAssetPath(path);
@@ -108,7 +118,7 @@ export function snapshotSourceAssetRecords(input) {
     const descriptor = dataRecord(records[path],sourceFields,path);
     validateMedia(path,descriptor);
     if (typeof descriptor.data !== 'string' || !descriptor.data.length) fail('Asset base64 must be a nonempty string',path);
-    if (descriptor.data.length > Math.ceil(assetLimits.imageBytes/3)*4) fail('Encoded asset exceeds image byte limit',path,true);
+    if (descriptor.data.length > Math.ceil(assetLimits.imageBytes/3)*4) fail(`Encoded asset exceeds the ${formatBytes(assetLimits.imageBytes)} image byte limit`,path,true);
     result[path] = Object.freeze({mediaType:descriptor.mediaType,encoding:'base64',data:descriptor.data});
   }
   return Object.freeze(result);
@@ -117,7 +127,7 @@ export function snapshotSourceAssetRecords(input) {
 function admit(input, derived = false) {
   if (!derived && admissions.has(input)) return admissions.get(input);
   const records = dataRecord(input), keys = Object.keys(records);
-  if (keys.length > assetLimits.count) fail('At most four image assets are supported', undefined, true);
+  if (keys.length > assetLimits.count) fail(`At most ${assetLimits.count} image assets are supported`, undefined, true);
   keys.sort(); // Code-unit ASCII order; never localeCompare.
   const seen = new Set(), result = {}, decoded = [];
   let totalBytes = 0, totalRgba = 0;
@@ -130,10 +140,10 @@ function admit(input, derived = false) {
     let bytes, info, pixels;
     try {
       bytes = decodeCanonicalBase64(descriptor.data);
-      if (totalBytes + bytes.byteLength > assetLimits.totalBytes) fail('Aggregate asset byte budget exceeded',path,true);
+      if (totalBytes + bytes.byteLength > assetLimits.totalBytes) fail(`Aggregate asset byte budget of ${formatBytes(assetLimits.totalBytes)} exceeded`,path,true);
       if (descriptor.mediaType === 'image/bmp') {
         info = validateBmp(bytes);
-        if (info.rgbaByteLength > assetLimits.rgbaBytes-totalRgba) fail('Aggregate decoded image budget exceeded',path,true);
+        if (info.rgbaByteLength > assetLimits.rgbaBytes-totalRgba) fail(`Aggregate decoded image budget of ${formatBytes(assetLimits.rgbaBytes)} exceeded`,path,true);
         pixels = {...decodeBmp(bytes),colorSpace:'srgb',alphaMode:'straight'};
       } else {
         pixels = (descriptor.mediaType === 'image/png' ? decodePng : decodeJpeg)(bytes,{maxRgbaBytes:assetLimits.rgbaBytes-totalRgba});
@@ -142,7 +152,7 @@ function admit(input, derived = false) {
     }
     catch (error) { fail(error.message, path, error.code === 'QUOTA_EXCEEDED'); }
     totalBytes += info.byteLength; totalRgba += info.rgbaByteLength;
-    if (totalBytes > assetLimits.totalBytes || totalRgba > assetLimits.rgbaBytes) fail('Aggregate asset byte budget exceeded', path, true);
+    if (totalBytes > assetLimits.totalBytes || totalRgba > assetLimits.rgbaBytes) fail(`Aggregate asset budget exceeded (${formatBytes(assetLimits.totalBytes)} originals, ${formatBytes(assetLimits.rgbaBytes)} decoded RGBA)`, path, true);
     const normalized = { mediaType: descriptor.mediaType, encoding: 'base64', data: descriptor.data };
     if (derived) {
       if (descriptor.byteLength !== info.byteLength || descriptor.width !== info.width || descriptor.height !== info.height || typeof descriptor.sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(descriptor.sha256)) fail('Invalid derived asset metadata', path);

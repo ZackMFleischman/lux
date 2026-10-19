@@ -177,7 +177,8 @@ playback changes.
 
 The document form is exclusive: do not include top-level `source`,
 `libraryLinks`, or Story v1 `story` beside `document`. Preserve all unedited
-visuals and document fields. A complete Scene 7 is limited to 32 MiB with at
-most 8 MiB of aggregate source text. The bridge admits a 34 MiB build request.
-Read JSON is capped at 52 MiB for the complete document, one selected-source
-view and runtime metadata; the fully escaped MCP result is capped at 104 MiB.
+visuals and document fields. A complete Scene 7 is limited to 224 MiB with at
+most 16 MiB of aggregate source text. The bridge admits a 226 MiB build request.
+Read JSON is capped at about 432 MiB for the complete document, one
+selected-source view and runtime metadata; the fully escaped MCP result is
+capped at about 480 MiB. `discover` reports the exact running values.

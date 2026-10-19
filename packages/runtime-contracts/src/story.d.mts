@@ -25,10 +25,10 @@ export type StoryFrame<BeatId extends string=string>=StoryNormalFrame|StoryActiv
 
 export const storyLimits:Readonly<{beats:128;occurrences:1024;id:128;label:160}>;
 export const storyLifecycleLimits:Readonly<{
- sceneBytes:33554432;aggregateSourceTextBytes:8388608;linkedEnvelopeBytes:16777216;aggregateLinkedEnvelopeBytes:67108864;scheduleMetadataBytes:1048576;
+ sceneBytes:number;aggregateSourceTextBytes:number;linkedEnvelopeBytes:number;aggregateLinkedEnvelopeBytes:number;scheduleMetadataBytes:1048576;
  visuals:8;slotsPerGeneration:2;generationsPerClient:2;pendingCreatesPerGeneration:1;readyInactiveSlotsPerGeneration:1;
  lookaheadSeconds:5;preparationMs:5000;commandReceiptMs:8000;cleanupMs:5000;
- assetBackingPerGeneration:6291456;assetBackingPerClient:12582912;assetStagingPerClient:3145728;
+ assetBackingPerGeneration:number;assetBackingPerClient:number;assetStagingPerClient:number;
  storyTargetBytesPerGeneration:201326592;storyTargetBytesPerClient:402653184;readbackBytesPerClient:33554432;pngBytes:41943040;
 }>;
 export function normalizeStoryCapabilityDeclaration(input:unknown):StoryCapabilityV1;
