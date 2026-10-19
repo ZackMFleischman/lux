@@ -505,7 +505,11 @@ export function kidPose(t: number, rig: Rig, out: Pose, which: 0 | 1): void {
   p.headYaw = span(t, cue.trusted, cue.kingdoms, 0.4, 0.4) * 0.6;
   p.headPitch -= span(t, cue.trusted, cue.kingdoms, 0.4, 0.4) * 0.3;
   const kidBow = span(t, cue.kings, cue.kings + 1.3, 0.3, 0.5);
+  // Bow from the waist with a nod and a small knee dip, one arm across.
   p.lean += kidBow * 0.5;
+  p.headPitch += kidBow * 0.3;
+  p.lift -= kidBow * 0.04;
+  p.handR = mixV(p.handR, v3(-0.05, 0.3, 0.22), kidBow);
   const awe = span(t, cue.placed, cue.chain, 0.6, 0.6);
   p.headPitch -= awe * 0.35;
   p.lookY = awe * 0.7;
