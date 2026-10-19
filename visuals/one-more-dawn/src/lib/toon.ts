@@ -15,7 +15,6 @@ import {
   Vector4,
 } from 'three/webgpu';
 import {
-  cameraPosition,
   dot,
   float,
   length,
@@ -23,7 +22,7 @@ import {
   normalize,
   normalWorld,
   positionWorld,
-  reflect,
+  transformedNormalView,
   smoothstep,
   uniform,
   vec3,
@@ -62,7 +61,7 @@ export type Spot = (typeof light.spots)[number];
 export function spotPool(spot: Spot): Node {
   const d = length(positionWorld.xz.sub(spot.shape.xy));
   const r = spot.shape.z;
-  return float(1).sub(smoothstep(r.mul(0.9), r, d)).mul(spot.shape.w);
+  return float(1).sub(smoothstep(r.mul(0.97), r, d)).mul(spot.shape.w);
 }
 
 export function spotLight(): Node {
@@ -96,9 +95,11 @@ export function toon(hex: number, options: ToonOptions = {}): MeshBasicNodeMater
   let color: Node = tone.mul(light3);
   const shine = options.shine ?? 0;
   if (shine > 0) {
-    const v = normalize(cameraPosition.sub(positionWorld));
-    const highlight = smoothstep(0.965, 0.975, dot(reflect(v.negate(), n), light.keyDir));
-    color = color.add(vec3(1, 1, 1).mul(highlight).mul(shine).mul(light.key));
+    // Painted cartoon highlight: a hard "bean" where the view-space normal
+    // faces up-left toward the viewer, so it stays put like a drawn decal.
+    const nv: Node = normalize(transformedNormalView);
+    const bean = smoothstep(0.935, 0.95, dot(nv, normalize(vec3(-0.45, 0.55, 0.7))));
+    color = mix(color, base.mul(0.35).add(vec3(0.75, 0.75, 0.72)).mul(light.key.add(light.fill).add(spotLight()).min(1.4)), bean.mul(shine));
   }
   const emissive = options.emissive ?? 0;
   if (emissive > 0) {

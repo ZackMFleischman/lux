@@ -40,7 +40,36 @@ function addEyes(rig: Rig, radius: number, spread: number, y: number, z: number,
   }
 }
 
-// A dark mouth opening that scales open when singing.
+// Split mouth plate: pale upper and lower plates with slots over a dark
+// interior. Plates part when the character sings.
+function addPlateMouth(rig: Rig, parent: Group, w: number, h: number, y: number, z: number, plateHex: number, slotHex: number, slots: number, oval = false): void {
+  const mouth = place(new Group(), parent, 0, y, z);
+  const inner = new Mesh(rbox(w * 0.9, h, 0.03), toon(0x241318, { shadow: 0 }));
+  mouth.add(inner);
+  const plate = toon(plateHex, { shadow: 0.5 });
+  const slot = toon(slotHex, { shadow: 0 });
+  const half = (sign: number) => {
+    const g = new Group();
+    const shape = oval ? blob(w, h * 0.55, 0.05, 2.4) : rbox(w, h * 0.5, 0.05);
+    g.add(new Mesh(shape, plate));
+    for (let i = 0; i < slots; i += 1) {
+      const s = new Mesh(rbox(w * 0.7, h * 0.05, 0.02), slot);
+      s.position.set(0, (i - (slots - 1) / 2) * h * 0.14, 0.03);
+      g.add(s);
+    }
+    g.position.y = sign * h * 0.26;
+    g.userData.baseY = g.position.y;
+    g.position.z = 0.012;
+    mouth.add(g);
+    return g;
+  };
+  const upper = half(1);
+  const lower = half(-1);
+  rig.plates = { upper, lower, inner, gap: h * 0.9 };
+  rig.mouthOpen = 0;
+}
+
+// Simple open cartoon mouth for the children.
 function addMouth(rig: Rig, w: number, h: number, y: number, z: number): void {
   const mouth = new Group();
   place(new Mesh(rbox(w, h, 0.04), toon(0x241318, { shadow: 0 })), mouth, 0, 0, 0);
@@ -94,7 +123,8 @@ export function makeAria(): Rig {
   rig.props.haloLight = new Mesh();
   rig.props.haloLight.userData.material = halo;
   addEyes(rig, 0.07, 0.1, 0.24, 0.27, toon(0xefe9dc));
-  addMouth(rig, 0.11, 0.07, 0.1, 0.285);
+  addPlateMouth(rig, rig.head, 0.16, 0.1, 0.1, 0.285, 0xc9bfdc, 0x6f5f8f, 2, true);
+  rig.head.scale.setScalar(1.35);
   return rig;
 }
 
@@ -147,8 +177,10 @@ export function makeBarnaby(): Rig {
   place(new Mesh(rbox(0.7, 0.09, 0.14), copperDark), rig.head, 0, 0.58, 0.27);
   rig.jaw.position.set(0, 0.2, 0.0);
   place(new Mesh(rbox(0.66, 0.2, 0.58), copper), rig.jaw, 0, -0.07, 0.02);
-  for (let i = 0; i < 4; i += 1) {
-    place(new Mesh(rbox(0.36, 0.022, 0.03), copperDark), rig.jaw, 0, -0.03 - i * 0.04, 0.31);
+  // Old radio vent plate on the jaw.
+  place(new Mesh(rbox(0.42, 0.15, 0.04), toon(0xd9cdb0, { shadow: 0.5 })), rig.jaw, 0, -0.06, 0.31);
+  for (let i = 0; i < 3; i += 1) {
+    place(new Mesh(rbox(0.34, 0.018, 0.02), toon(0x5a3a26, { shadow: 0 })), rig.jaw, 0, -0.02 - i * 0.04, 0.335);
   }
   place(new Mesh(rbox(0.6, 0.12, 0.5), toon(0x241318, { shadow: 0 })), rig.head, 0, 0.18, 0.04);
   rig.mouthOpen = 1;
@@ -167,6 +199,7 @@ export function makeBarnaby(): Rig {
   const bulb = antenna(tip, 0.2, 0xffb85a, 0.055, 0x6f4429);
   rig.props.bulb = new Mesh();
   rig.props.bulb.userData.material = bulb;
+  rig.head.scale.setScalar(1.2);
   return rig;
 }
 
@@ -255,12 +288,19 @@ export function makeKing(): Rig {
   capeMaterial.side = DoubleSide;
   place(new Mesh(lathe('king-cape2', [[0.3, 0.9], ...bell(0.46, 0.8, 0.86, -0.7, 1.3, 10)], 40, 1.15, Math.PI * 2 - 2.3), capeMaterial), rig.torso, 0, 0, -0.08);
   place(new Mesh(ring(0.42, 0.09), ermine), rig.torso, 0, 0.9, -0.02, Math.PI / 2);
-  place(new Mesh(rbox(0.66, 0.54, 0.56), gold), rig.head, 0, 0.3, 0);
+  // Round bronze head with a regal brow plate (deliberately not a box).
+  const bronze = toon(0x9c6b34, { shine: 0.6 });
+  place(new Mesh(can(0.32, 0.5, 40), bronze), rig.head, 0, 0.3, 0);
+  place(new Mesh(dome(0.32, 0.45), bronze), rig.head, 0, 0.55, 0);
   rig.jaw.position.set(0, 0.1, 0);
-  place(new Mesh(rbox(0.56, 0.16, 0.5), toon(0xa88330)), rig.jaw, 0, -0.04, 0.05);
+  place(new Mesh(can(0.3, 0.16, 40), toon(0x7f5428)), rig.jaw, 0, -0.04, 0.02);
+  // Horizontal gold bars across the jaw.
+  for (let i = 0; i < 3; i += 1) {
+    place(new Mesh(rbox(0.3, 0.025, 0.03), toon(0xe0b84a, { shadow: 0.4 })), rig.jaw, 0, -0.0 - i * 0.04, 0.31);
+  }
   rig.mouthOpen = 0.9;
-  addEyes(rig, 0.07, 0.14, 0.34, 0.28, gold);
-  place(new Mesh(rbox(0.56, 0.07, 0.1), toon(0x7a5a1f)), rig.head, 0, 0.47, 0.27, 0.2);
+  addEyes(rig, 0.07, 0.13, 0.36, 0.3, bronze);
+  place(new Mesh(rbox(0.5, 0.07, 0.1), toon(0x5e3b1a)), rig.head, 0, 0.47, 0.29, 0.2);
   const crown = place(new Group(), rig.head, 0, 0.57, 0);
   const crownGold = toon(0xe0b84a, { shine: 0.8 });
   place(new Mesh(can(0.27, 0.16, 6), crownGold), crown, 0, 0.08, 0);
@@ -276,6 +316,7 @@ export function makeKing(): Rig {
   rig.hands[1].add(sceptre);
   sceptre.position.set(0, -0.15, 0);
   rig.props.sceptre = sceptre;
+  rig.head.scale.setScalar(1.25);
   return rig;
 }
 
@@ -309,8 +350,8 @@ export function makeGuard(seed: number): Rig {
   }
   place(new Mesh(rbox(0.64, 0.08, 0.48), toon(0x15151c)), rig.torso, 0, 0.02, 0);
   place(new Mesh(rbox(0.44, 0.4, 0.42), steel), rig.head, 0, 0.2, 0);
-  addEyes(rig, 0.055, 0.1, 0.24, 0.21, steel);
-  addMouth(rig, 0.14, 0.05, 0.08, 0.215);
+  addEyes(rig, 0.07, 0.1, 0.25, 0.22, steel);
+  addPlateMouth(rig, rig.head, 0.18, 0.1, 0.07, 0.225, 0xd9d4c2, 0x55606e, 2);
   place(new Mesh(can(0.2, 0.46, 20), toon(0x1c1c28)), rig.head, 0, 0.64, -0.02);
   place(new Mesh(can(0.205, 0.06, 20), toon(P.gold)), rig.head, 0, 0.44, -0.02);
   place(new Mesh(blob(0.12, 0.3, 0.12, 1.8), white), rig.head, 0, 0.98, -0.02);
@@ -320,5 +361,6 @@ export function makeGuard(seed: number): Rig {
   rig.hands[0].add(rifle);
   rifle.position.set(0, -0.15, 0.02);
   rig.props.rifle = rifle;
+  rig.head.scale.setScalar(1.3);
   return rig;
 }

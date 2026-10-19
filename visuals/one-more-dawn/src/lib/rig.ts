@@ -59,6 +59,8 @@ export interface Rig {
   head: Group;
   jaw: Group;
   mouth: Object3D | null;
+  // Split mouth: plates move apart and the dark interior grows when singing.
+  plates: { upper: Object3D; lower: Object3D; inner: Object3D; gap: number } | null;
   mouthOpen: number;
   eyes: Eye[];
   shoulders: [Vector3, Vector3];
@@ -134,10 +136,13 @@ export function copyPose(from: Pose, to: Pose): Pose {
 // the arm.
 export function hand(material: MeshBasicNodeMaterial, size: number): Group {
   const group = new Group();
-  place(new Mesh(can(size * 0.42, size * 0.3), material), group, 0, -size * 0.05, 0);
-  place(new Mesh(rbox(size * 0.95, size * 0.95, size * 0.55), material), group, 0, -size * 0.6, 0);
-  place(new Mesh(rbox(size * 0.9, size * 0.42, size * 0.5), material), group, 0, -size * 1.12, 0.02, 0.15);
-  place(new Mesh(rbox(size * 0.3, size * 0.6, size * 0.36), material), group, size * 0.52, -size * 0.6, size * 0.08, 0, 0, 0.55);
+  place(new Mesh(can(size * 0.4, size * 0.26), material), group, 0, -size * 0.05, 0);
+  place(new Mesh(blob(size * 0.92, size * 0.8, size * 0.5, 2.6), material), group, 0, -size * 0.55, 0);
+  for (let i = 0; i < 3; i += 1) {
+    const finger = new Mesh(blob(size * 0.27, size * 0.62, size * 0.3, 2.2), material);
+    place(finger, group, (i - 1) * size * 0.3, -size * 1.05, 0.0, 0.12, 0, (i - 1) * 0.12);
+  }
+  place(new Mesh(blob(size * 0.28, size * 0.55, size * 0.3, 2.2), material), group, size * 0.5, -size * 0.55, size * 0.12, 0.2, 0, 0.75);
   return group;
 }
 
@@ -206,6 +211,7 @@ export function skeleton(spec: SkeletonSpec): Rig {
     head,
     jaw,
     mouth: null,
+    plates: null,
     mouthOpen: 1,
     eyes: [],
     shoulders,
@@ -255,6 +261,12 @@ export function applyPose(rig: Rig, pose: Pose): void {
   rig.jaw.rotation.x = open * 0.38 * rig.mouthOpen;
   if (rig.mouth) {
     rig.mouth.scale.set(1 - open * 0.2, 0.15 + open * 0.85, 1);
+  }
+  if (rig.plates) {
+    const m = rig.plates;
+    m.upper.position.y = (m.upper.userData.baseY as number) + open * m.gap * 0.35;
+    m.lower.position.y = (m.lower.userData.baseY as number) - open * m.gap * 0.65;
+    m.inner.scale.y = 0.08 + open;
   }
   const closed = Math.max(0, Math.min(1, pose.lid));
   for (const e of rig.eyes) {

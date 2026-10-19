@@ -141,41 +141,59 @@ interface DoorWallSpec {
 
 function doorWallMaterial(spec: DoorWallSpec, side: typeof DoubleSide | typeof BackSide = DoubleSide): MeshBasicNodeMaterial {
   const material = new MeshBasicNodeMaterial({ side });
-  const st = uv().mul(vec2(spec.cols, spec.rows));
+  // Rows have their own door count, so the wall reads as a painted tier of
+  // varied apartments rather than one repeated cell.
+  const rowF = uv().y.mul(spec.rows);
+  const row = floor(rowF);
+  const rowHash = hash(row.add(spec.cols * 3 + 11));
+  const colsRow = float(spec.cols).mul(rowHash.mul(0.55).add(0.72));
+  const st = vec2(uv().x.mul(colsRow), rowF);
   const cell = floor(st);
   const f = fract(st);
   const h = hash(cell.x.add(cell.y.mul(1013)).add(spec.cols * 7));
-  const dist = length(cell.sub(vec2(spec.center[0], spec.center[1])).mul(vec2(1, 1.7)));
+  const h2 = hash(cell.x.mul(3).add(cell.y.mul(577)).add(spec.cols * 13));
+  const centerCol = colsRow.mul(spec.center[0] / spec.cols);
+  const dist = length(vec2(cell.x.sub(centerCol), cell.y.sub(spec.center[1]).mul(1.7)));
   const wake = set.wallWakeAt.add(spec.delay).add(dist.mul(spec.spread)).add(h.mul(0.6));
   const open = smoothstep(wake, wake.add(0.55), set.now);
-  const p = f.sub(vec2(0.5, 0.47));
-  const d = roundBox(p, vec2(h.mul(0.08).add(0.24), 0.38), 0.12);
+  const p = f.sub(vec2(0.5, 0.44));
+  const halfW = h2.mul(0.1).add(0.2);
+  const halfH = h.mul(0.06).add(0.3);
+  const d = roundBox(p, vec2(halfW, halfH), 0.1);
   const aa = fwidth(d).mul(0.6);
   const inside = smoothstep(aa, aa.negate(), d);
-  const frame = smoothstep(aa, aa.negate(), d.sub(0.035)).sub(inside);
+  const frame = smoothstep(aa, aa.negate(), d.sub(0.03)).sub(inside);
   // Split doors slide apart to reveal the interior.
-  const revealed = smoothstep(open.mul(0.32).add(0.004), open.mul(0.32).sub(0.004), abs(p.x)).mul(inside);
+  const revealed = smoothstep(open.mul(halfW).add(0.004), open.mul(halfW).sub(0.004), abs(p.x)).mul(inside);
   const blinkPhase = mix(h, float(0), set.wallBlinkSync);
   const blink = smoothstep(0.0, 0.03, abs(fract(set.now.mul(0.23).add(blinkPhase)).sub(0.5)));
-  const eyeP = vec2(abs(p.x).sub(0.1), p.y.sub(0.04).div(blink.mul(0.85).add(0.15)));
-  const eyes = smoothstep(0.075, 0.06, length(eyeP.mul(vec2(1.25, 1)))).mul(revealed);
-  const pupilP = vec2(abs(p.x.sub(set.wallLook.x.mul(0.03))).sub(0.1), p.y.sub(0.04).sub(set.wallLook.y.mul(0.03)));
-  const pupil = smoothstep(0.032, 0.022, length(pupilP)).mul(eyes);
-  const ledge = step(f.y, 0.04);
-  const panelLine = smoothstep(0.012, 0.0, abs(f.x.sub(0.5)).sub(0.0)).mul(inside).mul(float(1).sub(revealed));
-  const tint = mix(vec3(0.2, 0.17, 0.26), vec3(0.16, 0.2, 0.24), step(0.5, hash(cell.y.mul(7).add(3))));
-  const wall = mix(tint, vec3(0.06, 0.05, 0.08), ledge);
-  const frameColor = vec3(0.05, 0.04, 0.07);
-  const panel = mix(vec3(0.3, 0.32, 0.36), vec3(0.36, 0.3, 0.26), step(0.5, h)).sub(panelLine.mul(0.2));
-  const led = smoothstep(0.02, 0.012, length(p.sub(vec2(0.21, 0.3)))).mul(inside).mul(float(1).sub(open));
-  const interiorGrad = smoothstep(-0.4, 0.4, p.y).mul(0.5).add(0.5);
-  const interior = set.wallInterior.mul(interiorGrad).mul(set.wallLevel).mul(h.mul(0.5).add(0.5));
-  const lightAmt = light.fill.mul(1.6).add(light.key.mul(0.1));
+  const eyeP = vec2(abs(p.x).sub(0.085), p.y.sub(0.04).div(blink.mul(0.85).add(0.15)));
+  const eyes = smoothstep(0.066, 0.056, length(eyeP.mul(vec2(1.25, 1)))).mul(revealed);
+  const pupilP = vec2(abs(p.x.sub(set.wallLook.x.mul(0.03))).sub(0.085), p.y.sub(0.04).sub(set.wallLook.y.mul(0.03)));
+  const pupil = smoothstep(0.026, 0.018, length(pupilP)).mul(eyes);
+  // Muted painted palette per cell and per row.
+  const plum = vec3(0.17, 0.13, 0.2);
+  const slate = vec3(0.12, 0.15, 0.18);
+  const umber = vec3(0.19, 0.14, 0.11);
+  const wallTone = mix(mix(plum, slate, step(0.4, rowHash)), umber, step(0.8, rowHash));
+  // Hard painted shadow under each ledge and a thin ledge strip.
+  const ledge = step(f.y, 0.035);
+  const ledgeShadow = step(0.83, f.y);
+  const wall = mix(wallTone, wallTone.mul(0.55), ledgeShadow).mul(float(1).sub(ledge)).add(vec3(0.07, 0.06, 0.08).mul(ledge));
+  const doorA = vec3(0.3, 0.33, 0.36);
+  const doorB = vec3(0.36, 0.29, 0.24);
+  const doorC = vec3(0.26, 0.3, 0.27);
+  const panelBase = mix(mix(doorA, doorB, step(0.45, h2)), doorC, step(0.8, h2));
+  const panelLine = smoothstep(0.012, 0.0, abs(p.x)).mul(inside).mul(float(1).sub(revealed));
+  const panel = panelBase.mul(float(1).sub(panelLine.mul(0.5)));
+  const frameColor = wallTone.mul(0.35);
+  const interiorGrad = step(0.0, p.y).mul(0.25).add(0.75);
+  const interior = set.wallInterior.mul(interiorGrad).mul(set.wallLevel).mul(h.mul(0.35).add(0.65));
+  const lightAmt = light.fill.mul(1.6).add(light.key.mul(0.12));
   let color: Node = wall.mul(lightAmt).mul(float(1).sub(inside).sub(frame));
   color = color.add(frameColor.mul(frame));
   color = color.add(mix(panel.mul(lightAmt), interior, revealed).mul(inside));
-  color = color.add(vec3(1.0, 0.25, 0.3).mul(led).mul(0.6));
-  color = mix(color, set.wallEyes.mul(set.wallEyeLevel).mul(1.4), eyes.mul(set.wallEyeLevel.min(1)));
+  color = mix(color, set.wallEyes.mul(set.wallEyeLevel).mul(1.2), eyes.mul(set.wallEyeLevel.min(1)));
   color = mix(color, vec3(0.02, 0.02, 0.05), pupil.mul(set.wallEyeLevel.min(1)));
   material.colorNode = vec4(color.mul(spec.dim), 1);
   return material;
@@ -195,7 +213,7 @@ function skyMaterial(): MeshBasicNodeMaterial {
   const star = smoothstep(0.09, 0.0, length(sp)).mul(step(0.86, h)).mul(twinkle).mul(set.starLevel);
   color = color.add(vec3(0.85, 0.9, 1.0).mul(star).mul(smoothstep(0.02, 0.15, elev)));
   // Ringed planet.
-  const planetDir = normalize(vec3(0.42, 0.2, -1));
+  const planetDir = normalize(vec3(0.42, 0.3, -1));
   const pd = dot(dir, planetDir);
   const planet = smoothstep(0.9965, 0.9969, pd);
   const pshade = dot(dir.sub(planetDir), normalize(vec3(-1, 0.6, 0))).mul(18).add(0.5);
@@ -223,11 +241,13 @@ function beamMaterial(spot: (typeof light.spots)[number]): MeshBasicNodeMaterial
     side: DoubleSide,
   });
   const v = normalize(positionView.negate());
-  const edge = smoothstep(0.0, 0.35, abs(dot(normalize(normalView), v)));
+  const edge = smoothstep(0.05, 0.12, abs(dot(normalize(normalView), v)));
   const along = uv().y;
   const fade = smoothstep(0.0, 0.25, along).mul(smoothstep(1.0, 0.75, along).mul(0.6).add(0.4));
   const amount = edge.mul(fade).mul(spot.shape.w).mul(set.hazeLevel).mul(0.1);
-  material.colorNode = vec4(spot.color.mul(amount), 1);
+  // Pale, warm beam colour so the haze never greys out the set.
+  const tone = mix(spot.color, vec3(1.0, 0.93, 0.8), 0.55);
+  material.colorNode = vec4(tone.mul(amount), 1);
   return material;
 }
 
@@ -273,12 +293,14 @@ export function buildStage(): Stage {
   root.add(far);
 
   // Near tier of doors behind the stage.
-  const wallGeometry = keep(new PlaneGeometry(30, 5.6));
-  const wall = new Mesh(wallGeometry, doorWallMaterial({ cols: 34, rows: 6, delay: 0, spread: 0.11, dim: 1, center: [17, 1.5] }));
-  wall.position.set(0, 2.8, -6.6);
+  // Curved tier of doors wrapping the back of the stage.
+  const wallGeometry = keep(new CylinderGeometry(14, 14, 5.6, 96, 1, true, Math.PI - 0.95, 1.9));
+  const wall = new Mesh(wallGeometry, doorWallMaterial({ cols: 30, rows: 6, delay: 0, spread: 0.11, dim: 0.85, center: [15, 1.5] }, BackSide));
+  wall.position.set(0, 2.8, 7.4);
   root.add(wall);
-  const wallCap = inked(blob(30, 0.22, 0.4, 4), toon(0x2a2440));
-  place(wallCap, root, 0, 5.65, -6.5);
+  const wallCap = new Mesh(keep(new CylinderGeometry(14.1, 14.1, 0.22, 96, 1, true, Math.PI - 0.95, 1.9)), toon(0x2a2440));
+  wallCap.material.side = BackSide;
+  place(wallCap, root, 0, 5.65, 7.4);
 
   // Stage floor, apron and footlights.
   const floorGeometry = keep(new PlaneGeometry(24, 10.4));
