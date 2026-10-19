@@ -29,11 +29,11 @@ try{
   page.on('pageerror',error=>report.errors.push(error.stack??error.message));
   const call=createStudioConnection(session);
   let current;
-  for(let attempt=0;attempt<100;attempt++){try{current=await call('read');if(current.source)break;}catch{}await page.waitForTimeout(100);}
+  for(let attempt=0;attempt<300;attempt++){try{current=await call('read');if(current.source)break;}catch{}await page.waitForTimeout(100);}
   assert.ok(current?.source,'Studio agent endpoint did not become ready');
   const source={sdkVersion:'0.2.0',entry:'visual.ts',files:{'visual.ts':await readFile(join(root,'skills/lux-visual-creation/assets/noise-sphere.ts'),'utf8')}};
   async function build(){
-    for(let attempt=0;attempt<100;attempt++){
+    for(let attempt=0;attempt<900;attempt++){
       current=await call('read');
       try{return await call('build',{source,expectedDraftVersion:current.draftVersion});}
       catch(error){if(!/busy/i.test(String(error)))throw error;await page.waitForTimeout(100);}
@@ -184,22 +184,27 @@ try{
   await rm(songCopy);
   current=await call('read');
   await call('scene.open',{path:scenePath,expectedDraftVersion:current.draftVersion,discardDirty:true});
-  status=await waitStatus(value=>value.soundtrack?.state==='missing','missing soundtrack warning',400);
+  status=await waitStatus(value=>value.soundtrack?.state==='unavailable','missing soundtrack warning',400);
   assert.equal(status.soundtrack.playing,false);
   assert.ok(['playing','paused'].includes(status.authoring.playback),'the visual keeps running without its soundtrack');
   await shot('06-transport-missing-file.png');
-  await page.getByRole('button',{name:/^Soundtrack: dawn\.mp3\. File missing/}).click();
+  await page.getByRole('button',{name:/^Soundtrack: dawn\.mp3\. File unavailable/}).click();
   await page.getByRole('button',{name:'Relink file…',exact:true}).waitFor();
   await page.waitForTimeout(300);
   await shotWithPopover('07-soundtrack-popover-missing.png');
   await page.keyboard.press('Escape');
   report.checks.push('Missing file: preview keeps running, transport shows a warning and the popover offers Relink file…');
   await page.setViewportSize({width:1024,height:760});
-  await shot('08-transport-missing-1024px.png');
+  await page.evaluate(()=>{if(document.activeElement instanceof HTMLElement)document.activeElement.blur();});await page.mouse.move(5,5);await page.waitForTimeout(400);
+  await page.screenshot({path:join(output,'08-window-1024px.png')});
+  await shot('09-transport-1024px.png');
+  const viewport=page.viewportSize(),scroll=await page.evaluate(()=>({width:document.documentElement.scrollWidth,client:document.documentElement.clientWidth}));
+  assert.ok(scroll.width<=scroll.client,'no horizontal page overflow at 1024 px');
+  report.narrowViewport={viewport,scroll};
   const row=await transport.boundingBox(),control=await page.locator('.soundtrack-control').boundingBox();
   report.narrowLayout={transport:row,control};
-  assert.ok(control&&row&&control.x+control.width<=row.x+row.width+1,'soundtrack control stays inside the transport row at 1024 px');
-  report.checks.push('At a 1024 px window the soundtrack control stays inside the transport row');
+  assert.ok(control&&row&&control.x+control.width<=row.x+row.width+1&&row.x+row.width<=viewport.width+1,'soundtrack control and transport row stay inside the 1024 px window');
+  report.checks.push('At a 1024 px window the transport row and soundtrack control end inside the window; no horizontal page overflow');
   report.ok=report.errors.length===0;
 }catch(error){
   report.errors.push(error.stack??String(error));
