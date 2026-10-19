@@ -43,6 +43,9 @@ const SHOTS: readonly Shot[] = [
 
 export const PLATE_SWITCH = 40.6;
 
+// No blinks within a few frames of a cut (they read as flicker).
+const nearCut = (t: number): boolean => SHOTS.some(s => Math.abs(t - s.at) < 0.3);
+
 export function camAt(t: number): Cam {
   let shot = SHOTS[0];
   for (const s of SHOTS) if (t >= s.at) shot = s;
@@ -157,7 +160,7 @@ export function ariaPose(t: number): Pose {
   face.glow = p.face.glow * (0.15 + 0.85 * ramp(t, 4.6, 5.9)) * (1 + 0.3 * ramp(t, 37.5, 40));
   // Blink every few seconds once awake (never on the closed-eye beats).
   const blinkPhase = (t + 0.7) % 4.3;
-  if (t > 6 && blinkPhase < 0.14) face.eyeOpen *= 0.15;
+  if (t > 6 && blinkPhase < 0.14 && !nearCut(t)) face.eyeOpen *= 0.15;
   return { ...p, bob: p.bob + breathe, headTilt: p.headTilt + Math.sin(t * 0.8) * 0.015, face };
 }
 
@@ -202,12 +205,12 @@ export function barnabyPose(t: number): Pose {
   const sing = barnabyMouth(t);
   const face: Face = { ...p.face, mouthOpen: Math.max(p.face.mouthOpen, sing * 0.85), mouthWide: 0.9 + sing * 0.2 };
   face.glow = p.face.glow * (0.08 + 0.92 * ramp(t, 43.7, 44.0)) * (1 + 0.6 * (ramp(t, 43.8, 44.0) - ramp(t, 44.0, 44.6)));
-  if (t > 45 && (t + 1.9) % 3.7 < 0.13) face.eyeOpen *= 0.15;
+  if (t > 45 && (t + 1.9) % 3.7 < 0.13 && !nearCut(t)) face.eyeOpen *= 0.15;
   return { ...p, bob: p.bob + Math.sin(t * 1.3) * 1.5, face };
 }
 
 // The chain appears on "chain" and lingers through the line.
-export const chainAmount = (t: number): number => ramp(t, 60.9, 61.04);
+export const chainAmount = (t: number): number => (t >= 61.04 ? 1 : 0);
 
 // Barnaby rises through the stage lift into the spotlight.
 export const barnabyRise = (t: number): number => ramp(t, 42.2, 44.0);

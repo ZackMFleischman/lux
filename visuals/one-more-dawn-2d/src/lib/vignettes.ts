@@ -57,12 +57,16 @@ export function drawThrone(ctx: Ctx, t: number): void {
   king.armR = 0.6 + rise * 0.3;
   king.look = -1;
   const helper = mini(-34, 1.15);
-  helper.bob = 0;
+  helper.bob = 18;
   helper.armL = 0.3 + pass * 1.0;
   helper.armR = 0.3 + pass * 1.6;
   const gx = 48 - pass * 66, gy = -78 + pass * 18 - Math.sin(pass * Math.PI) * 25;
   const globeOn = ramp(t, 54.8, 55.6);
   drawKing(ctx, king);
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.beginPath();
+  ctx.ellipse(helper.x, helper.bob, 24, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
   drawHelper(ctx, helper, { ...faceFrom(pass > 0.5 ? 'wonder' : 'dutiful'), lookX: 0.6, lookY: -0.2 });
   if (globeOn > 0) drawGlobe(ctx, gx, gy, 13, t * 1.2, globeOn * (0.4 + pass * 0.6));
 }
