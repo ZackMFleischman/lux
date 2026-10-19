@@ -292,7 +292,8 @@ export function applyPose(rig: Rig, pose: Pose): void {
     rig.brows.forEach((b, i) => {
       const side = i === 0 ? -1 : 1;
       b.position.y = (b.userData.baseY as number) + raise * 0.035;
-      b.rotation.z = side * (pose.browTilt * 0.35 - raise * 0.08);
+      // Positive tilt lifts the inner ends (worried), negative lowers them (stern).
+      b.rotation.z = side * (-pose.browTilt * 0.35 - raise * 0.08);
     });
   }
   for (const g of rig.glows) {
