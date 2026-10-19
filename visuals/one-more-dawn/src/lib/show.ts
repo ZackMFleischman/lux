@@ -467,7 +467,8 @@ export function kidPose(t: number, rig: Rig, out: Pose, which: 0 | 1): void {
   // Facing: run in facing right, then face front; turn to the throne.
   const toKing = span(t, cue.kingdoms + 0.2, cue.placed, 0.4, 0.6);
   p.yaw = lerp(1.25 * moving, which === 0 ? 0.35 : -0.2, 1 - moving) * 1;
-  p.yaw = lerp(p.yaw, which === 0 ? 2.6 : -2.7, toKing * 0.75);
+  // Both children turn upstage toward the throne (about +2.7 rad).
+  p.yaw = lerp(p.yaw, which === 0 ? 2.65 : 2.85, toKing * 0.75);
   p.yaw = lerp(p.yaw, 3.0, span(t, cue.begged + 0.6, CLIP_END + 5, 0.4, 0.5) * 0.15);
   walk(p, rig, phase, moving, 0.12, 0.09);
   // Toddle on "walk": stiff wobbly steps.
@@ -560,7 +561,8 @@ export function guardPose(t: number, rig: Rig, out: Pose, side: -1 | 1): void {
   p.bendL = 0.4;
   p.bendR = 0.4;
   const rifle = rig.props.rifle;
-  rifle.rotation.x = lerp(-0.1, -1.4, aim);
+  // Aimed: the barrel points forward along the line of sight.
+  rifle.rotation.x = lerp(-0.1, Math.PI - 0.12, aim);
   p.lean = aim * 0.08 - span(t, cue.never, CLIP_END + 5, 0.4, 0.4) * 0.05;
   p.headPitch = -0.05;
   p.lid = 0.25 + blinkAt(t, 4 + side);
