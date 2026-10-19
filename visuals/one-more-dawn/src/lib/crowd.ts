@@ -57,6 +57,9 @@ export const crowdState = {
   wakeAt: u(1000),
   wallLevel: u(1),
   eyesOpen: 1,
+  // Expression mix: awe (brows up, round 'o' mouth), joy (brows up, wide grin).
+  awe: 0,
+  joy: 0,
   lookX: 0,
   lookY: 0,
 };
@@ -263,14 +266,17 @@ export function buildCrowd(): Crowd {
         o.matrix.premultiply(head.matrix);
         antennas.setMatrixAt(i, i % 6 === 0 && kind === 0 ? o.matrix : hidden.matrix);
         const faceZ = kind === 1 ? 0.14 : kind === 2 ? 0.15 : 0.125;
-        o.position.set(0, -0.08, faceZ);
+        const awe = crowdState.awe * (0.75 + 0.25 * Math.sin(i * 3.1));
+        const joy = crowdState.joy * (0.75 + 0.25 * Math.cos(i * 2.3));
+        o.position.set(0, -0.08 - awe * 0.02, faceZ);
         o.rotation.set(0, 0, 0);
-        o.scale.set(1, 1, 1);
+        o.scale.set(1 - awe * 0.45 + joy * 0.3, 1 + awe * 2.2 + joy * 0.8, 1);
         o.updateMatrix();
         o.matrix.premultiply(head.matrix);
         mouths.setMatrixAt(i, o.matrix);
-        o.position.set(0, 0.085, faceZ);
-        o.rotation.set(0, 0, (i % 5 - 2) * 0.06);
+        // Neutral brows sit level; awe and joy lift them.
+        o.position.set(0, 0.09 + (awe + joy) * 0.03, faceZ);
+        o.rotation.set(0, 0, (i % 5 - 2) * 0.025 * (1 - Math.min(1, awe + joy)));
         o.updateMatrix();
         o.matrix.premultiply(head.matrix);
         brows.setMatrixAt(i, o.matrix);

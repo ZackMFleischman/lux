@@ -244,6 +244,15 @@ export function lighting(t: number, stagePos: { aria: Vector3; barnaby: Vector3;
   set.wallEyeLevel.value = keys(t, [[0, 1], [19.3, 1], [22, 0.12], [cue.dream - 0.6, 0.12], [cue.dream + 0.6, 0.95], [cue.bandIn, 0.95], [cue.bandIn + 1, 0.42], [cue.begged, 0.42], [cue.wars, 0.75]]);
   set.wallInterior.value.setRGB(0.94, 0.87, 0.68);
   set.wallEyes.value.setRGB(1.0, 0.98, 0.92);
+  // Crowd moods: awe as the doors open, during the dream and the king's
+  // rise; delight when the children sing; alarm (awe) at the wars.
+  set.crowdAwe = Math.max(
+    span(t, cue.doors, I[2][0], 0.6, 1.0),
+    span(t, cue.dream - 0.3, cue.bandIn, 0.8, 0.8) * 0.9,
+    span(t, cue.kingdoms - 0.2, cue.kings + 1.5, 0.3, 0.8),
+    span(t, cue.wars - 0.3, cue.never + 0.5, 0.2, 0.6) * 0.8,
+  );
+  set.crowdJoy = span(t, cue.walk - 0.3, cue.trusted + 1.0, 0.4, 0.8);
   set.wallBlinkSync.value = span(t, I[2][0] - 0.3, I[3][1] + 0.5, 0.5, 1.0);
   const look = set.wallLook.value;
   look.set(

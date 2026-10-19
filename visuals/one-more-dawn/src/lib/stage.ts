@@ -67,6 +67,8 @@ export const set = {
   marqueeChase: u(0),
   neonLevel: u(0),
   curtainOpen: 0,
+  crowdAwe: 0,
+  crowdJoy: 0,
   curtainPin: u(0),
   pedestalDrop: 0,
   wallWakeAt: u(1000),
@@ -292,10 +294,19 @@ function skyMaterial(): MeshBasicNodeMaterial {
   color = mix(color, vec3(0.08, 0.05, 0.08), ringInk);
   // The "dream" star the soprano reaches for.
   const dreamDir = normalize(vec3(0.16, 0.42, -1));
-  const dd = float(1).sub(dot(dir, dreamDir)).mul(9000);
-  const core = float(1).div(dd.add(1)).mul(set.dreamStar);
-  const rays = pow(clamp(float(1).sub(abs(dir.sub(dreamDir).x.mul(dir.sub(dreamDir).y).mul(9000))), 0, 1), 6).mul(smoothstep(0.004, 0.0, length(dir.sub(dreamDir)).mul(0.1))).mul(set.dreamStar);
-  color = color.add(vec3(1.0, 0.92, 0.75).mul(core.mul(3).add(rays)));
+  // A drawn five-point star with an ink outline and only a small glow.
+  const q = dir.sub(dreamDir).xy.mul(55);
+  const qr = length(q);
+  const qa = atan(q.y, q.x).add(1.5708);
+  const lobe = pow(abs(cos(qa.mul(2.5))), 3).mul(0.6).add(0.4);
+  const starSize = set.dreamStar.min(1.6).mul(0.75);
+  const sd = qr.sub(lobe.mul(starSize));
+  const starFill = smoothstep(0.04, -0.04, sd).mul(step(0.05, set.dreamStar));
+  const starInk = smoothstep(0.16, 0.1, abs(sd.sub(0.08))).mul(step(0.05, set.dreamStar));
+  const halo = float(1).div(qr.mul(qr).mul(0.6).add(1)).mul(set.dreamStar).mul(0.25);
+  color = color.add(vec3(1.0, 0.9, 0.6).mul(halo));
+  color = mix(color, vec3(0.08, 0.05, 0.06), starInk);
+  color = mix(color, vec3(1.0, 0.95, 0.72), starFill);
   material.colorNode = vec4(color, 1);
   return material;
 }
@@ -566,6 +577,8 @@ export function buildStage(): Stage {
       crowdState.eyesOpen = Math.min(1, Math.max(0, (set.wallEyeLevel.value - 0.1) / 0.4));
       crowdState.lookX = set.wallLook.value.x;
       crowdState.lookY = set.wallLook.value.y;
+      crowdState.awe = set.crowdAwe;
+      crowdState.joy = set.crowdJoy;
       crowd.update(t, focusX);
       pedestal.position.y = -set.pedestalDrop * 0.45;
       pedestal.visible = set.pedestalDrop < 0.999;

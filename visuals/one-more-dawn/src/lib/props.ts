@@ -56,8 +56,7 @@ export function buildGlobe(): Globe {
   const aura = glow(0x9fdcff, 0.35);
   aura.transparent = true;
   aura.depthWrite = false;
-  place(new Mesh(ring(0.34, 0.012), glow(0xbfefff, 1.2)), group, 0, 0, 0, 1.2, 0.3, 0);
-  place(new Mesh(ring(0.38, 0.008), glow(0xffe2a0, 1.0)), group, 0, 0, 0, -0.4, 0.9, 0);
+  place(new Mesh(ring(0.34, 0.022), toon(0xd9b24a)), group, 0, 0, 0, Math.PI / 2 - 0.45, 0, 0.2);
   return { group, glowLevel };
 }
 

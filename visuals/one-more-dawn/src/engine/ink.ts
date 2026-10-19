@@ -32,7 +32,7 @@ export default defineComponent({
       image: { type: { kind: 'image', colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }, label: 'Image', description: 'Colour with ink lines.' },
     },
     controls: {
-      lineWidth: { type: 'number', label: 'Line weight', default: 5.0, min: 0, max: 8, step: 0.1, unit: 'px', group: 'Ink' },
+      lineWidth: { type: 'number', label: 'Line weight', default: 6.0, min: 0, max: 8, step: 0.1, unit: 'px', group: 'Ink' },
       setLine: { type: 'number', label: 'Set line weight', default: 0.5, min: 0, max: 1, step: 0.01, group: 'Ink' },
       crease: { type: 'number', label: 'Crease lines', default: 0.3, min: 0, max: 1, step: 0.01, group: 'Ink' },
     },
@@ -108,7 +108,7 @@ export default defineComponent({
     const scene = new Scene();
     scene.add(new Mesh(geometry, material));
     const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    let lineWidth = 5.0;
+    let lineWidth = 6.0;
     let setLine = 0.5;
     let crease = 0.3;
     void context;

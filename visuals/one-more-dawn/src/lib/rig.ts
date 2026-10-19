@@ -265,7 +265,11 @@ export function applyPose(rig: Rig, pose: Pose): void {
   rig.root.position.x = pose.x;
   rig.root.position.z = pose.z;
   rig.root.rotation.y = pose.yaw;
-  rig.hips.position.y = rig.hipHeight + pose.lift;
+  // A deep forward lean pushes the hips back and down, so a bow bends at
+  // the waist instead of tipping the whole body like a plank.
+  const bowLean = Math.max(0, pose.lean - 0.15);
+  rig.hips.position.y = rig.hipHeight + pose.lift - bowLean * rig.hipHeight * 0.12;
+  rig.hips.position.z = -bowLean * rig.hipHeight * 0.4;
   const sq = Math.max(0.6, pose.squash);
   rig.hips.scale.set(1 / Math.sqrt(sq), sq, 1 / Math.sqrt(sq));
   rig.torso.rotation.set(pose.lean, pose.twist, pose.tilt, 'YXZ');
