@@ -45,12 +45,12 @@ export function buildGlobe(): Globe {
   const glowLevel = u(1);
   const material = new MeshBasicNodeMaterial();
   const p = normalize(positionLocal);
-  const land = smoothstep(0.05, 0.12, mx_noise_float(p.mul(2.6)).add(mx_noise_float(p.mul(6.0)).mul(0.3)));
+  const land = smoothstep(0.08, 0.09, mx_noise_float(p.mul(2.2)));
   const ocean = vec3(0.12, 0.45, 0.95);
   const green = vec3(0.35, 0.9, 0.5);
   const base = ocean.mul(land.oneMinus()).add(green.mul(land));
   const facing = p.dot(light.keyDir).mul(0.5).add(0.5);
-  const shade = smoothstep(0.25, 0.3, facing).mul(0.4).add(0.6);
+  const shade = smoothstep(0.42, 0.44, facing).mul(0.35).add(0.65);
   material.colorNode = vec4(base.mul(shade).mul(glowLevel.mul(0.6).add(0.5)), 1);
   group.add(inked(ball(0.26, 32), material));
   const aura = glow(0x9fdcff, 0.35);

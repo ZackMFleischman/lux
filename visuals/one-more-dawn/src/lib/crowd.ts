@@ -37,7 +37,7 @@ import {
   vec3,
   vec4,
 } from 'three/tsl';
-import { ball, blob, can, dome, rbox } from './shapes.ts';
+import { ball, blob, can, dome, lathe, rbox } from './shapes.ts';
 import { light, spotLight, toon, u } from './toon.ts';
 
 type Node = any;
@@ -91,11 +91,13 @@ function backWallMaterial(tier: number): MeshBasicNodeMaterial {
   const frame = step(abs(fx), 0.25).mul(step(fy, 0.86)).mul(float(1).sub(inDoor));
   const revealed = step(abs(fx), open.mul(0.22)).mul(inDoor);
   const panelLine = step(abs(fx), 0.006).mul(inDoor);
-  const wallTone = mix(vec3(0.2, 0.1, 0.24), vec3(0.08, 0.13, 0.24), float(tier % 2));
+  const wallTone = mix(vec3(0.26, 0.12, 0.12), vec3(0.14, 0.16, 0.24), float(tier % 2));
   const doorTone = mix(vec3(0.32, 0.2, 0.36), vec3(0.18, 0.26, 0.4), float(tier % 2)).mul(float(1).sub(panelLine.mul(0.5)));
   const roomTone = mix(mix(vec3(0.62, 0.42, 0.24), vec3(0.42, 0.36, 0.42), step(0.5, hash(box.mul(3).add(tier * 5)))), vec3(0.36, 0.42, 0.38), step(0.8, hash(box.mul(7).add(tier * 11))));
   const poster = step(abs(fx.add(0.1)), 0.06).mul(step(abs(fy.sub(0.5)), 0.12)).mul(step(0.5, hash(box.add(tier * 31))));
-  const room = mix(roomTone, vec3(0.75, 0.3, 0.25), poster.mul(0.8));
+  void poster;
+  const stripe = step(0.5, fract(fx.mul(9)));
+  const room = mix(roomTone, roomTone.mul(0.82), stripe);
   const lit = light.fill.mul(1.6).add(light.key.mul(0.15)).max(vec3(0.5, 0.5, 0.55));
   let color: Node = wallTone.mul(lit);
   color = mix(color, vec3(0.75, 0.55, 0.22).mul(lit), frame);
@@ -117,9 +119,9 @@ export function buildCrowd(): Crowd {
     owned.push(x);
     return x;
   };
-  const front = toon(0x4c2f45);
+  const front = toon(0x7a2a2a);
   const gold = toon(0xd2a43c, { shine: 0.5 });
-  const column = toon(0x6a3a5e);
+  const column = toon(0x6e3a2e);
 
   TIERS.forEach((tier, i) => {
     const r = RADIUS - i * 0.15;
@@ -138,7 +140,7 @@ export function buildCrowd(): Crowd {
     rail.rotation.set(Math.PI / 2, 0, Math.PI / 2 - ARC + Math.PI);
     rail.position.set(0, tier.floor + parapetH - 0.03, CENTER_Z);
     root.add(rail);
-    const under = new Mesh(keep(new CylinderGeometry(r + 0.02, r + 0.02, 0.12, 120, 1, true, Math.PI - ARC, ARC * 2)), toon(0x1c0d1c, { shadow: 0 }));
+    const under = new Mesh(keep(new CylinderGeometry(r + 0.02, r + 0.02, 0.12, 120, 1, true, Math.PI - ARC, ARC * 2)), toon(0x2a1210, { shadow: 0 }));
     under.material.side = DoubleSide;
     under.position.set(0, tier.floor + 0.06, CENTER_Z);
     root.add(under);
@@ -174,7 +176,7 @@ export function buildCrowd(): Crowd {
     }
   });
   const n = seats.length;
-  const palette = [0x7d828c, 0x8a5a3c, 0x6f7a5a, 0x5f7f86, 0xa88a4a, 0x8c8f96, 0x7a5f72, 0x9a4f3f, 0x6a7078, 0x4f7f9a];
+  const palette = [0x5f8fb0, 0xb06a3c, 0x8a9a52, 0x4f9a96, 0xc9a24a, 0x9a6fa8, 0x8c8f99, 0xb84f45, 0x6f8fa0, 0xa8884f];
   const tints = new Float32Array(n * 3);
   const c = new Color();
   for (let i = 0; i < n; i += 1) {
@@ -188,16 +190,19 @@ export function buildCrowd(): Crowd {
 
   const bodies = new InstancedMesh(rbox(0.5, 0.42, 0.34), bodyMat, n);
   const heads = [
-    new InstancedMesh(can(0.15, 0.26, 32), headMat, n),
-    new InstancedMesh(ball(0.16, 32), headMat, n),
-    new InstancedMesh(rbox(0.34, 0.24, 0.28), headMat, n),
+    new InstancedMesh(rbox(0.38, 0.27, 0.24), headMat, n),
+    new InstancedMesh(blob(0.28, 0.36, 0.28, 2.0), headMat, n),
+    new InstancedMesh(lathe('crowd-pot', [[0, -0.13], [0.11, -0.13], [0.18, 0.13], [0, 0.13]], 40), headMat, n),
   ];
   const domes = new InstancedMesh(dome(0.15, 0.7, 32), headMat, n);
   const eyes = new InstancedMesh(blob(0.085, 0.1, 0.04, 2.2), toon(0xf4f1e8, { shadow: 0.3 }), n * 2);
   const pupils = new InstancedMesh(ball(0.013, 12), toon(0x101010, { shadow: 0 }), n * 2);
   const mouths = new InstancedMesh(rbox(0.13, 0.035, 0.03), toon(0x1c1216, { shadow: 0 }), n);
   const brows = new InstancedMesh(rbox(0.2, 0.025, 0.03), toon(0x2a2228, { shadow: 0 }), n);
-  const antennas = new InstancedMesh(ball(0.03, 12), toon(0xe0b84a), n);
+  const antennas = new InstancedMesh(can(0.022, 0.07, 12), toon(0x9a8f7a), n);
+  for (const m of [pupils, mouths, brows]) {
+    m.userData.line = 'none';
+  }
   for (const m of [bodies, ...heads, domes, eyes, pupils, antennas, mouths, brows]) {
     m.frustumCulled = false;
     root.add(m);
@@ -224,7 +229,8 @@ export function buildCrowd(): Crowd {
         const torsoY = seat.y + 0.62 + (ease - 1) * 0.9;
         o.position.set(base.x, torsoY, base.z);
         o.rotation.set(0, Math.atan2(-base.x, CENTER_Z - base.z), 0);
-        o.scale.setScalar(seat.scale);
+        const build = (i * 13) % 3;
+        o.scale.set(seat.scale * (build === 0 ? 1.25 : build === 1 ? 0.85 : 1.0), seat.scale * (build === 1 ? 1.2 : 0.95), seat.scale);
         o.updateMatrix();
         bodies.setMatrixAt(i, o.matrix);
         // Head turns toward the performer (three-quarter views) with a sway.
@@ -247,12 +253,12 @@ export function buildCrowd(): Crowd {
         o.scale.setScalar(1);
         o.updateMatrix();
         o.matrix.premultiply(head.matrix);
-        domes.setMatrixAt(i, kind === 0 ? o.matrix : hidden.matrix);
-        o.position.set(0, kind === 0 ? 0.28 : 0.22, 0);
+        domes.setMatrixAt(i, hidden.matrix);
+        o.position.set(0.1, 0.17, 0);
         o.updateMatrix();
         o.matrix.premultiply(head.matrix);
-        antennas.setMatrixAt(i, i % 3 === 0 ? o.matrix : hidden.matrix);
-        const faceZ = kind === 1 ? 0.15 : kind === 2 ? 0.145 : 0.155;
+        antennas.setMatrixAt(i, i % 6 === 0 && kind === 0 ? o.matrix : hidden.matrix);
+        const faceZ = kind === 1 ? 0.14 : kind === 2 ? 0.15 : 0.125;
         o.position.set(0, -0.08, faceZ);
         o.rotation.set(0, 0, 0);
         o.scale.set(1, 1, 1);
@@ -267,13 +273,13 @@ export function buildCrowd(): Crowd {
         const open = crowdState.eyesOpen * ease;
         for (let e = 0; e < 2; e += 1) {
           const side = e === 0 ? -1 : 1;
-          o.position.set(side * 0.06, 0.02, kind === 1 ? 0.14 : kind === 2 ? 0.145 : 0.15);
+          o.position.set(side * 0.07, 0.02, faceZ - 0.01);
           o.rotation.set(0, 0, 0);
           o.scale.set(1, Math.max(0.08, open), 1);
           o.updateMatrix();
           o.matrix.premultiply(head.matrix);
           eyes.setMatrixAt(i * 2 + e, o.matrix);
-          o.position.set(side * 0.06 + crowdState.lookX * 0.01, 0.02 + crowdState.lookY * 0.012, (kind === 1 ? 0.14 : kind === 2 ? 0.145 : 0.15) + 0.022);
+          o.position.set(side * 0.07 + crowdState.lookX * 0.01, 0.02 + crowdState.lookY * 0.012, faceZ + 0.012);
           o.scale.set(1, Math.max(0.05, open), 1);
           o.updateMatrix();
           o.matrix.premultiply(head.matrix);

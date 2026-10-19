@@ -39,6 +39,7 @@ import {
   mix,
   normalize,
   normalView,
+  normalWorld,
   positionLocal,
   positionView,
   positionWorld,
@@ -130,14 +131,14 @@ function curtainMaterial(folds: number, fringe: boolean): MeshBasicNodeMaterial 
   const sheen = smoothstep(0.93, 0.97, shade).mul(vec3(0.5, 0.1, 0.14));
   const v = uv().y;
   const vertical = smoothstep(0.0, 0.25, v).mul(0.35).add(0.65);
-  let color: Node = velvet.add(sheen).mul(vertical).mul(light.fill.mul(2.2).add(light.key.mul(0.55)).add(set.footLevel.mul(vec3(0.5, 0.3, 0.2))));
+  let color: Node = velvet.add(sheen).mul(vertical).mul(light.fill.mul(2.2).add(light.key.mul(0.55)).add(set.footLevel.mul(vec3(0.5, 0.3, 0.2))).max(vec3(0.55, 0.5, 0.5)));
   if (fringe) {
     const gold = smoothstep(0.035, 0.03, v).mul(step(0.5, fract(positionLocal.x.mul(14))).mul(0.4).add(0.6));
     color = mix(color, vec3(0.75, 0.52, 0.18).mul(light.fill.mul(2).add(light.key.mul(0.6)).add(set.footLevel.mul(0.5))), gold);
   }
   // Pre-show pin spot on the closed curtain.
   const pin = smoothstep(1.32, 1.28, length(positionWorld.xy.sub(vec2(0, 2.3)))).mul(set.curtainPin);
-  color = color.add(velvet.mul(1.1).add(sheen).add(vec3(0.16, 0.11, 0.08)).mul(pin));
+  color = color.add(vec3(0.42, 0.32, 0.24).mul(pin));
   material.colorNode = vec4(color, 1);
   return material;
 }
@@ -331,6 +332,17 @@ export function contactShadow(width: number, depth: number): Mesh {
   return mesh;
 }
 
+// Front-row audience: dark navy with a hard warm rim where they face the
+// stage lights.
+function audienceMaterial(hex: number): MeshBasicNodeMaterial {
+  const material = new MeshBasicNodeMaterial();
+  const n = normalize(normalWorld);
+  const rim = smoothstep(0.35, 0.4, dot(n, normalize(vec3(0, 0.55, -1))));
+  const base = vec3(new Color(hex).r, new Color(hex).g, new Color(hex).b);
+  material.colorNode = vec4(mix(base, vec3(0.85, 0.55, 0.32), rim.mul(0.7)), 1);
+  return material;
+}
+
 export interface Stage {
   root: Group;
   curtainL: Mesh;
@@ -384,9 +396,9 @@ export function buildStage(): Stage {
 
   // Robot audience silhouettes in the stalls.
   const headGeometry = blob(0.5, 0.46, 0.42, 2.6);
-  const audience = new InstancedMesh(headGeometry, toon(0x262a4a), 46);
+  const audience = new InstancedMesh(headGeometry, audienceMaterial(0x2a2f55), 46);
   const shoulderGeometry = blob(0.9, 0.5, 0.5, 2.8);
-  const shoulders = new InstancedMesh(shoulderGeometry, toon(0x1d203a), 46);
+  const shoulders = new InstancedMesh(shoulderGeometry, audienceMaterial(0x20244a), 46);
   const holder = new Object3D();
   let n = 0;
   for (let row = 0; row < 2; row += 1) {
@@ -421,7 +433,7 @@ export function buildStage(): Stage {
   root.add(antennaTips);
 
   // Proscenium: deco pillars, header with a ringed-planet crest.
-  const deco = toon(0x2f6a7a);
+  const deco = toon(0x2f6a7a, { emissive: 0.35 });
   const gold = toon(0xdcaa45);
   const neonCyan = glow(0x5ff2ff, 0);
   const neonPink = glow(0xff5fc8, 0);
@@ -450,7 +462,6 @@ export function buildStage(): Stage {
   const crest = place(new Group(), header, 0, 0.15, 0.55);
   place(inked(ball(0.5, 28), gold), crest, 0, 0, 0);
   place(inked(ring(0.85, 0.06), toon(0xf2d27a)), crest, 0, 0, 0, Math.PI / 2 - 0.35, 0, 0.25);
-  place(new Mesh(ring(1.15, 0.03), neonPink), crest, 0, 0, -0.05);
 
   // Marquee bulbs along the header and pillars, with a chase.
   const marqueeMat = new MeshBasicNodeMaterial();

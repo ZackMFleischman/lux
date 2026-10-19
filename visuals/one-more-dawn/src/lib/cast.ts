@@ -198,7 +198,12 @@ export function makeBarnaby(): Rig {
     place(new Mesh(can(0.11, 0.08), copperDark), rig.head, side * 0.38, 0.42, 0, 0, 0, Math.PI / 2);
   }
   const tip = place(new Group(), rig.head, 0.06, 0.82, 0, 0, 0, -0.25);
-  const bulb = antenna(tip, 0.2, 0xffb85a, 0.055, 0x6f4429);
+  place(new Mesh(rod(0.02, 0.02, 0.1, 12), toon(0x6f4429)), tip, 0, 0.05, 0);
+  for (let i = 0; i < 3; i += 1) {
+    place(new Mesh(ring(0.035, 0.01), toon(0xd2a43c)), tip, 0, 0.11 + i * 0.03, 0, Math.PI / 2);
+  }
+  const bulb = glow(0xffb85a, 1);
+  place(new Mesh(can(0.05, 0.025, 24), bulb), tip, 0, 0.21, 0);
   rig.props.bulb = new Mesh();
   rig.props.bulb.userData.material = bulb;
   rig.head.scale.setScalar(1.2);

@@ -136,12 +136,15 @@ export function copyPose(from: Pose, to: Pose): Pose {
 // Chunky mitten hand with a wrist cuff. The group's local -Y points along
 // the arm.
 export function hand(material: MeshBasicNodeMaterial, size: number): Group {
-  // Rounded mitten: cuff, soft palm with a finger lobe, and a thumb.
+  // Cartoon glove: cuff, palm, three chunky fingers and a thumb. Each part
+  // is its own mesh so the ink pass draws the gaps between fingers.
   const group = new Group();
   place(new Mesh(can(size * 0.4, size * 0.26), material), group, 0, -size * 0.05, 0);
-  place(new Mesh(blob(size * 0.95, size * 0.9, size * 0.55, 2.8), material), group, 0, -size * 0.6, 0);
-  place(new Mesh(blob(size * 0.88, size * 0.5, size * 0.5, 2.4), material), group, 0, -size * 1.12, 0.03, 0.2);
-  place(new Mesh(blob(size * 0.34, size * 0.6, size * 0.36, 2.2), material), group, size * 0.56, -size * 0.6, size * 0.1, 0.15, 0, 0.6);
+  place(new Mesh(blob(size * 0.92, size * 0.75, size * 0.52, 2.8), material), group, 0, -size * 0.55, 0);
+  for (let i = 0; i < 3; i += 1) {
+    place(new Mesh(blob(size * 0.31, size * 0.6, size * 0.34, 2.3), material), group, (i - 1) * size * 0.31, -size * 1.02, 0.01, 0.15, 0, (i - 1) * 0.1);
+  }
+  place(new Mesh(blob(size * 0.32, size * 0.56, size * 0.34, 2.3), material), group, size * 0.55, -size * 0.55, size * 0.1, 0.15, 0, 0.65);
   return group;
 }
 
