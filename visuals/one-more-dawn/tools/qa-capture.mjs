@@ -54,8 +54,20 @@ try {
     return r;
   };
   const json = r => JSON.parse(r.content.find(c => c.type === 'text').text);
-  const current = json(await call('lux.studio.read'));
-  const built = json(await call('lux.studio.build', { expectedDraftVersion: current.draftVersion, source: await bundle(sourceRoot) }));
+  // The first build in a fresh test profile can exceed the visual start-up
+  // deadline while shaders compile; retry inside the same isolated Studio.
+  const source = await bundle(sourceRoot);
+  let built;
+  for (let attempt = 1; ; attempt += 1) {
+    const draft = json(await call('lux.studio.read')).draftVersion;
+    try {
+      built = json(await call('lux.studio.build', { expectedDraftVersion: draft, source }));
+      break;
+    } catch (error) {
+      if (attempt >= 4 || !/exceeded|timed out|deadline/i.test(String(error))) throw error;
+      console.error(`build attempt ${attempt} timed out; retrying`);
+    }
+  }
   let a = built.status.authoring;
   const guard = () => ({ instanceId: a.instanceId, expectedGeneration: a.generation });
   a = json(await call('lux.studio.playback', { ...guard(), action: 'pause' })).status.authoring;
