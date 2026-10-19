@@ -95,14 +95,15 @@ function floorMaterial(): MeshBasicNodeMaterial {
   const material = new MeshBasicNodeMaterial();
   // Painted stage: warm boards that darken toward the back wall, plank
   // strokes, a darker band at the lip and hard-edged spot pools.
-  const px = positionWorld.x.div(0.75);
+  const px = positionWorld.x.div(1.4);
   const along = fract(px);
   const width = fwidth(px).mul(1.2);
   const plankLine = smoothstep(width, float(0), along.min(float(1).sub(along)));
-  const depth = smoothstep(-6.5, 2.5, positionWorld.z);
-  const board = mix(vec3(0.3, 0.17, 0.1), vec3(0.52, 0.32, 0.19), depth);
+  // Two painted bands instead of a gradient: shadowed upstage, lit downstage.
+  const depth = step(-2.6, positionWorld.z);
+  const board = mix(vec3(0.3, 0.18, 0.11), vec3(0.5, 0.31, 0.19), depth);
   const lip = step(2.9, positionWorld.z);
-  const wood = mix(mix(board, board.mul(0.72), plankLine), vec3(0.24, 0.13, 0.08), lip);
+  const wood = mix(mix(board, board.mul(0.62), plankLine), vec3(0.24, 0.13, 0.08), lip);
   let pools: Node = vec3(0, 0, 0);
   for (const spot of light.spots) {
     pools = pools.add(spot.color.mul(spotPool(spot)));
@@ -172,7 +173,7 @@ function doorWallMaterial(spec: DoorWallSpec, side: typeof DoubleSide | typeof B
   const d = mix(mix(box, arch, step(0.55, shapePick)), port, step(0.85, shapePick));
   const aa = fwidth(d).mul(0.6);
   const inside = smoothstep(aa, aa.negate(), d);
-  const frame = smoothstep(aa, aa.negate(), d.sub(0.045)).sub(inside);
+  const frame = smoothstep(aa, aa.negate(), d.sub(0.02)).sub(inside);
   // Split doors slide apart to reveal the interior.
   const revealed = smoothstep(open.mul(halfW).add(0.004), open.mul(halfW).sub(0.004), abs(p.x)).mul(inside);
   const blinkPhase = mix(h, float(0), set.wallBlinkSync);
@@ -183,9 +184,9 @@ function doorWallMaterial(spec: DoorWallSpec, side: typeof DoubleSide | typeof B
   const pupilP = vec2(abs(p.x.sub(set.wallLook.x.mul(0.03)).sub(lookJitter.x)).sub(0.095), p.y.sub(0.04).sub(set.wallLook.y.mul(0.03)).sub(lookJitter.y));
   const pupil = smoothstep(0.03, 0.022, length(pupilP)).mul(eyes);
   // Muted painted palette per cell and per row.
-  const plum = vec3(0.17, 0.13, 0.2);
-  const slate = vec3(0.12, 0.15, 0.18);
-  const umber = vec3(0.19, 0.14, 0.11);
+  const plum = vec3(0.13, 0.11, 0.18);
+  const slate = vec3(0.09, 0.12, 0.16);
+  const umber = vec3(0.14, 0.11, 0.11);
   const wallTone = mix(mix(plum, slate, step(0.4, rowHash)), umber, step(0.8, rowHash));
   // Hard painted shadow under each ledge and a thin ledge strip.
   const ledge = step(f.y, 0.035);
@@ -200,11 +201,11 @@ function doorWallMaterial(spec: DoorWallSpec, side: typeof DoubleSide | typeof B
   const panelBase = mix(mix(mix(doorA, doorB, step(0.3, h2)), doorC, step(0.6, h2)), doorD, step(0.85, h2));
   const panelLine = smoothstep(0.012, 0.0, abs(p.x)).mul(inside).mul(float(1).sub(revealed));
   const panel = panelBase.mul(float(1).sub(panelLine.mul(0.5)));
-  const frameColor = vec3(0.04, 0.03, 0.04);
+  const frameColor = wallTone.mul(0.4);
   const interiorGrad = step(0.0, p.y).mul(0.25).add(0.75);
   // A little robot occupant in each pod: head, shoulders and an antenna,
   // in one of a few painted colours, lit from behind by the pod light.
-  const occupantTone = mix(mix(vec3(0.35, 0.5, 0.62), vec3(0.62, 0.4, 0.3), step(0.4, h)), vec3(0.55, 0.55, 0.6), step(0.75, h));
+  const occupantTone = mix(mix(vec3(0.27, 0.36, 0.44), vec3(0.42, 0.3, 0.25), step(0.4, h)), vec3(0.38, 0.38, 0.42), step(0.75, h));
   const headD = roundBox(p.sub(vec2(0, 0.02)), vec2(0.15, 0.13), 0.06);
   const shoulderD = roundBox(p.sub(vec2(0, -0.27)), vec2(0.24, 0.12), 0.08);
   const antennaD = max(abs(p.x).sub(0.008), abs(p.y.sub(0.2)).sub(0.06));
@@ -261,7 +262,8 @@ function beamMaterial(spot: (typeof light.spots)[number]): MeshBasicNodeMaterial
     transparent: true,
     depthWrite: false,
     blending: AdditiveBlending,
-    side: DoubleSide,
+    // Far half only: the beam reads behind the performer, not over faces.
+    side: BackSide,
   });
   const v = normalize(positionView.negate());
   const edge = smoothstep(0.08, 0.16, abs(dot(normalize(normalView), v)));
@@ -275,12 +277,12 @@ function beamMaterial(spot: (typeof light.spots)[number]): MeshBasicNodeMaterial
   return material;
 }
 
-// Soft contact shadow decal laid on the floor under a performer.
+// Flat, hard-edged contact shadow laid on the floor under a performer.
 export function contactShadow(width: number, depth: number): Mesh {
   const material = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false });
   const d = length(uv().sub(0.5).mul(2));
-  const alpha = smoothstep(1.0, 0.25, d).mul(0.55);
-  material.colorNode = vec4(0.02, 0.0, 0.03, alpha);
+  const alpha = smoothstep(1.0, 0.96, d).mul(0.38);
+  material.colorNode = vec4(0.04, 0.02, 0.03, alpha);
   const mesh = new Mesh(new PlaneGeometry(width, depth), material);
   mesh.rotation.x = -Math.PI / 2;
   mesh.renderOrder = 1;
@@ -319,7 +321,7 @@ export function buildStage(): Stage {
   // Near tier of doors behind the stage.
   // Curved tier of doors wrapping the back of the stage.
   const wallGeometry = keep(new CylinderGeometry(14, 14, 5.6, 96, 1, true, Math.PI - 0.95, 1.9));
-  const wall = new Mesh(wallGeometry, doorWallMaterial({ cols: 30, rows: 6, delay: 0, spread: 0.11, dim: 0.85, center: [15, 1.5] }, BackSide));
+  const wall = new Mesh(wallGeometry, doorWallMaterial({ cols: 13, rows: 4, delay: 0, spread: 0.22, dim: 0.72, center: [6.5, 1.0] }, BackSide));
   wall.position.set(0, 2.8, 7.4);
   root.add(wall);
   const wallCap = new Mesh(keep(new CylinderGeometry(14.1, 14.1, 0.22, 96, 1, true, Math.PI - 0.95, 1.9)), toon(0x2a2440));

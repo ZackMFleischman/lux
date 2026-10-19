@@ -87,8 +87,9 @@ function antenna(parent: Group, height: number, bulbHex: number, bulbR: number, 
 }
 
 export function makeAria(): Rig {
+  // Tall lantern-headed soprano: pearl shell with teal and gold accents.
   const pearl = toon(P.pearl, { shine: 0.5 });
-  const lavender = toon(P.lavender);
+  const teal = toon(0x2f9c95);
   const gold = toon(P.gold, { shine: 0.6 });
   const rig = skeleton({
     name: 'Aria',
@@ -97,34 +98,34 @@ export function makeAria(): Rig {
     neckY: 0.74,
     shoulder: [0.24, 0.5, 0],
     armRadius: [0.05, 0.045],
-    armMaterial: lavender,
+    armMaterial: teal,
     handMaterial: pearl,
     handSize: 0.15,
     armHang: 0.72,
   });
-  // Hard cone gown with a gold hem band.
-  place(new Mesh(lathe('aria-gown2', [[0.0, -0.98], [0.66, -0.98], ...bell(0.62, 0.2, -0.95, 0.04, 0.6, 10).slice(1), [0.0, 0.04]]), toon(0xe7e3ee)), rig.hips, 0, 0, 0);
+  // Hard cone gown with a gold hem band and a teal sash.
+  place(new Mesh(lathe('aria-gown2', [[0.0, -0.98], [0.66, -0.98], ...bell(0.62, 0.2, -0.95, 0.04, 0.6, 10).slice(1), [0.0, 0.04]]), toon(0xeeebf3)), rig.hips, 0, 0, 0);
   place(new Mesh(can(0.665, 0.08), gold), rig.hips, 0, -0.93, 0);
-  // Tapered bodice can with a lavender belt.
+  place(new Mesh(can(0.43, 0.05), teal), rig.hips, 0, -0.45, 0);
+  // Tapered bodice with a teal belt.
   place(new Mesh(lathe('aria-bodice', [[0, 0], [0.2, 0], [0.24, 0.3], [0.21, 0.56], [0, 0.56]]), pearl), rig.torso, 0, 0.02, 0);
-  place(new Mesh(can(0.215, 0.07), lavender), rig.torso, 0, 0.04, 0);
-  place(new Mesh(can(0.07, 0.2), lavender), rig.torso, 0, 0.66, 0);
-  // Lamp-shade head: can with a dome cap and an oval face plate.
-  place(new Mesh(can(0.27, 0.34), pearl), rig.head, 0, 0.2, 0);
-  place(new Mesh(dome(0.27, 0.7), pearl), rig.head, 0, 0.37, 0);
-  place(new Mesh(can(0.285, 0.05), gold), rig.head, 0, 0.37, 0);
-  place(new Mesh(blob(0.42, 0.3, 0.08, 2.4), toon(0xefe9dc, { shadow: 0.4 })), rig.head, 0, 0.2, 0.24);
-  for (const side of [-1, 1]) {
-    place(new Mesh(can(0.08, 0.06), lavender), rig.head, side * 0.28, 0.22, 0, 0, 0, Math.PI / 2);
-  }
-  const antennaGroup = place(new Group(), rig.head, 0, 0.55, 0);
+  place(new Mesh(can(0.215, 0.07), teal), rig.torso, 0, 0.04, 0);
+  place(new Mesh(can(0.07, 0.2), gold), rig.torso, 0, 0.66, 0);
+  // Lantern head: a tall can with gold bands, a pale face window and a
+  // cone finial carrying the bulb.
+  place(new Mesh(can(0.24, 0.46), pearl), rig.head, 0, 0.24, 0);
+  place(new Mesh(can(0.255, 0.05), gold), rig.head, 0, 0.02, 0);
+  place(new Mesh(can(0.255, 0.05), gold), rig.head, 0, 0.47, 0);
+  place(new Mesh(rod(0.03, 0.2, 0.18, 32), teal), rig.head, 0, 0.58, 0);
+  place(new Mesh(rbox(0.36, 0.3, 0.06), toon(0xf3eedf, { shadow: 0.4 })), rig.head, 0, 0.24, 0.22);
+  const antennaGroup = place(new Group(), rig.head, 0, 0.66, 0);
   rig.props.antenna = antennaGroup;
-  const halo = antenna(antennaGroup, 0.18, 0xbfeaf2, 0.05);
+  const halo = antenna(antennaGroup, 0.1, 0xbfeaf2, 0.05);
   rig.props.haloLight = new Mesh();
   rig.props.haloLight.userData.material = halo;
-  addEyes(rig, 0.07, 0.1, 0.24, 0.27, toon(0xefe9dc));
-  addPlateMouth(rig, rig.head, 0.17, 0.11, 0.09, 0.29, 0xb79ad8, 0xe9e2f4, 1, true);
-  rig.head.scale.setScalar(1.35);
+  addEyes(rig, 0.065, 0.09, 0.28, 0.26, toon(0xf3eedf));
+  addPlateMouth(rig, rig.head, 0.13, 0.08, 0.13, 0.27, 0x8fd0ca, 0x1e5f5a, 1, true);
+  rig.head.scale.setScalar(1.3);
   return rig;
 }
 
