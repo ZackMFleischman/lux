@@ -51,13 +51,14 @@ export function arm(ctx: Ctx, shoulder: P2, handAt: P2, elbow: number, side: num
 
 export const ariaFaceStyle: FaceStyle = {
   skin: GOLD.base, skinShade: GOLD.shade, skinLight: GOLD.light,
-  visor: '#151a21', eye: '#9dffd9', brow: '#8a5a17', lips: '#c4505e', mouth: '#3a0c16',
+  visor: '#151a21', eye: '#9dffd9', brow: '#5a3208', lips: '#c4505e', mouth: '#3a0c16',
 };
 
 function ariaHead(ctx: Ctx, p: Pose): void {
   ctx.save();
-  ctx.translate(0, -300);
+  ctx.translate(0, -296);
   ctx.rotate(p.headTilt);
+  ctx.scale(0.88, 0.88);
   // Sculpted golden updo: a big swirl bun, side curls and a crown band.
   const bun = smooth([[-36, -28], [-46, -62], [-24, -92], [8, -98], [36, -84], [46, -54], [34, -26], [0, -34]]);
   paint(ctx, bun, lin(ctx, -40, -95, 40, -30, [[0, GOLD.light], [0.45, '#f0c457'], [1, GOLD.deep]]), 2.6);
@@ -68,7 +69,10 @@ function ariaHead(ctx: Ctx, p: Pose): void {
     ctx.arc(a, b, r, 0.6, 3.8);
     ctx.stroke();
   }
-  for (const side of [-1, 1]) paint(ctx, ellipse(side * 42, -8, 9, 20, side * 0.25), lin(ctx, 0, -28, 0, 12, [[0, GOLD.light], [1, GOLD.shade]]), 2.2);
+  for (const side of [-1, 1]) {
+    paint(ctx, ellipse(side * 45, 8, 7, 11, side * 0.15), lin(ctx, 0, -6, 0, 18, [[0, GOLD.light], [1, GOLD.shade]]), 2);
+    paint(ctx, ellipse(side * 47, 26, 6, 9, side * 0.2), lin(ctx, 0, 14, 0, 34, [[0, GOLD.light], [1, GOLD.shade]]), 2);
+  }
   // Head.
   const head = ellipse(0, 0, 40, 44);
   paint(ctx, head, rad(ctx, -12, -16, 4, 58, [[0, GOLD.light], [0.45, GOLD.base], [1, GOLD.shade]]), 2.8);

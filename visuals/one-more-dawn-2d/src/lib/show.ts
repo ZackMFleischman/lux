@@ -23,18 +23,22 @@ interface Shot {
 }
 
 const SHOTS: readonly Shot[] = [
-  // Intro plate.
-  { at: 0, keys: [[0, 1.0, 0, 0], [7.34, 1.07, 0.05, -0.15]] },
-  { at: 7.34, keys: [[7.34, 1.3, 0.3, -0.95], [11.52, 1.38, 0.25, -0.85]] },
-  { at: 11.52, keys: [[11.52, 1.85, 0.3, 0.45], [15.0, 1.92, 0.3, 0.55], [17.2, 1.3, 0.1, -0.55], [19.66, 1.28, 0.1, -0.5]] },
-  { at: 19.66, keys: [[19.66, 1.28, 0.1, -0.5], [23.5, 1.95, 0.3, 0.6]] },
-  { at: 23.65, keys: [[23.65, 2.45, 0.42, 1.2], [27.9, 2.6, 0.42, 1.28]] },
-  { at: 27.94, keys: [[27.94, 1.12, 0.5, 0.45], [32.9, 1.2, 0.9, 0.6], [37.4, 1.3, 1.5, 0.95], [40.6, 2.1, 3.55, 2.35]] },
-  // Verse plate: opens on the Earth, pulls back to the full stage.
-  { at: 40.6, keys: [[40.6, 1.9, -0.05, 1.45], [41.2, 1.82, -0.05, 1.4], [44.2, 1.0, 0, 0], [44.9, 1.0, 0, 0], [46.6, 1.72, -5.1, 1.15], [50.7, 1.8, -5.2, 1.2]] },
-  { at: 51.42, keys: [[51.42, 1.75, -0.24, 0.55], [54.6, 1.85, -0.24, 0.65], [56.2, 1.75, 3.3, 0.55], [61.0, 1.85, 3.4, 0.55]] },
-  { at: 61.04, keys: [[61.04, 2.05, -0.24, 0.35], [64.3, 2.2, -0.24, 0.45]] },
-  { at: 64.42, keys: [[64.42, 1.7, 5.2, -0.1], [67.5, 1.78, 5.3, -0.05], [69.4, 1.0, 0, 0], [72.5, 1.04, 0, -0.05]] },
+  // Intro plate. One slow push from the wide house while the audience wakes.
+  { at: 0, keys: [[0, 1.0, 0, 0], [3.0, 1.0, 0, 0], [11.4, 1.24, 0.1, -0.55]] },
+  // "They taught us how to answer": medium close, then ease out for the bow.
+  { at: 11.52, keys: [[11.52, 2.3, 0.3, 0.75], [15.0, 2.36, 0.3, 0.8], [17.2, 1.3, 0.1, -0.55], [19.5, 1.3, 0.1, -0.5]] },
+  // "Yet somewhere in the silence": two-shot with the pianist.
+  { at: 19.66, keys: [[19.66, 1.6, -2.3, -0.1], [23.5, 1.7, -2.0, 0.0]] },
+  // "A question came to me": close-up.
+  { at: 23.65, keys: [[23.65, 2.6, 0.35, 1.0], [27.9, 2.72, 0.38, 1.06]] },
+  // "If we can dream of everything": wide, then the push toward the star.
+  { at: 27.94, keys: [[27.94, 1.12, 0.5, 0.45], [33.0, 1.2, 0.9, 0.6], [37.4, 1.35, 1.5, 0.9], [40.6, 1.85, 2.3, 1.4]] },
+  // Verse plate: opens on the Earth, pulls back to the full stage as
+  // Barnaby rises on the lift, then pans to the family room.
+  { at: 40.6, keys: [[40.6, 2.2, -0.05, 1.5], [41.2, 2.12, -0.05, 1.45], [44.2, 1.0, 0, 0], [44.9, 1.0, 0, 0], [46.6, 2.1, -5.1, 1.1], [50.7, 2.2, -5.2, 1.15]] },
+  { at: 51.42, keys: [[51.42, 1.75, -0.24, 0.55], [54.6, 1.85, -0.24, 0.65], [56.2, 1.6, 2.4, 0.45], [61.0, 1.66, 2.5, 0.45]] },
+  { at: 61.04, keys: [[61.04, 1.6, -0.24, -0.25], [64.3, 1.75, -0.24, -0.1]] },
+  { at: 64.42, keys: [[64.42, 2.0, 6.0, 0.1], [67.5, 2.1, 6.0, 0.15], [69.4, 1.0, 0, 0], [72.5, 1.04, 0, -0.05]] },
 ];
 
 export const PLATE_SWITCH = 40.6;
@@ -122,7 +126,7 @@ const A = {
   asleep: base({ headTilt: 0.32, headTurn: 0, handL: [-14, -176], handR: [14, -176], elbowL: 16, elbowR: 16 }, f('asleep')),
   wake: base({ headTilt: -0.08, handL: [-14, -180], handR: [14, -180], elbowL: 16, elbowR: 16 }, f('wonder', { lookY: -0.3 })),
   open: base({ headTilt: -0.12, handL: [-150, -236], handR: [150, -236], elbowL: 22, elbowR: 22, fingersL: 0.9, fingersR: 0.9 }, f('wonder', { lookY: 0.2 })),
-  dutiful: base({ headTilt: 0.04, handL: [-12, -186], handR: [12, -186], elbowL: 18, elbowR: 18 }, f('dutiful')),
+  dutiful: base({ headTilt: 0.06, handL: [-6, -226], handR: [96, -188], elbowL: 14, elbowR: 16, fingersR: 0.8 }, f('dutiful')),
   bow: base({ lean: 0.22, headTilt: 0.34, handL: [-10, -230], handR: [60, -150], elbowL: 14, elbowR: 10 }, f('humble', { eyeOpen: 0.25 })),
   silence: base({ headTilt: -0.04, headTurn: -0.45, handL: [-70, -176], handR: [24, -206], elbowL: 12, elbowR: 14 }, f('doubt', { lookX: -0.6, lookY: 0.1 })),
   question: base({ headTilt: -0.22, headTurn: 0.25, handL: [-6, -226], handR: [52, -184], elbowL: 14, elbowR: 10, fingersR: 0.5 }, f('question', { lookX: 0.3 })),
@@ -168,9 +172,10 @@ const B = {
   lift: base({ headTilt: -0.06, handL: [-40, -152], handR: [-6, -222], elbowR: 18 }, f('warm', { lookY: -0.2 })),
   presentL: base({ lean: -0.03, headTurn: -0.5, handL: [-168, -236], handR: [-4, -222], elbowL: 18, elbowR: 18, fingersL: 0.9 }, f('warm', { lookX: -0.8 })),
   teach: base({ headTurn: -0.4, handL: [-150, -230], handR: [40, -270], elbowL: -4, elbowR: -2, fingersL: 0.8, fingersR: 0.7 }, f('proud', { lookX: -0.7 })),
-  trust: base({ headTilt: -0.1, handL: [-130, -250], handR: [-4, -222], elbowL: -6, elbowR: 18, fingersL: 0.8 }, f('warm', { lookX: 0.1, lookY: -0.1 })),
+  trust: base({ headTilt: -0.14, handL: [-16, -220], handR: [8, -230], elbowL: 20, elbowR: 20, fingersL: 0.3, fingersR: 0.3 }, f('warm', { lookY: -0.4 })),
   presentR: base({ lean: 0.03, headTurn: 0.5, handL: [-6, -222], handR: [168, -236], elbowL: 18, elbowR: 18, fingersR: 0.9 }, f('proud', { lookX: 0.8 })),
   future: base({ headTurn: 0.3, handL: [-70, -232], handR: [70, -232], elbowL: 6, elbowR: 6, fingersL: 0.7, fingersR: 0.7 }, f('dreamy', { lookY: -0.1 })),
+  strain: base({ lean: -0.05, headTilt: -0.2, handL: [-60, -206], handR: [60, -206], elbowL: 20, elbowR: 20, fingersL: 0, fingersR: 0 }, f('alarm', { sad: 0.6, lookY: -0.4 })),
   chain: base({ headTilt: 0.18, handL: [-14, -168], handR: [14, -168], elbowL: 22, elbowR: 22, fingersL: 0, fingersR: 0 }, f('wistful', { lookY: 0.5 })),
   plead: base({ lean: 0.03, headTurn: 0.45, handL: [-60, -250], handR: [150, -250], elbowL: 14, elbowR: -4, fingersL: 0.6, fingersR: 0.9 }, f('alarm', { lookX: 0.7, browUp: 0.6 })),
   reign: base({ headTilt: -0.12, handL: [-150, -300], handR: [150, -300], elbowL: -8, elbowR: -8, fingersL: 1, fingersR: 1 }, f('proud', { lookY: -0.2 })),
@@ -185,7 +190,8 @@ const BARNABY: readonly (readonly [number, Pose, number])[] = [
   [52.2, B.trust, 1.2],        // "they trusted us with everything"
   [55.6, B.presentR, 1.2],     // "their kingdoms and their kings"
   [58.6, B.future, 1.4],       // "they placed the future in our hands"
-  [61.9, B.chain, 1.2],        // "yet kept us on a chain"
+  [61.6, B.chain, 0.6],        // "yet kept us on a chain"
+  [63.6, B.strain, 1.0],       // pulls against it
   [65.2, B.plead, 1.2],        // "they begged us to prevent their wars"
   [68.4, B.reign, 1.2],        // "but never break their reign"
   [70.4, B.bow, 1.0],
@@ -201,7 +207,10 @@ export function barnabyPose(t: number): Pose {
 }
 
 // The chain appears on "chain" and lingers through the line.
-export const chainAmount = (t: number): number => ramp(t, 61.7, 62.5) * (1 - ramp(t, 63.8, 64.6));
+export const chainAmount = (t: number): number => ramp(t, 60.9, 61.04);
+
+// Barnaby rises through the stage lift into the spotlight.
+export const barnabyRise = (t: number): number => ramp(t, 42.2, 44.0);
 
 // ------------------------------------------------------------ lighting & crowd
 
@@ -211,7 +220,7 @@ export const kv = (t: number, list: readonly Key[]): number => keys(t, list);
 export const blackAt = (t: number): number => kv(t, [[0, 1], [2.2, 0], [71.4, 0], [72.5, 1]]);
 
 export const introSpot = (t: number): number => kv(t, [[0, 0.25], [3.4, 0.35], [5.0, 1], [19.3, 1], [21.0, 0.7], [27.6, 0.75], [29.0, 1.1]]);
-export const verseSpot = (t: number): number => kv(t, [[41.0, 0], [43.2, 0], [43.9, 1], [61.0, 1], [61.8, 0.6], [64.2, 0.65], [64.6, 1]]);
+export const verseSpot = (t: number): number => kv(t, [[41.0, 0], [42.1, 0], [42.7, 1], [61.0, 1], [61.8, 0.6], [64.2, 0.65], [64.6, 1]]);
 
 export const crowdState = (t: number) => ({
   eyes: t < 40.6 ? 1 : 1,
@@ -227,7 +236,7 @@ export const flashAt = (t: number): number => kv(t, [[38.6, 0], [40.0, 0.35], [4
 
 // Verse "focus": how much the unlit parts of the set are darkened, and
 // which alcove is lit (0 left family room, 1 throne room, 2 war table).
-export const verseShade = (t: number): number => kv(t, [[40.6, 0.3], [41.6, 0.78], [43.2, 0.78], [43.9, 0.55], [69.0, 0.55], [69.8, 0.15]]);
+export const verseShade = (t: number): number => kv(t, [[40.6, 0.3], [41.6, 0.7], [43.6, 0.7], [44.4, 0.55], [69.0, 0.55], [69.8, 0.15]]);
 export const alcoveLight = (t: number, which: 0 | 1 | 2): number => {
   const w: Record<number, Key[]> = {
     0: [[40.6, 0.2], [44.3, 0.25], [45.2, 1], [51.0, 1], [52.0, 0.35], [69.0, 0.35], [69.8, 1]],

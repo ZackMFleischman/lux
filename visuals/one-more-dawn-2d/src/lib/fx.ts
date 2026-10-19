@@ -7,10 +7,9 @@ import { lin, rad } from './ink.ts';
 
 // Soft spotlight: a cone from the top of the frame to a pool on the floor.
 // Layer covers the whole 16x9 frame (centre origin), additive.
-export function drawSpot(layer: DrawnLayer, topX: number, poolX: number, poolY: number, poolW: number, level: number, warm = '255,214,140'): void {
+export function drawSpot(layer: DrawnLayer, topX: number, poolX: number, poolY: number, poolW: number, level: number, warm = '255,214,140', clear = true): void {
   const { ctx, canvas, ppu } = layer;
-  const W = canvas.width, H = canvas.height;
-  ctx.clearRect(0, 0, W, H);
+  if (clear) ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (level <= 0.001) return;
   const px = (x: number) => (x + 8) * ppu;
   const py = (y: number) => (4.5 - y) * ppu;

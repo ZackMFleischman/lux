@@ -61,8 +61,9 @@ export function drawBarnaby(ctx: Ctx, p: Pose): void {
   sleeve(ctx, shoulderL, p.handL, p.elbowL, -1, p.fingersL);
   // Head: tall bronze robot head, ear bolts, swept silver pompadour.
   ctx.save();
-  ctx.translate(0, -322);
+  ctx.translate(0, -318);
   ctx.rotate(p.headTilt);
+  ctx.scale(0.92, 0.92);
   for (const side of [-1, 1]) {
     paint(ctx, ellipse(side * 40, 4, 8, 12), lin(ctx, 0, -10, 0, 14, [[0, BRONZE.light], [1, BRONZE.shade]]), 2.2);
     tube(ctx, [side * 44, -4], [side * 50, -20], [side * 52, -34], 3, '#c9ccd6', '#ffffff', '#7c8294', 1.4);
@@ -107,13 +108,14 @@ export interface Mini {
   look: number;
   scale: number;
   step: number;   // walk cycle phase
+  turn?: number;  // spin angle (pirouette), radians
 }
 
 export const mini = (x: number, scale = 1): Mini => ({ x, bob: 0, lean: 0, armL: 0.2, armR: 0.2, mouth: 0, look: 0, scale, step: 0 });
 
-function miniArm(ctx: Ctx, sx: number, sy: number, angle: number, len: number, color: string, side: number): void {
+function miniArm(ctx: Ctx, sx: number, sy: number, angle: number, len: number, color: string, side: number, width = 6): void {
   const ex = sx + Math.sin(angle) * len * side, ey = sy + Math.cos(angle) * len;
-  tube(ctx, [sx, sy], [(sx + ex) / 2 + side * 3, (sy + ey) / 2], [ex, ey], 6, color, 'rgba(255,255,255,0.45)', 'rgba(0,0,0,0.25)', 1.6);
+  tube(ctx, [sx, sy], [(sx + ex) / 2 + side * 3, (sy + ey) / 2], [ex, ey], width, color, 'rgba(255,255,255,0.45)', 'rgba(0,0,0,0.25)', 1.6);
   paint(ctx, ellipse(ex, ey, 4, 4), color, 1.4);
 }
 
@@ -121,7 +123,7 @@ function miniArm(ctx: Ctx, sx: number, sy: number, angle: number, len: number, c
 export function drawChild(ctx: Ctx, m: Mini, shirt: string, hair: string): void {
   ctx.save();
   ctx.translate(m.x, m.bob);
-  ctx.scale(m.scale, m.scale);
+  ctx.scale(m.scale * (m.turn ? Math.max(0.3, Math.abs(Math.cos(m.turn))) * Math.sign(Math.cos(m.turn) || 1) : 1), m.scale);
   ctx.rotate(m.lean);
   const s = Math.sin(m.step);
   for (const side of [-1, 1]) tube(ctx, [side * 6, -40], [side * 7, -22], [side * 8 + s * 6 * side, -2], 7, '#3b4f8a', '#6d82c0', '#22305a', 1.6);
@@ -148,8 +150,8 @@ export function drawHelper(ctx: Ctx, m: Mini, face: Face): void {
   ctx.rotate(m.lean);
   for (const side of [-1, 1]) tube(ctx, [side * 8, -50], [side * 9, -26], [side * 10, -2], 9, GOLD.base, GOLD.light, GOLD.shade, 1.8);
   paint(ctx, smooth([[-16, -50], [-18, -84], [0, -90], [18, -84], [16, -50], [0, -46]]), lin(ctx, -16, -90, 16, -46, [[0, GOLD.light], [1, GOLD.shade]]), 2);
-  miniArm(ctx, -16, -82, m.armL, 26, GOLD.base, -1);
-  miniArm(ctx, 16, -82, m.armR, 26, GOLD.base, 1);
+  miniArm(ctx, -16, -82, m.armL, 28, GOLD.base, -1, 9);
+  miniArm(ctx, 16, -82, m.armR, 28, GOLD.base, 1, 9);
   ctx.save();
   ctx.translate(0, -108);
   paint(ctx, ellipse(0, 0, 18, 19), rad(ctx, -5, -6, 2, 24, [[0, GOLD.light], [0.5, GOLD.base], [1, GOLD.shade]]), 2);
@@ -159,19 +161,40 @@ export function drawHelper(ctx: Ctx, m: Mini, face: Face): void {
   ctx.restore();
 }
 
-// Cartoon king (original): crown, red robe, white beard, seated.
+// Cartoon king (original): crown, red robe with ermine collar, white beard.
 export function drawKing(ctx: Ctx, m: Mini): void {
   ctx.save();
   ctx.translate(m.x, m.bob);
   ctx.scale(m.scale, m.scale);
-  paint(ctx, smooth([[-30, 0], [-34, -60], [-22, -86], [0, -92], [22, -86], [34, -60], [30, 0]]), lin(ctx, -30, -90, 30, 0, [[0, '#d23040'], [1, '#7a1220']]), 2);
-  paint(ctx, smooth([[-24, -84], [0, -78], [24, -84], [22, -74], [0, -70], [-22, -74]]), '#f6f2ea', 1.6);
-  miniArm(ctx, -22, -76, m.armL, 30, '#f0c09a', -1);
-  miniArm(ctx, 22, -76, m.armR, 30, '#f0c09a', 1);
-  paint(ctx, ellipse(0, -104, 17, 18), rad(ctx, -4, -110, 2, 22, [[0, '#ffe0c4'], [1, '#d99a72']]), 2);
-  paint(ctx, smooth([[-14, -96], [-12, -84], [0, -80], [12, -84], [14, -96], [0, -90]]), '#e8e2d8', 1.6);
-  paint(ctx, smooth([[-16, -116], [-16, -132], [-8, -124], [0, -136], [8, -124], [16, -132], [16, -116]]), lin(ctx, 0, -136, 0, -116, [[0, '#ffe68a'], [1, '#c8901c']]), 1.8);
-  for (const side of [-1, 1]) paint(ctx, ellipse(side * 5 + m.look * 2, -106, 2, 2.4), '#1a1210', 0);
+  // Robe sweeping to the floor, gold tunic down the front.
+  paint(ctx, smooth([[-26, -86], [-34, -50], [-44, -2], [0, 4], [44, -2], [34, -50], [26, -86], [0, -92]]), lin(ctx, -40, -90, 40, 0, [[0, '#e04656'], [0.5, '#b0202e'], [1, '#6a0e18']]), 2.2);
+  paint(ctx, smooth([[-9, -84], [9, -84], [12, -2], [-12, -2]]), lin(ctx, 0, -84, 0, 0, [[0, '#ffe08a'], [1, '#b8841c']]), 1.6);
+  for (const side of [-1, 1]) paint(ctx, ellipse(side * 9, -1, 9, 4), '#2a1810', 1.4);
+  // Ermine collar.
+  const collar = smooth([[-30, -90], [0, -80], [30, -90], [26, -76], [0, -68], [-26, -76]]);
+  paint(ctx, collar, '#fbf8f0', 1.8);
+  ctx.fillStyle = '#1a1210';
+  for (const x of [-18, -6, 6, 18]) ctx.fillRect(x - 1, -80 + Math.abs(x) * 0.25, 2, 4);
+  for (const [side, angle] of [[-1, m.armL], [1, m.armR]] as const) {
+    const sx = side * 24, sy = -82, len = 32;
+    const ex = sx + Math.sin(angle) * len * side, ey = sy + Math.cos(angle) * len;
+    tube(ctx, [sx, sy], [(sx + ex) / 2 + side * 3, (sy + ey) / 2], [ex, ey], 11, '#c02a38', '#e86a78', '#6a0e18', 1.8);
+    paint(ctx, ellipse(ex, ey, 5, 5), '#f0c09a', 1.4);
+  }
+  // Head, beard, crown.
+  paint(ctx, ellipse(0, -106, 17, 18), rad(ctx, -4, -112, 2, 22, [[0, '#ffe0c4'], [1, '#d99a72']]), 2);
+  paint(ctx, smooth([[-16, -104], [-14, -88], [0, -78], [14, -88], [16, -104], [6, -96], [-6, -96]]), lin(ctx, 0, -104, 0, -78, [[0, '#ffffff'], [1, '#c8c4bc']]), 1.6);
+  paint(ctx, smooth([[-17, -118], [-18, -138], [-9, -128], [0, -142], [9, -128], [18, -138], [17, -118]]), lin(ctx, 0, -142, 0, -118, [[0, '#fff09a'], [1, '#c8901c']]), 1.8);
+  paint(ctx, ellipse(0, -124, 3, 3), '#d0283a', 1);
+  for (const side of [-1, 1]) {
+    paint(ctx, ellipse(side * 6 + m.look * 2, -109, 2.2, 2.6), '#1a1210', 0);
+    ctx.strokeStyle = '#8a8478';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(side * 2 + m.look * 2, -115);
+    ctx.lineTo(side * 10 + m.look * 2, -116);
+    ctx.stroke();
+  }
   ctx.restore();
 }
 
@@ -186,8 +209,8 @@ export function drawGeneral(ctx: Ctx, m: Mini): void {
   paint(ctx, smooth([[-22, -56], [-26, -96], [0, -104], [26, -96], [22, -56], [0, -52]]), lin(ctx, -22, -104, 22, -52, [[0, '#6f8050'], [1, '#2f3a22']]), 2);
   for (let i = 0; i < 3; i += 1) paint(ctx, rrect(-16, -92 + i * 6, 10, 4, 1), ['#d23a3a', '#3a7ad2', '#e8c040'][i], 0.8);
   for (const side of [-1, 1]) paint(ctx, ellipse(side * 22, -100, 8, 4), '#e8c040', 1.4);
-  miniArm(ctx, -22, -98, m.armL, 34, '#4b5a36', -1);
-  miniArm(ctx, 22, -98, m.armR, 34, '#4b5a36', 1);
+  miniArm(ctx, -22, -98, m.armL, 34, '#4b5a36', -1, 9);
+  miniArm(ctx, 22, -98, m.armR, 34, '#4b5a36', 1, 9);
   paint(ctx, ellipse(0, -120, 15, 17), rad(ctx, -4, -126, 2, 22, [[0, '#ffd8b8'], [1, '#d0906a']]), 2);
   paint(ctx, smooth([[-10, -112], [0, -116], [10, -112], [6, -108], [-6, -108]]), '#c8c8c8', 1.2);
   for (const side of [-1, 1]) {

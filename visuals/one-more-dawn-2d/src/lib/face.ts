@@ -44,7 +44,7 @@ export interface FaceStyle {
 // Eyes inside the visor band. Each eye is a rounded lozenge whose top edge is
 // cut by the lid (eyeOpen, sad tilt) and whose bottom rises when happy.
 function eyeShape(cx: number, side: number, f: Face): Path2D {
-  const w = 17, h = 13;
+  const w = 13, h = 9;
   const open = clamp01(f.eyeOpen);
   const droop = f.sad * 6 * side;        // outer corner lower when sad
   const lidTop = -h + (1 - open) * h * 1.8;
@@ -83,11 +83,11 @@ export function drawFace(ctx: Ctx, f: Face, s: FaceStyle, opts: { mouthY?: numbe
     ctx.translate(lx, visorY + ly);
     for (const side of [-1, 1]) {
       const shape = eyeShape(side * 20, side, f);
-      glowFill(ctx, shape, s.eye, 10 * f.glow, clamp01(f.glow));
+      glowFill(ctx, shape, s.eye, 5 * f.glow, clamp01(f.glow));
       ctx.save();
       ctx.globalAlpha = 0.55 * clamp01(f.glow);
       ctx.fillStyle = '#ffffff';
-      ctx.fill(ellipse(side * 20 - 4, -4 + (1 - f.eyeOpen) * 6, 5, 3));
+      ctx.fill(ellipse(side * 20 - 3, -3 + (1 - f.eyeOpen) * 4, 3.5, 2));
       ctx.restore();
     }
     ctx.restore();
@@ -109,8 +109,8 @@ export function drawFace(ctx: Ctx, f: Face, s: FaceStyle, opts: { mouthY?: numbe
     paint(ctx, p, s.brow, 2);
   }
   // Mouth.
-  const w = 15 * f.mouthWide;
-  const open = clamp01(f.mouthOpen) * 17;
+  const w = 19 * f.mouthWide;
+  const open = clamp01(f.mouthOpen) * 25;
   const corner = mouthY - f.smile * 6;
   const upper = new Path2D();
   upper.moveTo(-w, corner);

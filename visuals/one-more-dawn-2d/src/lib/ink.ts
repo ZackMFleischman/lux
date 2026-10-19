@@ -24,7 +24,7 @@ export function paint(ctx: Ctx, path: Path2D, fill: string | CanvasGradient, lin
   ctx.fillStyle = fill;
   ctx.fill(path);
   if (line > 0) {
-    ctx.lineWidth = line;
+    ctx.lineWidth = line * 1.3;
     ctx.strokeStyle = ink;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';

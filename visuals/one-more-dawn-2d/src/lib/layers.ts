@@ -109,3 +109,38 @@ export function drawnLayer(width: number, height: number, ppu: number, additive 
     },
   };
 }
+
+// A foreground cut-out of a plate: the pixels inside `poly` (plate pixel
+// coordinates) redrawn above the cast, so figures can stand behind painted
+// set pieces (tables, railings). Drawn once; costs one extra quad.
+export function matte(image: ImageData8, plateW: number, plateH: number, poly: readonly (readonly [number, number])[], feather = 2): DrawnLayer {
+  const xs = poly.map(p => p[0]), ys = poly.map(p => p[1]);
+  const x0 = Math.max(0, Math.floor(Math.min(...xs))), y0 = Math.max(0, Math.floor(Math.min(...ys)));
+  const x1 = Math.min(image.width, Math.ceil(Math.max(...xs))), y1 = Math.min(image.height, Math.ceil(Math.max(...ys)));
+  const w = x1 - x0, h = y1 - y0;
+  const ppu = image.width / plateW;
+  const layer = drawnLayer(w / ppu, h / ppu, ppu);
+  const src = new OffscreenCanvas(w, h);
+  const sctx = src.getContext('2d') as OffscreenCanvasRenderingContext2D;
+  const pixels = sctx.createImageData(w, h);
+  for (let y = 0; y < h; y += 1) {
+    const row = ((y + y0) * image.width + x0) * 4;
+    pixels.data.set(image.data.subarray(row, row + w * 4), y * w * 4);
+  }
+  sctx.putImageData(pixels, 0, 0);
+  const { ctx, canvas } = layer;
+  ctx.save();
+  ctx.filter = `blur(${feather}px)`;
+  ctx.beginPath();
+  poly.forEach(([x, y], i) => (i ? ctx.lineTo(x - x0, y - y0) : ctx.moveTo(x - x0, y - y0)));
+  ctx.closePath();
+  ctx.fillStyle = '#000';
+  ctx.fill();
+  ctx.filter = 'none';
+  ctx.globalCompositeOperation = 'source-in';
+  ctx.drawImage(src, 0, 0, canvas.width, canvas.height);
+  ctx.restore();
+  layer.update();
+  layer.mesh.position.set((x0 + w / 2) / ppu - plateW / 2, plateH / 2 - (y0 + h / 2) / ppu, 0);
+  return layer;
+}
