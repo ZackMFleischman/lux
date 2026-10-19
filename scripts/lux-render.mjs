@@ -165,13 +165,34 @@ async function call(e, path, body) {
   return value;
 }
 
-export async function renderFrames({ src, out, times, controls = {}, width = 1920, height = 1080, pool = 3 }) {
+// Frames go to the pool in chunks: one long request would hit Node fetch's
+// 300 s header timeout on big renders (the client dropped while the pool
+// kept rendering). With `resume`, frames already on disk are skipped, and
+// failed frames get one retry on a fresh slot.
+const CHUNK = 96;
+
+export async function renderFrames({ src, out, times, controls = {}, width = 1920, height = 1080, pool = 3, resume = false }) {
   const source = await bundleSource(resolve(src));
   const compiled = await compileCached(source);
   const job = jobFor(compiled, { width, height, controls });
   const e = await ensurePool(pool);
-  const frames = times.map(t => ({ t, path: join(resolve(out), `t${t.toFixed(4).padStart(9, '0')}.png`) }));
-  const result = await call(e, '/render', { job, frames });
+  const all = times.map(t => ({ t, path: join(resolve(out), `t${t.toFixed(4).padStart(9, '0')}.png`) }));
+  const todo = resume ? all.filter(f => !existsSync(f.path)) : all;
+  const result = { rendered: 0, failed: [], timing: [], skipped: all.length - todo.length };
+  const run = async frames => {
+    for (let i = 0; i < frames.length; i += CHUNK) {
+      const part = await call(e, '/render', { job, frames: frames.slice(i, i + CHUNK) });
+      result.rendered += part.rendered;
+      result.failed.push(...part.failed);
+      result.timing.push(...(part.timing ?? []));
+    }
+  };
+  await run(todo);
+  if (result.failed.length) {
+    const retry = new Set(result.failed.map(f => f.t));
+    result.failed = [];
+    await run(todo.filter(f => retry.has(f.t)));
+  }
   return { ...result, compileMs: compiled.cached ? 0 : compiled.compileMs, compileCached: compiled.cached };
 }
 
@@ -181,7 +202,7 @@ export async function renderVideo({ src, out, range, controls, width, height, po
   const [a, b, fps] = range;
   const frameDir = keepFrames ? resolve(keepFrames) : join(stateDir, 'video', createHash('sha256').update(String(Date.now())).digest('hex').slice(0, 8));
   const times = Array.from({ length: Math.round((b - a) * fps) }, (_, i) => a + i / fps);
-  const result = await renderFrames({ src, out: frameDir, times, controls, width, height, pool });
+  const result = await renderFrames({ src, out: frameDir, times, controls, width, height, pool, resume: Boolean(keepFrames) });
   if (result.failed.length) throw Error(`${result.failed.length} frames failed, first: ${JSON.stringify(result.failed[0])}`);
   const list = join(frameDir, 'frames.txt');
   const frameLine = t => {
