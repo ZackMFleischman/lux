@@ -117,6 +117,23 @@ export default defineVisual({
           const rise = barnabyRise(t);
           barnaby.draw(ctx => {
             ctx.save();
+            const hole = ramp(t, 41.8, 42.2) * (1 - ramp(t, 44.0, 44.6));
+            if (hole > 0) {
+              // Trapdoor: dark opening with a cool glow from the lift shaft.
+              ctx.save();
+              ctx.globalAlpha = hole;
+              ctx.shadowColor = 'rgba(140,220,255,0.9)';
+              ctx.shadowBlur = 30;
+              ctx.fillStyle = '#04060a';
+              ctx.beginPath();
+              ctx.ellipse(0, -4, 92, 16, 0, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.shadowBlur = 0;
+              ctx.strokeStyle = 'rgba(160,230,255,0.9)';
+              ctx.lineWidth = 3;
+              ctx.stroke();
+              ctx.restore();
+            }
             if (rise < 1) {
               // Below the stage floor until the lift brings him up.
               ctx.beginPath();
@@ -136,6 +153,17 @@ export default defineVisual({
               }
             }
             drawBarnaby(ctx, bp);
+            if (rise < 1) {
+              // Cool light from the lift shaft on the rising figure.
+              const y0 = -(1 - rise) * 470;
+              const up = ctx.createLinearGradient(0, y0, 0, y0 - 280);
+              up.addColorStop(0, 'rgba(150,225,255,0.6)');
+              up.addColorStop(1, 'rgba(150,225,255,0)');
+              ctx.globalCompositeOperation = 'source-atop';
+              ctx.fillStyle = up;
+              ctx.fillRect(-300, y0 - 520, 600, 540);
+              ctx.globalCompositeOperation = 'source-over';
+            }
             if (chain > 0) {
               const pull = (hx: number, hy: number) => Math.max(4, 30 - Math.hypot(hx, hy + 3) * 0.08);
               drawChain(ctx, [bp.handL[0], bp.handL[1] + 6], [-78, -4], pull(bp.handL[0] + 78, bp.handL[1]), chain);

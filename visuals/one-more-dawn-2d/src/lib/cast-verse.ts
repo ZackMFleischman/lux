@@ -109,6 +109,8 @@ export interface Mini {
   scale: number;
   step: number;   // walk cycle phase
   turn?: number;  // spin angle (pirouette), radians
+  tuck?: number;  // 0..1 right leg tucked (pirouette)
+  notes?: number; // 0..1 music notes rising from the mouth
 }
 
 export const mini = (x: number, scale = 1): Mini => ({ x, bob: 0, lean: 0, armL: 0.2, armR: 0.2, mouth: 0, look: 0, scale, step: 0 });
@@ -126,7 +128,14 @@ export function drawChild(ctx: Ctx, m: Mini, shirt: string, hair: string): void 
   ctx.scale(m.scale * (m.turn ? Math.max(0.3, Math.abs(Math.cos(m.turn))) * Math.sign(Math.cos(m.turn) || 1) : 1), m.scale);
   ctx.rotate(m.lean);
   const s = Math.sin(m.step);
-  for (const side of [-1, 1]) tube(ctx, [side * 6, -40], [side * 7, -22], [side * 8 + s * 6 * side, -2], 7, '#3b4f8a', '#6d82c0', '#22305a', 1.6);
+  for (const side of [-1, 1]) {
+    const swing = -side * s * 11;
+    const tuck = side > 0 ? (m.tuck ?? 0) : 0;
+    const foot: [number, number] = [side * 6 + swing + tuck * -12, -2 - tuck * 24 - (side * s > 0 ? Math.abs(s) * 3 : 0)];
+    const knee: [number, number] = [side * 7 + swing * 0.5 + tuck * 6, -22 - tuck * 8];
+    tube(ctx, [side * 6, -40], knee, foot, 7, '#3b4f8a', '#6d82c0', '#22305a', 1.6);
+    paint(ctx, ellipse(foot[0] + side * 2, foot[1], 6, 3), '#2a1a14', 1.2);
+  }
   paint(ctx, smooth([[-14, -40], [-15, -64], [0, -70], [15, -64], [14, -40], [0, -36]]), shirt, 2);
   miniArm(ctx, -13, -62, m.armL, 22, '#f2c39e', -1);
   miniArm(ctx, 13, -62, m.armR, 22, '#f2c39e', 1);
@@ -136,9 +145,29 @@ export function drawChild(ctx: Ctx, m: Mini, shirt: string, hair: string): void 
   ctx.strokeStyle = '#5a2a20';
   ctx.lineWidth = 1.6;
   ctx.beginPath();
-  if (m.mouth > 0.2) ctx.ellipse(m.look * 2, -77, 3.4, 2 + m.mouth * 3, 0, 0, Math.PI * 2);
-  else ctx.arc(m.look * 2, -79, 4, 0.2, Math.PI - 0.2);
+  if (m.mouth > 0.2) {
+    ctx.ellipse(m.look * 2, -76, 4, 2.5 + m.mouth * 4, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#5a1a18';
+    ctx.fill();
+  } else ctx.arc(m.look * 2, -79, 4, 0.2, Math.PI - 0.2);
   ctx.stroke();
+  const notes = m.notes ?? 0;
+  if (notes > 0.01) {
+    ctx.globalAlpha = Math.min(1, notes);
+    for (let i = 0; i < 2; i += 1) {
+      const u = (notes * 1.6 + i * 0.5) % 1;
+      const nx = 14 + i * 10 + Math.sin(u * 6) * 4, ny = -96 - u * 40;
+      paint(ctx, ellipse(nx, ny, 4, 3, -0.4), '#fff2b0', 1.2);
+      ctx.strokeStyle = '#1b1410';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(nx + 3.5, ny);
+      ctx.lineTo(nx + 3.5, ny - 13);
+      ctx.lineTo(nx + 8, ny - 10);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
   ctx.restore();
 }
 

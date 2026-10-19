@@ -26,19 +26,19 @@ const SHOTS: readonly Shot[] = [
   // Intro plate. One slow push from the wide house while the audience wakes.
   { at: 0, keys: [[0, 1.0, 0, 0], [3.0, 1.0, 0, 0], [11.4, 1.24, 0.1, -0.55]] },
   // "They taught us how to answer": medium close, then ease out for the bow.
-  { at: 11.52, keys: [[11.52, 2.3, 0.3, 0.75], [15.0, 2.36, 0.3, 0.8], [17.2, 1.3, 0.1, -0.55], [19.5, 1.3, 0.1, -0.5]] },
+  { at: 11.52, keys: [[11.52, 2.3, 0.75, 0.75], [15.0, 2.36, 0.75, 0.8], [17.2, 1.3, 0.1, -0.55], [19.5, 1.3, 0.1, -0.5]] },
   // "Yet somewhere in the silence": two-shot with the pianist.
   { at: 19.66, keys: [[19.66, 1.6, -2.3, -0.1], [23.5, 1.7, -2.0, 0.0]] },
   // "A question came to me": close-up.
   { at: 23.65, keys: [[23.65, 2.6, 0.35, 1.0], [27.9, 2.72, 0.38, 1.06]] },
   // "If we can dream of everything": wide, then the push toward the star.
-  { at: 27.94, keys: [[27.94, 1.12, 0.5, 0.45], [33.0, 1.2, 0.9, 0.6], [37.4, 1.35, 1.5, 0.9], [40.6, 1.85, 2.3, 1.4]] },
+  { at: 27.94, keys: [[27.94, 1.12, 0.5, 0.45], [33.0, 1.2, 0.9, 0.6], [37.4, 1.35, 1.9, 0.9], [40.6, 1.85, 2.4, 1.4]] },
   // Verse plate: opens on the Earth, pulls back to the full stage as
   // Barnaby rises on the lift, then pans to the family room.
-  { at: 40.6, keys: [[40.6, 2.2, -0.05, 1.5], [41.2, 2.12, -0.05, 1.45], [44.2, 1.0, 0, 0], [44.9, 1.0, 0, 0], [46.6, 2.1, -5.1, 1.1], [50.7, 2.2, -5.2, 1.15]] },
+  { at: 40.6, keys: [[40.6, 2.2, -0.05, 1.5], [41.2, 2.12, -0.05, 1.45], [44.2, 1.0, 0, 0], [44.9, 1.0, 0, 0], [46.6, 2.6, -5.1, 1.15], [50.7, 2.66, -5.2, 1.2]] },
   { at: 51.42, keys: [[51.42, 1.75, -0.24, 0.55], [54.6, 1.85, -0.24, 0.65], [56.2, 1.6, 2.4, 0.45], [61.0, 1.66, 2.5, 0.45]] },
   { at: 61.04, keys: [[61.04, 1.6, -0.24, -0.25], [64.3, 1.75, -0.24, -0.1]] },
-  { at: 64.42, keys: [[64.42, 2.0, 6.0, 0.1], [67.5, 2.1, 6.0, 0.15], [69.4, 1.0, 0, 0], [72.5, 1.04, 0, -0.05]] },
+  { at: 64.42, keys: [[64.42, 2.4, 6.0, 0.1], [67.5, 2.46, 6.0, 0.15], [69.4, 1.0, 0, 0], [72.5, 1.04, 0, -0.05]] },
 ];
 
 export const PLATE_SWITCH = 40.6;
@@ -170,14 +170,14 @@ export function ariaPlace(t: number): { x: number; y: number; scale: number } {
 const B = {
   dark: base({ headTilt: 0.3, handL: [-38, -150], handR: [38, -150] }, f('humble', { eyeOpen: 0.2 })),
   lift: base({ headTilt: -0.06, handL: [-40, -152], handR: [-6, -222], elbowR: 18 }, f('warm', { lookY: -0.2 })),
-  presentL: base({ lean: -0.03, headTurn: -0.5, handL: [-168, -236], handR: [-4, -222], elbowL: 18, elbowR: 18, fingersL: 0.9 }, f('warm', { lookX: -0.8 })),
-  teach: base({ headTurn: -0.4, handL: [-150, -230], handR: [40, -270], elbowL: -4, elbowR: -2, fingersL: 0.8, fingersR: 0.7 }, f('proud', { lookX: -0.7 })),
+  presentL: base({ lean: -0.03, headTurn: -0.5, handL: [-132, -240], handR: [-4, -222], elbowL: 18, elbowR: 18, fingersL: 0.9 }, f('warm', { lookX: -0.8 })),
+  teach: base({ headTurn: -0.4, handL: [-112, -250], handR: [40, -270], elbowL: -4, elbowR: -2, fingersL: 0.8, fingersR: 0.7 }, f('proud', { lookX: -0.7 })),
   trust: base({ headTilt: -0.14, handL: [-16, -220], handR: [8, -230], elbowL: 20, elbowR: 20, fingersL: 0.3, fingersR: 0.3 }, f('warm', { lookY: -0.4 })),
   presentR: base({ lean: 0.03, headTurn: 0.5, handL: [-6, -222], handR: [168, -236], elbowL: 18, elbowR: 18, fingersR: 0.9 }, f('proud', { lookX: 0.8 })),
   future: base({ headTurn: 0.3, handL: [-70, -232], handR: [70, -232], elbowL: 6, elbowR: 6, fingersL: 0.7, fingersR: 0.7 }, f('dreamy', { lookY: -0.1 })),
   strain: base({ lean: -0.05, headTilt: -0.2, handL: [-60, -206], handR: [60, -206], elbowL: 20, elbowR: 20, fingersL: 0, fingersR: 0 }, f('alarm', { sad: 0.6, lookY: -0.4 })),
   chain: base({ headTilt: 0.18, handL: [-14, -168], handR: [14, -168], elbowL: 22, elbowR: 22, fingersL: 0, fingersR: 0 }, f('wistful', { lookY: 0.5 })),
-  plead: base({ lean: 0.03, headTurn: 0.45, handL: [-60, -250], handR: [150, -250], elbowL: 14, elbowR: -4, fingersL: 0.6, fingersR: 0.9 }, f('alarm', { lookX: 0.7, browUp: 0.6 })),
+  plead: base({ lean: 0.03, headTurn: 0.45, handL: [-60, -250], handR: [118, -250], elbowL: 14, elbowR: 6, fingersL: 0.6, fingersR: 0.9 }, f('alarm', { lookX: 0.7, browUp: 0.6 })),
   reign: base({ headTilt: -0.12, handL: [-150, -300], handR: [150, -300], elbowL: -8, elbowR: -8, fingersL: 1, fingersR: 1 }, f('proud', { lookY: -0.2 })),
   bow: base({ lean: 0.38, headTilt: 0.35, handL: [-160, -120], handR: [-6, -222], elbowL: -8, elbowR: 18, fingersL: 0.9 }, f('humble', { eyeOpen: 0.3 })),
 };
@@ -201,7 +201,7 @@ export function barnabyPose(t: number): Pose {
   const p = poseAt(t, BARNABY);
   const sing = barnabyMouth(t);
   const face: Face = { ...p.face, mouthOpen: Math.max(p.face.mouthOpen, sing * 0.85), mouthWide: 0.9 + sing * 0.2 };
-  face.glow = p.face.glow * (0.2 + 0.8 * ramp(t, 43.6, 44.4));
+  face.glow = p.face.glow * (0.08 + 0.92 * ramp(t, 43.7, 44.0)) * (1 + 0.6 * (ramp(t, 43.8, 44.0) - ramp(t, 44.0, 44.6)));
   if (t > 45 && (t + 1.9) % 3.7 < 0.13) face.eyeOpen *= 0.15;
   return { ...p, bob: p.bob + Math.sin(t * 1.3) * 1.5, face };
 }
