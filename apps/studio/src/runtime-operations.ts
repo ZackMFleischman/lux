@@ -13,7 +13,7 @@ export const nodeParameterInputSchema=parameterInputSchema.extend({nodePath:z.ar
 const animationTarget={nodePath:z.array(nodeIdSchema).max(8),definitionHash:z.string().regex(/^[a-f0-9]{64}$/),schemaHash:z.string().regex(/^[a-f0-9]{64}$/),controlId:z.string().min(1).max(64)};
 const animationAmount={amount:z.number().finite().nonnegative(),enabled:z.boolean()};
 const lfoAnimationBindingSchema=z.object({...animationTarget,...animationAmount,shape:z.enum(['sine','triangle','saw','square']),periodSeconds:z.number().finite().min(.05).max(3600),phase:z.number().finite().min(0).max(1)}).strict();
-const audioAnalyzerSchema=z.object({version:z.literal(1),fftSize:z.literal(2048),minDecibels:z.number().finite().min(-120).max(-40),maxDecibels:z.number().finite().min(-80).max(0)}).strict()
+export const audioAnalyzerSchema=z.object({version:z.literal(1),fftSize:z.literal(2048),minDecibels:z.number().finite().min(-120).max(-40),maxDecibels:z.number().finite().min(-80).max(0)}).strict()
   .refine(analyzer=>analyzer.maxDecibels-analyzer.minDecibels>=10,{message:'Audio analyzer range must span at least 10 decibels'});
 const audioSourceSchema=z.object({kind:z.literal('audio-band'),logicalInputId:z.literal('primary-audio'),band:z.enum(['level','bass','mids','highs']),analyzer:audioAnalyzerSchema}).strict();
 const kickSourceSchema=z.object({kind:z.literal('audio-kick'),logicalInputId:z.literal('primary-audio'),analyzer:audioAnalyzerSchema}).strict();
@@ -66,9 +66,9 @@ export const studioOperationSchema = z.discriminatedUnion('name', [
   z.object({name:z.literal('lux.story.transport'),input:storyTransportOperationInputSchema}).strict(),
 ]);
 export async function dispatchRuntimeCommand(client: StudioClient, method: string, params: unknown) {
-  const schemas = { parameters: parameterInputSchema, variation:nodeVariationInputSchema, playback: playbackInputSchema, restart: restartInputSchema,'tempo.set':tempoSetInputSchema,'tempo.tap':tempoTapInputSchema,trigger:triggerInputSchema,'story.transport':storyTransportInputSchema };
+  const schemas = { parameters: parameterInputSchema, animation:nodeAnimationInputSchema, variation:nodeVariationInputSchema, playback: playbackInputSchema, restart: restartInputSchema,'tempo.set':tempoSetInputSchema,'tempo.tap':tempoTapInputSchema,trigger:triggerInputSchema,'story.transport':storyTransportInputSchema };
   if (!Object.hasOwn(schemas, method)) throw Error('Unsupported runtime command');
-  const names = { parameters: 'lux.parameters.set', variation:'lux.node.variation.set', playback: 'lux.playback', restart: 'lux.runtime.restart','tempo.set':'lux.tempo.set','tempo.tap':'lux.tempo.tap',trigger:'lux.trigger.fire','story.transport':'lux.story.transport' } as const;
+  const names = { parameters: 'lux.parameters.set', animation:'lux.node.animation.set', variation:'lux.node.variation.set', playback: 'lux.playback', restart: 'lux.runtime.restart','tempo.set':'lux.tempo.set','tempo.tap':'lux.tempo.tap',trigger:'lux.trigger.fire','story.transport':'lux.story.transport' } as const;
   const key = method as keyof typeof schemas;
   if(key==='parameters') {const raw=snapshotRecord(params);params={...raw,values:snapshotRecord(raw.values)};}
   const parsedInput=schemas[key].parse(params),name=key==='trigger'&&'nodePath' in parsedInput?'lux.node.trigger.fire':names[key];

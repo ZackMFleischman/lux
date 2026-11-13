@@ -1,3 +1,4 @@
+import {audioInputsInputSchema,audioConnectInputSchema} from '../apps/studio/src/audio/agent-audio.ts';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {z} from 'zod';
@@ -9,7 +10,7 @@ import { resolve } from 'node:path';
 import { createStudioConnection, resolveStudioSession, studioAppData } from './studio-session.mjs';
 import { createLibraryContext, resolveMcpStandardLibrary } from './studio-library-context.mjs';
 import { discoverVisualSdk } from '../packages/visual-sdk/src/discovery.mjs';
-import { parameterInputSchema,triggerInputSchema,nodeVariationInputSchema, playbackInputSchema, restartInputSchema,tempoSetInputSchema,tempoTapInputSchema,storyTransportInputSchema } from '../apps/studio/src/runtime-operations.ts';
+import { parameterInputSchema,triggerInputSchema,nodeAnimationInputSchema,nodeVariationInputSchema, playbackInputSchema, restartInputSchema,tempoSetInputSchema,tempoTapInputSchema,storyTransportInputSchema } from '../apps/studio/src/runtime-operations.ts';
 import {supportsControlTriggersCapability,supportsManualTapTempoCapability,supportsStoryCapability} from '../apps/studio/src/capabilities.ts';
 const selectedSession = resolveStudioSession({ workspace: resolve(import.meta.dirname, '..') });
 let libraryContext;
@@ -21,6 +22,8 @@ const server = new McpServer({ name: 'lux-studio', version: '0.1.0' },
 const call = createStudioConnection(selectedSession);
 const text = value => ({ content: [{ type: 'text', text: JSON.stringify(value) }] });
 async function requireTempoCapability(){const status=await call('status');if(!supportsManualTapTempoCapability(status.capabilities))throw Error('Running Studio does not support manual/tap tempo from 20 through 300 BPM; restart from the matching checkout before sending tempo operations.');}
+async function requireAudioInputCapability(){const status=await call('status');if(status.capabilities?.audioInputControl?.enumerate!==true||status.capabilities?.audioInputControl?.connect!==true||status.capabilities?.audioInputControl?.disconnect!==true)throw Error('Running Studio does not support audio input control through MCP. Use the adapter and Studio from the same build.');}
+async function requireAnimationCapability(){const status=await call('status');if(status.capabilities?.controlAnimation?.guardedBindings!==true)throw Error('Running Studio does not support guarded control animation through MCP. Use the adapter and Studio from the same build.');}
 async function requireVariationCapability(){const status=await call('status');if(status.capabilities?.controlVariation?.stableInstanceKeys!==true)throw Error('Running Studio does not support per-instance control variation; restart from the matching checkout before configuring it.');}
 async function requireTriggerCapability(){const status=await call('status');if(!supportsControlTriggersCapability(status.capabilities))throw Error('Running Studio does not support acknowledged trigger actions. Use the adapter and Studio from the same build.');}
 async function requireStoryCapability(){const status=await call('status');if(!supportsStoryCapability(status.capabilities))throw Error('Running Studio does not support Story playback. Use the adapter and Studio from the same build.');}
@@ -31,17 +34,18 @@ async function requireParameterKinds(input){
   if(kinds.some(kind=>!status.capabilities?.parameterKinds?.includes(kind)))throw Error('Running Studio does not support these parameter types. Use the adapter and Studio from the same build.');
 }
 async function runningStudio() {
-  try { const status = await call('status'); return { connected: true, studioSession: status.studioSession, capabilities: status.capabilities ?? null,
+  try { const status = await call('status'); return { connected: true, studioSession: status.studioSession, diagnostics: status.diagnostics ?? null, capabilities: status.capabilities ?? null,
     compatible: status.capabilities?.codeDeclaredParameters === true && status.capabilities?.supportedSdkVersions?.includes('0.4.0'),
     advice: status.capabilities?.codeDeclaredParameters && status.capabilities?.supportedSdkVersions?.includes('0.4.0') ? undefined : 'Running Studio predates this adapter; restart from the matching checkout before using SDK 0.4 composition.' }; }
   catch (error) { return { connected: false, compatible: false,
     selectedSession: { profile: selectedSession.profile, workspace: selectedSession.workspace },
     advice: `Use the same Studio profile and checkout; reconnect the adapter after replacing Studio. ${error.message}` }; }
 }
-server.registerTool('lux.studio.discover', { description: 'Read the exact visual SDK, example and standalone Lux capabilities. Start Lux Studio separately.', inputSchema: {} }, async () => text({ ...await discoverVisualSdk(), scope: 'standalone-studio', tools: ['read', 'build', 'save', 'open', 'capture', 'status', 'parameters', 'trigger', 'variation', 'playback', 'restart','tempo.set','tempo.tap','story.read','story.transport','library.list','library.read','library.create','library.update'], resolume: false,
+server.registerTool('lux.studio.discover', { description: 'Read the exact visual SDK, example and standalone Lux capabilities. Start Lux Studio separately.', inputSchema: {} }, async () => text({ ...await discoverVisualSdk(), scope: 'standalone-studio', tools: ['read', 'build', 'save', 'open', 'capture', 'status', 'parameters', 'trigger', 'audio.inputs','audio.connect','audio.disconnect', 'animation', 'variation', 'playback', 'restart','tempo.set','tempo.tap','story.read','story.transport','library.list','library.read','library.create','library.update'], resolume: false,
   libraryCatalog: await libraryContext.catalog(),
   runningStudio: await runningStudio(),
   story:{readTool:'lux.story.read',transportTool:'lux.story.transport',rootSdkVersion:'0.2.0',authoring:'Single-visual scenes use studio.read/build story v1; omit preserves, null clears. Scene v7 uses the exclusive complete document form with Story v2 visual references. Definitions persist; playback state does not.',sustained:'Manual launch stays indefinitely; sequence occurrences can assign dwell.',timed:'Only active timed/direct beats support local seek; no absolute Story seek.',build:'Successful rebuild and recovery return to Normal.'},
+  animation:{tool:'lux.studio.animation',kinds:['lfo','audio','kick','tempo','variation'],numericControlsOnly:true,requires:'Running Studio capabilities.controlAnimation.guardedBindings',audio:'Configures bindings on the shared primary-audio input. Connect an explicitly chosen local input through lux.studio.audio.connect; animation itself does not acquire capture. Read status.audioInput for availability and band levels.'},
   triggers:{kind:'trigger',tool:'lux.studio.trigger',persistent:false,commandId:'Caller-supplied idempotency key; reuse only to retry the same uncertain action in the same guarded generation.',receipt:'Acknowledged after one completed update/render frame. A paused preview stays paused.',maxCommandIdsPerGeneration:16384},
   parameters: { kinds: ['number','boolean','enum'], declaredInCode: true, requiredGuard: 'expectedControlSchemaHash from current runtime status', implicitControls: false,
     composition: 'SDK 0.4 supports image-chain-v1 and typed-image-graph-v1 (image, paths2d and shader-field ports, acyclic fan-out). Selected leaf controls are public aliases; values remain owned by stable node identity.' },
@@ -67,6 +71,12 @@ for (const [method, schema, description] of [
   ['playback', playbackInputSchema, 'Play, pause or reset the Studio runtime using current instance and generation guards. Reset preserves playing/paused state. Returns applied state.'],
   ['restart', restartInputSchema, 'Restart the Studio runtime using current instance and generation guards. Retains source and controls; returns replacement runtime state.'],
 ]) server.registerTool(`lux.studio.${method}`, { description, inputSchema: schema.shape }, async input => {if(method==='parameters')await requireParameterKinds(input);return text(await call(method, input));});
+for(const [method,schema,description] of [
+  ['audio.inputs',audioInputsInputSchema,'List currently available local audio input IDs and labels. Choose an exact ID before an explicitly authorized audio connection.'],
+  ['audio.connect',audioConnectInputSchema,'Connect the explicitly chosen audio input to the existing shared analyzer using Studio permission handling. Read inputs for the exact current localDeviceId. Preserve the analyzer configuration of existing bindings. Device IDs remain local; scenes retain only primary-audio and analyzer settings.'],
+  ['audio.disconnect',audioInputsInputSchema,'Disconnect the shared audio capture, releasing the device and returning modulation toward manual bases.'],
+]) server.registerTool(`lux.studio.${method}`,{description,inputSchema:schema.shape},async input=>{await requireAudioInputCapability();return text(await call(method,input));});
+server.registerTool('lux.studio.animation',{description:'Configure or remove animation for any discovered numeric control using the existing binding contract: LFO (no kind), audio band, kick, tempo, or variation. Read status first for runtime guards and target identity. Direct visual targets use nodePath:[] and controlSchemaHash for both binding hashes; compositions use the reported leaf nodePath, definitionHash and schemaHash. Pass animation:null to remove. Audio uses the user-connected primary-audio input; it never opens capture. Reuse the existing analyzer settings to preserve the connection.',inputSchema:nodeAnimationInputSchema.shape},async input=>{await requireAnimationCapability();return text(await call('animation',input));});
 server.registerTool('lux.studio.variation',{description:'Configure or remove stable per-instance variation for one numeric control. Read status first for nodePath, controlId and runtime guards. Amount is a symmetric range around the current base; distribution is random, centered, or spread. Pass variation:null to remove it.',inputSchema:nodeVariationInputSchema.shape},async input=>{await requireVariationCapability();return text(await call('variation',input));});
 server.registerTool('lux.studio.trigger',{description:'Invoke one discovered trigger control with current instance, generation, revision and schema guards, a controlId and caller-supplied commandId. Optional nodePath addresses a component instance. Returns the completed-frame receipt. Retry an uncertain action with the same commandId and guards; never automatically retry across generations. Trigger actions are not saved values. A paused preview draws once with zero delta and remains paused.',inputSchema:triggerInputSchema.shape},async input=>{await requireTriggerCapability();return text(await call('trigger',input));});
 server.registerTool('lux.story.read',{description:'Read accepted Story status, definition, or source capabilities. Status supplies current runtime guards and transport revision. Sustained beats have no local timeline; occurrence dwell is separate from timed beat phase.',inputSchema:{view:z.enum(['status','definition','capabilities'])}},async input=>{await requireStoryCapability();return text(await call('story.read',input));});

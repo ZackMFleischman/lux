@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {StandaloneClient} from '../../apps/studio/src/standalone-client.ts';
 import {StudioController, getRuntimeControlState} from '../../apps/studio/src/service-client.ts';
-import {studioOperationSchema} from '../../apps/studio/src/runtime-operations.ts';
+import {dispatchRuntimeCommand,studioOperationSchema} from '../../apps/studio/src/runtime-operations.ts';
 import {normalizeControlDeclarations,canonicalControlSchemaJson} from '../../packages/runtime-contracts/src/parameters.mjs';
 import {validateSource} from '../../apps/build-worker/src/source-policy.mjs';
 import {linkedBody} from '../../apps/build-worker/src/artifact-identity.mjs';
@@ -271,4 +271,27 @@ test('legacy runtime state preserves scene animation fields',()=>{
   assert.deepEqual(state.effectiveControls,{intensity:.75});
   assert.equal(state.animationSequence,3);
   assert.equal(state.controlAnimations?.length,1);
+});
+
+
+test('MCP animation dispatch applies and removes audio on a numeric control with runtime guards',async t=>{
+  const client=await fixture(t);await client.submit(source);const worker=FlatWorker.all.at(-1)!,state=client.getSnapshot().authoring!;
+  const audio={kind:'audio' as const,nodePath:[],definitionHash:schemaHash,schemaHash,controlId:'speed',amount:.8,enabled:true,
+    source:{kind:'audio-band' as const,logicalInputId:'primary-audio' as const,band:'bass' as const,analyzer:{version:1 as const,fftSize:2048 as const,minDecibels:-100,maxDecibels:-30}},attackMs:20,releaseMs:200};
+  const input={instanceId:state.instanceId,expectedGeneration:state.generation,expectedRevisionId:state.revisionId,expectedControlSchemaHash:schemaHash,nodePath:[],controlId:'speed',animation:audio};
+  let settled=false;const write=dispatchRuntimeCommand(client,'animation',input).then(value=>{settled=true;return value;});
+  await Promise.resolve();assert.equal(settled,false);
+  const message=worker.messages.at(-1)!;
+  assert.equal(message.type,'animations');assert.deepEqual(message.controlAnimations,[audio]);
+  worker.reply({requestId:message.requestId,controlAnimations:[audio],animationSequence:1});
+  assert.deepEqual((await write).status.authoring!.controlAnimations,[audio]);
+  assert.deepEqual((client.acceptedDocument() as any).controlAnimations,[audio]);
+  const count=worker.messages.length;
+  await assert.rejects(dispatchRuntimeCommand(client,'animation',{...input,expectedRevisionId:'stale'}),/Revision changed/);
+  await assert.rejects(dispatchRuntimeCommand(client,'animation',{...input,animation:{...audio,definitionHash:'0'.repeat(64)}}),/identity/);
+  await assert.rejects(dispatchRuntimeCommand(client,'animation',{...input,animation:{...audio,source:{...audio.source,band:'unknown'}}}));
+  assert.equal(worker.messages.length,count);
+  const remove=dispatchRuntimeCommand(client,'animation',{...input,animation:null});const removal=worker.messages.at(-1)!;
+  assert.deepEqual(removal.controlAnimations,[]);worker.reply({requestId:removal.requestId,controlAnimations:[],animationSequence:2});
+  assert.deepEqual((await remove).status.authoring!.controlAnimations,[]);
 });

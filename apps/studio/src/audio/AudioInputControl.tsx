@@ -15,7 +15,7 @@ export function AudioInputControl({provider,onError,configuration=defaultConfigu
   const configurationKey=JSON.stringify(configuration),priorConfiguration=useRef(configurationKey),currentConfiguration=useRef(configurationKey),operation=useRef(0),currentDevice=useRef(device);
   currentConfiguration.current=configurationKey;
   currentDevice.current=device;
-  useEffect(()=>provider.subscribe(()=>{const snapshot=provider.getSnapshot();setPhase(current=>snapshot.available?(current==='connecting'?'connected':current):(current==='connected'?'unavailable':current));setMonitoring(provider.getMonitoring());}),[provider]);
+  useEffect(()=>provider.subscribe(()=>{const snapshot=provider.getSnapshot();if(snapshot.available&&provider.getConnectedInputId){const id=provider.getConnectedInputId()??'';setDevice(id);currentDevice.current=id;}setPhase(current=>snapshot.available?'connected':(current==='connected'?'unavailable':current));setMonitoring(provider.getMonitoring());}),[provider]);
   useEffect(()=>()=>{operation.current++;void provider.dispose();},[provider]);
   useEffect(()=>{
     let disposed=false,refreshId=0;
@@ -46,9 +46,10 @@ export function AudioInputControl({provider,onError,configuration=defaultConfigu
     catch(error){setMonitoring(provider.getMonitoring());onError(String(error));}
   }
   const label=phase==='connecting'?'Connecting…':phase==='connected'?'Connected':phase==='unavailable'?'Unavailable':'Disconnected';
+  const deviceLabel=devices.find(row=>row.id===device)?.label||(device?'Previously selected input (unavailable)':'Default input');
   return <span className="audio-input-control" aria-label={`Audio input ${label}`}>
     <span className="document-label">Audio</span>
-    <Select size="small" value={device} disabled={phase==='connecting'||phase==='connected'} aria-label="Audio input device" displayEmpty onChange={event=>{const next=String(event.target.value);setDevice(next);setPhase(current=>current==='unavailable'?'disconnected':current);onError('');try{if(next)localStorage.setItem(devicePreference,next);else localStorage.removeItem(devicePreference);}catch{}}}>
+    <Select title={deviceLabel} size="small" value={device} disabled={phase==='connecting'||phase==='connected'} aria-label="Audio input device" displayEmpty onChange={event=>{const next=String(event.target.value);setDevice(next);setPhase(current=>current==='unavailable'?'disconnected':current);onError('');try{if(next)localStorage.setItem(devicePreference,next);else localStorage.removeItem(devicePreference);}catch{}}}>
       <MenuItem value="">Default input</MenuItem>{device&&!devices.some(row=>row.id===device)?<MenuItem value={device} disabled>Previously selected input (unavailable)</MenuItem>:null}{devices.map(row=><MenuItem key={row.id} value={row.id}>{row.label}</MenuItem>)}
     </Select>
     {phase==='connected'?<Button size="small" color="inherit" aria-pressed={monitoring} title="Monitor audio through default speakers" onClick={()=>void toggleMonitoring()}>{monitoring?'Monitor on':'Monitor'}</Button>:null}

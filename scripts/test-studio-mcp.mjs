@@ -31,7 +31,7 @@ try {
   const parsed = result => JSON.parse(result.content.find(part => part.type === 'text').text);
   const discovery = parsed(await call('lux.studio.discover')); assert.ok(discovery.contractSource.includes('VisualDefinition'));
   let read;
-  for (let i = 0; i < 20; i++) { read = parsed(await call('lux.studio.read')); if (read.source) break; await new Promise(resolve => setTimeout(resolve, 250)); }
+  for (let i = 0; i < 120; i++) { read = parsed(await call('lux.studio.read')); if (read.source && read.status.authoring?.frameId) break; await new Promise(resolve => setTimeout(resolve, 250)); }
   assert.ok(read.source);
   read.source.files['lib/color.ts'] = 'export const green = 0.2;';
   read.source.files[read.source.entry] = "import { green } from './lib/color.ts';\n" + read.source.files[read.source.entry].replace('vec4(level, 0.2, 0.4, 1)', 'vec4(level, green, 0.4, 1)');
@@ -52,6 +52,19 @@ try {
   assert.equal(controlled.status.authoring.intensity, 0.8);
   assert.ok(controlled.status.authoring.controlSequence > 0);
   assert.equal(controlled.applied.controlSequence, controlled.status.authoring.controlSequence);
+  assert.equal(openedStatus.capabilities.controlAnimation.guardedBindings,true);
+  assert.equal(openedStatus.audioInput.available,false,'isolated MCP test must not acquire an audio device');
+  const schemaHash=openedStatus.authoring.controlSchemaHash;
+  const animationTarget={...target,expectedRevisionId:first.status.authoring.revisionId,expectedControlSchemaHash:schemaHash,nodePath:[],controlId:'intensity'};
+  const audioBinding={kind:'audio',nodePath:[],definitionHash:schemaHash,schemaHash,controlId:'intensity',amount:.2,enabled:true,attackMs:30,releaseMs:250,
+    source:{kind:'audio-band',logicalInputId:'primary-audio',band:'bass',analyzer:{version:1,fftSize:2048,minDecibels:-100,maxDecibels:-30}}};
+  const animated=parsed(await call('lux.studio.animation',{...animationTarget,animation:audioBinding}));
+  assert.deepEqual(animated.status.authoring.controlAnimations,[audioBinding]);
+  assert.equal(animated.status.authoring.controls.intensity,.8,'disconnected input retains the editable base');
+  const animationCapture=parsed(await call('lux.studio.capture'));
+  assert.equal(animationCapture.animationSequence,animated.status.authoring.animationSequence);
+  const removedAnimation=parsed(await call('lux.studio.animation',{...animationTarget,animation:null}));
+  assert.deepEqual(removedAnimation.status.authoring.controlAnimations,[]);
   for (const action of ['play', 'pause', 'reset']) {
     const result = parsed(await call('lux.studio.playback', { ...target, action }));
     assert.equal(result.status.authoring.playback, action === 'play' ? 'playing' : 'paused');
