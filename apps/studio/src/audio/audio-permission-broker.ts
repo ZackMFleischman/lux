@@ -34,6 +34,10 @@ type BrokerState = {
   webContents: PermissionWebContents;
   token: string;
   expiresAtMs: number;
+  startedAtMs:number;
+  attemptedAtMs?:number;
+  attemptExpiresAtMs?:number;
+  checkReported?:boolean;
   detach: () => void;
 };
 
@@ -46,11 +50,17 @@ export function createAudioPermissionBroker(options: Readonly<{
   createToken(): string;
   setExpiry(callback: () => void, milliseconds: number): unknown;
   clearExpiry(handle: unknown): void;
+  diagnostic?(details:Readonly<{stage:string;code:string;elapsedMs:number;attemptMs?:number}>):void;
 }>) {
-  const armLifetimeMs = 5000;
+  const armLifetimeMs = 5000,attemptLifetimeMs=60000;
   let state: BrokerState | null = null;
   let expiry: unknown;
   let disposed = false;
+
+  function report(code:string,current:BrokerState|null=state){
+    const now=options.now();
+    try{options.diagnostic?.({stage:current?.phase??'none',code,elapsedMs:current?Math.max(0,now-current.startedAtMs):0,...(current?.attemptedAtMs===undefined?{}:{attemptMs:Math.max(0,now-current.attemptedAtMs)})});}catch{}
+  }
 
   function clearExpiry() {
     if (expiry === undefined) return;
@@ -89,7 +99,7 @@ export function createAudioPermissionBroker(options: Readonly<{
   }
 
   function observe(webContents: PermissionWebContents) {
-    const revoke = () => clearState();
+    const revoke = () => {report('context-revoked');clearState();};
     const events = ['did-start-navigation', 'render-process-gone', 'destroyed'] as const;
     for (const event of events) webContents.on(event, revoke);
     return () => { for (const event of events) webContents.removeListener(event, revoke); };
@@ -104,13 +114,27 @@ export function createAudioPermissionBroker(options: Readonly<{
     }
     const fresh = options.now() <= current.expiresAtMs;
     const allowed = fresh && exactRequest(webContents, permission, details);
-    if (allowed) current.phase = 'attempting';
-    else clearState();
+    if (allowed) {
+      clearExpiry();current.phase = 'attempting';current.attemptedAtMs=options.now();current.attemptExpiresAtMs=current.attemptedAtMs+attemptLifetimeMs;
+      expiry=options.setExpiry(()=>{if(state===current&&state.phase==='attempting'){report('attempt-expired');clearState();}},attemptLifetimeMs);
+      report('request-accepted');
+    }
+    else {report(fresh?'request-rejected':'intent-expired');clearState();}
     callback(allowed);
   });
   options.session.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
     const current = state;
     if (!current || current.webContents !== webContents || !exactAudioCheck(webContents, permission, requestingOrigin, details, current.phase)) return false;
+    if (current.phase === 'armed') {
+      if(options.now()>current.expiresAtMs){report('intent-expired');clearState();}
+      else if(!current.checkReported){current.checkReported=true;report('check-await-request');}
+      return false; // An armed intent is not a cached capture grant: require the exact request handler.
+    }
+    if (current.phase === 'attempting') {
+      if(options.now()>current.attemptExpiresAtMs!){report('attempt-expired');clearState();return false;}
+      // Only continuation of the admitted capture passes; a new capture must request again and is denied.
+      return requestingOrigin===options.securityOrigin&&details.requestingUrl===options.pageUrl&&details.securityOrigin===undefined&&details.embeddingOrigin===options.securityOrigin&&details.mediaType===undefined;
+    }
     if (current.phase === 'active') return true;
     if (options.now() <= current.expiresAtMs) return true;
     clearState();
@@ -123,10 +147,11 @@ export function createAudioPermissionBroker(options: Readonly<{
     clearState();
     const token = options.createToken();
     if (typeof token !== 'string' || token.length < 16 || token.length > 256) throw new Error('Invalid audio permission token');
-    const expiresAtMs = options.now() + armLifetimeMs;
-    state = { phase, webContents, token, expiresAtMs, detach: observe(webContents) };
+    const startedAtMs=options.now(),expiresAtMs = startedAtMs + armLifetimeMs;
+    state = { phase, webContents, token, expiresAtMs,startedAtMs, detach: observe(webContents) };
+    report('intent-created');
     expiry = options.setExpiry(() => {
-      if (state?.phase !== 'active' && state?.token === token) clearState();
+      if ((state?.phase === 'armed'||state?.phase === 'discovering') && state.token === token) {report('intent-expired');clearState();}
     }, armLifetimeMs);
     return Object.freeze({ token, expiresAtMs });
   }
@@ -139,23 +164,22 @@ export function createAudioPermissionBroker(options: Readonly<{
       return begin(webContents, 'armed');
     },
     activate(webContents: PermissionWebContents, token: string) {
-      if (!state || state.phase !== 'attempting' || state.webContents !== webContents || state.token !== token) return false;
-      if (options.now() > state.expiresAtMs) {
-        clearState();
-        return false;
-      }
+      if (!state || state.phase !== 'attempting' || state.webContents !== webContents || state.token !== token) {report('activation-mismatch');return false;}
+      if(options.now()>state.attemptExpiresAtMs!){report('attempt-expired');clearState();return false;}
+      if(!exactWebContents(webContents)){report('activation-context-rejected');clearState();return false;}
       clearExpiry();
       state.phase = 'active';
+      report('capture-activated');
       return true;
     },
     cancel(webContents: PermissionWebContents, token: string) {
       if (!state || state.webContents !== webContents || state.token !== token) return false;
-      clearState();
+      report('intent-cancelled');clearState();
       return true;
     },
     revoke(webContents?: PermissionWebContents) {
       if (!state || (webContents && state.webContents !== webContents)) return false;
-      clearState();
+      report('capture-revoked');clearState();
       return true;
     },
     dispose() {

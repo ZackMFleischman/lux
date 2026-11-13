@@ -171,6 +171,7 @@ app.whenReady().then(async () => {
     createToken: () => randomBytes(24).toString('base64url'),
     setExpiry: (callback, milliseconds) => setTimeout(callback, milliseconds),
     clearExpiry: handle => clearTimeout(handle as ReturnType<typeof setTimeout>),
+    diagnostic: details => diagnostics.write('audio.permission',details),
   });
   app.once('will-quit', () => audioPermissions.dispose());
   let markAgentReady = () => {};

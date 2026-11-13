@@ -28,7 +28,7 @@ export function createStudioDiagnostics({directory,sessionId,maxBytes=256*1024})
  return {location,status:()=>({...location,writable}),write(event,details={}){
   try{
    const record={timestamp:new Date().toISOString(),sessionId,event:String(event).slice(0,80)};
-   for(const key of ['operationId','command','stage','code','signal','elapsedMs','line','column','errorName','stderrTailBytes','exitCode']){
+   for(const key of ['operationId','command','stage','code','signal','elapsedMs','attemptMs','line','column','errorName','stderrTailBytes','exitCode']){
     const value=details[key];if(typeof value==='string'||typeof value==='number')record[key]=typeof value==='string'?String(value).replace(/[^A-Za-z0-9._: -]/g,'').slice(0,160):value;
    }
    if(typeof details.file==='string'&&/^[A-Za-z0-9_-][A-Za-z0-9_./-]{0,179}\.[cm]?[jt]sx?$/.test(details.file)&&!details.file.split('/').includes('..'))record.file=details.file;
