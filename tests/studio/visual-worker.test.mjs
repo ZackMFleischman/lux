@@ -30,21 +30,21 @@ async function fixture(controls=schema,declared=controls,mutation='',sdkVersion=
     ImageData:class{},OffscreenCanvas:class{getContext(){return {putImageData(){}}}async convertToBlob(){return new Blob(['png']);}},
   });
   vm.runInContext('const parseForHarness=JSON.parse; globalThis.deliver=raw=>onmessage({data:parseForHarness(raw)});',context);
-  const methods=[`update(frame){recordFrame(frame);${lifecycle.mutationOnUpdate?'mutateAfterInit();globalThis.mutateAfterInit=()=>{};':''}}`,gpuTimed?'render(){gpuDraw();}':timed?'async render(){advanceClock(7);await Promise.resolve();advanceClock(11);}':'render(){}','reset(){}',`dispose(){recordLifecycle('authored-dispose',this===instance);${lifecycle.throwDispose?"throw Error('legacy dispose failed');":''}}`];
+  const methods=[`update(frame){recordFrame(frame);${lifecycle.mutationOnUpdate?'mutateAfterInit();globalThis.mutateAfterInit=()=>{};':''}}`,gpuTimed?'render(){gpuDraw();}':timed?'async render(){advanceClock(7);await Promise.resolve();advanceClock(11);}':lifecycle.orderedRenders?'async render(){await renderContext.renderer.render(scene,camera);recordLifecycle("between");await renderContext.renderer.render(scene,camera);}':lifecycle.compileGate?'render(){renderContext.renderer.render(scene,camera);}':'render(){}','reset(){}',`dispose(){recordLifecycle('authored-dispose',this===instance);${lifecycle.throwDispose?"throw Error('legacy dispose failed');":''}}`];
   const instanceCode=lifecycle.classInstance?`new (class {${methods.join(' ')}})()`:`{${methods.join(',')}}`;
   const visualCode=`${mutation}
-    export class WebGPURenderer {backend={isWebGPUBackend:true};setSize(){}async init(){}setRenderTarget(){}render(){}dispose(){recordLifecycle('renderer-dispose');}async readRenderTargetPixelsAsync(){const pixels=new Uint8Array(1920*1080*4);pixels.set([188,0,0,128]);return pixels;}}
+    export class WebGPURenderer {backend={isWebGPUBackend:true};setSize(){}async init(){}setRenderTarget(){}async compileAsync(){recordLifecycle('compile');if(!globalThis.compiled)await new Promise(resolve=>globalThis.finishCompile=resolve);globalThis.compiled=true;}render(){if(${!!lifecycle.compileGate}&&!globalThis.compiled)throw Error('synchronous GPU pipeline compilation');recordLifecycle('gpu-render');}dispose(){recordLifecycle('renderer-dispose');}async readRenderTargetPixelsAsync(){const pixels=new Uint8Array(1920*1080*4);pixels.set([188,0,0,128]);return pixels;}}
     export class RenderTarget{texture={};dispose(){recordLifecycle('target-dispose');}} export const SRGBColorSpace='srgb';
     export class MeshBasicNodeMaterial {dispose(){recordLifecycle('material-dispose');}} export class QuadMesh {constructor(material){this.material=material;}render(){}} export const sampleTexture=()=>({});
-    export default {sdkVersion:${JSON.stringify(sdkVersion)},controls:${typeof declared==='string'?declared:JSON.stringify(declared)},${lifecycle.storyCapability?`story:${JSON.stringify(lifecycle.storyCapability)},`:''}async create(){recordCreate();${waitCreate?'await new Promise(()=>{});':''}const instance=${instanceCode};return instance;}};`;
+    export default {sdkVersion:${JSON.stringify(sdkVersion)},controls:${typeof declared==='string'?declared:JSON.stringify(declared)},${lifecycle.storyCapability?`story:${JSON.stringify(lifecycle.storyCapability)},`:''}async create(context){globalThis.renderContext=context;globalThis.scene={};globalThis.camera={};recordCreate();${waitCreate?'await new Promise(()=>{});':''}const instance=${instanceCode};return instance;}};`;
   const module=new vm.SourceTextModule(bundle,{context,importModuleDynamically:async()=>{
-    imports++;assert.equal(messages[0]?.type,'heartbeat','worker must announce liveness before authored module import');assert.equal(messages[0].workerHeartbeat,1);const visual=new vm.SourceTextModule(visualCode,{context});await visual.link(()=>{throw Error('Unexpected import')});await visual.evaluate();return visual;
+    imports++;assert.equal(messages.find(row=>row.type==='heartbeat')?.workerHeartbeat,1,'worker must announce liveness before authored module import');const visual=new vm.SourceTextModule(visualCode,{context});await visual.link(()=>{throw Error('Unexpected import')});await visual.evaluate();return visual;
   }});
   await module.link(()=>{throw Error('Unexpected bundled import')});await module.evaluate();
   const identity={instanceId:'instance',generation:1,revisionId:'revision'};
   const initial={type:'init',requestId:'init',...identity,moduleSource:'fixture',canvas:{},settings:{width:1920,height:1080,fps:60,seed:0},sdkVersion,controlSchema:controls,controlSchemaHash:hash(canonicalControlSchemaJson(controls)),controls:Object.fromEntries(controls.filter(row=>row.type!=='trigger').map(row=>[row.id,row.default])),playing:false};
   const post=message=>context.deliver(JSON.stringify({...identity,...message}));
-  async function send(message){const before=messages.length;post(message);const response=()=>messages.slice(before).find(row=>row.type!=='heartbeat');for(let i=0;i<2000&&!response();i++)await new Promise(resolve=>setImmediate(resolve));assert.ok(response(),`worker must respond; messages=${JSON.stringify(messages.slice(before))}`);return response();}
+  async function send(message){const before=messages.length;post(message);const response=()=>messages.slice(before).find(row=>row.type!=='heartbeat'&&row.type!=='startup-progress');for(let i=0;i<2000&&!response();i++)await new Promise(resolve=>setImmediate(resolve));assert.ok(response(),`worker must respond; messages=${JSON.stringify(messages.slice(before))}`);return response();}
   const flush=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};
   return {send,post,initial,events,messages,frames,requested,allocations,scheduled,timers,flush,mutate(code){vm.runInContext(code,context);},async fireTimer(late=0){const [id,timer]=timers.entries().next().value;timers.delete(id);now=Math.max(now,timer.at)+late;timer.fn();await flush();},created:()=>created,imports:()=>imports,telemetry(){now=500;intervals.get(500)?.();return messages.at(-1);},intervals};
 }
@@ -85,7 +85,7 @@ test('worker announces liveness before top-level/create and heartbeats continue 
  for(const stage of ['top-level','create']){
   const f=await fixture(schema,schema,stage==='top-level'?'await new Promise(()=>{});':'','0.2.0',false,false,0,stage==='create');f.post(f.initial);
   for(let i=0;i<20;i++)await new Promise(resolve=>setImmediate(resolve));
-  assert.equal(f.imports(),1);assert.equal(f.created(),stage==='create'?1:0);assert.equal(f.messages.length,1);assert.equal(f.messages[0].workerHeartbeat,1);assert.equal(f.messages[0].frameId,'0');
+  assert.equal(f.imports(),1);assert.equal(f.created(),stage==='create'?1:0);const beats=f.messages.filter(row=>row.type==='heartbeat');assert.equal(beats.length,1);assert.equal(beats[0].workerHeartbeat,1);assert.equal(beats[0].frameId,'0');
   f.intervals.get(250)();assert.equal(f.messages.at(-1).workerHeartbeat,2);assert.equal(f.messages.at(-1).frameId,'0');assert.equal(f.messages.some(row=>row.type==='ready'),false);
  }
 });
@@ -264,4 +264,29 @@ test('legacy worker protocol remains scalar-compatible and invalid generic snaps
   const generic=await fixture();await generic.send(generic.initial);
   const bad=await generic.send({type:'controls',requestId:'bad',controlSequence:1,controlSchemaHash:generic.initial.controlSchemaHash,values:{height:2,speed:99}});
   assert.equal(bad.type,'failure');assert.equal(generic.frames.length,1);assert.deepEqual(generic.frames[0].controls,{height:1,speed:0.5});
+});
+
+test('ordinary visuals await asynchronous shader preparation while heartbeats remain live',async()=>{
+ const f=await fixture(schema,schema,'','0.2.0',false,false,0,false,{compileGate:true});f.post(f.initial);
+ for(let i=0;i<30;i++)await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(f.messages.some(r=>r.type==='failure'),false,JSON.stringify(f.messages));
+ assert.equal(f.messages.some(r=>r.type==='ready'),false,'first frame must wait for shader preparation');
+ f.intervals.get(250)();assert.equal(f.messages.at(-1).workerHeartbeat,2);
+ f.mutate('finishCompile()');
+ for(let i=0;i<30&&!f.messages.some(r=>r.type==='ready');i++)await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(f.messages.at(-1).type,'ready',JSON.stringify(f.messages));
+ assert.equal(f.events.filter(([name])=>name==='gpu-render').length,1);
+ // Routine frames retain the original path without another scene traversal.
+ assert.equal((await f.send({type:'playback',action:'reset'})).type,'status');
+ assert.equal(f.events.filter(([name])=>name==='gpu-render').length,2);
+ assert.equal(f.events.filter(([name])=>name==='compile').length,1);
+});
+
+test('awaited startup render calls prepare and draw in authored order before ready',async()=>{
+ const f=await fixture(schema,schema,'','0.2.0',false,false,0,false,{compileGate:true,orderedRenders:true});f.post(f.initial);
+ for(let i=0;i<30;i++)await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(f.events.some(([name])=>name==='between'),false);f.mutate('finishCompile()');
+ for(let i=0;i<30&&!f.messages.some(row=>row.type==='ready');i++)await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(f.messages.at(-1).type,'ready',JSON.stringify(f.messages));
+ assert.deepEqual(f.events.filter(([name])=>['compile','gpu-render','between'].includes(name)).map(([name])=>name),['compile','gpu-render','between','compile','gpu-render']);
 });
