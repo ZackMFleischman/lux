@@ -34,7 +34,7 @@ async function fixture({mutation='',declared=JSON.stringify(metadata),create='',
  const initial={...identity,type:'init',requestId:'init',linked,canvas:{},settings:{width:1920,height:1080,fps:60,seed:3},sdkVersion:'0.3.0',controlSchema:metadata.controls,controlSchemaHash:hash(canonicalControlSchemaJson(metadata.controls)),controls:{speed:1},playing:false,performanceMode:'baseline'};
  const post=message=>context.deliver(JSON.stringify({...identity,...message}));
  const flush=async()=>{await new Promise(r=>setTimeout(r,30));};
- async function send(message){const n=messages.length;post(message);const response=()=>messages.slice(n).find(m=>m.type!=='heartbeat'&&m.type!=='cleanup');for(let i=0;i<500&&!response();i++)await new Promise(r=>setTimeout(r,1));assert.ok(response(),JSON.stringify(messages));return response();}
+ async function send(message){const n=messages.length;post(message);const response=()=>messages.slice(n).find(m=>m.type!=='heartbeat'&&m.type!=='cleanup'&&m.type!=='startup-progress');for(let i=0;i<500&&!response();i++)await new Promise(r=>setTimeout(r,1));assert.ok(response(),JSON.stringify(messages));return response();}
  const until=async event=>{for(let i=0;i<500&&!events.includes(event);i++)await new Promise(r=>setTimeout(r,1));assert.ok(events.includes(event),`${event}: ${events}`);};
  return {initial,post,send,flush,until,events,messages,frames,imports:()=>imports,finishBackend,finishQueue,finishLifecycle,loseDevice,holdQueue:()=>queueGate=true};
 }
