@@ -8,12 +8,12 @@ import {createStudioDiagnostics,diagnosticLocation,summarizeCompilerStderr} from
 test('diagnostics persist bounded rotated records and exclude arbitrary request fields',()=>{
  const directory=mkdtempSync(join(tmpdir(),'lux-logs-'));try {
   const log=createStudioDiagnostics({directory,sessionId:'session-1',maxBytes:2048});
-  for(let i=0;i<60;i++)log.write('compile.failed',{operationId:'compile-1',stage:'shader-compile',file:'src/visual.ts',line:4,column:7,message:'failure '+i+' '.repeat(40),source:'private scene',token:'private token',deviceId:'private device'});
+  for(let i=0;i<60;i++)log.write('compile.failed',{operationId:'compile-1',stage:'shader-compile',elapsedMs:9000,attemptMs:8990,file:'src/visual.ts',line:4,column:7,message:'failure '+i+' '.repeat(40),source:'private scene',token:'private token',deviceId:'private device'});
   const location=diagnosticLocation(directory);
   for(const file of [location.path,location.previousPath])assert.ok(statSync(file).size<=2048);
   const records=readFileSync(location.path,'utf8').trim().split('\n').map(JSON.parse);
   assert.equal(records.at(-1).event,'compile.failed');assert.equal(records.at(-1).sessionId,'session-1');assert.ok(Date.parse(records.at(-1).timestamp));
-  assert.equal(records.at(-1).stage,'shader-compile');assert.equal(records.at(-1).file,'src/visual.ts');assert.equal(records.at(-1).line,4);assert.equal(records.at(-1).column,7);assert.equal(records.at(-1).operationId,'compile-1');
+  assert.equal(records.at(-1).stage,'shader-compile');assert.equal(records.at(-1).elapsedMs,9000);assert.equal(records.at(-1).attemptMs,8990);assert.equal(records.at(-1).file,'src/visual.ts');assert.equal(records.at(-1).line,4);assert.equal(records.at(-1).column,7);assert.equal(records.at(-1).operationId,'compile-1');
   assert.doesNotMatch(JSON.stringify(records),/private/);
  }finally{rmSync(directory,{recursive:true,force:true});}
 });
