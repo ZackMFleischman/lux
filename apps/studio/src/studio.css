@@ -149,9 +149,10 @@ summary:focus-visible,.file-tab-close:focus-visible{outline:2px solid #bbb0fa;ou
 .graph-panel { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
 .graph-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; padding: 6px 10px; border-bottom: 1px solid #343943; }
 .graph-toolbar button { min-width: 32px; }
-.graph-breadcrumb { display: flex; align-items: center; min-width: 0; overflow: hidden; }
-.graph-breadcrumb > span { display: flex; align-items: center; min-width: 0; }
-.graph-breadcrumb button { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.graph-breadcrumb { display: flex; align-items: center; min-width: 0; max-width: 100%; overflow-x: auto; }
+.graph-breadcrumb > span { display: flex; align-items: center; min-width: 0; flex-shrink: 0; }
+.graph-breadcrumb button { flex-shrink: 0; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.graph-breadcrumb [aria-current="page"] { display: block; min-width: 0; max-width: 180px; padding: 6px 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #eee9ff; }
 .graph-viewport { position: relative; flex: 1; min-height: 180px; overflow: hidden; touch-action: none; background-color: #15181e; background-image: radial-gradient(#343943 1px, transparent 1px); background-size: 20px 20px; }
 .graph-content { position: absolute; transform-origin: top left; }
 .graph-viewport { cursor: grab; }

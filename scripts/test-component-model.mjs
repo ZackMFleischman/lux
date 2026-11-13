@@ -44,15 +44,15 @@ try {
     await statusWhen(runtime=>runtime?.playback==='playing');await useSmallPreview();
     await page.getByRole('button',{name:'View',exact:true}).click();await page.getByRole('menuitem',{name:'Graph',exact:true}).click();
     if(name==='legacy-graph'&&!graphsOnly){
-      assert.equal(await page.locator('.graph-scene-root').getAttribute('aria-pressed'),'true','direct-only selection returns to Scene after representation change');
+      assert.equal(await page.locator('.graph-node[aria-pressed="true"]').count(),0,'direct-only selection returns to Scene after representation change');
       assert.equal(await page.getByRole('button',{name:'Controls for Nested prismatic mirrors',exact:true}).count(),0);
     }
     if(nodePath.length){
       const group=page.locator('.graph-node').filter({hasText:'Double mirror 1'});
       await group.focus();await page.keyboard.press('Enter');
-      await page.getByRole('button',{name:/^Back to /}).waitFor();
+      await page.getByRole('navigation',{name:'Component breadcrumb'}).getByRole('button',{name:'Scene',exact:true}).waitFor();
       await capture(`${name}-inside`);
-      await page.getByRole('button',{name:/^Back to /}).click();
+      await page.getByRole('navigation',{name:'Component breadcrumb'}).getByRole('button',{name:'Scene',exact:true}).click();
     }
     const node=nodePath.length?page.locator('.graph-node').filter({hasText:'Prismatic Ball'}):page.locator('.graph-node').filter({hasText:/Visual/});
     await node.click();

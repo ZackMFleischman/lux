@@ -304,8 +304,7 @@ test('Scene and component controls expose real animation plus independent reset 
   assert.equal(calls[1].name,'lux.node.parameters.set');assert.deepEqual(calls[1].input.nodePath,[ballId]);assert.deepEqual(calls[1].input.values,{intensity:.6});
   calls.splice(0);
   await click('Open Graph');
-  const graphNodes=[...document.querySelectorAll<HTMLButtonElement>('.graph-node')];assert.equal(graphNodes.length,4);
-  const nodes=graphNodes.slice(1);
+  const nodes=[...document.querySelectorAll<HTMLButtonElement>('.graph-node')];assert.equal(nodes.length,3);
   assert.equal(document.querySelectorAll('.graph-wires path').length,2);
   assert.equal(document.querySelectorAll('.graph-final-output').length,1);
   selectedPanel = 'inspector';await click('Close selected panel');
@@ -378,9 +377,9 @@ test('Graph enters nested components one level at a time and edits an exposed co
   await act(async()=>{fireEvent.change(alias,{target:{value:'9'}});fireEvent.keyDown(alias,{key:'Enter'});});
   assert.deepEqual(calls[0].input.nodePath,[compositeAId,wrapperNodeId,wrappedEffectId]);assert.deepEqual(calls[0].input.values,{segments:9});
   await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'View inside'}));});
-  assert.equal(document.querySelectorAll('.graph-node').length,3);assert.ok(screen.getByRole('navigation',{name:'Component breadcrumb'}));
+  assert.equal(document.querySelectorAll('.graph-node').length,2);assert.ok(screen.getByRole('navigation',{name:'Component breadcrumb'}));
   const wrapper=screen.getByRole('button',{name:/Wrapped mirror/});await act(async()=>{fireEvent.click(wrapper);fireEvent.dblClick(wrapper);});
-  assert.equal(document.querySelectorAll('.graph-node').length,2);assert.ok(screen.getByRole('button',{name:'Back to Double mirror 1'}));
+  assert.equal(document.querySelectorAll('.graph-node').length,1);assert.ok(within(document.querySelector('.graph-breadcrumb')!).getByText('Double mirror 1'));
   await act(async()=>{runtime={...runtime,revisionId:'nested-r2'};snapshot={...snapshot,authoring:runtime};listeners.forEach(fn=>fn());});
   assert.ok(within(document.querySelector('.inspector')!).getByText('Wrapped mirror'),'selection survives an accepted rebuild when the full path remains');
   selectedPanel='graph'; await click('Close selected panel');
@@ -399,10 +398,10 @@ test('Graph enters nested components one level at a time and edits an exposed co
   assert.equal(document.querySelectorAll('.dv-tab').length,6,'Inspector navigation does not reopen Graph');
   await click('Open Graph');
 
-  await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Back to Double mirror 1'}));});
-  await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Back to Nested demo'}));});
+  await act(async()=>{fireEvent.click(within(document.querySelector('.graph-breadcrumb')!).getByText('Double mirror 1'));});
+  await act(async()=>{fireEvent.click(within(document.querySelector('.graph-breadcrumb')!).getByText('Scene'));});
   const second=screen.getByRole('button',{name:/Double mirror 2/});await act(async()=>{fireEvent.keyDown(second,{key:'Enter'});});
-  assert.ok(screen.getByRole('button',{name:'Double mirror 2',current:'page'}));assert.ok(within(document.querySelector('.inspector')!).getByText('Double mirror 2'));
+  assert.ok(within(screen.getByRole('navigation',{name:'Component breadcrumb'})).getByText('Double mirror 2'));assert.ok(within(document.querySelector('.inspector')!).getByText('Double mirror 2'));
   ui.unmount();
 });
 
@@ -496,20 +495,22 @@ test('Graph wheel zoom anchors at the pointer and background gestures keep selec
     assert.ok(Math.abs((250 - old.y) / old.zoom - (250 - next.y) / next.zoom) < 1e-8);
   }
   assert.equal(transform().zoom, .2);
-  await click('Scene controls');
-  assert.deepEqual(selections, [null, null]);
+
 });
 
-test('Graph keeps Scene available for plain visuals and compositions', async () => {
+test('Graph opens inside Scene with one breadcrumb and no redundant settings buttons', async () => {
   const { GraphPanel } = await import('../../apps/studio/src/GraphPanel.tsx');
   const selections: unknown[] = [];
   const { unmount } = render(<GraphPanel runtime={{ sceneName: 'Plain visual' } as any} selected={null} onSelect={path => selections.push(path)} />);
-  assert.ok(within(screen.getByRole('navigation', { name: 'Component breadcrumb' })).getByRole('button', { name: 'Scene' }));
-  assert.equal(document.querySelectorAll('.graph-node').length, 2,'plain visual graph includes Scene and its visual source occurrence');
-  assert.ok(screen.getByRole('button', { name: 'Scene' }));
+  assert.equal(within(screen.getByRole('navigation', { name: 'Component breadcrumb' })).getByText('Scene').getAttribute('aria-current'), 'page');
+  assert.equal(document.querySelectorAll('.graph-node').length, 1,'Scene contains the visual instead of appearing beside it');
+  assert.equal(document.querySelector('.graph-scene-root'), null);
+  assert.equal(document.querySelector<HTMLElement>('.graph-node')!.style.left, '0px');
+  assert.equal(screen.queryByRole('button', { name: 'Scene' }), null);
+  assert.equal(screen.queryByRole('button', { name: 'Scene controls' }), null);
   assert.equal(screen.queryByRole('button', { name: 'View inside' }), null);
-  await act(async () => { fireEvent.click(document.querySelector<HTMLButtonElement>('.graph-scene-root')!); });
-  assert.deepEqual(selections, [null]);
+  await act(async () => { fireEvent.click(document.querySelector<HTMLButtonElement>('.graph-node')!); });
+  assert.deepEqual(selections, [[]]);
   unmount();
 
   const { parse } = await import('@babel/parser');
@@ -526,11 +527,29 @@ test('Graph keeps Scene available for plain visuals and compositions', async () 
     return <GraphPanel runtime={{ composition } as any} selected={selected} onSelect={path => setSelected(path ? JSON.stringify(path) : null)} />;
   }
   render(<CompositionGraph />);
-  assert.equal(document.querySelectorAll('.graph-node').length, 4);
+  assert.equal(document.querySelectorAll('.graph-node').length, 3);
   assert.equal(screen.queryByRole('button', { name: 'View inside' }), null);
   const component = [...document.querySelectorAll<HTMLButtonElement>('.graph-node')].find(node => node.textContent?.includes('Double mirror'))!;
   await act(async () => { fireEvent.click(component); });
   assert.ok(screen.getByRole('button', { name: 'View inside' }));
+  await click('View inside');
+  assert.equal(document.querySelectorAll('.graph-node').length, 2, 'nested view shows only its immediate children');
+  assert.equal(document.querySelector('.graph-scene-root'), null);
+  const canvas = screen.getByLabelText('Graph canvas');
+  assert.equal(document.activeElement, canvas, 'entering a component moves focus from the removed card or button to Graph');
+  const wrapper = screen.getByRole('button', { name: /Wrapped mirror/ });
+  await act(async () => { fireEvent.dblClick(wrapper); });
+  assert.equal(document.querySelectorAll('.graph-node').length, 1);
+  const ancestor = within(screen.getByRole('navigation', { name: 'Component breadcrumb' })).getByRole('button', { name: 'Double mirror 1' });
+  await act(async () => { ancestor.focus(); fireEvent.click(ancestor); });
+  assert.equal(document.activeElement, canvas, 'activating a disappearing ancestor breadcrumb retains Graph focus');
+  await act(async () => { fireEvent.keyDown(canvas, { key: 'ArrowUp' }); });
+  assert.equal(document.querySelectorAll('.graph-node').length, 2, 'ordinary arrows do not navigate');
+  await act(async () => { fireEvent.keyDown(canvas, { key: 'ArrowUp', altKey: true }); });
+  assert.equal(document.querySelectorAll('.graph-node').length, 3, 'Alt+Up returns to the parent contents');
+  assert.equal(document.activeElement, canvas, 'up navigation keeps keyboard focus in Graph');
+  await act(async () => { fireEvent.keyDown(canvas, { key: 'ArrowUp', altKey: true }); });
+  assert.equal(document.querySelectorAll('.graph-node').length, 3, 'up at Scene stays at the root');
 });
 
 test('Graph connections point from output to input with reversed node declarations', async () => {

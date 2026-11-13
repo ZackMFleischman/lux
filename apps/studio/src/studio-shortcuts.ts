@@ -9,6 +9,7 @@ export const shortcutHint = Object.freeze({
   export: 'Ctrl+Shift+E',
   build: 'Ctrl+Enter',
   'shortcut-reference': '?',
+  'graph-up': 'Alt+↑', // Handled locally by GraphPanel, not by the global dispatcher.
 } as const);
 
 export const shortcutReference: readonly Readonly<{ command: StudioShortcutCommand; label: string }>[] = [
@@ -22,6 +23,7 @@ export const shortcutReference: readonly Readonly<{ command: StudioShortcutComma
   { command: 'maximize-panel', label: 'Maximize or restore focused panel' },
   { command: 'fullscreen', label: 'Toggle Preview fullscreen' },
   { command: 'shortcut-reference', label: 'Show keyboard shortcuts' },
+  { command: 'graph-up', label: 'Go up one level in Graph (when focused)' },
 ];
 
 export type StudioShortcutCommand = keyof typeof shortcutHint;

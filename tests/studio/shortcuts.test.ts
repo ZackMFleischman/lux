@@ -23,6 +23,7 @@ test('Studio shortcut map uses the approved Windows bindings and accepts Command
   assert.equal(shortcutCommand(key({ key: 's', ctrlKey: true, altKey: true })), null);
   assert.equal(shortcutCommand(key({ key: 'Enter', ctrlKey: true, shiftKey: true })), null);
   assert.equal(shortcutCommand(key({ key: 'F11', ctrlKey: true })), null);
+  assert.equal(shortcutCommand(key({ key: 'ArrowUp', altKey: true })), null, 'Graph up navigation is scoped to Graph focus');
 });
 
 test('shortcut hints expose the exact commands shown by menus and buttons', () => {
@@ -31,5 +32,6 @@ test('shortcut hints expose the exact commands shown by menus and buttons', () =
     'save-frame': 'Ctrl+Shift+P', 'toggle-recording': 'Ctrl+Shift+R', save: 'Ctrl+S',
     'save-as': 'Ctrl+Shift+S', export: 'Ctrl+Shift+E', build: 'Ctrl+Enter',
     'shortcut-reference': '?',
+    'graph-up': 'Alt+↑',
   });
 });
