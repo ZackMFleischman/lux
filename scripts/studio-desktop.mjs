@@ -4,7 +4,7 @@ import { spawn, execFileSync } from 'node:child_process';
 import { setTimeout } from 'node:timers/promises';
 import { pathToFileURL } from 'node:url';
 import { desktopInstallRoot } from './studio-package.mjs';
-import { resolveStudioSession, createStudioConnection } from './studio-session.mjs';
+import { resolveStudioSession, createStudioConnection, openSceneInStudio, resolveSceneArgument } from './studio-session.mjs';
 
 const inside=(root,path)=>{const rel=relative(root,path);return rel!==''&&!isAbsolute(rel)&&rel!=='..'&&!rel.startsWith('..'+sep);};
 export async function readDesktopInstallation({root=desktopInstallRoot(),recordPath=join(root,'installation.json')}={}) {
@@ -19,7 +19,8 @@ export async function readDesktopInstallation({root=desktopInstallRoot(),recordP
  return record;
 }
 function alive(pid) { if(!Number.isSafeInteger(pid)||pid<=0)return false;try{process.kill(pid,0);return true;}catch(error){return error.code!=='ESRCH';} }
-export async function desktopInfo(record,{start=false}={}) {
+export async function desktopInfo(record,{start=false,scene}={}) {
+ const scenePath=scene===undefined?undefined:await resolveSceneArgument(scene);
  const env={...process.env,LUX_STUDIO_PROFILE:record.profile};
  for(const key of ['LUX_STUDIO_SESSION_ID','LUX_STUDIO_MCP_TEST','LUX_STUDIO_SMOKE','ELECTRON_RUN_AS_NODE','LUX_STUDIO_DIST']) delete env[key];
  const session=resolveStudioSession({workspace:record.workspace,env});
@@ -36,7 +37,8 @@ export async function desktopInfo(record,{start=false}={}) {
   while(Date.now()<deadline) {try{status=await connect('status');break;}catch{await setTimeout(250);}}
   if(!status)throw Error('Installed Lux did not become ready within 60 seconds; inspect the desktop app before retrying.');
  }
- return {installed:true,running:true,...record,studioSession:status.studioSession,
+ const openedScene=scenePath?await openSceneInStudio(connect,scenePath):undefined;
+ return {installed:true,running:true,...record,studioSession:status.studioSession,...(openedScene&&{openedScene}),
   mcp:{command:record.node,args:[record.adapter],cwd:record.workspace,env:{LUX_STUDIO_PROFILE:record.profile,LUX_STUDIO_DESKTOP:'1',LUX_STUDIO_SESSION_ID:status.studioSession.sessionId}}};
 }
 export async function activateDesktop(recordPath,{root=desktopInstallRoot()}={}) {
@@ -52,6 +54,7 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).hr
  const args=process.argv.slice(2);
  const operation=args.length===2&&args[0]==='--activate'?activateDesktop(args[1]):
   args.length===1&&['--start','--status'].includes(args[0])?readDesktopInstallation().then(record=>desktopInfo(record,{start:args[0]==='--start'})):
-  Promise.reject(Error('Usage: node scripts/studio-desktop.mjs --start | --status | --activate <installation.json>'));
+  args.length===3&&args[0]==='--start'&&args[1]==='--open'?readDesktopInstallation().then(record=>desktopInfo(record,{start:true,scene:args[2]})):
+  Promise.reject(Error('Usage: node scripts/studio-desktop.mjs --start [--open <scene.lux-scene>] | --status | --activate <installation.json>'));
  operation.then(result=>console.log(JSON.stringify(result,null,2))).catch(error=>{console.error(error.message);process.exitCode=1;});
 }

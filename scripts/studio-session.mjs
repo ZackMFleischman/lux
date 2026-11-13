@@ -55,6 +55,22 @@ function validateEndpoint(endpoint, session) {
   return endpoint;
 }
 
+/** Launcher `--open <scene>`: resolve and check the path before any Studio is started. */
+export async function resolveSceneArgument(path) {
+  const { stat } = await import('node:fs/promises');
+  const scenePath = resolve(path);
+  if (!scenePath.toLowerCase().endsWith('.lux-scene')) throw Error(`Not a .lux-scene file: ${scenePath}`);
+  if (!(await stat(scenePath)).isFile()) throw Error(`Scene is not a file: ${scenePath}`);
+  return scenePath;
+}
+
+/** Open a scene in a connected Studio. Never discards unsaved work: a dirty draft is reported, not replaced. */
+export async function openSceneInStudio(connect, scenePath) {
+  const { draftVersion } = await connect('read');
+  try { return { requested: scenePath, ...await connect('scene.open', { path: scenePath, expectedDraftVersion: draftVersion }) }; }
+  catch (error) { throw Error(`Studio is running but did not open ${scenePath}: ${error.message}. The current draft and preview were kept.`); }
+}
+
 /** One adapter stays bound to one process lifetime, even if its endpoint is replaced. */
 // Outlast Studio's own operation deadline so its error, not an abort, reports a slow build.
 export function createStudioConnection(session, { timeoutMs = sourceLimits.agentOperationMs + 15000 } = {}) {

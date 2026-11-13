@@ -56,6 +56,8 @@ try {
 
 Run from the verified checkout with its installed Node. Keep a script outside the repo if preferred, resolving SDK imports against the checkout explicitly; merely changing cwd does not change ESM package resolution for a script elsewhere. For captures, retain the `image` content block and display it through the agent's image tool, or write its decoded PNG to an artifact and inspect that image. Text-only JSON output is not visual inspection.
 
+Launchers accept `--open <absolute or relative .lux-scene path>`: `node scripts/studio-creative.mjs --open <scene>` and `studio-desktop.mjs --start --open <scene>`. The scene opens right after start or reuse. A dirty draft is not discarded. On failure the current draft and preview are kept.
+
 ## Current tool shapes
 
 Read live tool schemas if available; these are the checked adapter's contracts. All tool names below have the `lux.studio.` prefix.
