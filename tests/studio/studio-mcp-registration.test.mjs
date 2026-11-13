@@ -47,9 +47,10 @@ test('MCP animation checks the running app capability before forwarding binding 
   const root=resolve(import.meta.dirname,'../..'),appData=await mkdtemp(join(tmpdir(),'lux-animation-mcp-'));
   const env=studioTestEnvironment({...process.env,APPDATA:appData}),session=resolveStudioSession({workspace:root,env});
   let capabilities={},calls=[];
+  const diagnostics={path:join(session.directory,'logs','studio.jsonl'),maxFileBytes:262144,retainedFiles:2,writable:true};
   const identity={sessionId:'12345678-1234-1234-1234-123456789abc',profile:session.profile,workspace:session.workspace,pid:process.pid};
   const bridge=await createAgentBridge(async(method,params)=>{
-    if(method==='status')return {studioSession:identity,capabilities};
+    if(method==='status')return {studioSession:identity,capabilities,diagnostics};
     calls.push({method,params});return {applied:true};
   });
   const client=new Client({name:'animation-mcp-test',version:'1.0.0'});
@@ -57,6 +58,8 @@ test('MCP animation checks the running app capability before forwarding binding 
   await mkdir(session.directory,{recursive:true});
   await writeFile(session.endpointPath,JSON.stringify({version:1,...identity,url:bridge.url,token:bridge.token}));
   await client.connect(new StdioClientTransport({command:process.execPath,args:[join(root,'scripts/studio-mcp.mjs')],cwd:root,env}));
+  const discovery=await client.callTool({name:'lux.studio.discover',arguments:{}});
+  assert.deepEqual(JSON.parse(discovery.content[0].text).runningStudio.diagnostics,diagnostics);
   const hash='a'.repeat(64),args={instanceId:'runtime',expectedGeneration:2,expectedRevisionId:'revision',expectedControlSchemaHash:hash,nodePath:[],controlId:'speed',animation:{kind:'audio',nodePath:[],definitionHash:hash,schemaHash:hash,controlId:'speed',amount:1,enabled:true,attackMs:20,releaseMs:200,source:{kind:'audio-band',logicalInputId:'primary-audio',band:'bass',analyzer:{version:1,fftSize:2048,minDecibels:-100,maxDecibels:-30}}}};
   const rejected=await client.callTool({name:'lux.studio.animation',arguments:args});
   assert.equal(rejected.isError,true);assert.match(rejected.content[0].text,/Running Studio does not support/);assert.deepEqual(calls,[]);

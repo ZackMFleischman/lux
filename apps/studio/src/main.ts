@@ -15,6 +15,7 @@ import { observeFullscreen } from './fullscreen.ts';
 import { createExportService, runExportChild } from './export-process.ts';
 import { createCloseConfirmation } from './close-confirmation.ts';
 import { resolveStudioSession } from '../../../scripts/studio-session.mjs';
+import { createStudioDiagnostics, summarizeCompilerStderr } from '../../../scripts/studio-diagnostics.mjs';
 import { ComponentLibraryStore } from '../../../packages/core/src/component-library-store.ts';
 import { validateLibraryCandidate } from '../../../packages/core/src/component-library-validation.ts';
 import { LookStore } from '../../../packages/core/src/look-store.ts';
@@ -35,6 +36,10 @@ const studioProfile = resolveStudioSession({ workspace, appData: app.getPath('ap
 const studioSession = { profile: studioProfile.profile, workspace: studioProfile.workspace,
   sessionId: randomBytes(18).toString('hex'), pid: process.pid };
 mkdirSync(studioProfile.directory, { recursive: true });
+const diagnostics = createStudioDiagnostics({ directory: studioProfile.directory, sessionId: studioSession.sessionId });
+diagnostics.write('startup.begin', { stage: 'main', code: String(process.pid) });
+process.on('uncaughtExceptionMonitor', error => diagnostics.write('process.exception', { errorName: error.name, message: error.stack ?? error.message }));
+app.on('child-process-gone', (_event, details) => diagnostics.write('process.gone', { stage: details.type, code: details.reason }));
 app.setPath('userData', studioProfile.directory);
 app.setPath('sessionData', studioProfile.directory);
 const page = join(app.getPath('userData'), 'studio-shell.html');
@@ -91,17 +96,30 @@ async function compile(source: unknown, shared = false): Promise<unknown> {
   const executable = process.env.LUX_NODE_EXECUTABLE;
   if (!executable) throw Error('Start Studio with pnpm studio');
   compiling = true;
+  const operationId = randomBytes(8).toString('hex'), started = Date.now();
+  diagnostics.write('compile.begin', { operationId, command: shared ? 'compile-document' : 'compile', stage: 'compiler' });
   try { return await new Promise((done, reject) => {
     const child = spawn(executable, [join(workspace, shared ? 'scripts/studio-compile-story.mjs' : 'scripts/studio-compile.mjs')], { cwd: workspace, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
     if (shared) child.stdout.setEncoding('utf8');
-    let output = '', bytes = 0;
+    let output = '', bytes = 0, stderr = '';
+    child.stderr.setEncoding('utf8');
     const timer = setTimeout(() => { child.kill(); reject(Error('Compile/link deadline exceeded')); }, studioCompileLimits.deadlineMs);
     child.stdout.on('data', chunk => { bytes += typeof chunk === 'string' ? Buffer.byteLength(chunk, 'utf8') : chunk.length; if (bytes > (shared ? studioCompileLimits.storyResultBytes : studioCompileLimits.resultBytes)) { child.kill(); reject(Error('Compile result exceeded its limit')); } else output += chunk; });
-    child.stderr.resume();
+    child.stderr.on('data', chunk => { stderr = (stderr + chunk).slice(-4096); });
     child.once('error', error => { clearTimeout(timer); reject(error); });
-    child.once('close', code => { clearTimeout(timer); try { if (code !== 0) throw Error('Compiler process failed'); done(JSON.parse(output)); } catch (error) { reject(error); } });
+    child.once('close', (code, signal) => { clearTimeout(timer);
+      diagnostics.write('compile.exit', { operationId, exitCode: code ?? 'none', signal: signal ?? '', elapsedMs: Date.now() - started, ...(stderr ? summarizeCompilerStderr(stderr) : {}) });
+      try { if (code !== 0) throw Error('Compiler process failed');
+        const result = JSON.parse(output);
+        if (result?.ok === false) for (const issue of result.diagnostics?.slice(0, 4) ?? []) diagnostics.write('compile.diagnostic', { operationId, code: issue.code, file: issue.file, line: issue.line, column: issue.column, message: issue.message });
+        done(result);
+      } catch (error) { reject(error); }
+    });
     child.stdin.on('error', () => {}); child.stdin.end(encoded);
-  }); } finally { compiling = false; }
+  }); } catch (error) {
+    diagnostics.write('compile.failed', { operationId, stage: 'compiler', elapsedMs: Date.now() - started, errorName: error instanceof Error ? error.name : undefined, message: error instanceof Error ? (error.stack ?? error.message) : String(error) });
+    throw error;
+  } finally { compiling = false; }
 }
 const coordinator = new StudioWindows(async closed => {
   const window = createWindow(true);
@@ -126,6 +144,8 @@ function createWindow(preview: boolean): BrowserWindow {
       additionalArguments: process.env.LUX_STUDIO_DESKTOP === '1' ? ['--lux-no-export'] : [] },
   });
   owned.add(window);
+  window.webContents.on('render-process-gone', (_event, details) => diagnostics.write('renderer.gone', { stage: preview ? 'preview' : 'main', code: details.reason }));
+  window.webContents.on('did-fail-load', (_event, code, description) => diagnostics.write('renderer.load-failed', { code, message: description }));
   window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   window.webContents.on('will-navigate', event => event.preventDefault());
   window.webContents.on('will-attach-webview', event => event.preventDefault());
@@ -135,6 +155,7 @@ function createWindow(preview: boolean): BrowserWindow {
 }
 
 app.whenReady().then(async () => {
+  diagnostics.write('startup.stage', { stage: 'electron-ready' });
   // Electron's default menu owns F11, Ctrl+Shift+I and Ctrl+Shift+R. Studio
   // handles those keys in the renderer so every entry point uses one action.
   Menu.setApplicationMenu(null);
@@ -305,6 +326,7 @@ app.whenReady().then(async () => {
     }
   });
   mainWindow = createWindow(false);
+  diagnostics.write('startup.stage', { stage: 'window-created' });
   mainWindow.once('closed', () => audioPermissions.revoke());
   ipcMain.handle('studio:agent-result', (event, id: string, result: { ok: boolean; result?: unknown; error?: string }) => {
     if (!trusted(event) || BrowserWindow.fromWebContents(event.sender) !== mainWindow) throw Error('Untrusted authoring reply');
@@ -312,14 +334,30 @@ app.whenReady().then(async () => {
     clearTimeout(pending.timer); agentRequests.delete(id);
     result.ok ? pending.resolve(result.result) : pending.reject(Error(result.error || 'Authoring operation failed'));
   });
+  let lastFault = '';
   const bridge = await createAgentBridge((method, params) => new Promise((resolve, reject) => {
     if (process.env.LUX_STUDIO_MCP_TEST === '1' && method === 'status' && (params as { shutdown?: boolean })?.shutdown) {
       resolve({ closing: true }); setTimeout(() => app.exit(0), 100); return;
     }
     if (!mainWindow || mainWindow.isDestroyed()) { reject(Error('Studio is closed')); return; }
-    const id = randomBytes(16).toString('hex');
-    const timer = setTimeout(() => { agentRequests.delete(id); reject(Error('Studio did not finish the operation in time')); }, agentTransportLimits.operationMs);
-    agentRequests.set(id, { resolve: result => resolve(method === 'status' ? { ...(result as object), studioSession } : result), reject, timer }); mainWindow.webContents.send('studio:agent-command', { id, method, params });
+    const id = randomBytes(16).toString('hex'), commandStarted = Date.now();
+    const logCommand = method !== 'status' && method !== 'read';
+    if (logCommand) diagnostics.write('command.begin', { operationId: id, command: method });
+    const timer = setTimeout(() => { agentRequests.delete(id); diagnostics.write('command.timeout', { operationId: id, command: method }); reject(Error('Studio did not finish the operation in time')); }, agentTransportLimits.operationMs);
+    agentRequests.set(id, { resolve: result => {
+      if (logCommand) diagnostics.write('command.finished', { operationId: id, command: method, elapsedMs: Date.now() - commandStarted });
+      if (method === 'status') {
+        const snapshot = result as { authoring?: { fault?: { code?: string; message?: string } }; jobs?: { jobId: string; state: string; fault?: string }[] };
+        const failed = snapshot.jobs?.find(job => job.fault);
+        const fault = snapshot.authoring?.fault;
+        const key = JSON.stringify([failed?.jobId, failed?.fault, fault]);
+        if (key !== lastFault) { lastFault = key;
+          if (failed) diagnostics.write('runtime.job-failed', { operationId: failed.jobId, stage: failed.state, message: failed.fault });
+          if (fault) diagnostics.write('runtime.fault', { code: fault.code, message: fault.message });
+        }
+      }
+      resolve(method === 'status' ? { ...(result as object), studioSession, diagnostics: diagnostics.status() } : result);
+    }, reject: error => { diagnostics.write('command.failed', { operationId: id, command: method, elapsedMs: Date.now() - commandStarted, errorName: error.name, message: error.message }); reject(error); }, timer }); mainWindow.webContents.send('studio:agent-command', { id, method, params });
   }));
   app.once('will-quit', () => { bridge.close(); for (const pending of agentRequests.values()) { clearTimeout(pending.timer); pending.reject(Error('Studio closed')); } agentRequests.clear(); });
   mainWindow.on('close', event => {
@@ -335,19 +373,26 @@ app.whenReady().then(async () => {
   });
   if (process.env.LUX_STUDIO_SMOKE === '1') setTimeout(() => { console.error('Studio smoke timeout'); app.exit(3); }, 90000);
   if (process.env.LUX_STUDIO_MCP_TEST === '1') setTimeout(() => { console.error('Studio MCP test timeout'); app.exit(3); }, 120000);
-  mainWindow.webContents.on('console-message', details => console.log('Studio:', details.message));
+  mainWindow.webContents.on('console-message', details => {
+    console.log('Studio:', details.message);
+    if (details.level === 'error' || details.level === 'warning') diagnostics.write('renderer.console', { stage: details.level });
+  });
+  diagnostics.write('startup.stage', { stage: 'bridge-ready' });
   await mainWindow.loadFile(page);
+  diagnostics.write('startup.stage', { stage: 'page-loaded' });
   let readyTimer: ReturnType<typeof setTimeout> | undefined;
   try {
     await Promise.race([agentReady, new Promise<never>((_, reject) => {
       readyTimer = setTimeout(() => reject(Error('Studio agent listener did not become ready')), 30000);
     })]);
   } finally { clearTimeout(readyTimer); }
+  diagnostics.write('startup.stage', { stage: 'agent-listener-ready' });
   const endpointTemp = `${studioProfile.endpointPath}.${studioSession.sessionId}.tmp`;
   await writeFile(endpointTemp, JSON.stringify({ version: 1, ...studioSession, url: bridge.url, token: bridge.token }));
   await rename(endpointTemp, studioProfile.endpointPath);
   mainWindow.show();
-}).catch(error => { console.error('Studio startup failed:', error); app.exit(1); });
+  diagnostics.write('startup.ready', { stage: 'agent-ready' });
+}).catch(error => { diagnostics.write('startup.failed', { message: error instanceof Error ? error.message : String(error) }); console.error('Studio startup failed:', error); app.exit(1); });
 app.on('second-instance', () => {
   if (!mainWindow || mainWindow.isDestroyed()) return;
   if (mainWindow.isMinimized()) mainWindow.restore();
