@@ -50,8 +50,10 @@ test('audio runtime reuses active capture permission for device refresh',async()
     createContext:()=>context,createAnalyzer:()=>({sample:()=>({level:0,bass:0,mids:0,highs:0,kickStrength:0}),dispose(){}}),scheduler:{request:()=>1,cancel(){}},
   });
   await runtime.connect(configuration,'cable');
+  assert.equal(runtime.getConnectedInputId(),'cable');
   assert.deepEqual(await runtime.listInputs(),[{id:'cable',label:'CABLE Output'}]);
   await runtime.disconnect();
+  assert.equal(runtime.getConnectedInputId(),undefined);
   assert.deepEqual(calls,['stop','close','revoke']);
 });
 
