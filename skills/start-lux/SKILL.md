@@ -25,6 +25,8 @@ node scripts/studio-creative.mjs
 
 The launcher uses this checkout directly. It automatically selects a separate creative profile for the checkout, builds into a private output directory, and opens Studio with a hidden helper. A responsive session is reused without rebuilding or changing its scene. The next start after Studio closes builds the current app source. No fetch, reserved version, upgrade procedure, or rollback checkout is needed. Uncommitted source in the selected checkout is included.
 
+To open a scene at once, add `--open <absolute or relative .lux-scene path>` (checkout: `node scripts/studio-creative.mjs --open <scene>`; installed app: `studio-desktop.mjs --start --open <scene>`). It works after a fresh start or when a session is reused. A dirty draft is not discarded. If the open fails, the current draft and preview are kept and the launcher reports the error.
+
 If dependencies are missing, use the pinned package manager and frozen lockfile in an idle checkout. Do not reinstall dependencies under active development or a running Studio. The launcher installs a missing pinned Electron runtime with the official checksum-verifying installer. Report concrete startup failures; do not kill another process or launch duplicates around an unreachable live session.
 
 ## Connect
