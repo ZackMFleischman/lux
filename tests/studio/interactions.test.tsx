@@ -1123,7 +1123,7 @@ test('RTL: an MCP-connected audio device replaces the previous device label',asy
   assert.equal(selector.textContent,'CABLE Output');
   assert.equal(selector.parentElement!.getAttribute('title'),'CABLE Output');
   const styles=document.createElement('style');
-  styles.textContent=await (await import('node:fs/promises')).readFile(new URL('../../apps/studio/src/studio.css',import.meta.url),'utf8');
+  styles.textContent=await (await import('node:fs/promises')).readFile('apps/studio/src/studio.css','utf8');
   document.head.append(styles);
   try {
     const backing=selector.parentElement!.querySelector('input')!;
