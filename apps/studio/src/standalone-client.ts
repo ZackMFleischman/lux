@@ -301,17 +301,14 @@ export class StandaloneClient implements StudioClient, PresentationPort {
     this.audioRuntimes.add(candidate);
     const previous = this.running;
     let ready = false,initialized=false,latestStatus:any;
-    let startupStage='worker-start';
-    const startupDetail=()=>` (stage: ${startupStage})`;
+
     let synchronization:Readonly<{requestId:string;kind:'controls'|'animations'|'playback'|'tempo';animationSourceSequence?:number;animationSequence?:number;expectedControlAnimations?:readonly ControlAnimationBinding[];tempoSequence?:number}>|undefined;
     let reconciledAnimationSequence=previous?.state.animationSequence??0;
     let reconciledTempoSequence=tempoSequence;
     let synchronizeCandidate:()=>void=()=>{};
     try {
       await new Promise<void>((resolve, reject) => {
-        const abort = (error: Error) => { clearTimeout(timer); this.stop(candidate, error.message); reject(error); };
-        const timer = setTimeout(() => abort(Error('Visual initialization exceeded five seconds'+startupDetail())), 5000);
-        candidate.activationTimer = timer;
+        const abort = (error: Error) => { this.stop(candidate, error.message); reject(error); };
         const fail = (message: string) => { if (!ready) abort(Error(message)); else this.fault(candidate, message); };
         const publishRuntime=(message:any)=>this.publish({ authoring: { instanceId: candidate.instanceId, generation: candidate.generation, revisionId,
           ...('linkedVersion' in linked&&linked.linkedVersion===5?{composition:linked.composition}:{}),
@@ -324,7 +321,7 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           if(ready||!initialized||!latestStatus)return;
           if(playbackIntent?.settling||synchronization)return;
           if(playbackIntent&&candidate.playback!==(playbackIntent.playing?'playing':'paused'))return;
-          ready=true;clearTimeout(timer);this.running=candidate;
+          ready=true;this.running=candidate;
           if(previous){this.stop(previous,'Runtime changed before command completed');previous.canvas.remove();}
           this.target?.appendChild(canvas);this.publish({performance:candidate.performance.snapshot});publishRuntime(latestStatus);resolve();
         };
@@ -373,12 +370,12 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           postSynchronization('playback',{type:'playback',action:playbackIntent.playing?'play':'pause'});
         };
         if(playbackIntent)playbackIntent.synchronize=synchronizeCandidate;
-        // Candidate JS needs the same liveness deadline as an accepted worker.
-        // Healthy asynchronous startup can still use the independent 5 s cap.
+        // Loading is user-controlled: trusted admission and first-frame preparation
+        // have no fixed deadline. Only an accepted runtime is watchdog-monitored.
         candidate.watchdog = setInterval(() => {
           const now = performance.now();
           if(this.running===candidate&&candidate.performance.age(now))this.publish({performance:candidate.performance.snapshot});
-          if (now - candidate.lastHeartbeat >= 1250) fail(ready ? 'Visual stopped making progress. Restart the runtime to retry.' : 'Visual initialization stopped making progress'+startupDetail());
+          if (ready && now - candidate.lastHeartbeat >= 1250) fail('Visual stopped making progress. Restart the runtime to retry.');
           else if (ready && this.snapshot.authoring?.playback === 'playing' && now - candidate.lastFrame >= 1250) fail('Visual stopped completing frames. Restart the runtime to retry.');
         }, 250);
         worker.onerror = event => fail(event.message);
@@ -386,7 +383,9 @@ export class StandaloneClient implements StudioClient, PresentationPort {
           const message = event.data;
           if (candidate.terminal || message?.instanceId !== candidate.instanceId || message.generation !== candidate.generation || message.revisionId !== candidate.revisionId) return;
           if(message.type==='startup-progress'){
-            if(!ready&&['admission','module-import','gpu-device','renderer','create','first-update','shader-compile','first-render','gpu-completion'].includes(message.stage))startupStage=message.stage;
+            if(!ready&&['admission','module-import','gpu-device','renderer','create','first-update','shader-compile','first-render','gpu-completion'].includes(message.stage)){
+              this.publish({jobs:this.snapshot.jobs.map(job=>job.state==='initializing'?{...job,summary:`Loading visual: ${message.stage}…`}:job)});
+            }
             return; // A stage transition is diagnostic; it never refreshes liveness.
           }
           if(message.type==='performance') {
