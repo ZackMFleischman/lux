@@ -415,3 +415,9 @@ test('saving a look above the scene format resolution limit gives a short action
  assert.throws(()=>f.client.acceptedDocument(),{message:'Set Preview to 1920 × 1080 or smaller before saving a look.'});
  WorkerFixture.all.forEach(worker=>worker.terminate());f.scheduled.clear();
 });
+
+test('startup failure identifies the last validated stage without treating stage messages as liveness',async t=>{
+ const f=fixture(t);const rejected=assert.rejects(f.client.submit(source),/initialization stopped making progress.*shader-compile/);await f.flush();const candidate=WorkerFixture.all.at(-1)!;
+ await f.advance(1000);candidate.reply({type:'startup-progress',stage:'shader-compile'});
+ await f.advance(250);await rejected;assert.equal(candidate.terminated,true);
+});
