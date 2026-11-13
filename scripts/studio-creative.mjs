@@ -4,7 +4,7 @@ import { mkdir, readFile, writeFile, realpath, rmdir, unlink } from 'node:fs/pro
 import { isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { setTimeout } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
-import { canonicalWorkspace, createStudioConnection, resolveStudioSession, studioAppData } from './studio-session.mjs';
+import { canonicalWorkspace, createStudioConnection, openSceneInStudio, resolveSceneArgument, resolveStudioSession, studioAppData } from './studio-session.mjs';
 import { ensureElectron } from './studio-electron.mjs';
 
 function git(root, args) {
@@ -69,8 +69,16 @@ export async function verifyCreativeDependencies(checkout) {
 }
 
 
-export async function startCreativeStudio({ source, prepareOnly = false, env = creativeEnvironment(source), appData = studioAppData(env) }) {
+export async function startCreativeStudio({ source, prepareOnly = false, scene, env = creativeEnvironment(source), appData = studioAppData(env) }) {
   const session = resolveStudioSession({ workspace: source, appData, env });
+  const scenePath = scene === undefined ? undefined : await resolveSceneArgument(scene);
+  const result = await launchCreativeStudio({ source, prepareOnly, session, appData, env });
+  if (!scenePath || prepareOnly) return result;
+  const connect = createStudioConnection({ ...session, expectedSessionId: result.studioSession.sessionId });
+  return { ...result, openedScene: await openSceneInStudio(connect, scenePath) };
+}
+
+async function launchCreativeStudio({ source, prepareOnly, session, appData, env }) {
   const directory = session.directory;
   return locked(directory, 'launch.lock', async () => {
     const pendingPath = join(directory, 'launch.json');
@@ -126,8 +134,11 @@ export async function startCreativeStudio({ source, prepareOnly = false, env = c
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
-  if (args.some(arg => arg !== '--prepare')) { console.error('Usage: node scripts/studio-creative.mjs [--prepare]'); process.exitCode = 1; }
-  else startCreativeStudio({ source: resolve(import.meta.dirname, '..'), prepareOnly: args.includes('--prepare') })
+  const openAt = args.indexOf('--open');
+  const scene = openAt >= 0 ? args[openAt + 1] : undefined;
+  const rest = openAt >= 0 ? args.filter((_, i) => i !== openAt && i !== openAt + 1) : args;
+  if ((openAt >= 0 && !scene) || rest.some(arg => arg !== '--prepare')) { console.error('Usage: node scripts/studio-creative.mjs [--prepare] [--open <scene.lux-scene>]'); process.exitCode = 1; }
+  else startCreativeStudio({ source: resolve(import.meta.dirname, '..'), prepareOnly: rest.includes('--prepare'), scene })
     .then(result => console.log(JSON.stringify(result, null, 2)))
     .catch(error => { console.error(error.message); process.exitCode = 1; });
 }
