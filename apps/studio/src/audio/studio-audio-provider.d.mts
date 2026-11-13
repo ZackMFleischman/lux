@@ -10,7 +10,7 @@ export type StudioAudioProvider = Readonly<{
   subscribe(listener: () => void): () => void;
   dispose(): Promise<void>;
 }>;
-export type AudioCapture = Readonly<{ stream: MediaStream; context: AudioContext }>;
+export type AudioCapture = Readonly<{ stream: MediaStream; context: AudioContext; dispose?(): void }>;
 export type AudioFrameScheduler = Readonly<{ request(callback: FrameRequestCallback): number; cancel(id: number): void }>;
 export function createStudioAudioProvider(options: Readonly<{
   openCapture(request: Readonly<{ configuration: AudioInputConfiguration; localDeviceId?: string }>): Promise<AudioCapture>;

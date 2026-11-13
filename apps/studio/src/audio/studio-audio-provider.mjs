@@ -28,6 +28,7 @@ function normalizeBands(input) {
 async function cleanupCapture(capture, analyzer, detach = () => {}) {
   detach();
   try { analyzer?.dispose(); } catch { /* Continue releasing owned capture. */ }
+  try { capture?.dispose?.(); } catch { /* Continue releasing owned capture. */ }
   let tracks = [];
   try { tracks = capture?.stream?.getTracks?.() ?? []; } catch { /* Continue closing owned context. */ }
   for (const track of tracks) {
