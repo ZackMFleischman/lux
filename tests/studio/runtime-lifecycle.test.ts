@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {setTimeout as delay} from 'node:timers/promises';
 import assert from 'node:assert/strict';
 import { StandaloneClient } from '../../apps/studio/src/standalone-client.ts';
 import { StudioController } from '../../apps/studio/src/service-client.ts';
@@ -122,7 +123,7 @@ test('scene Open autoplays accepted source and a failed later Open retains the p
   const session=createAuthoringSession(workspace,{submit:(value,options)=>f.client.submit(value,options),save:async()=>null,
     getControls:()=>({intensity:.5}),open:async()=>({token:'scene',name:'scene.lux-scene',document:{format:'lux-scene',version:1,
       source:incoming,settings:{width:1920,height:1080,fps:60,seed:0},controls:{intensity:.7}}})});
-  const opening=session.open();for(let i=0;i<20&&WorkerFixture.all.length===0;i++)await new Promise<void>(resolve=>setImmediate(resolve));const loaded=WorkerFixture.all.at(-1)!;
+  const opening=session.open();for(let i=0;i<100&&WorkerFixture.all.length===0;i++)await delay(5);const loaded=WorkerFixture.all.at(-1)!;
   assert.equal(loaded.init.playing,true);loaded.reply({type:'ready'});await opening;
   assert.equal(f.client.getSnapshot().authoring!.playback,'playing');assert.equal(workspace.getSnapshot().source.files['visual.ts'],'loaded');
   const controller=new StudioController(f.client),pause=controller.playback('pause'),request=loaded.messages.at(-1)!;
@@ -186,23 +187,25 @@ test('baseline selection reaches initial and restarted workers without changing 
  retry.reply({type:'ready'});await f.flush();assert.equal(f.client.getSnapshot().authoring!.playback,'playing');
 });
 
-test('silent candidate is terminated at 1250 ms while previous preview survives', async t => {
-  const f = fixture(t), old = await f.start(); old.reply({ playback: 'paused' });
-  const previous = f.client.getSnapshot().authoring;
-  const rejected = assert.rejects(f.client.submit(source), /initialization stopped making progress/); await f.flush();
-  const candidate = WorkerFixture.all.at(-1)!;
-  await f.advance(1000); old.reply({ type: 'heartbeat' }); assert.equal(candidate.terminated, false);
-  await f.advance(250); assert.equal(candidate.terminated, true); await rejected;
-  assert.equal(old.terminated, false); assert.equal(f.client.getSnapshot().authoring, previous);
+test('candidate loading has no heartbeat or activation deadline and retains the previous preview',async t=>{
+ const f=fixture(t),old=await f.start();old.reply({playback:'paused'});const previous=f.client.getSnapshot().authoring;
+ const pending=f.client.submit(source);pending.catch(()=>{});await f.flush();const candidate=WorkerFixture.all.at(-1)!;
+ candidate.reply({type:'startup-progress',stage:'admission'});
+ for(let i=0;i<40;i++){await f.advance(250);old.reply({type:'heartbeat'});}
+ assert.equal(candidate.terminated,false);assert.equal(old.terminated,false);assert.equal(f.client.getSnapshot().authoring,previous);
+ candidate.reply({type:'heartbeat'});candidate.reply({type:'startup-progress',stage:'shader-compile'});
+ for(let i=0;i<40;i++){await f.advance(250);old.reply({type:'heartbeat'});}
+ assert.equal(candidate.terminated,false);candidate.reply({type:'ready'});await pending;
+ assert.equal(old.terminated,true);assert.equal(f.client.getSnapshot().authoring!.generation,candidate.init.generation);
 });
-test('healthy candidate heartbeats permit slow initialization until the independent five-second cap', async t => {
-  const f = fixture(t); const pending = f.client.submit(source); await f.flush(); const worker = WorkerFixture.all.at(-1)!;
-  for (let i = 0; i < 18; i++) { await f.advance(250); worker.reply({ type: 'heartbeat' }); }
-  assert.equal(worker.terminated, false); worker.reply({ type: 'ready' }); await pending;
-  const reject = assert.rejects(f.client.submit(source), /five seconds/); await f.flush(); const slow = WorkerFixture.all.at(-1)!;
-  for (let i = 0; i < 19; i++) { await f.advance(250); worker.reply({ type: 'heartbeat' }); slow.reply({ type: 'heartbeat' }); }
-  await f.advance(250); await reject; assert.equal(slow.terminated, true);
+
+test('an explicit startup failure still terminates the candidate and retains the accepted preview',async t=>{
+ const f=fixture(t),old=await f.start();old.reply({playback:'paused'});const previous=f.client.getSnapshot().authoring;
+ const rejected=assert.rejects(f.client.submit(source),/actual asset failure/);await f.flush();const candidate=WorkerFixture.all.at(-1)!;
+ candidate.reply({type:'failure',message:'actual asset failure'});await rejected;
+ assert.equal(candidate.terminated,true);assert.equal(old.terminated,false);assert.equal(f.client.getSnapshot().authoring,previous);
 });
+
 test('paused stalled commands fault the runtime and settle all pending waiters', async t => {
   const f = fixture(t), worker = await f.start();
   worker.reply({ playback: 'paused' });
@@ -414,4 +417,11 @@ test('saving a look above the scene format resolution limit gives a short action
  const resizing=f.client.invoke({name:'lux.preview.resize',input:{requestId:'large-look',instanceId:runtime.instanceId,expectedGeneration:runtime.generation,width:2560,height:1440}});await f.flush();WorkerFixture.all.at(-1)!.reply({type:'ready'});await resizing;
  assert.throws(()=>f.client.acceptedDocument(),{message:'Set Preview to 1920 × 1080 or smaller before saving a look.'});
  WorkerFixture.all.forEach(worker=>worker.terminate());f.scheduled.clear();
+});
+
+test('startup stage progress is visible while slow loading remains active',async t=>{
+ const f=fixture(t);const pending=f.client.submit(source);pending.catch(()=>{});await f.flush();const candidate=WorkerFixture.all.at(-1)!;
+ candidate.reply({type:'startup-progress',stage:'shader-compile'});await f.advance(30000);
+ assert.equal(candidate.terminated,false);assert.match(f.client.getSnapshot().jobs[0]!.summary,/shader-compile/);
+ candidate.reply({type:'ready'});await pending;await f.advance(1250);assert.equal(candidate.terminated,true,'the accepted runtime still has its heartbeat watchdog');
 });
