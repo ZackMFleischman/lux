@@ -390,7 +390,16 @@ app.whenReady().then(async () => {
   diagnostics.write('startup.stage', { stage: 'agent-listener-ready' });
   const endpointTemp = `${studioProfile.endpointPath}.${studioSession.sessionId}.tmp`;
   await writeFile(endpointTemp, JSON.stringify({ version: 1, ...studioSession, url: bridge.url, token: bridge.token }));
-  await rename(endpointTemp, studioProfile.endpointPath);
+  // Windows refuses to replace a file another process has open (EPERM/EBUSY/EACCES).
+  // Launchers and adapters read the endpoint while polling, so retry briefly.
+  for (let attempt = 0; ; attempt++) {
+    try { await rename(endpointTemp, studioProfile.endpointPath); break; }
+    catch (error) {
+      const code = (error as NodeJS.ErrnoException).code;
+      if (attempt >= 40 || !['EPERM', 'EBUSY', 'EACCES'].includes(code ?? '')) throw error;
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+  }
   mainWindow.show();
   diagnostics.write('startup.ready', { stage: 'agent-ready' });
 }).catch(error => { diagnostics.write('startup.failed', { message: error instanceof Error ? error.message : String(error) }); console.error('Studio startup failed:', error); app.exit(1); });

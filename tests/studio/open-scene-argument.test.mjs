@@ -51,3 +51,21 @@ test('openSceneInStudio wraps open failures and says the draft was kept', async 
   await assert.rejects(openSceneInStudio(connect, 'a.lux-scene'),
     /did not open a\.lux-scene: draft has unsaved changes\. The current draft and preview were kept\./);
 });
+
+test('openSceneInStudio waits while a starting Studio is busy, then opens', async () => {
+  let opens = 0;
+  const connect = async method => {
+    if (method === 'read') return { draftVersion: 7 };
+    if (++opens === 1) throw Error('Studio is busy');
+    if (opens === 2) throw Error('Editor changed; read its source again');
+    return { draftVersion: 8 };
+  };
+  const result = await openSceneInStudio(connect, 'C:/x/a.lux-scene', { sleep: async () => {} });
+  assert.equal(opens, 3);
+  assert.equal(result.draftVersion, 8);
+});
+
+test('openSceneInStudio stops waiting for busy after its deadline', async () => {
+  const connect = async method => { if (method === 'read') return { draftVersion: 1 }; throw Error('Studio is busy'); };
+  await assert.rejects(openSceneInStudio(connect, 'C:/x/a.lux-scene', { busyTimeoutMs: 0, sleep: async () => {} }), /busy\. The current draft and preview were kept/);
+});
