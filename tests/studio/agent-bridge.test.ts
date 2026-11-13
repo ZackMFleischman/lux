@@ -20,7 +20,7 @@ test('local agent bridge forwards every authoring method and rejects unknown met
   const calls: unknown[] = [];
   const bridge = await createAgentBridge(async (method, params) => { calls.push({ method, params }); return { applied: true }; });
   try {
-    const methods=['read','build','capture','status','parameters','trigger','variation','playback','restart','tempo.set','tempo.tap','story.read','story.transport','scene.save','scene.open','library.list','library.read','library.create','library.update'];
+    const methods=['read','build','capture','status','audio.inputs','audio.connect','audio.disconnect','parameters','trigger','animation','variation','playback','restart','tempo.set','tempo.tap','story.read','story.transport','scene.save','scene.open','library.list','library.read','library.create','library.update'];
     for (const method of methods) {
       const params = { instanceId: 'runtime', expectedGeneration: 2 };
       const response = await fetch(bridge.url, { method: 'POST', headers: { authorization: `Bearer ${bridge.token}` }, body: JSON.stringify({ id: method, method, params }) });

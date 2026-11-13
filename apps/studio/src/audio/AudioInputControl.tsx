@@ -15,7 +15,7 @@ export function AudioInputControl({provider,onError,configuration=defaultConfigu
   const configurationKey=JSON.stringify(configuration),priorConfiguration=useRef(configurationKey),currentConfiguration=useRef(configurationKey),operation=useRef(0),currentDevice=useRef(device);
   currentConfiguration.current=configurationKey;
   currentDevice.current=device;
-  useEffect(()=>provider.subscribe(()=>{const snapshot=provider.getSnapshot();setPhase(current=>snapshot.available?(current==='connecting'?'connected':current):(current==='connected'?'unavailable':current));setMonitoring(provider.getMonitoring());}),[provider]);
+  useEffect(()=>provider.subscribe(()=>{const snapshot=provider.getSnapshot();if(snapshot.available&&provider.getConnectedInputId){const id=provider.getConnectedInputId()??'';setDevice(id);currentDevice.current=id;}setPhase(current=>snapshot.available?'connected':(current==='connected'?'unavailable':current));setMonitoring(provider.getMonitoring());}),[provider]);
   useEffect(()=>()=>{operation.current++;void provider.dispose();},[provider]);
   useEffect(()=>{
     let disposed=false,refreshId=0;

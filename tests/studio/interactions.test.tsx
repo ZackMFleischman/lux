@@ -1108,3 +1108,18 @@ test('RTL: sequence timing is visible before launch and selection does not alter
   await waitFor(()=>assert.equal(calls.length,1));
   assert.deepEqual(calls[0][0],{action:'start',occurrenceId:'hold-b'});
 });
+
+
+test('RTL: an MCP-connected audio device replaces the previous device label',async()=>{
+  const {AudioInputControl}=await import('../../apps/studio/src/audio/AudioInputControl.tsx');
+  localStorage.clear();let connected=false,listener:()=>void=()=>{};
+  const provider:any={getSnapshot:()=>({available:connected}),getMonitoring:()=>false,getConnectedInputId:()=>connected?'cable':undefined,
+    listInputs:async()=>[{id:'cable',label:'CABLE Output'}],subscribeDevices:()=>()=>{},subscribe:(next:()=>void)=>{listener=next;return()=>{};},dispose:async()=>{}};
+  render(<AudioInputControl provider={provider} onError={()=>{}}/>);
+  await waitFor(()=>assert.ok(screen.getByRole('button',{name:'Connect'})));
+  await act(async()=>{connected=true;listener();});
+  assert.equal(screen.getByRole('status').textContent,'Connected');
+  assert.equal(screen.getByRole('combobox',{name:'Audio input device'}).textContent,'CABLE Output');
+  await act(async()=>{connected=false;listener();});
+  assert.equal(screen.getByRole('status').textContent,'Unavailable');
+});
