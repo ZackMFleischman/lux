@@ -34,7 +34,7 @@ async function requireParameterKinds(input){
   if(kinds.some(kind=>!status.capabilities?.parameterKinds?.includes(kind)))throw Error('Running Studio does not support these parameter types. Use the adapter and Studio from the same build.');
 }
 async function runningStudio() {
-  try { const status = await call('status'); return { connected: true, studioSession: status.studioSession, capabilities: status.capabilities ?? null,
+  try { const status = await call('status'); return { connected: true, studioSession: status.studioSession, diagnostics: status.diagnostics ?? null, capabilities: status.capabilities ?? null,
     compatible: status.capabilities?.codeDeclaredParameters === true && status.capabilities?.supportedSdkVersions?.includes('0.4.0'),
     advice: status.capabilities?.codeDeclaredParameters && status.capabilities?.supportedSdkVersions?.includes('0.4.0') ? undefined : 'Running Studio predates this adapter; restart from the matching checkout before using SDK 0.4 composition.' }; }
   catch (error) { return { connected: false, compatible: false,

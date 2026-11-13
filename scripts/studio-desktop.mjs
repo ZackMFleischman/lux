@@ -3,6 +3,7 @@ import { join, resolve, relative, sep, isAbsolute } from 'node:path';
 import { spawn, execFileSync } from 'node:child_process';
 import { setTimeout } from 'node:timers/promises';
 import { pathToFileURL } from 'node:url';
+import { diagnosticLocation } from './studio-diagnostics.mjs';
 import { desktopInstallRoot } from './studio-package.mjs';
 import { resolveStudioSession, createStudioConnection } from './studio-session.mjs';
 
@@ -29,14 +30,14 @@ export async function desktopInfo(record,{start=false}={}) {
  catch(error) {
   let endpoint;try{endpoint=JSON.parse(await readFile(session.endpointPath,'utf8'));}catch(e){if(e.code!=='ENOENT')throw e;}
   if(alive(endpoint?.pid))throw Error(`An existing desktop Lux is running but does not match this installation: ${error.message}`);
-  if(!start)return {installed:true,running:false,...record};
+  if(!start)return {installed:true,running:false,...record,diagnostics:diagnosticLocation(session.directory)};
   const child=spawn(record.executable,[],{cwd:record.directory,env,detached:true,windowsHide:false,stdio:'ignore'});
   await new Promise((yes,no)=>{child.once('spawn',yes);child.once('error',no);});child.unref();
   const deadline=Date.now()+60000;
   while(Date.now()<deadline) {try{status=await connect('status');break;}catch{await setTimeout(250);}}
-  if(!status)throw Error('Installed Lux did not become ready within 60 seconds; inspect the desktop app before retrying.');
+  if(!status)throw Error('Installed Lux did not become ready within 60 seconds; diagnostics: '+diagnosticLocation(session.directory).path);
  }
- return {installed:true,running:true,...record,studioSession:status.studioSession,
+ return {installed:true,running:true,...record,studioSession:status.studioSession,diagnostics:status.diagnostics ?? diagnosticLocation(session.directory),
   mcp:{command:record.node,args:[record.adapter],cwd:record.workspace,env:{LUX_STUDIO_PROFILE:record.profile,LUX_STUDIO_DESKTOP:'1',LUX_STUDIO_SESSION_ID:status.studioSession.sessionId}}};
 }
 export async function activateDesktop(recordPath,{root=desktopInstallRoot()}={}) {

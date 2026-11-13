@@ -61,3 +61,5 @@ Capture the actual completed frame and inspect its composition, silhouette, pale
 Respect the user's explicit play/pause state after Build or Open completes. A paused preview can be captured immediately; waiting does not make it animate. When animation verification is needed and consistent with the user's intent, use the playback tool and inspect separated frames. Restore a pause changed only for testing. Do not substitute frame count for visual judgment.
 
 Briefly report what changed, which controls are live versus source settings, and what was actually inspected. Save/Open, Preview frame/video capture, and export are Studio UI workflows unless discovery provides newer tools. A successful build does **not** imply the scene was saved, captured, or exported.
+
+For failures in a matching build, read the local log path returned by `status.diagnostics` or `discover.runningStudio.diagnostics`; see the connection reference for bounded retention and privacy rules.
