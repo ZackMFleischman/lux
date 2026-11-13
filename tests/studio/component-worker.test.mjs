@@ -98,7 +98,14 @@ test('explicit resets run individually, preserve controls, and reset rejection t
 });
 test('backend rejection restores target; forced termination remains separate from graceful cleanup',async()=>{
  const rejected=await fixture({renderFailure:true});assert.equal((await rejected.send(rejected.initial)).type,'failure');assert.ok(rejected.events.includes('restore'));assert.ok(!rejected.events.includes('present'));
- const stuck=await fixture({create:'await new Promise(()=>{});'});stuck.post(stuck.initial);await stuck.flush();assert.ok(stuck.events.includes('create'));assert.ok(!stuck.events.includes('authored-dispose'));assert.ok(!stuck.events.includes('ready'));
+ const stuck=await fixture({create:'await new Promise(()=>{});'});stuck.post(stuck.initial);await stuck.until('create');assert.ok(stuck.events.includes('create'));assert.ok(!stuck.events.includes('authored-dispose'));assert.ok(!stuck.events.includes('ready'));
  // This VM is abandoned like a terminated worker. No graceful acknowledgment,
  // authored disposal, backend settlement or GPU drain is inferred from it.
+});
+
+
+test('component update receives the same measured spectrum frame field',async()=>{
+ const f=await fixture(),spectrum={sampleRate:48000,fftSize:2048,scale:'log',minFrequency:20,maxFrequency:24000,magnitudes:Array(128).fill(.4)};
+ await f.send({...f.initial,playing:true,audioSnapshot:{generation:1,sequence:1,available:true,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0,spectrum}});
+ assert.equal(f.frames.at(-1).audioSpectrum.magnitudes[12],.4);assert.equal(f.frames.at(-1).audioSpectrum.sampleRate,48000);
 });

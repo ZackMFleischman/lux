@@ -1,9 +1,10 @@
+export type {AudioSpectrumFrame};
 // Internal root-output profile. Public Studio admission remains SDK 0.1/0.2.
 import { normalizeComponentDeclaration } from '../../runtime-contracts/src/components.mjs';
 import type { ComponentDeclaration, ComponentMetadata } from '../../runtime-contracts/src/components.mjs';
 import type { ControlDeclarations, ControlsOf, ControlTriggerEvent, NumberControlIdsOf, ValidControlDeclarations } from '../../runtime-contracts/src/parameters.mjs';
 export type { ControlTriggerEvent, TriggerControlDefinition, TriggerDeclaration, TriggerIdsOf } from '../../runtime-contracts/src/parameters.mjs';
-import type { OutputSettings } from '../../runtime-contracts/src/index.ts';
+import type { AudioSpectrumFrame, OutputSettings } from '../../runtime-contracts/src/index.ts';
 export const sdkVersion = '0.3.0' as const;
 declare const imageResourceBrand: unique symbol;
 export interface ImageResource {
@@ -14,6 +15,7 @@ export interface ImageResource {
 export type EmptyInputs = Readonly<Record<string, never>>;
 export interface EvaluationContext { render(scene: unknown, camera: unknown): Promise<ImageResource> }
 export interface ComponentFrame<C extends ControlDeclarations = ControlDeclarations> {
+  readonly audioSpectrum?: AudioSpectrumFrame;
   readonly tick: number; readonly timeSeconds: number; readonly deltaSeconds: number;
   readonly controls: ControlsOf<C>; readonly events: readonly ControlTriggerEvent<C>[];
   readonly sampleControl?: (controlId: NumberControlIdsOf<C>, instanceKey: string | number) => number;

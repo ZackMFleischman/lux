@@ -1,10 +1,8 @@
 import type { AudioInputConfiguration } from './audio-contract.mjs';
 import type { AudioBandAnalyzer } from './audio-analysis.mjs';
 
-export type AudioBandSnapshot = Readonly<{
-  generation: number; sequence: number; available: boolean;
-  level: number; bass: number; mids: number; highs: number;kickSequence:number;kickStrength:number;
-}>;
+export type {AudioBandSnapshot} from '../../../../packages/runtime-contracts/src/audio-input.mjs';
+import type {AudioBandSnapshot} from '../../../../packages/runtime-contracts/src/audio-input.mjs';
 export type StudioAudioProvider = Readonly<{
   connect(configuration: AudioInputConfiguration, localDeviceId?: string): Promise<void>;
   disconnect(): Promise<void>;

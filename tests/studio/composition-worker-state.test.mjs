@@ -25,6 +25,7 @@ test('worker evaluates one node LFO without replacing its base or changing a sib
  assert.equal(state.nodeValues([kaleidoscopeAId],0).segments,9);
  assert.equal(state.nodeValues([kaleidoscopeBId],0).segments,6);
  assert.equal(state.values(0).segmentsA,9);
+ assert.equal(state.state(0).effectiveControls?.segmentsA,9,'public status must project the animated leaf value');
  assert.deepEqual(state.state().controls,{ballIntensity:.6,segmentsA:6,segmentsB:6},'status and persistence retain base values');
  assert.equal(state.values(.5).segmentsA,6);
 });

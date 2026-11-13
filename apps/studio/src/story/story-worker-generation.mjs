@@ -1,3 +1,4 @@
+import {createAudioSpectrumFrameState} from '../../../../packages/runtime-contracts/src/audio-input.mjs';
 import {SeededRandom} from '../../../../packages/runtime/src/seed.ts';
 import {createStorySchedule} from '../controls/story-schedule.mjs';
 import {createStoryGenerationRuntime} from '../controls/story-generation-runtime.mjs';
@@ -10,6 +11,7 @@ const descriptor=Object.getOwnPropertyDescriptor,createObject=Object.create;
 function method(instance,name){const value=instance?.[name];if(typeof value!=='function')throw new RuntimeError('Visual missing '+name);return value;}
 
 export function createStoryWorkerGeneration({identity,manifest,initialVisualStates,factories,sharedModules,renderer,device,compositor,settings,tempoClock,sampleTime,onPreparedReceipt,onIntermediateFrame,onError}){
+ const audioSpectrumState=createAudioSpectrumFrameState();let audioPlaying=false;
  const visualRows=new MapCtor(),baseControls=new MapCtor(),slotsByVisual=new MapCtor(),pendingControlsByVisual=new MapCtor(),freeTargets=new SetCtor([0,1]);
  for(let index=0;index<manifest.visuals.length;index++)mapSet(visualRows,manifest.visuals[index].visualId,manifest.visuals[index]);
  for(let index=0;index<initialVisualStates.length;index++){const state=initialVisualStates[index],prepared=factories.visual(state.visualId);mapSet(baseControls,state.visualId,prepared.controls.createSlot());mapSet(slotsByVisual,state.visualId,new SetCtor());mapSet(pendingControlsByVisual,state.visualId,new SetCtor());}
@@ -38,7 +40,7 @@ export function createStoryWorkerGeneration({identity,manifest,initialVisualStat
  }
  async function renderSlot(slot,storyFrame,now=slot.renderTime??0){
   const tempo=tempoClock.snapshot(now),events=freeze(arraySplice(slot.events,0));
-  await apply(slot.captured.update,slot.instance,[freeze({tick:tick++,timeSeconds:now,deltaSeconds:slot.firstRender?0:maxDelta(now-slot.lastTime),controls:slot.controls.values(now,tempo.beatPosition),events,story:storyFrame,sampleControl:(controlId,instanceKey)=>slot.controls.sample(freeze([]),controlId,instanceKey,now,tempo.beatPosition)})]);
+  await apply(slot.captured.update,slot.instance,[freeze({tick:tick++,timeSeconds:now,deltaSeconds:slot.firstRender?0:maxDelta(now-slot.lastTime),controls:slot.controls.values(now,tempo.beatPosition),events,story:storyFrame,audioSpectrum:audioSpectrumState.frame(audioPlaying),sampleControl:(controlId,instanceKey)=>slot.controls.sample(freeze([]),controlId,instanceKey,now,tempo.beatPosition)})]);
   await slot.scope.run(()=>apply(slot.captured.render,slot.instance,[freeze({width:settings.width,height:settings.height,colorSpace:'linear-srgb',alphaMode:'premultiplied'})]));slot.lastTime=now;slot.firstRender=false;
  }
  const maxDelta=value=>value>0?value:0;
@@ -50,8 +52,8 @@ export function createStoryWorkerGeneration({identity,manifest,initialVisualStat
  function setRenderTime(now){runtime.forEachSlot(slot=>{slot.renderTime=now;});}
  async function initialize(now){runtime.initialize(now);await runtime.idle();if(!schedule.status(now).committed)throw new RuntimeError('Story Normal visual did not commit');}
  function command(input,now){setRenderTime(now);return runtime.command(input,now);}
- async function draw(now,frameId,previewPlaying=true){setRenderTime(now);return runtime.draw(now,frameId,previewPlaying);}
- async function reset(now){
+ async function draw(now,frameId,previewPlaying=true){audioPlaying=previewPlaying;setRenderTime(now);return runtime.draw(now,frameId,previewPlaying);}
+ async function reset(now){audioSpectrumState.reset();
   const current=schedule.status(now);if(current.outgoing||current.pendingPreparation)throw new RuntimeError('Story reset is unavailable during a transition');
   if(current.committed?.visualId!==manifest.story.normalVisualId){runtime.command({action:'return-normal',commandId:null},now);await runtime.idle();}
   const operations=[];runtime.forEachSlot(slot=>{operations[operations.length]=apply(slot.captured.reset,slot.instance,[settings.seed]);slot.lastTime=now;});for(let index=0;index<operations.length;index++)await operations[index];
@@ -59,7 +61,7 @@ export function createStoryWorkerGeneration({identity,manifest,initialVisualStat
  function eachVisualSlot(visualId,callback){const rows=arrayFrom(setValues(mapGet(slotsByVisual,visualId))),pending=arrayFrom(setValues(mapGet(pendingControlsByVisual,visualId)));for(let index=0;index<rows.length;index++)callback(rows[index]);for(let index=0;index<pending.length;index++)callback(pending[index]);}
  function controls(message){const base=mapGet(baseControls,message.visualId);if(!base)throw new RuntimeError('Story visual is unavailable');base.apply(message.values,message.controlSequence,message.controlSchemaHash);eachVisualSlot(message.visualId,slot=>slot.controls.apply(message.values,message.controlSequence,message.controlSchemaHash));}
  function animations(message,now){const base=mapGet(baseControls,message.visualId);if(!base)throw new RuntimeError('Story visual is unavailable');base.applyAnimations(message.controlAnimations,message.animationSequence,now);eachVisualSlot(message.visualId,slot=>slot.controls.applyAnimations(message.controlAnimations,message.animationSequence,now));}
- function audio(snapshot,context){latestAudio=freeze({snapshot,context});const bases=arrayFrom(mapValues(baseControls));for(let index=0;index<bases.length;index++)bases[index].applyAudioSnapshot(snapshot,context);for(let index=0;index<initialVisualStates.length;index++)eachVisualSlot(initialVisualStates[index].visualId,slot=>slot.controls.applyAudioSnapshot(snapshot,context));}
+ function audio(snapshot,context){audioSpectrumState.apply(snapshot);audioPlaying=context.playing;latestAudio=freeze({snapshot,context});const bases=arrayFrom(mapValues(baseControls));for(let index=0;index<bases.length;index++)bases[index].applyAudioSnapshot(snapshot,context);for(let index=0;index<initialVisualStates.length;index++)eachVisualSlot(initialVisualStates[index].visualId,slot=>slot.controls.applyAudioSnapshot(snapshot,context));}
  function visualStates(now){const tempo=tempoClock.snapshot(now),rows=[];for(let index=0;index<initialVisualStates.length;index++){const initial=initialVisualStates[index],visualId=initial.visualId;rows[index]=freeze({visualId,...mapGet(baseControls,visualId).state(now,tempo.beatPosition),controlSchema:initial.controlSchema});}return freeze(rows);}
  function admitTrigger({visualId,activationId,controlId,commandId,sequence}){const status=schedule.status(0),active=status.committed;if(!active||active.visualId!==visualId||active.activationId!==activationId){const error=new RuntimeError('Story trigger activation is unavailable');define(error,'code',{value:'TRIGGER_REJECTED',enumerable:true});throw error;}const slot=runtime.getSlot(active.slotId),target=slot.controls.resolveTrigger(freeze([]),controlId),event=freeze({type:'trigger',controlId:target.controlId,commandId,sequence});arrayPush(slot.events,event);return freeze({slot,target,event});}
  function triggerAndDraw(input,now,previewPlaying=true){setRenderTime(now);return runtime.transaction(async({draw})=>{const target=admitTrigger(input);try{const result=await draw(now,undefined,previewPlaying);return freeze({target,result});}catch(error){const failure=new RuntimeError(RuntimeString(error?.message||error));define(failure,'code',{value:'TRIGGER_DRAW_FAILED',enumerable:true});throw failure;}});}

@@ -3,7 +3,12 @@ export type AudioAnalyzerConfig=Readonly<{version:1;fftSize:2048;minDecibels:num
 export type AudioInputConfiguration=Readonly<{logicalInputId:'primary-audio';analyzer:AudioAnalyzerConfig}>;
 export type AudioBandSource=Readonly<{kind:'audio-band';logicalInputId:'primary-audio';band:AudioBand;analyzer:AudioAnalyzerConfig}>;
 export type AudioKickSource=Readonly<{kind:'audio-kick';logicalInputId:'primary-audio';analyzer:AudioAnalyzerConfig}>;
-export type AudioBandSnapshot=Readonly<{generation:number;sequence:number;available:boolean;level:number;bass:number;mids:number;highs:number;kickSequence:number;kickStrength:number}>;
+export type AudioSpectrum=Readonly<{sampleRate:number;fftSize:2048;scale:'log';minFrequency:20;maxFrequency:number;magnitudes:readonly number[]}>;
+export type AudioSpectrumFrame=Readonly<AudioSpectrum&{available:boolean;generation:number;sequence:number}>;
+export const audioSpectrumBins:128;
+export function normalizeAudioSpectrum(input:unknown,available?:boolean):AudioSpectrum;
+export function createAudioSpectrumFrameState():Readonly<{apply(input:unknown):boolean;frame(playing:boolean):AudioSpectrumFrame;reset():void}>;
+export type AudioBandSnapshot=Readonly<{generation:number;sequence:number;available:boolean;level:number;bass:number;mids:number;highs:number;kickSequence:number;kickStrength:number;spectrum?:AudioSpectrum}>;
 export function normalizeAudioAnalyzerConfig(input:unknown):AudioAnalyzerConfig;
 export function normalizeAudioInputConfiguration(input:unknown):AudioInputConfiguration;
 export function normalizeAudioBandSource(input:unknown):AudioBandSource;

@@ -65,7 +65,9 @@ test('Web Audio analyzer disables built-in smoothing and disconnects only owned 
   assert.equal(analyzerNode.maxDecibels, -20);
   assert.equal(analyzerNode.smoothingTimeConstant, 0);
   assert.equal(sourceNode.connected, analyzerNode);
-  assert.deepEqual(analyzer.sample(0), { level: 0.5, bass: 0, mids: 0, highs: 0, kickStrength: 0 });
+  const {spectrum,...bands}=analyzer.sample(0);
+  assert.deepEqual(bands, { level: 0.5, bass: 0, mids: 0, highs: 0, kickStrength: 0 });
+  assert.equal(spectrum.magnitudes.length,128);assert.ok(spectrum.magnitudes.every(value=>value===0));
 
   analyzer.dispose();
   analyzer.dispose();
