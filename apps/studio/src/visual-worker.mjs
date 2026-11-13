@@ -33,6 +33,7 @@ const now=performance.now.bind(performance);
 const post=postMessage.bind(globalThis);
 let identity, renderer, device, visual, clock, tempoClock, random, settings, outputTarget, presentation;
 let initializationProbe, material, componentBridge, compositionBridge, authoredCleanup, cleanupPromise, activeOperation;
+let legacyRenders=Promise.resolve();
 let authoredDisposalAttempted=false,terminalError;
 let controlState, frame = 0, tick = 0, lastTime = 0;
 let triggerSequence=0,latestTriggerReceipt,activeTrigger,storyTransport,admittedStoryHash;
@@ -43,6 +44,7 @@ let drawStarted=0,scheduleEpoch=0;
 let performanceMode='routine';
 let stopped = false, externallyDriven=false, timer, heartbeat, telemetryTimer, collector, gpuTimer, gpuCapability, chain = Promise.resolve();
 const send = (type, extra = {}) => post({ type, ...identity, ...extra });
+const startupStage=stage=>{if(frame===0)send('startup-progress',{stage});};
 function state(sample) { const clockState=sample??clock.snapshot(),tempo=tempoClock.snapshot(clockState.timeSeconds);if(storyGeneration)return { ...clockState,tempo,tempoSequence:tempo.tempoSequence,frameId:String(frame),triggerSequence,...(latestTriggerReceipt?{latestTriggerReceipt}:{}),storySchedule:storyGeneration.status(clockState.timeSeconds,clockState.playback==='playing'),visualStates:storyGeneration.visualStates(clockState.timeSeconds)};return { ...clockState, tempo,tempoSequence:tempo.tempoSequence, frameId: String(frame),...controlState.state(clockState.timeSeconds,tempo.beatPosition),triggerSequence,...(latestTriggerReceipt?{latestTriggerReceipt}:{}),...(storyTransport?{story:storyTransport.status(clockState.timeSeconds,clockState.playback==='playing')}:{}) }; }
 function runOperation(operation) {
   // Device loss bypasses the command queue. Keep the current command's lifetime
@@ -71,7 +73,7 @@ function terminalCleanup(requestId) {
     }
     // Settlement failures must not authorize freeing an in-use target. Bridge
     // drain observes backend rejection; a rejected GPU barrier stops teardown.
-    try{await componentBridge?.drain();if(device)await device.queue.onSubmittedWorkDone();}
+    try{await legacyRenders;await componentBridge?.drain();if(device)await device.queue.onSubmittedWorkDone();}
     catch(error){send('cleanup',{complete:false,message:String(error?.message||error).slice(0,200)});return;}
     if(!authoredDisposalAttempted&&authoredCleanup){authoredDisposalAttempted=true;await attempt('authored',authoredCleanup);}
     await attempt('target',()=>outputTarget?.dispose());
@@ -98,18 +100,24 @@ async function draw(requestId, type = 'frame',extra = {},trigger,storyCommand,cl
   if(profiling)gpuTimer.begin(frame+1);
   const updateStart=profiling?now():0;
   const triggerEvent=trigger?.event,events=triggerEvent&&trigger.target.nodePath.length===0?freeze([triggerEvent]):freeze([]);activeTrigger=trigger;
+  startupStage('first-update');
   await visual.update(freeze({ tick: tick++, timeSeconds: time.timeSeconds,
     deltaSeconds: (triggerEvent||storyCommand)&&time.playback==='paused'?0:max(0, time.timeSeconds - lastTime), controls: controlState.values(time.timeSeconds,tempo.beatPosition), events,
     story:storyFrame,sampleControl:(controlId,instanceKey)=>controlState.sample(scenePath,controlId,instanceKey,time.timeSeconds,tempo.beatPosition) }));
   requireRunning();
   const updateEnd=profiling?now():0;
+  startupStage('first-render');
   const renderResult=visual.render(freeze({ width: settings.width, height: settings.height, colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }));
   const renderCallEnd=profiling?now():0;
   const asynchronous=profiling&&renderResult != null && typeof renderResult.then === 'function';
   await renderResult;
+  // Authors may omit returning context.renderer.render(). The frame still owns
+  // every queued render and must wait for asynchronous pipeline preparation.
+  await legacyRenders;
   requireRunning();
   if(componentBridge||compositionBridge) presentation.render(renderer);
   const renderEnd=profiling?now():0;
+  startupStage('gpu-completion');
   await device.queue.onSubmittedWorkDone();
   requireRunning();
   const completed=now();
@@ -181,6 +189,7 @@ async function initialize(message) {
     storyGeneration.audio(message.audioSnapshot??{generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0},{playing:false,timeSeconds:0});
     await storyGeneration.initialize(0);requireRunning();storyReady=true;frame=1;if(message.playing)clock.play();send('ready',{requestId:message.requestId,...state(),timeSeconds:clock.snapshot().timeSeconds});schedule();return;
   }
+  startupStage('admission');
   const prepared=await prepareAuthoredModule(message);
   controlState=prepared.admission.kind==='composition'?await prepareWorkerCompositionState(message,prepared.admission):await prepareWorkerControlState(message,prepared.admission);
   controlState.applyAudioSnapshot(message.audioSnapshot??{generation:0,sequence:0,available:false,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0},{playing:false,timeSeconds:0});
@@ -192,11 +201,13 @@ async function initialize(message) {
   const beat=()=>send('heartbeat', { frameId: String(frame),workerHeartbeat:++workerHeartbeat });
   heartbeat = setInterval(beat, 250);
   beat(); // Arm external worker liveness before any authored import/create runs.
+  startupStage('module-import');
   const {module,assets,images} = await prepared.import(async moduleSource => {
     const url = createURL(new RuntimeBlob([moduleSource], { type: 'text/javascript' }));
     try { return await import(url); } finally { revokeURL(url); }
   });
   const create=controlState.checkDefinition(module);
+  startupStage('gpu-device');
   if (!navigator.gpu) throw Error('WebGPU is unavailable');
   const adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
   if (!adapter) throw Error('No WebGPU adapter available');
@@ -204,6 +215,7 @@ async function initialize(message) {
   device = await adapter.requestDevice(performanceMode==='routine'&&gpuCapability.timestampQuerySupported?{requiredFeatures:['timestamp-query']}:{});
   gpuTimer=createGpuPassTimer(device,(frame,ms,complete)=>collector?.recordGpu(frame,ms,complete)??false,{mode:performanceMode});
   device.lost.then(info => { if (!stopped) failure(Error(`WebGPU device lost: ${info.message}`)); });
+  startupStage('renderer');
   renderer = new module.WebGPURenderer({ canvas: message.canvas, device, alpha: true, antialias: false });
   renderer.setSize(settings.width, settings.height, false); await renderer.init();
   requireRunning();
@@ -225,6 +237,7 @@ async function initialize(message) {
   }
   const context={ settings: freeze({ ...settings }), assets, images,
     random: () => random.next(), reportError: value => { throw new RuntimeError(String(value)); } };
+  startupStage('create');
   if(prepared.admission.kind==='composition'){
     const profile=prepared.admission.composition,targets=new WeakMap(),compiledScenes=new WeakSet(),settlements=new Set(),descriptor={width:settings.width,height:settings.height};let staged,settlementFailure;
     const resources=freeze({async produce(output){const call=staged;staged=undefined;if(!call)throw new RuntimeError('Missing staged component render');const target=new module.RenderTarget(descriptor.width,descriptor.height);target.texture.colorSpace=module.SRGBColorSpace;targets.set(output,target);renderer.setRenderTarget(target);try{
@@ -250,9 +263,25 @@ async function initialize(message) {
     visual=componentBridge;authoredCleanup=()=>componentBridge.dispose();
   }else{
     visual=await create(freeze({...context,renderer:freeze({render:(scene,camera)=>{
-      renderer.setRenderTarget(outputTarget);
-      try{renderer.render(scene,camera);}finally{renderer.setRenderTarget(null);}
-      presentation.render(renderer);
+      if(frame>0){
+        renderer.setRenderTarget(outputTarget);
+        try{renderer.render(scene,camera);}finally{renderer.setRenderTarget(null);}
+        presentation.render(renderer);return;
+      }
+      legacyRenders=legacyRenders.then(async()=>{
+        requireRunning();renderer.setRenderTarget(outputTarget);
+        try{
+          // Prepare each first-frame call: a scene cache can miss a changed
+          // camera or material. Later frames retain the existing render path
+          // rather than compiling/traversing the whole scene on every frame.
+          startupStage('shader-compile');await renderer.compileAsync(scene,camera);
+          requireRunning();startupStage('first-render');renderer.render(scene,camera);
+        }finally{renderer.setRenderTarget(null);}
+        presentation.render(renderer);
+      });
+      // A visual can ignore the returned promise. draw() still observes failure.
+      legacyRenders.catch(()=>{});
+      return legacyRenders;
     }})}));
     // Legacy visuals support prototype methods with the visual as receiver.
     authoredCleanup=()=>visual?.dispose?.();
