@@ -65,10 +65,19 @@ export async function resolveSceneArgument(path) {
 }
 
 /** Open a scene in a connected Studio. Never discards unsaved work: a dirty draft is reported, not replaced. */
-export async function openSceneInStudio(connect, scenePath) {
-  const { draftVersion } = await connect('read');
-  try { return { requested: scenePath, ...await connect('scene.open', { path: scenePath, expectedDraftVersion: draftVersion }) }; }
-  catch (error) { throw Error(`Studio is running but did not open ${scenePath}: ${error.message}. The current draft and preview were kept.`); }
+export async function openSceneInStudio(connect, scenePath, { busyTimeoutMs = 120000, retryMs = 500, sleep = ms => new Promise(r => setTimeout(r, ms)) } = {}) {
+  // A freshly started Studio is busy building its startup visual; wait for it instead of failing.
+  const deadline = Date.now() + busyTimeoutMs;
+  for (;;) {
+    try {
+      const { draftVersion } = await connect('read');
+      return { requested: scenePath, ...await connect('scene.open', { path: scenePath, expectedDraftVersion: draftVersion }) };
+    } catch (error) {
+      // Startup also replaces the draft once ("Editor changed"); re-read and try again.
+      if (/\bbusy\b|editor changed/i.test(error.message) && Date.now() < deadline) { await sleep(retryMs); continue; }
+      throw Error(`Studio is running but did not open ${scenePath}: ${error.message}. The current draft and preview were kept.`);
+    }
+  }
 }
 
 /** One adapter stays bound to one process lifetime, even if its endpoint is replaced. */
