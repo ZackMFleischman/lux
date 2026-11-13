@@ -8,6 +8,7 @@ export type LocalAudioInput=Readonly<{id:string;label:string}>;
 export type StudioAudioRuntime=StudioAudioProvider&Readonly<{
   listInputs():Promise<readonly LocalAudioInput[]>;
   subscribeDevices(listener:()=>void):()=>void;
+  getConnectedInputId():string|undefined;
   getMonitoring():boolean;
   setMonitoring(enabled:boolean):Promise<boolean>;
 }>;
@@ -23,6 +24,7 @@ export function createStudioAudioRuntime(options:Readonly<{
   let capture:Readonly<{stream:MediaStream;context:AudioContext}>|undefined;
   let monitor:MediaStreamAudioSourceNode|undefined;
   let monitoring=false;
+  let connection=0,connectedInputId:string|undefined;
   const listeners=new Set<()=>void>();
   const notify=()=>{for(const listener of listeners)listener();};
   const stopMonitoring=()=>{try{monitor?.disconnect();}catch{}monitor=undefined;monitoring=false;};
@@ -54,7 +56,7 @@ export function createStudioAudioRuntime(options:Readonly<{
     },
   });
   provider.subscribe(()=>{
-    if(!provider.getSnapshot().available){stopMonitoring();capture=undefined;}
+    if(!provider.getSnapshot().available){stopMonitoring();capture=undefined;connectedInputId=undefined;}
     notify();
   });
   return Object.freeze({
@@ -74,10 +76,11 @@ export function createStudioAudioRuntime(options:Readonly<{
       options.mediaDevices.addEventListener('devicechange',changed);
       return()=>options.mediaDevices.removeEventListener('devicechange',changed);
     },
-    async connect(configuration,localDeviceId){capturesPending++;try{await provider.connect(configuration,localDeviceId);}finally{capturesPending--;}},
-    async disconnect(){stopMonitoring();capture=undefined;try{await provider.disconnect();}finally{await options.permissions.disconnect();}},
+    async connect(configuration,localDeviceId){const token=++connection;capturesPending++;try{await provider.connect(configuration,localDeviceId);if(token===connection&&provider.getSnapshot().available){connectedInputId=localDeviceId;notify();}}finally{capturesPending--;}},
+    async disconnect(){connection++;connectedInputId=undefined;stopMonitoring();capture=undefined;try{await provider.disconnect();}finally{await options.permissions.disconnect();}},
     getSnapshot:provider.getSnapshot,
     subscribe(listener){listeners.add(listener);return()=>listeners.delete(listener);},
+    getConnectedInputId:()=>connectedInputId,
     getMonitoring:()=>monitoring,
     async setMonitoring(enabled){
       if(!enabled){stopMonitoring();notify();return false;}

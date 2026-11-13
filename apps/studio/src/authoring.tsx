@@ -35,6 +35,7 @@ import { createRendererSnapshot } from './renderer-snapshot.ts';
 import { shortcutHint } from './studio-shortcuts.ts';
 import type { StudioShortcutActions, StudioShortcutCommand } from './studio-shortcuts.ts';
 import {createStudioAudioRuntime} from './audio/studio-audio-runtime.ts';
+import {dispatchAudioCommand} from './audio/agent-audio.ts';
 import {AudioInputControl} from './audio/AudioInputControl.tsx';
 import {SoundtrackPlayer} from './soundtrack/soundtrack-player.ts';
 import {SoundtrackControl} from './soundtrack/SoundtrackControl.tsx';
@@ -46,7 +47,7 @@ const client = new StandaloneClient(window.luxAuthoring, { codeDeclaredParameter
 const soundtrackPlayer=new SoundtrackPlayer({createContext:()=>new AudioContext()});
 client.subscribe(()=>soundtrackPlayer.update(client.getSnapshot().authoring));
 function soundtrackStatus(){const status=soundtrackPlayer.status();return status.file||status.state!=='none'?status:null;}
-const agentStatus = () => ({ ...client.getSnapshot(), capabilities: studioCapabilities, soundtrack: soundtrackStatus() });
+const agentStatus = () => ({ ...client.getSnapshot(), capabilities: studioCapabilities, audioInput: audioProvider.getSnapshot(), soundtrack: soundtrackStatus() });
 const idleRecording = Object.freeze({ phase: 'idle' }) as PreviewRecorderSnapshot;
 const subscribeIdle = () => () => {};
 const getIdleRecording = () => idleRecording;
@@ -124,10 +125,11 @@ export function AuthoringApp() {
   useEffect(() => window.luxAuthoring.onAgentCommand(async command => {
     if (lookOperation.current && !['read', 'status','story.read'].includes(command.method)) throw Error('Wait for the look operation to finish');
     if (confirmation.isPending() && !['read', 'status','story.read', 'capture','library.list','library.read'].includes(command.method)) throw Error('Studio is waiting for a user confirmation');
-    if (['parameters', 'variation', 'playback', 'restart','tempo.set','tempo.tap','trigger','story.transport'].includes(command.method)) {
+    if (['audio.inputs','audio.connect','audio.disconnect'].includes(command.method)) return dispatchAudioCommand(audioProvider,command.method,command.params);
+    if (['parameters', 'animation', 'variation', 'playback', 'restart','tempo.set','tempo.tap','trigger','story.transport'].includes(command.method)) {
       if(!session.getSnapshot().runtimeControlsAvailable)throw Error('Studio is busy with a scene file operation');
       const write = dispatchRuntimeCommand(client, command.method, command.params);
-      if (command.method === 'parameters'||command.method==='variation'||command.method==='tempo.set'||command.method==='tempo.tap') {
+      if (command.method === 'parameters'||command.method==='animation'||command.method==='variation'||command.method==='tempo.set'||command.method==='tempo.tap') {
         pendingControlWrites.current.add(write);
         void write.then(() => pendingControlWrites.current.delete(write), () => pendingControlWrites.current.delete(write));
       }
