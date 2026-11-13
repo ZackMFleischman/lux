@@ -171,3 +171,24 @@ When the running app reports Story support for SDK0.2 root visuals, use
 [Story playback](story-playback.md) for guards, sustained/manual behavior,
 sequence occurrences, timed seeking, return-to-normal examples, and complete
 Scene 7 multi-visual document builds.
+
+
+### Audio spectrum in visual code
+
+When the actual running app reports `capabilities.audioSpectrum` with `bins: 128`, SDK 0.2 visuals and SDK 0.4 component leaves receive optional readonly `frame.audioSpectrum` during `update(frame)`. Its fields are `available`, provider `generation` and `sequence`, `sampleRate`, `fftSize: 2048`, `scale: 'log'`, `minFrequency: 20`, `maxFrequency: sampleRate / 2`, and a frozen `magnitudes` array of exactly 128 numbers from 0 to 1. Each bucket holds the peak normalized linear amplitude from measured FFT bins overlapping its logarithmic interval; normalization uses the connected analyzer's min/max decibels. Low-frequency buckets can share an FFT bin because a 2048-point FFT has finite resolution. This is frequency magnitude data, not raw PCM, phase, a waveform or inferred BPM.
+
+```ts
+update(frame) {
+  const spectrum = frame.audioSpectrum;
+  if (spectrum?.available) {
+    // Feed these measured heights to your line/bars or a data texture.
+    for (let i = 0; i < spectrum.magnitudes.length; i++) {
+      const amplitude = spectrum.magnitudes[i];
+      const lowerHz = 20 * Math.pow(spectrum.maxFrequency / 20, i / 128);
+      // Update the visual's own preallocated geometry/uniforms here.
+    }
+  }
+}
+```
+
+Frames receive immutable snapshots. Stale provider sequences are ignored. Pause holds the last displayed spectrum; disconnect clears it even during a paused explicit draw. Reset supplies one zero frame before live samples resume. With no spectrum input, `available` is false, magnitudes are zero, and `sampleRate`/`maxFrequency` are 0. Older hosts can omit the optional field, so guard it. The same shared input and explicit connection remain in effect; this API requests no new permission, opens no device, and writes no audio samples into scenes. Adapter discovery describes source support; it does not upgrade an older running app. Inspect actual frames and audio status before claiming music response.

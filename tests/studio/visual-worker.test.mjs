@@ -290,3 +290,15 @@ test('awaited startup render calls prepare and draw in authored order before rea
  assert.equal(f.messages.at(-1).type,'ready',JSON.stringify(f.messages));
  assert.deepEqual(f.events.filter(([name])=>['compile','gpu-render','between'].includes(name)).map(([name])=>name),['compile','gpu-render','between','compile','gpu-render']);
 });
+
+
+test('actual visual frames expose bounded measured spectrum and clear disconnected or stale audio',async()=>{
+ const f=await fixture(),spectrum={sampleRate:48000,fftSize:2048,scale:'log',minFrequency:20,maxFrequency:24000,magnitudes:Array(128).fill(.7)};
+ const audio={generation:1,sequence:1,available:true,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0,spectrum};
+ await f.send({...f.initial,playing:true,audioSnapshot:audio});assert.equal(f.frames.at(-1).audioSpectrum.magnitudes[8],.7);
+ await f.send({type:'audio',audioSnapshot:{...audio,sequence:2,spectrum:{...spectrum,magnitudes:Array(128).fill(.9)}}});
+ await f.send({type:'frame'});assert.equal(f.frames.at(-1).audioSpectrum.magnitudes[8],.9);
+ await f.send({type:'audio',audioSnapshot:audio});await f.send({type:'frame'});assert.equal(f.frames.at(-1).audioSpectrum.magnitudes[8],.9);
+ const {spectrum:_,...zero}=audio;await f.send({type:'audio',audioSnapshot:{...zero,generation:2,sequence:0,available:false}});await f.send({type:'frame'});
+ assert.equal(f.frames.at(-1).audioSpectrum.available,false);assert.ok(f.frames.at(-1).audioSpectrum.magnitudes.every(value=>value===0));
+});

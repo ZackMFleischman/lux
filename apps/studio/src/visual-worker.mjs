@@ -1,3 +1,4 @@
+import {createAudioSpectrumFrameState} from '../../../packages/runtime-contracts/src/audio-input.mjs';
 import { encodeCapturedTarget } from './capture-png.mjs';
 import { createInitializationProbe } from './initialization-probe.mjs';
 // Generated modules run only in this dedicated browser worker. No Node or
@@ -35,6 +36,7 @@ let identity, renderer, device, visual, clock, tempoClock, random, settings, out
 let initializationProbe, material, componentBridge, compositionBridge, authoredCleanup, cleanupPromise, activeOperation;
 let legacyRenders=Promise.resolve();
 let authoredDisposalAttempted=false,terminalError;
+const audioSpectrumState=createAudioSpectrumFrameState();
 let controlState, frame = 0, tick = 0, lastTime = 0;
 let triggerSequence=0,latestTriggerReceipt,activeTrigger,storyTransport,admittedStoryHash;
 let storyMode=false,storyReady=false,storyGeneration,storyResourcePorts,storySharedModules,storyFactories,storyCompositor;const storyPendingCommands=new RuntimeMap(),storyFailedCommands=new RuntimeMap();
@@ -103,7 +105,7 @@ async function draw(requestId, type = 'frame',extra = {},trigger,storyCommand,cl
   startupStage('first-update');
   await visual.update(freeze({ tick: tick++, timeSeconds: time.timeSeconds,
     deltaSeconds: (triggerEvent||storyCommand)&&time.playback==='paused'?0:max(0, time.timeSeconds - lastTime), controls: controlState.values(time.timeSeconds,tempo.beatPosition), events,
-    story:storyFrame,sampleControl:(controlId,instanceKey)=>controlState.sample(scenePath,controlId,instanceKey,time.timeSeconds,tempo.beatPosition) }));
+    story:storyFrame,audioSpectrum:audioSpectrumState.frame(time.playback==='playing'),sampleControl:(controlId,instanceKey)=>controlState.sample(scenePath,controlId,instanceKey,time.timeSeconds,tempo.beatPosition) }));
   requireRunning();
   const updateEnd=profiling?now():0;
   startupStage('first-render');
@@ -150,6 +152,7 @@ function schedule() {
   }).catch(failure); }, delay);
 }
 async function initialize(message) {
+  if(message.audioSnapshot)audioSpectrumState.apply(message.audioSnapshot);
   identity = { instanceId: message.instanceId, generation: message.generation, revisionId: message.revisionId,...(message.manifest?{scheduleHash:message.scheduleHash,capsuleHash:message.capsuleHash}:{}) };
   externallyDriven=message.externallyDriven===true;
   performanceMode=collectionMode(message.performanceMode);
@@ -324,7 +327,7 @@ onmessage = event => {
       if(message.restart)controlState.restartAnimation(message.restart.nodePath,message.restart.controlId,clock.snapshot().timeSeconds);
       await draw(message.requestId,'status');schedule();
     } else if(message.type==='audio'){
-      const audioClock=clock.snapshot();if(storyGeneration)storyGeneration.audio(message.audioSnapshot,{playing:audioClock.playback==='playing',timeSeconds:audioClock.timeSeconds});else controlState.applyAudioSnapshot(message.audioSnapshot,{playing:audioClock.playback==='playing',timeSeconds:audioClock.timeSeconds});
+      audioSpectrumState.apply(message.audioSnapshot);const audioClock=clock.snapshot();if(storyGeneration)storyGeneration.audio(message.audioSnapshot,{playing:audioClock.playback==='playing',timeSeconds:audioClock.timeSeconds});else controlState.applyAudioSnapshot(message.audioSnapshot,{playing:audioClock.playback==='playing',timeSeconds:audioClock.timeSeconds});
       send('audio-ack',{providerGeneration:message.audioSnapshot.generation,sampleSequence:message.audioSnapshot.sequence});
     } else if(message.type==='tempo'){
       const time=clock.snapshot().timeSeconds;
@@ -388,11 +391,11 @@ onmessage = event => {
       if (!arrayIncludes(['play', 'pause', 'reset'],message.action)) throw Error('Invalid playback command');
       clearTimeout(timer);
       if(storyGeneration){
-        if(message.action==='reset'){clock.reset();tempoClock.reset(0);await storyGeneration.reset(0);lastTime=0;tick=0;}
+        if(message.action==='reset'){audioSpectrumState.reset();clock.reset();tempoClock.reset(0);await storyGeneration.reset(0);lastTime=0;tick=0;}
         else clock[message.action]();
         await draw(message.requestId,'status');schedule();return;
       }
-      if (message.action === 'reset') { clock.reset();tempoClock.reset(0); controlState.resetAnimations?.(0);storyTransport?.reset(0); random.reset(settings.seed); await visual.reset(settings.seed); lastTime = 0; tick = 0; }
+      if (message.action === 'reset') { audioSpectrumState.reset();clock.reset();tempoClock.reset(0); controlState.resetAnimations?.(0);storyTransport?.reset(0); random.reset(settings.seed); await visual.reset(settings.seed); lastTime = 0; tick = 0; }
       else {if(message.action==='pause')controlState.fenceAudioEvents?.();clock[message.action]();}
       await draw(message.requestId, 'status'); schedule();
     } else if (message.type === 'render-frame') {

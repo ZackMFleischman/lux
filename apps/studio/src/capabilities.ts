@@ -3,6 +3,7 @@ import { parameterLimits } from '../../../packages/runtime-contracts/src/paramet
 export const studioCapabilities = Object.freeze({ protocolVersion: 4,
   supportedSdkVersions: Object.freeze(['0.1.0', '0.2.0', '0.4.0']),
   codeDeclaredParameters: true, parameterKinds: Object.freeze(['number','boolean','enum']), maxParameterMetadataBytes: parameterLimits.metadataBytes,
+  audioSpectrum: Object.freeze({frameField:'audioSpectrum',bins:128,scale:'log',fftSize:2048,readOnly:true}),
   audioInputControl: Object.freeze({enumerate:true,connect:true,disconnect:true}),
   controlAnimation: Object.freeze({guardedBindings:true,kinds:Object.freeze(['lfo','audio','kick','tempo','variation'])}),
   controlTriggers: Object.freeze({commandReceipts:true,pausedFrame:true,maxCommandIds:16384}),

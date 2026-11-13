@@ -121,3 +121,10 @@ export const compileResultSchema = z.discriminatedUnion('ok', [
   z.object({ ok: z.literal(false), code: compileFailureCodeSchema, diagnostics: z.array(compileDiagnosticSchema) }).strict(),
 ]);
 export type CompileResult = z.infer<typeof compileResultSchema>;
+
+/** Optional connected-input frequency view supplied once per authored update. */
+export interface AudioSpectrumFrame {
+ readonly available:boolean;readonly generation:number;readonly sequence:number;
+ readonly sampleRate:number;readonly fftSize:2048;readonly scale:'log';
+ readonly minFrequency:20;readonly maxFrequency:number;readonly magnitudes:readonly number[];
+}

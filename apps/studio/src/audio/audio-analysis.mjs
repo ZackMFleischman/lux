@@ -1,3 +1,4 @@
+import {audioSpectrumBins} from '../../../../packages/runtime-contracts/src/audio-input.mjs';
 import { normalizeAudioAnalyzerConfig } from './audio-contract.mjs';
 
 const freeze = Object.freeze;
@@ -98,7 +99,7 @@ export function createWebAudioBandAnalyzer(context, stream, inputConfig) {
       analyzer.getFloatTimeDomainData(timeDomain);
       analyzer.getFloatFrequencyData(frequency);
       const bands=analyzeAudioFrame(timeDomain, frequency, context.sampleRate, config);
-      return freeze({...bands,kickStrength:kick.sample(bands.bass,timeMs)});
+      return freeze({...bands,kickStrength:kick.sample(bands.bass,timeMs),spectrum:analyzeAudioSpectrum(frequency,context.sampleRate,config)});
     },
     dispose() {
       if (disposed) return;
@@ -108,4 +109,17 @@ export function createWebAudioBandAnalyzer(context, stream, inputConfig) {
       analyzer.disconnect();
     },
   });
+}
+
+export function analyzeAudioSpectrum(frequencyDecibels,sampleRate,inputConfig){
+ const config=normalizeAudioAnalyzerConfig(inputConfig);
+ if(!(frequencyDecibels instanceof Float32Array)||frequencyDecibels.length!==config.fftSize/2||!finite(sampleRate)||sampleRate<8000||sampleRate>384000)throw new Error('Invalid audio frequency frame');
+ const floorAmplitude=pow(10,config.minDecibels/20),ceilingAmplitude=pow(10,config.maxDecibels/20),span=ceilingAmplitude-floorAmplitude;
+ const minFrequency=20,maxFrequency=sampleRate/2,ratio=maxFrequency/minFrequency,magnitudes=[];
+ for(let bucket=0;bucket<audioSpectrumBins;bucket++){
+  const low=minFrequency*pow(ratio,bucket/audioSpectrumBins),high=minFrequency*pow(ratio,(bucket+1)/audioSpectrumBins);
+  const first=min(frequencyDecibels.length-1,max(1,Math.floor(low*config.fftSize/sampleRate))),end=min(frequencyDecibels.length,max(first+1,Math.ceil(high*config.fftSize/sampleRate)));
+  let peak=0;for(let index=first;index<end;index++)peak=max(peak,unitAmplitude(frequencyDecibels[index],floorAmplitude,ceilingAmplitude,span));magnitudes[bucket]=peak;
+ }
+ return freeze({sampleRate,fftSize:2048,scale:'log',minFrequency,maxFrequency,magnitudes:freeze(magnitudes)});
 }

@@ -1,4 +1,5 @@
-import type { ControlDefinition, ControlValues, OutputSettings } from '../../runtime-contracts/src/index.ts';
+export type {AudioSpectrumFrame};
+import type { ControlDefinition, ControlValues, AudioSpectrumFrame, OutputSettings } from '../../runtime-contracts/src/index.ts';
 
 export const sdkVersion = '0.1.0' as const;
 export interface OutputTarget {
@@ -6,6 +7,7 @@ export interface OutputTarget {
   readonly colorSpace: 'linear-srgb'; readonly alphaMode: 'premultiplied';
 }
 export interface FrameContext {
+  readonly audioSpectrum?: AudioSpectrumFrame;
   readonly tick: number; readonly timeSeconds: number; readonly deltaSeconds: number;
   readonly controls: Readonly<ControlValues>; readonly events: readonly never[];
   readonly sampleControl?: (controlId: string, instanceKey: string | number) => number;

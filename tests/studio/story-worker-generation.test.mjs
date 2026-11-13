@@ -32,7 +32,7 @@ test('generation imports only prepared visuals, publishes full visual state, and
 });
 
 test('initial and mid-create audio snapshots reach the delayed candidate before its first frame',async()=>{
- const f=fixture({deferBlue:true}),audio1={generation:1,sequence:1,available:true},audio2={generation:1,sequence:2,available:true};f.generation.audio(audio1,{playing:false,timeSeconds:0});await f.generation.initialize(0);
+ const f=fixture({deferBlue:true}),audio1={generation:1,sequence:1,available:true,level:0,bass:0,mids:0,highs:0,kickSequence:0,kickStrength:0},audio2={...audio1,sequence:2};f.generation.audio(audio1,{playing:false,timeSeconds:0});await f.generation.initialize(0);
  f.generation.command({action:'launch',beatId:'move',commandId:'launch'},1);for(let i=0;i<20&&!f.events.includes('create:blue');i++)await new Promise(resolve=>setTimeout(resolve,0));f.generation.audio(audio2,{playing:true,timeSeconds:1});f.releaseBlue();for(let i=0;i<20&&!f.receipts.some(row=>row.commandId==='launch');i++)await new Promise(resolve=>setTimeout(resolve,0));
  const blue=f.controlSlots.get('blue');assert.equal(blue.at(-1).latestAudio().sequence,2);assert.equal(f.receipts.at(-1).commandId,'launch');await f.generation.dispose();
 });

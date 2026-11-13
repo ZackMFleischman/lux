@@ -1,3 +1,4 @@
+import {normalizeAudioSpectrum} from '../../../../packages/runtime-contracts/src/audio-input.mjs';
 import { normalizeAudioInputConfiguration, normalizeLocalAudioDeviceId } from './audio-contract.mjs';
 import { createWebAudioBandAnalyzer } from './audio-analysis.mjs';
 
@@ -9,7 +10,7 @@ function zero(generation) {
 }
 
 function normalizeBands(input) {
-  if (!input || typeof input !== 'object' || Array.isArray(input) || Reflect.ownKeys(input).length !== 5) {
+  if (!input || typeof input !== 'object' || Array.isArray(input) || Reflect.ownKeys(input).length !== (Object.hasOwn(input,'spectrum')?6:5)) {
     throw new Error('Invalid audio band sample');
   }
   const result = {};
@@ -20,6 +21,7 @@ function normalizeBands(input) {
     }
     result[name] = value.value === 0 ? 0 : value.value;
   }
+  if(Object.hasOwn(input,'spectrum'))result.spectrum=normalizeAudioSpectrum(input.spectrum);
   return freeze(result);
 }
 
@@ -73,7 +75,7 @@ export function createStudioAudioProvider(options) {
         const kickSequence=rollover?(bands.kickStrength>0?1:0):(bands.kickStrength>0?snapshot.kickSequence+1:snapshot.kickSequence);
         const kickStrength=bands.kickStrength>0?bands.kickStrength:(rollover?0:snapshot.kickStrength);
         publish(freeze({ generation: owner.generation, sequence: rollover?1:snapshot.sequence + 1, available: true,
-          level:bands.level,bass:bands.bass,mids:bands.mids,highs:bands.highs,kickSequence,kickStrength }));
+          level:bands.level,bass:bands.bass,mids:bands.mids,highs:bands.highs,kickSequence,kickStrength,...(bands.spectrum?{spectrum:bands.spectrum}:{}) }));
         scheduleSampling();
       } catch {
         void fail(owner);

@@ -1,10 +1,11 @@
+export type {AudioSpectrumFrame};
 // SDK 0.2 entry prepared for compiler version selection. The package's current
 // index/discovery remain 0.1 until compilation and artifact support land.
 import { normalizeControlDeclarations } from '../../runtime-contracts/src/parameters.mjs';
 import { normalizeStoryCapabilityDeclaration } from '../../runtime-contracts/src/story.mjs';
 import type { ControlDeclarations, ControlSchema, ControlsOf, ControlTriggerEvent, NumberControlIdsOf, ValidControlDeclarations } from '../../runtime-contracts/src/parameters.mjs';
 import type { StoryBeatIdsOf, StoryCapabilityDeclaration, StoryCapabilityV1, StoryFrame } from '../../runtime-contracts/src/story.mjs';
-import type { OutputSettings } from '../../runtime-contracts/src/index.ts';
+import type { AudioSpectrumFrame, OutputSettings } from '../../runtime-contracts/src/index.ts';
 export type {
   BooleanControlDefinition, BooleanDeclaration, ControlDeclaration, ControlDeclarations, ControlDefinition, ControlSchema,
   ControlsOf, ControlValue, ControlValues, EnumControlDefinition, EnumDeclaration, EnumOption, EnumPresentation,
@@ -21,6 +22,7 @@ export interface OutputTarget {
   readonly colorSpace: 'linear-srgb'; readonly alphaMode: 'premultiplied';
 }
 export interface FrameContext<C extends ControlDeclarations = ControlDeclarations, S extends StoryCapabilityDeclaration | undefined = undefined> {
+  readonly audioSpectrum?: AudioSpectrumFrame;
   readonly tick: number; readonly timeSeconds: number; readonly deltaSeconds: number;
   readonly controls: ControlsOf<C>; readonly events: readonly ControlTriggerEvent<C>[];
   readonly story: StoryFrame<S extends StoryCapabilityDeclaration ? StoryBeatIdsOf<S> : string>;

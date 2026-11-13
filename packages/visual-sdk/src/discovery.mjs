@@ -4,6 +4,8 @@ import { readFile } from 'node:fs/promises';
 import { sdkMetadata } from './metadata.mjs';
 export async function discoverVisualSdk() {
   return { ...sdkMetadata, sdkVersion: '0.2.0', supportedSdkVersions: ['0.1.0', '0.2.0', '0.4.0'],
+    audioSpectrum: {frameField:'audioSpectrum',bins:128,scale:'log',fftSize:2048,minFrequency:20,maxFrequency:'sampleRate / 2',normalization:'peak normalized linear amplitude per logarithmic bucket',readOnly:true,requires:'runningStudio.capabilities.audioSpectrum',rawPcm:false},
+    audioContractSource: await readFile(new URL('../../runtime-contracts/src/audio-input.d.mts', import.meta.url), 'utf8'),
     contractSource: await readFile(new URL('./sdk-v2.ts', import.meta.url), 'utf8'),
     parameterContractSource: await readFile(new URL('../../runtime-contracts/src/parameters.d.mts', import.meta.url), 'utf8'),
     sharedContractSource: await readFile(new URL('../../runtime-contracts/src/index.ts', import.meta.url), 'utf8'),
