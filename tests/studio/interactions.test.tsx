@@ -1119,7 +1119,17 @@ test('RTL: an MCP-connected audio device replaces the previous device label',asy
   await waitFor(()=>assert.ok(screen.getByRole('button',{name:'Connect'})));
   await act(async()=>{connected=true;listener();});
   assert.equal(screen.getByRole('status').textContent,'Connected');
-  assert.equal(screen.getByRole('combobox',{name:'Audio input device'}).textContent,'CABLE Output');
+  const selector=screen.getByRole('combobox',{name:'Audio input device'});
+  assert.equal(selector.textContent,'CABLE Output');
+  assert.equal(selector.parentElement!.getAttribute('title'),'CABLE Output');
+  const styles=document.createElement('style');
+  styles.textContent=await (await import('node:fs/promises')).readFile(new URL('../../apps/studio/src/studio.css',import.meta.url),'utf8');
+  document.head.append(styles);
+  try {
+    const backing=selector.parentElement!.querySelector('input')!;
+    assert.equal(backing.disabled,true);
+    assert.equal(getComputedStyle(backing).opacity,'0','disabled backing input must never paint its device ID');
+  } finally {styles.remove();}
   await act(async()=>{connected=false;listener();});
   assert.equal(screen.getByRole('status').textContent,'Unavailable');
 });
