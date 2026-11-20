@@ -88,7 +88,7 @@ Validation policy:
 - Labels are trimmed nonempty strings, at most 80 code points, without control characters; optional units at most 24. Numeric fields are finite, `min < max`, and `min <= default <= max`; normalize negative zero to zero. Optional `step` is finite, positive and no greater than `max - min`.
 - `step` is a UI gesture increment, **not** a wire quantization rule. A valid finite in-range MCP/host value need not lie on a step grid. Without step, Inspector uses `(max - min) / 1000`; numeric entry permits finer values.
 - All controls are live in this slice; normalization inserts `changeCost: 'live'`. Do not accept reset/rebuild controls with misleading live semantics. Expensive topology changes stay in source.
-- Runtime/API input rejects unknown IDs, out-of-range values and nonfinite values atomically. It does not clamp. Validation errors identify the parameter and expected range. Bound metadata to 32 KiB of canonical UTF-8 JSON.
+- Runtime/API input rejects unknown IDs, out-of-range values and nonfinite values atomically. It does not clamp. Validation errors identify the parameter and expected range. Control metadata has no aggregate byte bound; per-field and count limits still apply.
 - Exact fields, deterministic descriptor order/field ordering and the normalized schema determine `controlSchemaHash` (SHA-256). Label/order changes change this identity even when values migrate compatibly. Declaration IDs should change when semantic meaning changes; code cannot prove semantic equivalence.
 
 ### Discovery and execution boundary

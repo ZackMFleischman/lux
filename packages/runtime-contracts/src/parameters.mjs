@@ -1,10 +1,9 @@
 // Pure browser-compatible parameter policy. No visual execution, hashing,
 // environment access, or legacy Intensity fallback belongs at this boundary.
-export const parameterLimits = Object.freeze({ count: 32, metadataBytes: 32768, id: 64, label: 80, unit: 24 });
+export const parameterLimits = Object.freeze({ count: 32, id: 64, label: 80, unit: 24 });
 const requiredFields = ['type', 'label', 'default', 'min', 'max'];
 const optionalFields = ['step', 'unit'];
 const reservedIds = new Set(['constructor', 'prototype', '__proto__']);
-const encoder = new TextEncoder();
 
 function invalid(path, message) {
   throw Object.assign(new Error(`${path}: ${message}`), { code: 'INVALID_PARAMETERS', path });
@@ -64,7 +63,6 @@ function definition(id, input, normalizedRow) {
   return Object.freeze(result);
 }
 function finishSchema(rows) {
-  if (encoder.encode(JSON.stringify(rows)).byteLength > parameterLimits.metadataBytes) invalid('controls', 'schema exceeds 32 KiB UTF-8');
   return Object.freeze(rows);
 }
 

@@ -73,7 +73,6 @@ test('metadata enforces Unicode validity, code-point lengths, controls, and UTF-
   }
   const maximum = Object.fromEntries(Array.from({ length: 32 }, (_, i) => [`control${i}`, number({ label: '😀'.repeat(80), unit: '😀'.repeat(24) })]));
   const schema = normalizeControlDeclarations(maximum);
-  assert.ok(new TextEncoder().encode(canonicalControlSchemaJson(schema)).byteLength <= 32768);
   assert.throws(() => normalizeControlDeclarations({ ...maximum, overflow: number() }), /32/);
 });
 
