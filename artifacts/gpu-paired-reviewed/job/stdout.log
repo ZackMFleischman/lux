@@ -1,0 +1,351 @@
+{
+  "measurementValid": true,
+  "resultPath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\artifacts\\gpu-paired-reviewed\\result.json",
+  "analysis": {
+    "metric": "render/compute pass perturbation on reference frames",
+    "validity": "diagnostic",
+    "issues": [],
+    "legs": [
+      {
+        "pair": 0,
+        "mode": "baseline",
+        "samples": 8,
+        "meanMs": 1.709956,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 0,
+        "mode": "routine",
+        "samples": 8,
+        "meanMs": 1.7116879999999999,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 1,
+        "mode": "routine",
+        "samples": 8,
+        "meanMs": 2.0086399999999998,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 1,
+        "mode": "baseline",
+        "samples": 8,
+        "meanMs": 1.6223079999999999,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 2,
+        "mode": "baseline",
+        "samples": 8,
+        "meanMs": 1.944252,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 2,
+        "mode": "routine",
+        "samples": 8,
+        "meanMs": 1.679932,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 3,
+        "mode": "routine",
+        "samples": 8,
+        "meanMs": 1.4105159999999999,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 3,
+        "mode": "baseline",
+        "samples": 8,
+        "meanMs": 1.703392,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 4,
+        "mode": "baseline",
+        "samples": 8,
+        "meanMs": 1.6279440000000003,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "pair": 4,
+        "mode": "routine",
+        "samples": 8,
+        "meanMs": 1.933524,
+        "quantizationErrorBoundMs": 0.393216,
+        "passCounts": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "copiesUploadsAndClearsExcluded": true,
+        "completeFlags": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      }
+    ],
+    "pairs": [
+      {
+        "pair": 0,
+        "ratio": 1.0010128915597827,
+        "percent": 0.10128915597826804,
+        "quantizationPercentBounds": [
+          -37.31031033125204,
+          59.85722314200221
+        ]
+      },
+      {
+        "pair": 1,
+        "ratio": 1.23813727109772,
+        "percent": 23.81372710977201,
+        "quantizationPercentBounds": [
+          -19.85091718084232,
+          95.41710465937454
+        ]
+      },
+      {
+        "pair": 2,
+        "ratio": 0.864050544888214,
+        "percent": -13.594945511178603,
+        "quantizationPercentBounds": [
+          -44.952572612758765,
+          33.662145817376235
+        ]
+      },
+      {
+        "pair": 3,
+        "ratio": 0.8280630647554995,
+        "percent": -17.193693524450048,
+        "quantizationPercentBounds": [
+          -51.47876951723928,
+          37.67096939647803
+        ]
+      },
+      {
+        "pair": 4,
+        "ratio": 1.1877091595288287,
+        "percent": 18.770915952882874,
+        "quantizationPercentBounds": [
+          -23.79089235884344,
+          88.4415029059031
+        ]
+      }
+    ],
+    "meanPairedPercent": 2.3794586366009005,
+    "pairedBootstrap95Percent": [
+      -12.295197783055807,
+      17.054115056257608
+    ],
+    "systematicQuantizationPercentBounds": [
+      -35.47669240018717,
+      63.009789184226825
+    ],
+    "quantizationAssumption": "Prior observed65536ns quantum treated as endpoint uncertainty; sum bound2*quantum per pass. Null upper bound means unbounded. Bootstrap does not remove this systematic bound.",
+    "totalGpuOverheadGate": "unavailable",
+    "reason": "Reference frames exclude real routine query frames; pass sums omit uploads/copies/query resolve/readback. This is not direct collector GPU overhead or total visual GPU cost."
+  },
+  "errors": []
+}

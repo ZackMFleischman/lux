@@ -1,0 +1,130 @@
+{
+  "plan": {
+    "pairs": 5,
+    "warmupFrames": 60,
+    "measuredFrames": 240,
+    "totalFrames": 300,
+    "trialDeadlineMs": 100000,
+    "processDeadlineMs": 120000,
+    "referencePhase": 16,
+    "sampleEvery": 30,
+    "quantumNs": 65536,
+    "framePeriodMs": 16.666666666666668,
+    "metric": "render/compute pass perturbation on reference frames",
+    "totalGpuOverheadGate": "unavailable"
+  },
+  "order": [
+    {
+      "pair": 0,
+      "modes": [
+        "baseline",
+        "routine"
+      ]
+    },
+    {
+      "pair": 1,
+      "modes": [
+        "routine",
+        "baseline"
+      ]
+    },
+    {
+      "pair": 2,
+      "modes": [
+        "baseline",
+        "routine"
+      ]
+    },
+    {
+      "pair": 3,
+      "modes": [
+        "routine",
+        "baseline"
+      ]
+    },
+    {
+      "pair": 4,
+      "modes": [
+        "baseline",
+        "routine"
+      ]
+    }
+  ],
+  "electronExecutable": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\image-codecs\\node_modules\\.pnpm\\electron@44.3.0\\node_modules\\electron\\dist\\electron.exe",
+  "sourceHash": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+  "linkedHash": "1f0bacc722393fa663b01a6a1fe8c2f5913b897fde124cf22df0848133bfb197",
+  "controlSchemaHash": "297bc0bf1131f8a46dcb56f87631f45c0f0d7a66f583d9605ff2b06c795dd3a2",
+  "savedControls": {
+    "spikeHeight": 0.85,
+    "noiseScale": 8,
+    "sharpness": 2,
+    "motionSpeed": 0.28,
+    "roughness": 0.38
+  },
+  "simulation": "Paused at time0 throughout each new worker; exact tick/frame/control sequence, no gestures.",
+  "probe": "Same timestamp-query feature and independent reference query pool in both modes. Referenceframes16,46; actual routinequeries1,31. Disjoint measured passes.",
+  "scope": "Short diagnostic warmup60frames (~1s) then240frames (~4s) perleg, not acceptance30s warmup. Five alternating pairs (AB3/BA2).",
+  "exclusions": [
+    "uploads",
+    "copies",
+    "clears outside passes",
+    "query resolve/readback",
+    "direct routine GPU-query frames",
+    "native bridge/compositor"
+  ],
+  "rawLimitPerLeg": 64,
+  "files": [
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\apps\\studio\\src\\visual-worker.mjs",
+      "sha256": "1d721eadf6aeb07705b15ccb918868b9261036de270167e740329d8c66667142"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\packages\\performance\\gpu-pass.mjs",
+      "sha256": "87e9a405b88241892ef2bece29cae6572918ee603443d53da89e5701a28e01e8"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\scripts\\gpu-paired\\build.mjs",
+      "sha256": "45c43a1cdbf8b82f4c1d29852b75bc53a627153b0b937675b1b6c6bbedc7e8b3"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\scripts\\gpu-paired\\renderer.mjs",
+      "sha256": "73e590d612f9d3b7c92846175e72c3ebd9651c0706cfd6e11259aa89c54c3524"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\scripts\\gpu-paired\\method.mjs",
+      "sha256": "c28b7e2b2599c8f859f485215b3e4e94a616a5e7d70f71fce2277c9bd51e0332"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\scripts\\gpu-paired\\main.cjs",
+      "sha256": "0a278b0bc77815e68ac9a2d4c766fcddb780655128dce3e0a45b533aa1c2c6fc"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\scripts\\gpu-paired\\run.mjs",
+      "sha256": "c2db21b27189aee2da00e0325a7e7745f8ff0325b50591d1ab94ba430e3c64f5"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\scripts\\gpu-paired\\launch.mjs",
+      "sha256": "d7ccf36d1d5b9ee70db916c37bd9e57d1dfec80d61f8590336bef55d38410ba2"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\artifacts\\gpu-paired-reviewed\\instrumented-worker.mjs",
+      "sha256": "7e9759102438103dbc8c3277de314c2b8a90f03880262e1801c2f12fa6de62a8"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\artifacts\\gpu-paired-reviewed\\worker.js",
+      "sha256": "54a3708965c2964b364074200b63ae7df1b23b68a2712078a067277a65ae0a10"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\artifacts\\gpu-paired-reviewed\\renderer.js",
+      "sha256": "421bed0e6657f22564d6cfb59df8275f4489426cb1d1c6af67470e16f4e00062"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\artifacts\\gpu-paired-reviewed\\index.html",
+      "sha256": "8808d8d028712355c1663de8cba36c22a0dce677fea49f23c2d16f5add93c730"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\artifacts\\gpu-paired-reviewed\\transport.json",
+      "sha256": "145999a7ecec420386d32d0df8368e895e4b688873419908a1c216b2553509e0"
+    }
+  ]
+}

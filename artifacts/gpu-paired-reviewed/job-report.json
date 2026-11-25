@@ -1,0 +1,2977 @@
+{
+  "id": "2eb6cf03-6e40-4163-b47f-9438fe9adbe4",
+  "scope": "120-second paired Studio GPU pass diagnostic; owned Node/Electron descendants",
+  "reviewFile": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\artifacts\\gpu-paired-reviewed\\review-authorized.json",
+  "timeoutMs": 120000,
+  "ok": true,
+  "activity": [
+    {
+      "ProcessId": 0,
+      "Name": "System Idle Process",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:07.7994010Z"
+    },
+    {
+      "ProcessId": 4,
+      "Name": "System",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:07.7994010Z"
+    },
+    {
+      "ProcessId": 188,
+      "Name": "Secure System",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:03.5644650Z"
+    },
+    {
+      "ProcessId": 232,
+      "Name": "Registry",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:03.5763260Z"
+    },
+    {
+      "ProcessId": 808,
+      "Name": "smss.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:07.8123060Z"
+    },
+    {
+      "ProcessId": 1100,
+      "Name": "csrss.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:14.1609570Z"
+    },
+    {
+      "ProcessId": 1200,
+      "Name": "wininit.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:15.3584120Z"
+    },
+    {
+      "ProcessId": 1208,
+      "Name": "csrss.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:15.3593950Z"
+    },
+    {
+      "ProcessId": 1296,
+      "Name": "winlogon.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:15.6164070Z"
+    },
+    {
+      "ProcessId": 1316,
+      "Name": "services.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:15.6503920Z"
+    },
+    {
+      "ProcessId": 1360,
+      "Name": "LsaIso.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:15.6973530Z"
+    },
+    {
+      "ProcessId": 1368,
+      "Name": "lsass.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:15.7010900Z"
+    },
+    {
+      "ProcessId": 1500,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.2085840Z"
+    },
+    {
+      "ProcessId": 1536,
+      "Name": "fontdrvhost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.2275230Z"
+    },
+    {
+      "ProcessId": 1532,
+      "Name": "fontdrvhost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.2275230Z"
+    },
+    {
+      "ProcessId": 1620,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.3017900Z"
+    },
+    {
+      "ProcessId": 1672,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.3272390Z"
+    },
+    {
+      "ProcessId": 1764,
+      "Name": "dwm.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.4416890Z"
+    },
+    {
+      "ProcessId": 1848,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.4534450Z"
+    },
+    {
+      "ProcessId": 1952,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.4653270Z"
+    },
+    {
+      "ProcessId": 1956,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.4653290Z"
+    },
+    {
+      "ProcessId": 1964,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.4653300Z"
+    },
+    {
+      "ProcessId": 2056,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.5025480Z"
+    },
+    {
+      "ProcessId": 2064,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.5029630Z"
+    },
+    {
+      "ProcessId": 2180,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.5274420Z"
+    },
+    {
+      "ProcessId": 2188,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.5274780Z"
+    },
+    {
+      "ProcessId": 2196,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.5280680Z"
+    },
+    {
+      "ProcessId": 2228,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.5314740Z"
+    },
+    {
+      "ProcessId": 2356,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.5413080Z"
+    },
+    {
+      "ProcessId": 2416,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.5485960Z"
+    },
+    {
+      "ProcessId": 2600,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.5785140Z"
+    },
+    {
+      "ProcessId": 2632,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.5835200Z"
+    },
+    {
+      "ProcessId": 2808,
+      "Name": "NVDisplay.Container.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.6196970Z"
+    },
+    {
+      "ProcessId": 2940,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.6450740Z"
+    },
+    {
+      "ProcessId": 3016,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.6758130Z"
+    },
+    {
+      "ProcessId": 2052,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.6907690Z"
+    },
+    {
+      "ProcessId": 3140,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.7093610Z"
+    },
+    {
+      "ProcessId": 3148,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.7096580Z"
+    },
+    {
+      "ProcessId": 3156,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.7098140Z"
+    },
+    {
+      "ProcessId": 3164,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.7099000Z"
+    },
+    {
+      "ProcessId": 3300,
+      "Name": "Memory Compression",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.7381640Z"
+    },
+    {
+      "ProcessId": 3324,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.7386500Z"
+    },
+    {
+      "ProcessId": 3344,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.7408290Z"
+    },
+    {
+      "ProcessId": 3436,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.7535290Z"
+    },
+    {
+      "ProcessId": 3492,
+      "Name": "igfxCUIService.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.7657550Z"
+    },
+    {
+      "ProcessId": 3544,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.7950220Z"
+    },
+    {
+      "ProcessId": 3576,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.8044780Z"
+    },
+    {
+      "ProcessId": 3592,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.8053100Z"
+    },
+    {
+      "ProcessId": 3684,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.8304940Z"
+    },
+    {
+      "ProcessId": 3744,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.8498290Z"
+    },
+    {
+      "ProcessId": 3780,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.8635480Z"
+    },
+    {
+      "ProcessId": 3832,
+      "Name": "WUDFHost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.8789250Z"
+    },
+    {
+      "ProcessId": 3844,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.8833830Z"
+    },
+    {
+      "ProcessId": 3928,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.8988180Z"
+    },
+    {
+      "ProcessId": 3936,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.8992790Z"
+    },
+    {
+      "ProcessId": 3240,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.9502140Z"
+    },
+    {
+      "ProcessId": 4132,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.9683740Z"
+    },
+    {
+      "ProcessId": 4160,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.9823290Z"
+    },
+    {
+      "ProcessId": 4188,
+      "Name": "WUDFHost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:16.9986480Z"
+    },
+    {
+      "ProcessId": 4240,
+      "Name": "spoolsv.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.0189000Z"
+    },
+    {
+      "ProcessId": 4272,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.0324110Z"
+    },
+    {
+      "ProcessId": 4340,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.0792630Z"
+    },
+    {
+      "ProcessId": 4436,
+      "Name": "AppleMobileDeviceService.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.0949680Z"
+    },
+    {
+      "ProcessId": 4444,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.0951850Z"
+    },
+    {
+      "ProcessId": 4452,
+      "Name": "DbxSvc.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.0952940Z"
+    },
+    {
+      "ProcessId": 4460,
+      "Name": "mDNSResponder.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.0958670Z"
+    },
+    {
+      "ProcessId": 4472,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.0973330Z"
+    },
+    {
+      "ProcessId": 4480,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.0976750Z"
+    },
+    {
+      "ProcessId": 4488,
+      "Name": "IntelCpHDCPSvc.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.0982080Z"
+    },
+    {
+      "ProcessId": 4496,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.0982280Z"
+    },
+    {
+      "ProcessId": 4508,
+      "Name": "GameInputRedistService.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1002790Z"
+    },
+    {
+      "ProcessId": 4548,
+      "Name": "AdobeUpdateService.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1014890Z"
+    },
+    {
+      "ProcessId": 4560,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1039180Z"
+    },
+    {
+      "ProcessId": 4576,
+      "Name": "jhi_service.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1075080Z"
+    },
+    {
+      "ProcessId": 4596,
+      "Name": "OfficeClickToRun.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1108060Z"
+    },
+    {
+      "ProcessId": 4636,
+      "Name": "MpDefenderCoreService.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1139520Z"
+    },
+    {
+      "ProcessId": 4704,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1220820Z"
+    },
+    {
+      "ProcessId": 4716,
+      "Name": "nvcontainer.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1232150Z"
+    },
+    {
+      "ProcessId": 4724,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1235360Z"
+    },
+    {
+      "ProcessId": 4736,
+      "Name": "NahimicService.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1256280Z"
+    },
+    {
+      "ProcessId": 4800,
+      "Name": "RstMwService.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1330430Z"
+    },
+    {
+      "ProcessId": 4888,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1432070Z"
+    },
+    {
+      "ProcessId": 4896,
+      "Name": "RtkAudUService64.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1433380Z"
+    },
+    {
+      "ProcessId": 4904,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1439450Z"
+    },
+    {
+      "ProcessId": 4916,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1449430Z"
+    },
+    {
+      "ProcessId": 4924,
+      "Name": "MsMpEng.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1455550Z"
+    },
+    {
+      "ProcessId": 4992,
+      "Name": "WMIRegistrationService.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1519990Z"
+    },
+    {
+      "ProcessId": 5152,
+      "Name": "wslservice.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.1740290Z"
+    },
+    {
+      "ProcessId": 5556,
+      "Name": "EvoDriverUpdateService.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.2195210Z"
+    },
+    {
+      "ProcessId": 5572,
+      "Name": "IntelCpHeciSvc.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.2237790Z"
+    },
+    {
+      "ProcessId": 6672,
+      "Name": "NVDisplay.Container.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.5446790Z"
+    },
+    {
+      "ProcessId": 7560,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.9891540Z"
+    },
+    {
+      "ProcessId": 7600,
+      "Name": "WmiPrvSE.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.9918150Z"
+    },
+    {
+      "ProcessId": 7608,
+      "Name": "dasHost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:17.9919170Z"
+    },
+    {
+      "ProcessId": 7744,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:18.0480060Z"
+    },
+    {
+      "ProcessId": 8272,
+      "Name": "dasHost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:18.5162510Z"
+    },
+    {
+      "ProcessId": 8412,
+      "Name": "GameInputRedistService.exe",
+      "ExecutablePath": "C:\\Program Files\\Microsoft GameInput\\x64\\GameInputRedistService.exe",
+      "CreationUtc": "2026-09-12T08:00:18.5452140Z"
+    },
+    {
+      "ProcessId": 8420,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:18.5465030Z"
+    },
+    {
+      "ProcessId": 6320,
+      "Name": "nvcontainer.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:20.5172400Z"
+    },
+    {
+      "ProcessId": 8904,
+      "Name": "WmiPrvSE.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:20.5176970Z"
+    },
+    {
+      "ProcessId": 8956,
+      "Name": "nvcontainer.exe",
+      "ExecutablePath": "C:\\Program Files\\NVIDIA Corporation\\NvContainer\\nvcontainer.exe",
+      "CreationUtc": "2026-09-12T08:00:20.5384310Z"
+    },
+    {
+      "ProcessId": 9276,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:20.9741410Z"
+    },
+    {
+      "ProcessId": 9444,
+      "Name": "gamingservicesnet.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:21.0340850Z"
+    },
+    {
+      "ProcessId": 9552,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:21.0413450Z"
+    },
+    {
+      "ProcessId": 9560,
+      "Name": "gamingservices.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:21.0441210Z"
+    },
+    {
+      "ProcessId": 9592,
+      "Name": "cowork-svc.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:21.0521710Z"
+    },
+    {
+      "ProcessId": 10028,
+      "Name": "sihost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\sihost.exe",
+      "CreationUtc": "2026-09-12T08:00:21.1431660Z"
+    },
+    {
+      "ProcessId": 10108,
+      "Name": "svchost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\svchost.exe",
+      "CreationUtc": "2026-09-12T08:00:21.1606130Z"
+    },
+    {
+      "ProcessId": 10136,
+      "Name": "svchost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\svchost.exe",
+      "CreationUtc": "2026-09-12T08:00:21.1646740Z"
+    },
+    {
+      "ProcessId": 10156,
+      "Name": "wlanext.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:21.1721220Z"
+    },
+    {
+      "ProcessId": 10180,
+      "Name": "PresentationFontCache.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:21.1782270Z"
+    },
+    {
+      "ProcessId": 10232,
+      "Name": "svchost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\svchost.exe",
+      "CreationUtc": "2026-09-12T08:00:21.1880460Z"
+    },
+    {
+      "ProcessId": 2384,
+      "Name": "svchost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\svchost.exe",
+      "CreationUtc": "2026-09-12T08:00:21.2103830Z"
+    },
+    {
+      "ProcessId": 9764,
+      "Name": "taskhostw.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\taskhostw.exe",
+      "CreationUtc": "2026-09-12T08:00:21.2349970Z"
+    },
+    {
+      "ProcessId": 10292,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:21.2758660Z"
+    },
+    {
+      "ProcessId": 10360,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:21.2938440Z"
+    },
+    {
+      "ProcessId": 10972,
+      "Name": "AggregatorHost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:21.6325810Z"
+    },
+    {
+      "ProcessId": 11076,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:21.6767500Z"
+    },
+    {
+      "ProcessId": 11112,
+      "Name": "igfxEM.exe",
+      "ExecutablePath": "C:\\WINDOWS\\System32\\DriverStore\\FileRepository\\cui_dch.inf_amd64_ba5b1813656e5c27\\igfxEM.exe",
+      "CreationUtc": "2026-09-12T08:00:21.6831050Z"
+    },
+    {
+      "ProcessId": 10416,
+      "Name": "explorer.exe",
+      "ExecutablePath": "C:\\WINDOWS\\Explorer.EXE",
+      "CreationUtc": "2026-09-12T08:00:21.8635650Z"
+    },
+    {
+      "ProcessId": 10556,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:22.1242780Z"
+    },
+    {
+      "ProcessId": 10528,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:22.1252850Z"
+    },
+    {
+      "ProcessId": 11056,
+      "Name": "CrossDeviceResume.exe",
+      "ExecutablePath": "C:\\WINDOWS\\SystemApps\\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\\CrossDeviceResume.exe",
+      "CreationUtc": "2026-09-12T08:00:22.1904810Z"
+    },
+    {
+      "ProcessId": 11552,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:22.5486500Z"
+    },
+    {
+      "ProcessId": 11940,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:23.0756660Z"
+    },
+    {
+      "ProcessId": 12040,
+      "Name": "svchost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\svchost.exe",
+      "CreationUtc": "2026-09-12T08:00:23.1890770Z"
+    },
+    {
+      "ProcessId": 12108,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:23.2148240Z"
+    },
+    {
+      "ProcessId": 12204,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:23.2695650Z"
+    },
+    {
+      "ProcessId": 10964,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:23.3416410Z"
+    },
+    {
+      "ProcessId": 11828,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:23.4050970Z"
+    },
+    {
+      "ProcessId": 12300,
+      "Name": "NgcIso.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:23.4482060Z"
+    },
+    {
+      "ProcessId": 12456,
+      "Name": "CrossDeviceService.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\MicrosoftWindows.CrossDevice_1.26071.84.0_x64__cw5n1h2txyewy\\CrossDeviceService.exe",
+      "CreationUtc": "2026-09-12T08:00:23.5836630Z"
+    },
+    {
+      "ProcessId": 12732,
+      "Name": "SearchHost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\SystemApps\\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\\SearchHost.exe",
+      "CreationUtc": "2026-09-12T08:00:23.8983690Z"
+    },
+    {
+      "ProcessId": 12756,
+      "Name": "StartMenuExperienceHost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\StartMenuExperienceHost.exe",
+      "CreationUtc": "2026-09-12T08:00:23.9021620Z"
+    },
+    {
+      "ProcessId": 12908,
+      "Name": "WidgetBoard.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\MicrosoftWindows.Client.WebExperience_526.21100.40.0_x64__cw5n1h2txyewy\\WidgetBoard.exe",
+      "CreationUtc": "2026-09-12T08:00:23.9781570Z"
+    },
+    {
+      "ProcessId": 13144,
+      "Name": "RuntimeBroker.exe",
+      "ExecutablePath": "C:\\Windows\\System32\\RuntimeBroker.exe",
+      "CreationUtc": "2026-09-12T08:00:24.3545830Z"
+    },
+    {
+      "ProcessId": 13236,
+      "Name": "svchost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\svchost.exe",
+      "CreationUtc": "2026-09-12T08:00:24.4398790Z"
+    },
+    {
+      "ProcessId": 12364,
+      "Name": "WidgetService.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\Microsoft.WidgetsPlatformRuntime_1.6.19.0_x64__8wekyb3d8bbwe\\WidgetService\\WidgetService.exe",
+      "CreationUtc": "2026-09-12T08:00:24.4925770Z"
+    },
+    {
+      "ProcessId": 13880,
+      "Name": "vmcompute.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:25.1965350Z"
+    },
+    {
+      "ProcessId": 14020,
+      "Name": "ShellExperienceHost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\SystemApps\\ShellExperienceHost_cw5n1h2txyewy\\ShellExperienceHost.exe",
+      "CreationUtc": "2026-09-12T08:00:25.2656990Z"
+    },
+    {
+      "ProcessId": 14716,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:00:26.0607970Z"
+    },
+    {
+      "ProcessId": 14832,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:26.1292300Z"
+    },
+    {
+      "ProcessId": 14984,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:00:26.2019670Z"
+    },
+    {
+      "ProcessId": 15084,
+      "Name": "MicrosoftStartFeedProvider.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\Microsoft.StartExperiencesApp_1.380.2.0_x64__8wekyb3d8bbwe\\MicrosoftStartFeedProvider\\MicrosoftStartFeedProvider.exe",
+      "CreationUtc": "2026-09-12T08:00:26.2537560Z"
+    },
+    {
+      "ProcessId": 15104,
+      "Name": "RuntimeBroker.exe",
+      "ExecutablePath": "C:\\Windows\\System32\\RuntimeBroker.exe",
+      "CreationUtc": "2026-09-12T08:00:26.2650450Z"
+    },
+    {
+      "ProcessId": 12712,
+      "Name": "ctfmon.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:26.9274330Z"
+    },
+    {
+      "ProcessId": 11704,
+      "Name": "GameInputSvc.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:27.3333980Z"
+    },
+    {
+      "ProcessId": 15372,
+      "Name": "GameInputSvc.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:27.3514390Z"
+    },
+    {
+      "ProcessId": 15476,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:00:27.5171950Z"
+    },
+    {
+      "ProcessId": 15520,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:00:27.5396170Z"
+    },
+    {
+      "ProcessId": 15644,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:00:27.5918170Z"
+    },
+    {
+      "ProcessId": 15820,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:00:27.7048570Z"
+    },
+    {
+      "ProcessId": 15988,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:27.8248890Z"
+    },
+    {
+      "ProcessId": 16588,
+      "Name": "SearchIndexer.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:28.5042910Z"
+    },
+    {
+      "ProcessId": 16836,
+      "Name": "svchost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\svchost.exe",
+      "CreationUtc": "2026-09-12T08:00:28.7961580Z"
+    },
+    {
+      "ProcessId": 6468,
+      "Name": "NisSrv.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:32.2742400Z"
+    },
+    {
+      "ProcessId": 15388,
+      "Name": "TextInputHost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\SystemApps\\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\\TextInputHost.exe",
+      "CreationUtc": "2026-09-12T08:00:33.8252140Z"
+    },
+    {
+      "ProcessId": 17564,
+      "Name": "SpotifyLauncher.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\SpotifyAB.SpotifyMusic_1.299.317.0_x64__zpdnekdrzrea0\\SpotifyLauncher.exe",
+      "CreationUtc": "2026-09-12T08:00:35.9088530Z"
+    },
+    {
+      "ProcessId": 17872,
+      "Name": "crashpad_handler.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\SpotifyAB.SpotifyMusic_1.299.317.0_x64__zpdnekdrzrea0\\crashpad_handler.exe",
+      "CreationUtc": "2026-09-12T08:00:36.1292130Z"
+    },
+    {
+      "ProcessId": 17620,
+      "Name": "NhNotifSys.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\NhNotifSys.exe",
+      "CreationUtc": "2026-09-12T08:00:49.6469800Z"
+    },
+    {
+      "ProcessId": 17640,
+      "Name": "PhoneExperienceHost.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\Microsoft.YourPhone_1.26071.164.0_x64__8wekyb3d8bbwe\\PhoneExperienceHost.exe",
+      "CreationUtc": "2026-09-12T08:00:50.2730990Z"
+    },
+    {
+      "ProcessId": 18128,
+      "Name": "SecurityHealthSystray.exe",
+      "ExecutablePath": "C:\\Windows\\System32\\SecurityHealthSystray.exe",
+      "CreationUtc": "2026-09-12T08:00:54.7754950Z"
+    },
+    {
+      "ProcessId": 4612,
+      "Name": "SecurityHealthService.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:00:54.8006850Z"
+    },
+    {
+      "ProcessId": 18188,
+      "Name": "RtkAudUService64.exe",
+      "ExecutablePath": "C:\\Windows\\System32\\DriverStore\\FileRepository\\realtekservice.inf_amd64_a112e46fc636d880\\RtkAudUService64.exe",
+      "CreationUtc": "2026-09-12T08:00:55.8922000Z"
+    },
+    {
+      "ProcessId": 2248,
+      "Name": "OneDrive.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\Microsoft\\OneDrive\\OneDrive.exe",
+      "CreationUtc": "2026-09-12T08:00:57.4738500Z"
+    },
+    {
+      "ProcessId": 4372,
+      "Name": "flux.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\FluxSoftware\\Flux\\flux.exe",
+      "CreationUtc": "2026-09-12T08:01:01.1066160Z"
+    },
+    {
+      "ProcessId": 13376,
+      "Name": "Superwhisper.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\superwhisper\\Superwhisper.exe",
+      "CreationUtc": "2026-09-12T08:01:06.7608810Z"
+    },
+    {
+      "ProcessId": 15076,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:01:06.9694880Z"
+    },
+    {
+      "ProcessId": 6976,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:01:07.0154720Z"
+    },
+    {
+      "ProcessId": 10668,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:01:07.1417700Z"
+    },
+    {
+      "ProcessId": 18332,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:01:07.1440790Z"
+    },
+    {
+      "ProcessId": 16912,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:01:07.1742030Z"
+    },
+    {
+      "ProcessId": 18452,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:01:07.2379550Z"
+    },
+    {
+      "ProcessId": 18580,
+      "Name": "Superwhisper.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\superwhisper\\Superwhisper.exe",
+      "CreationUtc": "2026-09-12T08:01:07.3865950Z"
+    },
+    {
+      "ProcessId": 18924,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:01:08.8324570Z"
+    },
+    {
+      "ProcessId": 18952,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:01:08.8499070Z"
+    },
+    {
+      "ProcessId": 19128,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:01:08.9761100Z"
+    },
+    {
+      "ProcessId": 19136,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:01:08.9778080Z"
+    },
+    {
+      "ProcessId": 19148,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:01:08.9874580Z"
+    },
+    {
+      "ProcessId": 19216,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:01:09.0163430Z"
+    },
+    {
+      "ProcessId": 19368,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:01:09.0799250Z"
+    },
+    {
+      "ProcessId": 19540,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:01:09.7105250Z"
+    },
+    {
+      "ProcessId": 19668,
+      "Name": "msedgewebview2.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\152.0.4191.66\\msedgewebview2.exe",
+      "CreationUtc": "2026-09-12T08:01:10.2651220Z"
+    },
+    {
+      "ProcessId": 19884,
+      "Name": "1Password.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:01:14.8992610Z"
+    },
+    {
+      "ProcessId": 17400,
+      "Name": "1Password.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:01:15.9426900Z"
+    },
+    {
+      "ProcessId": 14068,
+      "Name": "1Password.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:01:16.0089030Z"
+    },
+    {
+      "ProcessId": 20220,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:01:18.2081280Z"
+    },
+    {
+      "ProcessId": 20356,
+      "Name": "EvoMouseExec.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Evoluent\\Evoluent Mouse Manager\\EvoMouseExec.exe",
+      "CreationUtc": "2026-09-12T08:01:18.6857640Z"
+    },
+    {
+      "ProcessId": 20408,
+      "Name": "EvoMouseListener.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Evoluent\\Evoluent Mouse Manager\\EvoMouseListener.exe",
+      "CreationUtc": "2026-09-12T08:01:18.7560050Z"
+    },
+    {
+      "ProcessId": 3380,
+      "Name": "ollama app.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Ollama\\ollama app.exe",
+      "CreationUtc": "2026-09-12T08:01:19.5981290Z"
+    },
+    {
+      "ProcessId": 3632,
+      "Name": "ollama.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Ollama\\ollama.exe",
+      "CreationUtc": "2026-09-12T08:01:19.6612660Z"
+    },
+    {
+      "ProcessId": 15256,
+      "Name": "conhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\conhost.exe",
+      "CreationUtc": "2026-09-12T08:01:19.7230590Z"
+    },
+    {
+      "ProcessId": 4248,
+      "Name": "Dropbox.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Dropbox\\Client\\Dropbox.exe",
+      "CreationUtc": "2026-09-12T08:01:19.9124620Z"
+    },
+    {
+      "ProcessId": 5096,
+      "Name": "Dropbox.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Dropbox\\Client\\Dropbox.exe",
+      "CreationUtc": "2026-09-12T08:01:21.0161690Z"
+    },
+    {
+      "ProcessId": 5104,
+      "Name": "Dropbox.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Dropbox\\Client\\Dropbox.exe",
+      "CreationUtc": "2026-09-12T08:01:21.0530780Z"
+    },
+    {
+      "ProcessId": 17192,
+      "Name": "Dropbox.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Dropbox\\Client\\Dropbox.exe",
+      "CreationUtc": "2026-09-12T08:01:31.1756760Z"
+    },
+    {
+      "ProcessId": 10208,
+      "Name": "Dropbox.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Dropbox\\Client\\Dropbox.exe",
+      "CreationUtc": "2026-09-12T08:01:31.2272910Z"
+    },
+    {
+      "ProcessId": 13568,
+      "Name": "ONENOTEM.EXE",
+      "ExecutablePath": "C:\\Program Files\\Microsoft Office\\root\\Office16\\ONENOTEM.EXE",
+      "CreationUtc": "2026-09-12T08:01:33.0192440Z"
+    },
+    {
+      "ProcessId": 1304,
+      "Name": "Dropbox.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Dropbox\\Client\\Dropbox.exe",
+      "CreationUtc": "2026-09-12T08:01:33.7416240Z"
+    },
+    {
+      "ProcessId": 1656,
+      "Name": "AutoHotkeyU64.exe",
+      "ExecutablePath": "C:\\Program Files\\AutoHotkey\\v1.1.36.02\\AutoHotkeyU64.exe",
+      "CreationUtc": "2026-09-12T08:01:33.7871330Z"
+    },
+    {
+      "ProcessId": 21196,
+      "Name": "Dropbox.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Dropbox\\Client\\Dropbox.exe",
+      "CreationUtc": "2026-09-12T08:01:36.6491620Z"
+    },
+    {
+      "ProcessId": 21400,
+      "Name": "Dropbox.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Dropbox\\Client\\Dropbox.exe",
+      "CreationUtc": "2026-09-12T08:01:38.3250900Z"
+    },
+    {
+      "ProcessId": 9072,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:01:52.5815940Z"
+    },
+    {
+      "ProcessId": 21216,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-12T08:01:52.7727350Z"
+    },
+    {
+      "ProcessId": 4268,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-12T08:01:52.9033260Z"
+    },
+    {
+      "ProcessId": 21332,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-12T08:01:52.9448310Z"
+    },
+    {
+      "ProcessId": 13052,
+      "Name": "svchost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\System32\\svchost.exe",
+      "CreationUtc": "2026-09-12T08:01:53.7502370Z"
+    },
+    {
+      "ProcessId": 10228,
+      "Name": "RuntimeBroker.exe",
+      "ExecutablePath": "C:\\Windows\\System32\\RuntimeBroker.exe",
+      "CreationUtc": "2026-09-12T08:01:53.8618200Z"
+    },
+    {
+      "ProcessId": 11108,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-12T08:01:54.0499450Z"
+    },
+    {
+      "ProcessId": 1892,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-12T08:01:54.1116910Z"
+    },
+    {
+      "ProcessId": 21680,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-12T08:02:01.2202490Z"
+    },
+    {
+      "ProcessId": 21688,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-12T08:02:01.2206030Z"
+    },
+    {
+      "ProcessId": 22076,
+      "Name": "codex.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\bin\\bffc5354119c8421\\codex.exe",
+      "CreationUtc": "2026-09-12T08:02:02.2752300Z"
+    },
+    {
+      "ProcessId": 22084,
+      "Name": "conhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\conhost.exe",
+      "CreationUtc": "2026-09-12T08:02:02.2855920Z"
+    },
+    {
+      "ProcessId": 14868,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T08:02:02.6169430Z"
+    },
+    {
+      "ProcessId": 21008,
+      "Name": "codex-computer-use-swift.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node_modules\\@oai\\sky\\bin\\windows\\swift\\x64\\codex-computer-use-swift.exe",
+      "CreationUtc": "2026-09-12T08:02:07.6004120Z"
+    },
+    {
+      "ProcessId": 21308,
+      "Name": "conhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\conhost.exe",
+      "CreationUtc": "2026-09-12T08:02:07.6182160Z"
+    },
+    {
+      "ProcessId": 14792,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-12T08:02:10.3408430Z"
+    },
+    {
+      "ProcessId": 23012,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-12T08:02:14.0574120Z"
+    },
+    {
+      "ProcessId": 22456,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:02:21.8493930Z"
+    },
+    {
+      "ProcessId": 15692,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:02:22.1146480Z"
+    },
+    {
+      "ProcessId": 21564,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:02:22.2236710Z"
+    },
+    {
+      "ProcessId": 17176,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:02:22.2677660Z"
+    },
+    {
+      "ProcessId": 23196,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:02:22.4094930Z"
+    },
+    {
+      "ProcessId": 8996,
+      "Name": "AdobeNotificationClient.exe",
+      "ExecutablePath": "C:\\Program Files\\Common Files\\Adobe\\Adobe OS Extension\\AdobeNotificationClient.exe",
+      "CreationUtc": "2026-09-12T08:03:26.5618610Z"
+    },
+    {
+      "ProcessId": 4104,
+      "Name": "RuntimeBroker.exe",
+      "ExecutablePath": "C:\\Windows\\System32\\RuntimeBroker.exe",
+      "CreationUtc": "2026-09-12T08:03:26.9912660Z"
+    },
+    {
+      "ProcessId": 8076,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:03:27.2005950Z"
+    },
+    {
+      "ProcessId": 3664,
+      "Name": "AppActions.exe",
+      "ExecutablePath": "C:\\WINDOWS\\SystemApps\\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\\AppActions.exe",
+      "CreationUtc": "2026-09-12T08:10:22.1705300Z"
+    },
+    {
+      "ProcessId": 2256,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:10:27.7571040Z"
+    },
+    {
+      "ProcessId": 11272,
+      "Name": "SDXHelper.exe",
+      "ExecutablePath": "C:\\Program Files\\Microsoft Office\\Root\\Office16\\SDXHelper.exe",
+      "CreationUtc": "2026-09-12T08:15:26.8973310Z"
+    },
+    {
+      "ProcessId": 13200,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T08:26:22.9924630Z"
+    },
+    {
+      "ProcessId": 8676,
+      "Name": "Video.UI.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\Microsoft.ZuneVideo_10.26061.10051.0_x64__8wekyb3d8bbwe\\Video.UI.exe",
+      "CreationUtc": "2026-09-12T08:30:46.5089320Z"
+    },
+    {
+      "ProcessId": 17376,
+      "Name": "XboxPcAppFT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\Microsoft.GamingApp_2608.1001.17.0_x64__8wekyb3d8bbwe\\XboxPcAppFT.exe",
+      "CreationUtc": "2026-09-12T08:30:47.0013300Z"
+    },
+    {
+      "ProcessId": 6136,
+      "Name": "RuntimeBroker.exe",
+      "ExecutablePath": "C:\\Windows\\System32\\RuntimeBroker.exe",
+      "CreationUtc": "2026-09-12T08:30:47.4875010Z"
+    },
+    {
+      "ProcessId": 14292,
+      "Name": "OneDrive.Sync.Service.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\Microsoft\\OneDrive\\26.158.0816.0003\\OneDrive.Sync.Service.exe",
+      "CreationUtc": "2026-09-12T11:19:51.8746250Z"
+    },
+    {
+      "ProcessId": 21908,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T17:04:15.4831720Z"
+    },
+    {
+      "ProcessId": 3272,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-12T17:04:49.7778480Z"
+    },
+    {
+      "ProcessId": 20920,
+      "Name": "node_repl.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node_repl.exe",
+      "CreationUtc": "2026-09-12T17:04:49.7824360Z"
+    },
+    {
+      "ProcessId": 6900,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-12T17:04:49.7892850Z"
+    },
+    {
+      "ProcessId": 9100,
+      "Name": "cmd.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\cmd.exe",
+      "CreationUtc": "2026-09-12T17:04:49.7930500Z"
+    },
+    {
+      "ProcessId": 11564,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-12T17:04:49.8239470Z"
+    },
+    {
+      "ProcessId": 17916,
+      "Name": "node_repl.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node_repl.exe",
+      "CreationUtc": "2026-09-12T17:04:49.8885690Z"
+    },
+    {
+      "ProcessId": 6964,
+      "Name": "codex-code-mode-host.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\bin\\bffc5354119c8421\\codex-code-mode-host.exe",
+      "CreationUtc": "2026-09-12T17:05:09.1617560Z"
+    },
+    {
+      "ProcessId": 23480,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T17:05:11.1821520Z"
+    },
+    {
+      "ProcessId": 12848,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T17:07:16.0915130Z"
+    },
+    {
+      "ProcessId": 12436,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T17:07:31.2758030Z"
+    },
+    {
+      "ProcessId": 7408,
+      "Name": "MidiSrv.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T17:08:46.7589670Z"
+    },
+    {
+      "ProcessId": 8384,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T17:09:11.3448150Z"
+    },
+    {
+      "ProcessId": 21292,
+      "Name": "svchost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\svchost.exe",
+      "CreationUtc": "2026-09-12T17:14:24.1236420Z"
+    },
+    {
+      "ProcessId": 8604,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T17:18:54.3744930Z"
+    },
+    {
+      "ProcessId": 13292,
+      "Name": "ShellHost.exe",
+      "ExecutablePath": "C:\\Windows\\System32\\ShellHost.exe",
+      "CreationUtc": "2026-09-12T17:24:27.6972950Z"
+    },
+    {
+      "ProcessId": 8900,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T17:42:34.2064490Z"
+    },
+    {
+      "ProcessId": 904,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T17:51:22.7418620Z"
+    },
+    {
+      "ProcessId": 21868,
+      "Name": "taskhostw.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T17:51:22.7780760Z"
+    },
+    {
+      "ProcessId": 10776,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T17:58:46.9578290Z"
+    },
+    {
+      "ProcessId": 7412,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T17:59:40.3288950Z"
+    },
+    {
+      "ProcessId": 22596,
+      "Name": "RuntimeBroker.exe",
+      "ExecutablePath": "C:\\Windows\\System32\\RuntimeBroker.exe",
+      "CreationUtc": "2026-09-12T18:03:14.6221260Z"
+    },
+    {
+      "ProcessId": 6392,
+      "Name": "mscopilot_proxy.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft\\Copilot\\Application\\mscopilot_proxy.exe",
+      "CreationUtc": "2026-09-12T18:10:22.8170330Z"
+    },
+    {
+      "ProcessId": 2800,
+      "Name": "dllhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\DllHost.exe",
+      "CreationUtc": "2026-09-12T18:10:22.9395520Z"
+    },
+    {
+      "ProcessId": 20940,
+      "Name": "dllhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\DllHost.exe",
+      "CreationUtc": "2026-09-12T18:10:23.0045990Z"
+    },
+    {
+      "ProcessId": 4832,
+      "Name": "dllhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\DllHost.exe",
+      "CreationUtc": "2026-09-12T18:10:23.2119920Z"
+    },
+    {
+      "ProcessId": 3096,
+      "Name": "dllhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\DllHost.exe",
+      "CreationUtc": "2026-09-12T18:10:23.3321640Z"
+    },
+    {
+      "ProcessId": 2428,
+      "Name": "dllhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\SysWOW64\\DllHost.exe",
+      "CreationUtc": "2026-09-12T18:10:23.4061650Z"
+    },
+    {
+      "ProcessId": 13320,
+      "Name": "herdr.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T18:10:45.9393660Z"
+    },
+    {
+      "ProcessId": 21508,
+      "Name": "OpenConsole.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T18:10:46.1208090Z"
+    },
+    {
+      "ProcessId": 20936,
+      "Name": "powershell.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T18:10:46.1331850Z"
+    },
+    {
+      "ProcessId": 16292,
+      "Name": "codex.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T18:11:34.3729840Z"
+    },
+    {
+      "ProcessId": 24276,
+      "Name": "node_repl.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T18:11:40.8326890Z"
+    },
+    {
+      "ProcessId": 24284,
+      "Name": "node.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T18:11:40.8404290Z"
+    },
+    {
+      "ProcessId": 24444,
+      "Name": "node_repl.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T18:11:40.9242380Z"
+    },
+    {
+      "ProcessId": 7524,
+      "Name": "codex-code-mode-host.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T18:13:36.1804580Z"
+    },
+    {
+      "ProcessId": 9112,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T18:17:54.3677050Z"
+    },
+    {
+      "ProcessId": 23656,
+      "Name": "RuntimeBroker.exe",
+      "ExecutablePath": "C:\\Windows\\System32\\RuntimeBroker.exe",
+      "CreationUtc": "2026-09-12T18:55:07.8405990Z"
+    },
+    {
+      "ProcessId": 4668,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T19:01:18.9786150Z"
+    },
+    {
+      "ProcessId": 21656,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T19:01:31.9675560Z"
+    },
+    {
+      "ProcessId": 12508,
+      "Name": "codex.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\bin\\bffc5354119c8421\\codex.exe",
+      "CreationUtc": "2026-09-12T19:01:36.1753830Z"
+    },
+    {
+      "ProcessId": 23180,
+      "Name": "codex.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\bin\\bffc5354119c8421\\codex.exe",
+      "CreationUtc": "2026-09-12T19:01:38.4228220Z"
+    },
+    {
+      "ProcessId": 1352,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-12T19:01:38.5721420Z"
+    },
+    {
+      "ProcessId": 3208,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-12T19:01:38.5780720Z"
+    },
+    {
+      "ProcessId": 11256,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T19:01:49.9577060Z"
+    },
+    {
+      "ProcessId": 20868,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T19:11:16.4673370Z"
+    },
+    {
+      "ProcessId": 14812,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T19:25:23.0336110Z"
+    },
+    {
+      "ProcessId": 21984,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T19:39:41.1929440Z"
+    },
+    {
+      "ProcessId": 2032,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T19:40:48.6279040Z"
+    },
+    {
+      "ProcessId": 17476,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T19:43:10.5652770Z"
+    },
+    {
+      "ProcessId": 25348,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T19:49:43.3179490Z"
+    },
+    {
+      "ProcessId": 12828,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T20:30:19.7274620Z"
+    },
+    {
+      "ProcessId": 13104,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T20:30:20.4130110Z"
+    },
+    {
+      "ProcessId": 23928,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T20:30:21.1208560Z"
+    },
+    {
+      "ProcessId": 2144,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T20:58:09.8721980Z"
+    },
+    {
+      "ProcessId": 22964,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T20:58:10.4887120Z"
+    },
+    {
+      "ProcessId": 25656,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T21:17:27.3519400Z"
+    },
+    {
+      "ProcessId": 26232,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-12T21:19:46.2671120Z"
+    },
+    {
+      "ProcessId": 22164,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T21:27:35.4167790Z"
+    },
+    {
+      "ProcessId": 17944,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T21:33:56.8018920Z"
+    },
+    {
+      "ProcessId": 20392,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T21:52:11.3145860Z"
+    },
+    {
+      "ProcessId": 948,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T21:54:54.9586610Z"
+    },
+    {
+      "ProcessId": 8796,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T21:55:11.9307880Z"
+    },
+    {
+      "ProcessId": 22600,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T21:58:38.5519100Z"
+    },
+    {
+      "ProcessId": 3520,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:01:32.3555050Z"
+    },
+    {
+      "ProcessId": 26100,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:03:02.9195800Z"
+    },
+    {
+      "ProcessId": 26364,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:10:14.8710870Z"
+    },
+    {
+      "ProcessId": 25812,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:12:39.6818440Z"
+    },
+    {
+      "ProcessId": 25360,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:20:34.4793780Z"
+    },
+    {
+      "ProcessId": 13096,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:20:48.8626070Z"
+    },
+    {
+      "ProcessId": 7076,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:20:49.1607840Z"
+    },
+    {
+      "ProcessId": 15300,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Program Files\\nodejs\\node.exe",
+      "CreationUtc": "2026-09-12T22:34:26.3461280Z"
+    },
+    {
+      "ProcessId": 15044,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:37:40.2846470Z"
+    },
+    {
+      "ProcessId": 18016,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:37:40.6508880Z"
+    },
+    {
+      "ProcessId": 27164,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:37:41.3270750Z"
+    },
+    {
+      "ProcessId": 27344,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:42:45.2968590Z"
+    },
+    {
+      "ProcessId": 3768,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-12T22:48:01.0071450Z"
+    },
+    {
+      "ProcessId": 20908,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:51:11.6549740Z"
+    },
+    {
+      "ProcessId": 27420,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:51:18.2420350Z"
+    },
+    {
+      "ProcessId": 12856,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:51:27.2643050Z"
+    },
+    {
+      "ProcessId": 1440,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:51:59.2116620Z"
+    },
+    {
+      "ProcessId": 8724,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:56:18.4443870Z"
+    },
+    {
+      "ProcessId": 16116,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:59:32.3025220Z"
+    },
+    {
+      "ProcessId": 23732,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:59:32.6697040Z"
+    },
+    {
+      "ProcessId": 11232,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T22:59:33.0134830Z"
+    },
+    {
+      "ProcessId": 7252,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T23:06:33.1705560Z"
+    },
+    {
+      "ProcessId": 31144,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T23:10:37.3799670Z"
+    },
+    {
+      "ProcessId": 30560,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-12T23:11:22.2842490Z"
+    },
+    {
+      "ProcessId": 29280,
+      "Name": "UserOOBEBroker.exe",
+      "ExecutablePath": "C:\\Windows\\System32\\oobe\\UserOOBEBroker.exe",
+      "CreationUtc": "2026-09-12T23:18:06.6364410Z"
+    },
+    {
+      "ProcessId": 3392,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T23:23:12.2535760Z"
+    },
+    {
+      "ProcessId": 28628,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T23:25:42.5458390Z"
+    },
+    {
+      "ProcessId": 15208,
+      "Name": "SystemSettings.exe",
+      "ExecutablePath": "C:\\Windows\\ImmersiveControlPanel\\SystemSettings.exe",
+      "CreationUtc": "2026-09-12T23:33:50.2140700Z"
+    },
+    {
+      "ProcessId": 29536,
+      "Name": "ApplicationFrameHost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\ApplicationFrameHost.exe",
+      "CreationUtc": "2026-09-12T23:33:50.2154310Z"
+    },
+    {
+      "ProcessId": 27984,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T23:41:12.6643150Z"
+    },
+    {
+      "ProcessId": 27852,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T23:48:50.8159570Z"
+    },
+    {
+      "ProcessId": 4540,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T23:51:50.3364600Z"
+    },
+    {
+      "ProcessId": 8028,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T23:51:50.6425040Z"
+    },
+    {
+      "ProcessId": 32688,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-12T23:51:50.9361720Z"
+    },
+    {
+      "ProcessId": 25652,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-13T00:04:05.8339760Z"
+    },
+    {
+      "ProcessId": 16424,
+      "Name": "node_repl.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node_repl.exe",
+      "CreationUtc": "2026-09-13T00:12:31.7735430Z"
+    },
+    {
+      "ProcessId": 28232,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T00:12:31.7814300Z"
+    },
+    {
+      "ProcessId": 884,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T00:12:31.7896890Z"
+    },
+    {
+      "ProcessId": 30544,
+      "Name": "node_repl.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node_repl.exe",
+      "CreationUtc": "2026-09-13T00:12:31.8862700Z"
+    },
+    {
+      "ProcessId": 28240,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Program Files\\nodejs\\node.exe",
+      "CreationUtc": "2026-09-13T00:13:09.9135140Z"
+    },
+    {
+      "ProcessId": 24128,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Program Files\\nodejs\\node.exe",
+      "CreationUtc": "2026-09-13T00:13:10.0487860Z"
+    },
+    {
+      "ProcessId": 31252,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T00:13:27.4666020Z"
+    },
+    {
+      "ProcessId": 23680,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T00:13:36.9802290Z"
+    },
+    {
+      "ProcessId": 27688,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T00:20:14.7007850Z"
+    },
+    {
+      "ProcessId": 432,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T00:20:15.2154180Z"
+    },
+    {
+      "ProcessId": 31452,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T00:21:21.5664020Z"
+    },
+    {
+      "ProcessId": 13420,
+      "Name": "svchost.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-13T00:22:19.4340490Z"
+    },
+    {
+      "ProcessId": 25248,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T00:34:26.2567530Z"
+    },
+    {
+      "ProcessId": 22792,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-13T00:36:32.6861760Z"
+    },
+    {
+      "ProcessId": 26836,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-13T00:37:57.2748560Z"
+    },
+    {
+      "ProcessId": 26740,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T00:39:14.3010950Z"
+    },
+    {
+      "ProcessId": 29084,
+      "Name": "node_repl.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node_repl.exe",
+      "CreationUtc": "2026-09-13T00:42:33.8365750Z"
+    },
+    {
+      "ProcessId": 17388,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T00:42:33.8450220Z"
+    },
+    {
+      "ProcessId": 7008,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T00:42:33.8529800Z"
+    },
+    {
+      "ProcessId": 31592,
+      "Name": "node_repl.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node_repl.exe",
+      "CreationUtc": "2026-09-13T00:42:33.9723860Z"
+    },
+    {
+      "ProcessId": 29188,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Program Files\\nodejs\\node.exe",
+      "CreationUtc": "2026-09-13T00:43:27.8334990Z"
+    },
+    {
+      "ProcessId": 32248,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T01:01:39.1392260Z"
+    },
+    {
+      "ProcessId": 28612,
+      "Name": "cmd.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\cmd.exe",
+      "CreationUtc": "2026-09-13T01:02:08.8865310Z"
+    },
+    {
+      "ProcessId": 25536,
+      "Name": "cmd.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\cmd.exe",
+      "CreationUtc": "2026-09-13T01:02:08.8913720Z"
+    },
+    {
+      "ProcessId": 8092,
+      "Name": "cmd.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\cmd.exe",
+      "CreationUtc": "2026-09-13T01:02:08.8973510Z"
+    },
+    {
+      "ProcessId": 28584,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T01:02:08.9376130Z"
+    },
+    {
+      "ProcessId": 19376,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T01:02:08.9698780Z"
+    },
+    {
+      "ProcessId": 13428,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T01:02:09.0205520Z"
+    },
+    {
+      "ProcessId": 31392,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T01:03:09.3848590Z"
+    },
+    {
+      "ProcessId": 28256,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T01:07:22.6634340Z"
+    },
+    {
+      "ProcessId": 26032,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T01:12:11.2741120Z"
+    },
+    {
+      "ProcessId": 14768,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T01:12:40.6846520Z"
+    },
+    {
+      "ProcessId": 10656,
+      "Name": "node_repl.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node_repl.exe",
+      "CreationUtc": "2026-09-13T01:12:40.6886310Z"
+    },
+    {
+      "ProcessId": 31992,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T01:12:40.6955470Z"
+    },
+    {
+      "ProcessId": 28480,
+      "Name": "node_repl.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node_repl.exe",
+      "CreationUtc": "2026-09-13T01:12:40.7622420Z"
+    },
+    {
+      "ProcessId": 17704,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T01:17:41.6682550Z"
+    },
+    {
+      "ProcessId": 23872,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-13T01:23:30.3538420Z"
+    },
+    {
+      "ProcessId": 28000,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T01:26:50.8271340Z"
+    },
+    {
+      "ProcessId": 32628,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T01:28:07.8086810Z"
+    },
+    {
+      "ProcessId": 9044,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T01:28:48.4851710Z"
+    },
+    {
+      "ProcessId": 26620,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T01:37:38.6721260Z"
+    },
+    {
+      "ProcessId": 9068,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T01:38:10.5090570Z"
+    },
+    {
+      "ProcessId": 7504,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T01:45:54.8218480Z"
+    },
+    {
+      "ProcessId": 17948,
+      "Name": "CCXProcess.exe",
+      "ExecutablePath": "C:\\Program Files\\Adobe\\Adobe Creative Cloud Experience\\CCXProcess.exe",
+      "CreationUtc": "2026-09-13T01:46:01.8041440Z"
+    },
+    {
+      "ProcessId": 32500,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Program Files\\Adobe\\Adobe Creative Cloud Experience\\libs\\node.exe",
+      "CreationUtc": "2026-09-13T01:46:01.8421240Z"
+    },
+    {
+      "ProcessId": 31772,
+      "Name": "conhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\conhost.exe",
+      "CreationUtc": "2026-09-13T01:46:01.8576790Z"
+    },
+    {
+      "ProcessId": 31388,
+      "Name": "AdobeIPCBroker.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Common Files\\Adobe\\Adobe Desktop Common\\IPCBox\\AdobeIPCBroker.exe",
+      "CreationUtc": "2026-09-13T01:46:09.0388150Z"
+    },
+    {
+      "ProcessId": 30044,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Program Files\\nodejs\\node.exe",
+      "CreationUtc": "2026-09-13T01:46:24.8520720Z"
+    },
+    {
+      "ProcessId": 28780,
+      "Name": "node_repl.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node_repl.exe",
+      "CreationUtc": "2026-09-13T01:46:24.8568000Z"
+    },
+    {
+      "ProcessId": 27264,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T01:46:24.8648110Z"
+    },
+    {
+      "ProcessId": 28180,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T01:46:24.8723320Z"
+    },
+    {
+      "ProcessId": 28696,
+      "Name": "cmd.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\cmd.exe",
+      "CreationUtc": "2026-09-13T01:46:24.8773720Z"
+    },
+    {
+      "ProcessId": 28112,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T01:46:24.9187870Z"
+    },
+    {
+      "ProcessId": 13684,
+      "Name": "node_repl.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node_repl.exe",
+      "CreationUtc": "2026-09-13T01:46:25.0049370Z"
+    },
+    {
+      "ProcessId": 2440,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T01:49:13.7206750Z"
+    },
+    {
+      "ProcessId": 12228,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-13T01:52:02.3168950Z"
+    },
+    {
+      "ProcessId": 21824,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T01:52:03.6149920Z"
+    },
+    {
+      "ProcessId": 20420,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T01:54:18.2195030Z"
+    },
+    {
+      "ProcessId": 20932,
+      "Name": "codex.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\bin\\bffc5354119c8421\\codex.exe",
+      "CreationUtc": "2026-09-13T01:55:32.8404340Z"
+    },
+    {
+      "ProcessId": 22632,
+      "Name": "codex.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\bin\\bffc5354119c8421\\codex.exe",
+      "CreationUtc": "2026-09-13T01:55:32.8634510Z"
+    },
+    {
+      "ProcessId": 29552,
+      "Name": "codex-command-runner-0.154.0-alpha.6.2.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\.codex\\.sandbox-bin\\codex-command-runner-0.154.0-alpha.6.2.exe",
+      "CreationUtc": "2026-09-13T01:55:33.7494680Z"
+    },
+    {
+      "ProcessId": 27860,
+      "Name": "codex-command-runner-0.154.0-alpha.6.2.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\.codex\\.sandbox-bin\\codex-command-runner-0.154.0-alpha.6.2.exe",
+      "CreationUtc": "2026-09-13T01:55:33.7660980Z"
+    },
+    {
+      "ProcessId": 23728,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T01:55:33.8012160Z"
+    },
+    {
+      "ProcessId": 8648,
+      "Name": "conhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\conhost.exe",
+      "CreationUtc": "2026-09-13T01:55:33.8135180Z"
+    },
+    {
+      "ProcessId": 8752,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T01:55:33.8174340Z"
+    },
+    {
+      "ProcessId": 32236,
+      "Name": "conhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\conhost.exe",
+      "CreationUtc": "2026-09-13T01:55:33.8296410Z"
+    },
+    {
+      "ProcessId": 22616,
+      "Name": "codex.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\bin\\bffc5354119c8421\\codex.exe",
+      "CreationUtc": "2026-09-13T01:55:34.2123150Z"
+    },
+    {
+      "ProcessId": 31584,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T01:57:12.0950630Z"
+    },
+    {
+      "ProcessId": 23988,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T01:57:12.4229140Z"
+    },
+    {
+      "ProcessId": 31464,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T01:57:12.7621010Z"
+    },
+    {
+      "ProcessId": 25048,
+      "Name": "conductor-api.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\.codex\\worktrees\\b978\\conductor\\.superpowers\\backend\\conductor-api.exe",
+      "CreationUtc": "2026-09-13T01:58:17.3959940Z"
+    },
+    {
+      "ProcessId": 15016,
+      "Name": "conhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\conhost.exe",
+      "CreationUtc": "2026-09-13T01:58:17.4211190Z"
+    },
+    {
+      "ProcessId": 13276,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T02:06:57.3909380Z"
+    },
+    {
+      "ProcessId": 19852,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T02:12:13.9747340Z"
+    },
+    {
+      "ProcessId": 30920,
+      "Name": "node_repl.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node_repl.exe",
+      "CreationUtc": "2026-09-13T02:16:25.6504600Z"
+    },
+    {
+      "ProcessId": 27708,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T02:16:25.6570280Z"
+    },
+    {
+      "ProcessId": 15120,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T02:16:25.6632870Z"
+    },
+    {
+      "ProcessId": 27876,
+      "Name": "cmd.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\cmd.exe",
+      "CreationUtc": "2026-09-13T02:16:25.6674830Z"
+    },
+    {
+      "ProcessId": 32160,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T02:16:25.6961710Z"
+    },
+    {
+      "ProcessId": 27020,
+      "Name": "node_repl.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node_repl.exe",
+      "CreationUtc": "2026-09-13T02:16:25.7688880Z"
+    },
+    {
+      "ProcessId": 4396,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T02:17:01.8850590Z"
+    },
+    {
+      "ProcessId": 24680,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T02:20:05.2616870Z"
+    },
+    {
+      "ProcessId": 27824,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T02:21:21.0371630Z"
+    },
+    {
+      "ProcessId": 27772,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T02:21:41.6714700Z"
+    },
+    {
+      "ProcessId": 9152,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-13T02:21:41.7512520Z"
+    },
+    {
+      "ProcessId": 27196,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-13T02:22:42.7369100Z"
+    },
+    {
+      "ProcessId": 27520,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T02:23:26.4567090Z"
+    },
+    {
+      "ProcessId": 29120,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T02:23:26.4924930Z"
+    },
+    {
+      "ProcessId": 13652,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T02:23:26.6563200Z"
+    },
+    {
+      "ProcessId": 8044,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T02:23:26.6643550Z"
+    },
+    {
+      "ProcessId": 7548,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T02:23:26.7361450Z"
+    },
+    {
+      "ProcessId": 25936,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T02:23:26.8691700Z"
+    },
+    {
+      "ProcessId": 31564,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T02:23:27.0663770Z"
+    },
+    {
+      "ProcessId": 19392,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T02:23:27.0706750Z"
+    },
+    {
+      "ProcessId": 3084,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T02:23:27.0747390Z"
+    },
+    {
+      "ProcessId": 14916,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T02:23:27.0840640Z"
+    },
+    {
+      "ProcessId": 14576,
+      "Name": "cmd.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\cmd.exe",
+      "CreationUtc": "2026-09-13T02:23:27.4777310Z"
+    },
+    {
+      "ProcessId": 22396,
+      "Name": "conhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\conhost.exe",
+      "CreationUtc": "2026-09-13T02:23:27.5064870Z"
+    },
+    {
+      "ProcessId": 17960,
+      "Name": "extension-host.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\.codex\\plugins\\cache\\openai-bundled\\chrome\\latest\\extension-host\\windows\\x64\\extension-host.exe",
+      "CreationUtc": "2026-09-13T02:23:27.6914090Z"
+    },
+    {
+      "ProcessId": 26704,
+      "Name": "cmd.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\cmd.exe",
+      "CreationUtc": "2026-09-13T02:23:27.8012630Z"
+    },
+    {
+      "ProcessId": 30476,
+      "Name": "conhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\conhost.exe",
+      "CreationUtc": "2026-09-13T02:23:27.8331250Z"
+    },
+    {
+      "ProcessId": 28364,
+      "Name": "chrome-native-host.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Roaming\\Claude\\ChromeNativeHost\\chrome-native-host.exe",
+      "CreationUtc": "2026-09-13T02:23:27.9526610Z"
+    },
+    {
+      "ProcessId": 8260,
+      "Name": "cmd.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\cmd.exe",
+      "CreationUtc": "2026-09-13T02:23:28.5869110Z"
+    },
+    {
+      "ProcessId": 28816,
+      "Name": "conhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\conhost.exe",
+      "CreationUtc": "2026-09-13T02:23:28.6042560Z"
+    },
+    {
+      "ProcessId": 8344,
+      "Name": "1Password-BrowserSupport.exe",
+      "ExecutablePath": null,
+      "CreationUtc": "2026-09-13T02:23:28.7075460Z"
+    },
+    {
+      "ProcessId": 22788,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T02:23:30.6678270Z"
+    },
+    {
+      "ProcessId": 24428,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T02:24:27.0413140Z"
+    },
+    {
+      "ProcessId": 33652,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T02:28:45.9657830Z"
+    },
+    {
+      "ProcessId": 32288,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T02:29:17.2569440Z"
+    },
+    {
+      "ProcessId": 29780,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T02:29:39.2233880Z"
+    },
+    {
+      "ProcessId": 30916,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T02:29:57.8651920Z"
+    },
+    {
+      "ProcessId": 33320,
+      "Name": "node_repl.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node_repl.exe",
+      "CreationUtc": "2026-09-13T02:29:57.9479260Z"
+    },
+    {
+      "ProcessId": 13416,
+      "Name": "codex.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\bin\\bffc5354119c8421\\codex.exe",
+      "CreationUtc": "2026-09-13T02:29:58.0411410Z"
+    },
+    {
+      "ProcessId": 29052,
+      "Name": "codex.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\bin\\bffc5354119c8421\\codex.exe",
+      "CreationUtc": "2026-09-13T02:29:58.0638180Z"
+    },
+    {
+      "ProcessId": 11072,
+      "Name": "codex-command-runner-0.154.0-alpha.6.2.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\.codex\\.sandbox-bin\\codex-command-runner-0.154.0-alpha.6.2.exe",
+      "CreationUtc": "2026-09-13T02:29:58.8778110Z"
+    },
+    {
+      "ProcessId": 25288,
+      "Name": "codex-command-runner-0.154.0-alpha.6.2.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\.codex\\.sandbox-bin\\codex-command-runner-0.154.0-alpha.6.2.exe",
+      "CreationUtc": "2026-09-13T02:29:58.8944670Z"
+    },
+    {
+      "ProcessId": 33596,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T02:29:58.9274960Z"
+    },
+    {
+      "ProcessId": 2916,
+      "Name": "conhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\conhost.exe",
+      "CreationUtc": "2026-09-13T02:29:58.9365060Z"
+    },
+    {
+      "ProcessId": 30752,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T02:29:58.9384130Z"
+    },
+    {
+      "ProcessId": 7260,
+      "Name": "conhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\conhost.exe",
+      "CreationUtc": "2026-09-13T02:29:58.9484790Z"
+    },
+    {
+      "ProcessId": 31676,
+      "Name": "codex.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\bin\\bffc5354119c8421\\codex.exe",
+      "CreationUtc": "2026-09-13T02:29:59.2666510Z"
+    },
+    {
+      "ProcessId": 33408,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T02:30:57.9394930Z"
+    },
+    {
+      "ProcessId": 33160,
+      "Name": "vctip.exe",
+      "ExecutablePath": "C:\\Program Files (x86)\\Microsoft Visual Studio\\18\\BuildTools\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\VCTIP.EXE",
+      "CreationUtc": "2026-09-13T02:37:12.4511690Z"
+    },
+    {
+      "ProcessId": 31756,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T02:38:13.8890760Z"
+    },
+    {
+      "ProcessId": 23852,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-13T02:41:01.1848900Z"
+    },
+    {
+      "ProcessId": 16372,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T02:49:29.9285720Z"
+    },
+    {
+      "ProcessId": 9192,
+      "Name": "node_repl.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node_repl.exe",
+      "CreationUtc": "2026-09-13T02:51:40.1582090Z"
+    },
+    {
+      "ProcessId": 7796,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T02:51:40.1658590Z"
+    },
+    {
+      "ProcessId": 6984,
+      "Name": "cmd.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\cmd.exe",
+      "CreationUtc": "2026-09-13T02:51:40.1698620Z"
+    },
+    {
+      "ProcessId": 28684,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T02:51:40.2022320Z"
+    },
+    {
+      "ProcessId": 15312,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T02:52:59.8009790Z"
+    },
+    {
+      "ProcessId": 23624,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T02:53:00.5080700Z"
+    },
+    {
+      "ProcessId": 32728,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T02:53:11.9860580Z"
+    },
+    {
+      "ProcessId": 28372,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T02:53:53.9405160Z"
+    },
+    {
+      "ProcessId": 24300,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Program Files\\nodejs\\node.exe",
+      "CreationUtc": "2026-09-13T02:54:25.3600480Z"
+    },
+    {
+      "ProcessId": 29136,
+      "Name": "conhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\conhost.exe",
+      "CreationUtc": "2026-09-13T02:54:25.3684670Z"
+    },
+    {
+      "ProcessId": 11088,
+      "Name": "ChatGPT.exe",
+      "ExecutablePath": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe",
+      "CreationUtc": "2026-09-13T02:55:06.2540040Z"
+    },
+    {
+      "ProcessId": 30988,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T02:59:59.2138450Z"
+    },
+    {
+      "ProcessId": 12616,
+      "Name": "node_repl.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node_repl.exe",
+      "CreationUtc": "2026-09-13T02:59:59.2991090Z"
+    },
+    {
+      "ProcessId": 29032,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T03:00:29.1995830Z"
+    },
+    {
+      "ProcessId": 24220,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T03:00:29.6466590Z"
+    },
+    {
+      "ProcessId": 26284,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T03:00:32.3500500Z"
+    },
+    {
+      "ProcessId": 31152,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T03:00:32.3502270Z"
+    },
+    {
+      "ProcessId": 26324,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T03:00:34.2960290Z"
+    },
+    {
+      "ProcessId": 32988,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T03:00:42.9015860Z"
+    },
+    {
+      "ProcessId": 6488,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T03:02:09.9598460Z"
+    },
+    {
+      "ProcessId": 26608,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T03:04:02.1727130Z"
+    },
+    {
+      "ProcessId": 14808,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T03:13:55.6222540Z"
+    },
+    {
+      "ProcessId": 7192,
+      "Name": "git.exe",
+      "ExecutablePath": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+      "CreationUtc": "2026-09-13T03:16:49.3202940Z"
+    },
+    {
+      "ProcessId": 28196,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Program Files\\nodejs\\node.exe",
+      "CreationUtc": "2026-09-13T03:27:29.6740630Z"
+    },
+    {
+      "ProcessId": 31420,
+      "Name": "node_repl.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node_repl.exe",
+      "CreationUtc": "2026-09-13T03:27:29.6785920Z"
+    },
+    {
+      "ProcessId": 8624,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T03:27:29.6857740Z"
+    },
+    {
+      "ProcessId": 13596,
+      "Name": "cmd.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\cmd.exe",
+      "CreationUtc": "2026-09-13T03:27:29.6898710Z"
+    },
+    {
+      "ProcessId": 30768,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a708e72b10c27b59\\bin\\node.exe",
+      "CreationUtc": "2026-09-13T03:27:29.7186890Z"
+    },
+    {
+      "ProcessId": 29936,
+      "Name": "chrome.exe",
+      "ExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "CreationUtc": "2026-09-13T03:28:29.4097310Z"
+    },
+    {
+      "ProcessId": 32328,
+      "Name": "pwsh.exe",
+      "ExecutablePath": "C:\\Users\\zFlei\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+      "CreationUtc": "2026-09-13T03:28:35.6387560Z"
+    },
+    {
+      "ProcessId": 31268,
+      "Name": "node.exe",
+      "ExecutablePath": "C:\\Program Files\\nodejs\\node.exe",
+      "CreationUtc": "2026-09-13T03:28:37.7500480Z"
+    },
+    {
+      "ProcessId": 26452,
+      "Name": "powershell.exe",
+      "ExecutablePath": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "CreationUtc": "2026-09-13T03:28:40.7948210Z"
+    },
+    {
+      "ProcessId": 33368,
+      "Name": "conhost.exe",
+      "ExecutablePath": "C:\\WINDOWS\\system32\\conhost.exe",
+      "CreationUtc": "2026-09-13T03:28:40.8065170Z"
+    }
+  ],
+  "job": {
+    "exitCode": 0,
+    "timeout": false,
+    "cancelled": false,
+    "forcedStop": false,
+    "cleanupComplete": true,
+    "endUtc": "2026-09-13T03:29:45.3476210Z",
+    "endTicks": "701822905808"
+  },
+  "cleanupComplete": true
+}

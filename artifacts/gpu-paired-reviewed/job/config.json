@@ -1,0 +1,7 @@
+{
+  "executable": "C:\\Program Files\\nodejs\\node.exe",
+  "commandLine": "\"C:\\Program Files\\nodejs\\node.exe\" \"C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\scripts\\gpu-paired\\run.mjs\" \"--hardware-authorized\" \"C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\artifacts\\gpu-paired-reviewed\"",
+  "cwd": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic",
+  "directory": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\gpu-paired-diagnostic\\artifacts\\gpu-paired-reviewed\\job",
+  "timeoutMs": 120000
+}
