@@ -1,0 +1,19 @@
+{
+  "ok": false,
+  "label": "parameters",
+  "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\studio-qa-helper",
+  "profile": "test-a1b377ec-61b9-4c47-8d4c-f6f6b8c1c74a",
+  "sessionDirectory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-a1b377ec-61b9-4c47-8d4c-f6f6b8c1c74a",
+  "source": {
+    "commit": "e11c1884df3e183aa1d55457736c357cad441341",
+    "trackedDiffSha256": "64195665db659ec04763b17af4385fd15f7a228cae71c16d485c3474a13aa403",
+    "worktreeStatusSha256": "67b00a03563d914f2dac1ac51b2a382facb1d4a2e02ff782a8e84a927dd81157"
+  },
+  "resolution": "C:\\Users\\zFlei\\repos\\lux\\node_modules\\.pnpm\\electron@44.3.0\\node_modules\\electron\\dist\\electron.exe",
+  "cleanup": {
+    "ownedPid": 28008,
+    "attempted": true,
+    "completed": true
+  },
+  "error": "AssertionError [ERR_ASSERTION]: {\"content\":[{\"type\":\"text\",\"text\":\"ENOENT: no such file or directory, realpath 'c:\\\\users\\\\zflei\\\\repos\\\\lux\\\\.worktrees\\\\studio-qa-helper\\\\node_modules'; retained evidence: C:\\\\Users\\\\zFlei\\\\AppData\\\\Local\\\\Temp\\\\lux-compile-hxl1iT\"}],\"isError\":true}\n+ actual - expected\n\n+ true\n- undefined\n\n    at call (file:///C:/Users/zFlei/repos/lux/.worktrees/studio-qa-helper/scripts/test-studio-parameters.mjs:32:85)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/studio-qa-helper/scripts/test-studio-parameters.mjs:39:17"
+}

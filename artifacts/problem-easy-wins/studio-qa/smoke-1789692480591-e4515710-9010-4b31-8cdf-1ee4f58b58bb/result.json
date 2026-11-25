@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "label": "smoke",
+  "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\studio-qa-helper",
+  "profile": "test-74ad7566-e3d1-448e-aed5-99139bd6a574",
+  "sessionDirectory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-74ad7566-e3d1-448e-aed5-99139bd6a574",
+  "source": {
+    "commit": "37e49496baf9c5cf87785d53b9c16fd9612c2a72",
+    "trackedDiffSha256": "965c5cbfabeba106ada5e0806ca0b9e4f74413f201543e9d6dcd3a7d14cc97e4",
+    "worktreeStatusSha256": "910ce34a51e5ebb1f8cb2952edeea2de7d19737eac2d427d0be24a657d128d2d"
+  },
+  "resolution": {
+    "executablePath": "C:\\Users\\zFlei\\repos\\lux\\node_modules\\.pnpm\\electron@44.3.0\\node_modules\\electron\\dist\\electron.exe",
+    "entryPath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\studio-qa-helper\\apps\\studio\\dist\\main.cjs"
+  },
+  "viewport": {
+    "requested": {
+      "width": 640,
+      "height": 360
+    },
+    "actual": {
+      "width": 640,
+      "height": 360
+    }
+  },
+  "cleanup": {
+    "ownedPid": 14396,
+    "attempted": true,
+    "completed": true
+  },
+  "error": null
+}

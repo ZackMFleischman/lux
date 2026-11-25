@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "label": "smoke",
+  "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\studio-qa-helper",
+  "profile": "test-8be47e88-47da-46e7-96ac-7beb072a7b90",
+  "sessionDirectory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-8be47e88-47da-46e7-96ac-7beb072a7b90",
+  "source": {
+    "commit": "e11c1884df3e183aa1d55457736c357cad441341",
+    "trackedDiffSha256": "64195665db659ec04763b17af4385fd15f7a228cae71c16d485c3474a13aa403",
+    "worktreeStatusSha256": "2c841f09837ee48796df3ac6edc506e9640d20f8b10c987b3c9767170ba8a6a8"
+  },
+  "resolution": "C:\\Users\\zFlei\\repos\\lux\\node_modules\\.pnpm\\electron@44.3.0\\node_modules\\electron\\dist\\electron.exe",
+  "cleanup": {
+    "ownedPid": 35380,
+    "attempted": true,
+    "completed": true
+  },
+  "error": null
+}

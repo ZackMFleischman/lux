@@ -1,0 +1,6 @@
+{
+  "ok": false,
+  "checks": [],
+  "errors": [],
+  "error": "page.waitForFunction: Timeout 30000ms exceeded.\n    at Object.launch (C:\\Users\\zFlei\\repos\\lux\\.worktrees\\studio-qa-helper\\scripts\\studio-qa.mjs:56:72)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/studio-qa-helper/scripts/test-studio-parameters.mjs:15:20"
+}

@@ -1,0 +1,18 @@
+{
+  "ok": false,
+  "label": "parameters",
+  "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\studio-qa-helper",
+  "profile": "test-b2613933-fdb3-4d0f-8051-09a99a97924b",
+  "sessionDirectory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-b2613933-fdb3-4d0f-8051-09a99a97924b",
+  "source": {
+    "commit": "e11c1884df3e183aa1d55457736c357cad441341",
+    "trackedDiffSha256": "c43a5d09c882e082c578761bbce642e0f78f7ec6b07d61903bbbd72188253b57"
+  },
+  "resolution": "C:\\Users\\zFlei\\repos\\lux\\node_modules\\.pnpm\\electron@44.3.0\\node_modules\\electron\\dist\\electron.exe",
+  "cleanup": {
+    "ownedPid": null,
+    "attempted": false,
+    "completed": false
+  },
+  "error": "electron.launch: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - <launching> \"C:\\Users\\zFlei\\repos\\lux\\node_modules\\.pnpm\\electron@44.3.0\\node_modules\\electron\\dist\\electron.exe\" \"--inspect=0\" \"--remote-debugging-port=0\" \"c:\\users\\zflei\\repos\\lux\\.worktrees\\studio-qa-helper\\apps\\studio\\dist\\main.cjs\"\u001b[22m\n\u001b[2m  - <launched> pid=29796\u001b[22m\n\u001b[2m  - [pid=29796][out]\u001b[22m\n\u001b[2m  - [pid=29796][err] Debugger listening on ws://127.0.0.1:55337/e0a840f8-e414-4845-9648-be97b7e71690\u001b[22m\n\u001b[2m  - [pid=29796][err] For help, see: https://nodejs.org/learn/getting-started/debugging\u001b[22m\n\u001b[2m  - <ws connecting> ws://127.0.0.1:55337/e0a840f8-e414-4845-9648-be97b7e71690\u001b[22m\n\u001b[2m  - <ws connected> ws://127.0.0.1:55337/e0a840f8-e414-4845-9648-be97b7e71690\u001b[22m\n\u001b[2m  - [pid=29796][err] Debugger attached.\u001b[22m\n\n    at async Object.launch (C:\\Users\\zFlei\\repos\\lux\\.worktrees\\studio-qa-helper\\scripts\\studio-qa.mjs:44:13)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/studio-qa-helper/scripts/test-studio-parameters.mjs:15:20"
+}

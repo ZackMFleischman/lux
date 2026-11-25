@@ -1,0 +1,6 @@
+{
+  "ok": false,
+  "checks": [],
+  "errors": [],
+  "error": "AssertionError [ERR_ASSERTION]: {\"content\":[{\"type\":\"text\",\"text\":\"Studio is busy or command is unsupported\"}],\"isError\":true}\n+ actual - expected\n\n+ true\n- undefined\n\n    at call (file:///C:/Users/zFlei/repos/lux/.worktrees/studio-qa-helper/scripts/test-studio-parameters.mjs:32:85)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/studio-qa-helper/scripts/test-studio-parameters.mjs:39:17"
+}

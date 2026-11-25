@@ -1,0 +1,18 @@
+{
+  "ok": false,
+  "label": "dock",
+  "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\studio-qa-helper",
+  "profile": "test-a78a5946-04ad-4d6f-90dc-0091a87fcec8",
+  "sessionDirectory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-a78a5946-04ad-4d6f-90dc-0091a87fcec8",
+  "source": {
+    "commit": null,
+    "trackedDiffSha256": null
+  },
+  "resolution": "C:\\Users\\zFlei\\repos\\lux\\node_modules\\.pnpm\\electron@44.3.0\\node_modules\\electron\\dist\\electron.exe",
+  "cleanup": {
+    "ownedPid": null,
+    "attempted": false,
+    "completed": false
+  },
+  "error": "Studio QA requires dependencies local to the selected checkout"
+}

@@ -1,0 +1,18 @@
+{
+  "ok": false,
+  "label": "dock",
+  "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\studio-qa-helper",
+  "profile": "test-da3a5ebe-28f0-4788-a894-e1c961058d24",
+  "sessionDirectory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-da3a5ebe-28f0-4788-a894-e1c961058d24",
+  "source": {
+    "commit": null,
+    "trackedDiffSha256": null
+  },
+  "resolution": "C:\\Users\\zFlei\\repos\\lux\\node_modules\\.pnpm\\electron@44.3.0\\node_modules\\electron\\dist\\electron.exe",
+  "cleanup": {
+    "ownedPid": null,
+    "attempted": false,
+    "completed": false
+  },
+  "error": "electron.launch: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - <launching> \"C:\\Users\\zFlei\\repos\\lux\\node_modules\\.pnpm\\electron@44.3.0\\node_modules\\electron\\dist\\electron.exe\" \"--inspect=0\" \"--remote-debugging-port=0\" \"c:\\users\\zflei\\repos\\lux\\.worktrees\\studio-qa-helper\\apps\\studio\\dist\\main.cjs\"\u001b[22m\n\u001b[2m  - <launched> pid=30752\u001b[22m\n\u001b[2m  - [pid=30752][out]\u001b[22m\n\u001b[2m  - [pid=30752][err] Debugger listening on ws://127.0.0.1:64654/c2b5841a-2caa-4b71-944c-7d5c0626c1c7\u001b[22m\n\u001b[2m  - <ws connecting> ws://127.0.0.1:64654/c2b5841a-2caa-4b71-944c-7d5c0626c1c7\u001b[22m\n\u001b[2m  - [pid=30752][err] For help, see: https://nodejs.org/learn/getting-started/debugging\u001b[22m\n\u001b[2m  - <ws connected> ws://127.0.0.1:64654/c2b5841a-2caa-4b71-944c-7d5c0626c1c7\u001b[22m\n\u001b[2m  - [pid=30752][err] Debugger attached.\u001b[22m\n\n    at async Object.launch (C:\\Users\\zFlei\\repos\\lux\\.worktrees\\studio-qa-helper\\scripts\\studio-qa.mjs:39:13)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/studio-qa-helper/scripts/test-studio-dock.mjs:12:20"
+}

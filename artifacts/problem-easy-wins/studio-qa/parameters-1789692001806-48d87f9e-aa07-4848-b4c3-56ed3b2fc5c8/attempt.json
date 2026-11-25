@@ -1,0 +1,19 @@
+{
+  "ok": false,
+  "label": "parameters",
+  "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\studio-qa-helper",
+  "profile": "test-6f7f9887-f6be-46ca-af1f-ae07e40f59b2",
+  "sessionDirectory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-6f7f9887-f6be-46ca-af1f-ae07e40f59b2",
+  "source": {
+    "commit": "e11c1884df3e183aa1d55457736c357cad441341",
+    "trackedDiffSha256": "60a49f57c3e6bdfd3d178260449b9cf0de6296383171e2172b35258e51d74d03",
+    "worktreeStatusSha256": "b8b27e137cac7a44feca8f16f07fd58c2f2f844f4214ab2e36b29a9a1ab933a0"
+  },
+  "resolution": "C:\\Users\\zFlei\\repos\\lux\\node_modules\\.pnpm\\electron@44.3.0\\node_modules\\electron\\dist\\electron.exe",
+  "cleanup": {
+    "ownedPid": 33900,
+    "attempted": true,
+    "completed": true
+  },
+  "error": "page.waitForFunction: Timeout 30000ms exceeded.\n    at Object.launch (C:\\Users\\zFlei\\repos\\lux\\.worktrees\\studio-qa-helper\\scripts\\studio-qa.mjs:56:72)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/studio-qa-helper/scripts/test-studio-parameters.mjs:15:20"
+}
