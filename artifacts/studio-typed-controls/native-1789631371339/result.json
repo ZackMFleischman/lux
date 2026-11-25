@@ -1,0 +1,19 @@
+{
+  "ok": false,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/story-controls",
+  "profile": "test-e1db54fb-93c4-4b43-9370-3fd16b0b7446",
+  "commit": "973bc062ea152eabfc04ab56a6c3387b4f6ebd20",
+  "fixture": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\skills\\lux-visual-creation\\assets\\typed-controls.ts",
+    "sha256": "7b8aaee97917e64fb6c61debc8f35cb8ebcd1e0186f0fe3be3d205cad40ef778"
+  },
+  "checks": [],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-typed-controls\\native-1789631371339\\failure.png"
+  ],
+  "errors": [],
+  "pid": 32560,
+  "error": "locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Reset desktop layout', exact: true })\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\scripts\\test-studio-typed-controls.mjs:168:81",
+  "exitCode": 0,
+  "processExited": true
+}

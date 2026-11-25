@@ -1,0 +1,3 @@
+- The isolated GPU probe reproduced duplicated Three/TSL failures: the second visual rendered transparent black; lighting and shader stack warnings explain the failure. [Evidence](C:/Users/zFlei/repos/lux/.worktrees/story-controls/docs/implementation/story-controls/story-interop-evidence.md).
+- The reviewed [shared-linker amendment](C:/Users/zFlei/repos/lux/.worktrees/story-controls/docs/implementation/story-controls/story-shared-linker-amendment.md) adds one sealed shared dependency capsule with lazy visual entries. Standalone linking stays unchanged.
+- Pure scene schemas and persistence are progressing in parallel. Scheduling remains gated on the repaired GPU probe; no user scene or installed application was changed.

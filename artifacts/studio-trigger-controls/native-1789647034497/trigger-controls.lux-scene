@@ -1,0 +1,89 @@
+{
+  "format": "lux-scene",
+  "version": 3,
+  "source": {
+    "sdkVersion": "0.2.0",
+    "entry": "visual.ts",
+    "files": {
+      "visual.ts": "import { defineVisual } from '@lux/visual-sdk';\nimport {\n  Color,\n  Mesh,\n  MeshBasicNodeMaterial,\n  OrthographicCamera,\n  PlaneGeometry,\n  Scene,\n} from 'three/webgpu';\n\nexport default defineVisual({\n  controls: {\n    size: {\n      type: 'number',\n      label: 'Size',\n      default: 0.64,\n      min: 0.3,\n      max: 0.9,\n      step: 0.01,\n      group: 'Shape',\n    },\n    glow: {\n      type: 'boolean',\n      label: 'Glow',\n      default: true,\n      group: 'Appearance',\n    },\n    palette: {\n      type: 'enum',\n      label: 'Palette',\n      default: 'violet',\n      presentation: 'segmented',\n      group: 'Appearance',\n      options: [\n        { id: 'violet', label: 'Violet' },\n        { id: 'ember', label: 'Ember' },\n        { id: 'mint', label: 'Mint' },\n      ],\n    },\n    pulse: {\n      type: 'trigger',\n      label: 'Pulse',\n      description: 'Rotate the tile by one deterministic step.',\n      group: 'Actions',\n    },\n    regenerate: {\n      type: 'trigger',\n      label: 'Regenerate',\n      description: 'Advance the deterministic color and position variant.',\n      group: 'Actions',\n    },\n  },\n  async create(context) {\n    const geometry = new PlaneGeometry(1, 1);\n    const material = new MeshBasicNodeMaterial({ color: '#8a68ff' });\n    const mesh = new Mesh(geometry, material);\n    const scene = new Scene();\n    scene.background = new Color('#090b13');\n    scene.add(mesh);\n\n    const camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 10);\n    camera.position.z = 1;\n\n    let pulseStep = 0;\n    let variant = 0;\n    return {\n      update(frame) {\n        for (const event of frame.events) {\n          if (event.controlId === 'pulse') pulseStep = (pulseStep + 1) % 8;\n          if (event.controlId === 'regenerate') variant = (variant + 1) % 3;\n        }\n\n        const colors = {\n          violet: ['#8a68ff', '#d45cff', '#5c78ff'],\n          ember: ['#ff7043', '#ffb347', '#dd3f68'],\n          mint: ['#54e6b3', '#31bfe0', '#a4ef6f'],\n        } as const;\n        mesh.scale.setScalar(frame.controls.size);\n        mesh.rotation.z = pulseStep * Math.PI / 8;\n        mesh.position.x = (variant - 1) * 0.22;\n        material.color.set(colors[frame.controls.palette][variant]);\n        material.opacity = frame.controls.glow ? 1 : 0.45;\n        material.transparent = !frame.controls.glow;\n      },\n      render(target) {\n        return context.renderer.render(scene, camera, target);\n      },\n      reset(_seed) {\n        pulseStep = 0;\n        variant = 0;\n      },\n      dispose() {\n        geometry.dispose();\n        material.dispose();\n      },\n    };\n  },\n});\n"
+    }
+  },
+  "settings": {
+    "width": 640,
+    "height": 360,
+    "fps": 60,
+    "seed": 0
+  },
+  "controls": {
+    "sourceHash": "196ffdc8b8d2ea18ecfcbcfc6038cf0014100f946b18f4799ad29edb78cd229d",
+    "schema": [
+      {
+        "id": "size",
+        "type": "number",
+        "label": "Size",
+        "default": 0.64,
+        "min": 0.3,
+        "max": 0.9,
+        "step": 0.01,
+        "group": "Shape",
+        "changeCost": "live"
+      },
+      {
+        "id": "glow",
+        "type": "boolean",
+        "label": "Glow",
+        "default": true,
+        "group": "Appearance",
+        "changeCost": "live"
+      },
+      {
+        "id": "palette",
+        "type": "enum",
+        "label": "Palette",
+        "default": "violet",
+        "options": [
+          {
+            "id": "violet",
+            "label": "Violet"
+          },
+          {
+            "id": "ember",
+            "label": "Ember"
+          },
+          {
+            "id": "mint",
+            "label": "Mint"
+          }
+        ],
+        "presentation": "segmented",
+        "group": "Appearance",
+        "changeCost": "live"
+      },
+      {
+        "id": "pulse",
+        "type": "trigger",
+        "label": "Pulse",
+        "description": "Rotate the tile by one deterministic step.",
+        "group": "Actions",
+        "changeCost": "live"
+      },
+      {
+        "id": "regenerate",
+        "type": "trigger",
+        "label": "Regenerate",
+        "description": "Advance the deterministic color and position variant.",
+        "group": "Actions",
+        "changeCost": "live"
+      }
+    ],
+    "schemaHash": "e2c33ba81e6803810019aaa9bbe42ff62018314bc5c88df55e8b3f333e3606b3",
+    "values": {
+      "size": 0.72,
+      "glow": false,
+      "palette": "mint"
+    }
+  },
+  "tempo": {
+    "bpm": 120
+  }
+}

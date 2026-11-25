@@ -1,0 +1,34 @@
+{
+  "ok": true,
+  "mode": "tail",
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/story-controls",
+  "profile": "test-ef69c8c3-fb27-4e01-90a1-9aced6c90c08",
+  "scene": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\story-controls\\Vinyl Cosmos Story.lux-scene",
+    "sha256": "d005f1d4127ef6006db5ccf46c69c172bc5a9b567925a35be17e9146c1ec23dc",
+    "sourceHash": "1428669e5df4e2a10230829043196c755536a8a567888289869e47c06d63dc3d"
+  },
+  "testedSource": {
+    "baselineCommit": "7a5bd180a776a00c12109479493b41882212eb34",
+    "trackedDiffSha256": "faf9ec629fdc8e56aae6bd477a5235b96bdbd4b7abeacbf2c64aee2107aa83bf",
+    "harnessSha256": "1b5d25e03ad2c52b5aa0684c630f343c950fc7ad46fd4640cf8d769caa25c324"
+  },
+  "checks": [
+    "Timed direct seek returns the drawn pose; exact retry is idempotent and stale revision leaves it unchanged",
+    "Native replay and keyboard loop restart timed beats at local zero and loop across an endpoint",
+    "Keyboard Return to normal restores the original solar-system behavior without a visual reset command",
+    "Native Story panel and sequence ribbon remain visible at desktop, 1100×720, and 640×360",
+    "Save/reopen preserves Story definitions and starts in Normal without playback transport state",
+    "Invalid build and invalid open preserve the accepted paused output, runtime generation, and saved user copy"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-story\\native-1789652173969-tail\\story-timed-paused-seek-1360x900.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-story\\native-1789652173969-tail\\story-desktop-1360x900.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-story\\native-1789652173969-tail\\story-medium-1100x720.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-story\\native-1789652173969-tail\\story-compact-640x360.png"
+  ],
+  "errors": [],
+  "pid": 33396,
+  "exitCode": 0,
+  "processExited": true
+}

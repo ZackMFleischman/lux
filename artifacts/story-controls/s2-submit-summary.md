@@ -1,0 +1,1 @@
+Implemented multi-visual Story playback and source controls. Commit f214d2f9a2f6a49395dfa175f1e697ebb1313fae on codex/story-controls. Users can select visual sources, play sustained or timed beats, scrub, loop, replay, and return to Normal. Source preparation, overlap, replacement and disposal remain bounded. Ready for independent acceptance; not merged or installed.

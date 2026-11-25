@@ -1,0 +1,74 @@
+{
+  "format": "lux-scene",
+  "version": 7,
+  "visuals": [
+    {
+      "id": "a",
+      "source": {
+        "sdkVersion": "0.2.0",
+        "entry": "visual.ts",
+        "files": {
+          "visual.ts": "import {defineVisual} from '@lux/visual-sdk';\nimport {Scene,Mesh,PlaneGeometry,MeshLambertMaterial,OrthographicCamera,AmbientLight} from 'three/webgpu';\nexport default defineVisual({controls:{},async create(context){\n const material=new MeshLambertMaterial({color:0xff0000,transparent:true,opacity:0.5,depthTest:false,depthWrite:false});material.toneMapped=false;\n const geometry=new PlaneGeometry(2,2),scene=new Scene();scene.add(new AmbientLight(0xffffff,Math.PI));scene.add(new Mesh(geometry,material));\n const camera=new OrthographicCamera(-1,1,1,-1,0,1);\n return {update(){},render(target){return context.renderer.render(scene,camera,target);},reset(){},dispose(){geometry.dispose();material.dispose();}};\n}});"
+        }
+      },
+      "controls": {
+        "sourceHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "schema": [],
+        "schemaHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "values": {}
+      },
+      "controlAnimations": []
+    },
+    {
+      "id": "b",
+      "source": {
+        "sdkVersion": "0.2.0",
+        "entry": "visual.ts",
+        "files": {
+          "visual.ts": "import {defineVisual} from '@lux/visual-sdk';import {Scene,PerspectiveCamera,Mesh,PlaneGeometry,MeshBasicMaterial} from 'three/webgpu';export default defineVisual({controls:{amount:{type:'number',label:'Amount',default:1,min:0,max:2}},story:{version:1,beats:{hold:{kind:'sustained',seek:'none'}}},async create({renderer}){const scene=new Scene(),camera=new PerspectiveCamera(45,1,.1,100);camera.position.z=3;const geometry=new PlaneGeometry(2,2),material=new MeshBasicMaterial({color:0x0088ff});scene.add(new Mesh(geometry,material));return {update(){},render(target){renderer.render(scene,camera,target);},reset(){},dispose(){geometry.dispose();material.dispose();}};}});"
+        }
+      },
+      "controls": {
+        "sourceHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "schema": [],
+        "schemaHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "values": {}
+      },
+      "controlAnimations": []
+    }
+  ],
+  "settings": {
+    "width": 640,
+    "height": 360,
+    "fps": 60,
+    "seed": 0
+  },
+  "tempo": {
+    "bpm": 120
+  },
+  "story": {
+    "version": 2,
+    "normalVisualId": "a",
+    "crossfadeSeconds": 0.35,
+    "beats": [
+      {
+        "id": "hold",
+        "label": "Blue hold",
+        "timing": {
+          "kind": "sustained"
+        },
+        "visualId": "b"
+      }
+    ],
+    "sequence": [
+      {
+        "id": "blue",
+        "beatId": "hold",
+        "visualId": "b",
+        "follow": {
+          "kind": "manual"
+        }
+      }
+    ]
+  }
+}

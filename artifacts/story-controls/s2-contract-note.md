@@ -1,0 +1,3 @@
+- S1 is accepted at e54266c0326d56fb152d471fa54938081cfceea4 (receipt 6ac989f6-2391-40ce-af86-e3cbc199e9a5).
+- Exact S2 schema, scoped resource accounting, seek/overlap behavior, and ownership are in [reviewed implementation contract](C:/Users/zFlei/repos/lux/.worktrees/story-controls/docs/implementation/story-controls/story-lifecycle-review.md#implementation-contract-addendum). This supersedes alternatives in the initial lifecycle proposal.
+- First gate: independently compiled ordinary/TSL visuals must share a renderer correctly in an isolated GPU probe before scheduler implementation.

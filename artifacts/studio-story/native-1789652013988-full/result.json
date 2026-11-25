@@ -1,0 +1,31 @@
+{
+  "ok": false,
+  "mode": "full",
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/story-controls",
+  "profile": "test-1b7ab810-c923-4b8b-a622-2f7647303fa2",
+  "scene": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\story-controls\\Vinyl Cosmos Story.lux-scene",
+    "sha256": "d005f1d4127ef6006db5ccf46c69c172bc5a9b567925a35be17e9146c1ec23dc",
+    "sourceHash": "1428669e5df4e2a10230829043196c755536a8a567888289869e47c06d63dc3d"
+  },
+  "testedSource": {
+    "baselineCommit": "7a5bd180a776a00c12109479493b41882212eb34",
+    "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "harnessSha256": "a448bdf49090cdabae93fb0ffe1f4a445b8b30ad23f3233327db79acdc329833"
+  },
+  "checks": [
+    "Pointer selection changes no runtime Story state or persisted scene",
+    "Manual sustained Orbit remains one activation beyond its scheduled occurrence dwell",
+    "Story pause keeps sustained ambient motion live while Preview pause freezes all pixels",
+    "Explicit repeated-occurrence resume preserves the pose, starts fresh dwell, and advances on the worker clock"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-story\\native-1789652013988-full\\story-attached-occurrence-dwell-1360x900.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-story\\native-1789652013988-full\\failure.png"
+  ],
+  "errors": [],
+  "pid": 10372,
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '20afa4f030bf4293973b262ec3be0864674c299fcc3d43c81f19f758f344d72a'\n- 'bc4a49cca6040e39c923db5b2368bcb4741b0e14ae39256157b66f3be954db73'\n\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/story-controls/scripts/test-studio-story.mjs:271:12",
+  "exitCode": 0,
+  "processExited": true
+}

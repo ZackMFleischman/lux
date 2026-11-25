@@ -1,0 +1,45 @@
+{
+  "ok": false,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/story-controls",
+  "profile": "test-cb318ea4-fcd0-47a5-863b-f3e9acb53538",
+  "testedSource": {
+    "baselineCommit": "4a1742bd78d13e4c44d8dbbb57939ea272135e60",
+    "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "harnessSha256": "869e97adc466745297943a5b29d3fe5e78354e8bf2b0cc31ac7f0859fb74fba0"
+  },
+  "fixture": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\skills\\lux-visual-creation\\assets\\trigger-controls.ts",
+    "sha256": "77244145f4ce986d274217d0bfb50953dcb981b1fb5c0d583e62c9d870c082f1"
+  },
+  "componentFixture": {
+    "sha256": "0faa7910cbe51586344cab08131bbb906e2412d6df9ad4b8c37838b2efba71f8"
+  },
+  "checks": [
+    "Pointer, Enter, and Space invoke real trigger buttons while playing or paused; every acknowledgement names a completed frame",
+    "Generic MCP command IDs are idempotent; old duplicates return the original receipt without redelivery or latest-state regression",
+    "Stale guards and unknown actions reject without changing the paused preview",
+    "Save/open, reset, rebuild, and restart preserve persistent controls but never persist or replay trigger actions",
+    "Public aliases, generic node addressing, and selected-node UI route actions to the intended component instance without sibling delivery"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-trigger-controls\\native-1789647034497\\wide-trigger-controls.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-trigger-controls\\native-1789647034497\\narrow-trigger-controls.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-trigger-controls\\native-1789647034497\\component-trigger-isolation.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-trigger-controls\\native-1789647034497\\authored-trigger-failure.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-trigger-controls\\native-1789647034497\\failure.png"
+  ],
+  "errors": [],
+  "pid": 20472,
+  "narrowInspector": {
+    "window": {
+      "width": 820,
+      "height": 720
+    },
+    "before": 137,
+    "after": 242,
+    "target": 240
+  },
+  "error": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Runtime changed|generation/i. Input:\n\n'A visual build is already running'\n\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/story-controls/scripts/test-studio-trigger-controls.mjs:465:35\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)",
+  "exitCode": 0,
+  "processExited": true
+}

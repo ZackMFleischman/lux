@@ -1,0 +1,234 @@
+{
+  "ok": true,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/story-controls",
+  "profile": "test-b0dd5638-9551-499a-8e0e-f1971d193e52",
+  "testedSource": {
+    "baselineCommit": "973bc062ea152eabfc04ab56a6c3387b4f6ebd20",
+    "trackedDiffSha256": "6172be595eb82414a5d1102b8d882c31c26fe42798cdd6c5ddaff92142fedf93",
+    "worktreeStatus": [
+      "M apps/build-worker/src/component-declarations.mjs",
+      " M apps/build-worker/src/parameter-declarations.mjs",
+      " M apps/studio/src/capabilities.ts",
+      " M apps/studio/src/controls/ParameterInspector.tsx",
+      " M apps/studio/src/controls/control-animation.mjs",
+      " M apps/studio/src/controls/worker-composition-state.mjs",
+      " M apps/studio/src/controls/worker-control-state.mjs",
+      " M apps/studio/src/runtime-operations.ts",
+      " M apps/studio/src/service-client.ts",
+      " M apps/studio/src/standalone-client.ts",
+      " M apps/studio/src/studio.css",
+      " M packages/inputs/src/mapping.mjs",
+      " M packages/runtime-contracts/src/index.ts",
+      " M packages/runtime-contracts/src/parameters.d.mts",
+      " M packages/runtime-contracts/src/parameters.mjs",
+      " M packages/runtime/src/components/composition-controls.ts",
+      " M packages/runtime/src/components/image-chain.ts",
+      " M packages/runtime/src/graph/nested-validate.ts",
+      " M packages/visual-sdk/examples/parameters.ts",
+      " M packages/visual-sdk/src/component-metadata.ts",
+      " M packages/visual-sdk/src/sdk-components.ts",
+      " M packages/visual-sdk/src/sdk-composition.ts",
+      " M packages/visual-sdk/src/sdk-v2.ts",
+      " M scripts/studio-export.mjs",
+      " M scripts/studio-mcp.mjs",
+      " M scripts/transport-prepare.mjs",
+      " M skills/lux-visual-creation/SKILL.md",
+      " M skills/lux-visual-creation/references/studio-tools.md",
+      " M skills/lux-visual-creation/references/visual-programming.md",
+      " M tests/compiler/parameter-declarations.test.mjs",
+      " M tests/compiler/parameter-identity.test.mjs",
+      " M tests/compiler/sdk-v2.test.mjs",
+      " M tests/compiler/sdk.test.mjs",
+      " M tests/runtime/composition-controls.test.ts",
+      " M tests/studio/authoring-session.test.ts",
+      " M tests/studio/client.test.ts",
+      " M tests/studio/composition-worker-state.test.mjs",
+      " M tests/studio/interactions.test.tsx",
+      " M tests/studio/runtime-parameters.test.ts",
+      " M tests/studio/scene-control-animation.test.mjs",
+      " M tests/studio/visual-worker.test.mjs",
+      " M tests/unit/parameters.test.mjs",
+      " M tools/gpu-spike/parameter-mapping.cjs",
+      "?? artifacts/studio-typed-controls/native-1789631371339/failure.png",
+      "?? artifacts/studio-typed-controls/native-1789631371339/result.json",
+      "?? artifacts/studio-typed-controls/native-1789631727053/after-invalid-build-preview.png",
+      "?? artifacts/studio-typed-controls/native-1789631727053/before-invalid-build-preview.png",
+      "?? artifacts/studio-typed-controls/native-1789631727053/failure.png",
+      "?? artifacts/studio-typed-controls/native-1789631727053/narrow-typed-controls.png",
+      "?? artifacts/studio-typed-controls/native-1789631727053/result.json",
+      "?? artifacts/studio-typed-controls/native-1789631727053/typed-controls.lux-scene",
+      "?? artifacts/studio-typed-controls/native-1789631727053/wide-typed-controls.png",
+      "?? docs/implementation/story-controls/progress.md",
+      "?? scripts/test-studio-typed-controls.mjs",
+      "?? skills/lux-visual-creation/assets/typed-controls.ts",
+      "?? tests/core/scene-typed-controls.test.ts",
+      "?? tests/unit/typed-export.test.mjs"
+    ],
+    "harnessSha256": "b0b1a2c9a461dfc76b636e8f04f98a8ba91a0e26124ac9062fcd52d4c97e66f7"
+  },
+  "fixture": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\skills\\lux-visual-creation\\assets\\typed-controls.ts",
+    "sha256": "7b8aaee97917e64fb6c61debc8f35cb8ebcd1e0186f0fe3be3d205cad40ef778"
+  },
+  "componentFixture": {
+    "sha256": "bb8efd6d308b1e75337393b3d6769b1473abb58f36290cf663dad2443eb69b88"
+  },
+  "checks": [
+    "Native number, switch, dropdown, radio, and segmented editors accept pointer and keyboard edits",
+    "Existing numeric LFO modulation remains available while typed controls stay non-animatable",
+    "Generic MCP applies mixed typed patches atomically and rejects a number for a boolean",
+    "Scene save and reopen preserve typed values and the numeric LFO",
+    "Enum labels and order can change without moving the selected stable option ID",
+    "An invalid build preserves the accepted revision, typed values, and exact paused preview",
+    "Selected-node Inspector edits and guarded public aliases change one typed component instance without changing its sibling",
+    "SDK 0.4 save and reopen preserve distinct number, boolean, and enum values for two instances of one component"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-typed-controls\\native-1789632068797\\wide-typed-controls.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-typed-controls\\native-1789632068797\\narrow-typed-controls.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-typed-controls\\native-1789632068797\\component-instance-a.png"
+  ],
+  "errors": [],
+  "pid": 17052,
+  "previewContinuity": {
+    "before": {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-typed-controls\\native-1789632068797\\before-invalid-build-preview.png",
+      "hash": "88cede165bc4d465dabc27951f3d22e49a89b148d73607c04c2ccbb609d24f50",
+      "metadata": {
+        "playback": "paused",
+        "timeSeconds": 1.19489999999851,
+        "clockEpoch": 0,
+        "tempo": {
+          "bpm": 120,
+          "beatPosition": 2.38979999999702,
+          "beatPhase": 0.38979999999701986,
+          "tempoSequence": 0
+        },
+        "tempoSequence": 0,
+        "frameId": "68",
+        "sdkVersion": "0.2.0",
+        "controlSchemaHash": "70461199c847c6606cfeba848576653150e4c903b1ffc5c1844089858012ca32",
+        "controls": {
+          "scale": 0.61,
+          "glow": false,
+          "palette": "mint",
+          "direction": "right",
+          "shape": "tall"
+        },
+        "controlSequence": 0,
+        "effectiveControls": {
+          "scale": 0.61,
+          "glow": false,
+          "palette": "mint",
+          "direction": "right",
+          "shape": "tall"
+        },
+        "controlAnimations": [
+          {
+            "nodePath": [],
+            "definitionHash": "4d09d641bdf8ad5f0b943d1f640a0c982331c7eae78c9c879e591be5195a43df",
+            "schemaHash": "4d09d641bdf8ad5f0b943d1f640a0c982331c7eae78c9c879e591be5195a43df",
+            "controlId": "scale",
+            "shape": "sine",
+            "periodSeconds": 2,
+            "amount": 0.06999999999999999,
+            "phase": 0,
+            "enabled": true
+          }
+        ],
+        "controlAnimationIssues": [
+          {
+            "index": 0,
+            "nodePath": [],
+            "controlId": "scale",
+            "message": "Animated control changed and is incompatible with this binding."
+          }
+        ],
+        "animationSequence": 0,
+        "width": 640,
+        "height": 360,
+        "seed": 0,
+        "colorSpace": "srgb",
+        "alphaMode": "straight",
+        "instanceId": "893f5e8a-7846-418f-b2f9-27ec56dfedcc",
+        "generation": 5,
+        "revisionId": "53132fd3a07e9011d872c97d25261cfdbbb1868c90954225dde5d14d1fecf97e"
+      }
+    },
+    "after": {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-typed-controls\\native-1789632068797\\after-invalid-build-preview.png",
+      "hash": "88cede165bc4d465dabc27951f3d22e49a89b148d73607c04c2ccbb609d24f50",
+      "metadata": {
+        "playback": "paused",
+        "timeSeconds": 1.19489999999851,
+        "clockEpoch": 0,
+        "tempo": {
+          "bpm": 120,
+          "beatPosition": 2.38979999999702,
+          "beatPhase": 0.38979999999701986,
+          "tempoSequence": 0
+        },
+        "tempoSequence": 0,
+        "frameId": "68",
+        "sdkVersion": "0.2.0",
+        "controlSchemaHash": "70461199c847c6606cfeba848576653150e4c903b1ffc5c1844089858012ca32",
+        "controls": {
+          "scale": 0.61,
+          "glow": false,
+          "palette": "mint",
+          "direction": "right",
+          "shape": "tall"
+        },
+        "controlSequence": 0,
+        "effectiveControls": {
+          "scale": 0.61,
+          "glow": false,
+          "palette": "mint",
+          "direction": "right",
+          "shape": "tall"
+        },
+        "controlAnimations": [
+          {
+            "nodePath": [],
+            "definitionHash": "4d09d641bdf8ad5f0b943d1f640a0c982331c7eae78c9c879e591be5195a43df",
+            "schemaHash": "4d09d641bdf8ad5f0b943d1f640a0c982331c7eae78c9c879e591be5195a43df",
+            "controlId": "scale",
+            "shape": "sine",
+            "periodSeconds": 2,
+            "amount": 0.06999999999999999,
+            "phase": 0,
+            "enabled": true
+          }
+        ],
+        "controlAnimationIssues": [
+          {
+            "index": 0,
+            "nodePath": [],
+            "controlId": "scale",
+            "message": "Animated control changed and is incompatible with this binding."
+          }
+        ],
+        "animationSequence": 0,
+        "width": 640,
+        "height": 360,
+        "seed": 0,
+        "colorSpace": "srgb",
+        "alphaMode": "straight",
+        "instanceId": "893f5e8a-7846-418f-b2f9-27ec56dfedcc",
+        "generation": 5,
+        "revisionId": "53132fd3a07e9011d872c97d25261cfdbbb1868c90954225dde5d14d1fecf97e"
+      }
+    }
+  },
+  "narrowInspector": {
+    "window": {
+      "width": 820,
+      "height": 720
+    },
+    "before": 137,
+    "after": 242,
+    "target": 240
+  },
+  "exitCode": 0,
+  "processExited": true
+}

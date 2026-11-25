@@ -1,0 +1,35 @@
+{
+  "ok": true,
+  "mode": "layout",
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/story-controls",
+  "profile": "test-4e873302-d8f4-4214-9b17-fd205034b402",
+  "scene": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\story-controls\\Vinyl Cosmos Story.lux-scene",
+    "sha256": "d005f1d4127ef6006db5ccf46c69c172bc5a9b567925a35be17e9146c1ec23dc",
+    "sourceHash": "1428669e5df4e2a10230829043196c755536a8a567888289869e47c06d63dc3d"
+  },
+  "testedSource": {
+    "baselineCommit": "b22dc818dbb03553b213de03d1bf34d2443bb270",
+    "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "harnessSha256": "5a915210539148f48f4dd55e48fe80bc6d8e3b6640a46adb5cbf492d645bb168"
+  },
+  "checks": [
+    "Native Story panel and sequence ribbon remain visible at desktop, 1100×720, and 640×360",
+    "Normal, paused timed seek, and attached dwell remain visible with Preview across desktop, 1100×720, and 640×360"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-story\\native-1789652789036-layout\\story-desktop-1360x900.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-story\\native-1789652789036-layout\\story-medium-1100x720.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-story\\native-1789652789036-layout\\story-compact-640x360.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-story\\native-1789652789036-layout\\story-layout-timed-paused-desktop-1360x900.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-story\\native-1789652789036-layout\\story-layout-timed-paused-medium-1100x720.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-story\\native-1789652789036-layout\\story-layout-timed-paused-compact-640x360.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-story\\native-1789652789036-layout\\story-layout-attached-dwell-desktop-1360x900.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-story\\native-1789652789036-layout\\story-layout-attached-dwell-medium-1100x720.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-story\\native-1789652789036-layout\\story-layout-attached-dwell-compact-640x360.png"
+  ],
+  "errors": [],
+  "pid": 25700,
+  "exitCode": 0,
+  "processExited": true
+}

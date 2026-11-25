@@ -1,0 +1,47 @@
+{
+  "ok": true,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/story-controls",
+  "profile": "test-eddb6fdd-2f6c-4f89-8b3b-2ac4b88a4743",
+  "testedSource": {
+    "baselineCommit": "4a1742bd78d13e4c44d8dbbb57939ea272135e60",
+    "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "harnessSha256": "6da70f20117eb98ac4513a29cacf16b1ad12fcfcdc96753acdeb60f32212a1c3"
+  },
+  "fixture": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\skills\\lux-visual-creation\\assets\\trigger-controls.ts",
+    "sha256": "77244145f4ce986d274217d0bfb50953dcb981b1fb5c0d583e62c9d870c082f1"
+  },
+  "componentFixture": {
+    "sha256": "0faa7910cbe51586344cab08131bbb906e2412d6df9ad4b8c37838b2efba71f8"
+  },
+  "checks": [
+    "An authored trigger update failure preserves the paused frame and saved scene; its failed generation cannot redeliver and recovery starts with an empty ledger"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-trigger-controls\\native-1789647267163\\authored-trigger-failure.png"
+  ],
+  "errors": [],
+  "mode": "fault-only",
+  "pid": 29232,
+  "failedAction": {
+    "failedGeneration": 3,
+    "recoveredGeneration": 4,
+    "before": {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-trigger-controls\\native-1789647267163\\before-authored-trigger-fault-canvas.png",
+      "hash": "f0366541ef0f34ce422827c1e33dcbac8dff961e0949f47507e0edd40350959f",
+      "source": "canvas-backing-store"
+    },
+    "afterFailure": {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-trigger-controls\\native-1789647267163\\after-authored-trigger-fault-canvas.png",
+      "hash": "f0366541ef0f34ce422827c1e33dcbac8dff961e0949f47507e0edd40350959f",
+      "source": "canvas-backing-store"
+    },
+    "afterRecovery": {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-trigger-controls\\native-1789647267163\\after-authored-trigger-recovery-canvas.png",
+      "hash": "f0366541ef0f34ce422827c1e33dcbac8dff961e0949f47507e0edd40350959f",
+      "source": "canvas-backing-store"
+    }
+  },
+  "exitCode": 0,
+  "processExited": true
+}

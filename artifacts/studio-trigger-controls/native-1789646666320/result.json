@@ -1,0 +1,32 @@
+{
+  "ok": false,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/story-controls",
+  "profile": "test-be519443-1204-4f62-a66c-7f9d3986d288",
+  "testedSource": {
+    "baselineCommit": "4a1742bd78d13e4c44d8dbbb57939ea272135e60",
+    "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "harnessSha256": "4e470173c90354f24b6e9a09608743ac1b4861b8cf5d64dbf1980ca3caf2a31a"
+  },
+  "fixture": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\skills\\lux-visual-creation\\assets\\trigger-controls.ts",
+    "sha256": "77244145f4ce986d274217d0bfb50953dcb981b1fb5c0d583e62c9d870c082f1"
+  },
+  "componentFixture": {
+    "sha256": "0faa7910cbe51586344cab08131bbb906e2412d6df9ad4b8c37838b2efba71f8"
+  },
+  "checks": [
+    "Pointer, Enter, and Space invoke real trigger buttons while playing or paused; every acknowledgement names a completed frame",
+    "Generic MCP command IDs are idempotent; old duplicates return the original receipt without redelivery or latest-state regression",
+    "Stale guards and unknown actions reject without changing the paused preview",
+    "Save/open, reset, rebuild, and restart preserve persistent controls but never persist or replay trigger actions"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-trigger-controls\\native-1789646666320\\wide-trigger-controls.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-trigger-controls\\native-1789646666320\\failure.png"
+  ],
+  "errors": [],
+  "pid": 28752,
+  "error": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(sash)\n\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/story-controls/scripts/test-studio-trigger-controls.mjs:360:10",
+  "exitCode": 0,
+  "processExited": true
+}

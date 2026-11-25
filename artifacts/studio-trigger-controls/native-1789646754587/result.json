@@ -1,0 +1,44 @@
+{
+  "ok": false,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/story-controls",
+  "profile": "test-058bcf51-9e9f-4b6b-8186-822d636cded4",
+  "testedSource": {
+    "baselineCommit": "4a1742bd78d13e4c44d8dbbb57939ea272135e60",
+    "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "harnessSha256": "42cd167e9e2f791f6dd91a5c662247abdfc5e180765874aea9a5c3d07430143f"
+  },
+  "fixture": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\skills\\lux-visual-creation\\assets\\trigger-controls.ts",
+    "sha256": "77244145f4ce986d274217d0bfb50953dcb981b1fb5c0d583e62c9d870c082f1"
+  },
+  "componentFixture": {
+    "sha256": "0faa7910cbe51586344cab08131bbb906e2412d6df9ad4b8c37838b2efba71f8"
+  },
+  "checks": [
+    "Pointer, Enter, and Space invoke real trigger buttons while playing or paused; every acknowledgement names a completed frame",
+    "Generic MCP command IDs are idempotent; old duplicates return the original receipt without redelivery or latest-state regression",
+    "Stale guards and unknown actions reject without changing the paused preview",
+    "Save/open, reset, rebuild, and restart preserve persistent controls but never persist or replay trigger actions",
+    "Public aliases, generic node addressing, and selected-node UI route actions to the intended component instance without sibling delivery"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-trigger-controls\\native-1789646754587\\wide-trigger-controls.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-trigger-controls\\native-1789646754587\\narrow-trigger-controls.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-trigger-controls\\native-1789646754587\\component-trigger-isolation.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-trigger-controls\\native-1789646754587\\failure.png"
+  ],
+  "errors": [],
+  "pid": 3736,
+  "narrowInspector": {
+    "window": {
+      "width": 820,
+      "height": 720
+    },
+    "before": 137,
+    "after": 242,
+    "target": 240
+  },
+  "error": "AssertionError [ERR_ASSERTION]: capture: No working visual to capture\n+ actual - expected\n\n+ true\n- undefined\n\n    at captureCurrentPreview (file:///C:/Users/zFlei/repos/lux/.worktrees/story-controls/scripts/test-studio-trigger-controls.mjs:201:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/story-controls/scripts/test-studio-trigger-controls.mjs:439:22",
+  "exitCode": 0,
+  "processExited": true
+}

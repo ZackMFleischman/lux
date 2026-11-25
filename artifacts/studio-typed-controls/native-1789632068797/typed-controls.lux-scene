@@ -1,0 +1,130 @@
+{
+  "format": "lux-scene",
+  "version": 3,
+  "source": {
+    "sdkVersion": "0.2.0",
+    "entry": "visual.ts",
+    "files": {
+      "visual.ts": "import { defineVisual } from '@lux/visual-sdk';\nimport {\n  Color,\n  Mesh,\n  MeshBasicNodeMaterial,\n  OrthographicCamera,\n  PlaneGeometry,\n  Scene,\n} from 'three/webgpu';\n\nexport default defineVisual({\n  controls: {\n    scale: {\n      type: 'number',\n      label: 'Scale',\n      default: 0.72,\n      min: 0.3,\n      max: 1,\n      step: 0.01,\n      group: 'Shape',\n    },\n    glow: {\n      type: 'boolean',\n      label: 'Glow',\n      default: true,\n      group: 'Appearance',\n    },\n    palette: {\n      type: 'enum',\n      label: 'Palette',\n      default: 'violet',\n      presentation: 'dropdown',\n      group: 'Appearance',\n      options: [\n        { id: 'violet', label: 'Violet' },\n        { id: 'ember', label: 'Ember' },\n        { id: 'mint', label: 'Mint' },\n      ],\n    },\n    direction: {\n      type: 'enum',\n      label: 'Direction',\n      default: 'right',\n      presentation: 'radio',\n      group: 'Motion',\n      options: [\n        { id: 'left', label: 'Left' },\n        { id: 'right', label: 'Right' },\n      ],\n    },\n    shape: {\n      type: 'enum',\n      label: 'Shape',\n      default: 'square',\n      presentation: 'segmented',\n      group: 'Shape',\n      options: [\n        { id: 'wide', label: 'Wide' },\n        { id: 'square', label: 'Square' },\n        { id: 'tall', label: 'Tall' },\n      ],\n    },\n  },\n  async create(context) {\n    const geometry = new PlaneGeometry(1, 1);\n    const material = new MeshBasicNodeMaterial({ color: '#8a68ff' });\n    const mesh = new Mesh(geometry, material);\n    const scene = new Scene();\n    scene.background = new Color('#090b13');\n    scene.add(mesh);\n\n    const camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 10);\n    camera.position.z = 1;\n\n    return {\n      update(frame) {\n        const direction = frame.controls.direction === 'left' ? -1 : 1;\n        const dimensions = frame.controls.shape === 'wide'\n          ? [1.35, 0.68]\n          : frame.controls.shape === 'tall'\n            ? [0.68, 1.35]\n            : [1, 1];\n        const colors = {\n          violet: '#8a68ff',\n          ember: '#ff7043',\n          mint: '#54e6b3',\n        } as const;\n\n        mesh.scale.set(\n          dimensions[0] * frame.controls.scale,\n          dimensions[1] * frame.controls.scale,\n          1,\n        );\n        mesh.rotation.z = direction * frame.timeSeconds * 0.22;\n        material.color.set(colors[frame.controls.palette]);\n        material.opacity = frame.controls.glow ? 1 : 0.45;\n        material.transparent = !frame.controls.glow;\n      },\n      render(target) {\n        return context.renderer.render(scene, camera, target);\n      },\n      reset(_seed) {},\n      dispose() {\n        geometry.dispose();\n        material.dispose();\n      },\n    };\n  },\n});\n"
+    }
+  },
+  "settings": {
+    "width": 640,
+    "height": 360,
+    "fps": 60,
+    "seed": 0
+  },
+  "controls": {
+    "sourceHash": "77c28af7d323a180bfa5716818964194d43e111b5f5e1e0cc4f4d9a54fab2060",
+    "schema": [
+      {
+        "id": "scale",
+        "type": "number",
+        "label": "Scale",
+        "default": 0.72,
+        "min": 0.3,
+        "max": 1,
+        "step": 0.01,
+        "group": "Shape",
+        "changeCost": "live"
+      },
+      {
+        "id": "glow",
+        "type": "boolean",
+        "label": "Glow",
+        "default": true,
+        "group": "Appearance",
+        "changeCost": "live"
+      },
+      {
+        "id": "palette",
+        "type": "enum",
+        "label": "Palette",
+        "default": "violet",
+        "options": [
+          {
+            "id": "violet",
+            "label": "Violet"
+          },
+          {
+            "id": "ember",
+            "label": "Ember"
+          },
+          {
+            "id": "mint",
+            "label": "Mint"
+          }
+        ],
+        "presentation": "dropdown",
+        "group": "Appearance",
+        "changeCost": "live"
+      },
+      {
+        "id": "direction",
+        "type": "enum",
+        "label": "Direction",
+        "default": "right",
+        "options": [
+          {
+            "id": "left",
+            "label": "Left"
+          },
+          {
+            "id": "right",
+            "label": "Right"
+          }
+        ],
+        "presentation": "radio",
+        "group": "Motion",
+        "changeCost": "live"
+      },
+      {
+        "id": "shape",
+        "type": "enum",
+        "label": "Shape",
+        "default": "square",
+        "options": [
+          {
+            "id": "wide",
+            "label": "Wide"
+          },
+          {
+            "id": "square",
+            "label": "Square"
+          },
+          {
+            "id": "tall",
+            "label": "Tall"
+          }
+        ],
+        "presentation": "segmented",
+        "group": "Shape",
+        "changeCost": "live"
+      }
+    ],
+    "schemaHash": "4d09d641bdf8ad5f0b943d1f640a0c982331c7eae78c9c879e591be5195a43df",
+    "values": {
+      "scale": 0.61,
+      "glow": false,
+      "palette": "mint",
+      "direction": "right",
+      "shape": "tall"
+    }
+  },
+  "tempo": {
+    "bpm": 120
+  },
+  "controlAnimations": [
+    {
+      "nodePath": [],
+      "definitionHash": "4d09d641bdf8ad5f0b943d1f640a0c982331c7eae78c9c879e591be5195a43df",
+      "schemaHash": "4d09d641bdf8ad5f0b943d1f640a0c982331c7eae78c9c879e591be5195a43df",
+      "controlId": "scale",
+      "shape": "sine",
+      "periodSeconds": 2,
+      "amount": 0.06999999999999999,
+      "phase": 0,
+      "enabled": true
+    }
+  ]
+}

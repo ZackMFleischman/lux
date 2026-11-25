@@ -1,0 +1,28 @@
+{
+  "ok": false,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/story-controls",
+  "profile": "test-1df68418-b73f-4f1b-9cea-2ba09481d1cf",
+  "testedSource": {
+    "baselineCommit": "5c77d26c3dfdc2e4de53a0e76fea166f935d7ce5",
+    "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "harnessSha256": "e9778e48d4dc32e164b949687629c6a60448ce191af6e9a65fd041cb16321f1c"
+  },
+  "fixture": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\skills\\lux-visual-creation\\assets\\trigger-controls.ts",
+    "sha256": "77244145f4ce986d274217d0bfb50953dcb981b1fb5c0d583e62c9d870c082f1"
+  },
+  "componentFixture": {
+    "sha256": "0faa7910cbe51586344cab08131bbb906e2412d6df9ad4b8c37838b2efba71f8"
+  },
+  "checks": [
+    "Pointer, Enter, and Space invoke real trigger buttons while playing or paused; every acknowledgement names a completed frame"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-trigger-controls\\native-1789645968359\\failure.png"
+  ],
+  "errors": [],
+  "pid": 34820,
+  "error": "AssertionError [ERR_ASSERTION]: trigger: Studio is busy or command is unsupported\n+ actual - expected\n\n+ true\n- undefined\n\n    at call (file:///C:/Users/zFlei/repos/lux/.worktrees/story-controls/scripts/test-studio-trigger-controls.mjs:163:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/story-controls/scripts/test-studio-trigger-controls.mjs:285:27",
+  "exitCode": 0,
+  "processExited": true
+}

@@ -1,0 +1,25 @@
+{
+  "ok": false,
+  "mode": "full",
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/story-controls",
+  "profile": "test-c5430adb-0720-405c-80f1-3422dd666f20",
+  "scene": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\story-controls\\Vinyl Cosmos Story.lux-scene",
+    "sha256": "fecfacee1267ed0f52ddddac635d07c10d90ad9bbd67de749ac82b3dac576c26",
+    "sourceHash": "1428669e5df4e2a10230829043196c755536a8a567888289869e47c06d63dc3d"
+  },
+  "testedSource": {
+    "baselineCommit": "90209c5022cb3990be8ce2039b8524cdda8e951c",
+    "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "harnessSha256": "61a7448e71edecf673f56129110bf0c30c6ee2a2a0caa25f138925503c03af26"
+  },
+  "checks": [],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-story\\native-1789650900566-full\\failure.png"
+  ],
+  "errors": [],
+  "pid": 35352,
+  "error": "AssertionError [ERR_ASSERTION]: lux.story.read: Invalid authoring command\n+ actual - expected\n\n+ true\n- undefined\n\n    at callTool (file:///C:/Users/zFlei/repos/lux/.worktrees/story-controls/scripts/test-studio-story.mjs:83:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/story-controls/scripts/test-studio-story.mjs:182:23",
+  "exitCode": 0,
+  "processExited": true
+}

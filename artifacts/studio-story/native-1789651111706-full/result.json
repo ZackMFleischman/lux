@@ -1,0 +1,25 @@
+{
+  "ok": false,
+  "mode": "full",
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/story-controls",
+  "profile": "test-cce69e5b-e984-4a2e-9a84-4f9606d13a32",
+  "scene": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\story-controls\\Vinyl Cosmos Story.lux-scene",
+    "sha256": "fecfacee1267ed0f52ddddac635d07c10d90ad9bbd67de749ac82b3dac576c26",
+    "sourceHash": "1428669e5df4e2a10230829043196c755536a8a567888289869e47c06d63dc3d"
+  },
+  "testedSource": {
+    "baselineCommit": "d4e179676e243c9be3a1733e0e2bf879597991e0",
+    "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "harnessSha256": "61a7448e71edecf673f56129110bf0c30c6ee2a2a0caa25f138925503c03af26"
+  },
+  "checks": [],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-story\\native-1789651111706-full\\failure.png"
+  ],
+  "errors": [],
+  "pid": 37732,
+  "error": "Error: 640×360 preview output did not settle\n    at statusWhen (file:///C:/Users/zFlei/repos/lux/.worktrees/story-controls/scripts/test-studio-story.mjs:98:11)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/story-controls/scripts/test-studio-story.mjs:186:3",
+  "exitCode": 0,
+  "processExited": true
+}

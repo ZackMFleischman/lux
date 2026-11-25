@@ -1,0 +1,198 @@
+{
+  "ok": true,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/story-controls",
+  "profile": "test-cde6908c-4013-48fd-bd25-00f50dd97307",
+  "testedSource": {
+    "baselineCommit": "325be93de6ca0a5e5871b0165358cf91d8cd352b",
+    "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "worktreeStatus": [
+      "?? artifacts/studio-typed-controls/native-1789631371339/failure.png",
+      "?? artifacts/studio-typed-controls/native-1789631371339/result.json",
+      "?? artifacts/studio-typed-controls/native-1789631727053/after-invalid-build-preview.png",
+      "?? artifacts/studio-typed-controls/native-1789631727053/before-invalid-build-preview.png",
+      "?? artifacts/studio-typed-controls/native-1789631727053/failure.png",
+      "?? artifacts/studio-typed-controls/native-1789631727053/narrow-typed-controls.png",
+      "?? artifacts/studio-typed-controls/native-1789631727053/result.json",
+      "?? artifacts/studio-typed-controls/native-1789631727053/typed-controls.lux-scene",
+      "?? artifacts/studio-typed-controls/native-1789631727053/wide-typed-controls.png",
+      "?? artifacts/studio-typed-controls/native-1789632068797/after-invalid-build-preview.png",
+      "?? artifacts/studio-typed-controls/native-1789632068797/before-invalid-build-preview.png",
+      "?? artifacts/studio-typed-controls/native-1789632068797/component-instance-a.png",
+      "?? artifacts/studio-typed-controls/native-1789632068797/narrow-typed-controls.png",
+      "?? artifacts/studio-typed-controls/native-1789632068797/result.json",
+      "?? artifacts/studio-typed-controls/native-1789632068797/typed-component-isolation.lux-scene",
+      "?? artifacts/studio-typed-controls/native-1789632068797/typed-controls.lux-scene",
+      "?? artifacts/studio-typed-controls/native-1789632068797/wide-typed-controls.png",
+      "?? docs/implementation/story-controls/typed-controls-evidence.md",
+      "?? scripts/test-studio-typed-controls.mjs"
+    ],
+    "harnessSha256": "ed65a20c2f329ff17bd234aa61d839819662128a61162d97fdc12a5d821bc6f7"
+  },
+  "fixture": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\skills\\lux-visual-creation\\assets\\typed-controls.ts",
+    "sha256": "c2588e5ea213d25bb44ab16778ab8c2d5ab3dbbb8608dd52dd2bbe55bfafe6e2"
+  },
+  "componentFixture": {
+    "sha256": "bb8efd6d308b1e75337393b3d6769b1473abb58f36290cf663dad2443eb69b88"
+  },
+  "checks": [
+    "Native number, switch, dropdown, radio, and segmented editors accept pointer and keyboard edits; keyboard focus reveals enum option help",
+    "Existing numeric LFO modulation remains available while typed controls stay non-animatable",
+    "Generic MCP applies mixed typed patches atomically and rejects a number for a boolean",
+    "Scene save and reopen preserve typed values and the numeric LFO",
+    "Enum labels and order can change without moving the selected stable option ID",
+    "An invalid build preserves the accepted revision, typed values, and exact paused preview",
+    "Selected-node Inspector edits and guarded public aliases change one typed component instance without changing its sibling",
+    "SDK 0.4 save and reopen preserve distinct number, boolean, and enum values for two instances of one component"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-typed-controls\\native-1789632976959\\keyboard-option-help.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-typed-controls\\native-1789632976959\\wide-typed-controls.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-typed-controls\\native-1789632976959\\narrow-typed-controls.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-typed-controls\\native-1789632976959\\invalid-build-preserved.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-typed-controls\\native-1789632976959\\component-instance-a.png"
+  ],
+  "errors": [],
+  "pid": 18080,
+  "narrowInspector": {
+    "window": {
+      "width": 820,
+      "height": 720
+    },
+    "before": 137,
+    "after": 242,
+    "target": 240
+  },
+  "previewContinuity": {
+    "before": {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-typed-controls\\native-1789632976959\\before-invalid-build-preview.png",
+      "hash": "96c1a13e82229388a3ff7c8adb16c49118e4676c214a1b4d4fb01e0e5303887d",
+      "metadata": {
+        "playback": "paused",
+        "timeSeconds": 1.4100999999977648,
+        "clockEpoch": 0,
+        "tempo": {
+          "bpm": 120,
+          "beatPosition": 2.8201999999955296,
+          "beatPhase": 0.8201999999955296,
+          "tempoSequence": 0
+        },
+        "tempoSequence": 0,
+        "frameId": "71",
+        "sdkVersion": "0.2.0",
+        "controlSchemaHash": "1a6eee5bc00d9b8aa3ba082734274303b5d9b69c0fa1390ba0a1db5d760512f5",
+        "controls": {
+          "scale": 0.61,
+          "glow": false,
+          "palette": "mint",
+          "direction": "right",
+          "shape": "tall"
+        },
+        "controlSequence": 0,
+        "effectiveControls": {
+          "scale": 0.61,
+          "glow": false,
+          "palette": "mint",
+          "direction": "right",
+          "shape": "tall"
+        },
+        "controlAnimations": [
+          {
+            "nodePath": [],
+            "definitionHash": "894ac638efd2e0fe9beeba1df77a10314d5030a0e90590ee4d8497360566b9cb",
+            "schemaHash": "894ac638efd2e0fe9beeba1df77a10314d5030a0e90590ee4d8497360566b9cb",
+            "controlId": "scale",
+            "shape": "sine",
+            "periodSeconds": 2,
+            "amount": 0.06999999999999999,
+            "phase": 0,
+            "enabled": true
+          }
+        ],
+        "controlAnimationIssues": [
+          {
+            "index": 0,
+            "nodePath": [],
+            "controlId": "scale",
+            "message": "Animated control changed and is incompatible with this binding."
+          }
+        ],
+        "animationSequence": 0,
+        "width": 640,
+        "height": 360,
+        "seed": 0,
+        "colorSpace": "srgb",
+        "alphaMode": "straight",
+        "instanceId": "f9a64255-3e53-48bb-baf8-81624ccbf3b6",
+        "generation": 5,
+        "revisionId": "6ea98cf1b8a741957dee520712a41d3cfc792fdb86b5bf7c690f19d5d54e9370"
+      }
+    },
+    "after": {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-controls\\artifacts\\studio-typed-controls\\native-1789632976959\\after-invalid-build-preview.png",
+      "hash": "96c1a13e82229388a3ff7c8adb16c49118e4676c214a1b4d4fb01e0e5303887d",
+      "metadata": {
+        "playback": "paused",
+        "timeSeconds": 1.4100999999977648,
+        "clockEpoch": 0,
+        "tempo": {
+          "bpm": 120,
+          "beatPosition": 2.8201999999955296,
+          "beatPhase": 0.8201999999955296,
+          "tempoSequence": 0
+        },
+        "tempoSequence": 0,
+        "frameId": "71",
+        "sdkVersion": "0.2.0",
+        "controlSchemaHash": "1a6eee5bc00d9b8aa3ba082734274303b5d9b69c0fa1390ba0a1db5d760512f5",
+        "controls": {
+          "scale": 0.61,
+          "glow": false,
+          "palette": "mint",
+          "direction": "right",
+          "shape": "tall"
+        },
+        "controlSequence": 0,
+        "effectiveControls": {
+          "scale": 0.61,
+          "glow": false,
+          "palette": "mint",
+          "direction": "right",
+          "shape": "tall"
+        },
+        "controlAnimations": [
+          {
+            "nodePath": [],
+            "definitionHash": "894ac638efd2e0fe9beeba1df77a10314d5030a0e90590ee4d8497360566b9cb",
+            "schemaHash": "894ac638efd2e0fe9beeba1df77a10314d5030a0e90590ee4d8497360566b9cb",
+            "controlId": "scale",
+            "shape": "sine",
+            "periodSeconds": 2,
+            "amount": 0.06999999999999999,
+            "phase": 0,
+            "enabled": true
+          }
+        ],
+        "controlAnimationIssues": [
+          {
+            "index": 0,
+            "nodePath": [],
+            "controlId": "scale",
+            "message": "Animated control changed and is incompatible with this binding."
+          }
+        ],
+        "animationSequence": 0,
+        "width": 640,
+        "height": 360,
+        "seed": 0,
+        "colorSpace": "srgb",
+        "alphaMode": "straight",
+        "instanceId": "f9a64255-3e53-48bb-baf8-81624ccbf3b6",
+        "generation": 5,
+        "revisionId": "6ea98cf1b8a741957dee520712a41d3cfc792fdb86b5bf7c690f19d5d54e9370"
+      }
+    }
+  },
+  "exitCode": 0,
+  "processExited": true
+}

@@ -1,0 +1,36 @@
+{
+  "ok": true,
+  "elapsedMs": 10557,
+  "capsuleHash": "676ea9b4d2df523e8c602a15ad77fba99015025726905b6f84f7eca946d0bb29",
+  "scheduleHash": "66cd3e4de86f2e7496ee36186c80a8a7f389ea31a5a494f48a22e5d85d817a2d",
+  "visuals": [
+    {
+      "visualId": "a",
+      "entry": "v000.js",
+      "entryCodeHash": "1b32c4f85f4413330afec64e438d65e38f5f80153f3a42529d2618c851ac76ba",
+      "sourceHash": "34e2b5fe9156acd7aefcad600b734c1956564ed64869c665e887f07f871c4466",
+      "bundleHash": "4de61a3c99f1efa17c741bcfabcbc0c96a8a67e6e3fc3b5b2cee6d0b8904de81",
+      "controlSchemaHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "storyCapabilityHash": null,
+      "assetSetHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "visualId": "b",
+      "entry": "v001.js",
+      "entryCodeHash": "1e9faf692d9bd5fa9046c9ed132100c0012bd9b92d7b6e3fc3f8b44f94fad45a",
+      "sourceHash": "02f065ab89ed98dc6747e82f2c16b82184712e8cc25da9f74cabb5bd573c9c65",
+      "bundleHash": "1d39fd14223e48adcf6eb0f3cd3cb3357cef138d43a12ba669b0d7ca05701ea8",
+      "controlSchemaHash": "8cbb63b97b31d8a31e8abf2d2f929e9bd572f4cf40e725c8dfa302d6a9614d7a",
+      "storyCapabilityHash": "425a13a3844466311ffa0b4bda6de685c94950bff0d2a3d96c990eca0e64724c",
+      "assetSetHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "migrationIssues": [
+    {
+      "visualId": "b",
+      "id": "amount",
+      "reason": "added",
+      "value": 1
+    }
+  ]
+}

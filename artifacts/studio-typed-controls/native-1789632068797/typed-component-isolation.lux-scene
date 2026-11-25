@@ -1,0 +1,160 @@
+{
+  "format": "lux-scene",
+  "version": 4,
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "composition.ts",
+    "files": {
+      "ball.ts": "import { defineComponent } from '@lux/visual-sdk';\nimport { Scene, Mesh, IcosahedronGeometry, MeshPhysicalNodeMaterial, PerspectiveCamera, Color, AmbientLight, DirectionalLight } from 'three/webgpu';\nimport { uniform, vec3, positionLocal, mx_noise_float, mix, color, varying } from 'three/tsl';\n\nexport default defineComponent({\n  metadata: {\n    declarationVersion: 1, key: 'demo/prismatic-ball', label: 'Prismatic Ball', description: 'Animated iridescent spike source', tags: ['demo'],\n    inputs: {}, outputs: { image: { type: { kind: 'image', colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }, label: 'Image', description: 'Rendered ball' } },\n    controls: { intensity: { type: 'number', label: 'Spike amount', default: 0.67, min: 0, max: 1, step: 0.01 } },\n    controlDescriptions: { intensity: 'Controls the height of the animated spikes.' }, lifecycle: { state: 'stateful', reset: 'seed' },\n  },\n  async create(context) {\n    const clock = uniform(0), intensity = uniform(0.67), p = positionLocal.normalize();\n    const drift = vec3(clock.mul(0.43), clock.mul(-0.31), clock.mul(0.22));\n    const warp = mx_noise_float(p.mul(2).add(drift.mul(0.45))).mul(0.48);\n    const field = p.mul(3.6).add(drift).add(warp), noise = mx_noise_float(field).mul(0.8).add(0.44).clamp(0, 1);\n    const spikes = noise.pow(3.4).mul(intensity.mul(1.6).add(0.25)), height = varying(spikes);\n    const material = new MeshPhysicalNodeMaterial({ metalness: 0.56, roughness: 0.29, clearcoat: 0.8, clearcoatRoughness: 0.22, iridescence: 0.85, flatShading: true });\n    material.positionNode = p.mul(spikes.add(mx_noise_float(field.mul(3.1).sub(drift)).mul(0.07).mul(intensity)).add(0.85));\n    material.colorNode = mix(color('#392565'), color('#21e6cb'), height.mul(1.8).clamp(0, 1));\n    material.emissiveNode = mix(color('#120420'), color('#16b9b6'), height.mul(1.2).clamp(0, 1)).mul(0.13);\n    const geometry = new IcosahedronGeometry(1, 24), sphere = new Mesh(geometry, material), scene = new Scene();\n    scene.background = new Color('#030510'); scene.add(sphere, new AmbientLight('#668ab4', 0.8));\n    const key = new DirectionalLight('#bfefff', 4.4); key.position.set(3, 4, 4); scene.add(key);\n    const rim = new DirectionalLight('#fc4fa4', 5.5); rim.position.set(-3, 1, -1); scene.add(rim);\n    const camera = new PerspectiveCamera(36, context.settings.width / context.settings.height, 0.1, 30); camera.position.set(0, 0, 9);\n    return { update(frame) { intensity.value = frame.controls.intensity; clock.value = frame.timeSeconds * 0.3 * (0.5 + frame.controls.intensity); sphere.rotation.set(Math.sin(frame.timeSeconds * 0.17) * 0.16, frame.timeSeconds * 0.13, 0.13); },\n      async evaluate(_inputs, evaluation) { return { image: await evaluation.render(scene, camera) }; },\n      reset() { clock.value = 0; sphere.rotation.set(0, 0, 0.13); }, dispose() { geometry.dispose(); material.dispose(); } };\n  },\n});\n",
+      "composition.ts": "import { defineVisual } from '@lux/visual-sdk';\nimport ball from './ball.ts';\nimport effect from './effect.ts';\n\nexport default defineVisual({\n  label: 'Typed instance isolation',\n  definitions: { ball, effect },\n  nodes: [\n    { id: '11111111-1111-4111-8111-111111111111', definition: 'ball' },\n    { id: '22222222-2222-4222-8222-222222222222', definition: 'effect' },\n    { id: '33333333-3333-4333-8333-333333333333', definition: 'effect' },\n  ],\n  edges: [\n    { id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', from: { nodeId: '11111111-1111-4111-8111-111111111111', portId: 'image' }, to: { nodeId: '22222222-2222-4222-8222-222222222222', portId: 'image' }, delay: 'none' },\n    { id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', from: { nodeId: '22222222-2222-4222-8222-222222222222', portId: 'image' }, to: { nodeId: '33333333-3333-4333-8333-333333333333', portId: 'image' }, delay: 'none' },\n  ],\n  output: { nodeId: '33333333-3333-4333-8333-333333333333', portId: 'image' },\n  expose: [\n    { id: 'segmentsA', nodeId: '22222222-2222-4222-8222-222222222222', controlId: 'segments' },\n    { id: 'mirroredA', nodeId: '22222222-2222-4222-8222-222222222222', controlId: 'mirrored' },\n    { id: 'directionA', nodeId: '22222222-2222-4222-8222-222222222222', controlId: 'direction' },\n    { id: 'segmentsB', nodeId: '33333333-3333-4333-8333-333333333333', controlId: 'segments' },\n    { id: 'mirroredB', nodeId: '33333333-3333-4333-8333-333333333333', controlId: 'mirrored' },\n    { id: 'directionB', nodeId: '33333333-3333-4333-8333-333333333333', controlId: 'direction' },\n  ],\n});\n",
+      "effect.ts": "import { defineComponent, type ImageResource } from '@lux/visual-sdk';\nimport { Scene, Mesh, PlaneGeometry, MeshBasicNodeMaterial, OrthographicCamera, type Texture } from 'three/webgpu';\nimport { texture, uniform, uv, vec2, vec4, float, atan, cos, sin } from 'three/tsl';\n\nexport default defineComponent({\n  metadata: {\n    declarationVersion: 1, key: 'demo/kaleidoscope', label: 'Kaleidoscope', description: 'Mirrored image effect', tags: ['demo'],\n    inputs: { image: { type: { kind: 'image', colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }, label: 'Image', description: 'Source image' } },\n    outputs: { image: { type: { kind: 'image', colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }, label: 'Image', description: 'Mirrored image' } },\n    controls: {\n      segments: { type: 'number', label: 'Mirror segments', default: 6, min: 2, max: 16, step: 1 },\n      mirrored: { type: 'boolean', label: 'Mirrored', default: true },\n      direction: { type: 'enum', label: 'Direction', default: 'forward', presentation: 'dropdown', options: [\n        { id: 'forward', label: 'Forward' }, { id: 'reverse', label: 'Reverse' },\n      ] },\n    },\n    controlDescriptions: { segments: 'Sets the number of independently mirrored wedges.', mirrored: 'Turns the mirror fold on or off.', direction: 'Sets the rotation direction.' }, lifecycle: { state: 'stateful', reset: 'seed' },\n  },\n  async create(context) {\n    const segments = uniform(6), rotation = uniform(0), scene = new Scene(), geometry = new PlaneGeometry(2, 2);\n    const material = new MeshBasicNodeMaterial({ depthTest: false, depthWrite: false }), quad = new Mesh(geometry, material);\n    quad.frustumCulled = false; scene.add(quad); const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);\n    const aspect = context.settings.width / context.settings.height;\n    let time = 0, input: ImageResource | undefined;\n    function bind(source: ImageResource) {\n      const image = texture(source.texture as Texture), screen = uv(), p = screen.sub(0.5).mul(vec2(aspect, 1));\n      const radius = p.length().div(1.25), sector = float(Math.PI * 2).div(segments);\n      const angle = atan(p.y, p.x).add(rotation).add(radius.mul(0.35));\n      const folded = angle.div(sector).fract().sub(0.5).abs().mul(sector).add(time * 0.05);\n      const distance = float(1).sub(radius.mul(1.2).fract().mul(2).sub(1).abs()).mul(0.19);\n      const direction = vec2(cos(folded).div(aspect), sin(folded)), q = vec2(0.515, 0.515).add(direction.mul(distance));\n      const center = image.sample(q), red = image.sample(q.add(direction.mul(0.001))).r, blue = image.sample(q.sub(direction.mul(0.001))).b;\n      material.fragmentNode = vec4(red, center.g, blue, center.a); material.needsUpdate = true;\n    }\n    return { update(frame) { segments.value = frame.controls.mirrored ? Math.round(frame.controls.segments) : 2; rotation.value = frame.timeSeconds * 0.08 * (frame.controls.direction === 'reverse' ? -1 : 1); time = frame.timeSeconds; },\n      async evaluate(inputs, evaluation) { input = inputs.image; bind(input); return { image: await evaluation.render(scene, camera) }; },\n      reset() { rotation.value = 0; time = 0; }, dispose() { input = undefined; geometry.dispose(); material.dispose(); } };\n  },\n});\n"
+    }
+  },
+  "settings": {
+    "width": 640,
+    "height": 360,
+    "fps": 60,
+    "seed": 0
+  },
+  "controls": {
+    "sourceHash": "ff3f81c9f7329a7b2cdfcad03caef197da6e11a6691aa3d346f34ac6f3b8771c",
+    "nodes": [
+      {
+        "nodePath": [
+          "11111111-1111-4111-8111-111111111111"
+        ],
+        "definitionHash": "481058d404d75e32c4efbd3354e06415e04f7df25cab4d2af272ae890a06592a",
+        "schema": [
+          {
+            "id": "intensity",
+            "type": "number",
+            "label": "Spike amount",
+            "default": 0.67,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "8229c8eca7f52b563e1adf1eb8c801db6ffd4438d611f332ff491facb6c823bd",
+        "values": {
+          "intensity": 0.67
+        }
+      },
+      {
+        "nodePath": [
+          "22222222-2222-4222-8222-222222222222"
+        ],
+        "definitionHash": "1cf600c035ec82f1146b9f797fb30f66413c9f327e5494ffc8148d445615046e",
+        "schema": [
+          {
+            "id": "segments",
+            "type": "number",
+            "label": "Mirror segments",
+            "default": 6,
+            "min": 2,
+            "max": 16,
+            "step": 1,
+            "changeCost": "live"
+          },
+          {
+            "id": "mirrored",
+            "type": "boolean",
+            "label": "Mirrored",
+            "default": true,
+            "changeCost": "live"
+          },
+          {
+            "id": "direction",
+            "type": "enum",
+            "label": "Direction",
+            "default": "forward",
+            "options": [
+              {
+                "id": "forward",
+                "label": "Forward"
+              },
+              {
+                "id": "reverse",
+                "label": "Reverse"
+              }
+            ],
+            "presentation": "dropdown",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "d18c58caea713eaa094b02976b868b6d27c42135f20e5255f1ab5050d956db07",
+        "values": {
+          "segments": 11,
+          "mirrored": false,
+          "direction": "reverse"
+        }
+      },
+      {
+        "nodePath": [
+          "33333333-3333-4333-8333-333333333333"
+        ],
+        "definitionHash": "1cf600c035ec82f1146b9f797fb30f66413c9f327e5494ffc8148d445615046e",
+        "schema": [
+          {
+            "id": "segments",
+            "type": "number",
+            "label": "Mirror segments",
+            "default": 6,
+            "min": 2,
+            "max": 16,
+            "step": 1,
+            "changeCost": "live"
+          },
+          {
+            "id": "mirrored",
+            "type": "boolean",
+            "label": "Mirrored",
+            "default": true,
+            "changeCost": "live"
+          },
+          {
+            "id": "direction",
+            "type": "enum",
+            "label": "Direction",
+            "default": "forward",
+            "options": [
+              {
+                "id": "forward",
+                "label": "Forward"
+              },
+              {
+                "id": "reverse",
+                "label": "Reverse"
+              }
+            ],
+            "presentation": "dropdown",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "d18c58caea713eaa094b02976b868b6d27c42135f20e5255f1ab5050d956db07",
+        "values": {
+          "segments": 6,
+          "mirrored": true,
+          "direction": "forward"
+        }
+      }
+    ]
+  },
+  "tempo": {
+    "bpm": 120
+  },
+  "controlAnimations": [
+    {
+      "nodePath": [],
+      "definitionHash": "4d09d641bdf8ad5f0b943d1f640a0c982331c7eae78c9c879e591be5195a43df",
+      "schemaHash": "4d09d641bdf8ad5f0b943d1f640a0c982331c7eae78c9c879e591be5195a43df",
+      "controlId": "scale",
+      "shape": "sine",
+      "periodSeconds": 2,
+      "amount": 0.06999999999999999,
+      "phase": 0,
+      "enabled": true
+    }
+  ]
+}
