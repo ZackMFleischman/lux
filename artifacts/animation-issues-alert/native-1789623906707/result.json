@@ -1,0 +1,74 @@
+{
+  "ok": false,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/control-binding-alerts",
+  "profile": "test-f5f457be-bb36-4191-abd9-24304a545416",
+  "commit": "101a981ae3a9d8c67ab1a7cbc7f3a2ebd338d7de",
+  "checks": [],
+  "layouts": [
+    {
+      "name": "wide-collapsed",
+      "width": 1360,
+      "height": 900,
+      "alert": {
+        "x": 1152,
+        "y": 124,
+        "width": 189,
+        "height": 40
+      },
+      "measurement": {
+        "clientWidth": 189,
+        "scrollWidth": 189,
+        "clientHeight": 40,
+        "scrollHeight": 40,
+        "viewportWidth": 1360,
+        "documentWidth": 1360,
+        "right": 1341,
+        "left": 1152,
+        "top": 124,
+        "bottom": 164
+      }
+    }
+  ],
+  "screenshots": [],
+  "errors": [],
+  "pid": 9852,
+  "fixture": {
+    "cleanPath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-binding-alerts\\artifacts\\animation-issues-alert\\native-1789623906707\\four-bindings.lux-scene",
+    "incompatiblePath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-binding-alerts\\artifacts\\animation-issues-alert\\native-1789623906707\\four-incompatible-bindings.lux-scene",
+    "issues": [
+      {
+        "index": 0,
+        "nodePath": [],
+        "controlId": "bass",
+        "message": "Animated control changed and is incompatible with this binding."
+      },
+      {
+        "index": 1,
+        "nodePath": [],
+        "controlId": "mids",
+        "message": "Animated control changed and is incompatible with this binding."
+      },
+      {
+        "index": 2,
+        "nodePath": [],
+        "controlId": "highs",
+        "message": "Animated control changed and is incompatible with this binding."
+      },
+      {
+        "index": 3,
+        "nodePath": [],
+        "controlId": "kick",
+        "message": "Animated control changed and is incompatible with this binding."
+      }
+    ],
+    "previewOutput": {
+      "width": 640,
+      "height": 360,
+      "fps": 60,
+      "seed": 0
+    }
+  },
+  "error": "page.screenshot: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n\u001b[2m  - waiting for fonts to load...\u001b[22m\n\u001b[2m  - fonts loaded\u001b[22m\n\n    at capture (C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-binding-alerts\\scripts\\test-animation-issues-alert.mjs:62:81)\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-binding-alerts\\scripts\\test-animation-issues-alert.mjs:130:80",
+  "exitCode": 0,
+  "processExited": true
+}

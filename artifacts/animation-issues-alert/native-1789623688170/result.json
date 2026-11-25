@@ -1,0 +1,142 @@
+{
+  "ok": true,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/control-binding-alerts",
+  "profile": "test-5cc02264-a07b-4b4c-aa53-8b687a4e3668",
+  "commit": "b4f327bdd5f44b5285fd278fe31ffdd15ebd406d",
+  "checks": [
+    "Wide alert is compact by default; Enter expands full control context and Space collapses it",
+    "Narrow alert stays inside its panel without horizontal overflow; Space expands and Enter collapses it"
+  ],
+  "layouts": [
+    {
+      "name": "wide-collapsed",
+      "width": 1360,
+      "height": 900,
+      "alert": {
+        "x": 1152,
+        "y": -119,
+        "width": 189,
+        "height": 40
+      },
+      "measurement": {
+        "clientWidth": 189,
+        "scrollWidth": 189,
+        "clientHeight": 40,
+        "scrollHeight": 40,
+        "viewportWidth": 1360,
+        "documentWidth": 1360,
+        "right": 1341,
+        "left": 1152
+      }
+    },
+    {
+      "name": "wide-expanded",
+      "width": 1360,
+      "height": 900,
+      "alert": {
+        "x": 1152,
+        "y": 124,
+        "width": 189,
+        "height": 181.5
+      },
+      "measurement": {
+        "clientWidth": 189,
+        "scrollWidth": 189,
+        "clientHeight": 182,
+        "scrollHeight": 182,
+        "viewportWidth": 1360,
+        "documentWidth": 1360,
+        "right": 1341,
+        "left": 1152
+      }
+    },
+    {
+      "name": "narrow-collapsed",
+      "width": 820,
+      "height": 720,
+      "alert": {
+        "x": 698,
+        "y": 156,
+        "width": 107,
+        "height": 55
+      },
+      "measurement": {
+        "clientWidth": 107,
+        "scrollWidth": 107,
+        "clientHeight": 55,
+        "scrollHeight": 55,
+        "viewportWidth": 820,
+        "documentWidth": 820,
+        "right": 805,
+        "left": 698
+      }
+    },
+    {
+      "name": "narrow-expanded",
+      "width": 820,
+      "height": 720,
+      "alert": {
+        "x": 698,
+        "y": 156,
+        "width": 92,
+        "height": 738.5
+      },
+      "measurement": {
+        "clientWidth": 92,
+        "scrollWidth": 92,
+        "clientHeight": 739,
+        "scrollHeight": 739,
+        "viewportWidth": 820,
+        "documentWidth": 820,
+        "right": 790,
+        "left": 698
+      }
+    }
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-binding-alerts\\artifacts\\animation-issues-alert\\native-1789623688170\\wide-collapsed.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-binding-alerts\\artifacts\\animation-issues-alert\\native-1789623688170\\wide-expanded.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-binding-alerts\\artifacts\\animation-issues-alert\\native-1789623688170\\narrow-collapsed.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-binding-alerts\\artifacts\\animation-issues-alert\\native-1789623688170\\narrow-expanded.png"
+  ],
+  "errors": [],
+  "pid": 29884,
+  "fixture": {
+    "cleanPath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-binding-alerts\\artifacts\\animation-issues-alert\\native-1789623688170\\four-bindings.lux-scene",
+    "incompatiblePath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-binding-alerts\\artifacts\\animation-issues-alert\\native-1789623688170\\four-incompatible-bindings.lux-scene",
+    "issues": [
+      {
+        "index": 0,
+        "nodePath": [],
+        "controlId": "bass",
+        "message": "Animated control changed and is incompatible with this binding."
+      },
+      {
+        "index": 1,
+        "nodePath": [],
+        "controlId": "mids",
+        "message": "Animated control changed and is incompatible with this binding."
+      },
+      {
+        "index": 2,
+        "nodePath": [],
+        "controlId": "highs",
+        "message": "Animated control changed and is incompatible with this binding."
+      },
+      {
+        "index": 3,
+        "nodePath": [],
+        "controlId": "kick",
+        "message": "Animated control changed and is incompatible with this binding."
+      }
+    ],
+    "previewOutput": {
+      "width": 640,
+      "height": 360,
+      "fps": 60,
+      "seed": 0
+    }
+  },
+  "exitCode": 0,
+  "processExited": true
+}

@@ -1,0 +1,159 @@
+{
+  "ok": true,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/control-binding-alerts",
+  "profile": "test-805dc486-dd7b-4961-9451-c2aad1861e9f",
+  "commit": "101a981ae3a9d8c67ab1a7cbc7f3a2ebd338d7de",
+  "checks": [
+    "Wide alert is compact by default; Enter expands full control context and Space collapses it",
+    "Narrow alert stays inside its panel without horizontal overflow; Space expands and Enter collapses it"
+  ],
+  "layouts": [
+    {
+      "name": "wide-collapsed",
+      "width": 1360,
+      "height": 900,
+      "alert": {
+        "x": 1152,
+        "y": 124,
+        "width": 189,
+        "height": 40
+      },
+      "measurement": {
+        "clientWidth": 189,
+        "scrollWidth": 189,
+        "clientHeight": 40,
+        "scrollHeight": 40,
+        "viewportWidth": 1360,
+        "documentWidth": 1360,
+        "right": 1341,
+        "left": 1152,
+        "top": 124,
+        "bottom": 164
+      }
+    },
+    {
+      "name": "wide-expanded",
+      "width": 1360,
+      "height": 900,
+      "alert": {
+        "x": 1152,
+        "y": 124,
+        "width": 189,
+        "height": 181.5
+      },
+      "measurement": {
+        "clientWidth": 189,
+        "scrollWidth": 189,
+        "clientHeight": 182,
+        "scrollHeight": 182,
+        "viewportWidth": 1360,
+        "documentWidth": 1360,
+        "right": 1341,
+        "left": 1152,
+        "top": 124,
+        "bottom": 305.5
+      }
+    },
+    {
+      "name": "narrow-collapsed",
+      "width": 820,
+      "height": 720,
+      "alert": {
+        "x": 593,
+        "y": 124,
+        "width": 212,
+        "height": 27
+      },
+      "measurement": {
+        "clientWidth": 212,
+        "scrollWidth": 212,
+        "clientHeight": 27,
+        "scrollHeight": 27,
+        "viewportWidth": 820,
+        "documentWidth": 820,
+        "right": 805,
+        "left": 593,
+        "top": 124,
+        "bottom": 151
+      }
+    },
+    {
+      "name": "narrow-expanded",
+      "width": 820,
+      "height": 720,
+      "alert": {
+        "x": 593,
+        "y": 124,
+        "width": 212,
+        "height": 151
+      },
+      "measurement": {
+        "clientWidth": 212,
+        "scrollWidth": 212,
+        "clientHeight": 151,
+        "scrollHeight": 151,
+        "viewportWidth": 820,
+        "documentWidth": 820,
+        "right": 805,
+        "left": 593,
+        "top": 124,
+        "bottom": 275
+      }
+    }
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-binding-alerts\\artifacts\\animation-issues-alert\\native-1789624149649\\wide-collapsed.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-binding-alerts\\artifacts\\animation-issues-alert\\native-1789624149649\\wide-expanded.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-binding-alerts\\artifacts\\animation-issues-alert\\native-1789624149649\\narrow-collapsed.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-binding-alerts\\artifacts\\animation-issues-alert\\native-1789624149649\\narrow-expanded.png"
+  ],
+  "errors": [],
+  "pid": 12612,
+  "fixture": {
+    "cleanPath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-binding-alerts\\artifacts\\animation-issues-alert\\native-1789624149649\\four-bindings.lux-scene",
+    "incompatiblePath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-binding-alerts\\artifacts\\animation-issues-alert\\native-1789624149649\\four-incompatible-bindings.lux-scene",
+    "issues": [
+      {
+        "index": 0,
+        "nodePath": [],
+        "controlId": "bass",
+        "message": "Animated control changed and is incompatible with this binding."
+      },
+      {
+        "index": 1,
+        "nodePath": [],
+        "controlId": "mids",
+        "message": "Animated control changed and is incompatible with this binding."
+      },
+      {
+        "index": 2,
+        "nodePath": [],
+        "controlId": "highs",
+        "message": "Animated control changed and is incompatible with this binding."
+      },
+      {
+        "index": 3,
+        "nodePath": [],
+        "controlId": "kick",
+        "message": "Animated control changed and is incompatible with this binding."
+      }
+    ],
+    "previewOutput": {
+      "width": 640,
+      "height": 360,
+      "fps": 60,
+      "seed": 0
+    }
+  },
+  "narrowInspector": {
+    "window": {
+      "width": 820,
+      "height": 720
+    },
+    "before": 137,
+    "after": 242,
+    "target": 240
+  },
+  "exitCode": 0,
+  "processExited": true
+}

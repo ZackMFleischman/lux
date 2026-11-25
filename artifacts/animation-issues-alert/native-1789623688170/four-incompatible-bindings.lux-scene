@@ -1,0 +1,118 @@
+{
+  "format": "lux-scene",
+  "version": 3,
+  "source": {
+    "sdkVersion": "0.2.0",
+    "entry": "visual.ts",
+    "files": {
+      "visual.ts": "import { defineVisual } from '@lux/visual-sdk';\nimport { Color, Mesh, MeshBasicNodeMaterial, OrthographicCamera, PlaneGeometry, Scene } from 'three/webgpu';\n\nexport default defineVisual({\n  controls: {\n    bass: {type:'number',label:'Bass',default:.25,min:0,max:1,step:.01},\n    mids: {type:'number',label:'Mids',default:.4,min:0,max:1,step:.01},\n    highs: {type:'number',label:'Highs',default:.55,min:0,max:1,step:.01},\n    kick: {type:'number',label:'Kick',default:.7,min:0,max:1,step:.01},\n  },\n  async create(context) {\n    const geometry=new PlaneGeometry(1.5,1.5);\n    const material=new MeshBasicNodeMaterial({color:'#7f5cff'});\n    const mesh=new Mesh(geometry,material),scene=new Scene();\n    scene.background=new Color('#070b16');scene.add(mesh);\n    const camera=new OrthographicCamera(-1,1,1,-1,.1,10);camera.position.z=1;\n    return {\n      update(frame){mesh.rotation.z=frame.timeSeconds*.08;material.opacity=.35+(frame.controls.bass+frame.controls.mids+frame.controls.highs+frame.controls.kick)*.125;material.transparent=true;},\n      render(target){return context.renderer.render(scene,camera,target);},\n      reset(_seed){},dispose(){geometry.dispose();material.dispose();},\n    };\n  },\n});\n"
+    }
+  },
+  "settings": {
+    "width": 640,
+    "height": 360,
+    "fps": 60,
+    "seed": 0
+  },
+  "controls": {
+    "sourceHash": "e4278907be46a5e16688ea2c3e171b03d6151f7598e3436b2eda8693774619c7",
+    "schema": [
+      {
+        "id": "bass",
+        "type": "number",
+        "label": "Bass",
+        "default": 0.25,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "changeCost": "live"
+      },
+      {
+        "id": "mids",
+        "type": "number",
+        "label": "Mids",
+        "default": 0.4,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "changeCost": "live"
+      },
+      {
+        "id": "highs",
+        "type": "number",
+        "label": "Highs",
+        "default": 0.55,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "changeCost": "live"
+      },
+      {
+        "id": "kick",
+        "type": "number",
+        "label": "Kick",
+        "default": 0.7,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "changeCost": "live"
+      }
+    ],
+    "schemaHash": "c9a73b5c09c0e21e5ba112456a9199e05bc8f459785f1fe6960a6ef02fbe894e",
+    "values": {
+      "bass": 0.25,
+      "mids": 0.4,
+      "highs": 0.55,
+      "kick": 0.7
+    }
+  },
+  "tempo": {
+    "bpm": 120
+  },
+  "controlAnimations": [
+    {
+      "nodePath": [],
+      "definitionHash": "1111111111111111111111111111111111111111111111111111111111111111",
+      "schemaHash": "5555555555555555555555555555555555555555555555555555555555555555",
+      "controlId": "bass",
+      "shape": "sine",
+      "periodSeconds": 2,
+      "amount": 0.1,
+      "phase": 0,
+      "enabled": true
+    },
+    {
+      "nodePath": [],
+      "definitionHash": "2222222222222222222222222222222222222222222222222222222222222222",
+      "schemaHash": "6666666666666666666666666666666666666666666666666666666666666666",
+      "controlId": "mids",
+      "shape": "sine",
+      "periodSeconds": 2,
+      "amount": 0.1,
+      "phase": 0,
+      "enabled": true
+    },
+    {
+      "nodePath": [],
+      "definitionHash": "3333333333333333333333333333333333333333333333333333333333333333",
+      "schemaHash": "7777777777777777777777777777777777777777777777777777777777777777",
+      "controlId": "highs",
+      "shape": "sine",
+      "periodSeconds": 2,
+      "amount": 0.1,
+      "phase": 0,
+      "enabled": true
+    },
+    {
+      "nodePath": [],
+      "definitionHash": "4444444444444444444444444444444444444444444444444444444444444444",
+      "schemaHash": "8888888888888888888888888888888888888888888888888888888888888888",
+      "controlId": "kick",
+      "shape": "sine",
+      "periodSeconds": 2,
+      "amount": 0.1,
+      "phase": 0,
+      "enabled": true
+    }
+  ]
+}

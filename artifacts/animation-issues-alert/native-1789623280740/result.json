@@ -1,0 +1,14 @@
+{
+  "ok": false,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/control-binding-alerts",
+  "profile": "test-f24a78dd-8789-4772-bfb2-1f1df56b1f92",
+  "commit": "b4f327bdd5f44b5285fd278fe31ffdd15ebd406d",
+  "checks": [],
+  "layouts": [],
+  "screenshots": [],
+  "errors": [],
+  "pid": 25320,
+  "error": "Error: initial startup did not settle\n    at statusWhen (file:///C:/Users/zFlei/repos/lux/.worktrees/control-binding-alerts/scripts/test-animation-issues-alert.mjs:60:11)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/control-binding-alerts/scripts/test-animation-issues-alert.mjs:63:3",
+  "exitCode": 0,
+  "processExited": true
+}
