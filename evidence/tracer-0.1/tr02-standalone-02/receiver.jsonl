@@ -1,0 +1,7 @@
+{"kind":"context","sharedContext":true,"nvInterop":true,"pid":23296,"renderer":"NVIDIA GeForce RTX 2070/PCIe/SSE2"}
+{"kind":"adapter","luidLow":71045,"luidHigh":0}
+{"kind":"counters","callbacks":7,"consumed":0}
+{"kind":"attached","producerPid":10048,"generation":1806739503478}
+{"kind":"counters","callbacks":281,"consumed":0}
+{"kind":"nv-register-error","win32":3221684334,"glError":0,"misc":2050,"format":87}
+{"kind":"failure","reason":"NV registration failed"}

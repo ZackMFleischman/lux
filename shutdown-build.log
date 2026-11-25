@@ -1,0 +1,30 @@
+ WARN  Unsupported engine: wanted: {"node":"24.12.0"} (current: {"node":"v20.11.1","pnpm":"10.33.0"})
+
+> lux@0.0.0 native:build C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu
+> powershell -NoProfile -ExecutionPolicy Bypass -File scripts/native-build.ps1
+
+-- Configuring done (0.0s)
+-- Generating done (0.3s)
+-- Build files have been written to: C:/Users/zFlei/repos/lux/.worktrees/tr02-gpu/native/build
+MSBuild version 18.0.5+e22287bf1 for .NET Framework
+
+  Scanning sources for module dependencies...
+  LuxTracerTR02.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\Release\LuxTracerTR02.dll
+  Scanning sources for module dependencies...
+  lux_native_smoke.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\Release\lux_native_smoke.exe
+  Scanning sources for module dependencies...
+  lux_pool_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\Release\lux_pool_test.exe
+  Scanning sources for module dependencies...
+  lux_shared_ring_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\Release\lux_shared_ring_test.exe
+  Scanning sources for module dependencies...
+  lux_standalone_host.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\Release\lux_standalone_host.exe
+  Scanning sources for module dependencies...
+  electron_texture.cc
+  Compiling...
+  electron_texture.cc
+C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\texture-bridge\src\electron_texture.cc(122,129): error C2065: 'Reading': undeclared identifier [C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\lux_texture_bridge.vcxproj]
+C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\scripts\native-build.ps1 : TR-01 native build failed
+    + CategoryInfo          : NotSpecified: (:) [Write-Error], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands.WriteErrorException,native-build.ps1
+ 
+ ELIFECYCLE  Command failed with exit code 1.

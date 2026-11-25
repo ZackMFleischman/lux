@@ -1,0 +1,41 @@
+ WARN  Unsupported engine: wanted: {"node":"24.12.0"} (current: {"node":"v20.11.1","pnpm":"10.33.0"})
+
+> lux@0.0.0 native:build C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu
+> powershell -NoProfile -ExecutionPolicy Bypass -File scripts/native-build.ps1
+
+-- Configuring done (0.0s)
+-- Generating done (0.3s)
+-- Build files have been written to: C:/Users/zFlei/repos/lux/.worktrees/tr02-gpu/native/build
+MSBuild version 18.0.5+e22287bf1 for .NET Framework
+
+  Scanning sources for module dependencies...
+  LuxTracerTR02.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\Release\LuxTracerTR02.dll
+  Scanning sources for module dependencies...
+  lux_native_smoke.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\Release\lux_native_smoke.exe
+  Scanning sources for module dependencies...
+  lux_pool_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\Release\lux_pool_test.exe
+  Scanning sources for module dependencies...
+  lux_shared_ring_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\Release\lux_shared_ring_test.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/tr02-gpu/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  gl_load.c
+  standalone_host.cc
+  Compiling...
+  gl_load.c
+  standalone_host.cc
+     Creating library C:/Users/zFlei/repos/lux/.worktrees/tr02-gpu/native/build/Release/lux_standalone_host.lib and object C:/Users/zFlei/repos/lux/.worktrees/tr02-gpu/native/build/Release/lux_standalone_host.exp
+  lux_standalone_host.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\Release\lux_standalone_host.exe
+  Scanning sources for module dependencies...
+  lux_texture_bridge.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\Release\lux_texture_bridge.node
+Test project C:/Users/zFlei/repos/lux/.worktrees/tr02-gpu/native/build
+    Start 1: native_clock_smoke
+1/3 Test #1: native_clock_smoke ...............   Passed    0.02 sec
+    Start 2: pool_ownership
+2/3 Test #2: pool_ownership ...................   Passed    0.02 sec
+    Start 3: shared_ring_ownership
+3/3 Test #3: shared_ring_ownership ............   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   0.06 sec
+{"target":"lux_native_smoke","architecture":"x64","qpcFrequency":10000000,"compiler":195035721,"gpuTested":false,"hostTested":false}

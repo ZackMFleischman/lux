@@ -1,0 +1,54 @@
+ WARN  Unsupported engine: wanted: {"node":"24.12.0"} (current: {"node":"v20.11.1","pnpm":"10.33.0"})
+
+> lux@0.0.0 native:build C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu
+> powershell -NoProfile -ExecutionPolicy Bypass -File scripts/native-build.ps1
+
+-- Configuring done (0.0s)
+-- Generating done (0.2s)
+-- Build files have been written to: C:/Users/zFlei/repos/lux/.worktrees/tr02-gpu/native/build
+MSBuild version 18.0.5+e22287bf1 for .NET Framework
+
+  Scanning sources for module dependencies...
+  FFGLSDK.cpp
+  LuxSource.cpp
+  Compiling...
+  LuxSource.cpp
+  FFGLSDK.cpp
+C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\vendor\ffgl\source\lib\ffgl\FFGL.h(104,9): warning C4005: 'WIN32_LEAN_AND_MEAN': macro redefinition [C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\LuxTracerTR02.vcxproj]
+C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\vendor\ffgl\source\lib\ffgl\FFGL.h(104,9): warning C4005: 'WIN32_LEAN_AND_MEAN': macro redefinition [C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\LuxTracerTR02.vcxproj]
+  (compiling source file '../vendor/ffgl/source/lib/FFGLSDK.cpp')
+      C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\vendor\ffgl\source\lib\ffgl\FFGL.h(104,9):
+      'WIN32_LEAN_AND_MEAN' previously declared on the command line
+  
+C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\vendor\ffgl\source\lib\ffgl\FFGL.h(131,9): warning C4005: 'NOMINMAX': macro redefinition [C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\LuxTracerTR02.vcxproj]
+  (compiling source file '../vendor/ffgl/source/lib/FFGLSDK.cpp')
+      C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\vendor\ffgl\source\lib\ffgl\FFGL.h(131,9):
+      'NOMINMAX' previously declared on the command line
+  
+  (compiling source file '../ffgl-source/src/LuxSource.cpp')
+      C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\vendor\ffgl\source\lib\ffgl\FFGL.h(104,9):
+      'WIN32_LEAN_AND_MEAN' previously declared on the command line
+  
+C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\vendor\ffgl\source\lib\ffgl\FFGL.h(131,9): warning C4005: 'NOMINMAX': macro redefinition [C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\LuxTracerTR02.vcxproj]
+  (compiling source file '../ffgl-source/src/LuxSource.cpp')
+      C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\vendor\ffgl\source\lib\ffgl\FFGL.h(131,9):
+      'NOMINMAX' previously declared on the command line
+  
+     Creating library C:/Users/zFlei/repos/lux/.worktrees/tr02-gpu/native/build/Release/LuxTracerTR02.lib and object C:/Users/zFlei/repos/lux/.worktrees/tr02-gpu/native/build/Release/LuxTracerTR02.exp
+  LuxTracerTR02.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\Release\LuxTracerTR02.dll
+  Scanning sources for module dependencies...
+  lux_native_smoke.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\Release\lux_native_smoke.exe
+  Scanning sources for module dependencies...
+  lux_pool_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\Release\lux_pool_test.exe
+  Scanning sources for module dependencies...
+  lux_texture_bridge.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\tr02-gpu\native\build\Release\lux_texture_bridge.node
+Test project C:/Users/zFlei/repos/lux/.worktrees/tr02-gpu/native/build
+    Start 1: native_clock_smoke
+1/2 Test #1: native_clock_smoke ...............   Passed    0.02 sec
+    Start 2: pool_ownership
+2/2 Test #2: pool_ownership ...................   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.04 sec
+{"target":"lux_native_smoke","architecture":"x64","qpcFrequency":10000000,"compiler":195035721,"gpuTested":false,"hostTested":false}
