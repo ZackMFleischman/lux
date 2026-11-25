@@ -1,0 +1,46 @@
+{
+  "ok": true,
+  "sourcePath": "C:/Users/zFlei/repos/lux/visuals/Prismatic Kaleidoscope.lux-scene",
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-groups",
+  "commit": "477632e6a1866a448a96d424a6bf93dd24e30ab4",
+  "session": {
+    "profile": "test-c74fc69b-d56c-45f9-bb23-d3751ec54fed",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\control-groups",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-c74fc69b-d56c-45f9-bb23-d3751ec54fed",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-c74fc69b-d56c-45f9-bb23-d3751ec54fed\\agent-endpoint.json"
+  },
+  "checks": [
+    "Actual Prismatic Kaleidoscope source built in owned isolated Studio",
+    "Kaleidoscope then Spiky Ball disclosures preserve declared control order",
+    "Space collapses and Enter expands with summary focus retained",
+    "Other group remains independently open",
+    "Collapse/expand preserves controls, playback, sequence and generation"
+  ],
+  "errors": [],
+  "pid": 28360,
+  "groups": [
+    {
+      "text": "Kaleidoscope",
+      "tabIndex": 0,
+      "fontSize": "10px"
+    },
+    {
+      "text": "Spiky Ball",
+      "tabIndex": 0,
+      "fontSize": "10px"
+    }
+  ],
+  "source": {
+    "sdkVersion": "0.2.0",
+    "entry": "visual.ts",
+    "groups": {
+      "Kaleidoscope": 12,
+      "Spiky Ball": 1
+    }
+  },
+  "screenshots": [
+    "kaleidoscope-expanded.png",
+    "kaleidoscope-collapsed.png"
+  ],
+  "processExited": true
+}
