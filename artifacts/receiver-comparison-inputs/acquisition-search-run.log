@@ -1,0 +1,28 @@
+{
+  "checkedFiles": 1219,
+  "totalBytes": 76079309,
+  "skipped": 21,
+  "matchingFiles": 5,
+  "matches": [
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\docs\\conductor-onboarding\\receiver-inputs-body.md",
+      "hits": 1
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\docs\\conductor-onboarding\\receiver-inputs-create.json",
+      "hits": 1
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\docs\\conductor-onboarding\\receiver-inputs-spec.json",
+      "hits": 1
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\docs\\conductor-onboarding\\results.jsonl",
+      "hits": 2
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\docs\\implementation\\receiver-comparison-plan.md",
+      "hits": 1
+    }
+  ]
+}

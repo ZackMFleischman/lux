@@ -1,0 +1,17 @@
+file:///C:/Users/zFlei/repos/lux/.worktrees/receiver-inputs-provenance/artifacts/receiver-comparison-inputs/inventory.mjs:13
+function inventory(root){root=slash(fs.realpathSync(root));const seen=new Set(),active=new Set(),files=[],links=[],dirs=[];function walk(p){let canonical=slash(fs.realpathSync(p));if(!(canonical.toLowerCase()===root.toLowerCase()||canonical.toLowerCase().startsWith(root.toLowerCase()+'/')))throw Error('outside root '+p+' -> '+canonical);if(active.has(canonical.toLowerCase()))throw Error('cycle '+p);if(seen.has(canonical.toLowerCase()))return;seen.add(canonical.toLowerCase());const st=fs.statSync(canonical);if(st.isFile()){files.push(file(canonical));return;}if(!st.isDirectory())throw Error('unsupported file '+p);dirs.push(canonical);active.add(canonical.toLowerCase());for(const e of fs.readdirSync(canonical,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){const child=path.join(canonical,e.name);if(e.isSymbolicLink())links.push({path:slash(child),target:slash(fs.realpathSync(child))});walk(child);}active.delete(canonical.toLowerCase());}walk(root);return {root,files,links,directories:dirs,counts:{files:files.length,links:links.length,directories:dirs.length},totalBytes:files.reduce((n,f)=>n+f.length,0)};}
+                                                                                                                                                                                                                                                                                                         ^
+
+Error: outside root C:\Users\zFlei\repos\lux\node_modules\.pnpm\node_modules\@lux\build-worker -> C:/Users/zFlei/repos/lux/apps/build-worker
+    at walk (file:///C:/Users/zFlei/repos/lux/.worktrees/receiver-inputs-provenance/artifacts/receiver-comparison-inputs/inventory.mjs:13:298)
+    at walk (file:///C:/Users/zFlei/repos/lux/.worktrees/receiver-inputs-provenance/artifacts/receiver-comparison-inputs/inventory.mjs:13:914)
+    at walk (file:///C:/Users/zFlei/repos/lux/.worktrees/receiver-inputs-provenance/artifacts/receiver-comparison-inputs/inventory.mjs:13:914)
+    at walk (file:///C:/Users/zFlei/repos/lux/.worktrees/receiver-inputs-provenance/artifacts/receiver-comparison-inputs/inventory.mjs:13:914)
+    at walk (file:///C:/Users/zFlei/repos/lux/.worktrees/receiver-inputs-provenance/artifacts/receiver-comparison-inputs/inventory.mjs:13:914)
+    at inventory (file:///C:/Users/zFlei/repos/lux/.worktrees/receiver-inputs-provenance/artifacts/receiver-comparison-inputs/inventory.mjs:13:967)
+    at file:///C:/Users/zFlei/repos/lux/.worktrees/receiver-inputs-provenance/artifacts/receiver-comparison-inputs/inventory.mjs:23:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:413:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.12.0

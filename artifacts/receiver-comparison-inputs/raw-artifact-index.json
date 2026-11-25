@@ -1,0 +1,207 @@
+[
+  {
+    "path": "acquisition-search-preliminary.txt",
+    "length": 2398,
+    "sha256": "3b22eb16574406a70c504d947a36c4a889104255adb01f9c6cccbc3a4adf4fa2"
+  },
+  {
+    "path": "acquisition-search-run.log",
+    "length": 773,
+    "sha256": "61dd135e5b56d12576bf120854fcfa740921413aceeee9d98d9458d546dd227f"
+  },
+  {
+    "path": "acquisition-search-v1.mjs",
+    "length": 2266,
+    "sha256": "24c95d90490812a31417bfa6f30e18a01b2514879e0d11d01c28478bca8bc36d"
+  },
+  {
+    "path": "acquisition-search-v2-run.log",
+    "length": 773,
+    "sha256": "2a1a435472a1470c69ef811e754c6ea220691aaabcdcd4b560bfc83fb2e48a76"
+  },
+  {
+    "path": "acquisition-search-v2.json",
+    "length": 301583,
+    "sha256": "cec9a104c28d4fa51e69418194a01c2bc14e7c50e25ec839fd861353eabf0b33"
+  },
+  {
+    "path": "acquisition-search.json",
+    "length": 198484,
+    "sha256": "7c7611aab686be4073a85b04ebe70d1064a28987617c0462bef445dc36f02716"
+  },
+  {
+    "path": "acquisition-search.mjs",
+    "length": 2359,
+    "sha256": "75998fe2e6a0b3a0919139e149d86f38ae37fe7d45eba75afeee92b772e195e0"
+  },
+  {
+    "path": "candidate-executable-version.json",
+    "length": 314,
+    "sha256": "3425839fced37a4d0544f8ab1443d43d1cffa5aa17d2e49e34e6c60d260c5809"
+  },
+  {
+    "path": "candidate-run.log",
+    "length": 202,
+    "sha256": "a7488c49038f06e4e62fdb36c89a3ad7373ead0ca14426cb4a7392ce4b515e25"
+  },
+  {
+    "path": "candidate/electron-retained-candidate.json",
+    "length": 23060,
+    "sha256": "6938c821c9e206311c7739deaa92b86cc91737c005e620f7d29381811b4e2ec7"
+  },
+  {
+    "path": "final-budget.json",
+    "length": 198,
+    "sha256": "9aa51a4d46ca213765038f47a6bb964827a3f158a64d93621b7bd7565c7c44b5"
+  },
+  {
+    "path": "inventory-run.log",
+    "length": 2394,
+    "sha256": "f9fb52cd5d1fe84b89f057a689443c7cf52cc24059b9eec07c337a35097dd0e6"
+  },
+  {
+    "path": "inventory-v1.mjs",
+    "length": 7943,
+    "sha256": "c39ccf02a2c44a234b44d34bea20c87fa1b13b1bfa3bbb49c474894148786721"
+  },
+  {
+    "path": "inventory-v2-run.log",
+    "length": 2975,
+    "sha256": "07e26cc41dfaa67068d61f78cae641ded6de8450c417ba05e0db1a4258037cc6"
+  },
+  {
+    "path": "inventory-v2.mjs",
+    "length": 8286,
+    "sha256": "ef0a4f5a6d9fda5a1a57830dbe7d22d0fba2969b09eefe9403f21dfbd19181b0"
+  },
+  {
+    "path": "inventory-v3-run.log",
+    "length": 1873,
+    "sha256": "09f02fd5509f7288175efc509f97edad0815968c04fe21b9b9900b4fe4c10785"
+  },
+  {
+    "path": "inventory.mjs",
+    "length": 8657,
+    "sha256": "b570dfbad095c5455c7e8d7e8328d1ce856004b1b7fddfd24d593e206c0ae782"
+  },
+  {
+    "path": "node-retained.json",
+    "length": 891634,
+    "sha256": "2f486e5fc559ae2ff6b174079b8506c4ae8f101543c5c1c8f48948a28212ed0d"
+  },
+  {
+    "path": "prerequisite-addendum-receipt.json",
+    "length": 608,
+    "sha256": "117857e4b201677db2541d98b5a359a483914b2f66f241ba701f6dfc42220b21"
+  },
+  {
+    "path": "prerequisite-addendum.txt",
+    "length": 423,
+    "sha256": "52fb9eb5266593a2c1d5f9a1dcd35a8c6669da7d7ef8816a0cfe3d86088aef96"
+  },
+  {
+    "path": "prerequisite-problem-receipt.json",
+    "length": 1602,
+    "sha256": "94529de1e5e68ac845ec4f7a85cc60abe1a5145fd24d7d6140af48e422fb1099"
+  },
+  {
+    "path": "prerequisite-problem.json",
+    "length": 1308,
+    "sha256": "e7744285f225dae2a616408f0844a5f4e26e9e30d389f8c74bfc279712763d19"
+  },
+  {
+    "path": "retained-candidate.mjs",
+    "length": 3777,
+    "sha256": "b3c7335ff6bf1a57d353d6882ff7739f98173927486588b55d8fc05330dbc41b"
+  },
+  {
+    "path": "setup-problem-receipt.json",
+    "length": 1629,
+    "sha256": "ed59bc07f03044bf4e8419050d19bd4173b33120b6a8c896a9478d8dce2cd10f"
+  },
+  {
+    "path": "setup-problem.json",
+    "length": 1335,
+    "sha256": "dbef3caab37595ffef037e8756d94aad5f284952fa7fd41169bb4c032c6647ce"
+  },
+  {
+    "path": "source-recheck.json",
+    "length": 106,
+    "sha256": "6696c690ee3f4f482657a38cbe09c13a176d8b0a572d55f91a45743de8b3ff6f"
+  },
+  {
+    "path": "system-tool-identities.json",
+    "length": 4662,
+    "sha256": "79157efaf77334c8f4aa621640f37ec6a86fe2a61f4fc7865482943f79272164"
+  },
+  {
+    "path": "v2/node-archive-comparison.json",
+    "length": 843803,
+    "sha256": "b4ae3d0fb8236a891fb0d4f8396a7dc21b7cfe4b46057d9925de3d5431013e1e"
+  },
+  {
+    "path": "v2/node-retained.json",
+    "length": 891634,
+    "sha256": "2f486e5fc559ae2ff6b174079b8506c4ae8f101543c5c1c8f48948a28212ed0d"
+  },
+  {
+    "path": "v2/node-version.json",
+    "length": 702,
+    "sha256": "726d7ce25bb77a423fe2641e0d48c611b490eefa3000e1bac90c1e6e9f576ffb"
+  },
+  {
+    "path": "v3/dependencies.json",
+    "length": 4618006,
+    "sha256": "4d43b83a0f8e7312da6512528b6ace71533d5b2771df601e80c147de4dae4e85"
+  },
+  {
+    "path": "v3/dependency-package-identities.json",
+    "length": 107878,
+    "sha256": "08c3e9df5c6ed1961c3dceb16f5781abab26fa73c314d3f74b5541b7afeb3504"
+  },
+  {
+    "path": "v3/electron-distribution.json",
+    "length": 129,
+    "sha256": "802c9964f8bac26d817683ecfa5f4fdcdc06d202c00d51dda51ae8d118575437"
+  },
+  {
+    "path": "v3/electron-metadata.json",
+    "length": 1998,
+    "sha256": "1ef7f9a48a4ad3aab625e5c196ee39ccf5d6806434d34b95b5e286330a935007"
+  },
+  {
+    "path": "v3/ffgl-source-comparison.json",
+    "length": 51616,
+    "sha256": "0138f8f69e7dbd5764680241c08a80329891cd9bc523a43cf774ba12f894d3d2"
+  },
+  {
+    "path": "v3/inventory-summary.json",
+    "length": 2807,
+    "sha256": "75a4e7d2c3eda86d2980ee2e0deeb2e970d7884009eda9bebca75978dade889e"
+  },
+  {
+    "path": "v3/node-archive-comparison.json",
+    "length": 843803,
+    "sha256": "b4ae3d0fb8236a891fb0d4f8396a7dc21b7cfe4b46057d9925de3d5431013e1e"
+  },
+  {
+    "path": "v3/node-retained.json",
+    "length": 891730,
+    "sha256": "14b0b560b65b42b0b6a1065e1b1b7a53cc4a031cb3e66ac2c7ce59f6b36fa0ee"
+  },
+  {
+    "path": "v3/node-version.json",
+    "length": 702,
+    "sha256": "726d7ce25bb77a423fe2641e0d48c611b490eefa3000e1bac90c1e6e9f576ffb"
+  },
+  {
+    "path": "v3/tracked-source.json",
+    "length": 215902,
+    "sha256": "e449fa775508a91e8944ebd9b080ab535538b038c60ff6095d964e2e4c213826"
+  },
+  {
+    "path": "workspace-input-recheck.json",
+    "length": 30581,
+    "sha256": "1bc8dc78954783d250a81b722ea3722809f6f0877d5e55decf1ef6b779585d62"
+  }
+]

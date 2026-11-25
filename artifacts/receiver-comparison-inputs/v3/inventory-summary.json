@@ -1,0 +1,102 @@
+{
+  "executor": "/root/receiver_inputs_provenance",
+  "ticket": "LUX-48",
+  "base": "f176aaad6b9af46aee14546553451f14c69d2ee2",
+  "nodeRuntime": {
+    "version": "v24.12.0",
+    "execPath": "C:\\Program Files\\nodejs\\node.exe",
+    "executable": {
+      "path": "C:/Program Files/nodejs/node.exe",
+      "length": 89935872,
+      "sha256": "2ffe3acc0458fdde999f50d11809bbe7c9b7ef204dcf17094e325d26ace101d8"
+    }
+  },
+  "hashCount": 22280,
+  "manifestBytes": 6731764,
+  "dependencies": {
+    "files": 15733,
+    "links": 750,
+    "directories": 2697
+  },
+  "nodeFiles": {
+    "files": 2812,
+    "links": 0,
+    "directories": 621
+  },
+  "nodeArchiveFiles": 2810,
+  "archiveMatches": true,
+  "ffglMatches": true,
+  "phases": [
+    {
+      "name": "admission",
+      "utc": "2026-09-13T11:10:28.001Z",
+      "freeBytes": 394286821376,
+      "ownArtifactBytes": 0
+    },
+    {
+      "name": "node closure",
+      "utc": "2026-09-13T11:10:35.959Z",
+      "freeBytes": 394285072384,
+      "ownArtifactBytes": 1736235
+    },
+    {
+      "name": "dependency closure",
+      "utc": "2026-09-13T11:11:26.178Z",
+      "freeBytes": 394279669760,
+      "ownArtifactBytes": 6462119
+    },
+    {
+      "name": "source and distribution",
+      "utc": "2026-09-13T11:11:27.433Z",
+      "freeBytes": 394279329792,
+      "ownArtifactBytes": 6731764
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "node-retained.json",
+      "length": 891730,
+      "sha256": "14b0b560b65b42b0b6a1065e1b1b7a53cc4a031cb3e66ac2c7ce59f6b36fa0ee"
+    },
+    {
+      "name": "node-archive-comparison.json",
+      "length": 843803,
+      "sha256": "b4ae3d0fb8236a891fb0d4f8396a7dc21b7cfe4b46057d9925de3d5431013e1e"
+    },
+    {
+      "name": "node-version.json",
+      "length": 702,
+      "sha256": "726d7ce25bb77a423fe2641e0d48c611b490eefa3000e1bac90c1e6e9f576ffb"
+    },
+    {
+      "name": "dependencies.json",
+      "length": 4618006,
+      "sha256": "4d43b83a0f8e7312da6512528b6ace71533d5b2771df601e80c147de4dae4e85"
+    },
+    {
+      "name": "dependency-package-identities.json",
+      "length": 107878,
+      "sha256": "08c3e9df5c6ed1961c3dceb16f5781abab26fa73c314d3f74b5541b7afeb3504"
+    },
+    {
+      "name": "electron-distribution.json",
+      "length": 129,
+      "sha256": "802c9964f8bac26d817683ecfa5f4fdcdc06d202c00d51dda51ae8d118575437"
+    },
+    {
+      "name": "electron-metadata.json",
+      "length": 1998,
+      "sha256": "1ef7f9a48a4ad3aab625e5c196ee39ccf5d6806434d34b95b5e286330a935007"
+    },
+    {
+      "name": "tracked-source.json",
+      "length": 215902,
+      "sha256": "e449fa775508a91e8944ebd9b080ab535538b038c60ff6095d964e2e4c213826"
+    },
+    {
+      "name": "ffgl-source-comparison.json",
+      "length": 51616,
+      "sha256": "0138f8f69e7dbd5764680241c08a80329891cd9bc523a43cf774ba12f894d3d2"
+    }
+  ]
+}

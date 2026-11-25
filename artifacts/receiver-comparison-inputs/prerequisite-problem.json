@@ -1,0 +1,7 @@
+{
+  "evidence": "LUX48 artifacts/receiver-comparison-inputs/acquisition-search.json; v2/node-archive-comparison.json; system-tool-identities.json; exact worker f176aaad6b9af46aee14546553451f14c69d2ee2. No build/export/execution occurred.",
+  "correction": "Keep b1 prerequisite incomplete. A retained Electron candidate resolves through transport to tracer package root; inventory as candidate only, no substitution/install/download authorized by investigation. Root must resolve original criterion explicitly before preparation.",
+  "summary": "Receiver comparison prerequisite investigation finds missing main Electron runtime and unavailable Node acquisition attribution",
+  "actual": "Read-only main Electron package has package.json44.3.0 but lacks dist and path.txt; exporter copies resolved electronRoot/dist. Bounded search of1219 project related retained text/evidence files76079309bytes found only current plan/ticket references, no cached headers.tar.gz/node.lib acquisition record. All2810archive regular files equal extracted headers but this proves local equality, not upstream origin.",
+  "expected": "R2b-b1 requires actual Electron44.3 distribution at resolved main pinned dependency root and attributable retained Node24.20 headers/import library before build/package acceptance."
+}

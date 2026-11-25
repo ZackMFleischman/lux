@@ -1,0 +1,7 @@
+{
+  "summary": "LUX48 investigation helpers required bounded format and path corrections",
+  "expected": "Read exact command references, create receipt directories before persistence, and account for real retained archive metadata and explicit workspace aliases.",
+  "correction": "Created receipt directory and followed documented session syntax; actual ownACK/dynamic-ready preceded only successful claim. Retained inventory-v1/v2 scripts/logs; v3 accepts bounded GNU long names and only four filesystem-verified Lux workspace roots. Full v3 run completed. These are scoped investigation corrections, not authorization to relax future build prerequisites.",
+  "evidence": "LUX48 artifacts/receiver-comparison-inputs/inventory-v1.mjs,inventory-run.log,inventory-v2.mjs,inventory-v2-run.log,inventory.mjs,inventory-v3-run.log; report and source-recheck.json. All installed Conductor calls used require_escalated and exact process cwd Git trust.",
+  "actual": "Initial session start --help was unsupported (USAGE, no mutation). First team-show receipt write targeted missing coordination directory. Initial archive reader refused GNU long-name L records; v2 dependency reader refused first main @lux workspace link as outside node_modules. Both helper failures preserved; no source input modified or archive content executed."
+}

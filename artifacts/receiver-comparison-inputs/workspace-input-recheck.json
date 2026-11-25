@@ -1,0 +1,854 @@
+[
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/node_modules/.bin/esbuild",
+    "length": 944,
+    "sha256": "7cf07c2ff45a627f4747d80b2a05319d2454562af79e4f49dc52ec80a303f5e6",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/node_modules/.bin/esbuild.CMD",
+    "length": 724,
+    "sha256": "54f4a68f43780ac6309ba51264f4b535bc9c4eec6ab59d975cbaf31f9732cd49",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/node_modules/.bin/esbuild.ps1",
+    "length": 1537,
+    "sha256": "f56c8e43cd2ab6d63f3c247ab4429de666515a685c75278b9417a54687dd8c92",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/node_modules/.bin/parser",
+    "length": 1004,
+    "sha256": "8c769b1b88903e5400600b5afce86265820f743d4827cad095b2752de5fdee4b",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/node_modules/.bin/parser.CMD",
+    "length": 784,
+    "sha256": "a1051cc000c7f2d8c21aeab635667121d494de4910d87c0d24fbd7317ae98f21",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/node_modules/.bin/parser.ps1",
+    "length": 1625,
+    "sha256": "85ca95d5619ec1c53f5ff3f93fa0423f8a1cb6f1930df680f90853d8640d91d0",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/node_modules/.bin/tsc",
+    "length": 956,
+    "sha256": "4cf3e76571c24691ad1489b571c1de42fe457046facc6918987068a969b731f8",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/node_modules/.bin/tsc.CMD",
+    "length": 736,
+    "sha256": "a212625b2e3b937e00481459962406ed5c33fa85c358ed46cd3ad448c766b031",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/node_modules/.bin/tsc.ps1",
+    "length": 1547,
+    "sha256": "7afd5030ee13a267889ae215463aa3c5bf801515bbab0f80be21090406fb8551",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/package.json",
+    "length": 244,
+    "sha256": "aa3d09f2e5817354ecd030877e932720af65999a9f89f41da504f112cc8718c9",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/src/artifact-identity.d.mts",
+    "length": 2420,
+    "sha256": "4c7602721c7271c5ef88ed7a5b24ad52d4eff54105f06e63a68896a9fa1faec7",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/src/artifact-identity.mjs",
+    "length": 7707,
+    "sha256": "cead82d2c91e2e8746e7c51e197b861d5db12a8811b6d92dd73ddc5f3b87f907",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/src/asset-dependencies.mjs",
+    "length": 2650,
+    "sha256": "ba9c78c284ec3d80567f0e4498493eb581f7ffc8fcbee61cd021293b69aa6b56",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/src/bounded-json.mjs",
+    "length": 934,
+    "sha256": "7f99aac66626a1ed548dbece74984975cb831c064256b857497527905af168ee",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/src/compile.mjs",
+    "length": 5750,
+    "sha256": "54104bedea1f45022fa2856c9aa7d7c863ca8dfa6f222e3a0d2cda6d41bf03b1",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/src/component-declarations.mjs",
+    "length": 2870,
+    "sha256": "3e3ced0f34be2d12bdc2b90c43aebf86ef7d3c655634dac13537dd4df349898e",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/src/link-runtime.mjs",
+    "length": 3851,
+    "sha256": "b34f744b5ea6ca556eff232453622ed202960a1bc78678b7c609ce5d247aaeef",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/src/link-worker.mjs",
+    "length": 11636,
+    "sha256": "925dd07d59cc52782169e9ddb639f93e24a6f2b6a5b74dbe850f75787933b41d",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/src/main.ts",
+    "length": 237,
+    "sha256": "44d7997f5006c5a64892de9d52147bd7c008a01df8dcef12cc697849d980e42c",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/src/parameter-declarations.mjs",
+    "length": 3799,
+    "sha256": "5c6a1d6d1dbdddad8f30e42c8c535d08e9618e10d4caaf433a3a2061d1dac199",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/src/result-budget.mjs",
+    "length": 1448,
+    "sha256": "c2c4262921ca33756e41cffae6c12f81a04e01b5b7444f778f2de1c86ea77590",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/src/sdk-selection.mjs",
+    "length": 650,
+    "sha256": "dc0108c9f492206f5e97ac04faa35d9040351eceb835ddc0c298e50c66750384",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/src/source-policy.d.mts",
+    "length": 699,
+    "sha256": "039f78fa3b4bbbedd989abd400f9f1314a96a5f687591ee6ff372919ae482163",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/src/source-policy.mjs",
+    "length": 4786,
+    "sha256": "c456dd67ad8f1a33273d48bb527662e25ca80bd51ad4d965b08a751451f03393",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/build-worker/src/worker.mjs",
+    "length": 14486,
+    "sha256": "0f83a51a362087a8416beea836ccf494023ebe52a6313ee119bd2abb6fc83f41",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/runtime-contracts/package.json",
+    "length": 184,
+    "sha256": "8ff95e4901d6861153336b925867529a6b1d40438dd0db67fafa5337d07ea51f",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/runtime-contracts/src/component-profile.mjs",
+    "length": 611,
+    "sha256": "392df7bb17ac1925da0b023716512aeebd55cde52b5fe37731ceaa03b900fbe3",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/runtime-contracts/src/components.d.mts",
+    "length": 1638,
+    "sha256": "903e8acbbcfef0479c411787a77a17e5da6b8582d24b4b742e1c473651899c93",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/runtime-contracts/src/components.mjs",
+    "length": 7226,
+    "sha256": "06b8b897b2237b410018aaab81903b45b660ef292867fffb2b2b21a50f00d4bc",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/runtime-contracts/src/graph.ts",
+    "length": 1583,
+    "sha256": "f1a6ed2303146af7f0f5bef31ea2a5f93e4fd094177e91d8b0c98d8113ea73eb",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/runtime-contracts/src/identities.ts",
+    "length": 1231,
+    "sha256": "97573fb40fdc5622539932fd595fd45d9e5f318d1b864ff25c3902e70516cfb6",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/runtime-contracts/src/index.ts",
+    "length": 6654,
+    "sha256": "09796dd9564e205e3d3cfda8624e413b572dbcdb100242564109160a5fa18a53",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/runtime-contracts/src/nested-graph.ts",
+    "length": 2535,
+    "sha256": "bdfaaa33ed02583c72e27766b5b7cb1a50917f52d0687a6cfe4e39989b32aefd",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/runtime-contracts/src/parameters.d.mts",
+    "length": 1797,
+    "sha256": "3f002921cd0cc2bd65f3d25303bc57d8f40efd0eaa03de1427ddd6d86e03fd48",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/runtime-contracts/src/parameters.mjs",
+    "length": 7693,
+    "sha256": "f1a5a2bac44c1ba72899f5b210727c63e39ea36943d08b0cf31a8049b41428e2",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/runtime-contracts/src/telemetry.ts",
+    "length": 1458,
+    "sha256": "6c71c168f20762439aec9bd32e1d0c6dc0a051f16b7ee1544ec9027734f26902",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/build.mjs",
+    "length": 2854,
+    "sha256": "654cf740f216ce63036f739e0e08ed96b4b9545f0a613ad9350f6a27c850dd37",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/image-preview-worker.js",
+    "length": 193541,
+    "sha256": "6924783842b1bf9b1faa5570a1847a1286afe97831ec45769fb21afa405cadc2",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/image-preview-worker.js.map",
+    "length": 444724,
+    "sha256": "9ee5dafd395b073e6057097d0e4d815125f724edbe3694f85f4d93bd89aa0b70",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/index.html",
+    "length": 673,
+    "sha256": "ab833402b58ce2db10657074a337c5aca65496b1f258159c0cafe1cf3cd2fead",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/interactions.test.css",
+    "length": 121726,
+    "sha256": "7b2a3c5422689fecc08d7983776b595aa37304734f1a32d23681bd7d3a794f4f",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/interactions.test.css.map",
+    "length": 187997,
+    "sha256": "197de26de920e66d540c84e8ded998931ac479e3974d663964f7e6a7a0b7efe7",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/interactions.test.mjs",
+    "length": 99896,
+    "sha256": "5219f8f3d8e2e016012f6e9bf6c0a274a219b241d0ee55b6a33a9d8a17f51983",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/interactions.test.mjs.map",
+    "length": 341222,
+    "sha256": "e47d160e6e8e2bf88eade5cdfd6931b7cc4a775a27403e154d4c5e2cc1135235",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/main.cjs",
+    "length": 360826,
+    "sha256": "5f65f1c15815d2c71c6fad4bc166b596351fe3dac2c9b27eecebe8c3a252229f",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/main.cjs.map",
+    "length": 765013,
+    "sha256": "9e7527c99477c15e64c3fc3c567f764df3c687f387b4557f318a1ba9e14a4994",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/preload.cjs",
+    "length": 2894,
+    "sha256": "e54bf2ecc924e5827895d7fc22de3809ca2d6a88996d12b624799347d27f5524",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/preload.cjs.map",
+    "length": 4593,
+    "sha256": "56f70b7ade839249aa79c789752be53336a5caaa125f6d0f6e6e2b307f140f90",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/renderer.css",
+    "length": 143776,
+    "sha256": "32840bf1fcc4075fbf7be815609021070b10483b8f5f06bd7f465610cc56fcb3",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/renderer.css.map",
+    "length": 220696,
+    "sha256": "8beca65e44692e2507824068c7992f350eddaa014f764812a3feb92fb6ee5e56",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/renderer.js",
+    "length": 4237532,
+    "sha256": "7d006c1fff351e4c56f496c9acd22d4dbd029204494e73a666b142f3025cfa2e",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/renderer.js.map",
+    "length": 7873498,
+    "sha256": "a34045d9f959dbe1719fe1027186dc920ff94b4096985fcb29b9192723494bd1",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/source-admission-worker.js",
+    "length": 196299,
+    "sha256": "246532fb6609a9474ab3f78b926a4d7ec855e3d2586ed1f522203f7b2e867e65",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/source-admission-worker.js.map",
+    "length": 446340,
+    "sha256": "7285ec5c5f5f814e5cd4032b06595a32745cab5b6fb27bf0c7ab17c16c3f0508",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/source-editor.test.css",
+    "length": 121727,
+    "sha256": "5f1a3d8026b5182854f838e211679975aef6f8c3e01cd4b0dad91948dc6059a2",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/source-editor.test.css.map",
+    "length": 187997,
+    "sha256": "197de26de920e66d540c84e8ded998931ac479e3974d663964f7e6a7a0b7efe7",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/source-editor.test.mjs",
+    "length": 254737,
+    "sha256": "77b9e05c8a3cdeec5fac987c2ea0c71c4eae9de16011ff3d666942728b6b9d18",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/source-editor.test.mjs.map",
+    "length": 561698,
+    "sha256": "07d5473f8224299446dd9b3c880c2b9dc49846076fde71d1ce17f3f21750797b",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/view.test.cjs",
+    "length": 3443206,
+    "sha256": "8191f70afba45a66a53d6f0482d1460c1a48a40d1265ffb90674603126b4fe45",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/view.test.cjs.map",
+    "length": 5993858,
+    "sha256": "efa585eebe57da8d630041a2aa62cee0515cb19229fd5107fb19d6ab71eab4ce",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/view.test.css",
+    "length": 121718,
+    "sha256": "d14eddd6c93529a8da778af4f2d6f637d5fafae11175bcc0bf00979a8e923ca8",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/view.test.css.map",
+    "length": 187997,
+    "sha256": "197de26de920e66d540c84e8ded998931ac479e3974d663964f7e6a7a0b7efe7",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/visual-worker.js",
+    "length": 278949,
+    "sha256": "19f60b7f159b94b81fd42b751a6280093d0c117fa03667fb5d5cf01ece5ce35f",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/dist/visual-worker.js.map",
+    "length": 590576,
+    "sha256": "2aca1c695097c4908398c79d79ab3ebd186702788607a123ca448eff962ed5c4",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/node_modules/.bin/esbuild",
+    "length": 944,
+    "sha256": "7cf07c2ff45a627f4747d80b2a05319d2454562af79e4f49dc52ec80a303f5e6",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/node_modules/.bin/esbuild.CMD",
+    "length": 724,
+    "sha256": "54f4a68f43780ac6309ba51264f4b535bc9c4eec6ab59d975cbaf31f9732cd49",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/node_modules/.bin/esbuild.ps1",
+    "length": 1537,
+    "sha256": "f56c8e43cd2ab6d63f3c247ab4429de666515a685c75278b9417a54687dd8c92",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/package.json",
+    "length": 743,
+    "sha256": "e0710c877413b007dea2291db4aa9066ad92485f24511cb015fda421c2251404",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/agent-bridge.ts",
+    "length": 2604,
+    "sha256": "e0d3e978e95a58baf0b3f54348a5d8584d947daa3ba345d22d779c9d4f07d0da",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/assets.d.ts",
+    "length": 24,
+    "sha256": "da5bf71d48cf909584a01c80b445f730507068f5b34c920f352e2bfcf0315e4c",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/authored-worker-assets.d.mts",
+    "length": 792,
+    "sha256": "1fb244da928f8ef2ec9f957a0b3bd2e6dbaa2a344906d578579ec8d05321a83b",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/authored-worker-assets.mjs",
+    "length": 3295,
+    "sha256": "c494742c71ac557c79b325c873f30232792569427b66b93b60ff2908427d4162",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/authoring.tsx",
+    "length": 11401,
+    "sha256": "e3d456c267646e14bef5ec52cf91c2babc2932be237ebfa7f7291887d59a56ff",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/capabilities.ts",
+    "length": 443,
+    "sha256": "9d2ea7b019fcfa2bcab62c1f8cc6a36385bddf999790856fa064c3a6145184d2",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/capture-png.mjs",
+    "length": 1737,
+    "sha256": "c2e2b7ec3256e0cd173f11e9824f0032f94b4939302aaf1631c8bdc4684c26ae",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/close-confirmation.ts",
+    "length": 648,
+    "sha256": "e497e55f70a7c3525880954e61ba54e799d55a936f6991a65e10f97f8f2f64a8",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/Confirmation.tsx",
+    "length": 1802,
+    "sha256": "67cbc8e34050252dded1eb50c0ddd44ed6f4d7aff7f487f099fa5e29f1446315",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/controls/control-state.ts",
+    "length": 2041,
+    "sha256": "f4badb8e39a4f150c9295cf42627d244de9753d6c4732a685c7fe75fa8d1842a",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/controls/ParameterInspector.tsx",
+    "length": 5415,
+    "sha256": "ec99da7b542b81b38784c67e73b8a2ae5538c27b1cd5d83595c59d3d8eac7cb7",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/controls/worker-component-definition.mjs",
+    "length": 1795,
+    "sha256": "91c0373bbfe9e2edcf0308f518a90254310757ad136ea8b0c5502f6ebc508b0c",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/controls/worker-control-state.mjs",
+    "length": 4539,
+    "sha256": "d2df5e5c575e7562b9c02d2aa5cbf1eb2db66213ee911ceb54ccff4a67849ab2",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/entry.tsx",
+    "length": 913,
+    "sha256": "525e021646890bb5143041ee5b18b668caa8c92401c139e1d185bb329c8c868b",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/export-client.ts",
+    "length": 429,
+    "sha256": "1013eb70f5feff70bd05fe89513cd258674fa1872da5d5cb7f7f66cd50f3358d",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/export-process.ts",
+    "length": 5890,
+    "sha256": "188c455a39ac81ceefc051f496f5eaf530e9016d1f88d5e33deb03319def4e42",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/ExportDialog.tsx",
+    "length": 2746,
+    "sha256": "1af7c8dc31425410f06f9962f2cb6c3b197057e35a72c09369716a85f0f655a6",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/fullscreen.ts",
+    "length": 578,
+    "sha256": "beb2a9883c69f76762dcc831bb8ac6ac1ed37c2f23caebb9e96c288d5b9c9e82",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/index.html",
+    "length": 673,
+    "sha256": "ab833402b58ce2db10657074a337c5aca65496b1f258159c0cafe1cf3cd2fead",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/initialization-probe.mjs",
+    "length": 599,
+    "sha256": "8a41ca5291aefd7c957e42b77ba5dd8213559f0a0dde2833bebe15e63cad306e",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/layout/dockview-adapter.ts",
+    "length": 6289,
+    "sha256": "e89c7b8a7c5cc6241abc531588ebee6e28ee0aba7891c5d26e97500775290a17",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/layout/LuxDockLayout.tsx",
+    "length": 3988,
+    "sha256": "88a301ca57efa92e9c5f3af8ac185855bea99de2f6d2c7a9d3d2c30493fdd3ba",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/layout/personal-layout.ts",
+    "length": 6963,
+    "sha256": "195ca8a2235f6bb72c4c9ea7e172eb60d01ee40657162fb6371865f0cc0ecdf4",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/layout/registry.ts",
+    "length": 1999,
+    "sha256": "d37d86816ea27d7feae19ca98171521a1a272729220dfd8f81b13067760ec814",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/layout/StudioDockShell.tsx",
+    "length": 5889,
+    "sha256": "e2e1173d1370cb42c7cf5c9171a6df9ee6fbb86b8bdd6f6e0b7862ca6c2c5ba1",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/layout/styles.d.ts",
+    "length": 58,
+    "sha256": "929892cc2fb15805465b7ccdc23e0e1d6169a3e7d9af7974249931805f1a2e11",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/layout/test-cpu.mjs",
+    "length": 1352,
+    "sha256": "f0d838ba35646f7a93af6ebd6d60c88073b9b2dfd405a4e697c08387f56998a2",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/layout/tsconfig.json",
+    "length": 200,
+    "sha256": "ea31cf98fd0badf9ec5d5299abb8cc026cc8a80667af36c4d62db4dc65a39f1f",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/main.ts",
+    "length": 12915,
+    "sha256": "7475ce1e17bd2c47cd68b16d1afe35649578d765d43a64f279948962a13444f6",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/page.ts",
+    "length": 595,
+    "sha256": "d58c3f18a082aa573fcbe91a746f677f29fcbd71515678aec516c2c78b6c58a9",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/performance/performance-state.ts",
+    "length": 6529,
+    "sha256": "8595538950da07d4d759fdcb70961cf649592699818e76b2f6723a42355c818e",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/performance/PerformanceStatus.tsx",
+    "length": 2387,
+    "sha256": "de1eed7901e21e86da9a0a2245b5f93178006bbefdd0148402d1309d51eed44a",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/preload.ts",
+    "length": 2809,
+    "sha256": "e3cd016dd19a6d42fb7c9a50505317e84628b15c62cabee10f6645d2aad8ef7a",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/presentation.ts",
+    "length": 1647,
+    "sha256": "8b4eb1e776f6ab651635869833b5a771f40fba5f50cae1334340b5f4c7ffd5df",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/preview.tsx",
+    "length": 3001,
+    "sha256": "c6ca91f1f7cb1b0ef75caccd779a30896292a8f3ee19ac7def6ab665550a1389",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/renderer-snapshot.ts",
+    "length": 2101,
+    "sha256": "e1dab97be426353b7b41fbe50f2971ea47d69e39ae56173d8f523e02bc2ab961",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/renderer.tsx",
+    "length": 12574,
+    "sha256": "51c302b7be6c7a8215ea19b8a467c10d176aa3d3f928391f5956bc858d480159",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/runtime-operations.ts",
+    "length": 2131,
+    "sha256": "21f4a4364c96c0322a4a2cfa99537373eec8f45ca188b55a903a76b8404d02fd",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/service-client.ts",
+    "length": 7179,
+    "sha256": "041d9471570829c2bc0561d09b198727524151a451a41e63d06f1b0022e4d1e5",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/source/admission-worker-handler.mjs",
+    "length": 1486,
+    "sha256": "138046c0db50fce86a2d5107bfbda3923aa7b9d2a79da49773a6d75b910e2d3e",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/source/admission-worker.mjs",
+    "length": 250,
+    "sha256": "a0da3d3ced51a7549a88b80ae4bac3ada741754119fe055cf0a5981402da4db6",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/source/admission.d.mts",
+    "length": 1068,
+    "sha256": "91a1151ba0dab899413993923e344547ba42490358af60f67422e0ce290e195e",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/source/admission.mjs",
+    "length": 3680,
+    "sha256": "413d8e338fdeed1da78f78679bfff821f2f718d85508431b2637e3bcc314eb1d",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/source/agent-contract.ts",
+    "length": 882,
+    "sha256": "09db04dce4edd3baa81633d4b27533d0f3dd02120a8134c66ba54c87651dedc9",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/source/asset-playback.ts",
+    "length": 366,
+    "sha256": "302e90ac3713d994376a3b1e33221a3467ea0559fe57085fb43dd32fba771758",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/source/AssetImport.tsx",
+    "length": 3909,
+    "sha256": "88f98c2e7d7ea182bb7a2cf793bee0431ee8eae0ddec782fc50214cee38bca1a",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/source/AssetPreview.tsx",
+    "length": 4945,
+    "sha256": "d6eacfcf231fe152d6bf45f50037fdead0e6217dc75d872b84f9f8b7618b4a6a",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/source/authoring-session.ts",
+    "length": 6743,
+    "sha256": "5c8e03e2259a409d140af350165c36881301238aaa5bb35892143ae80e1a1c1e",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/source/CodeEditor.tsx",
+    "length": 7430,
+    "sha256": "348dc6d4066d5bdf4fe4074f24aaff4b89b7c32b1c3e2953bae7978d95d4e516",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/source/diagnostics.ts",
+    "length": 2015,
+    "sha256": "a72a6ff6d57476bf1e13d901935947ecbd3af5a78afc9aba4484040a5853e36f",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/source/editor-state.ts",
+    "length": 1217,
+    "sha256": "b7c638ece2f8f85c4c3ae2830f7c7253323922e54896d0abfdbb0ff5e17484b8",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/source/image-preview-worker.mjs",
+    "length": 200,
+    "sha256": "1938b1351a96bf7ee17a87b46ac8b99c02c2e2090faf91f127ad8f8e7b36abe0",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/source/ProblemsPanel.tsx",
+    "length": 1218,
+    "sha256": "e83e96e89cb8d9a73499a1ba88775981dd548b3eda8f0d29216c18352606ba31",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/source/source-equality.ts",
+    "length": 1092,
+    "sha256": "162d02e0203729a73a1e71cbfb0736490907c27c71c8b0f0bdb37e02f03b04f0",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/source/SourcePanel.tsx",
+    "length": 7335,
+    "sha256": "257877e1cd337cab6bc01d6ec0ee299f410dcad542700372d41b5fd81fb5cc92",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/source/workspace.ts",
+    "length": 5644,
+    "sha256": "9411d9740ac45b56f9cb3d78a30c75cefd574ef05fd5acd93834dda2a355231c",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/standalone-client.ts",
+    "length": 22759,
+    "sha256": "e6c64458cd7080808c426a23f3c432c92c59e22ae07b4e4c992611a9c11f40d3",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/studio.css",
+    "length": 18059,
+    "sha256": "25ed15b9fbf0dc06a5d03cd9cc4dcfd4af2cf71ab8955ddae65b2b7d17def466",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/theme.ts",
+    "length": 1011,
+    "sha256": "8d05e4dd89279166e7cfbb1b24e3258dd9896ce5e50aee8c489cc09e232d0c5e",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/visual-worker.mjs",
+    "length": 13428,
+    "sha256": "1e33fae6610c7fd9c1638d5fcfc14629811f2e6506e97b300d0ecf586a30ed6a",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/window-client.ts",
+    "length": 397,
+    "sha256": "bff6796f5b8cda5526a963bbde48a99e24f6021bad793228aa1b205a226256f1",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/src/windows.ts",
+    "length": 1648,
+    "sha256": "cceb9756fcacd1ce4591e9dac09ee6b77d4dc2889b4132d9631cacf93df9b2ff",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/test-cpu.mjs",
+    "length": 1414,
+    "sha256": "4fcac25a5781e61d6bd5515351418e968ae1eb417b042e449a0acdba24955b73",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/test-dock-cpu.mjs",
+    "length": 797,
+    "sha256": "238aeaa507451012a02e0bf51c64db6248da6c013ef4c755b122c0b70bec84e6",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/apps/studio/tsconfig.json",
+    "length": 362,
+    "sha256": "2b542fbcc13cc84746d2881abd28c65b9d2706d10d89d9f99b58796587d4a8b7",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/visual-sdk/examples/intensity.ts",
+    "length": 904,
+    "sha256": "a54136ff4a25a7e4e96af0f378ec25fcbf6cb145bbef6da11287bb26145fd0be",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/visual-sdk/examples/parameters.ts",
+    "length": 1170,
+    "sha256": "d8c4d04a72e838d00eb8f707e2e9f695d25a86606a355abd94027bf5ca61c3ba",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/visual-sdk/package.json",
+    "length": 184,
+    "sha256": "4892537c912f2c70d60e6ff42e1262006f8d20d45e45a90732cc747094812f38",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/visual-sdk/src/component-metadata.ts",
+    "length": 703,
+    "sha256": "b5474348facad3c56f47c0045283354e676e8e8ddc83ce2ae494c13f5c3551f3",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/visual-sdk/src/discovery.mjs",
+    "length": 1018,
+    "sha256": "06db67f598ff40feac439e85ad61a98ba349bcd6caca60e51a28ff07cfd8aa51",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/visual-sdk/src/index.ts",
+    "length": 1734,
+    "sha256": "c7586a9950be5854ff8b0266ca66fdb9afa549a714d9e86d74a71124e8d14d28",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/visual-sdk/src/metadata.mjs",
+    "length": 175,
+    "sha256": "2348b24e1b03155b0af7880290a326f3535f41df81048edacba438e96aa609c2",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/visual-sdk/src/sdk-components.ts",
+    "length": 3121,
+    "sha256": "a868cee008d37a3d5f0710d387a20682fa8ca15b0b2023711a47f8cb6df6cff9",
+    "matches": true
+  },
+  {
+    "path": "C:/Users/zFlei/repos/lux/packages/visual-sdk/src/sdk-v2.ts",
+    "length": 3098,
+    "sha256": "34df2e7233011f8d291e5da7804987681906b2c0339c568350e39315582a14ba",
+    "matches": true
+  }
+]
