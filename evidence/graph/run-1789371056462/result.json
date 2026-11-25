@@ -1,0 +1,3252 @@
+{
+  "ok": true,
+  "candidate": "406561fc6a3e6e866144610a2c06af63e4b68413",
+  "session": {
+    "profile": "test-40c26b47-8669-42e5-a5bd-15607967a8ac",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\graph-ports-122",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-40c26b47-8669-42e5-a5bd-15607967a8ac",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-40c26b47-8669-42e5-a5bd-15607967a8ac\\agent-endpoint.json"
+  },
+  "checks": [
+    "Historical Prism copied to private profile, compiled before and after formatting; actual preview retained controls; user profile untouched",
+    "Wheel zoom anchors at actual pointer and preserves selected node",
+    "Native drag shows grab/grabbing, pans without text selection, retains node selection",
+    "Selected and unselected port centers align with actual SVG endpoints after pan/zoom"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-ports-122\\evidence\\graph\\run-1789371056462\\original-preview.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-ports-122\\evidence\\graph\\run-1789371056462\\graph-normal.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-ports-122\\evidence\\graph\\run-1789371056462\\graph-pan.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-ports-122\\evidence\\graph\\run-1789371056462\\graph-selected-ports.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-ports-122\\evidence\\graph\\run-1789371056462\\graph-narrow.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-ports-122\\evidence\\graph\\run-1789371056462\\readable-prism-source.png"
+  ],
+  "errors": [],
+  "ownedPid": 14040,
+  "endpoint": {
+    "pid": 14040,
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\graph-ports-122",
+    "profile": "test-40c26b47-8669-42e5-a5bd-15607967a8ac"
+  },
+  "before": {
+    "connection": "connected",
+    "message": null,
+    "receivedAtMs": 1789371067772,
+    "authoring": {
+      "instanceId": "9804e568-0680-48a1-a0df-9fac9276980c",
+      "generation": 1,
+      "revisionId": "95d301d7d7c25d4f6380f0d2f253ffdf80c992e6c15102a4a8f848acda870290",
+      "composition": {
+        "version": 1,
+        "declaration": {
+          "definitions": {
+            "instrument": "shared/observatory/instrument.ts",
+            "prism": "effects/prism.ts"
+          },
+          "nodes": [
+            {
+              "id": "48a7d856-2cb2-4779-b756-0ba156718321",
+              "definition": "instrument"
+            },
+            {
+              "id": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+              "definition": "prism"
+            },
+            {
+              "id": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+              "definition": "prism"
+            }
+          ],
+          "edges": [
+            {
+              "id": "1aa3d8c0-a9ca-47ef-ab77-c3e49f5e240a",
+              "from": {
+                "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                "portId": "image"
+              },
+              "to": {
+                "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                "portId": "image"
+              },
+              "delay": "none"
+            },
+            {
+              "id": "3aa3d8c0-a9ca-47ef-ab77-c3e49f5e240a",
+              "from": {
+                "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                "portId": "image"
+              },
+              "to": {
+                "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                "portId": "image"
+              },
+              "delay": "none"
+            }
+          ],
+          "output": {
+            "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+            "portId": "image"
+          },
+          "expose": [
+            {
+              "id": "orbitSpeed",
+              "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+              "controlId": "speed"
+            },
+            {
+              "id": "ringExpansion",
+              "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+              "controlId": "spread"
+            },
+            {
+              "id": "gimbalTilt",
+              "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+              "controlId": "twist"
+            },
+            {
+              "id": "spectrum",
+              "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+              "controlId": "hue"
+            },
+            {
+              "id": "innerSplit",
+              "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+              "controlId": "split"
+            },
+            {
+              "id": "innerGlow",
+              "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+              "controlId": "glow"
+            },
+            {
+              "id": "innerRadius",
+              "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+              "controlId": "radius"
+            },
+            {
+              "id": "outerSplit",
+              "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+              "controlId": "split"
+            },
+            {
+              "id": "outerGlow",
+              "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+              "controlId": "glow"
+            },
+            {
+              "id": "outerRadius",
+              "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+              "controlId": "radius"
+            }
+          ]
+        },
+        "definitionNames": {
+          "instrument": "e3dff0e7a6f1ce837ce4b3e6df928c7772654d20c0c5adc25d5069b90c91caa1",
+          "prism": "ab517cc74a30f9eb6eaa66e4dd0f31850f3c5531f2de0f74cacfea6405f2920f"
+        },
+        "moduleDeclarations": {
+          "9522874d4dfd3685f72bf2f5e7d53e31dbcb4110c40327659873351e590661c5": {
+            "modulePath": "observatory.ts",
+            "definitionNames": {
+              "instrument": "e3dff0e7a6f1ce837ce4b3e6df928c7772654d20c0c5adc25d5069b90c91caa1",
+              "prism": "ab517cc74a30f9eb6eaa66e4dd0f31850f3c5531f2de0f74cacfea6405f2920f"
+            },
+            "declaration": {
+              "definitions": {
+                "instrument": "shared/observatory/instrument.ts",
+                "prism": "effects/prism.ts"
+              },
+              "nodes": [
+                {
+                  "id": "48a7d856-2cb2-4779-b756-0ba156718321",
+                  "definition": "instrument"
+                },
+                {
+                  "id": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                  "definition": "prism"
+                },
+                {
+                  "id": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                  "definition": "prism"
+                }
+              ],
+              "edges": [
+                {
+                  "id": "1aa3d8c0-a9ca-47ef-ab77-c3e49f5e240a",
+                  "from": {
+                    "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                    "portId": "image"
+                  },
+                  "to": {
+                    "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                    "portId": "image"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "3aa3d8c0-a9ca-47ef-ab77-c3e49f5e240a",
+                  "from": {
+                    "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                    "portId": "image"
+                  },
+                  "to": {
+                    "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                    "portId": "image"
+                  },
+                  "delay": "none"
+                }
+              ],
+              "output": {
+                "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                "portId": "image"
+              },
+              "expose": [
+                {
+                  "id": "orbitSpeed",
+                  "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                  "controlId": "speed"
+                },
+                {
+                  "id": "ringExpansion",
+                  "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                  "controlId": "spread"
+                },
+                {
+                  "id": "gimbalTilt",
+                  "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                  "controlId": "twist"
+                },
+                {
+                  "id": "spectrum",
+                  "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                  "controlId": "hue"
+                },
+                {
+                  "id": "innerSplit",
+                  "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                  "controlId": "split"
+                },
+                {
+                  "id": "innerGlow",
+                  "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                  "controlId": "glow"
+                },
+                {
+                  "id": "innerRadius",
+                  "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                  "controlId": "radius"
+                },
+                {
+                  "id": "outerSplit",
+                  "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                  "controlId": "split"
+                },
+                {
+                  "id": "outerGlow",
+                  "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                  "controlId": "glow"
+                },
+                {
+                  "id": "outerRadius",
+                  "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                  "controlId": "radius"
+                }
+              ]
+            }
+          }
+        },
+        "graph": {
+          "version": 2,
+          "rootDefinitionHash": "9522874d4dfd3685f72bf2f5e7d53e31dbcb4110c40327659873351e590661c5",
+          "outputPort": "image"
+        },
+        "definitions": {
+          "9522874d4dfd3685f72bf2f5e7d53e31dbcb4110c40327659873351e590661c5": {
+            "kind": "graph",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "lux/image-composition",
+              "label": "Image composition",
+              "description": "Authored image component chain",
+              "tags": [],
+              "inputs": {},
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Image"
+                }
+              },
+              "controls": [
+                {
+                  "id": "orbitSpeed",
+                  "type": "number",
+                  "label": "Orbit speed",
+                  "default": 0.35,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "Speed of the nested orbital assemblies. Zero freezes orbital rotation.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "ringExpansion",
+                  "type": "number",
+                  "label": "Ring expansion",
+                  "default": 1,
+                  "min": 0.6,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "Radius of the orbital rings around the crystalline core.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "gimbalTilt",
+                  "type": "number",
+                  "label": "Gimbal tilt",
+                  "default": 0.65,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "Inclination of each nested gimbal assembly.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "spectrum",
+                  "type": "number",
+                  "label": "Spectrum",
+                  "default": 0.53,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Base hue of the instrument, offset around each orbital assembly.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "innerSplit",
+                  "type": "number",
+                  "label": "Spectral split",
+                  "default": 0.002,
+                  "min": 0,
+                  "max": 0.03,
+                  "step": 0.001,
+                  "description": "Separates red and blue channels across the image. This instance is independent of the other lens.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "innerGlow",
+                  "type": "number",
+                  "label": "Halo strength",
+                  "default": 0.45,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "Adds a soft four-direction light halo.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "innerRadius",
+                  "type": "number",
+                  "label": "Halo radius",
+                  "default": 0.004,
+                  "min": 0.001,
+                  "max": 0.025,
+                  "step": 0.001,
+                  "description": "Distance used to spread the halo around bright lines.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "outerSplit",
+                  "type": "number",
+                  "label": "Spectral split",
+                  "default": 0.002,
+                  "min": 0,
+                  "max": 0.03,
+                  "step": 0.001,
+                  "description": "Separates red and blue channels across the image. This instance is independent of the other lens.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "outerGlow",
+                  "type": "number",
+                  "label": "Halo strength",
+                  "default": 0.45,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "Adds a soft four-direction light halo.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "outerRadius",
+                  "type": "number",
+                  "label": "Halo radius",
+                  "default": 0.004,
+                  "min": 0.001,
+                  "max": 0.025,
+                  "step": 0.001,
+                  "description": "Distance used to spread the halo around bright lines.",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "gimbalTilt": "Inclination of each nested gimbal assembly.",
+                "innerGlow": "Adds a soft four-direction light halo.",
+                "innerRadius": "Distance used to spread the halo around bright lines.",
+                "innerSplit": "Separates red and blue channels across the image. This instance is independent of the other lens.",
+                "orbitSpeed": "Speed of the nested orbital assemblies. Zero freezes orbital rotation.",
+                "outerGlow": "Adds a soft four-direction light halo.",
+                "outerRadius": "Distance used to spread the halo around bright lines.",
+                "outerSplit": "Separates red and blue channels across the image. This instance is independent of the other lens.",
+                "ringExpansion": "Radius of the orbital rings around the crystalline core.",
+                "spectrum": "Base hue of the instrument, offset around each orbital assembly."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            },
+            "body": {
+              "nodes": [
+                {
+                  "id": "48a7d856-2cb2-4779-b756-0ba156718321",
+                  "definitionHash": "e3dff0e7a6f1ce837ce4b3e6df928c7772654d20c0c5adc25d5069b90c91caa1",
+                  "controlDefaults": {}
+                },
+                {
+                  "id": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                  "definitionHash": "ab517cc74a30f9eb6eaa66e4dd0f31850f3c5531f2de0f74cacfea6405f2920f",
+                  "controlDefaults": {}
+                },
+                {
+                  "id": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                  "definitionHash": "ab517cc74a30f9eb6eaa66e4dd0f31850f3c5531f2de0f74cacfea6405f2920f",
+                  "controlDefaults": {}
+                }
+              ],
+              "edges": [
+                {
+                  "id": "1aa3d8c0-a9ca-47ef-ab77-c3e49f5e240a",
+                  "from": {
+                    "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                    "portId": "image"
+                  },
+                  "to": {
+                    "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                    "portId": "image"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "3aa3d8c0-a9ca-47ef-ab77-c3e49f5e240a",
+                  "from": {
+                    "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                    "portId": "image"
+                  },
+                  "to": {
+                    "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                    "portId": "image"
+                  },
+                  "delay": "none"
+                }
+              ],
+              "inputBindings": {},
+              "outputBindings": {
+                "image": {
+                  "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                  "portId": "image"
+                }
+              },
+              "controlBindings": {
+                "gimbalTilt": [
+                  {
+                    "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                    "controlId": "twist"
+                  }
+                ],
+                "innerGlow": [
+                  {
+                    "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                    "controlId": "glow"
+                  }
+                ],
+                "innerRadius": [
+                  {
+                    "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                    "controlId": "radius"
+                  }
+                ],
+                "innerSplit": [
+                  {
+                    "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                    "controlId": "split"
+                  }
+                ],
+                "orbitSpeed": [
+                  {
+                    "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                    "controlId": "speed"
+                  }
+                ],
+                "outerGlow": [
+                  {
+                    "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                    "controlId": "glow"
+                  }
+                ],
+                "outerRadius": [
+                  {
+                    "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                    "controlId": "radius"
+                  }
+                ],
+                "outerSplit": [
+                  {
+                    "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                    "controlId": "split"
+                  }
+                ],
+                "ringExpansion": [
+                  {
+                    "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                    "controlId": "spread"
+                  }
+                ],
+                "spectrum": [
+                  {
+                    "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                    "controlId": "hue"
+                  }
+                ]
+              }
+            }
+          },
+          "ab517cc74a30f9eb6eaa66e4dd0f31850f3c5531f2de0f74cacfea6405f2920f": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "observatory/prism",
+              "label": "Prism lens",
+              "description": "Reusable image lens. Each instance has independent spectral split and halo controls.",
+              "tags": [
+                "effect"
+              ],
+              "inputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Linear light image"
+                }
+              },
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Linear light image"
+                }
+              },
+              "controls": [
+                {
+                  "id": "split",
+                  "type": "number",
+                  "label": "Spectral split",
+                  "default": 0.002,
+                  "min": 0,
+                  "max": 0.03,
+                  "step": 0.001,
+                  "changeCost": "live"
+                },
+                {
+                  "id": "glow",
+                  "type": "number",
+                  "label": "Halo strength",
+                  "default": 0.45,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "changeCost": "live"
+                },
+                {
+                  "id": "radius",
+                  "type": "number",
+                  "label": "Halo radius",
+                  "default": 0.004,
+                  "min": 0.001,
+                  "max": 0.025,
+                  "step": 0.001,
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "glow": "Adds a soft four-direction light halo.",
+                "radius": "Distance used to spread the halo around bright lines.",
+                "split": "Separates red and blue channels across the image. This instance is independent of the other lens."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            }
+          },
+          "e3dff0e7a6f1ce837ce4b3e6df928c7772654d20c0c5adc25d5069b90c91caa1": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "observatory/orbital-instrument",
+              "label": "Orbital instrument",
+              "description": "Nested armillary rings, orbiting satellites and a luminous crystalline heart.",
+              "tags": [
+                "generative",
+                "space"
+              ],
+              "inputs": {},
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Linear light image"
+                }
+              },
+              "controls": [
+                {
+                  "id": "speed",
+                  "type": "number",
+                  "label": "Orbit speed",
+                  "default": 0.35,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "changeCost": "live"
+                },
+                {
+                  "id": "spread",
+                  "type": "number",
+                  "label": "Ring expansion",
+                  "default": 1,
+                  "min": 0.6,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "changeCost": "live"
+                },
+                {
+                  "id": "twist",
+                  "type": "number",
+                  "label": "Gimbal tilt",
+                  "default": 0.65,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "changeCost": "live"
+                },
+                {
+                  "id": "hue",
+                  "type": "number",
+                  "label": "Spectrum",
+                  "default": 0.53,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "hue": "Base hue of the instrument, offset around each orbital assembly.",
+                "speed": "Speed of the nested orbital assemblies. Zero freezes orbital rotation.",
+                "spread": "Radius of the orbital rings around the crystalline core.",
+                "twist": "Inclination of each nested gimbal assembly."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            }
+          }
+        },
+        "publicControls": [
+          {
+            "id": "orbitSpeed",
+            "type": "number",
+            "label": "Orbit speed",
+            "default": 0.35,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "description": "Speed of the nested orbital assemblies. Zero freezes orbital rotation.",
+            "changeCost": "live"
+          },
+          {
+            "id": "ringExpansion",
+            "type": "number",
+            "label": "Ring expansion",
+            "default": 1,
+            "min": 0.6,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "Radius of the orbital rings around the crystalline core.",
+            "changeCost": "live"
+          },
+          {
+            "id": "gimbalTilt",
+            "type": "number",
+            "label": "Gimbal tilt",
+            "default": 0.65,
+            "min": 0,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "Inclination of each nested gimbal assembly.",
+            "changeCost": "live"
+          },
+          {
+            "id": "spectrum",
+            "type": "number",
+            "label": "Spectrum",
+            "default": 0.53,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "Base hue of the instrument, offset around each orbital assembly.",
+            "changeCost": "live"
+          },
+          {
+            "id": "innerSplit",
+            "type": "number",
+            "label": "Spectral split",
+            "default": 0.002,
+            "min": 0,
+            "max": 0.03,
+            "step": 0.001,
+            "description": "Separates red and blue channels across the image. This instance is independent of the other lens.",
+            "changeCost": "live"
+          },
+          {
+            "id": "innerGlow",
+            "type": "number",
+            "label": "Halo strength",
+            "default": 0.45,
+            "min": 0,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "Adds a soft four-direction light halo.",
+            "changeCost": "live"
+          },
+          {
+            "id": "innerRadius",
+            "type": "number",
+            "label": "Halo radius",
+            "default": 0.004,
+            "min": 0.001,
+            "max": 0.025,
+            "step": 0.001,
+            "description": "Distance used to spread the halo around bright lines.",
+            "changeCost": "live"
+          },
+          {
+            "id": "outerSplit",
+            "type": "number",
+            "label": "Spectral split",
+            "default": 0.002,
+            "min": 0,
+            "max": 0.03,
+            "step": 0.001,
+            "description": "Separates red and blue channels across the image. This instance is independent of the other lens.",
+            "changeCost": "live"
+          },
+          {
+            "id": "outerGlow",
+            "type": "number",
+            "label": "Halo strength",
+            "default": 0.45,
+            "min": 0,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "Adds a soft four-direction light halo.",
+            "changeCost": "live"
+          },
+          {
+            "id": "outerRadius",
+            "type": "number",
+            "label": "Halo radius",
+            "default": 0.004,
+            "min": 0.001,
+            "max": 0.025,
+            "step": 0.001,
+            "description": "Distance used to spread the halo around bright lines.",
+            "changeCost": "live"
+          }
+        ],
+        "publicControlBindings": {
+          "orbitSpeed": [
+            {
+              "nodePath": [
+                "48a7d856-2cb2-4779-b756-0ba156718321"
+              ],
+              "controlId": "speed",
+              "active": true
+            }
+          ],
+          "ringExpansion": [
+            {
+              "nodePath": [
+                "48a7d856-2cb2-4779-b756-0ba156718321"
+              ],
+              "controlId": "spread",
+              "active": true
+            }
+          ],
+          "gimbalTilt": [
+            {
+              "nodePath": [
+                "48a7d856-2cb2-4779-b756-0ba156718321"
+              ],
+              "controlId": "twist",
+              "active": true
+            }
+          ],
+          "spectrum": [
+            {
+              "nodePath": [
+                "48a7d856-2cb2-4779-b756-0ba156718321"
+              ],
+              "controlId": "hue",
+              "active": true
+            }
+          ],
+          "innerSplit": [
+            {
+              "nodePath": [
+                "c61a5b8f-d522-4f50-b7fb-c6c64976a638"
+              ],
+              "controlId": "split",
+              "active": true
+            }
+          ],
+          "innerGlow": [
+            {
+              "nodePath": [
+                "c61a5b8f-d522-4f50-b7fb-c6c64976a638"
+              ],
+              "controlId": "glow",
+              "active": true
+            }
+          ],
+          "innerRadius": [
+            {
+              "nodePath": [
+                "c61a5b8f-d522-4f50-b7fb-c6c64976a638"
+              ],
+              "controlId": "radius",
+              "active": true
+            }
+          ],
+          "outerSplit": [
+            {
+              "nodePath": [
+                "831d46b4-3f11-4f9d-a89b-9f4fbe535621"
+              ],
+              "controlId": "split",
+              "active": true
+            }
+          ],
+          "outerGlow": [
+            {
+              "nodePath": [
+                "831d46b4-3f11-4f9d-a89b-9f4fbe535621"
+              ],
+              "controlId": "glow",
+              "active": true
+            }
+          ],
+          "outerRadius": [
+            {
+              "nodePath": [
+                "831d46b4-3f11-4f9d-a89b-9f4fbe535621"
+              ],
+              "controlId": "radius",
+              "active": true
+            }
+          ]
+        },
+        "nodes": [
+          {
+            "nodePath": [
+              "48a7d856-2cb2-4779-b756-0ba156718321"
+            ],
+            "definitionHash": "e3dff0e7a6f1ce837ce4b3e6df928c7772654d20c0c5adc25d5069b90c91caa1",
+            "schema": [
+              {
+                "id": "speed",
+                "type": "number",
+                "label": "Orbit speed",
+                "default": 0.35,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "spread",
+                "type": "number",
+                "label": "Ring expansion",
+                "default": 1,
+                "min": 0.6,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "twist",
+                "type": "number",
+                "label": "Gimbal tilt",
+                "default": 0.65,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "hue",
+                "type": "number",
+                "label": "Spectrum",
+                "default": 0.53,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "3bc2ab20b41dff79ec431c8487fc2fa4b7d580206e7a24266c0d0bb1e9a14da0"
+          },
+          {
+            "nodePath": [
+              "c61a5b8f-d522-4f50-b7fb-c6c64976a638"
+            ],
+            "definitionHash": "ab517cc74a30f9eb6eaa66e4dd0f31850f3c5531f2de0f74cacfea6405f2920f",
+            "schema": [
+              {
+                "id": "split",
+                "type": "number",
+                "label": "Spectral split",
+                "default": 0.002,
+                "min": 0,
+                "max": 0.03,
+                "step": 0.001,
+                "changeCost": "live"
+              },
+              {
+                "id": "glow",
+                "type": "number",
+                "label": "Halo strength",
+                "default": 0.45,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "radius",
+                "type": "number",
+                "label": "Halo radius",
+                "default": 0.004,
+                "min": 0.001,
+                "max": 0.025,
+                "step": 0.001,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "cc0915d22dae0b34ba850155bdcbc1270935cbe51a51503faf2688f78a6201e5"
+          },
+          {
+            "nodePath": [
+              "831d46b4-3f11-4f9d-a89b-9f4fbe535621"
+            ],
+            "definitionHash": "ab517cc74a30f9eb6eaa66e4dd0f31850f3c5531f2de0f74cacfea6405f2920f",
+            "schema": [
+              {
+                "id": "split",
+                "type": "number",
+                "label": "Spectral split",
+                "default": 0.002,
+                "min": 0,
+                "max": 0.03,
+                "step": 0.001,
+                "changeCost": "live"
+              },
+              {
+                "id": "glow",
+                "type": "number",
+                "label": "Halo strength",
+                "default": 0.45,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "radius",
+                "type": "number",
+                "label": "Halo radius",
+                "default": 0.004,
+                "min": 0.001,
+                "max": 0.025,
+                "step": 0.001,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "cc0915d22dae0b34ba850155bdcbc1270935cbe51a51503faf2688f78a6201e5"
+          }
+        ]
+      },
+      "sceneName": "Untitled visual",
+      "authority": "studio",
+      "playback": "paused",
+      "sdkVersion": "0.4.0",
+      "controlSchema": [
+        {
+          "id": "orbitSpeed",
+          "type": "number",
+          "label": "Orbit speed",
+          "default": 0.35,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "Speed of the nested orbital assemblies. Zero freezes orbital rotation.",
+          "changeCost": "live"
+        },
+        {
+          "id": "ringExpansion",
+          "type": "number",
+          "label": "Ring expansion",
+          "default": 1,
+          "min": 0.6,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "Radius of the orbital rings around the crystalline core.",
+          "changeCost": "live"
+        },
+        {
+          "id": "gimbalTilt",
+          "type": "number",
+          "label": "Gimbal tilt",
+          "default": 0.65,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "Inclination of each nested gimbal assembly.",
+          "changeCost": "live"
+        },
+        {
+          "id": "spectrum",
+          "type": "number",
+          "label": "Spectrum",
+          "default": 0.53,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Base hue of the instrument, offset around each orbital assembly.",
+          "changeCost": "live"
+        },
+        {
+          "id": "innerSplit",
+          "type": "number",
+          "label": "Spectral split",
+          "default": 0.002,
+          "min": 0,
+          "max": 0.03,
+          "step": 0.001,
+          "description": "Separates red and blue channels across the image. This instance is independent of the other lens.",
+          "changeCost": "live"
+        },
+        {
+          "id": "innerGlow",
+          "type": "number",
+          "label": "Halo strength",
+          "default": 0.45,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "Adds a soft four-direction light halo.",
+          "changeCost": "live"
+        },
+        {
+          "id": "innerRadius",
+          "type": "number",
+          "label": "Halo radius",
+          "default": 0.004,
+          "min": 0.001,
+          "max": 0.025,
+          "step": 0.001,
+          "description": "Distance used to spread the halo around bright lines.",
+          "changeCost": "live"
+        },
+        {
+          "id": "outerSplit",
+          "type": "number",
+          "label": "Spectral split",
+          "default": 0.002,
+          "min": 0,
+          "max": 0.03,
+          "step": 0.001,
+          "description": "Separates red and blue channels across the image. This instance is independent of the other lens.",
+          "changeCost": "live"
+        },
+        {
+          "id": "outerGlow",
+          "type": "number",
+          "label": "Halo strength",
+          "default": 0.45,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "Adds a soft four-direction light halo.",
+          "changeCost": "live"
+        },
+        {
+          "id": "outerRadius",
+          "type": "number",
+          "label": "Halo radius",
+          "default": 0.004,
+          "min": 0.001,
+          "max": 0.025,
+          "step": 0.001,
+          "description": "Distance used to spread the halo around bright lines.",
+          "changeCost": "live"
+        }
+      ],
+      "controlSchemaHash": "cfb03551c212e25e7fa941175ead1efcff94c52f0b87618e4ddeb317663a6154",
+      "controls": {
+        "orbitSpeed": 0.35,
+        "ringExpansion": 1,
+        "gimbalTilt": 0.65,
+        "spectrum": 0.53,
+        "innerSplit": 0.002,
+        "innerGlow": 0.45,
+        "innerRadius": 0.004,
+        "outerSplit": 0.002,
+        "outerGlow": 0.45,
+        "outerRadius": 0.004
+      },
+      "controlSequence": 0,
+      "nodeControls": {
+        "sourceHash": "95d301d7d7c25d4f6380f0d2f253ffdf80c992e6c15102a4a8f848acda870290",
+        "nodes": [
+          {
+            "nodePath": [
+              "48a7d856-2cb2-4779-b756-0ba156718321"
+            ],
+            "definitionHash": "e3dff0e7a6f1ce837ce4b3e6df928c7772654d20c0c5adc25d5069b90c91caa1",
+            "schema": [
+              {
+                "id": "speed",
+                "type": "number",
+                "label": "Orbit speed",
+                "default": 0.35,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "spread",
+                "type": "number",
+                "label": "Ring expansion",
+                "default": 1,
+                "min": 0.6,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "twist",
+                "type": "number",
+                "label": "Gimbal tilt",
+                "default": 0.65,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "hue",
+                "type": "number",
+                "label": "Spectrum",
+                "default": 0.53,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "3bc2ab20b41dff79ec431c8487fc2fa4b7d580206e7a24266c0d0bb1e9a14da0",
+            "values": {
+              "speed": 0.35,
+              "spread": 1,
+              "twist": 0.65,
+              "hue": 0.53
+            }
+          },
+          {
+            "nodePath": [
+              "c61a5b8f-d522-4f50-b7fb-c6c64976a638"
+            ],
+            "definitionHash": "ab517cc74a30f9eb6eaa66e4dd0f31850f3c5531f2de0f74cacfea6405f2920f",
+            "schema": [
+              {
+                "id": "split",
+                "type": "number",
+                "label": "Spectral split",
+                "default": 0.002,
+                "min": 0,
+                "max": 0.03,
+                "step": 0.001,
+                "changeCost": "live"
+              },
+              {
+                "id": "glow",
+                "type": "number",
+                "label": "Halo strength",
+                "default": 0.45,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "radius",
+                "type": "number",
+                "label": "Halo radius",
+                "default": 0.004,
+                "min": 0.001,
+                "max": 0.025,
+                "step": 0.001,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "cc0915d22dae0b34ba850155bdcbc1270935cbe51a51503faf2688f78a6201e5",
+            "values": {
+              "split": 0.002,
+              "glow": 0.45,
+              "radius": 0.004
+            }
+          },
+          {
+            "nodePath": [
+              "831d46b4-3f11-4f9d-a89b-9f4fbe535621"
+            ],
+            "definitionHash": "ab517cc74a30f9eb6eaa66e4dd0f31850f3c5531f2de0f74cacfea6405f2920f",
+            "schema": [
+              {
+                "id": "split",
+                "type": "number",
+                "label": "Spectral split",
+                "default": 0.002,
+                "min": 0,
+                "max": 0.03,
+                "step": 0.001,
+                "changeCost": "live"
+              },
+              {
+                "id": "glow",
+                "type": "number",
+                "label": "Halo strength",
+                "default": 0.45,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "radius",
+                "type": "number",
+                "label": "Halo radius",
+                "default": 0.004,
+                "min": 0.001,
+                "max": 0.025,
+                "step": 0.001,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "cc0915d22dae0b34ba850155bdcbc1270935cbe51a51503faf2688f78a6201e5",
+            "values": {
+              "split": 0.002,
+              "glow": 0.45,
+              "radius": 0.004
+            }
+          }
+        ]
+      },
+      "controlAnimations": [],
+      "controlAnimationIssues": [],
+      "animationSequence": 0,
+      "effectiveNodeControls": {
+        "sourceHash": "95d301d7d7c25d4f6380f0d2f253ffdf80c992e6c15102a4a8f848acda870290",
+        "nodes": [
+          {
+            "nodePath": [
+              "48a7d856-2cb2-4779-b756-0ba156718321"
+            ],
+            "definitionHash": "e3dff0e7a6f1ce837ce4b3e6df928c7772654d20c0c5adc25d5069b90c91caa1",
+            "schema": [
+              {
+                "id": "speed",
+                "type": "number",
+                "label": "Orbit speed",
+                "default": 0.35,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "spread",
+                "type": "number",
+                "label": "Ring expansion",
+                "default": 1,
+                "min": 0.6,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "twist",
+                "type": "number",
+                "label": "Gimbal tilt",
+                "default": 0.65,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "hue",
+                "type": "number",
+                "label": "Spectrum",
+                "default": 0.53,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "3bc2ab20b41dff79ec431c8487fc2fa4b7d580206e7a24266c0d0bb1e9a14da0",
+            "values": {
+              "speed": 0.35,
+              "spread": 1,
+              "twist": 0.65,
+              "hue": 0.53
+            }
+          },
+          {
+            "nodePath": [
+              "c61a5b8f-d522-4f50-b7fb-c6c64976a638"
+            ],
+            "definitionHash": "ab517cc74a30f9eb6eaa66e4dd0f31850f3c5531f2de0f74cacfea6405f2920f",
+            "schema": [
+              {
+                "id": "split",
+                "type": "number",
+                "label": "Spectral split",
+                "default": 0.002,
+                "min": 0,
+                "max": 0.03,
+                "step": 0.001,
+                "changeCost": "live"
+              },
+              {
+                "id": "glow",
+                "type": "number",
+                "label": "Halo strength",
+                "default": 0.45,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "radius",
+                "type": "number",
+                "label": "Halo radius",
+                "default": 0.004,
+                "min": 0.001,
+                "max": 0.025,
+                "step": 0.001,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "cc0915d22dae0b34ba850155bdcbc1270935cbe51a51503faf2688f78a6201e5",
+            "values": {
+              "split": 0.002,
+              "glow": 0.45,
+              "radius": 0.004
+            }
+          },
+          {
+            "nodePath": [
+              "831d46b4-3f11-4f9d-a89b-9f4fbe535621"
+            ],
+            "definitionHash": "ab517cc74a30f9eb6eaa66e4dd0f31850f3c5531f2de0f74cacfea6405f2920f",
+            "schema": [
+              {
+                "id": "split",
+                "type": "number",
+                "label": "Spectral split",
+                "default": 0.002,
+                "min": 0,
+                "max": 0.03,
+                "step": 0.001,
+                "changeCost": "live"
+              },
+              {
+                "id": "glow",
+                "type": "number",
+                "label": "Halo strength",
+                "default": 0.45,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "radius",
+                "type": "number",
+                "label": "Halo radius",
+                "default": 0.004,
+                "min": 0.001,
+                "max": 0.025,
+                "step": 0.001,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "cc0915d22dae0b34ba850155bdcbc1270935cbe51a51503faf2688f78a6201e5",
+            "values": {
+              "split": 0.002,
+              "glow": 0.45,
+              "radius": 0.004
+            }
+          }
+        ]
+      },
+      "controlMigration": [],
+      "clockEpoch": 0,
+      "timeSeconds": 1.7278999999985099,
+      "frameId": "88",
+      "output": {
+        "width": 1920,
+        "height": 1080,
+        "fps": 60,
+        "seed": 0
+      },
+      "fault": null
+    },
+    "host": null,
+    "jobs": [
+      {
+        "jobId": "9054a7dc-6df2-4fe7-ba85-c151af36cf37",
+        "state": "succeeded",
+        "summary": "Visual is ready in Lux."
+      }
+    ],
+    "visualFps": null,
+    "uiFps": null,
+    "performance": {
+      "owner": {
+        "instanceId": "9804e568-0680-48a1-a0df-9fac9276980c",
+        "generation": 1,
+        "revisionId": "95d301d7d7c25d4f6380f0d2f253ffdf80c992e6c15102a4a8f848acda870290"
+      },
+      "status": "live",
+      "observedAtMs": 10736.10000000149,
+      "worker": {
+        "schemaVersion": 1,
+        "mode": "routine",
+        "clockDomain": "dedicated-worker-monotonic-ms",
+        "sequence": 3,
+        "windowStartMs": 1744.2000000029802,
+        "windowEndMs": 2242.39999999851,
+        "lostRecords": 0,
+        "invalidRecords": 0,
+        "intervalLostRecords": 0,
+        "intervalInvalidRecords": 0,
+        "retainedRecords": 30,
+        "produced": {
+          "unit": "Hz",
+          "availability": "available",
+          "validity": "complete",
+          "gate": "not_evaluated",
+          "sampleCount": 30,
+          "expectedCount": 30,
+          "missingCount": 0,
+          "samplingPolicy": "completed frames over independent summary interval",
+          "value": 60.21678041001443
+        },
+        "update": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "complete",
+          "gate": "not_evaluated",
+          "sampleCount": 30,
+          "expectedCount": 30,
+          "missingCount": 0,
+          "samplingPolicy": "all completed frames in this summary interval",
+          "p50": 0.10000000149011612,
+          "p95": 0.20000000298023224,
+          "p99": 0.20000000298023224,
+          "max": 0.20000000298023224
+        },
+        "renderCall": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "complete",
+          "gate": "not_evaluated",
+          "sampleCount": 30,
+          "expectedCount": 30,
+          "missingCount": 0,
+          "samplingPolicy": "all completed frames in this summary interval",
+          "p50": 1.1000000014901161,
+          "p95": 1.3000000044703484,
+          "p99": 1.3999999985098839,
+          "max": 1.3999999985098839
+        },
+        "cpuCall": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "incomplete",
+          "gate": "not_evaluated",
+          "sampleCount": 30,
+          "expectedCount": 30,
+          "missingCount": 0,
+          "samplingPolicy": "all completed frames in this summary interval",
+          "reason": "Asynchronous render continuation CPU work is not fully measured",
+          "p50": 1.2000000029802322,
+          "p95": 1.5,
+          "p99": 1.5,
+          "max": 1.5
+        },
+        "renderAwait": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "complete",
+          "gate": "not_evaluated",
+          "sampleCount": 30,
+          "expectedCount": 30,
+          "missingCount": 0,
+          "samplingPolicy": "all completed frames in this summary interval",
+          "p50": 2.8000000044703484,
+          "p95": 3.5,
+          "p99": 3.6999999955296516,
+          "max": 3.6999999955296516
+        },
+        "queueWait": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "complete",
+          "gate": "not_evaluated",
+          "sampleCount": 30,
+          "expectedCount": 30,
+          "missingCount": 0,
+          "samplingPolicy": "all completed frames in this summary interval",
+          "p50": 9.900000005960464,
+          "p95": 11.799999997019768,
+          "p99": 11.800000004470348,
+          "max": 11.800000004470348
+        },
+        "gpu": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "incomplete",
+          "gate": "not_evaluated",
+          "sampleCount": 1,
+          "expectedCount": 1,
+          "missingCount": 0,
+          "samplingPolicy": "one in 30 frames (frame IDs 1,31,61,...)",
+          "reason": "GPU copies, uploads or clears outside passes are excluded",
+          "p50": 0.524288,
+          "p95": 0.524288,
+          "p99": 0.524288,
+          "max": 0.524288,
+          "timestampQuerySupported": true,
+          "timestampQueryEnabled": true,
+          "failedSamples": 0,
+          "droppedSamples": 0,
+          "pendingSamples": 0
+        }
+      }
+    },
+    "capabilities": {
+      "protocolVersion": 2,
+      "supportedSdkVersions": [
+        "0.1.0",
+        "0.2.0",
+        "0.4.0"
+      ],
+      "codeDeclaredParameters": true,
+      "parameterKinds": [
+        "number"
+      ],
+      "maxParameters": 32,
+      "imageFormats": [
+        "image/bmp",
+        "image/png",
+        "image/jpeg"
+      ],
+      "assetExport": true,
+      "sceneVersions": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    "studioSession": {
+      "profile": "test-40c26b47-8669-42e5-a5bd-15607967a8ac",
+      "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\graph-ports-122",
+      "sessionId": "9b9079ce65579fbd2bf600f33d94c1c105a0",
+      "pid": 14040
+    }
+  },
+  "after": {
+    "connection": "connected",
+    "message": null,
+    "receivedAtMs": 1789371076276,
+    "authoring": {
+      "instanceId": "9804e568-0680-48a1-a0df-9fac9276980c",
+      "generation": 2,
+      "revisionId": "d944381cc67a70042873f6b0138042590508197c6c53060c40b1ad5109dffe8d",
+      "composition": {
+        "version": 1,
+        "declaration": {
+          "definitions": {
+            "instrument": "shared/observatory/instrument.ts",
+            "prism": "effects/prism.ts"
+          },
+          "nodes": [
+            {
+              "id": "48a7d856-2cb2-4779-b756-0ba156718321",
+              "definition": "instrument"
+            },
+            {
+              "id": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+              "definition": "prism"
+            },
+            {
+              "id": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+              "definition": "prism"
+            }
+          ],
+          "edges": [
+            {
+              "id": "1aa3d8c0-a9ca-47ef-ab77-c3e49f5e240a",
+              "from": {
+                "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                "portId": "image"
+              },
+              "to": {
+                "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                "portId": "image"
+              },
+              "delay": "none"
+            },
+            {
+              "id": "3aa3d8c0-a9ca-47ef-ab77-c3e49f5e240a",
+              "from": {
+                "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                "portId": "image"
+              },
+              "to": {
+                "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                "portId": "image"
+              },
+              "delay": "none"
+            }
+          ],
+          "output": {
+            "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+            "portId": "image"
+          },
+          "expose": [
+            {
+              "id": "orbitSpeed",
+              "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+              "controlId": "speed"
+            },
+            {
+              "id": "ringExpansion",
+              "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+              "controlId": "spread"
+            },
+            {
+              "id": "gimbalTilt",
+              "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+              "controlId": "twist"
+            },
+            {
+              "id": "spectrum",
+              "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+              "controlId": "hue"
+            },
+            {
+              "id": "innerSplit",
+              "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+              "controlId": "split"
+            },
+            {
+              "id": "innerGlow",
+              "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+              "controlId": "glow"
+            },
+            {
+              "id": "innerRadius",
+              "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+              "controlId": "radius"
+            },
+            {
+              "id": "outerSplit",
+              "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+              "controlId": "split"
+            },
+            {
+              "id": "outerGlow",
+              "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+              "controlId": "glow"
+            },
+            {
+              "id": "outerRadius",
+              "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+              "controlId": "radius"
+            }
+          ]
+        },
+        "definitionNames": {
+          "instrument": "e3dff0e7a6f1ce837ce4b3e6df928c7772654d20c0c5adc25d5069b90c91caa1",
+          "prism": "12ad06cc5ed58252176c4762b38b90fdd4675b7bfa28d7159c1384157255dc51"
+        },
+        "moduleDeclarations": {
+          "0c3da39f7cb1467a76b78938c17700c7811fa29c135032a49b6a9d573e6bb601": {
+            "modulePath": "observatory.ts",
+            "definitionNames": {
+              "instrument": "e3dff0e7a6f1ce837ce4b3e6df928c7772654d20c0c5adc25d5069b90c91caa1",
+              "prism": "12ad06cc5ed58252176c4762b38b90fdd4675b7bfa28d7159c1384157255dc51"
+            },
+            "declaration": {
+              "definitions": {
+                "instrument": "shared/observatory/instrument.ts",
+                "prism": "effects/prism.ts"
+              },
+              "nodes": [
+                {
+                  "id": "48a7d856-2cb2-4779-b756-0ba156718321",
+                  "definition": "instrument"
+                },
+                {
+                  "id": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                  "definition": "prism"
+                },
+                {
+                  "id": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                  "definition": "prism"
+                }
+              ],
+              "edges": [
+                {
+                  "id": "1aa3d8c0-a9ca-47ef-ab77-c3e49f5e240a",
+                  "from": {
+                    "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                    "portId": "image"
+                  },
+                  "to": {
+                    "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                    "portId": "image"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "3aa3d8c0-a9ca-47ef-ab77-c3e49f5e240a",
+                  "from": {
+                    "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                    "portId": "image"
+                  },
+                  "to": {
+                    "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                    "portId": "image"
+                  },
+                  "delay": "none"
+                }
+              ],
+              "output": {
+                "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                "portId": "image"
+              },
+              "expose": [
+                {
+                  "id": "orbitSpeed",
+                  "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                  "controlId": "speed"
+                },
+                {
+                  "id": "ringExpansion",
+                  "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                  "controlId": "spread"
+                },
+                {
+                  "id": "gimbalTilt",
+                  "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                  "controlId": "twist"
+                },
+                {
+                  "id": "spectrum",
+                  "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                  "controlId": "hue"
+                },
+                {
+                  "id": "innerSplit",
+                  "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                  "controlId": "split"
+                },
+                {
+                  "id": "innerGlow",
+                  "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                  "controlId": "glow"
+                },
+                {
+                  "id": "innerRadius",
+                  "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                  "controlId": "radius"
+                },
+                {
+                  "id": "outerSplit",
+                  "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                  "controlId": "split"
+                },
+                {
+                  "id": "outerGlow",
+                  "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                  "controlId": "glow"
+                },
+                {
+                  "id": "outerRadius",
+                  "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                  "controlId": "radius"
+                }
+              ]
+            }
+          }
+        },
+        "graph": {
+          "version": 2,
+          "rootDefinitionHash": "0c3da39f7cb1467a76b78938c17700c7811fa29c135032a49b6a9d573e6bb601",
+          "outputPort": "image"
+        },
+        "definitions": {
+          "0c3da39f7cb1467a76b78938c17700c7811fa29c135032a49b6a9d573e6bb601": {
+            "kind": "graph",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "lux/image-composition",
+              "label": "Image composition",
+              "description": "Authored image component chain",
+              "tags": [],
+              "inputs": {},
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Image"
+                }
+              },
+              "controls": [
+                {
+                  "id": "orbitSpeed",
+                  "type": "number",
+                  "label": "Orbit speed",
+                  "default": 0.35,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "Speed of the nested orbital assemblies. Zero freezes orbital rotation.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "ringExpansion",
+                  "type": "number",
+                  "label": "Ring expansion",
+                  "default": 1,
+                  "min": 0.6,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "Radius of the orbital rings around the crystalline core.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "gimbalTilt",
+                  "type": "number",
+                  "label": "Gimbal tilt",
+                  "default": 0.65,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "Inclination of each nested gimbal assembly.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "spectrum",
+                  "type": "number",
+                  "label": "Spectrum",
+                  "default": 0.53,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Base hue of the instrument, offset around each orbital assembly.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "innerSplit",
+                  "type": "number",
+                  "label": "Spectral split",
+                  "default": 0.002,
+                  "min": 0,
+                  "max": 0.03,
+                  "step": 0.001,
+                  "description": "Separates red and blue channels across the image. This instance is independent of the other lens.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "innerGlow",
+                  "type": "number",
+                  "label": "Halo strength",
+                  "default": 0.45,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "Adds a soft four-direction light halo.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "innerRadius",
+                  "type": "number",
+                  "label": "Halo radius",
+                  "default": 0.004,
+                  "min": 0.001,
+                  "max": 0.025,
+                  "step": 0.001,
+                  "description": "Distance used to spread the halo around bright lines.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "outerSplit",
+                  "type": "number",
+                  "label": "Spectral split",
+                  "default": 0.002,
+                  "min": 0,
+                  "max": 0.03,
+                  "step": 0.001,
+                  "description": "Separates red and blue channels across the image. This instance is independent of the other lens.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "outerGlow",
+                  "type": "number",
+                  "label": "Halo strength",
+                  "default": 0.45,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "Adds a soft four-direction light halo.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "outerRadius",
+                  "type": "number",
+                  "label": "Halo radius",
+                  "default": 0.004,
+                  "min": 0.001,
+                  "max": 0.025,
+                  "step": 0.001,
+                  "description": "Distance used to spread the halo around bright lines.",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "gimbalTilt": "Inclination of each nested gimbal assembly.",
+                "innerGlow": "Adds a soft four-direction light halo.",
+                "innerRadius": "Distance used to spread the halo around bright lines.",
+                "innerSplit": "Separates red and blue channels across the image. This instance is independent of the other lens.",
+                "orbitSpeed": "Speed of the nested orbital assemblies. Zero freezes orbital rotation.",
+                "outerGlow": "Adds a soft four-direction light halo.",
+                "outerRadius": "Distance used to spread the halo around bright lines.",
+                "outerSplit": "Separates red and blue channels across the image. This instance is independent of the other lens.",
+                "ringExpansion": "Radius of the orbital rings around the crystalline core.",
+                "spectrum": "Base hue of the instrument, offset around each orbital assembly."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            },
+            "body": {
+              "nodes": [
+                {
+                  "id": "48a7d856-2cb2-4779-b756-0ba156718321",
+                  "definitionHash": "e3dff0e7a6f1ce837ce4b3e6df928c7772654d20c0c5adc25d5069b90c91caa1",
+                  "controlDefaults": {}
+                },
+                {
+                  "id": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                  "definitionHash": "12ad06cc5ed58252176c4762b38b90fdd4675b7bfa28d7159c1384157255dc51",
+                  "controlDefaults": {}
+                },
+                {
+                  "id": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                  "definitionHash": "12ad06cc5ed58252176c4762b38b90fdd4675b7bfa28d7159c1384157255dc51",
+                  "controlDefaults": {}
+                }
+              ],
+              "edges": [
+                {
+                  "id": "1aa3d8c0-a9ca-47ef-ab77-c3e49f5e240a",
+                  "from": {
+                    "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                    "portId": "image"
+                  },
+                  "to": {
+                    "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                    "portId": "image"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "3aa3d8c0-a9ca-47ef-ab77-c3e49f5e240a",
+                  "from": {
+                    "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                    "portId": "image"
+                  },
+                  "to": {
+                    "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                    "portId": "image"
+                  },
+                  "delay": "none"
+                }
+              ],
+              "inputBindings": {},
+              "outputBindings": {
+                "image": {
+                  "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                  "portId": "image"
+                }
+              },
+              "controlBindings": {
+                "gimbalTilt": [
+                  {
+                    "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                    "controlId": "twist"
+                  }
+                ],
+                "innerGlow": [
+                  {
+                    "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                    "controlId": "glow"
+                  }
+                ],
+                "innerRadius": [
+                  {
+                    "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                    "controlId": "radius"
+                  }
+                ],
+                "innerSplit": [
+                  {
+                    "nodeId": "c61a5b8f-d522-4f50-b7fb-c6c64976a638",
+                    "controlId": "split"
+                  }
+                ],
+                "orbitSpeed": [
+                  {
+                    "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                    "controlId": "speed"
+                  }
+                ],
+                "outerGlow": [
+                  {
+                    "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                    "controlId": "glow"
+                  }
+                ],
+                "outerRadius": [
+                  {
+                    "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                    "controlId": "radius"
+                  }
+                ],
+                "outerSplit": [
+                  {
+                    "nodeId": "831d46b4-3f11-4f9d-a89b-9f4fbe535621",
+                    "controlId": "split"
+                  }
+                ],
+                "ringExpansion": [
+                  {
+                    "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                    "controlId": "spread"
+                  }
+                ],
+                "spectrum": [
+                  {
+                    "nodeId": "48a7d856-2cb2-4779-b756-0ba156718321",
+                    "controlId": "hue"
+                  }
+                ]
+              }
+            }
+          },
+          "12ad06cc5ed58252176c4762b38b90fdd4675b7bfa28d7159c1384157255dc51": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "observatory/prism",
+              "label": "Prism lens",
+              "description": "Reusable image lens. Each instance has independent spectral split and halo controls.",
+              "tags": [
+                "effect"
+              ],
+              "inputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Linear light image"
+                }
+              },
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Linear light image"
+                }
+              },
+              "controls": [
+                {
+                  "id": "split",
+                  "type": "number",
+                  "label": "Spectral split",
+                  "default": 0.002,
+                  "min": 0,
+                  "max": 0.03,
+                  "step": 0.001,
+                  "changeCost": "live"
+                },
+                {
+                  "id": "glow",
+                  "type": "number",
+                  "label": "Halo strength",
+                  "default": 0.45,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "changeCost": "live"
+                },
+                {
+                  "id": "radius",
+                  "type": "number",
+                  "label": "Halo radius",
+                  "default": 0.004,
+                  "min": 0.001,
+                  "max": 0.025,
+                  "step": 0.001,
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "glow": "Adds a soft four-direction light halo.",
+                "radius": "Distance used to spread the halo around bright lines.",
+                "split": "Separates red and blue channels across the image. This instance is independent of the other lens."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            }
+          },
+          "e3dff0e7a6f1ce837ce4b3e6df928c7772654d20c0c5adc25d5069b90c91caa1": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "observatory/orbital-instrument",
+              "label": "Orbital instrument",
+              "description": "Nested armillary rings, orbiting satellites and a luminous crystalline heart.",
+              "tags": [
+                "generative",
+                "space"
+              ],
+              "inputs": {},
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Linear light image"
+                }
+              },
+              "controls": [
+                {
+                  "id": "speed",
+                  "type": "number",
+                  "label": "Orbit speed",
+                  "default": 0.35,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "changeCost": "live"
+                },
+                {
+                  "id": "spread",
+                  "type": "number",
+                  "label": "Ring expansion",
+                  "default": 1,
+                  "min": 0.6,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "changeCost": "live"
+                },
+                {
+                  "id": "twist",
+                  "type": "number",
+                  "label": "Gimbal tilt",
+                  "default": 0.65,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "changeCost": "live"
+                },
+                {
+                  "id": "hue",
+                  "type": "number",
+                  "label": "Spectrum",
+                  "default": 0.53,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "hue": "Base hue of the instrument, offset around each orbital assembly.",
+                "speed": "Speed of the nested orbital assemblies. Zero freezes orbital rotation.",
+                "spread": "Radius of the orbital rings around the crystalline core.",
+                "twist": "Inclination of each nested gimbal assembly."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            }
+          }
+        },
+        "publicControls": [
+          {
+            "id": "orbitSpeed",
+            "type": "number",
+            "label": "Orbit speed",
+            "default": 0.35,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "description": "Speed of the nested orbital assemblies. Zero freezes orbital rotation.",
+            "changeCost": "live"
+          },
+          {
+            "id": "ringExpansion",
+            "type": "number",
+            "label": "Ring expansion",
+            "default": 1,
+            "min": 0.6,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "Radius of the orbital rings around the crystalline core.",
+            "changeCost": "live"
+          },
+          {
+            "id": "gimbalTilt",
+            "type": "number",
+            "label": "Gimbal tilt",
+            "default": 0.65,
+            "min": 0,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "Inclination of each nested gimbal assembly.",
+            "changeCost": "live"
+          },
+          {
+            "id": "spectrum",
+            "type": "number",
+            "label": "Spectrum",
+            "default": 0.53,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "Base hue of the instrument, offset around each orbital assembly.",
+            "changeCost": "live"
+          },
+          {
+            "id": "innerSplit",
+            "type": "number",
+            "label": "Spectral split",
+            "default": 0.002,
+            "min": 0,
+            "max": 0.03,
+            "step": 0.001,
+            "description": "Separates red and blue channels across the image. This instance is independent of the other lens.",
+            "changeCost": "live"
+          },
+          {
+            "id": "innerGlow",
+            "type": "number",
+            "label": "Halo strength",
+            "default": 0.45,
+            "min": 0,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "Adds a soft four-direction light halo.",
+            "changeCost": "live"
+          },
+          {
+            "id": "innerRadius",
+            "type": "number",
+            "label": "Halo radius",
+            "default": 0.004,
+            "min": 0.001,
+            "max": 0.025,
+            "step": 0.001,
+            "description": "Distance used to spread the halo around bright lines.",
+            "changeCost": "live"
+          },
+          {
+            "id": "outerSplit",
+            "type": "number",
+            "label": "Spectral split",
+            "default": 0.002,
+            "min": 0,
+            "max": 0.03,
+            "step": 0.001,
+            "description": "Separates red and blue channels across the image. This instance is independent of the other lens.",
+            "changeCost": "live"
+          },
+          {
+            "id": "outerGlow",
+            "type": "number",
+            "label": "Halo strength",
+            "default": 0.45,
+            "min": 0,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "Adds a soft four-direction light halo.",
+            "changeCost": "live"
+          },
+          {
+            "id": "outerRadius",
+            "type": "number",
+            "label": "Halo radius",
+            "default": 0.004,
+            "min": 0.001,
+            "max": 0.025,
+            "step": 0.001,
+            "description": "Distance used to spread the halo around bright lines.",
+            "changeCost": "live"
+          }
+        ],
+        "publicControlBindings": {
+          "orbitSpeed": [
+            {
+              "nodePath": [
+                "48a7d856-2cb2-4779-b756-0ba156718321"
+              ],
+              "controlId": "speed",
+              "active": true
+            }
+          ],
+          "ringExpansion": [
+            {
+              "nodePath": [
+                "48a7d856-2cb2-4779-b756-0ba156718321"
+              ],
+              "controlId": "spread",
+              "active": true
+            }
+          ],
+          "gimbalTilt": [
+            {
+              "nodePath": [
+                "48a7d856-2cb2-4779-b756-0ba156718321"
+              ],
+              "controlId": "twist",
+              "active": true
+            }
+          ],
+          "spectrum": [
+            {
+              "nodePath": [
+                "48a7d856-2cb2-4779-b756-0ba156718321"
+              ],
+              "controlId": "hue",
+              "active": true
+            }
+          ],
+          "innerSplit": [
+            {
+              "nodePath": [
+                "c61a5b8f-d522-4f50-b7fb-c6c64976a638"
+              ],
+              "controlId": "split",
+              "active": true
+            }
+          ],
+          "innerGlow": [
+            {
+              "nodePath": [
+                "c61a5b8f-d522-4f50-b7fb-c6c64976a638"
+              ],
+              "controlId": "glow",
+              "active": true
+            }
+          ],
+          "innerRadius": [
+            {
+              "nodePath": [
+                "c61a5b8f-d522-4f50-b7fb-c6c64976a638"
+              ],
+              "controlId": "radius",
+              "active": true
+            }
+          ],
+          "outerSplit": [
+            {
+              "nodePath": [
+                "831d46b4-3f11-4f9d-a89b-9f4fbe535621"
+              ],
+              "controlId": "split",
+              "active": true
+            }
+          ],
+          "outerGlow": [
+            {
+              "nodePath": [
+                "831d46b4-3f11-4f9d-a89b-9f4fbe535621"
+              ],
+              "controlId": "glow",
+              "active": true
+            }
+          ],
+          "outerRadius": [
+            {
+              "nodePath": [
+                "831d46b4-3f11-4f9d-a89b-9f4fbe535621"
+              ],
+              "controlId": "radius",
+              "active": true
+            }
+          ]
+        },
+        "nodes": [
+          {
+            "nodePath": [
+              "48a7d856-2cb2-4779-b756-0ba156718321"
+            ],
+            "definitionHash": "e3dff0e7a6f1ce837ce4b3e6df928c7772654d20c0c5adc25d5069b90c91caa1",
+            "schema": [
+              {
+                "id": "speed",
+                "type": "number",
+                "label": "Orbit speed",
+                "default": 0.35,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "spread",
+                "type": "number",
+                "label": "Ring expansion",
+                "default": 1,
+                "min": 0.6,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "twist",
+                "type": "number",
+                "label": "Gimbal tilt",
+                "default": 0.65,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "hue",
+                "type": "number",
+                "label": "Spectrum",
+                "default": 0.53,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "3bc2ab20b41dff79ec431c8487fc2fa4b7d580206e7a24266c0d0bb1e9a14da0"
+          },
+          {
+            "nodePath": [
+              "c61a5b8f-d522-4f50-b7fb-c6c64976a638"
+            ],
+            "definitionHash": "12ad06cc5ed58252176c4762b38b90fdd4675b7bfa28d7159c1384157255dc51",
+            "schema": [
+              {
+                "id": "split",
+                "type": "number",
+                "label": "Spectral split",
+                "default": 0.002,
+                "min": 0,
+                "max": 0.03,
+                "step": 0.001,
+                "changeCost": "live"
+              },
+              {
+                "id": "glow",
+                "type": "number",
+                "label": "Halo strength",
+                "default": 0.45,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "radius",
+                "type": "number",
+                "label": "Halo radius",
+                "default": 0.004,
+                "min": 0.001,
+                "max": 0.025,
+                "step": 0.001,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "cc0915d22dae0b34ba850155bdcbc1270935cbe51a51503faf2688f78a6201e5"
+          },
+          {
+            "nodePath": [
+              "831d46b4-3f11-4f9d-a89b-9f4fbe535621"
+            ],
+            "definitionHash": "12ad06cc5ed58252176c4762b38b90fdd4675b7bfa28d7159c1384157255dc51",
+            "schema": [
+              {
+                "id": "split",
+                "type": "number",
+                "label": "Spectral split",
+                "default": 0.002,
+                "min": 0,
+                "max": 0.03,
+                "step": 0.001,
+                "changeCost": "live"
+              },
+              {
+                "id": "glow",
+                "type": "number",
+                "label": "Halo strength",
+                "default": 0.45,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "radius",
+                "type": "number",
+                "label": "Halo radius",
+                "default": 0.004,
+                "min": 0.001,
+                "max": 0.025,
+                "step": 0.001,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "cc0915d22dae0b34ba850155bdcbc1270935cbe51a51503faf2688f78a6201e5"
+          }
+        ]
+      },
+      "sceneName": "Untitled visual",
+      "authority": "studio",
+      "playback": "paused",
+      "sdkVersion": "0.4.0",
+      "controlSchema": [
+        {
+          "id": "orbitSpeed",
+          "type": "number",
+          "label": "Orbit speed",
+          "default": 0.35,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "Speed of the nested orbital assemblies. Zero freezes orbital rotation.",
+          "changeCost": "live"
+        },
+        {
+          "id": "ringExpansion",
+          "type": "number",
+          "label": "Ring expansion",
+          "default": 1,
+          "min": 0.6,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "Radius of the orbital rings around the crystalline core.",
+          "changeCost": "live"
+        },
+        {
+          "id": "gimbalTilt",
+          "type": "number",
+          "label": "Gimbal tilt",
+          "default": 0.65,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "Inclination of each nested gimbal assembly.",
+          "changeCost": "live"
+        },
+        {
+          "id": "spectrum",
+          "type": "number",
+          "label": "Spectrum",
+          "default": 0.53,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Base hue of the instrument, offset around each orbital assembly.",
+          "changeCost": "live"
+        },
+        {
+          "id": "innerSplit",
+          "type": "number",
+          "label": "Spectral split",
+          "default": 0.002,
+          "min": 0,
+          "max": 0.03,
+          "step": 0.001,
+          "description": "Separates red and blue channels across the image. This instance is independent of the other lens.",
+          "changeCost": "live"
+        },
+        {
+          "id": "innerGlow",
+          "type": "number",
+          "label": "Halo strength",
+          "default": 0.45,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "Adds a soft four-direction light halo.",
+          "changeCost": "live"
+        },
+        {
+          "id": "innerRadius",
+          "type": "number",
+          "label": "Halo radius",
+          "default": 0.004,
+          "min": 0.001,
+          "max": 0.025,
+          "step": 0.001,
+          "description": "Distance used to spread the halo around bright lines.",
+          "changeCost": "live"
+        },
+        {
+          "id": "outerSplit",
+          "type": "number",
+          "label": "Spectral split",
+          "default": 0.002,
+          "min": 0,
+          "max": 0.03,
+          "step": 0.001,
+          "description": "Separates red and blue channels across the image. This instance is independent of the other lens.",
+          "changeCost": "live"
+        },
+        {
+          "id": "outerGlow",
+          "type": "number",
+          "label": "Halo strength",
+          "default": 0.45,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "Adds a soft four-direction light halo.",
+          "changeCost": "live"
+        },
+        {
+          "id": "outerRadius",
+          "type": "number",
+          "label": "Halo radius",
+          "default": 0.004,
+          "min": 0.001,
+          "max": 0.025,
+          "step": 0.001,
+          "description": "Distance used to spread the halo around bright lines.",
+          "changeCost": "live"
+        }
+      ],
+      "controlSchemaHash": "cfb03551c212e25e7fa941175ead1efcff94c52f0b87618e4ddeb317663a6154",
+      "controls": {
+        "orbitSpeed": 0.35,
+        "ringExpansion": 1,
+        "gimbalTilt": 0.65,
+        "spectrum": 0.53,
+        "innerSplit": 0.002,
+        "innerGlow": 0.45,
+        "innerRadius": 0.004,
+        "outerSplit": 0.002,
+        "outerGlow": 0.45,
+        "outerRadius": 0.004
+      },
+      "controlSequence": 0,
+      "nodeControls": {
+        "sourceHash": "d944381cc67a70042873f6b0138042590508197c6c53060c40b1ad5109dffe8d",
+        "nodes": [
+          {
+            "nodePath": [
+              "48a7d856-2cb2-4779-b756-0ba156718321"
+            ],
+            "definitionHash": "e3dff0e7a6f1ce837ce4b3e6df928c7772654d20c0c5adc25d5069b90c91caa1",
+            "schema": [
+              {
+                "id": "speed",
+                "type": "number",
+                "label": "Orbit speed",
+                "default": 0.35,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "spread",
+                "type": "number",
+                "label": "Ring expansion",
+                "default": 1,
+                "min": 0.6,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "twist",
+                "type": "number",
+                "label": "Gimbal tilt",
+                "default": 0.65,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "hue",
+                "type": "number",
+                "label": "Spectrum",
+                "default": 0.53,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "3bc2ab20b41dff79ec431c8487fc2fa4b7d580206e7a24266c0d0bb1e9a14da0",
+            "values": {
+              "speed": 0.35,
+              "spread": 1,
+              "twist": 0.65,
+              "hue": 0.53
+            }
+          },
+          {
+            "nodePath": [
+              "c61a5b8f-d522-4f50-b7fb-c6c64976a638"
+            ],
+            "definitionHash": "12ad06cc5ed58252176c4762b38b90fdd4675b7bfa28d7159c1384157255dc51",
+            "schema": [
+              {
+                "id": "split",
+                "type": "number",
+                "label": "Spectral split",
+                "default": 0.002,
+                "min": 0,
+                "max": 0.03,
+                "step": 0.001,
+                "changeCost": "live"
+              },
+              {
+                "id": "glow",
+                "type": "number",
+                "label": "Halo strength",
+                "default": 0.45,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "radius",
+                "type": "number",
+                "label": "Halo radius",
+                "default": 0.004,
+                "min": 0.001,
+                "max": 0.025,
+                "step": 0.001,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "cc0915d22dae0b34ba850155bdcbc1270935cbe51a51503faf2688f78a6201e5",
+            "values": {
+              "split": 0.002,
+              "glow": 0.45,
+              "radius": 0.004
+            }
+          },
+          {
+            "nodePath": [
+              "831d46b4-3f11-4f9d-a89b-9f4fbe535621"
+            ],
+            "definitionHash": "12ad06cc5ed58252176c4762b38b90fdd4675b7bfa28d7159c1384157255dc51",
+            "schema": [
+              {
+                "id": "split",
+                "type": "number",
+                "label": "Spectral split",
+                "default": 0.002,
+                "min": 0,
+                "max": 0.03,
+                "step": 0.001,
+                "changeCost": "live"
+              },
+              {
+                "id": "glow",
+                "type": "number",
+                "label": "Halo strength",
+                "default": 0.45,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "radius",
+                "type": "number",
+                "label": "Halo radius",
+                "default": 0.004,
+                "min": 0.001,
+                "max": 0.025,
+                "step": 0.001,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "cc0915d22dae0b34ba850155bdcbc1270935cbe51a51503faf2688f78a6201e5",
+            "values": {
+              "split": 0.002,
+              "glow": 0.45,
+              "radius": 0.004
+            }
+          }
+        ]
+      },
+      "controlAnimations": [],
+      "controlAnimationIssues": [],
+      "animationSequence": 0,
+      "effectiveNodeControls": {
+        "sourceHash": "d944381cc67a70042873f6b0138042590508197c6c53060c40b1ad5109dffe8d",
+        "nodes": [
+          {
+            "nodePath": [
+              "48a7d856-2cb2-4779-b756-0ba156718321"
+            ],
+            "definitionHash": "e3dff0e7a6f1ce837ce4b3e6df928c7772654d20c0c5adc25d5069b90c91caa1",
+            "schema": [
+              {
+                "id": "speed",
+                "type": "number",
+                "label": "Orbit speed",
+                "default": 0.35,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "spread",
+                "type": "number",
+                "label": "Ring expansion",
+                "default": 1,
+                "min": 0.6,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "twist",
+                "type": "number",
+                "label": "Gimbal tilt",
+                "default": 0.65,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "hue",
+                "type": "number",
+                "label": "Spectrum",
+                "default": 0.53,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "3bc2ab20b41dff79ec431c8487fc2fa4b7d580206e7a24266c0d0bb1e9a14da0",
+            "values": {
+              "speed": 0.35,
+              "spread": 1,
+              "twist": 0.65,
+              "hue": 0.53
+            }
+          },
+          {
+            "nodePath": [
+              "c61a5b8f-d522-4f50-b7fb-c6c64976a638"
+            ],
+            "definitionHash": "12ad06cc5ed58252176c4762b38b90fdd4675b7bfa28d7159c1384157255dc51",
+            "schema": [
+              {
+                "id": "split",
+                "type": "number",
+                "label": "Spectral split",
+                "default": 0.002,
+                "min": 0,
+                "max": 0.03,
+                "step": 0.001,
+                "changeCost": "live"
+              },
+              {
+                "id": "glow",
+                "type": "number",
+                "label": "Halo strength",
+                "default": 0.45,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "radius",
+                "type": "number",
+                "label": "Halo radius",
+                "default": 0.004,
+                "min": 0.001,
+                "max": 0.025,
+                "step": 0.001,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "cc0915d22dae0b34ba850155bdcbc1270935cbe51a51503faf2688f78a6201e5",
+            "values": {
+              "split": 0.002,
+              "glow": 0.45,
+              "radius": 0.004
+            }
+          },
+          {
+            "nodePath": [
+              "831d46b4-3f11-4f9d-a89b-9f4fbe535621"
+            ],
+            "definitionHash": "12ad06cc5ed58252176c4762b38b90fdd4675b7bfa28d7159c1384157255dc51",
+            "schema": [
+              {
+                "id": "split",
+                "type": "number",
+                "label": "Spectral split",
+                "default": 0.002,
+                "min": 0,
+                "max": 0.03,
+                "step": 0.001,
+                "changeCost": "live"
+              },
+              {
+                "id": "glow",
+                "type": "number",
+                "label": "Halo strength",
+                "default": 0.45,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "changeCost": "live"
+              },
+              {
+                "id": "radius",
+                "type": "number",
+                "label": "Halo radius",
+                "default": 0.004,
+                "min": 0.001,
+                "max": 0.025,
+                "step": 0.001,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "cc0915d22dae0b34ba850155bdcbc1270935cbe51a51503faf2688f78a6201e5",
+            "values": {
+              "split": 0.002,
+              "glow": 0.45,
+              "radius": 0.004
+            }
+          }
+        ]
+      },
+      "controlMigration": [],
+      "clockEpoch": 0,
+      "timeSeconds": 0.7672000000029803,
+      "frameId": "28",
+      "output": {
+        "width": 1920,
+        "height": 1080,
+        "fps": 60,
+        "seed": 0
+      },
+      "fault": null
+    },
+    "host": null,
+    "jobs": [
+      {
+        "jobId": "3ed59afc-714c-405a-9f9c-44a3daaefd4c",
+        "state": "succeeded",
+        "summary": "Visual is ready in Lux."
+      }
+    ],
+    "visualFps": null,
+    "uiFps": null,
+    "performance": {
+      "owner": {
+        "instanceId": "9804e568-0680-48a1-a0df-9fac9276980c",
+        "generation": 2,
+        "revisionId": "d944381cc67a70042873f6b0138042590508197c6c53060c40b1ad5109dffe8d"
+      },
+      "status": "live",
+      "observedAtMs": 19251.10000000149,
+      "worker": {
+        "schemaVersion": 1,
+        "mode": "routine",
+        "clockDomain": "dedicated-worker-monotonic-ms",
+        "sequence": 1,
+        "windowStartMs": 399.5,
+        "windowEndMs": 900.7000000029802,
+        "lostRecords": 0,
+        "invalidRecords": 0,
+        "intervalLostRecords": 0,
+        "intervalInvalidRecords": 0,
+        "retainedRecords": 12,
+        "produced": {
+          "unit": "Hz",
+          "availability": "available",
+          "validity": "complete",
+          "gate": "not_evaluated",
+          "sampleCount": 12,
+          "expectedCount": 12,
+          "missingCount": 0,
+          "samplingPolicy": "completed frames over independent summary interval",
+          "value": 23.942537908875988
+        },
+        "update": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "complete",
+          "gate": "not_evaluated",
+          "sampleCount": 12,
+          "expectedCount": 12,
+          "missingCount": 0,
+          "samplingPolicy": "all completed frames in this summary interval",
+          "p50": 0,
+          "p95": 0.29999999701976776,
+          "p99": 0.29999999701976776,
+          "max": 0.29999999701976776
+        },
+        "renderCall": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "complete",
+          "gate": "not_evaluated",
+          "sampleCount": 12,
+          "expectedCount": 12,
+          "missingCount": 0,
+          "samplingPolicy": "all completed frames in this summary interval",
+          "p50": 1.5,
+          "p95": 41.70000000298023,
+          "p99": 41.70000000298023,
+          "max": 41.70000000298023
+        },
+        "cpuCall": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "incomplete",
+          "gate": "not_evaluated",
+          "sampleCount": 12,
+          "expectedCount": 12,
+          "missingCount": 0,
+          "samplingPolicy": "all completed frames in this summary interval",
+          "reason": "Asynchronous render continuation CPU work is not fully measured",
+          "p50": 1.6000000014901161,
+          "p95": 42,
+          "p99": 42,
+          "max": 42
+        },
+        "renderAwait": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "complete",
+          "gate": "not_evaluated",
+          "sampleCount": 12,
+          "expectedCount": 12,
+          "missingCount": 0,
+          "samplingPolicy": "all completed frames in this summary interval",
+          "p50": 3.100000001490116,
+          "p95": 26.19999999552965,
+          "p99": 26.19999999552965,
+          "max": 26.19999999552965
+        },
+        "queueWait": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "complete",
+          "gate": "not_evaluated",
+          "sampleCount": 12,
+          "expectedCount": 12,
+          "missingCount": 0,
+          "samplingPolicy": "all completed frames in this summary interval",
+          "p50": 28.299999997019768,
+          "p95": 57.79999999701977,
+          "p99": 57.79999999701977,
+          "max": 57.79999999701977
+        },
+        "gpu": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "incomplete",
+          "gate": "not_evaluated",
+          "sampleCount": 1,
+          "expectedCount": 1,
+          "missingCount": 0,
+          "samplingPolicy": "one in 30 frames (frame IDs 1,31,61,...)",
+          "reason": "GPU copies, uploads or clears outside passes are excluded",
+          "p50": 11.79648,
+          "p95": 11.79648,
+          "p99": 11.79648,
+          "max": 11.79648,
+          "timestampQuerySupported": true,
+          "timestampQueryEnabled": true,
+          "failedSamples": 0,
+          "droppedSamples": 0,
+          "pendingSamples": 0
+        }
+      }
+    },
+    "capabilities": {
+      "protocolVersion": 2,
+      "supportedSdkVersions": [
+        "0.1.0",
+        "0.2.0",
+        "0.4.0"
+      ],
+      "codeDeclaredParameters": true,
+      "parameterKinds": [
+        "number"
+      ],
+      "maxParameters": 32,
+      "imageFormats": [
+        "image/bmp",
+        "image/png",
+        "image/jpeg"
+      ],
+      "assetExport": true,
+      "sceneVersions": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    "studioSession": {
+      "profile": "test-40c26b47-8669-42e5-a5bd-15607967a8ac",
+      "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\graph-ports-122",
+      "sessionId": "9b9079ce65579fbd2bf600f33d94c1c105a0",
+      "pid": 14040
+    }
+  },
+  "zoom": {
+    "box": {
+      "x": 396,
+      "y": 113.171875,
+      "width": 791,
+      "height": 589.828125
+    },
+    "anchor": {
+      "x": 950,
+      "y": 585
+    },
+    "before": {
+      "x": 35.5,
+      "y": 204.914,
+      "zoom": 1
+    },
+    "after": {
+      "x": -105.143,
+      "y": 132.514,
+      "zoom": 1.27125
+    },
+    "currentBox": {
+      "x": 396,
+      "y": 113.171875,
+      "width": 791,
+      "height": 589.828125
+    }
+  },
+  "portGeometry": [
+    {
+      "startError": 0.00003411968959808029,
+      "endError": 0.0000152587890625
+    },
+    {
+      "startError": 0.0000152587890625,
+      "endError": 0.00003411968959808029
+    }
+  ],
+  "ownedProcessExited": true
+}
