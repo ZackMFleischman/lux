@@ -1,0 +1,1 @@
+Coordinator must run the isolated actual-app smoke. Check Monitor starts false, becomes true after a connected input, returns false after clicking again, and resets false on disconnect. Confirm analyzer activity continues while monitoring is true.
