@@ -1,0 +1,11 @@
+{
+  "launch_id": "8d4a3907-bc91-4bdd-86b7-a268c98a84cf",
+  "epoch": 1,
+  "challenge_generation": 1,
+  "host_id": "/root/readable_source_118",
+  "agent_id": "22657292-0b5b-4bad-baf3-c0b429eb892d",
+  "role": "worker",
+  "scope": "QA and improve the normal Lux creative workflow, then continue the four authorized workstreams. Root is sole coordinator. MIDI is paused for user design discussion.",
+  "skill_version": "layers-v1",
+  "checkpoint": "LUX-118 startup complete; source inspection and implementation await managed readiness and ticket claim."
+}
