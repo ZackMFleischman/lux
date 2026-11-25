@@ -1,0 +1,67 @@
+{
+  "ok": true,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\inter-typography",
+  "sourceCommit": "190d74b8ee2d560df1ce980b0fe579edafd4b11d",
+  "profile": "test-822640b4-ad38-4cec-8af3-5e62051bcbc3",
+  "errors": [],
+  "pid": 32788,
+  "font": {
+    "check400": true,
+    "check500": true,
+    "faces": [
+      {
+        "family": "Inter",
+        "weight": "100 900",
+        "style": "normal",
+        "status": "loaded"
+      }
+    ],
+    "resources": [
+      {
+        "url": "file:///C:/Users/zFlei/repos/lux/.worktrees/inter-typography/apps/studio/dist/assets/InterVariable-AM3KRH5U.woff2",
+        "type": "Font",
+        "mimeType": "application/octet-stream",
+        "lastModified": 1789689493,
+        "contentSize": 352240
+      }
+    ]
+  },
+  "styles": {
+    "body": {
+      "fontFamily": "Inter, \"Segoe UI\", sans-serif",
+      "fontWeight": "400",
+      "fontVariantNumeric": "normal"
+    },
+    "sectionHeading": {
+      "fontFamily": "Inter, \"Segoe UI\", sans-serif",
+      "fontWeight": "500",
+      "fontVariantNumeric": "normal"
+    },
+    "label": {
+      "fontFamily": "Inter, \"Segoe UI\", sans-serif",
+      "fontWeight": "400",
+      "fontVariantNumeric": "normal"
+    },
+    "numericControl": {
+      "fontFamily": "Inter, \"Segoe UI\", sans-serif",
+      "fontWeight": "400",
+      "fontVariantNumeric": "tabular-nums"
+    },
+    "fps": {
+      "fontFamily": "Inter, \"Segoe UI\", sans-serif",
+      "fontWeight": "400",
+      "fontVariantNumeric": "tabular-nums"
+    },
+    "code": {
+      "fontFamily": "Consolas, monospace",
+      "fontWeight": "400",
+      "fontVariantNumeric": "normal"
+    },
+    "menuItem": {
+      "fontFamily": "Inter, \"Segoe UI\", sans-serif",
+      "fontWeight": "400",
+      "fontVariantNumeric": "normal"
+    }
+  },
+  "processExited": true
+}

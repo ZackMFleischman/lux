@@ -1,0 +1,12 @@
+{
+  "commit": "e445637c5a93eb1361038b0144d7809b28c79640",
+  "criteria": "Independently reviewed the submitted Inter packaging, local CSP, typography weights, tabular numeric treatment, code monospace preservation, custom distribution regression test, and isolated native evidence.",
+  "evidence": "Independent review: artifacts/inter-typography/review.md. Native result: artifacts/inter-typography/native/result.json (Inter 400/500 loaded from local emitted WOFF2; computed 400 body/menu, 500 heading, tabular Inspector numeric/FPS, Consolas CodeMirror; owned PID exited). Visual inspection: native/dense-inspector.png and native/file-menu.png. The native run preceded the candidate commit but the implementation byte set was unchanged when e445637c was created, as declared in the submission and independently compared during review. Current landing is a51ad683868d6a73b9f3a57ec137f71bcfcfb0d5 with the identical product diff.",
+  "context_id": "reviewer-session-749d3c54-7cc6-4964-b935-cd86237f9b8e",
+  "checks": {
+    "source_and_ui_review": "pass",
+    "native_font_and_css_evidence": "pass",
+    "focused_build_regression": "pass",
+    "typescript": "pass"
+  }
+}
