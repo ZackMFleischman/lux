@@ -1,0 +1,6 @@
+{
+  "ok": false,
+  "profile": "test-0131d5ce-ee73-4b7c-b0b1-434883fa1281",
+  "checks": [],
+  "error": "Error: ENOENT: no such file or directory, realpath 'C:\\Users\\zFlei\\repos\\lux\\.worktrees\\inspector-horizontal-padding\\node_modules'; retained evidence: C:\\Users\\zFlei\\AppData\\Local\\Temp\\lux-compile-Wn5M9K\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/inspector-horizontal-padding/artifacts/inspector-horizontal-qa.mjs:5:1387\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"
+}

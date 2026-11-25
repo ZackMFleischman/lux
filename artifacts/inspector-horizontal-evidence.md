@@ -1,0 +1,1 @@
+Isolated Studio build passed. Native Dockview capture at 1560x900 used a 260px Inspector host with 245px inner width and 17 controls; the groups, filter match, no-match message, and a real clear-button click passed. Images and raw result: artifacts/inspector-density/run-1789630185695.
