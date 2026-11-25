@@ -1,0 +1,1 @@
+Studio build and focused Inspector group action regression passed. Isolated native Dockview capture at 1560x900 used real Collapse all control groups and Expand all control groups clicks with 17 controls in a 260px host / 245px Inspector. Screenshots and result: artifacts/inspector-density/run-1789631843186.

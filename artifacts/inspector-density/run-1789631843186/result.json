@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "profile": "test-2a559a9b-6bf8-4f23-a69b-f3f7d427736e",
+  "checks": [
+    "dense controls",
+    "collapse all",
+    "expand all"
+  ],
+  "hostWidth": 260,
+  "inspector": {
+    "width": 245,
+    "scroll": 245,
+    "controls": 17
+  }
+}

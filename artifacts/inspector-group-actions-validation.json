@@ -1,0 +1,12 @@
+{
+  "commit": "15f9fc9577fa7c6890b84ae70b87615714b3083f",
+  "criteria": "Reviewed every LUX-204 acceptance criterion against the final source and isolated native Dockview evidence.",
+  "evidence": "Independent source review confirmed the actions appear only when the current schema has groups; setAllGroups clears the query, clears openId to close an animation popover, and updates only disclosure state. It does not mutate controls or bindings. The final isolated run artifacts/inspector-density/run-1789631843186 used profile test-2a559a9b-6bf8-4f23-a69b-f3f7d427736e and real Collapse all / Expand all clicks. Its result records a 260px host, 245px Inspector with no horizontal overflow, and 17 controls. I visually reviewed collapsed and expanded screenshots: both actions fit beside Filter controls, accessible names and tooltip are present, collapsed group rows remain legible, and expansion restores all controls. The submission omitted its structured commit field; this decision records the exact reviewed commit while preserving that handoff omission.",
+  "context_id": "lux-inspector-group-validator-01a09baf",
+  "checks": {
+    "source_scope": "pass",
+    "focused_behavior_regression": "pass",
+    "isolated_native_dockview_ui": "pass",
+    "compact_toolbar_accessibility": "pass"
+  }
+}

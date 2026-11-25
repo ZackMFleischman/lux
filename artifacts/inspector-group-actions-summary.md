@@ -1,0 +1,1 @@
+Compact Inspector controls now collapse or expand every current group. Explicit actions clear any active filter and collapse closes an animation popover. Source commit: 15f9fc9577fa7c6890b84ae70b87615714b3083f.
