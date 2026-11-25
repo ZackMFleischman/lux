@@ -1,0 +1,12 @@
+{
+  "profile": "test-6a557cf3-8785-4a66-8665-81e01d55b988",
+  "root": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\b4f327bd-a84521b3\\resources\\app\\runtime",
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\cosmos-flares\\creative\\cosmos-flares/evidence-1789627117358/optical.png"
+  ],
+  "checks": [
+    "optical: built and captured"
+  ],
+  "ok": true,
+  "pid": 13040
+}

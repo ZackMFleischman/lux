@@ -1,0 +1,1185 @@
+{
+  "draftVersion": 3,
+  "status": {
+    "connection": "connected",
+    "message": null,
+    "receivedAtMs": 1789627605114,
+    "authoring": {
+      "instanceId": "b65793a7-c9cf-4457-9041-077781616143",
+      "generation": 2,
+      "revisionId": "ad27f23cfc8bf8847fd19d291e6c538c22133e7c75a87001d56f32769ed273ff",
+      "composition": {
+        "version": 1,
+        "declaration": {
+          "definitions": {
+            "flare": "diffraction.ts"
+          },
+          "nodes": [
+            {
+              "id": "916e8f01-1111-4111-8111-111111111111",
+              "definition": "flare"
+            }
+          ],
+          "edges": [],
+          "output": {
+            "nodeId": "916e8f01-1111-4111-8111-111111111111",
+            "portId": "image"
+          },
+          "expose": [
+            {
+              "id": "intensity",
+              "nodeId": "916e8f01-1111-4111-8111-111111111111",
+              "controlId": "intensity"
+            },
+            {
+              "id": "size",
+              "nodeId": "916e8f01-1111-4111-8111-111111111111",
+              "controlId": "size"
+            },
+            {
+              "id": "hue",
+              "nodeId": "916e8f01-1111-4111-8111-111111111111",
+              "controlId": "hue"
+            },
+            {
+              "id": "saturation",
+              "nodeId": "916e8f01-1111-4111-8111-111111111111",
+              "controlId": "saturation"
+            },
+            {
+              "id": "x",
+              "nodeId": "916e8f01-1111-4111-8111-111111111111",
+              "controlId": "x"
+            },
+            {
+              "id": "y",
+              "nodeId": "916e8f01-1111-4111-8111-111111111111",
+              "controlId": "y"
+            },
+            {
+              "id": "secondary",
+              "nodeId": "916e8f01-1111-4111-8111-111111111111",
+              "controlId": "secondary"
+            },
+            {
+              "id": "rotation",
+              "nodeId": "916e8f01-1111-4111-8111-111111111111",
+              "controlId": "rotation"
+            }
+          ],
+          "label": "Webb Diffraction Star Study"
+        },
+        "definitionNames": {
+          "flare": "ba49b6a4db3ed655c127633eba709f0ab0585e4a67907f40f494435e62bf2016"
+        },
+        "moduleDeclarations": {
+          "606585a0f035bf99c4f57c366009f4ee2aec72a2b4881b4515a94d58864278e5": {
+            "modulePath": "visual.ts",
+            "definitionNames": {
+              "flare": "ba49b6a4db3ed655c127633eba709f0ab0585e4a67907f40f494435e62bf2016"
+            },
+            "declaration": {
+              "definitions": {
+                "flare": "diffraction.ts"
+              },
+              "nodes": [
+                {
+                  "id": "916e8f01-1111-4111-8111-111111111111",
+                  "definition": "flare"
+                }
+              ],
+              "edges": [],
+              "output": {
+                "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                "portId": "image"
+              },
+              "expose": [
+                {
+                  "id": "intensity",
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "controlId": "intensity"
+                },
+                {
+                  "id": "size",
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "controlId": "size"
+                },
+                {
+                  "id": "hue",
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "controlId": "hue"
+                },
+                {
+                  "id": "saturation",
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "controlId": "saturation"
+                },
+                {
+                  "id": "x",
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "controlId": "x"
+                },
+                {
+                  "id": "y",
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "controlId": "y"
+                },
+                {
+                  "id": "secondary",
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "controlId": "secondary"
+                },
+                {
+                  "id": "rotation",
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "controlId": "rotation"
+                }
+              ],
+              "label": "Webb Diffraction Star Study"
+            }
+          }
+        },
+        "graph": {
+          "version": 2,
+          "rootDefinitionHash": "606585a0f035bf99c4f57c366009f4ee2aec72a2b4881b4515a94d58864278e5",
+          "outputPort": "image"
+        },
+        "definitions": {
+          "606585a0f035bf99c4f57c366009f4ee2aec72a2b4881b4515a94d58864278e5": {
+            "kind": "graph",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "lux/image-composition",
+              "label": "Webb Diffraction Star Study",
+              "description": "Authored image component chain",
+              "tags": [],
+              "inputs": {},
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Image"
+                }
+              },
+              "controls": [
+                {
+                  "id": "intensity",
+                  "type": "number",
+                  "label": "Brightness",
+                  "default": 1,
+                  "min": 0,
+                  "max": 5,
+                  "step": 0.01,
+                  "description": "Light energy; choose a small value for distant stars.",
+                  "group": "Light",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "size",
+                  "type": "number",
+                  "label": "Angular size",
+                  "default": 0.42,
+                  "min": 0.01,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "Radius relative to screen half-height, independent of world distance.",
+                  "group": "Light",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "hue",
+                  "type": "number",
+                  "label": "Tint hue",
+                  "default": 0.6,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Subtle warm or cool source color.",
+                  "group": "Light",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "saturation",
+                  "type": "number",
+                  "label": "Tint saturation",
+                  "default": 0.3,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Color strength; lower values preserve a white-hot core.",
+                  "group": "Light",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "x",
+                  "type": "number",
+                  "label": "Horizontal position",
+                  "default": -0.42,
+                  "min": -1.2,
+                  "max": 1.2,
+                  "step": 0.01,
+                  "description": "Normalized screen position; -1 is left and +1 is right.",
+                  "group": "Position",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "y",
+                  "type": "number",
+                  "label": "Vertical position",
+                  "default": 0.22,
+                  "min": -1.2,
+                  "max": 1.2,
+                  "step": 0.01,
+                  "description": "Normalized screen position; -1 is bottom and +1 is top.",
+                  "group": "Position",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "secondary",
+                  "type": "number",
+                  "label": "Faint secondary spikes",
+                  "default": 0.12,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Optional faint horizontal pair in addition to six primary rays.",
+                  "group": "Optics",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "rotation",
+                  "type": "number",
+                  "label": "Diffraction rotation",
+                  "default": 0,
+                  "min": -3.14159,
+                  "max": 3.14159,
+                  "step": 0.01,
+                  "description": "Rotation of the diffraction pattern in radians.",
+                  "group": "Optics",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "hue": "Subtle warm or cool source color.",
+                "intensity": "Light energy; choose a small value for distant stars.",
+                "rotation": "Rotation of the diffraction pattern in radians.",
+                "saturation": "Color strength; lower values preserve a white-hot core.",
+                "secondary": "Optional faint horizontal pair in addition to six primary rays.",
+                "size": "Radius relative to screen half-height, independent of world distance.",
+                "x": "Normalized screen position; -1 is left and +1 is right.",
+                "y": "Normalized screen position; -1 is bottom and +1 is top."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            },
+            "body": {
+              "nodes": [
+                {
+                  "id": "916e8f01-1111-4111-8111-111111111111",
+                  "definitionHash": "ba49b6a4db3ed655c127633eba709f0ab0585e4a67907f40f494435e62bf2016",
+                  "controlDefaults": {}
+                }
+              ],
+              "edges": [],
+              "inputBindings": {},
+              "outputBindings": {
+                "image": {
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "portId": "image"
+                }
+              },
+              "controlBindings": {
+                "hue": [
+                  {
+                    "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                    "controlId": "hue"
+                  }
+                ],
+                "intensity": [
+                  {
+                    "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                    "controlId": "intensity"
+                  }
+                ],
+                "rotation": [
+                  {
+                    "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                    "controlId": "rotation"
+                  }
+                ],
+                "saturation": [
+                  {
+                    "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                    "controlId": "saturation"
+                  }
+                ],
+                "secondary": [
+                  {
+                    "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                    "controlId": "secondary"
+                  }
+                ],
+                "size": [
+                  {
+                    "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                    "controlId": "size"
+                  }
+                ],
+                "x": [
+                  {
+                    "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                    "controlId": "x"
+                  }
+                ],
+                "y": [
+                  {
+                    "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                    "controlId": "y"
+                  }
+                ]
+              }
+            }
+          },
+          "ba49b6a4db3ed655c127633eba709f0ab0585e4a67907f40f494435e62bf2016": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "lux/diffraction-flare",
+              "label": "Webb Diffraction Star",
+              "description": "Six fine diffraction rays with an independent faint horizontal pair, soft stellar core, and no flashing.",
+              "tags": [
+                "cosmos",
+                "flare",
+                "light"
+              ],
+              "inputs": {},
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Flare",
+                  "description": "Transparent additive flare layer."
+                }
+              },
+              "controls": [
+                {
+                  "id": "intensity",
+                  "type": "number",
+                  "label": "Brightness",
+                  "default": 1,
+                  "min": 0,
+                  "max": 5,
+                  "step": 0.01,
+                  "group": "Light",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "size",
+                  "type": "number",
+                  "label": "Angular size",
+                  "default": 0.42,
+                  "min": 0.01,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "group": "Light",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "hue",
+                  "type": "number",
+                  "label": "Tint hue",
+                  "default": 0.6,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Light",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "saturation",
+                  "type": "number",
+                  "label": "Tint saturation",
+                  "default": 0.3,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Light",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "x",
+                  "type": "number",
+                  "label": "Horizontal position",
+                  "default": -0.42,
+                  "min": -1.2,
+                  "max": 1.2,
+                  "step": 0.01,
+                  "group": "Position",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "y",
+                  "type": "number",
+                  "label": "Vertical position",
+                  "default": 0.22,
+                  "min": -1.2,
+                  "max": 1.2,
+                  "step": 0.01,
+                  "group": "Position",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "secondary",
+                  "type": "number",
+                  "label": "Faint secondary spikes",
+                  "default": 0.12,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Optics",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "rotation",
+                  "type": "number",
+                  "label": "Diffraction rotation",
+                  "default": 0,
+                  "min": -3.14159,
+                  "max": 3.14159,
+                  "step": 0.01,
+                  "group": "Optics",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "hue": "Subtle warm or cool source color.",
+                "intensity": "Light energy; choose a small value for distant stars.",
+                "rotation": "Rotation of the diffraction pattern in radians.",
+                "saturation": "Color strength; lower values preserve a white-hot core.",
+                "secondary": "Optional faint horizontal pair in addition to six primary rays.",
+                "size": "Radius relative to screen half-height, independent of world distance.",
+                "x": "Normalized screen position; -1 is left and +1 is right.",
+                "y": "Normalized screen position; -1 is bottom and +1 is top."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            }
+          }
+        },
+        "publicControls": [
+          {
+            "id": "intensity",
+            "type": "number",
+            "label": "Brightness",
+            "default": 1,
+            "min": 0,
+            "max": 5,
+            "step": 0.01,
+            "description": "Light energy; choose a small value for distant stars.",
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "size",
+            "type": "number",
+            "label": "Angular size",
+            "default": 0.42,
+            "min": 0.01,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "Radius relative to screen half-height, independent of world distance.",
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "hue",
+            "type": "number",
+            "label": "Tint hue",
+            "default": 0.6,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "Subtle warm or cool source color.",
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "saturation",
+            "type": "number",
+            "label": "Tint saturation",
+            "default": 0.3,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "Color strength; lower values preserve a white-hot core.",
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "x",
+            "type": "number",
+            "label": "Horizontal position",
+            "default": -0.42,
+            "min": -1.2,
+            "max": 1.2,
+            "step": 0.01,
+            "description": "Normalized screen position; -1 is left and +1 is right.",
+            "group": "Position",
+            "changeCost": "live"
+          },
+          {
+            "id": "y",
+            "type": "number",
+            "label": "Vertical position",
+            "default": 0.22,
+            "min": -1.2,
+            "max": 1.2,
+            "step": 0.01,
+            "description": "Normalized screen position; -1 is bottom and +1 is top.",
+            "group": "Position",
+            "changeCost": "live"
+          },
+          {
+            "id": "secondary",
+            "type": "number",
+            "label": "Faint secondary spikes",
+            "default": 0.12,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "Optional faint horizontal pair in addition to six primary rays.",
+            "group": "Optics",
+            "changeCost": "live"
+          },
+          {
+            "id": "rotation",
+            "type": "number",
+            "label": "Diffraction rotation",
+            "default": 0,
+            "min": -3.14159,
+            "max": 3.14159,
+            "step": 0.01,
+            "description": "Rotation of the diffraction pattern in radians.",
+            "group": "Optics",
+            "changeCost": "live"
+          }
+        ],
+        "publicControlBindings": {
+          "intensity": [
+            {
+              "nodePath": [
+                "916e8f01-1111-4111-8111-111111111111"
+              ],
+              "controlId": "intensity",
+              "active": true
+            }
+          ],
+          "size": [
+            {
+              "nodePath": [
+                "916e8f01-1111-4111-8111-111111111111"
+              ],
+              "controlId": "size",
+              "active": true
+            }
+          ],
+          "hue": [
+            {
+              "nodePath": [
+                "916e8f01-1111-4111-8111-111111111111"
+              ],
+              "controlId": "hue",
+              "active": true
+            }
+          ],
+          "saturation": [
+            {
+              "nodePath": [
+                "916e8f01-1111-4111-8111-111111111111"
+              ],
+              "controlId": "saturation",
+              "active": true
+            }
+          ],
+          "x": [
+            {
+              "nodePath": [
+                "916e8f01-1111-4111-8111-111111111111"
+              ],
+              "controlId": "x",
+              "active": true
+            }
+          ],
+          "y": [
+            {
+              "nodePath": [
+                "916e8f01-1111-4111-8111-111111111111"
+              ],
+              "controlId": "y",
+              "active": true
+            }
+          ],
+          "secondary": [
+            {
+              "nodePath": [
+                "916e8f01-1111-4111-8111-111111111111"
+              ],
+              "controlId": "secondary",
+              "active": true
+            }
+          ],
+          "rotation": [
+            {
+              "nodePath": [
+                "916e8f01-1111-4111-8111-111111111111"
+              ],
+              "controlId": "rotation",
+              "active": true
+            }
+          ]
+        },
+        "nodes": [
+          {
+            "nodePath": [
+              "916e8f01-1111-4111-8111-111111111111"
+            ],
+            "definitionHash": "ba49b6a4db3ed655c127633eba709f0ab0585e4a67907f40f494435e62bf2016",
+            "schema": [
+              {
+                "id": "intensity",
+                "type": "number",
+                "label": "Brightness",
+                "default": 1,
+                "min": 0,
+                "max": 5,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "size",
+                "type": "number",
+                "label": "Angular size",
+                "default": 0.42,
+                "min": 0.01,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "hue",
+                "type": "number",
+                "label": "Tint hue",
+                "default": 0.6,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "saturation",
+                "type": "number",
+                "label": "Tint saturation",
+                "default": 0.3,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "x",
+                "type": "number",
+                "label": "Horizontal position",
+                "default": -0.42,
+                "min": -1.2,
+                "max": 1.2,
+                "step": 0.01,
+                "group": "Position",
+                "changeCost": "live"
+              },
+              {
+                "id": "y",
+                "type": "number",
+                "label": "Vertical position",
+                "default": 0.22,
+                "min": -1.2,
+                "max": 1.2,
+                "step": 0.01,
+                "group": "Position",
+                "changeCost": "live"
+              },
+              {
+                "id": "secondary",
+                "type": "number",
+                "label": "Faint secondary spikes",
+                "default": 0.12,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Optics",
+                "changeCost": "live"
+              },
+              {
+                "id": "rotation",
+                "type": "number",
+                "label": "Diffraction rotation",
+                "default": 0,
+                "min": -3.14159,
+                "max": 3.14159,
+                "step": 0.01,
+                "group": "Optics",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "9d2105a079d36b943aadeafd70f6befdc3c0aadaf1da358a8d1052a617e51c55"
+          }
+        ]
+      },
+      "sceneName": "Untitled visual",
+      "authority": "studio",
+      "playback": "playing",
+      "sdkVersion": "0.4.0",
+      "controlSchema": [
+        {
+          "id": "intensity",
+          "type": "number",
+          "label": "Brightness",
+          "default": 1,
+          "min": 0,
+          "max": 5,
+          "step": 0.01,
+          "description": "Light energy; choose a small value for distant stars.",
+          "group": "Light",
+          "changeCost": "live"
+        },
+        {
+          "id": "size",
+          "type": "number",
+          "label": "Angular size",
+          "default": 0.42,
+          "min": 0.01,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "Radius relative to screen half-height, independent of world distance.",
+          "group": "Light",
+          "changeCost": "live"
+        },
+        {
+          "id": "hue",
+          "type": "number",
+          "label": "Tint hue",
+          "default": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Subtle warm or cool source color.",
+          "group": "Light",
+          "changeCost": "live"
+        },
+        {
+          "id": "saturation",
+          "type": "number",
+          "label": "Tint saturation",
+          "default": 0.3,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Color strength; lower values preserve a white-hot core.",
+          "group": "Light",
+          "changeCost": "live"
+        },
+        {
+          "id": "x",
+          "type": "number",
+          "label": "Horizontal position",
+          "default": -0.42,
+          "min": -1.2,
+          "max": 1.2,
+          "step": 0.01,
+          "description": "Normalized screen position; -1 is left and +1 is right.",
+          "group": "Position",
+          "changeCost": "live"
+        },
+        {
+          "id": "y",
+          "type": "number",
+          "label": "Vertical position",
+          "default": 0.22,
+          "min": -1.2,
+          "max": 1.2,
+          "step": 0.01,
+          "description": "Normalized screen position; -1 is bottom and +1 is top.",
+          "group": "Position",
+          "changeCost": "live"
+        },
+        {
+          "id": "secondary",
+          "type": "number",
+          "label": "Faint secondary spikes",
+          "default": 0.12,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Optional faint horizontal pair in addition to six primary rays.",
+          "group": "Optics",
+          "changeCost": "live"
+        },
+        {
+          "id": "rotation",
+          "type": "number",
+          "label": "Diffraction rotation",
+          "default": 0,
+          "min": -3.14159,
+          "max": 3.14159,
+          "step": 0.01,
+          "description": "Rotation of the diffraction pattern in radians.",
+          "group": "Optics",
+          "changeCost": "live"
+        }
+      ],
+      "controlSchemaHash": "7c1441116cae5f0394ed10bc55b7a1ddbce6f3990443163d9aed4b30e2d47b99",
+      "controls": {
+        "intensity": 1,
+        "size": 0.42,
+        "hue": 0.6,
+        "saturation": 0.3,
+        "x": -0.42,
+        "y": 0.22,
+        "secondary": 0.12,
+        "rotation": 0
+      },
+      "controlSequence": 0,
+      "nodeControls": {
+        "sourceHash": "ad27f23cfc8bf8847fd19d291e6c538c22133e7c75a87001d56f32769ed273ff",
+        "nodes": [
+          {
+            "nodePath": [
+              "916e8f01-1111-4111-8111-111111111111"
+            ],
+            "definitionHash": "ba49b6a4db3ed655c127633eba709f0ab0585e4a67907f40f494435e62bf2016",
+            "schema": [
+              {
+                "id": "intensity",
+                "type": "number",
+                "label": "Brightness",
+                "default": 1,
+                "min": 0,
+                "max": 5,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "size",
+                "type": "number",
+                "label": "Angular size",
+                "default": 0.42,
+                "min": 0.01,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "hue",
+                "type": "number",
+                "label": "Tint hue",
+                "default": 0.6,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "saturation",
+                "type": "number",
+                "label": "Tint saturation",
+                "default": 0.3,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "x",
+                "type": "number",
+                "label": "Horizontal position",
+                "default": -0.42,
+                "min": -1.2,
+                "max": 1.2,
+                "step": 0.01,
+                "group": "Position",
+                "changeCost": "live"
+              },
+              {
+                "id": "y",
+                "type": "number",
+                "label": "Vertical position",
+                "default": 0.22,
+                "min": -1.2,
+                "max": 1.2,
+                "step": 0.01,
+                "group": "Position",
+                "changeCost": "live"
+              },
+              {
+                "id": "secondary",
+                "type": "number",
+                "label": "Faint secondary spikes",
+                "default": 0.12,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Optics",
+                "changeCost": "live"
+              },
+              {
+                "id": "rotation",
+                "type": "number",
+                "label": "Diffraction rotation",
+                "default": 0,
+                "min": -3.14159,
+                "max": 3.14159,
+                "step": 0.01,
+                "group": "Optics",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "9d2105a079d36b943aadeafd70f6befdc3c0aadaf1da358a8d1052a617e51c55",
+            "values": {
+              "intensity": 1,
+              "size": 0.42,
+              "hue": 0.6,
+              "saturation": 0.3,
+              "x": -0.42,
+              "y": 0.22,
+              "secondary": 0.12,
+              "rotation": 0
+            }
+          }
+        ]
+      },
+      "controlAnimations": [],
+      "controlAnimationIssues": [],
+      "animationSequence": 0,
+      "effectiveControls": {
+        "intensity": 1,
+        "size": 0.42,
+        "hue": 0.6,
+        "saturation": 0.3,
+        "x": -0.42,
+        "y": 0.22,
+        "secondary": 0.12,
+        "rotation": 0
+      },
+      "effectiveNodeControls": {
+        "sourceHash": "ad27f23cfc8bf8847fd19d291e6c538c22133e7c75a87001d56f32769ed273ff",
+        "nodes": [
+          {
+            "nodePath": [
+              "916e8f01-1111-4111-8111-111111111111"
+            ],
+            "definitionHash": "ba49b6a4db3ed655c127633eba709f0ab0585e4a67907f40f494435e62bf2016",
+            "schema": [
+              {
+                "id": "intensity",
+                "type": "number",
+                "label": "Brightness",
+                "default": 1,
+                "min": 0,
+                "max": 5,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "size",
+                "type": "number",
+                "label": "Angular size",
+                "default": 0.42,
+                "min": 0.01,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "hue",
+                "type": "number",
+                "label": "Tint hue",
+                "default": 0.6,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "saturation",
+                "type": "number",
+                "label": "Tint saturation",
+                "default": 0.3,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "x",
+                "type": "number",
+                "label": "Horizontal position",
+                "default": -0.42,
+                "min": -1.2,
+                "max": 1.2,
+                "step": 0.01,
+                "group": "Position",
+                "changeCost": "live"
+              },
+              {
+                "id": "y",
+                "type": "number",
+                "label": "Vertical position",
+                "default": 0.22,
+                "min": -1.2,
+                "max": 1.2,
+                "step": 0.01,
+                "group": "Position",
+                "changeCost": "live"
+              },
+              {
+                "id": "secondary",
+                "type": "number",
+                "label": "Faint secondary spikes",
+                "default": 0.12,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Optics",
+                "changeCost": "live"
+              },
+              {
+                "id": "rotation",
+                "type": "number",
+                "label": "Diffraction rotation",
+                "default": 0,
+                "min": -3.14159,
+                "max": 3.14159,
+                "step": 0.01,
+                "group": "Optics",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "9d2105a079d36b943aadeafd70f6befdc3c0aadaf1da358a8d1052a617e51c55",
+            "values": {
+              "intensity": 1,
+              "size": 0.42,
+              "hue": 0.6,
+              "saturation": 0.3,
+              "x": -0.42,
+              "y": 0.22,
+              "secondary": 0.12,
+              "rotation": 0
+            }
+          }
+        ]
+      },
+      "controlMigration": [],
+      "clockEpoch": 0,
+      "timeSeconds": 0.00019999999925494194,
+      "tempo": {
+        "bpm": 120,
+        "beatPosition": 0.2691999999955296,
+        "beatPhase": 0.2691999999955297,
+        "tempoSequence": 0
+      },
+      "tempoSequence": 0,
+      "frameId": "1",
+      "output": {
+        "width": 1920,
+        "height": 1080,
+        "fps": 60,
+        "seed": 0
+      },
+      "fault": null
+    },
+    "host": null,
+    "jobs": [
+      {
+        "jobId": "7254efe5-0b2d-4ea6-a0d0-6945b0e6ab0f",
+        "state": "succeeded",
+        "summary": "Visual is ready in Lux."
+      }
+    ],
+    "visualFps": null,
+    "uiFps": null,
+    "performance": {
+      "owner": {
+        "instanceId": "b65793a7-c9cf-4457-9041-077781616143",
+        "generation": 2,
+        "revisionId": "ad27f23cfc8bf8847fd19d291e6c538c22133e7c75a87001d56f32769ed273ff"
+      },
+      "status": "pending",
+      "observedAtMs": null,
+      "worker": null
+    },
+    "capabilities": {
+      "protocolVersion": 4,
+      "supportedSdkVersions": [
+        "0.1.0",
+        "0.2.0",
+        "0.4.0"
+      ],
+      "codeDeclaredParameters": true,
+      "parameterKinds": [
+        "number"
+      ],
+      "maxParameterMetadataBytes": 32768,
+      "imageFormats": [
+        "image/bmp",
+        "image/png",
+        "image/jpeg"
+      ],
+      "assetExport": true,
+      "sceneVersions": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "controlVariation": {
+        "stableInstanceKeys": true,
+        "distributions": [
+          "random",
+          "centered",
+          "spread"
+        ]
+      },
+      "tempo": {
+        "manual": true,
+        "tap": true,
+        "bpm": {
+          "min": 20,
+          "max": 300
+        }
+      }
+    }
+  }
+}

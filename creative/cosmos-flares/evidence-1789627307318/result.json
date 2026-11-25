@@ -1,0 +1,14 @@
+{
+  "profile": "test-74b4ca65-a4e0-43cd-91dd-8c1a3adfd0a3",
+  "root": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\b4f327bd-a84521b3\\resources\\app\\runtime",
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\cosmos-flares\\creative\\cosmos-flares/evidence-1789627307318/diffraction.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\cosmos-flares\\creative\\cosmos-flares/evidence-1789627307318/optical.png"
+  ],
+  "checks": [
+    "diffraction: built and captured",
+    "optical: built and captured"
+  ],
+  "ok": true,
+  "pid": 24920
+}

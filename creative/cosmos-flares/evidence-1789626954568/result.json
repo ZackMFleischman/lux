@@ -1,0 +1,9 @@
+{
+  "profile": "test-76d52f4a-ff08-41fb-a252-1a14020d69e8",
+  "root": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\b4f327bd-a84521b3\\resources\\app\\runtime",
+  "screenshots": [],
+  "checks": [],
+  "ok": false,
+  "pid": 29940,
+  "error": "Error: diffraction.ts:54:13 Unexpected token, expected \",\" (54:12)\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/cosmos-flares/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/cosmos-flares/creative/cosmos-flares/verify.mjs:34:19"
+}

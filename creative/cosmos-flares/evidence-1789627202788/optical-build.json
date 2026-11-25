@@ -1,0 +1,1206 @@
+{
+  "draftVersion": 4,
+  "status": {
+    "connection": "connected",
+    "message": null,
+    "receivedAtMs": 1789627230756,
+    "authoring": {
+      "instanceId": "49eb3e11-8d36-4fc0-9b7f-8252bb9ba948",
+      "generation": 3,
+      "revisionId": "204a1c3478e06feaf13f372d4b22ebceae7f3274316a2187dcff9d647d169c4f",
+      "composition": {
+        "version": 1,
+        "declaration": {
+          "definitions": {
+            "flare": "optical.ts"
+          },
+          "nodes": [
+            {
+              "id": "916e8f01-1111-4111-8111-111111111111",
+              "definition": "flare"
+            }
+          ],
+          "edges": [],
+          "output": {
+            "nodeId": "916e8f01-1111-4111-8111-111111111111",
+            "portId": "image"
+          },
+          "expose": [
+            {
+              "id": "intensity",
+              "nodeId": "916e8f01-1111-4111-8111-111111111111",
+              "controlId": "intensity"
+            },
+            {
+              "id": "size",
+              "nodeId": "916e8f01-1111-4111-8111-111111111111",
+              "controlId": "size"
+            },
+            {
+              "id": "hue",
+              "nodeId": "916e8f01-1111-4111-8111-111111111111",
+              "controlId": "hue"
+            },
+            {
+              "id": "saturation",
+              "nodeId": "916e8f01-1111-4111-8111-111111111111",
+              "controlId": "saturation"
+            },
+            {
+              "id": "x",
+              "nodeId": "916e8f01-1111-4111-8111-111111111111",
+              "controlId": "x"
+            },
+            {
+              "id": "y",
+              "nodeId": "916e8f01-1111-4111-8111-111111111111",
+              "controlId": "y"
+            },
+            {
+              "id": "ghosts",
+              "nodeId": "916e8f01-1111-4111-8111-111111111111",
+              "controlId": "ghosts"
+            },
+            {
+              "id": "streak",
+              "nodeId": "916e8f01-1111-4111-8111-111111111111",
+              "controlId": "streak"
+            }
+          ],
+          "label": "Layered Optical Flare Study"
+        },
+        "definitionNames": {
+          "flare": "5deeee3ff02dbef89cd9bd2130269eb077c44949d2d315a014646b3f1c891d13"
+        },
+        "moduleDeclarations": {
+          "22b9bdaa11c73bd8f955e93025d5b50105c1b9a81571b94be6f45fc964c811a8": {
+            "modulePath": "visual.ts",
+            "definitionNames": {
+              "flare": "5deeee3ff02dbef89cd9bd2130269eb077c44949d2d315a014646b3f1c891d13"
+            },
+            "declaration": {
+              "definitions": {
+                "flare": "optical.ts"
+              },
+              "nodes": [
+                {
+                  "id": "916e8f01-1111-4111-8111-111111111111",
+                  "definition": "flare"
+                }
+              ],
+              "edges": [],
+              "output": {
+                "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                "portId": "image"
+              },
+              "expose": [
+                {
+                  "id": "intensity",
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "controlId": "intensity"
+                },
+                {
+                  "id": "size",
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "controlId": "size"
+                },
+                {
+                  "id": "hue",
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "controlId": "hue"
+                },
+                {
+                  "id": "saturation",
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "controlId": "saturation"
+                },
+                {
+                  "id": "x",
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "controlId": "x"
+                },
+                {
+                  "id": "y",
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "controlId": "y"
+                },
+                {
+                  "id": "ghosts",
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "controlId": "ghosts"
+                },
+                {
+                  "id": "streak",
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "controlId": "streak"
+                }
+              ],
+              "label": "Layered Optical Flare Study"
+            }
+          }
+        },
+        "graph": {
+          "version": 2,
+          "rootDefinitionHash": "22b9bdaa11c73bd8f955e93025d5b50105c1b9a81571b94be6f45fc964c811a8",
+          "outputPort": "image"
+        },
+        "definitions": {
+          "22b9bdaa11c73bd8f955e93025d5b50105c1b9a81571b94be6f45fc964c811a8": {
+            "kind": "graph",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "lux/image-composition",
+              "label": "Layered Optical Flare Study",
+              "description": "Authored image component chain",
+              "tags": [],
+              "inputs": {},
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Image"
+                }
+              },
+              "controls": [
+                {
+                  "id": "intensity",
+                  "type": "number",
+                  "label": "Brightness",
+                  "default": 1,
+                  "min": 0,
+                  "max": 5,
+                  "step": 0.01,
+                  "description": "Light energy; choose a small value for distant stars.",
+                  "group": "Light",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "size",
+                  "type": "number",
+                  "label": "Angular size",
+                  "default": 0.42,
+                  "min": 0.01,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "Radius relative to screen half-height, independent of world distance.",
+                  "group": "Light",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "hue",
+                  "type": "number",
+                  "label": "Tint hue",
+                  "default": 0.6,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Subtle warm or cool source color.",
+                  "group": "Light",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "saturation",
+                  "type": "number",
+                  "label": "Tint saturation",
+                  "default": 0.3,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Color strength; lower values preserve a white-hot core.",
+                  "group": "Light",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "x",
+                  "type": "number",
+                  "label": "Horizontal position",
+                  "default": -0.42,
+                  "min": -1.2,
+                  "max": 1.2,
+                  "step": 0.01,
+                  "description": "Normalized screen position; -1 is left and +1 is right.",
+                  "group": "Position",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "y",
+                  "type": "number",
+                  "label": "Vertical position",
+                  "default": 0.22,
+                  "min": -1.2,
+                  "max": 1.2,
+                  "step": 0.01,
+                  "description": "Normalized screen position; -1 is bottom and +1 is top.",
+                  "group": "Position",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "ghosts",
+                  "type": "number",
+                  "label": "Ghost layers",
+                  "default": 0.8,
+                  "min": 0,
+                  "max": 3,
+                  "step": 0.01,
+                  "description": "Strength of chromatic aperture ghosts along the optical axis.",
+                  "group": "Optics",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "streak",
+                  "type": "number",
+                  "label": "Horizontal streak",
+                  "default": 0.08,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Strength of the thin horizontal streak; low by default.",
+                  "group": "Optics",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "ghosts": "Strength of chromatic aperture ghosts along the optical axis.",
+                "hue": "Subtle warm or cool source color.",
+                "intensity": "Light energy; choose a small value for distant stars.",
+                "saturation": "Color strength; lower values preserve a white-hot core.",
+                "size": "Radius relative to screen half-height, independent of world distance.",
+                "streak": "Strength of the thin horizontal streak; low by default.",
+                "x": "Normalized screen position; -1 is left and +1 is right.",
+                "y": "Normalized screen position; -1 is bottom and +1 is top."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            },
+            "body": {
+              "nodes": [
+                {
+                  "id": "916e8f01-1111-4111-8111-111111111111",
+                  "definitionHash": "5deeee3ff02dbef89cd9bd2130269eb077c44949d2d315a014646b3f1c891d13",
+                  "controlDefaults": {}
+                }
+              ],
+              "edges": [],
+              "inputBindings": {},
+              "outputBindings": {
+                "image": {
+                  "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                  "portId": "image"
+                }
+              },
+              "controlBindings": {
+                "ghosts": [
+                  {
+                    "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                    "controlId": "ghosts"
+                  }
+                ],
+                "hue": [
+                  {
+                    "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                    "controlId": "hue"
+                  }
+                ],
+                "intensity": [
+                  {
+                    "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                    "controlId": "intensity"
+                  }
+                ],
+                "saturation": [
+                  {
+                    "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                    "controlId": "saturation"
+                  }
+                ],
+                "size": [
+                  {
+                    "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                    "controlId": "size"
+                  }
+                ],
+                "streak": [
+                  {
+                    "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                    "controlId": "streak"
+                  }
+                ],
+                "x": [
+                  {
+                    "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                    "controlId": "x"
+                  }
+                ],
+                "y": [
+                  {
+                    "nodeId": "916e8f01-1111-4111-8111-111111111111",
+                    "controlId": "y"
+                  }
+                ]
+              }
+            }
+          },
+          "5deeee3ff02dbef89cd9bd2130269eb077c44949d2d315a014646b3f1c891d13": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "lux/optical-flare",
+              "label": "Layered Optical Flare",
+              "description": "Transparent camera-axis optical ghosts with soft bloom and a restrained optional streak.",
+              "tags": [
+                "cosmos",
+                "flare",
+                "light"
+              ],
+              "inputs": {},
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Flare",
+                  "description": "Transparent additive flare layer."
+                }
+              },
+              "controls": [
+                {
+                  "id": "intensity",
+                  "type": "number",
+                  "label": "Brightness",
+                  "default": 1,
+                  "min": 0,
+                  "max": 5,
+                  "step": 0.01,
+                  "group": "Light",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "size",
+                  "type": "number",
+                  "label": "Angular size",
+                  "default": 0.42,
+                  "min": 0.01,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "group": "Light",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "hue",
+                  "type": "number",
+                  "label": "Tint hue",
+                  "default": 0.6,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Light",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "saturation",
+                  "type": "number",
+                  "label": "Tint saturation",
+                  "default": 0.3,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Light",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "x",
+                  "type": "number",
+                  "label": "Horizontal position",
+                  "default": -0.42,
+                  "min": -1.2,
+                  "max": 1.2,
+                  "step": 0.01,
+                  "group": "Position",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "y",
+                  "type": "number",
+                  "label": "Vertical position",
+                  "default": 0.22,
+                  "min": -1.2,
+                  "max": 1.2,
+                  "step": 0.01,
+                  "group": "Position",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "ghosts",
+                  "type": "number",
+                  "label": "Ghost layers",
+                  "default": 0.8,
+                  "min": 0,
+                  "max": 3,
+                  "step": 0.01,
+                  "group": "Optics",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "streak",
+                  "type": "number",
+                  "label": "Horizontal streak",
+                  "default": 0.08,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Optics",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "ghosts": "Strength of chromatic aperture ghosts along the optical axis.",
+                "hue": "Subtle warm or cool source color.",
+                "intensity": "Light energy; choose a small value for distant stars.",
+                "saturation": "Color strength; lower values preserve a white-hot core.",
+                "size": "Radius relative to screen half-height, independent of world distance.",
+                "streak": "Strength of the thin horizontal streak; low by default.",
+                "x": "Normalized screen position; -1 is left and +1 is right.",
+                "y": "Normalized screen position; -1 is bottom and +1 is top."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            }
+          }
+        },
+        "publicControls": [
+          {
+            "id": "intensity",
+            "type": "number",
+            "label": "Brightness",
+            "default": 1,
+            "min": 0,
+            "max": 5,
+            "step": 0.01,
+            "description": "Light energy; choose a small value for distant stars.",
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "size",
+            "type": "number",
+            "label": "Angular size",
+            "default": 0.42,
+            "min": 0.01,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "Radius relative to screen half-height, independent of world distance.",
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "hue",
+            "type": "number",
+            "label": "Tint hue",
+            "default": 0.6,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "Subtle warm or cool source color.",
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "saturation",
+            "type": "number",
+            "label": "Tint saturation",
+            "default": 0.3,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "Color strength; lower values preserve a white-hot core.",
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "x",
+            "type": "number",
+            "label": "Horizontal position",
+            "default": -0.42,
+            "min": -1.2,
+            "max": 1.2,
+            "step": 0.01,
+            "description": "Normalized screen position; -1 is left and +1 is right.",
+            "group": "Position",
+            "changeCost": "live"
+          },
+          {
+            "id": "y",
+            "type": "number",
+            "label": "Vertical position",
+            "default": 0.22,
+            "min": -1.2,
+            "max": 1.2,
+            "step": 0.01,
+            "description": "Normalized screen position; -1 is bottom and +1 is top.",
+            "group": "Position",
+            "changeCost": "live"
+          },
+          {
+            "id": "ghosts",
+            "type": "number",
+            "label": "Ghost layers",
+            "default": 0.8,
+            "min": 0,
+            "max": 3,
+            "step": 0.01,
+            "description": "Strength of chromatic aperture ghosts along the optical axis.",
+            "group": "Optics",
+            "changeCost": "live"
+          },
+          {
+            "id": "streak",
+            "type": "number",
+            "label": "Horizontal streak",
+            "default": 0.08,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "Strength of the thin horizontal streak; low by default.",
+            "group": "Optics",
+            "changeCost": "live"
+          }
+        ],
+        "publicControlBindings": {
+          "intensity": [
+            {
+              "nodePath": [
+                "916e8f01-1111-4111-8111-111111111111"
+              ],
+              "controlId": "intensity",
+              "active": true
+            }
+          ],
+          "size": [
+            {
+              "nodePath": [
+                "916e8f01-1111-4111-8111-111111111111"
+              ],
+              "controlId": "size",
+              "active": true
+            }
+          ],
+          "hue": [
+            {
+              "nodePath": [
+                "916e8f01-1111-4111-8111-111111111111"
+              ],
+              "controlId": "hue",
+              "active": true
+            }
+          ],
+          "saturation": [
+            {
+              "nodePath": [
+                "916e8f01-1111-4111-8111-111111111111"
+              ],
+              "controlId": "saturation",
+              "active": true
+            }
+          ],
+          "x": [
+            {
+              "nodePath": [
+                "916e8f01-1111-4111-8111-111111111111"
+              ],
+              "controlId": "x",
+              "active": true
+            }
+          ],
+          "y": [
+            {
+              "nodePath": [
+                "916e8f01-1111-4111-8111-111111111111"
+              ],
+              "controlId": "y",
+              "active": true
+            }
+          ],
+          "ghosts": [
+            {
+              "nodePath": [
+                "916e8f01-1111-4111-8111-111111111111"
+              ],
+              "controlId": "ghosts",
+              "active": true
+            }
+          ],
+          "streak": [
+            {
+              "nodePath": [
+                "916e8f01-1111-4111-8111-111111111111"
+              ],
+              "controlId": "streak",
+              "active": true
+            }
+          ]
+        },
+        "nodes": [
+          {
+            "nodePath": [
+              "916e8f01-1111-4111-8111-111111111111"
+            ],
+            "definitionHash": "5deeee3ff02dbef89cd9bd2130269eb077c44949d2d315a014646b3f1c891d13",
+            "schema": [
+              {
+                "id": "intensity",
+                "type": "number",
+                "label": "Brightness",
+                "default": 1,
+                "min": 0,
+                "max": 5,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "size",
+                "type": "number",
+                "label": "Angular size",
+                "default": 0.42,
+                "min": 0.01,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "hue",
+                "type": "number",
+                "label": "Tint hue",
+                "default": 0.6,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "saturation",
+                "type": "number",
+                "label": "Tint saturation",
+                "default": 0.3,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "x",
+                "type": "number",
+                "label": "Horizontal position",
+                "default": -0.42,
+                "min": -1.2,
+                "max": 1.2,
+                "step": 0.01,
+                "group": "Position",
+                "changeCost": "live"
+              },
+              {
+                "id": "y",
+                "type": "number",
+                "label": "Vertical position",
+                "default": 0.22,
+                "min": -1.2,
+                "max": 1.2,
+                "step": 0.01,
+                "group": "Position",
+                "changeCost": "live"
+              },
+              {
+                "id": "ghosts",
+                "type": "number",
+                "label": "Ghost layers",
+                "default": 0.8,
+                "min": 0,
+                "max": 3,
+                "step": 0.01,
+                "group": "Optics",
+                "changeCost": "live"
+              },
+              {
+                "id": "streak",
+                "type": "number",
+                "label": "Horizontal streak",
+                "default": 0.08,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Optics",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "5dd0a5fb6a977b3b2885749100ee1db7a9c72b8201e8f8fb61a8873960b3febf"
+          }
+        ]
+      },
+      "sceneName": "Untitled visual",
+      "authority": "studio",
+      "playback": "playing",
+      "sdkVersion": "0.4.0",
+      "controlSchema": [
+        {
+          "id": "intensity",
+          "type": "number",
+          "label": "Brightness",
+          "default": 1,
+          "min": 0,
+          "max": 5,
+          "step": 0.01,
+          "description": "Light energy; choose a small value for distant stars.",
+          "group": "Light",
+          "changeCost": "live"
+        },
+        {
+          "id": "size",
+          "type": "number",
+          "label": "Angular size",
+          "default": 0.42,
+          "min": 0.01,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "Radius relative to screen half-height, independent of world distance.",
+          "group": "Light",
+          "changeCost": "live"
+        },
+        {
+          "id": "hue",
+          "type": "number",
+          "label": "Tint hue",
+          "default": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Subtle warm or cool source color.",
+          "group": "Light",
+          "changeCost": "live"
+        },
+        {
+          "id": "saturation",
+          "type": "number",
+          "label": "Tint saturation",
+          "default": 0.3,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Color strength; lower values preserve a white-hot core.",
+          "group": "Light",
+          "changeCost": "live"
+        },
+        {
+          "id": "x",
+          "type": "number",
+          "label": "Horizontal position",
+          "default": -0.42,
+          "min": -1.2,
+          "max": 1.2,
+          "step": 0.01,
+          "description": "Normalized screen position; -1 is left and +1 is right.",
+          "group": "Position",
+          "changeCost": "live"
+        },
+        {
+          "id": "y",
+          "type": "number",
+          "label": "Vertical position",
+          "default": 0.22,
+          "min": -1.2,
+          "max": 1.2,
+          "step": 0.01,
+          "description": "Normalized screen position; -1 is bottom and +1 is top.",
+          "group": "Position",
+          "changeCost": "live"
+        },
+        {
+          "id": "ghosts",
+          "type": "number",
+          "label": "Ghost layers",
+          "default": 0.8,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "description": "Strength of chromatic aperture ghosts along the optical axis.",
+          "group": "Optics",
+          "changeCost": "live"
+        },
+        {
+          "id": "streak",
+          "type": "number",
+          "label": "Horizontal streak",
+          "default": 0.08,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Strength of the thin horizontal streak; low by default.",
+          "group": "Optics",
+          "changeCost": "live"
+        }
+      ],
+      "controlSchemaHash": "e7332ac12e6726b7a502aa3a4fb10dcd1d58ab573538f122fb625938ab4480e1",
+      "controls": {
+        "intensity": 1,
+        "size": 0.42,
+        "hue": 0.6,
+        "saturation": 0.3,
+        "x": -0.42,
+        "y": 0.22,
+        "ghosts": 0.8,
+        "streak": 0.08
+      },
+      "controlSequence": 0,
+      "nodeControls": {
+        "sourceHash": "204a1c3478e06feaf13f372d4b22ebceae7f3274316a2187dcff9d647d169c4f",
+        "nodes": [
+          {
+            "nodePath": [
+              "916e8f01-1111-4111-8111-111111111111"
+            ],
+            "definitionHash": "5deeee3ff02dbef89cd9bd2130269eb077c44949d2d315a014646b3f1c891d13",
+            "schema": [
+              {
+                "id": "intensity",
+                "type": "number",
+                "label": "Brightness",
+                "default": 1,
+                "min": 0,
+                "max": 5,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "size",
+                "type": "number",
+                "label": "Angular size",
+                "default": 0.42,
+                "min": 0.01,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "hue",
+                "type": "number",
+                "label": "Tint hue",
+                "default": 0.6,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "saturation",
+                "type": "number",
+                "label": "Tint saturation",
+                "default": 0.3,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "x",
+                "type": "number",
+                "label": "Horizontal position",
+                "default": -0.42,
+                "min": -1.2,
+                "max": 1.2,
+                "step": 0.01,
+                "group": "Position",
+                "changeCost": "live"
+              },
+              {
+                "id": "y",
+                "type": "number",
+                "label": "Vertical position",
+                "default": 0.22,
+                "min": -1.2,
+                "max": 1.2,
+                "step": 0.01,
+                "group": "Position",
+                "changeCost": "live"
+              },
+              {
+                "id": "ghosts",
+                "type": "number",
+                "label": "Ghost layers",
+                "default": 0.8,
+                "min": 0,
+                "max": 3,
+                "step": 0.01,
+                "group": "Optics",
+                "changeCost": "live"
+              },
+              {
+                "id": "streak",
+                "type": "number",
+                "label": "Horizontal streak",
+                "default": 0.08,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Optics",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "5dd0a5fb6a977b3b2885749100ee1db7a9c72b8201e8f8fb61a8873960b3febf",
+            "values": {
+              "intensity": 1,
+              "size": 0.42,
+              "hue": 0.6,
+              "saturation": 0.3,
+              "x": -0.42,
+              "y": 0.22,
+              "ghosts": 0.8,
+              "streak": 0.08
+            }
+          }
+        ]
+      },
+      "controlAnimations": [],
+      "controlAnimationIssues": [],
+      "animationSequence": 0,
+      "effectiveControls": {
+        "intensity": 1,
+        "size": 0.42,
+        "hue": 0.6,
+        "saturation": 0.3,
+        "x": -0.42,
+        "y": 0.22,
+        "ghosts": 0.8,
+        "streak": 0.08
+      },
+      "effectiveNodeControls": {
+        "sourceHash": "204a1c3478e06feaf13f372d4b22ebceae7f3274316a2187dcff9d647d169c4f",
+        "nodes": [
+          {
+            "nodePath": [
+              "916e8f01-1111-4111-8111-111111111111"
+            ],
+            "definitionHash": "5deeee3ff02dbef89cd9bd2130269eb077c44949d2d315a014646b3f1c891d13",
+            "schema": [
+              {
+                "id": "intensity",
+                "type": "number",
+                "label": "Brightness",
+                "default": 1,
+                "min": 0,
+                "max": 5,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "size",
+                "type": "number",
+                "label": "Angular size",
+                "default": 0.42,
+                "min": 0.01,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "hue",
+                "type": "number",
+                "label": "Tint hue",
+                "default": 0.6,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "saturation",
+                "type": "number",
+                "label": "Tint saturation",
+                "default": 0.3,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "x",
+                "type": "number",
+                "label": "Horizontal position",
+                "default": -0.42,
+                "min": -1.2,
+                "max": 1.2,
+                "step": 0.01,
+                "group": "Position",
+                "changeCost": "live"
+              },
+              {
+                "id": "y",
+                "type": "number",
+                "label": "Vertical position",
+                "default": 0.22,
+                "min": -1.2,
+                "max": 1.2,
+                "step": 0.01,
+                "group": "Position",
+                "changeCost": "live"
+              },
+              {
+                "id": "ghosts",
+                "type": "number",
+                "label": "Ghost layers",
+                "default": 0.8,
+                "min": 0,
+                "max": 3,
+                "step": 0.01,
+                "group": "Optics",
+                "changeCost": "live"
+              },
+              {
+                "id": "streak",
+                "type": "number",
+                "label": "Horizontal streak",
+                "default": 0.08,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Optics",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "5dd0a5fb6a977b3b2885749100ee1db7a9c72b8201e8f8fb61a8873960b3febf",
+            "values": {
+              "intensity": 1,
+              "size": 0.42,
+              "hue": 0.6,
+              "saturation": 0.3,
+              "x": -0.42,
+              "y": 0.22,
+              "ghosts": 0.8,
+              "streak": 0.08
+            }
+          }
+        ]
+      },
+      "controlMigration": [
+        {
+          "id": "916e8f01-1111-4111-8111-111111111111:ghosts",
+          "reason": "added",
+          "value": 0.8
+        },
+        {
+          "id": "916e8f01-1111-4111-8111-111111111111:streak",
+          "reason": "added",
+          "value": 0.08
+        },
+        {
+          "id": "916e8f01-1111-4111-8111-111111111111:secondary",
+          "reason": "removed",
+          "previousValue": 0.12
+        },
+        {
+          "id": "916e8f01-1111-4111-8111-111111111111:rotation",
+          "reason": "removed",
+          "previousValue": 0
+        }
+      ],
+      "clockEpoch": 0,
+      "timeSeconds": 0.00010000000149011611,
+      "tempo": {
+        "bpm": 120,
+        "beatPosition": 0.2053999999985099,
+        "beatPhase": 0.20539999999850989,
+        "tempoSequence": 0
+      },
+      "tempoSequence": 0,
+      "frameId": "1",
+      "output": {
+        "width": 1920,
+        "height": 1080,
+        "fps": 60,
+        "seed": 0
+      },
+      "fault": null
+    },
+    "host": null,
+    "jobs": [
+      {
+        "jobId": "1ac434e1-85cd-4cf2-a983-f4be0a309df4",
+        "state": "succeeded",
+        "summary": "Visual is ready in Lux."
+      }
+    ],
+    "visualFps": null,
+    "uiFps": null,
+    "performance": {
+      "owner": {
+        "instanceId": "49eb3e11-8d36-4fc0-9b7f-8252bb9ba948",
+        "generation": 3,
+        "revisionId": "204a1c3478e06feaf13f372d4b22ebceae7f3274316a2187dcff9d647d169c4f"
+      },
+      "status": "pending",
+      "observedAtMs": null,
+      "worker": null
+    },
+    "capabilities": {
+      "protocolVersion": 4,
+      "supportedSdkVersions": [
+        "0.1.0",
+        "0.2.0",
+        "0.4.0"
+      ],
+      "codeDeclaredParameters": true,
+      "parameterKinds": [
+        "number"
+      ],
+      "maxParameterMetadataBytes": 32768,
+      "imageFormats": [
+        "image/bmp",
+        "image/png",
+        "image/jpeg"
+      ],
+      "assetExport": true,
+      "sceneVersions": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "controlVariation": {
+        "stableInstanceKeys": true,
+        "distributions": [
+          "random",
+          "centered",
+          "spread"
+        ]
+      },
+      "tempo": {
+        "manual": true,
+        "tap": true,
+        "bpm": {
+          "min": 20,
+          "max": 300
+        }
+      }
+    }
+  }
+}

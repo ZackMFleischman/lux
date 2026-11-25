@@ -1,0 +1,14 @@
+{
+  "profile": "test-c25b1316-636e-413e-a102-6cdabb90a491",
+  "root": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\b4f327bd-a84521b3\\resources\\app\\runtime",
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\cosmos-flares\\creative\\cosmos-flares/evidence-1789627510046/optical-composite.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\cosmos-flares\\creative\\cosmos-flares/evidence-1789627510046/diffraction-composite.png"
+  ],
+  "checks": [
+    "optical-composite: built and captured",
+    "diffraction-composite: built and captured"
+  ],
+  "ok": true,
+  "pid": 14724
+}

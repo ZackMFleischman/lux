@@ -1,0 +1,259 @@
+{
+  "playback": "playing",
+  "timeSeconds": 1.154300000000745,
+  "clockEpoch": 0,
+  "tempo": {
+    "bpm": 120,
+    "beatPosition": 2.93220000000298,
+    "beatPhase": 0.9322000000029802,
+    "tempoSequence": 0
+  },
+  "tempoSequence": 0,
+  "frameId": "61",
+  "sdkVersion": "0.4.0",
+  "controlSchemaHash": "e7332ac12e6726b7a502aa3a4fb10dcd1d58ab573538f122fb625938ab4480e1",
+  "controls": {
+    "intensity": 1,
+    "size": 0.42,
+    "hue": 0.6,
+    "saturation": 0.3,
+    "x": -0.42,
+    "y": 0.22,
+    "ghosts": 0.8,
+    "streak": 0.08
+  },
+  "controlSequence": 0,
+  "nodeControls": {
+    "nodes": [
+      {
+        "nodePath": [
+          "916e8f01-1111-4111-8111-111111111111"
+        ],
+        "definitionHash": "557172e10002c73c8699022787c58e4ea1678b8b0e6bc34551a9a8cad5c59993",
+        "schema": [
+          {
+            "id": "intensity",
+            "type": "number",
+            "label": "Brightness",
+            "default": 1,
+            "min": 0,
+            "max": 5,
+            "step": 0.01,
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "size",
+            "type": "number",
+            "label": "Angular size",
+            "default": 0.42,
+            "min": 0.01,
+            "max": 1.5,
+            "step": 0.01,
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "hue",
+            "type": "number",
+            "label": "Tint hue",
+            "default": 0.6,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "saturation",
+            "type": "number",
+            "label": "Tint saturation",
+            "default": 0.3,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "x",
+            "type": "number",
+            "label": "Horizontal position",
+            "default": -0.42,
+            "min": -1.2,
+            "max": 1.2,
+            "step": 0.01,
+            "group": "Position",
+            "changeCost": "live"
+          },
+          {
+            "id": "y",
+            "type": "number",
+            "label": "Vertical position",
+            "default": 0.22,
+            "min": -1.2,
+            "max": 1.2,
+            "step": 0.01,
+            "group": "Position",
+            "changeCost": "live"
+          },
+          {
+            "id": "ghosts",
+            "type": "number",
+            "label": "Ghost layers",
+            "default": 0.8,
+            "min": 0,
+            "max": 3,
+            "step": 0.01,
+            "group": "Optics",
+            "changeCost": "live"
+          },
+          {
+            "id": "streak",
+            "type": "number",
+            "label": "Horizontal streak",
+            "default": 0.08,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Optics",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "5dd0a5fb6a977b3b2885749100ee1db7a9c72b8201e8f8fb61a8873960b3febf",
+        "values": {
+          "intensity": 1,
+          "size": 0.42,
+          "hue": 0.6,
+          "saturation": 0.3,
+          "x": -0.42,
+          "y": 0.22,
+          "ghosts": 0.8,
+          "streak": 0.08
+        }
+      }
+    ]
+  },
+  "effectiveNodeControls": {
+    "nodes": [
+      {
+        "nodePath": [
+          "916e8f01-1111-4111-8111-111111111111"
+        ],
+        "definitionHash": "557172e10002c73c8699022787c58e4ea1678b8b0e6bc34551a9a8cad5c59993",
+        "schema": [
+          {
+            "id": "intensity",
+            "type": "number",
+            "label": "Brightness",
+            "default": 1,
+            "min": 0,
+            "max": 5,
+            "step": 0.01,
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "size",
+            "type": "number",
+            "label": "Angular size",
+            "default": 0.42,
+            "min": 0.01,
+            "max": 1.5,
+            "step": 0.01,
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "hue",
+            "type": "number",
+            "label": "Tint hue",
+            "default": 0.6,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "saturation",
+            "type": "number",
+            "label": "Tint saturation",
+            "default": 0.3,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "x",
+            "type": "number",
+            "label": "Horizontal position",
+            "default": -0.42,
+            "min": -1.2,
+            "max": 1.2,
+            "step": 0.01,
+            "group": "Position",
+            "changeCost": "live"
+          },
+          {
+            "id": "y",
+            "type": "number",
+            "label": "Vertical position",
+            "default": 0.22,
+            "min": -1.2,
+            "max": 1.2,
+            "step": 0.01,
+            "group": "Position",
+            "changeCost": "live"
+          },
+          {
+            "id": "ghosts",
+            "type": "number",
+            "label": "Ghost layers",
+            "default": 0.8,
+            "min": 0,
+            "max": 3,
+            "step": 0.01,
+            "group": "Optics",
+            "changeCost": "live"
+          },
+          {
+            "id": "streak",
+            "type": "number",
+            "label": "Horizontal streak",
+            "default": 0.08,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Optics",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "5dd0a5fb6a977b3b2885749100ee1db7a9c72b8201e8f8fb61a8873960b3febf",
+        "values": {
+          "intensity": 1,
+          "size": 0.42,
+          "hue": 0.6,
+          "saturation": 0.3,
+          "x": -0.42,
+          "y": 0.22,
+          "ghosts": 0.8,
+          "streak": 0.08
+        }
+      }
+    ]
+  },
+  "controlAnimations": [],
+  "controlAnimationIssues": [],
+  "animationSequence": 0,
+  "width": 1920,
+  "height": 1080,
+  "seed": 0,
+  "colorSpace": "srgb",
+  "alphaMode": "straight",
+  "instanceId": "b65793a7-c9cf-4457-9041-077781616143",
+  "generation": 3,
+  "revisionId": "c5d1ea4a4d916bd653ec23da95132268ac6e534a4eddea57bb95c8e2d087d4ab"
+}

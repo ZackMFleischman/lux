@@ -1,0 +1,13 @@
+{
+  "profile": "test-9c83c477-e304-45bd-89c7-b964ce39b7da",
+  "root": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\b4f327bd-a84521b3\\resources\\app\\runtime",
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\cosmos-flares\\creative\\cosmos-flares/evidence-1789627452108/optical.png"
+  ],
+  "checks": [
+    "optical: built and captured"
+  ],
+  "ok": false,
+  "pid": 27060,
+  "error": "Error: backing.ts:19:64 Type 'unknown' is not assignable to type 'Texture<unknown, TextureEventMap>'.\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/cosmos-flares/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/cosmos-flares/creative/cosmos-flares/verify.mjs:37:19"
+}

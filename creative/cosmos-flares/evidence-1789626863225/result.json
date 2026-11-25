@@ -1,0 +1,9 @@
+{
+  "profile": "test-cef5fb7b-6d8c-4357-a499-86d08e916ce4",
+  "root": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\b4f327bd-a84521b3\\resources\\app\\runtime",
+  "screenshots": [],
+  "checks": [],
+  "ok": false,
+  "pid": 26472,
+  "error": "Error: diffraction.ts:5:1 component: missing field controlDescriptions\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/cosmos-flares/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/cosmos-flares/creative/cosmos-flares/verify.mjs:34:19"
+}
