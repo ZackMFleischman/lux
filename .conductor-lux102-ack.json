@@ -1,0 +1,11 @@
+{
+  "launch_id": "b4fe9662-7465-447c-b4b5-69bedf16cd9d",
+  "epoch": 1,
+  "challenge_generation": 1,
+  "host_id": "/root/studio_polish_102",
+  "agent_id": "a78e5065-cc5d-4df6-890d-78e591751e8f",
+  "role": "worker",
+  "scope": "QA and improve the normal Lux creative workflow, then continue the four authorized workstreams. Root is sole coordinator. MIDI is paused for user design discussion.",
+  "skill_version": "layers-v1",
+  "checkpoint": "LUX-102 Source files and assets collapse/expand polish in isolated worktree."
+}
