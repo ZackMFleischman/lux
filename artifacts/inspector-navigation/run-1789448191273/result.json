@@ -1,0 +1,42 @@
+{
+  "ok": true,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\inspector-navigation",
+  "commit": "bbdcccb75f67a390f86cdbbb850e894258105c88",
+  "session": {
+    "profile": "test-d58645ba-eaeb-486f-9121-8c1a2dfd93d3",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\inspector-navigation",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-d58645ba-eaeb-486f-9121-8c1a2dfd93d3",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-d58645ba-eaeb-486f-9121-8c1a2dfd93d3\\agent-endpoint.json"
+  },
+  "checks": [
+    "Nested leaf to both parents and Scene with Graph closed",
+    "Keyboard activation and focus retained",
+    "Control values and runtime unchanged by navigation",
+    "Shared headings14px; normal and narrow breadcrumb wrap"
+  ],
+  "errors": [],
+  "pid": 18676,
+  "headings": [
+    {
+      "text": "Files and assets",
+      "fontSize": "14px"
+    },
+    {
+      "text": "ControlsLIVE",
+      "fontSize": "14px"
+    },
+    {
+      "text": "Performance",
+      "fontSize": "14px"
+    },
+    {
+      "text": "Runtime",
+      "fontSize": "14px"
+    },
+    {
+      "text": "Host output",
+      "fontSize": "14px"
+    }
+  ],
+  "processExited": true
+}
