@@ -1,0 +1,1207 @@
+{
+  "ok": false,
+  "candidate": "42b1e3c1489a16d9289022715bfe98ae92742ed9",
+  "session": {
+    "profile": "test-333469d3-931d-4b5e-aad0-8051f06f8ee2",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\save-looks-124",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-333469d3-931d-4b5e-aad0-8051f06f8ee2",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-333469d3-931d-4b5e-aad0-8051f06f8ee2\\agent-endpoint.json"
+  },
+  "checks": [],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\save-looks-124\\evidence\\looks\\run-1789372591196\\looks-restart-recall.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\save-looks-124\\evidence\\looks\\run-1789372591196\\looks-resize-confirmation.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\save-looks-124\\evidence\\looks\\run-1789372591196\\failure.png"
+  ],
+  "errors": [],
+  "ownedPid": 40952,
+  "endpoint": {
+    "pid": 40952,
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\save-looks-124",
+    "profile": "test-333469d3-931d-4b5e-aad0-8051f06f8ee2"
+  },
+  "recalled": {
+    "instanceId": "f0806248-c397-4733-9dad-9d2f0e2ab326",
+    "generation": 1,
+    "revisionId": "bf2a6c4d33b6d7923a5ebd8fde3b75b461dc455b2d380b2ea9e5aa139d8d2b92",
+    "composition": {
+      "version": 1,
+      "declaration": {
+        "definitions": {
+          "ball": "ball.ts",
+          "doubleMirror": "double-mirror.ts"
+        },
+        "nodes": [
+          {
+            "id": "11111111-1111-4111-8111-111111111111",
+            "definition": "ball"
+          },
+          {
+            "id": "44444444-4444-4444-8444-444444444444",
+            "definition": "doubleMirror"
+          },
+          {
+            "id": "55555555-5555-4555-8555-555555555555",
+            "definition": "doubleMirror"
+          }
+        ],
+        "edges": [
+          {
+            "id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+            "from": {
+              "nodeId": "11111111-1111-4111-8111-111111111111",
+              "portId": "image"
+            },
+            "to": {
+              "nodeId": "44444444-4444-4444-8444-444444444444",
+              "portId": "image"
+            },
+            "delay": "none"
+          },
+          {
+            "id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+            "from": {
+              "nodeId": "44444444-4444-4444-8444-444444444444",
+              "portId": "image"
+            },
+            "to": {
+              "nodeId": "55555555-5555-4555-8555-555555555555",
+              "portId": "image"
+            },
+            "delay": "none"
+          }
+        ],
+        "output": {
+          "nodeId": "55555555-5555-4555-8555-555555555555",
+          "portId": "image"
+        },
+        "expose": [
+          {
+            "id": "ballIntensity",
+            "nodeId": "11111111-1111-4111-8111-111111111111",
+            "controlId": "intensity"
+          },
+          {
+            "id": "segmentsA",
+            "nodeId": "44444444-4444-4444-8444-444444444444",
+            "controlId": "firstSegments"
+          },
+          {
+            "id": "segmentsB",
+            "nodeId": "55555555-5555-4555-8555-555555555555",
+            "controlId": "secondSegments"
+          }
+        ],
+        "label": "Nested prismatic mirrors"
+      },
+      "definitionNames": {
+        "ball": "481058d404d75e32c4efbd3354e06415e04f7df25cab4d2af272ae890a06592a",
+        "doubleMirror": "ebf6cf7d94016b4e14990076eed2ddcc3d2b63caac2f68c1afa5b3498e1b077c"
+      },
+      "moduleDeclarations": {
+        "46941f632f7ada5f77d01b2b66ef85569a64836f083928eae879eee812b792fd": {
+          "modulePath": "wrapped-mirror.ts",
+          "definitionNames": {
+            "kaleidoscope": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724"
+          },
+          "declaration": {
+            "definitions": {
+              "kaleidoscope": "kaleidoscope.ts"
+            },
+            "nodes": [
+              {
+                "id": "77777777-7777-4777-8777-777777777777",
+                "definition": "kaleidoscope"
+              }
+            ],
+            "edges": [],
+            "input": {
+              "nodeId": "77777777-7777-4777-8777-777777777777",
+              "portId": "image"
+            },
+            "output": {
+              "nodeId": "77777777-7777-4777-8777-777777777777",
+              "portId": "image"
+            },
+            "expose": [
+              {
+                "id": "segments",
+                "nodeId": "77777777-7777-4777-8777-777777777777",
+                "controlId": "segments"
+              }
+            ],
+            "label": "Wrapped mirror"
+          }
+        },
+        "ebf6cf7d94016b4e14990076eed2ddcc3d2b63caac2f68c1afa5b3498e1b077c": {
+          "modulePath": "double-mirror.ts",
+          "definitionNames": {
+            "wrappedMirror": "46941f632f7ada5f77d01b2b66ef85569a64836f083928eae879eee812b792fd",
+            "kaleidoscope": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724"
+          },
+          "declaration": {
+            "definitions": {
+              "wrappedMirror": "wrapped-mirror.ts",
+              "kaleidoscope": "kaleidoscope.ts"
+            },
+            "nodes": [
+              {
+                "id": "66666666-6666-4666-8666-666666666666",
+                "definition": "wrappedMirror"
+              },
+              {
+                "id": "88888888-8888-4888-8888-888888888888",
+                "definition": "kaleidoscope"
+              }
+            ],
+            "edges": [
+              {
+                "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+                "from": {
+                  "nodeId": "66666666-6666-4666-8666-666666666666",
+                  "portId": "image"
+                },
+                "to": {
+                  "nodeId": "88888888-8888-4888-8888-888888888888",
+                  "portId": "image"
+                },
+                "delay": "none"
+              }
+            ],
+            "input": {
+              "nodeId": "66666666-6666-4666-8666-666666666666",
+              "portId": "image"
+            },
+            "output": {
+              "nodeId": "88888888-8888-4888-8888-888888888888",
+              "portId": "image"
+            },
+            "expose": [
+              {
+                "id": "firstSegments",
+                "nodeId": "66666666-6666-4666-8666-666666666666",
+                "controlId": "segments"
+              },
+              {
+                "id": "secondSegments",
+                "nodeId": "88888888-8888-4888-8888-888888888888",
+                "controlId": "segments"
+              }
+            ],
+            "label": "Double mirror"
+          }
+        },
+        "a0344a289887ae293dcf185c7a1e54e33bda9280cc70306291d15bb88ad9e7a7": {
+          "modulePath": "composition.ts",
+          "definitionNames": {
+            "ball": "481058d404d75e32c4efbd3354e06415e04f7df25cab4d2af272ae890a06592a",
+            "doubleMirror": "ebf6cf7d94016b4e14990076eed2ddcc3d2b63caac2f68c1afa5b3498e1b077c"
+          },
+          "declaration": {
+            "definitions": {
+              "ball": "ball.ts",
+              "doubleMirror": "double-mirror.ts"
+            },
+            "nodes": [
+              {
+                "id": "11111111-1111-4111-8111-111111111111",
+                "definition": "ball"
+              },
+              {
+                "id": "44444444-4444-4444-8444-444444444444",
+                "definition": "doubleMirror"
+              },
+              {
+                "id": "55555555-5555-4555-8555-555555555555",
+                "definition": "doubleMirror"
+              }
+            ],
+            "edges": [
+              {
+                "id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+                "from": {
+                  "nodeId": "11111111-1111-4111-8111-111111111111",
+                  "portId": "image"
+                },
+                "to": {
+                  "nodeId": "44444444-4444-4444-8444-444444444444",
+                  "portId": "image"
+                },
+                "delay": "none"
+              },
+              {
+                "id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+                "from": {
+                  "nodeId": "44444444-4444-4444-8444-444444444444",
+                  "portId": "image"
+                },
+                "to": {
+                  "nodeId": "55555555-5555-4555-8555-555555555555",
+                  "portId": "image"
+                },
+                "delay": "none"
+              }
+            ],
+            "output": {
+              "nodeId": "55555555-5555-4555-8555-555555555555",
+              "portId": "image"
+            },
+            "expose": [
+              {
+                "id": "ballIntensity",
+                "nodeId": "11111111-1111-4111-8111-111111111111",
+                "controlId": "intensity"
+              },
+              {
+                "id": "segmentsA",
+                "nodeId": "44444444-4444-4444-8444-444444444444",
+                "controlId": "firstSegments"
+              },
+              {
+                "id": "segmentsB",
+                "nodeId": "55555555-5555-4555-8555-555555555555",
+                "controlId": "secondSegments"
+              }
+            ],
+            "label": "Nested prismatic mirrors"
+          }
+        }
+      },
+      "graph": {
+        "version": 2,
+        "rootDefinitionHash": "a0344a289887ae293dcf185c7a1e54e33bda9280cc70306291d15bb88ad9e7a7",
+        "outputPort": "image"
+      },
+      "definitions": {
+        "46941f632f7ada5f77d01b2b66ef85569a64836f083928eae879eee812b792fd": {
+          "kind": "graph",
+          "metadata": {
+            "declarationVersion": 1,
+            "key": "lux/image-composition",
+            "label": "Wrapped mirror",
+            "description": "Authored image component chain",
+            "tags": [],
+            "inputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Image"
+              }
+            },
+            "outputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Image"
+              }
+            },
+            "controls": [
+              {
+                "id": "segments",
+                "type": "number",
+                "label": "Mirror segments",
+                "default": 6,
+                "min": 2,
+                "max": 16,
+                "step": 1,
+                "description": "Sets the number of independently mirrored wedges.",
+                "changeCost": "live"
+              }
+            ],
+            "controlDescriptions": {
+              "segments": "Sets the number of independently mirrored wedges."
+            },
+            "lifecycle": {
+              "state": "stateful",
+              "reset": "seed"
+            }
+          },
+          "body": {
+            "nodes": [
+              {
+                "id": "77777777-7777-4777-8777-777777777777",
+                "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+                "controlDefaults": {}
+              }
+            ],
+            "edges": [],
+            "inputBindings": {
+              "image": [
+                {
+                  "nodeId": "77777777-7777-4777-8777-777777777777",
+                  "portId": "image"
+                }
+              ]
+            },
+            "outputBindings": {
+              "image": {
+                "nodeId": "77777777-7777-4777-8777-777777777777",
+                "portId": "image"
+              }
+            },
+            "controlBindings": {
+              "segments": [
+                {
+                  "nodeId": "77777777-7777-4777-8777-777777777777",
+                  "controlId": "segments"
+                }
+              ]
+            }
+          }
+        },
+        "481058d404d75e32c4efbd3354e06415e04f7df25cab4d2af272ae890a06592a": {
+          "kind": "code",
+          "metadata": {
+            "declarationVersion": 1,
+            "key": "demo/prismatic-ball",
+            "label": "Prismatic Ball",
+            "description": "Animated iridescent spike source",
+            "tags": [
+              "demo"
+            ],
+            "inputs": {},
+            "outputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Rendered ball"
+              }
+            },
+            "controls": [
+              {
+                "id": "intensity",
+                "type": "number",
+                "label": "Spike amount",
+                "default": 0.67,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "changeCost": "live"
+              }
+            ],
+            "controlDescriptions": {
+              "intensity": "Controls the height of the animated spikes."
+            },
+            "lifecycle": {
+              "state": "stateful",
+              "reset": "seed"
+            }
+          }
+        },
+        "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724": {
+          "kind": "code",
+          "metadata": {
+            "declarationVersion": 1,
+            "key": "demo/kaleidoscope",
+            "label": "Kaleidoscope",
+            "description": "Mirrored image effect",
+            "tags": [
+              "demo"
+            ],
+            "inputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Source image"
+              }
+            },
+            "outputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Mirrored image"
+              }
+            },
+            "controls": [
+              {
+                "id": "segments",
+                "type": "number",
+                "label": "Mirror segments",
+                "default": 6,
+                "min": 2,
+                "max": 16,
+                "step": 1,
+                "changeCost": "live"
+              }
+            ],
+            "controlDescriptions": {
+              "segments": "Sets the number of independently mirrored wedges."
+            },
+            "lifecycle": {
+              "state": "stateful",
+              "reset": "seed"
+            }
+          }
+        },
+        "a0344a289887ae293dcf185c7a1e54e33bda9280cc70306291d15bb88ad9e7a7": {
+          "kind": "graph",
+          "metadata": {
+            "declarationVersion": 1,
+            "key": "lux/image-composition",
+            "label": "Nested prismatic mirrors",
+            "description": "Authored image component chain",
+            "tags": [],
+            "inputs": {},
+            "outputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Image"
+              }
+            },
+            "controls": [
+              {
+                "id": "ballIntensity",
+                "type": "number",
+                "label": "Spike amount",
+                "default": 0.67,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Controls the height of the animated spikes.",
+                "changeCost": "live"
+              },
+              {
+                "id": "segmentsA",
+                "type": "number",
+                "label": "Mirror segments",
+                "default": 6,
+                "min": 2,
+                "max": 16,
+                "step": 1,
+                "description": "Sets the number of independently mirrored wedges.",
+                "changeCost": "live"
+              },
+              {
+                "id": "segmentsB",
+                "type": "number",
+                "label": "Mirror segments",
+                "default": 6,
+                "min": 2,
+                "max": 16,
+                "step": 1,
+                "description": "Sets the number of independently mirrored wedges.",
+                "changeCost": "live"
+              }
+            ],
+            "controlDescriptions": {
+              "ballIntensity": "Controls the height of the animated spikes.",
+              "segmentsA": "Sets the number of independently mirrored wedges.",
+              "segmentsB": "Sets the number of independently mirrored wedges."
+            },
+            "lifecycle": {
+              "state": "stateful",
+              "reset": "seed"
+            }
+          },
+          "body": {
+            "nodes": [
+              {
+                "id": "11111111-1111-4111-8111-111111111111",
+                "definitionHash": "481058d404d75e32c4efbd3354e06415e04f7df25cab4d2af272ae890a06592a",
+                "controlDefaults": {}
+              },
+              {
+                "id": "44444444-4444-4444-8444-444444444444",
+                "definitionHash": "ebf6cf7d94016b4e14990076eed2ddcc3d2b63caac2f68c1afa5b3498e1b077c",
+                "controlDefaults": {}
+              },
+              {
+                "id": "55555555-5555-4555-8555-555555555555",
+                "definitionHash": "ebf6cf7d94016b4e14990076eed2ddcc3d2b63caac2f68c1afa5b3498e1b077c",
+                "controlDefaults": {}
+              }
+            ],
+            "edges": [
+              {
+                "id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+                "from": {
+                  "nodeId": "11111111-1111-4111-8111-111111111111",
+                  "portId": "image"
+                },
+                "to": {
+                  "nodeId": "44444444-4444-4444-8444-444444444444",
+                  "portId": "image"
+                },
+                "delay": "none"
+              },
+              {
+                "id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+                "from": {
+                  "nodeId": "44444444-4444-4444-8444-444444444444",
+                  "portId": "image"
+                },
+                "to": {
+                  "nodeId": "55555555-5555-4555-8555-555555555555",
+                  "portId": "image"
+                },
+                "delay": "none"
+              }
+            ],
+            "inputBindings": {},
+            "outputBindings": {
+              "image": {
+                "nodeId": "55555555-5555-4555-8555-555555555555",
+                "portId": "image"
+              }
+            },
+            "controlBindings": {
+              "ballIntensity": [
+                {
+                  "nodeId": "11111111-1111-4111-8111-111111111111",
+                  "controlId": "intensity"
+                }
+              ],
+              "segmentsA": [
+                {
+                  "nodeId": "44444444-4444-4444-8444-444444444444",
+                  "controlId": "firstSegments"
+                }
+              ],
+              "segmentsB": [
+                {
+                  "nodeId": "55555555-5555-4555-8555-555555555555",
+                  "controlId": "secondSegments"
+                }
+              ]
+            }
+          }
+        },
+        "ebf6cf7d94016b4e14990076eed2ddcc3d2b63caac2f68c1afa5b3498e1b077c": {
+          "kind": "graph",
+          "metadata": {
+            "declarationVersion": 1,
+            "key": "lux/image-composition",
+            "label": "Double mirror",
+            "description": "Authored image component chain",
+            "tags": [],
+            "inputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Image"
+              }
+            },
+            "outputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Image"
+              }
+            },
+            "controls": [
+              {
+                "id": "firstSegments",
+                "type": "number",
+                "label": "Mirror segments",
+                "default": 6,
+                "min": 2,
+                "max": 16,
+                "step": 1,
+                "description": "Sets the number of independently mirrored wedges.",
+                "changeCost": "live"
+              },
+              {
+                "id": "secondSegments",
+                "type": "number",
+                "label": "Mirror segments",
+                "default": 6,
+                "min": 2,
+                "max": 16,
+                "step": 1,
+                "description": "Sets the number of independently mirrored wedges.",
+                "changeCost": "live"
+              }
+            ],
+            "controlDescriptions": {
+              "firstSegments": "Sets the number of independently mirrored wedges.",
+              "secondSegments": "Sets the number of independently mirrored wedges."
+            },
+            "lifecycle": {
+              "state": "stateful",
+              "reset": "seed"
+            }
+          },
+          "body": {
+            "nodes": [
+              {
+                "id": "66666666-6666-4666-8666-666666666666",
+                "definitionHash": "46941f632f7ada5f77d01b2b66ef85569a64836f083928eae879eee812b792fd",
+                "controlDefaults": {}
+              },
+              {
+                "id": "88888888-8888-4888-8888-888888888888",
+                "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+                "controlDefaults": {}
+              }
+            ],
+            "edges": [
+              {
+                "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+                "from": {
+                  "nodeId": "66666666-6666-4666-8666-666666666666",
+                  "portId": "image"
+                },
+                "to": {
+                  "nodeId": "88888888-8888-4888-8888-888888888888",
+                  "portId": "image"
+                },
+                "delay": "none"
+              }
+            ],
+            "inputBindings": {
+              "image": [
+                {
+                  "nodeId": "66666666-6666-4666-8666-666666666666",
+                  "portId": "image"
+                }
+              ]
+            },
+            "outputBindings": {
+              "image": {
+                "nodeId": "88888888-8888-4888-8888-888888888888",
+                "portId": "image"
+              }
+            },
+            "controlBindings": {
+              "firstSegments": [
+                {
+                  "nodeId": "66666666-6666-4666-8666-666666666666",
+                  "controlId": "segments"
+                }
+              ],
+              "secondSegments": [
+                {
+                  "nodeId": "88888888-8888-4888-8888-888888888888",
+                  "controlId": "segments"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "publicControls": [
+        {
+          "id": "ballIntensity",
+          "type": "number",
+          "label": "Spike amount",
+          "default": 0.67,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Controls the height of the animated spikes.",
+          "changeCost": "live"
+        },
+        {
+          "id": "segmentsA",
+          "type": "number",
+          "label": "Mirror segments",
+          "default": 6,
+          "min": 2,
+          "max": 16,
+          "step": 1,
+          "description": "Sets the number of independently mirrored wedges.",
+          "changeCost": "live"
+        },
+        {
+          "id": "segmentsB",
+          "type": "number",
+          "label": "Mirror segments",
+          "default": 6,
+          "min": 2,
+          "max": 16,
+          "step": 1,
+          "description": "Sets the number of independently mirrored wedges.",
+          "changeCost": "live"
+        }
+      ],
+      "publicControlBindings": {
+        "ballIntensity": [
+          {
+            "nodePath": [
+              "11111111-1111-4111-8111-111111111111"
+            ],
+            "controlId": "intensity",
+            "active": true
+          }
+        ],
+        "segmentsA": [
+          {
+            "nodePath": [
+              "44444444-4444-4444-8444-444444444444",
+              "66666666-6666-4666-8666-666666666666",
+              "77777777-7777-4777-8777-777777777777"
+            ],
+            "controlId": "segments",
+            "active": true
+          }
+        ],
+        "segmentsB": [
+          {
+            "nodePath": [
+              "55555555-5555-4555-8555-555555555555",
+              "88888888-8888-4888-8888-888888888888"
+            ],
+            "controlId": "segments",
+            "active": true
+          }
+        ]
+      },
+      "nodes": [
+        {
+          "nodePath": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "definitionHash": "481058d404d75e32c4efbd3354e06415e04f7df25cab4d2af272ae890a06592a",
+          "schema": [
+            {
+              "id": "intensity",
+              "type": "number",
+              "label": "Spike amount",
+              "default": 0.67,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "8229c8eca7f52b563e1adf1eb8c801db6ffd4438d611f332ff491facb6c823bd"
+        },
+        {
+          "nodePath": [
+            "44444444-4444-4444-8444-444444444444",
+            "66666666-6666-4666-8666-666666666666",
+            "77777777-7777-4777-8777-777777777777"
+          ],
+          "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+          "schema": [
+            {
+              "id": "segments",
+              "type": "number",
+              "label": "Mirror segments",
+              "default": 6,
+              "min": 2,
+              "max": 16,
+              "step": 1,
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163"
+        },
+        {
+          "nodePath": [
+            "44444444-4444-4444-8444-444444444444",
+            "88888888-8888-4888-8888-888888888888"
+          ],
+          "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+          "schema": [
+            {
+              "id": "segments",
+              "type": "number",
+              "label": "Mirror segments",
+              "default": 6,
+              "min": 2,
+              "max": 16,
+              "step": 1,
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163"
+        },
+        {
+          "nodePath": [
+            "55555555-5555-4555-8555-555555555555",
+            "66666666-6666-4666-8666-666666666666",
+            "77777777-7777-4777-8777-777777777777"
+          ],
+          "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+          "schema": [
+            {
+              "id": "segments",
+              "type": "number",
+              "label": "Mirror segments",
+              "default": 6,
+              "min": 2,
+              "max": 16,
+              "step": 1,
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163"
+        },
+        {
+          "nodePath": [
+            "55555555-5555-4555-8555-555555555555",
+            "88888888-8888-4888-8888-888888888888"
+          ],
+          "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+          "schema": [
+            {
+              "id": "segments",
+              "type": "number",
+              "label": "Mirror segments",
+              "default": 6,
+              "min": 2,
+              "max": 16,
+              "step": 1,
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163"
+        }
+      ]
+    },
+    "sceneName": "Untitled visual",
+    "authority": "studio",
+    "playback": "playing",
+    "sdkVersion": "0.4.0",
+    "controlSchema": [
+      {
+        "id": "ballIntensity",
+        "type": "number",
+        "label": "Spike amount",
+        "default": 0.67,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "description": "Controls the height of the animated spikes.",
+        "changeCost": "live"
+      },
+      {
+        "id": "segmentsA",
+        "type": "number",
+        "label": "Mirror segments",
+        "default": 6,
+        "min": 2,
+        "max": 16,
+        "step": 1,
+        "description": "Sets the number of independently mirrored wedges.",
+        "changeCost": "live"
+      },
+      {
+        "id": "segmentsB",
+        "type": "number",
+        "label": "Mirror segments",
+        "default": 6,
+        "min": 2,
+        "max": 16,
+        "step": 1,
+        "description": "Sets the number of independently mirrored wedges.",
+        "changeCost": "live"
+      }
+    ],
+    "controlSchemaHash": "27877f6d751ca1c44255c8cb47a8d0fd2738dea9ac10910e966842e7e5e78eda",
+    "controls": {
+      "ballIntensity": 0.67,
+      "segmentsA": 6,
+      "segmentsB": 6
+    },
+    "controlSequence": 0,
+    "nodeControls": {
+      "sourceHash": "bf2a6c4d33b6d7923a5ebd8fde3b75b461dc455b2d380b2ea9e5aa139d8d2b92",
+      "nodes": [
+        {
+          "nodePath": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "definitionHash": "481058d404d75e32c4efbd3354e06415e04f7df25cab4d2af272ae890a06592a",
+          "schema": [
+            {
+              "id": "intensity",
+              "type": "number",
+              "label": "Spike amount",
+              "default": 0.67,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "8229c8eca7f52b563e1adf1eb8c801db6ffd4438d611f332ff491facb6c823bd",
+          "values": {
+            "intensity": 0.67
+          }
+        },
+        {
+          "nodePath": [
+            "44444444-4444-4444-8444-444444444444",
+            "66666666-6666-4666-8666-666666666666",
+            "77777777-7777-4777-8777-777777777777"
+          ],
+          "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+          "schema": [
+            {
+              "id": "segments",
+              "type": "number",
+              "label": "Mirror segments",
+              "default": 6,
+              "min": 2,
+              "max": 16,
+              "step": 1,
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163",
+          "values": {
+            "segments": 6
+          }
+        },
+        {
+          "nodePath": [
+            "44444444-4444-4444-8444-444444444444",
+            "88888888-8888-4888-8888-888888888888"
+          ],
+          "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+          "schema": [
+            {
+              "id": "segments",
+              "type": "number",
+              "label": "Mirror segments",
+              "default": 6,
+              "min": 2,
+              "max": 16,
+              "step": 1,
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163",
+          "values": {
+            "segments": 6
+          }
+        },
+        {
+          "nodePath": [
+            "55555555-5555-4555-8555-555555555555",
+            "66666666-6666-4666-8666-666666666666",
+            "77777777-7777-4777-8777-777777777777"
+          ],
+          "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+          "schema": [
+            {
+              "id": "segments",
+              "type": "number",
+              "label": "Mirror segments",
+              "default": 6,
+              "min": 2,
+              "max": 16,
+              "step": 1,
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163",
+          "values": {
+            "segments": 6
+          }
+        },
+        {
+          "nodePath": [
+            "55555555-5555-4555-8555-555555555555",
+            "88888888-8888-4888-8888-888888888888"
+          ],
+          "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+          "schema": [
+            {
+              "id": "segments",
+              "type": "number",
+              "label": "Mirror segments",
+              "default": 6,
+              "min": 2,
+              "max": 16,
+              "step": 1,
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163",
+          "values": {
+            "segments": 6
+          }
+        }
+      ]
+    },
+    "controlAnimations": [
+      {
+        "nodePath": [
+          "44444444-4444-4444-8444-444444444444",
+          "66666666-6666-4666-8666-666666666666",
+          "77777777-7777-4777-8777-777777777777"
+        ],
+        "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+        "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163",
+        "controlId": "segments",
+        "shape": "sine",
+        "periodSeconds": 2,
+        "amount": 1.4,
+        "phase": 0,
+        "enabled": true
+      }
+    ],
+    "controlAnimationIssues": [],
+    "animationSequence": 0,
+    "effectiveNodeControls": {
+      "sourceHash": "bf2a6c4d33b6d7923a5ebd8fde3b75b461dc455b2d380b2ea9e5aa139d8d2b92",
+      "nodes": [
+        {
+          "nodePath": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "definitionHash": "481058d404d75e32c4efbd3354e06415e04f7df25cab4d2af272ae890a06592a",
+          "schema": [
+            {
+              "id": "intensity",
+              "type": "number",
+              "label": "Spike amount",
+              "default": 0.67,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "8229c8eca7f52b563e1adf1eb8c801db6ffd4438d611f332ff491facb6c823bd",
+          "values": {
+            "intensity": 0.67
+          }
+        },
+        {
+          "nodePath": [
+            "44444444-4444-4444-8444-444444444444",
+            "66666666-6666-4666-8666-666666666666",
+            "77777777-7777-4777-8777-777777777777"
+          ],
+          "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+          "schema": [
+            {
+              "id": "segments",
+              "type": "number",
+              "label": "Mirror segments",
+              "default": 6,
+              "min": 2,
+              "max": 16,
+              "step": 1,
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163",
+          "values": {
+            "segments": 7.172058391081027
+          }
+        },
+        {
+          "nodePath": [
+            "44444444-4444-4444-8444-444444444444",
+            "88888888-8888-4888-8888-888888888888"
+          ],
+          "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+          "schema": [
+            {
+              "id": "segments",
+              "type": "number",
+              "label": "Mirror segments",
+              "default": 6,
+              "min": 2,
+              "max": 16,
+              "step": 1,
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163",
+          "values": {
+            "segments": 6
+          }
+        },
+        {
+          "nodePath": [
+            "55555555-5555-4555-8555-555555555555",
+            "66666666-6666-4666-8666-666666666666",
+            "77777777-7777-4777-8777-777777777777"
+          ],
+          "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+          "schema": [
+            {
+              "id": "segments",
+              "type": "number",
+              "label": "Mirror segments",
+              "default": 6,
+              "min": 2,
+              "max": 16,
+              "step": 1,
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163",
+          "values": {
+            "segments": 6
+          }
+        },
+        {
+          "nodePath": [
+            "55555555-5555-4555-8555-555555555555",
+            "88888888-8888-4888-8888-888888888888"
+          ],
+          "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+          "schema": [
+            {
+              "id": "segments",
+              "type": "number",
+              "label": "Mirror segments",
+              "default": 6,
+              "min": 2,
+              "max": 16,
+              "step": 1,
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163",
+          "values": {
+            "segments": 6
+          }
+        }
+      ]
+    },
+    "controlMigration": [],
+    "clockEpoch": 0,
+    "timeSeconds": 0.6227999999970197,
+    "frameId": "11",
+    "output": {
+      "width": 1280,
+      "height": 720,
+      "fps": 60,
+      "seed": 0
+    },
+    "fault": null
+  },
+  "failure": "AssertionError [ERR_ASSERTION]: cancel returns focus to Load\n\nfalse !== true\n\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/save-looks-124/evidence/looks-demo.mjs:36:10",
+  "ownedProcessExited": true
+}

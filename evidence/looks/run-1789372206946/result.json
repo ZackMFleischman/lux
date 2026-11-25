@@ -1,0 +1,23 @@
+{
+  "ok": false,
+  "candidate": "e0aa8354f83bc9a7d36a7f9e90df38752cfcb75c",
+  "session": {
+    "profile": "test-b3cea456-3578-412f-840b-a603f4dd237b",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\save-looks-124",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-b3cea456-3578-412f-840b-a603f4dd237b",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-b3cea456-3578-412f-840b-a603f4dd237b\\agent-endpoint.json"
+  },
+  "checks": [],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\save-looks-124\\evidence\\looks\\run-1789372206946\\failure.png"
+  ],
+  "errors": [],
+  "ownedPid": 25400,
+  "endpoint": {
+    "pid": 25400,
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\save-looks-124",
+    "profile": "test-b3cea456-3578-412f-840b-a603f4dd237b"
+  },
+  "failure": "TypeError: Cannot read properties of undefined (reading 'length')\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/save-looks-124/evidence/looks-demo.mjs:35:224",
+  "ownedProcessExited": true
+}
