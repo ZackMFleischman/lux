@@ -1,0 +1,13 @@
+{
+  "ok": true,
+  "profile": "test-ac6a6368-647c-46fc-a564-9074fa40b9ab",
+  "source": "c7660fd06eb40230436463a53b727960378dfdf0",
+  "checks": [
+    "Normal startup built and played the initial visual without a Build action",
+    "Background candidate kept the old canvas and editable controls, then promoted with latest control, animation, and Pause state",
+    "Invalid replacement retained the promoted visual, base controls, animation, and explicit Pause"
+  ],
+  "errors": [],
+  "pid": 26144,
+  "exitCode": 0
+}
