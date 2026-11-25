@@ -1,0 +1,26 @@
+{
+  "ok": true,
+  "checks": [
+    "Preview smaller than output saved a decoded 1920×1080 PNG",
+    "Electron decoded, played, and sought within the finite-duration fixed 1920×1080 WebM clip",
+    "Closing Studio during recording drained writes and removed the partial clip"
+  ],
+  "errors": [],
+  "video": {
+    "bytes": 650332,
+    "width": 1920,
+    "height": 1080,
+    "duration": 2.912,
+    "playedAt": 0.25038,
+    "seekTarget": 1.7471999999999999,
+    "seekedAt": 1.747547,
+    "paused": false
+  },
+  "output": {
+    "width": 1920,
+    "height": 1080,
+    "displayWidth": 455,
+    "displayHeight": 288
+  },
+  "exitCode": 0
+}

@@ -1,0 +1,9 @@
+{
+  "ok": false,
+  "checks": [
+    "Preview smaller than output saved a decoded 1920×1080 PNG"
+  ],
+  "errors": [],
+  "failure": "locator.waitFor: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('status').filter({ hasText: 'Recording 1920 × 1080' }) to be visible\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\preview-capture\\scripts\\test-studio-capture.mjs:51:79",
+  "exitCode": 0
+}
