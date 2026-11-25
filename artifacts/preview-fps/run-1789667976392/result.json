@@ -1,0 +1,4 @@
+{
+  "ok": false,
+  "error": "locator.waitFor: Error: strict mode violation: getByText('640 × 360', { exact: true }) resolved to 2 elements:\n    1) <span aria-live=\"polite\" class=\"preview-resolution-value\">640 × 360</span> aka locator('span').filter({ hasText: /^640 × 360$/ })\n    2) <b>640 × 360</b> aka locator('b')\n\nCall log:\n\u001b[2m  - waiting for getByText('640 × 360', { exact: true }) to be visible\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\preview-fps\\artifacts\\preview-fps-capture.mjs:8:532"
+}

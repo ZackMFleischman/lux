@@ -1,0 +1,1 @@
+Root isolated native validation passed at 640x360: playing 43.9 FPS, paused — FPS. Root-owned process 35476 exited cleanly. Raw result and screenshots: C:/Users/zFlei/repos/lux/artifacts/preview-fps-final/result.json, playing.png, paused.png. Local Studio build passed for 72893f.

@@ -1,0 +1,11 @@
+{
+  "commit": "ebc2b905d5537567fba1ddf7b82b57fd5017ca82",
+  "criteria": "Independent review found the submitted telemetry source cannot provide a live FPS in the actual standalone client.",
+  "evidence": "The candidate reads snapshot.visualFps, but the actual standalone-client observation established that it is always null. Existing live measured telemetry is performance.worker.produced.value, as displayed by PerformanceStatus. Therefore the header always shows the fallback instead of a measured live FPS. The submission also records that its isolated 640x360 capture did not render because of a draft-version race, so the required capture is absent. Correct the source and submit fresh focused and isolated evidence.",
+  "context_id": "lux-inspector-group-validator-01a09baf",
+  "checks": {
+    "actual_live_telemetry": "fail",
+    "isolated_640x360_capture": "incomplete",
+    "header_fit": "not_reviewed"
+  }
+}

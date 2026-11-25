@@ -1,0 +1,1 @@
+Preview header now reads the live worker-produced FPS beside resolution controls and truthfully shows — FPS while paused or stale. Source chain: ebc2b905d5537567fba1ddf7b82b57fd5017ca82, 72893f16735146cf7dfd3913f71169f397ec6fd4.

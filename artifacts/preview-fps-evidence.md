@@ -1,0 +1,1 @@
+Studio build and tests/studio/view.test.tsx passed (5 tests), covering live 0.0 FPS and paused/stale fallback. The isolated 640x360 capture used its own test profile but encountered an editor draft-version race before rendering; no product error observed and no user session touched.

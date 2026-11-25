@@ -1,0 +1,13 @@
+{
+  "commit": "e8f40527b76c0d0e8205b267b6757e639f0ceb5d",
+  "criteria": "Independent review verified the corrected Preview FPS header against LUX-208's measured-telemetry and truthful-state requirements.",
+  "evidence": "The corrected source reads snapshot.performance.worker.produced, the existing actual worker-produced measurement, rather than null legacy snapshot.visualFps. It renders a numeric tabular FPS only for playing, live, available telemetry; stale and unavailable states render — FPS with an unavailable-or-stale detail, while paused renders — FPS with explicit Paused detail. Root isolated native evidence at artifacts/preview-fps-final/result.json reports playing 43.9 FPS, paused — FPS, no errors, owned PID 35476, and clean exit code 0. I visually reviewed playing.png and paused.png: the compact header fits alongside resolution controls with no clipping. The captures actually show 1920×1080, not the submitted claim of 640×360; preserve that correction. The final paused-tooltip source commit e8f40527 follows the submitted ebc2b905 and 72893f chain; its structured submitted commit field was omitted, and this validation records the exact final source.",
+  "context_id": "lux-inspector-group-validator-01a09baf",
+  "checks": {
+    "measured_worker_telemetry": "pass",
+    "playing_native_observation": "pass",
+    "paused_truthfulness": "pass",
+    "header_layout_at_actual_1920x1080": "pass",
+    "claimed_640x360_capture": "not_claimed"
+  }
+}

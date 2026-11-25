@@ -1,0 +1,6 @@
+{
+  "ok": false,
+  "profile": "test-95971cd1-3969-49b2-a422-940454d34e58",
+  "checks": [],
+  "error": "Error: Editor changed; read its source again\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/preview-fps/artifacts/preview-fps-qa.mjs:5:1387\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"
+}
