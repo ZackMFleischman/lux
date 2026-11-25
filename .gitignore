@@ -1,5 +1,6 @@
 .worktrees/
 node_modules/
+.env.local
 dist/
 native/build/
 native/vendor/

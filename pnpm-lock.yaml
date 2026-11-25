@@ -65,12 +65,21 @@ importers:
       jpeg-js:
         specifier: 0.4.4
         version: 0.4.4(patch_hash=9f104444e6d781245877562d247768cc15dca273e2a4bb238ae46bbf73146a69)
+      openai:
+        specifier: 7.15.0
+        version: 7.15.0(undici@7.29.1)(ws@8.21.3)(zod@3.25.76)
       pako:
         specifier: 2.1.0
         version: 2.1.0
+      smol-toml:
+        specifier: 1.8.0
+        version: 1.8.0
       three:
         specifier: 0.186.0
         version: 0.186.0
+      ws:
+        specifier: 8.21.3
+        version: 8.21.3
       zod:
         specifier: 3.25.76
         version: 3.25.76
@@ -114,6 +123,9 @@ importers:
       '@types/three':
         specifier: 0.186.0
         version: 0.186.0
+      '@types/ws':
+        specifier: 8.18.1
+        version: 8.18.1
       electron:
         specifier: 44.3.0
         version: 44.3.0
@@ -750,6 +762,9 @@ packages:
   '@types/webxr@0.5.24':
     resolution: {integrity: sha512-h8fgEd/DpoS9CBrjEQXR+dIDraopAEfu4wYVNY2tEPwk60stPWhvZMf4Foo5FakuQ7HFZoa8WceaWFervK2Ovg==}
 
+  '@types/ws@8.18.1':
+    resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
+
   '@typescript/typescript-aix-ppc64@7.0.2':
     resolution: {integrity: sha512-MTKKkWB7p/0E9xi1d1tHtZ5PiLkGEMIq88pK2CubZjOsLtYTLqhgIgi6zepFa+9GHZ6h05NMCkQxGKiPXMxXtQ==}
     engines: {node: '>=16.20.0'}
@@ -1303,6 +1318,30 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
+  openai@7.15.0:
+    resolution: {integrity: sha512-2DIwesnPSduw68MFx7nAdgvshrgvS8WOan5W8+tgUMlAy/tY+Q41g80Pa+w/v64rHA6rtn+dketa8QvMVxU96w==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@aws-sdk/credential-provider-node': '>=3.972.0 <4'
+      '@smithy/hash-node': '>=4.3.0 <5'
+      '@smithy/signature-v4': '>=5.4.0 <6'
+      undici: '>=5 <9'
+      ws: ^8.21.0
+      zod: ^3.25 || ^4.0
+    peerDependenciesMeta:
+      '@aws-sdk/credential-provider-node':
+        optional: true
+      '@smithy/hash-node':
+        optional: true
+      '@smithy/signature-v4':
+        optional: true
+      undici:
+        optional: true
+      ws:
+        optional: true
+      zod:
+        optional: true
+
   pako@2.1.0:
     resolution: {integrity: sha512-w+eufiZ1WuJYgPXbV/PO3NCMEc3xqylkKHzp8bxp1uW4qaSNQUkwmLLEc3kKsfz8lpV1F8Ht3U1Cm+9Srog2ug==}
 
@@ -1476,6 +1515,10 @@ packages:
   side-channel@1.1.1:
     resolution: {integrity: sha512-6x6dK6zJdpTzF4sQeNYxwtvBzf6Eg4GtlesS94HOvTudUeyK2WXAaIfmDgsyslYrRBeFIlsi54AYsFGUuhmvrQ==}
     engines: {node: '>= 0.4'}
+
+  smol-toml@1.8.0:
+    resolution: {integrity: sha512-kCZr2V3ch9i00x8zXRhjUNVcjG9ijES5dDudkXvUVCT5QlJNQWElSJdZqyPemffHoLNUYwOcou0Fy+ojN0uHSQ==}
+    engines: {node: '>= 18'}
 
   source-map@0.5.7:
     resolution: {integrity: sha512-LbrmJOMUSdEVxIKvdcJzQC+nQhe8FUZQTXQy6+I75skNgn3OoQ0DZA8YnFa7gp8tqtL3KPf1kmo0R5DoApeSGQ==}
@@ -2153,6 +2196,10 @@ snapshots:
 
   '@types/webxr@0.5.24': {}
 
+  '@types/ws@8.18.1':
+    dependencies:
+      '@types/node': 24.13.4
+
   '@typescript/typescript-aix-ppc64@7.0.2':
     optional: true
 
@@ -2675,6 +2722,12 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
+  openai@7.15.0(undici@7.29.1)(ws@8.21.3)(zod@3.25.76):
+    optionalDependencies:
+      undici: 7.29.1
+      ws: 8.21.3
+      zod: 3.25.76
+
   pako@2.1.0: {}
 
   parent-module@1.0.1:
@@ -2862,6 +2915,8 @@ snapshots:
       side-channel-list: 1.0.1
       side-channel-map: 1.0.1
       side-channel-weakmap: 1.0.2
+
+  smol-toml@1.8.0: {}
 
   source-map@0.5.7: {}
 
