@@ -1,0 +1,7 @@
+-- The CXX compiler identification is unknown
+CMake Error at CMakeLists.txt:2 (project):
+  No CMAKE_CXX_COMPILER could be found.
+
+
+
+-- Configuring incomplete, errors occurred!

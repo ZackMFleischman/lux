@@ -1,0 +1,36 @@
+✔ full cold-start window retains no-frame opportunities and elapsed callback spans (6.0825ms)
+✔ a skipped nominal slot lowers actual cadence and is never a fake opportunity (2.5706ms)
+✔ held transport frames remain held; they are not fresh rendered-image claims (3.0276ms)
+✔ supervisor QPC envelope and producer-start provenance cannot be shifted or fabricated (6.4119ms)
+✔ completed lifecycle uses the actual native exit timestamp fields, without clock.at (13.9915ms)
+✔ incomplete windows, fake joins, missing slots, timer failures and loss fail closed (4.1154ms)
+✖ cadence is exclusively 10 s under exactly 30 s supervision, validated before graphics (3.848ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 6
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 130.8587
+
+✖ failing tests:
+
+test at tests\unit\native-cadence-options.test.mjs:2:1
+✖ cadence is exclusively 10 s under exactly 30 s supervision, validated before graphics (3.848ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  null !== 0
+  
+      at TestContext.<anonymous> (file:///C:/Users/zFlei/repos/lux/.worktrees/receiver-diagnostics/tests/unit/native-cadence-options.test.mjs:6:9)
+      at Test.runInAsyncScope (node:async_hooks:214:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.start (node:internal/test_runner/test:1003:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

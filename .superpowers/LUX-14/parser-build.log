@@ -1,0 +1,11 @@
+MSBuild version 18.0.5+e22287bf1 for .NET Framework
+
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/receiver-diagnostics/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  standalone_host.cc
+  gl_load.c
+  Compiling...
+  gl_load.c
+  standalone_host.cc
+     Creating library C:/Users/zFlei/repos/lux/.worktrees/receiver-diagnostics/native/build/Release/lux_standalone_host.lib and object C:/Users/zFlei/repos/lux/.worktrees/receiver-diagnostics/native/build/Release/lux_standalone_host.exp
+  lux_standalone_host.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\Release\lux_standalone_host.exe

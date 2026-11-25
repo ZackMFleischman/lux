@@ -1,0 +1,7 @@
+MSBuild version 18.0.5+e22287bf1 for .NET Framework
+
+  Scanning sources for module dependencies...
+  receiver_run_test.cc
+  Compiling...
+  receiver_run_test.cc
+  lux_receiver_run_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\Release\lux_receiver_run_test.exe

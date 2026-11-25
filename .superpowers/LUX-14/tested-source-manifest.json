@@ -1,0 +1,26 @@
+[
+  {
+    "path": "native/CMakeLists.txt",
+    "sha256": "3B1D3218B395076C5E27B95C6D44F449163CDF9E6CB715A1125B9F73C5FCB5F2"
+  },
+  {
+    "path": "native/LIFECYCLE.md",
+    "sha256": "EDA52F6A14DD447AC7AD52AD3B043A7B7E94974B53B526D1C06F3AC2AC86CCF2"
+  },
+  {
+    "path": "native/ffgl-source/src/FrameReceiver.cpp",
+    "sha256": "BAF6A7C1F65B8E57FAD463041954E184309AEF86884F4C6EC5360BC9570B111E"
+  },
+  {
+    "path": "native/ffgl-source/src/ReceiverRun.h",
+    "sha256": "02BAD576393E2C99F30EE906BFF144670FD52CF8E89EBB26559D9C624FFC62B3"
+  },
+  {
+    "path": "tests/native/receiver_lifecycle_test.cc",
+    "sha256": "B7CF29BEE091BF551F54B2E9E9B6A54B6AFF10E6A6FDCFFF67C036CCEBE900F5"
+  },
+  {
+    "path": "tests/native/receiver_run_test.cc",
+    "sha256": "31A59F0ABA784F6A2ABF217C11396EA0350D663541AEE4F762E522E66AFE1338"
+  }
+]

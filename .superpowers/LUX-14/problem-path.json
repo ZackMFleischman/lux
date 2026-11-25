@@ -1,0 +1,7 @@
+{
+  "summary": "LUX-14 first CMake configuration failed from duplicate Path/PATH environment keys",
+  "evidence": "C:/Users/zFlei/repos/lux/.worktrees/receiver-diagnostics/.superpowers/LUX-14/configure.log; configure-normalized.log; red-build.log",
+  "correction": "Process-local PowerShell: save $env:PATH, Remove-Item Env:PATH, set $env:Path to saved value before CMake. Same generator/toolset/SDK then configured successfully and new test failed as expected for missing ReceiverRun.h. No machine environment or installation changes.",
+  "actual": "MSB6001 System.ArgumentException duplicate Path/PATH during CL launch; CMake reports no CXX compiler. Original log configure.log and CMakeConfigureLog.yaml.",
+  "expected": "Pinned VS18 compiler discovery succeeds in isolated receiver checkout"
+}

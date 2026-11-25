@@ -1,0 +1,9 @@
+-- The CXX compiler identification is MSVC 19.50.35721.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/18/BuildTools/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (2.7s)
+-- Generating done (0.5s)
+-- Build files have been written to: C:/Users/zFlei/repos/lux/.worktrees/receiver-diagnostics/native/build

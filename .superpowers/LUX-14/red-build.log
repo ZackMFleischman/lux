@@ -1,0 +1,12 @@
+MSBuild version 18.0.5+e22287bf1 for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/receiver-diagnostics/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  receiver_run_test.cc
+C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\tests\native\receiver_run_test.cc(1,10): fatal  error C1083: Cannot open include file: 'ReceiverRun.h': No such file or directory [C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\lux_receiver_run_test.vcxproj]
+C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\tests\native\receiver_run_test.cc(1,10): error C1083: Cannot open include file: 'ReceiverRun.h': No such file or directory [C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\lux_receiver_run_test.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\MSBuild\Microsoft\VC\v180\Microsoft.CppCommon.targets(533,5): warning MSB8074: Cannot read Module Dependencies file lux_receiver_run_test.dir\Release\receiver_run_test.cc.module.json: Expecting element 'root' from namespace ''.. Encountered 'None'  with name '', namespace ''.  The build order might be incorrect. [C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\lux_receiver_run_test.vcxproj]
+  Compiling...
+  receiver_run_test.cc
+C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\tests\native\receiver_run_test.cc(1,10): error C1083: Cannot open include file: 'ReceiverRun.h': No such file or directory [C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\lux_receiver_run_test.vcxproj]

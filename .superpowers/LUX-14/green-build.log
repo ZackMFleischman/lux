@@ -1,0 +1,107 @@
+MSBuild version 18.0.5+e22287bf1 for .NET Framework
+
+  Scanning sources for module dependencies...
+  receiver_run_test.cc
+  Compiling...
+  receiver_run_test.cc
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\chrono(2381,9): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc [C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\lux_receiver_run_test.vcxproj]
+  (compiling source file '../../tests/native/receiver_run_test.cc')
+  
+  lux_receiver_run_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\Release\lux_receiver_run_test.exe
+MSBuild version 18.0.5+e22287bf1 for .NET Framework
+
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/receiver-diagnostics/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  receiver_lifecycle_test.cc
+  Compiling...
+  receiver_lifecycle_test.cc
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\chrono(2381,9): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc [C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\lux_receiver_lifecycle_test.vcxproj]
+  (compiling source file '../../tests/native/receiver_lifecycle_test.cc')
+  
+  lux_receiver_lifecycle_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\Release\lux_receiver_lifecycle_test.exe
+MSBuild version 18.0.5+e22287bf1 for .NET Framework
+
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/receiver-diagnostics/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  shutdown_race_test.cc
+  Compiling...
+  shutdown_race_test.cc
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\__msvc_ostream.hpp(781,9): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc [C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\lux_shutdown_race_test.vcxproj]
+  (compiling source file '../../tests/native/shutdown_race_test.cc')
+      C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\__msvc_ostream.hpp(781,9):
+      the template instantiation context (the oldest one first) is
+          C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\tests\native\shutdown_race_test.cc(9,45):
+          see reference to function template instantiation 'std::basic_ostream<char,std::char_traits<char>> &std::operator <<<std::char_traits<char>>(std::basic_ostream<char,std::char_traits<char>> &,const char *)' being compiled
+  
+  lux_shutdown_race_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\Release\lux_shutdown_race_test.exe
+MSBuild version 18.0.5+e22287bf1 for .NET Framework
+
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/receiver-diagnostics/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  shared_ring_test.cc
+  Compiling...
+  shared_ring_test.cc
+  lux_shared_ring_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\Release\lux_shared_ring_test.exe
+MSBuild version 18.0.5+e22287bf1 for .NET Framework
+
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/receiver-diagnostics/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  context_handoff_test.cc
+  Compiling...
+  context_handoff_test.cc
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\chrono(2381,9): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc [C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\lux_context_handoff_test.vcxproj]
+  (compiling source file '../context_handoff_test.cc')
+  
+  lux_context_handoff_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\Release\lux_context_handoff_test.exe
+MSBuild version 18.0.5+e22287bf1 for .NET Framework
+
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/receiver-diagnostics/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  FrameReceiver.cpp
+  LuxSource.cpp
+  FFGLSDK.cpp
+  Compiling...
+  FrameReceiver.cpp
+  FFGLSDK.cpp
+  LuxSource.cpp
+C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\vendor\ffgl\source\lib\ffgl\FFGL.h(104,9): warning C4005: 'WIN32_LEAN_AND_MEAN': macro redefinition [C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\LuxTracerTR02.vcxproj]
+C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\vendor\ffgl\source\lib\ffgl\FFGL.h(104,9): warning C4005: 'WIN32_LEAN_AND_MEAN': macro redefinition [C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\LuxTracerTR02.vcxproj]
+  (compiling source file '../ffgl-source/src/LuxSource.cpp')
+      C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\vendor\ffgl\source\lib\ffgl\FFGL.h(104,9):
+      'WIN32_LEAN_AND_MEAN' previously declared on the command line
+  
+C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\vendor\ffgl\source\lib\ffgl\FFGL.h(131,9): warning C4005: 'NOMINMAX': macro redefinition [C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\LuxTracerTR02.vcxproj]
+  (compiling source file '../ffgl-source/src/LuxSource.cpp')
+      C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\vendor\ffgl\source\lib\ffgl\FFGL.h(131,9):
+      'NOMINMAX' previously declared on the command line
+  
+  (compiling source file '../vendor/ffgl/source/lib/FFGLSDK.cpp')
+      C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\vendor\ffgl\source\lib\ffgl\FFGL.h(104,9):
+      'WIN32_LEAN_AND_MEAN' previously declared on the command line
+  
+C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\vendor\ffgl\source\lib\ffgl\FFGL.h(131,9): warning C4005: 'NOMINMAX': macro redefinition [C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\LuxTracerTR02.vcxproj]
+  (compiling source file '../vendor/ffgl/source/lib/FFGLSDK.cpp')
+      C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\vendor\ffgl\source\lib\ffgl\FFGL.h(131,9):
+      'NOMINMAX' previously declared on the command line
+  
+C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\vendor\ffgl\source\lib\ffgl\FFGL.h(104,9): warning C4005: 'WIN32_LEAN_AND_MEAN': macro redefinition [C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\LuxTracerTR02.vcxproj]
+  (compiling source file '../ffgl-source/src/FrameReceiver.cpp')
+      C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\vendor\ffgl\source\lib\ffgl\FFGL.h(104,9):
+      'WIN32_LEAN_AND_MEAN' previously declared on the command line
+  
+C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\vendor\ffgl\source\lib\ffgl\FFGL.h(131,9): warning C4005: 'NOMINMAX': macro redefinition [C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\LuxTracerTR02.vcxproj]
+  (compiling source file '../ffgl-source/src/FrameReceiver.cpp')
+      C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\vendor\ffgl\source\lib\ffgl\FFGL.h(131,9):
+      'NOMINMAX' previously declared on the command line
+  
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\chrono(2381,9): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc [C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\LuxTracerTR02.vcxproj]
+  (compiling source file '../vendor/ffgl/source/lib/FFGLSDK.cpp')
+  
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\chrono(2381,9): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc [C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\LuxTracerTR02.vcxproj]
+  (compiling source file '../ffgl-source/src/LuxSource.cpp')
+  
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\chrono(2381,9): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc [C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\LuxTracerTR02.vcxproj]
+  (compiling source file '../ffgl-source/src/FrameReceiver.cpp')
+  
+     Creating library C:/Users/zFlei/repos/lux/.worktrees/receiver-diagnostics/native/build/Release/LuxTracerTR02.lib and object C:/Users/zFlei/repos/lux/.worktrees/receiver-diagnostics/native/build/Release/LuxTracerTR02.exp
+  LuxTracerTR02.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\receiver-diagnostics\native\build\Release\LuxTracerTR02.dll

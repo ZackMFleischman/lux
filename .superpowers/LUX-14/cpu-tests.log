@@ -1,0 +1,15 @@
+Test project C:/Users/zFlei/repos/lux/.worktrees/receiver-diagnostics/native/build
+    Start 3: shared_ring_ownership
+1/5 Test #3: shared_ring_ownership ............   Passed    0.04 sec
+    Start 4: shutdown_admission
+2/5 Test #4: shutdown_admission ...............   Passed    0.03 sec
+    Start 5: receiver_lifecycle_cpu
+3/5 Test #5: receiver_lifecycle_cpu ...........   Passed    0.05 sec
+    Start 6: receiver_run_cpu
+4/5 Test #6: receiver_run_cpu .................   Passed    0.05 sec
+    Start 8: context_handoff_cpu
+5/5 Test #8: context_handoff_cpu ..............   Passed    0.05 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =   0.36 sec

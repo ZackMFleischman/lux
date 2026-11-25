@@ -1,0 +1,15 @@
+✔ full cold-start window retains no-frame opportunities and elapsed callback spans (5.8519ms)
+✔ a skipped nominal slot lowers actual cadence and is never a fake opportunity (2.2183ms)
+✔ held transport frames remain held; they are not fresh rendered-image claims (3.9288ms)
+✔ supervisor QPC envelope and producer-start provenance cannot be shifted or fabricated (4.7149ms)
+✔ completed lifecycle uses the actual native exit timestamp fields, without clock.at (11.7003ms)
+✔ incomplete windows, fake joins, missing slots, timer failures and loss fail closed (5.3273ms)
+✔ cadence is exclusively 10 s under exactly 30 s supervision, validated before graphics (802.9751ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 901.9113
