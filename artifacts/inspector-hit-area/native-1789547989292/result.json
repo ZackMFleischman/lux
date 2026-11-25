@@ -1,0 +1,42 @@
+{
+  "ok": false,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/inspector-hit-area",
+  "profile": "test-b0b8759e-86b6-4013-9058-6cecc377a4d7",
+  "commit": "da4f86980bbdfce6c3683064a90f1289f8601b0d",
+  "checks": [
+    "wide: ordinary pointer Animate/Reset/numeric clicks with aligned thumb, pointer drag, slider ArrowRight, Tab/Enter activation and Escape all pass"
+  ],
+  "alignments": [
+    {
+      "label": "wide Animate",
+      "value": 1.61,
+      "targetX": 1303,
+      "thumbX": 1302.578125,
+      "distance": 0.421875
+    },
+    {
+      "label": "wide Reset",
+      "value": 1.92,
+      "targetX": 1329,
+      "thumbX": 1329.234375,
+      "distance": 0.234375
+    },
+    {
+      "label": "wide numeric",
+      "value": 1.08,
+      "targetX": 1258,
+      "thumbX": 1258.25,
+      "distance": 0.25
+    }
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\inspector-hit-area\\artifacts\\inspector-hit-area\\native-1789547989292\\wide-animate.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\inspector-hit-area\\artifacts\\inspector-hit-area\\native-1789547989292\\wide-controls.png"
+  ],
+  "errors": [],
+  "pid": 7392,
+  "stage": "narrow",
+  "error": "AssertionError [ERR_ASSERTION]: narrow Animate is horizontally aligned with thumb (12.390625px)\n    at align (file:///C:/Users/zFlei/repos/lux/.worktrees/inspector-hit-area/scripts/test-inspector-hit-area.mjs:50:12)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/inspector-hit-area/scripts/test-inspector-hit-area.mjs:59:5",
+  "exitCode": 0,
+  "processExited": true
+}

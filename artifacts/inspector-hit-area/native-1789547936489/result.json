@@ -1,0 +1,22 @@
+{
+  "ok": false,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/inspector-hit-area",
+  "profile": "test-66c4c4a2-9b79-4f5d-b5fc-60c71cf70a4b",
+  "commit": "6bf414d3ed4c815be7eaae83fe4a09421904bb08",
+  "checks": [],
+  "alignments": [
+    {
+      "label": "baseline Animate",
+      "value": 1.61,
+      "targetX": 1303,
+      "thumbX": 1302.578125,
+      "distance": 0.421875
+    }
+  ],
+  "screenshots": [],
+  "errors": [],
+  "pid": 29320,
+  "error": "page.addStyleTag: Applying inline style violates the following Content Security Policy directive 'style-src 'self' 'nonce-8wsRR41N+3nq3tJVp3s2+uPJHWe1/5nl''. Either the 'unsafe-inline' keyword, a hash ('sha256-cS5N8esmoKHhMSzM8m78bZLMkOXwwkicePenwjOOahc='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\inspector-hit-area\\scripts\\test-inspector-hit-area.mjs:58:34",
+  "exitCode": 0,
+  "processExited": true
+}

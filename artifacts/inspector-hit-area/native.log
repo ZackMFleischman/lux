@@ -1,0 +1,70 @@
+{
+  "output": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\inspector-hit-area\\artifacts\\inspector-hit-area\\native-1789548144151",
+  "ok": true,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/inspector-hit-area",
+  "profile": "test-0d756d7e-0b21-4bd4-a4bf-ef60e3ade1e3",
+  "commit": "47ccc6a3e6accaf6b76ca3fe39713d3853b925de",
+  "checks": [
+    "wide: ordinary pointer Animate/Reset/numeric clicks with aligned thumb, pointer drag, slider ArrowRight, Tab/Enter activation and Escape all pass",
+    "narrow: ordinary pointer Animate/Reset/numeric clicks with aligned thumb, pointer drag, slider ArrowRight, Tab/Enter activation and Escape all pass"
+  ],
+  "alignments": [
+    {
+      "label": "wide Animate",
+      "value": 1.61,
+      "targetX": 1303,
+      "thumbX": 1303.03125,
+      "distance": 0.03125
+    },
+    {
+      "label": "wide Reset",
+      "value": 1.92,
+      "targetX": 1329,
+      "thumbX": 1328.421875,
+      "distance": 0.578125
+    },
+    {
+      "label": "wide numeric",
+      "value": 1.08,
+      "targetX": 1258,
+      "thumbX": 1258.25,
+      "distance": 0.25
+    },
+    {
+      "label": "narrow Animate",
+      "value": 0.17,
+      "targetX": 720,
+      "thumbX": 720.390625,
+      "distance": 0.390625
+    },
+    {
+      "label": "narrow Reset",
+      "value": 0.76,
+      "targetX": 746,
+      "thumbX": 744.015625,
+      "distance": 1.984375
+    },
+    {
+      "label": "narrow numeric",
+      "value": 1.56,
+      "targetX": 781,
+      "thumbX": 780.859375,
+      "distance": 0.140625
+    }
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\inspector-hit-area\\artifacts\\inspector-hit-area\\native-1789548144151\\wide-animate.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\inspector-hit-area\\artifacts\\inspector-hit-area\\native-1789548144151\\wide-controls.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\inspector-hit-area\\artifacts\\inspector-hit-area\\native-1789548144151\\narrow-animate.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\inspector-hit-area\\artifacts\\inspector-hit-area\\native-1789548144151\\narrow-controls.png"
+  ],
+  "errors": [],
+  "pid": 8696,
+  "stage": "narrow",
+  "previewOutput": {
+    "width": 640,
+    "height": 360
+  },
+  "exitCode": 0,
+  "processExited": true
+}
