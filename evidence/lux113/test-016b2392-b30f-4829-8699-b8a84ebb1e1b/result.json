@@ -1,0 +1,880 @@
+{
+  "ok": false,
+  "commit": "beacfcf9eda7409cdb5502ff3b525d03d4987c1d",
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\disclosures-113",
+  "profile": "test-016b2392-b30f-4829-8699-b8a84ebb1e1b",
+  "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-016b2392-b30f-4829-8699-b8a84ebb1e1b\\agent-endpoint.json",
+  "checks": [],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\disclosures-113\\evidence\\lux113\\test-016b2392-b30f-4829-8699-b8a84ebb1e1b\\01-source-collapsed.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\disclosures-113\\evidence\\lux113\\test-016b2392-b30f-4829-8699-b8a84ebb1e1b\\02-all-expanded.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\disclosures-113\\evidence\\lux113\\test-016b2392-b30f-4829-8699-b8a84ebb1e1b\\03-inspector-collapsed.png"
+  ],
+  "pid": 4912,
+  "endpoint": {
+    "pid": 4912,
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\disclosures-113",
+    "profile": "test-016b2392-b30f-4829-8699-b8a84ebb1e1b",
+    "sessionId": "135ba352f10eb0aa86891d797bffaceb9b26"
+  },
+  "markers": [
+    {
+      "display": "list-item",
+      "font": "12px",
+      "marker": "normal",
+      "top": 81,
+      "height": 28
+    },
+    {
+      "display": "list-item",
+      "font": "12px",
+      "marker": "normal",
+      "top": 55,
+      "height": 28
+    },
+    {
+      "display": "list-item",
+      "font": "12px",
+      "marker": "normal",
+      "top": 287.5,
+      "height": 28
+    },
+    {
+      "display": "list-item",
+      "font": "12px",
+      "marker": "normal",
+      "top": 565.5,
+      "height": 28
+    },
+    {
+      "display": "list-item",
+      "font": "12px",
+      "marker": "normal",
+      "top": 808.5,
+      "height": 28
+    }
+  ],
+  "narrowFrame": {
+    "width": 820,
+    "height": 700,
+    "scrollX": 0,
+    "scrollWidth": 805
+  },
+  "error": "AssertionError [ERR_ASSERTION]: Narrow document must fit its real window\n\n805 !== 820\n\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/disclosures-113/evidence/lux113-demo.mjs:45:485",
+  "lastStatus": {
+    "connection": "connected",
+    "message": null,
+    "receivedAtMs": 1789365428549,
+    "authoring": {
+      "instanceId": "697ff7a3-0596-45cb-a3ec-6449565e4c01",
+      "generation": 1,
+      "revisionId": "0cf85d45361d2e85a0beb0b4da6c6f4a2470072a428b9eaa576f61130a81006e",
+      "composition": {
+        "version": 1,
+        "declaration": {
+          "definitions": {
+            "ball": "ball.ts",
+            "kaleidoscope": "kaleidoscope.ts"
+          },
+          "nodes": [
+            {
+              "id": "11111111-1111-4111-8111-111111111111",
+              "definition": "ball"
+            },
+            {
+              "id": "22222222-2222-4222-8222-222222222222",
+              "definition": "kaleidoscope"
+            },
+            {
+              "id": "33333333-3333-4333-8333-333333333333",
+              "definition": "kaleidoscope"
+            }
+          ],
+          "edges": [
+            {
+              "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+              "from": {
+                "nodeId": "11111111-1111-4111-8111-111111111111",
+                "portId": "image"
+              },
+              "to": {
+                "nodeId": "22222222-2222-4222-8222-222222222222",
+                "portId": "image"
+              },
+              "delay": "none"
+            },
+            {
+              "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+              "from": {
+                "nodeId": "22222222-2222-4222-8222-222222222222",
+                "portId": "image"
+              },
+              "to": {
+                "nodeId": "33333333-3333-4333-8333-333333333333",
+                "portId": "image"
+              },
+              "delay": "none"
+            }
+          ],
+          "output": {
+            "nodeId": "33333333-3333-4333-8333-333333333333",
+            "portId": "image"
+          },
+          "expose": [
+            {
+              "id": "ballIntensity",
+              "nodeId": "11111111-1111-4111-8111-111111111111",
+              "controlId": "intensity"
+            },
+            {
+              "id": "segmentsA",
+              "nodeId": "22222222-2222-4222-8222-222222222222",
+              "controlId": "segments"
+            },
+            {
+              "id": "segmentsB",
+              "nodeId": "33333333-3333-4333-8333-333333333333",
+              "controlId": "segments"
+            }
+          ]
+        },
+        "definitionNames": {
+          "ball": "481058d404d75e32c4efbd3354e06415e04f7df25cab4d2af272ae890a06592a",
+          "kaleidoscope": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724"
+        },
+        "graph": {
+          "version": 2,
+          "rootDefinitionHash": "b7853defdae2930f4f78f18055c37e0cad634152d6789f5112ddba207fd8c546",
+          "outputPort": "image"
+        },
+        "definitions": {
+          "481058d404d75e32c4efbd3354e06415e04f7df25cab4d2af272ae890a06592a": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "demo/prismatic-ball",
+              "label": "Prismatic Ball",
+              "description": "Animated iridescent spike source",
+              "tags": [
+                "demo"
+              ],
+              "inputs": {},
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Rendered ball"
+                }
+              },
+              "controls": [
+                {
+                  "id": "intensity",
+                  "type": "number",
+                  "label": "Spike amount",
+                  "default": 0.67,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "intensity": "Controls the height of the animated spikes."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            }
+          },
+          "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "demo/kaleidoscope",
+              "label": "Kaleidoscope",
+              "description": "Mirrored image effect",
+              "tags": [
+                "demo"
+              ],
+              "inputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Source image"
+                }
+              },
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Mirrored image"
+                }
+              },
+              "controls": [
+                {
+                  "id": "segments",
+                  "type": "number",
+                  "label": "Mirror segments",
+                  "default": 6,
+                  "min": 2,
+                  "max": 16,
+                  "step": 1,
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "segments": "Sets the number of independently mirrored wedges."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            }
+          },
+          "b7853defdae2930f4f78f18055c37e0cad634152d6789f5112ddba207fd8c546": {
+            "kind": "graph",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "lux/image-composition",
+              "label": "Image composition",
+              "description": "Authored image component chain",
+              "tags": [],
+              "inputs": {},
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Final image"
+                }
+              },
+              "controls": [
+                {
+                  "id": "ballIntensity",
+                  "type": "number",
+                  "label": "Spike amount",
+                  "default": 0.67,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Controls the height of the animated spikes.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "segmentsA",
+                  "type": "number",
+                  "label": "Mirror segments",
+                  "default": 6,
+                  "min": 2,
+                  "max": 16,
+                  "step": 1,
+                  "description": "Sets the number of independently mirrored wedges.",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "segmentsB",
+                  "type": "number",
+                  "label": "Mirror segments",
+                  "default": 6,
+                  "min": 2,
+                  "max": 16,
+                  "step": 1,
+                  "description": "Sets the number of independently mirrored wedges.",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "ballIntensity": "Controls the height of the animated spikes.",
+                "segmentsA": "Sets the number of independently mirrored wedges.",
+                "segmentsB": "Sets the number of independently mirrored wedges."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            },
+            "body": {
+              "nodes": [
+                {
+                  "id": "11111111-1111-4111-8111-111111111111",
+                  "definitionHash": "481058d404d75e32c4efbd3354e06415e04f7df25cab4d2af272ae890a06592a",
+                  "controlDefaults": {}
+                },
+                {
+                  "id": "22222222-2222-4222-8222-222222222222",
+                  "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+                  "controlDefaults": {}
+                },
+                {
+                  "id": "33333333-3333-4333-8333-333333333333",
+                  "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+                  "controlDefaults": {}
+                }
+              ],
+              "edges": [
+                {
+                  "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                  "from": {
+                    "nodeId": "11111111-1111-4111-8111-111111111111",
+                    "portId": "image"
+                  },
+                  "to": {
+                    "nodeId": "22222222-2222-4222-8222-222222222222",
+                    "portId": "image"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+                  "from": {
+                    "nodeId": "22222222-2222-4222-8222-222222222222",
+                    "portId": "image"
+                  },
+                  "to": {
+                    "nodeId": "33333333-3333-4333-8333-333333333333",
+                    "portId": "image"
+                  },
+                  "delay": "none"
+                }
+              ],
+              "inputBindings": {},
+              "outputBindings": {
+                "image": {
+                  "nodeId": "33333333-3333-4333-8333-333333333333",
+                  "portId": "image"
+                }
+              },
+              "controlBindings": {
+                "ballIntensity": [
+                  {
+                    "nodeId": "11111111-1111-4111-8111-111111111111",
+                    "controlId": "intensity"
+                  }
+                ],
+                "segmentsA": [
+                  {
+                    "nodeId": "22222222-2222-4222-8222-222222222222",
+                    "controlId": "segments"
+                  }
+                ],
+                "segmentsB": [
+                  {
+                    "nodeId": "33333333-3333-4333-8333-333333333333",
+                    "controlId": "segments"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "publicControls": [
+          {
+            "id": "ballIntensity",
+            "type": "number",
+            "label": "Spike amount",
+            "default": 0.67,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "Controls the height of the animated spikes.",
+            "changeCost": "live"
+          },
+          {
+            "id": "segmentsA",
+            "type": "number",
+            "label": "Mirror segments",
+            "default": 6,
+            "min": 2,
+            "max": 16,
+            "step": 1,
+            "description": "Sets the number of independently mirrored wedges.",
+            "changeCost": "live"
+          },
+          {
+            "id": "segmentsB",
+            "type": "number",
+            "label": "Mirror segments",
+            "default": 6,
+            "min": 2,
+            "max": 16,
+            "step": 1,
+            "description": "Sets the number of independently mirrored wedges.",
+            "changeCost": "live"
+          }
+        ],
+        "publicControlBindings": {
+          "ballIntensity": [
+            {
+              "nodePath": [
+                "11111111-1111-4111-8111-111111111111"
+              ],
+              "controlId": "intensity",
+              "active": true
+            }
+          ],
+          "segmentsA": [
+            {
+              "nodePath": [
+                "22222222-2222-4222-8222-222222222222"
+              ],
+              "controlId": "segments",
+              "active": true
+            }
+          ],
+          "segmentsB": [
+            {
+              "nodePath": [
+                "33333333-3333-4333-8333-333333333333"
+              ],
+              "controlId": "segments",
+              "active": true
+            }
+          ]
+        },
+        "nodes": [
+          {
+            "nodePath": [
+              "11111111-1111-4111-8111-111111111111"
+            ],
+            "definitionHash": "481058d404d75e32c4efbd3354e06415e04f7df25cab4d2af272ae890a06592a",
+            "schema": [
+              {
+                "id": "intensity",
+                "type": "number",
+                "label": "Spike amount",
+                "default": 0.67,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "8229c8eca7f52b563e1adf1eb8c801db6ffd4438d611f332ff491facb6c823bd"
+          },
+          {
+            "nodePath": [
+              "22222222-2222-4222-8222-222222222222"
+            ],
+            "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+            "schema": [
+              {
+                "id": "segments",
+                "type": "number",
+                "label": "Mirror segments",
+                "default": 6,
+                "min": 2,
+                "max": 16,
+                "step": 1,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163"
+          },
+          {
+            "nodePath": [
+              "33333333-3333-4333-8333-333333333333"
+            ],
+            "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+            "schema": [
+              {
+                "id": "segments",
+                "type": "number",
+                "label": "Mirror segments",
+                "default": 6,
+                "min": 2,
+                "max": 16,
+                "step": 1,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163"
+          }
+        ]
+      },
+      "sceneName": "Untitled visual",
+      "authority": "studio",
+      "playback": "paused",
+      "sdkVersion": "0.4.0",
+      "controlSchema": [
+        {
+          "id": "ballIntensity",
+          "type": "number",
+          "label": "Spike amount",
+          "default": 0.67,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Controls the height of the animated spikes.",
+          "changeCost": "live"
+        },
+        {
+          "id": "segmentsA",
+          "type": "number",
+          "label": "Mirror segments",
+          "default": 6,
+          "min": 2,
+          "max": 16,
+          "step": 1,
+          "description": "Sets the number of independently mirrored wedges.",
+          "changeCost": "live"
+        },
+        {
+          "id": "segmentsB",
+          "type": "number",
+          "label": "Mirror segments",
+          "default": 6,
+          "min": 2,
+          "max": 16,
+          "step": 1,
+          "description": "Sets the number of independently mirrored wedges.",
+          "changeCost": "live"
+        }
+      ],
+      "controlSchemaHash": "27877f6d751ca1c44255c8cb47a8d0fd2738dea9ac10910e966842e7e5e78eda",
+      "controls": {
+        "ballIntensity": 0.67,
+        "segmentsA": 6,
+        "segmentsB": 6
+      },
+      "controlSequence": 0,
+      "nodeControls": {
+        "sourceHash": "0cf85d45361d2e85a0beb0b4da6c6f4a2470072a428b9eaa576f61130a81006e",
+        "nodes": [
+          {
+            "nodePath": [
+              "11111111-1111-4111-8111-111111111111"
+            ],
+            "definitionHash": "481058d404d75e32c4efbd3354e06415e04f7df25cab4d2af272ae890a06592a",
+            "schema": [
+              {
+                "id": "intensity",
+                "type": "number",
+                "label": "Spike amount",
+                "default": 0.67,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "8229c8eca7f52b563e1adf1eb8c801db6ffd4438d611f332ff491facb6c823bd",
+            "values": {
+              "intensity": 0.67
+            }
+          },
+          {
+            "nodePath": [
+              "22222222-2222-4222-8222-222222222222"
+            ],
+            "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+            "schema": [
+              {
+                "id": "segments",
+                "type": "number",
+                "label": "Mirror segments",
+                "default": 6,
+                "min": 2,
+                "max": 16,
+                "step": 1,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163",
+            "values": {
+              "segments": 6
+            }
+          },
+          {
+            "nodePath": [
+              "33333333-3333-4333-8333-333333333333"
+            ],
+            "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+            "schema": [
+              {
+                "id": "segments",
+                "type": "number",
+                "label": "Mirror segments",
+                "default": 6,
+                "min": 2,
+                "max": 16,
+                "step": 1,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163",
+            "values": {
+              "segments": 6
+            }
+          }
+        ]
+      },
+      "controlAnimations": [],
+      "controlAnimationIssues": [],
+      "animationSequence": 0,
+      "effectiveNodeControls": {
+        "sourceHash": "0cf85d45361d2e85a0beb0b4da6c6f4a2470072a428b9eaa576f61130a81006e",
+        "nodes": [
+          {
+            "nodePath": [
+              "11111111-1111-4111-8111-111111111111"
+            ],
+            "definitionHash": "481058d404d75e32c4efbd3354e06415e04f7df25cab4d2af272ae890a06592a",
+            "schema": [
+              {
+                "id": "intensity",
+                "type": "number",
+                "label": "Spike amount",
+                "default": 0.67,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "8229c8eca7f52b563e1adf1eb8c801db6ffd4438d611f332ff491facb6c823bd",
+            "values": {
+              "intensity": 0.67
+            }
+          },
+          {
+            "nodePath": [
+              "22222222-2222-4222-8222-222222222222"
+            ],
+            "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+            "schema": [
+              {
+                "id": "segments",
+                "type": "number",
+                "label": "Mirror segments",
+                "default": 6,
+                "min": 2,
+                "max": 16,
+                "step": 1,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163",
+            "values": {
+              "segments": 6
+            }
+          },
+          {
+            "nodePath": [
+              "33333333-3333-4333-8333-333333333333"
+            ],
+            "definitionHash": "8169fad779369892f0fde2f0b366e8734d53abf75574cc16d7ad73a379d54724",
+            "schema": [
+              {
+                "id": "segments",
+                "type": "number",
+                "label": "Mirror segments",
+                "default": 6,
+                "min": 2,
+                "max": 16,
+                "step": 1,
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "011a6453a1138715e07e2a1c9649f547965474d55424046e0aac0edde9207163",
+            "values": {
+              "segments": 6
+            }
+          }
+        ]
+      },
+      "controlMigration": [],
+      "clockEpoch": 0,
+      "timeSeconds": 0,
+      "frameId": "1",
+      "output": {
+        "width": 1920,
+        "height": 1080,
+        "fps": 60,
+        "seed": 0
+      },
+      "fault": null
+    },
+    "host": null,
+    "jobs": [
+      {
+        "jobId": "380ff449-44a2-4509-b6d8-b8ee80a07157",
+        "state": "succeeded",
+        "summary": "Visual is ready in Lux."
+      }
+    ],
+    "visualFps": null,
+    "uiFps": null,
+    "performance": {
+      "owner": {
+        "instanceId": "697ff7a3-0596-45cb-a3ec-6449565e4c01",
+        "generation": 1,
+        "revisionId": "0cf85d45361d2e85a0beb0b4da6c6f4a2470072a428b9eaa576f61130a81006e"
+      },
+      "status": "live",
+      "observedAtMs": 9999.59999999404,
+      "worker": {
+        "schemaVersion": 1,
+        "mode": "routine",
+        "clockDomain": "dedicated-worker-monotonic-ms",
+        "sequence": 2,
+        "windowStartMs": 1398.1000000014901,
+        "windowEndMs": 1703,
+        "lostRecords": 0,
+        "invalidRecords": 0,
+        "intervalLostRecords": 0,
+        "intervalInvalidRecords": 0,
+        "retainedRecords": 1,
+        "produced": {
+          "unit": "Hz",
+          "availability": "available",
+          "validity": "complete",
+          "gate": "not_evaluated",
+          "sampleCount": 1,
+          "expectedCount": 1,
+          "missingCount": 0,
+          "samplingPolicy": "completed frames over independent summary interval",
+          "value": 3.2797638570183247
+        },
+        "update": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "complete",
+          "gate": "not_evaluated",
+          "sampleCount": 1,
+          "expectedCount": 1,
+          "missingCount": 0,
+          "samplingPolicy": "all completed frames in this summary interval",
+          "p50": 0.10000000149011612,
+          "p95": 0.10000000149011612,
+          "p99": 0.10000000149011612,
+          "max": 0.10000000149011612
+        },
+        "renderCall": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "complete",
+          "gate": "not_evaluated",
+          "sampleCount": 1,
+          "expectedCount": 1,
+          "missingCount": 0,
+          "samplingPolicy": "all completed frames in this summary interval",
+          "p50": 69.79999999701977,
+          "p95": 69.79999999701977,
+          "p99": 69.79999999701977,
+          "max": 69.79999999701977
+        },
+        "cpuCall": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "incomplete",
+          "gate": "not_evaluated",
+          "sampleCount": 1,
+          "expectedCount": 1,
+          "missingCount": 0,
+          "samplingPolicy": "all completed frames in this summary interval",
+          "reason": "Asynchronous render continuation CPU work is not fully measured",
+          "p50": 69.89999999850988,
+          "p95": 69.89999999850988,
+          "p99": 69.89999999850988,
+          "max": 69.89999999850988
+        },
+        "renderAwait": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "complete",
+          "gate": "not_evaluated",
+          "sampleCount": 1,
+          "expectedCount": 1,
+          "missingCount": 0,
+          "samplingPolicy": "all completed frames in this summary interval",
+          "p50": 33.100000001490116,
+          "p95": 33.100000001490116,
+          "p99": 33.100000001490116,
+          "max": 33.100000001490116
+        },
+        "queueWait": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "complete",
+          "gate": "not_evaluated",
+          "sampleCount": 1,
+          "expectedCount": 1,
+          "missingCount": 0,
+          "samplingPolicy": "all completed frames in this summary interval",
+          "p50": 730.2999999970198,
+          "p95": 730.2999999970198,
+          "p99": 730.2999999970198,
+          "max": 730.2999999970198
+        },
+        "gpu": {
+          "unit": "ms",
+          "availability": "available",
+          "validity": "incomplete",
+          "gate": "not_evaluated",
+          "sampleCount": 1,
+          "expectedCount": 1,
+          "missingCount": 0,
+          "samplingPolicy": "one in 30 frames (frame IDs 1,31,61,...)",
+          "reason": "GPU copies, uploads or clears outside passes are excluded",
+          "p50": 0.458752,
+          "p95": 0.458752,
+          "p99": 0.458752,
+          "max": 0.458752,
+          "timestampQuerySupported": true,
+          "timestampQueryEnabled": true,
+          "failedSamples": 0,
+          "droppedSamples": 0,
+          "pendingSamples": 0
+        }
+      }
+    },
+    "capabilities": {
+      "protocolVersion": 2,
+      "supportedSdkVersions": [
+        "0.1.0",
+        "0.2.0",
+        "0.4.0"
+      ],
+      "codeDeclaredParameters": true,
+      "parameterKinds": [
+        "number"
+      ],
+      "maxParameters": 32,
+      "imageFormats": [
+        "image/bmp",
+        "image/png",
+        "image/jpeg"
+      ],
+      "assetExport": true,
+      "sceneVersions": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    "studioSession": {
+      "profile": "test-016b2392-b30f-4829-8699-b8a84ebb1e1b",
+      "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\disclosures-113",
+      "sessionId": "135ba352f10eb0aa86891d797bffaceb9b26",
+      "pid": 4912
+    }
+  },
+  "processExited": true
+}

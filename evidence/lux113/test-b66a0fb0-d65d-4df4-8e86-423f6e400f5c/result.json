@@ -1,0 +1,74 @@
+{
+  "ok": true,
+  "commit": "beacfcf9eda7409cdb5502ff3b525d03d4987c1d",
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\disclosures-113",
+  "profile": "test-b66a0fb0-d65d-4df4-8e86-423f6e400f5c",
+  "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-b66a0fb0-d65d-4df4-8e86-423f6e400f5c\\agent-endpoint.json",
+  "checks": [
+    "Exact private source/endpoint/PID checked",
+    "Source keyboard collapse/expand recovers editor space",
+    "Shared native summary marker/font on all five disclosures",
+    "All Inspector sections expand/collapse; Controls defaults open and LIVE retained",
+    "Normal and narrow actual screenshots",
+    "Preview and control/playback state retained"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\disclosures-113\\evidence\\lux113\\test-b66a0fb0-d65d-4df4-8e86-423f6e400f5c\\01-source-collapsed.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\disclosures-113\\evidence\\lux113\\test-b66a0fb0-d65d-4df4-8e86-423f6e400f5c\\02-all-expanded.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\disclosures-113\\evidence\\lux113\\test-b66a0fb0-d65d-4df4-8e86-423f6e400f5c\\03-inspector-collapsed.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\disclosures-113\\evidence\\lux113\\test-b66a0fb0-d65d-4df4-8e86-423f6e400f5c\\04-narrow-controls.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\disclosures-113\\evidence\\lux113\\test-b66a0fb0-d65d-4df4-8e86-423f6e400f5c\\05-narrow-source-collapsed.png"
+  ],
+  "pid": 38460,
+  "endpoint": {
+    "pid": 38460,
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\disclosures-113",
+    "profile": "test-b66a0fb0-d65d-4df4-8e86-423f6e400f5c",
+    "sessionId": "badb1605efd1c8df1c654fb5b0da37d9a74a"
+  },
+  "markers": [
+    {
+      "display": "list-item",
+      "font": "12px",
+      "marker": "normal",
+      "top": 81,
+      "height": 28
+    },
+    {
+      "display": "list-item",
+      "font": "12px",
+      "marker": "normal",
+      "top": 85,
+      "height": 28
+    },
+    {
+      "display": "list-item",
+      "font": "12px",
+      "marker": "normal",
+      "top": 317.5,
+      "height": 28
+    },
+    {
+      "display": "list-item",
+      "font": "12px",
+      "marker": "normal",
+      "top": 595.5,
+      "height": 28
+    },
+    {
+      "display": "list-item",
+      "font": "12px",
+      "marker": "normal",
+      "top": 838.5,
+      "height": 28
+    }
+  ],
+  "narrowFrame": {
+    "width": 820,
+    "height": 700,
+    "scrollX": 0,
+    "clientWidth": 805,
+    "scrollWidth": 805
+  },
+  "processExited": true
+}
