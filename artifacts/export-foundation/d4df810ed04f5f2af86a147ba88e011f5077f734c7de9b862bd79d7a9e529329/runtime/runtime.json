@@ -1,0 +1,469 @@
+{
+  "format": "lux-runtime",
+  "version": 1,
+  "platform": "win32-x64",
+  "electronVersion": "44.3.0",
+  "files": [
+    {
+      "path": "apps/render-host/src/compiled-output.html",
+      "bytes": 2753,
+      "sha256": "ca32e3c12a7e00ec253e8885ab9e4bed49fa737a3da5b79a115c48881b690560"
+    },
+    {
+      "path": "apps/render-host/src/compiled-worker.js",
+      "bytes": 9742,
+      "sha256": "b42590ca9713066d0f147ea8ecc9ebfe561903ee80a498f742ced6c7df17c9ac"
+    },
+    {
+      "path": "apps/render-host/src/main.cjs",
+      "bytes": 8068,
+      "sha256": "243e5ac47c01e93bddcbf23b442a3582d3ac9420c67d9bd5132edacec7f124b5"
+    },
+    {
+      "path": "electron/LICENSE",
+      "bytes": 1096,
+      "sha256": "5154e165bd6c2cc0cfbcd8916498c7abab0497923bafcd5cb07673fe8480087d"
+    },
+    {
+      "path": "electron/LICENSES.chromium.html",
+      "bytes": 20472830,
+      "sha256": "7b328b8c7463ac9bfc7dc648c751533517c8441a0b5b21047d6c0b2620e60d70"
+    },
+    {
+      "path": "electron/chrome_100_percent.pak",
+      "bytes": 719654,
+      "sha256": "ab7c4b7b6cb8832a31d44b95ec50ce52294f49422a3bdde4e21968eca2930cbe"
+    },
+    {
+      "path": "electron/chrome_200_percent.pak",
+      "bytes": 1269017,
+      "sha256": "30fa4a6e27c9ff2fb0f939f01158477e621a67d86e9ecb84cf11b3947db8eb9d"
+    },
+    {
+      "path": "electron/d3dcompiler_47.dll",
+      "bytes": 4741488,
+      "sha256": "a05f99734f7c4822fefc12b367af21fd0976ed6608752fb1e1e80b6ece7ecbbb"
+    },
+    {
+      "path": "electron/dxcompiler.dll",
+      "bytes": 25744896,
+      "sha256": "b2b5c67bc4a9c92a0ea87000415e7970488d1ca25767518d4cc27b88f18fb6ac"
+    },
+    {
+      "path": "electron/dxil.dll",
+      "bytes": 1509760,
+      "sha256": "77e039c905030a641e53658a008b74e90635a5ea9b6b79eabd0f2003bdfca59a"
+    },
+    {
+      "path": "electron/electron.exe",
+      "bytes": 246070272,
+      "sha256": "e048632e03fabc96de5e10afbebc0aa31f4e1674155ea3d270597fe7523f9d80"
+    },
+    {
+      "path": "electron/ffmpeg.dll",
+      "bytes": 3113472,
+      "sha256": "336587847c4ed3ef1a195d1aaea3d3951c9749a035ffa7951df4c0e02971e4e0"
+    },
+    {
+      "path": "electron/icudtl.dat",
+      "bytes": 10876560,
+      "sha256": "9f48c7f9c7c94d516a14870707e910ab94d75ae640ff6842c4af53276cd26ebe"
+    },
+    {
+      "path": "electron/locales/af.pak",
+      "bytes": 636155,
+      "sha256": "3017b141bd16e24190d810f0748612f0fd4352ca8553002b9a63a7f77f7154f8"
+    },
+    {
+      "path": "electron/locales/am.pak",
+      "bytes": 1029450,
+      "sha256": "67b938d162bc75db067120bb8366b5bafd9a75fa99a0ca9ad4f46b47d1d37634"
+    },
+    {
+      "path": "electron/locales/ar.pak",
+      "bytes": 1130933,
+      "sha256": "a6eb037da4ac7930a8661c8bf602deee090fc4409bf4db24db8aab65c89b1d06"
+    },
+    {
+      "path": "electron/locales/bg.pak",
+      "bytes": 1178203,
+      "sha256": "2eb9c74c67e4b13b45a73061fa978738e335bc245da71bab0ea9b205fe91074e"
+    },
+    {
+      "path": "electron/locales/bn.pak",
+      "bytes": 1513545,
+      "sha256": "415621a5c0b1546e6e447d43b76414425a8703cc7681d637ec1f283ad0c787e7"
+    },
+    {
+      "path": "electron/locales/ca.pak",
+      "bytes": 716908,
+      "sha256": "6f28297c1ccb628f534d65dade167ae559f83eace359acf47e48ff890b9409d5"
+    },
+    {
+      "path": "electron/locales/cs.pak",
+      "bytes": 743351,
+      "sha256": "799a789ce531991cb975425730db310f9a8fe74091eee568f3e65fcc7ef0cd57"
+    },
+    {
+      "path": "electron/locales/da.pak",
+      "bytes": 666465,
+      "sha256": "9a2cd25537a4818897481ba944981e8aee3d89c7ad37588d02f1deebff3f62d0"
+    },
+    {
+      "path": "electron/locales/de.pak",
+      "bytes": 717834,
+      "sha256": "fcf63fd89e613a7ef69f16054b97b3493948e5c665aad180a91d3635256fb7d7"
+    },
+    {
+      "path": "electron/locales/el.pak",
+      "bytes": 1295538,
+      "sha256": "37d2e1ef69fea9bdb1e0902cbc61a458baa9009fc3761029bd1c1882a7a0c9b2"
+    },
+    {
+      "path": "electron/locales/en-GB.pak",
+      "bytes": 580030,
+      "sha256": "01d9200a5daee1770f7147b166d25baa6a8dd72c138c3c526421e656dec789f5"
+    },
+    {
+      "path": "electron/locales/en-US.pak",
+      "bytes": 586582,
+      "sha256": "23b271e8009bfa14783700cd0712b4ecaa5b8f2ea28a4d81ae1d7e05bc0c96b1"
+    },
+    {
+      "path": "electron/locales/es-419.pak",
+      "bytes": 707635,
+      "sha256": "6ff6ea0a14da50cacc4b72ab8c8c7b49c8423abb64f6a3a7f1643d8c3c74e6e9"
+    },
+    {
+      "path": "electron/locales/es.pak",
+      "bytes": 703926,
+      "sha256": "4578e08033967a5062bfd3b1937e711df84571d444e4940b8ffe5366bce4e778"
+    },
+    {
+      "path": "electron/locales/et.pak",
+      "bytes": 642216,
+      "sha256": "dd1205eae606f12510e24ce39f301439c98b3293d766ca5839dc292a14d7973c"
+    },
+    {
+      "path": "electron/locales/fa.pak",
+      "bytes": 1063054,
+      "sha256": "f3675255feb8b054717be9e92e93289262f35e82f25f2f8de0d3ebf3865715af"
+    },
+    {
+      "path": "electron/locales/fi.pak",
+      "bytes": 655113,
+      "sha256": "1f3123d7fb5c22a95b5250ea17450b665c3c6cd6a6dfd28bbdde15e1bf684a0e"
+    },
+    {
+      "path": "electron/locales/fil.pak",
+      "bytes": 741385,
+      "sha256": "02e2c70d3d85b0deb677a9ae576ae3cf89e80774532cb3315c14f1e8ce64b310"
+    },
+    {
+      "path": "electron/locales/fr.pak",
+      "bytes": 763453,
+      "sha256": "4db43f1cfba1ed1d7dd347d58fbab0b8d6d89dd008a3b9d2436d8744e3363453"
+    },
+    {
+      "path": "electron/locales/gu.pak",
+      "bytes": 1495625,
+      "sha256": "e86e8c240d4b6283abb03c49df9e8899607ef9def6d4933c7a541d63b5835271"
+    },
+    {
+      "path": "electron/locales/he.pak",
+      "bytes": 928748,
+      "sha256": "ddc1f304ab1f4489d19ae2b31e7f8e3ffb47dae439520159e8975422c65e4115"
+    },
+    {
+      "path": "electron/locales/hi.pak",
+      "bytes": 1586592,
+      "sha256": "10a6f19c1982590e33476427dee8d4293b0707e25dc536d6394b5782ecc3b642"
+    },
+    {
+      "path": "electron/locales/hr.pak",
+      "bytes": 715279,
+      "sha256": "d46c64ae8af3562e37eb80438aa2bee228fafda251d58ba4d0991291f1c72aab"
+    },
+    {
+      "path": "electron/locales/hu.pak",
+      "bytes": 765640,
+      "sha256": "0a46fc8d50f74effd1cfe1979e677df3de6fc47e6b551267303d93d57bd83f50"
+    },
+    {
+      "path": "electron/locales/id.pak",
+      "bytes": 635080,
+      "sha256": "f567569c42a25bb2dfc5c33e13aac558c0e2a1d5d4b969592bbd0841b36438db"
+    },
+    {
+      "path": "electron/locales/it.pak",
+      "bytes": 693990,
+      "sha256": "899be10e8f46f53d9bbe7cab827fc17b7c2bd7184e31791688016e2ca4df6622"
+    },
+    {
+      "path": "electron/locales/ja.pak",
+      "bytes": 842132,
+      "sha256": "9370c20a0612f5874dff2b015f31482e167eccf1b3c1d1a2efc1c2e38cefa88e"
+    },
+    {
+      "path": "electron/locales/kn.pak",
+      "bytes": 1720240,
+      "sha256": "af5fed2130102ecc0c878059c88faed9d6db2e8b147fb5ae9e15e3fe69706c8a"
+    },
+    {
+      "path": "electron/locales/ko.pak",
+      "bytes": 718709,
+      "sha256": "0f5bc49c4d35bfea1563db6eb77a074c65b39b49a916cb35a022ef96340338f2"
+    },
+    {
+      "path": "electron/locales/lt.pak",
+      "bytes": 777281,
+      "sha256": "af969f4407c190dd01a426fa1244cb1ec7cdf2909d1c3ba5b87ff662ba567303"
+    },
+    {
+      "path": "electron/locales/lv.pak",
+      "bytes": 774751,
+      "sha256": "27e20dfa5585161ef8b641f628aefe6c88d9f9590ffedb647e0c9da1cacf219d"
+    },
+    {
+      "path": "electron/locales/ml.pak",
+      "bytes": 1767850,
+      "sha256": "b5606265910e45098a88e989202a550531f6d00333c6b112ed4c5cbc07b2ff6a"
+    },
+    {
+      "path": "electron/locales/mr.pak",
+      "bytes": 1467313,
+      "sha256": "8465d4077ed5414cbcb7d9bdb00d85e515a1a069703cdc1d4d67c9d6e5623fb0"
+    },
+    {
+      "path": "electron/locales/ms.pak",
+      "bytes": 668356,
+      "sha256": "af7021a00befa586aa067ae3ccb339079e6f13ee0cab1621836f6abb608b6f2a"
+    },
+    {
+      "path": "electron/locales/nb.pak",
+      "bytes": 638121,
+      "sha256": "d97a2b0cbe6adc99add2ed3ce0d15d0bb124b778086c466c126634d60ea72608"
+    },
+    {
+      "path": "electron/locales/nl.pak",
+      "bytes": 664767,
+      "sha256": "9d82c384fbb6480c7a6e721c6bcd1f2cd19665d848b056b5a2911504308ba037"
+    },
+    {
+      "path": "electron/locales/pl.pak",
+      "bytes": 742064,
+      "sha256": "8a0969fc743d3e2f5111387d53c0d79e8c1d9f68256ad6553b87fca2bcaa7e6e"
+    },
+    {
+      "path": "electron/locales/pt-BR.pak",
+      "bytes": 697044,
+      "sha256": "8272a84e2e6658dc4da17c6bd21995011fbaa6c328efafd24c4ebd4fe2e64916"
+    },
+    {
+      "path": "electron/locales/pt-PT.pak",
+      "bytes": 701056,
+      "sha256": "bdfa7264dddf70f936f1785737969559a577b51d1952c820a468c611d18b17ca"
+    },
+    {
+      "path": "electron/locales/ro.pak",
+      "bytes": 728144,
+      "sha256": "1e6b5b0dac63a9e951daf523de310f6bd9e5c53e281f37706d41bd35d2a08bb5"
+    },
+    {
+      "path": "electron/locales/ru.pak",
+      "bytes": 1200996,
+      "sha256": "52a31a7ca057b8c76208620932120927a089502ddfb66c30de4324959f9e0075"
+    },
+    {
+      "path": "electron/locales/sk.pak",
+      "bytes": 755475,
+      "sha256": "a53551e8d251fa01305afe1d0d187144c56bfdffd5d1aa9f96a9350b96c0a252"
+    },
+    {
+      "path": "electron/locales/sl.pak",
+      "bytes": 722720,
+      "sha256": "e1371c8df577b979e3a515af34b0aaa3d07153c7a5c55d39a9b49a7ffe62d3d2"
+    },
+    {
+      "path": "electron/locales/sr.pak",
+      "bytes": 1112919,
+      "sha256": "be4ce17afac24dffc1eb36609cb51e766e77097d6656b1008a2a825e59609cc1"
+    },
+    {
+      "path": "electron/locales/sv.pak",
+      "bytes": 646537,
+      "sha256": "8bdff8855d23c739ece357f653c0a17bb36fe97577a5761912080d057ed341a5"
+    },
+    {
+      "path": "electron/locales/sw.pak",
+      "bytes": 685130,
+      "sha256": "312b225a81cc3cc15f13f80c45dd0e0bb3655d31873d2956861207e70c33c1dc"
+    },
+    {
+      "path": "electron/locales/ta.pak",
+      "bytes": 1758067,
+      "sha256": "91fb1460711df108d8d435a378c8be1d1e80b0886c0158d8c6ae92f35812681b"
+    },
+    {
+      "path": "electron/locales/te.pak",
+      "bytes": 1629379,
+      "sha256": "fc8c2706c5dfd36e7af8e380a240e0f697cc5fe969b512092a2185896512c4af"
+    },
+    {
+      "path": "electron/locales/th.pak",
+      "bytes": 1368866,
+      "sha256": "c1f4235c31bc05153230b0e55b7aabc9020d7460d5b0a025c386885e1e4bda3c"
+    },
+    {
+      "path": "electron/locales/tr.pak",
+      "bytes": 697368,
+      "sha256": "ae87bbd88ce0adfc2dc3c460736a7d0513472af62fc856caccc638dedfec9b4a"
+    },
+    {
+      "path": "electron/locales/uk.pak",
+      "bytes": 1211565,
+      "sha256": "a6230520dac708a6235588f5d9e894fcc9b1391e18a70e3220e06ddf80f76688"
+    },
+    {
+      "path": "electron/locales/ur.pak",
+      "bytes": 1047994,
+      "sha256": "c218e21744df2ff0669a87d497d65d76333073577360d4c662c592de146bf82a"
+    },
+    {
+      "path": "electron/locales/vi.pak",
+      "bytes": 830059,
+      "sha256": "42f3f0c4f645aedc66c12c74aee7256336a929798d736c56853daec91d44511a"
+    },
+    {
+      "path": "electron/locales/zh-CN.pak",
+      "bytes": 592116,
+      "sha256": "ba8ac4bf82b50728d907215d1993948457835bf2942a4d7266a3f8af5f51de15"
+    },
+    {
+      "path": "electron/locales/zh-TW.pak",
+      "bytes": 583860,
+      "sha256": "82739378d17ea73e57c8efae31994e0c8818ab2d0d12cb1f6b20d2f340b3229d"
+    },
+    {
+      "path": "electron/resources.pak",
+      "bytes": 12435445,
+      "sha256": "3d8c36b2ec7099a27fe00763e5af28319643ba65c1b48b85eb6a7caaae034ba6"
+    },
+    {
+      "path": "electron/resources/default_app.asar",
+      "bytes": 111073,
+      "sha256": "06d4a28be095a80eff94dbd18edcfac5b5805e1b5538e0fb7cee7c7ae81db76a"
+    },
+    {
+      "path": "electron/snapshot_blob.bin",
+      "bytes": 368776,
+      "sha256": "1176cfa83f9ef458e7ed5b5b255c9289691dbef3ff1e4a073a5c90f9a16e8458"
+    },
+    {
+      "path": "electron/v8_context_snapshot.bin",
+      "bytes": 742208,
+      "sha256": "d9d3ec18e937ed2fddd02d92e4f0726919769e16f2ea17f962d23e40d5962b7b"
+    },
+    {
+      "path": "electron/version",
+      "bytes": 6,
+      "sha256": "a1d640d380c386200a420b590105d25da627723ee42ee1061108f3acde9f25fd"
+    },
+    {
+      "path": "electron/vk_swiftshader.dll",
+      "bytes": 5520384,
+      "sha256": "cfb8a533c5da1ade3fd4e66ebd0acf7186bd17fb3cc09d48809a7909c4aaf0f8"
+    },
+    {
+      "path": "electron/vk_swiftshader_icd.json",
+      "bytes": 106,
+      "sha256": "32d83ff113fef532a9f97e0d2831f8656628ab1c99e9060f0332b1532839afd9"
+    },
+    {
+      "path": "electron/vulkan-1.dll",
+      "bytes": 939008,
+      "sha256": "c1b383f18c0949f233e949ae197c2ad4c416abe7790894d7e395d73116403b4f"
+    },
+    {
+      "path": "install.cjs",
+      "bytes": 856,
+      "sha256": "2dfa7c54dad6dd154aa45bce70c54c53552a6760da39d01d696308c6065f5322"
+    },
+    {
+      "path": "native/build/Release/LuxTracerTR02.dll",
+      "bytes": 474624,
+      "sha256": "2de5d23b889202da46ec9b2b141f9969a14e9c12ad53c29d185815b88f82f453"
+    },
+    {
+      "path": "native/build/Release/lux_texture_bridge.node",
+      "bytes": 60416,
+      "sha256": "82bd9a1b1efdd6e7aa94e67197e2b9baa9b1401f6a371aa54b6c0fe4fd3923c5"
+    },
+    {
+      "path": "native/build/Release/msvcp140.dll",
+      "bytes": 643512,
+      "sha256": "7c26614e1d733892c2deac7e245ce115504b1d80592dd0a01b08e3e5a55f89ca"
+    },
+    {
+      "path": "native/build/Release/msvcp140_1.dll",
+      "bytes": 35768,
+      "sha256": "206c931bf90fdad8816de3b5e2ef80b2bcaa9406c89ecc05fe6fddffe251e982"
+    },
+    {
+      "path": "native/build/Release/msvcp140_2.dll",
+      "bytes": 274872,
+      "sha256": "d50d7883f20d1dc6191768d3746f52dd9cac89c346ffaed5be1f110c2f34a838"
+    },
+    {
+      "path": "native/build/Release/msvcp140_atomic_wait.dll",
+      "bytes": 57792,
+      "sha256": "3d0cbfaa1bf3eecf5a3f4491d2960ee803cb994f30292c6adc4a07c498f60e2b"
+    },
+    {
+      "path": "native/build/Release/msvcp140_codecvt_ids.dll",
+      "bytes": 31160,
+      "sha256": "8a65c7596ef2e6938731f5a1058e7e40145b6d97967cc649231a076b9a608d78"
+    },
+    {
+      "path": "native/build/Release/vcruntime140.dll",
+      "bytes": 178616,
+      "sha256": "d1f4225df2cd877dbf130d5668a021dce3f94118455ff5ec952061c30afc9ce7"
+    },
+    {
+      "path": "native/build/Release/vcruntime140_1.dll",
+      "bytes": 50112,
+      "sha256": "a7146c08f89fe5b04541ab507cdb59ff7b44534d4ba3c668a426c6450a03434e"
+    },
+    {
+      "path": "package.cjs",
+      "bytes": 11090,
+      "sha256": "2bbcf604fd65f5cf5216fd5b53694c3dc14bdf6eea74ecfb4ba5f32e5315ce84"
+    },
+    {
+      "path": "tools/gpu-spike/frame-progress.cjs",
+      "bytes": 373,
+      "sha256": "0545fa67500527eaffd81cde3a2f225b0ce3c7d679c493cd524fc32f20376609"
+    },
+    {
+      "path": "tools/gpu-spike/host-startup.cjs",
+      "bytes": 1046,
+      "sha256": "46a8c5b1f65cbd27396061b302dc15f46b3b98ee4df863cadee968b3bb83f2af"
+    },
+    {
+      "path": "tools/gpu-spike/producer-session.cjs",
+      "bytes": 2096,
+      "sha256": "ad146474202dfe65e8dbb6a90d09075ff1ce6b189c9fbe98685c4b29293a0e29"
+    },
+    {
+      "path": "tools/gpu-spike/transport-release.cjs",
+      "bytes": 1355,
+      "sha256": "2d66c204a24399a172461def938e9f73fbfbb5418e9f3e4627b147cc6a38256e"
+    },
+    {
+      "path": "transport-release.cjs",
+      "bytes": 1355,
+      "sha256": "2d66c204a24399a172461def938e9f73fbfbb5418e9f3e4627b147cc6a38256e"
+    }
+  ],
+  "runtimeId": "bc6257bf99705d7b19e6b737b40b1ed971265a88764f95842e6635f0dd7734cc"
+}

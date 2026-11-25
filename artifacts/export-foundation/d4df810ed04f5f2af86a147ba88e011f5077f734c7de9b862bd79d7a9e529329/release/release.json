@@ -1,0 +1,30 @@
+{
+  "format": "lux-resolume-source",
+  "version": 1,
+  "name": "Tunnel transport checkpoint",
+  "runtimeId": "bc6257bf99705d7b19e6b737b40b1ed971265a88764f95842e6635f0dd7734cc",
+  "transportHash": "04784f34a76b02531b5808e8110ebb95592541ca5019a497344b68ab42d68e19",
+  "sourceHash": "162ca0934b099b13fa63b3bad31b9ec02ca738ff07ca1697e8a0c3b062f2d898",
+  "linkedHash": "958b7e50987fd63497a857f6593c8473b1479df793c2c9be2f7b911c7e6368bb",
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "seed": 7
+  },
+  "controls": [
+    {
+      "id": "intensity",
+      "type": "number",
+      "label": "Intensity",
+      "default": 0.5,
+      "min": 0,
+      "max": 1,
+      "changeCost": "live"
+    }
+  ],
+  "savedControls": {
+    "intensity": 0.5
+  },
+  "releaseId": "d4df810ed04f5f2af86a147ba88e011f5077f734c7de9b862bd79d7a9e529329"
+}
