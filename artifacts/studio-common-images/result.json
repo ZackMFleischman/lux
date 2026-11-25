@@ -1,0 +1,504 @@
+{
+  "ok": true,
+  "checks": [
+    "PNG straight RGBA capture, browser alpha composition, and linear scene composition over black and white",
+    "Replace preserves the asset path and last applied pixels until explicit Build",
+    "Progressive JPEG import renders opaque colors with EXIF clockwise orientation and bounded color tolerance",
+    "Removing a required image leaves an honest draft; failed candidate retains the exact last-good runtime",
+    "Real Save/Open and cached restart retain both original image byte streams, accepted provenance, controls, and actual pixels"
+  ],
+  "captures": [
+    {
+      "name": "png-alpha",
+      "samples": [
+        [
+          255,
+          0,
+          0,
+          128
+        ],
+        [
+          0,
+          255,
+          0,
+          255
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          255,
+          255,
+          255,
+          64
+        ]
+      ],
+      "metadata": {
+        "playback": "paused",
+        "timeSeconds": 0,
+        "clockEpoch": 0,
+        "frameId": "1",
+        "sdkVersion": "0.2.0",
+        "controlSchemaHash": "34d2674bcc50fb19507f3b21815f3e628307137ff80e72c99a77a862a1e5a542",
+        "controls": {
+          "backdrop": -1
+        },
+        "controlSequence": 0,
+        "width": 1920,
+        "height": 1080,
+        "seed": 0,
+        "colorSpace": "srgb",
+        "alphaMode": "straight",
+        "instanceId": "19b3cf20-b354-4faa-9c63-f79434706878",
+        "generation": 1,
+        "revisionId": "f39f1362812c2c3a4af0423341031867dc8d0ea191f55b318f114f1c3deba3e1"
+      }
+    },
+    {
+      "name": "preview-over-black",
+      "samples": [
+        [
+          128,
+          0,
+          0
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          64,
+          64,
+          64
+        ]
+      ]
+    },
+    {
+      "name": "preview-over-white",
+      "samples": [
+        [
+          255,
+          127,
+          127
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          255,
+          255,
+          255
+        ]
+      ]
+    },
+    {
+      "name": "png-over-black",
+      "samples": [
+        [
+          188,
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          0,
+          255
+        ],
+        [
+          0,
+          0,
+          0,
+          255
+        ],
+        [
+          137,
+          137,
+          137,
+          255
+        ]
+      ],
+      "metadata": {
+        "playback": "paused",
+        "timeSeconds": 0,
+        "clockEpoch": 0,
+        "frameId": "2",
+        "sdkVersion": "0.2.0",
+        "controlSchemaHash": "34d2674bcc50fb19507f3b21815f3e628307137ff80e72c99a77a862a1e5a542",
+        "controls": {
+          "backdrop": 0
+        },
+        "controlSequence": 1,
+        "width": 1920,
+        "height": 1080,
+        "seed": 0,
+        "colorSpace": "srgb",
+        "alphaMode": "straight",
+        "instanceId": "19b3cf20-b354-4faa-9c63-f79434706878",
+        "generation": 1,
+        "revisionId": "f39f1362812c2c3a4af0423341031867dc8d0ea191f55b318f114f1c3deba3e1"
+      }
+    },
+    {
+      "name": "png-over-white",
+      "samples": [
+        [
+          255,
+          187,
+          187,
+          255
+        ],
+        [
+          0,
+          255,
+          0,
+          255
+        ],
+        [
+          255,
+          255,
+          255,
+          255
+        ],
+        [
+          255,
+          255,
+          255,
+          255
+        ]
+      ],
+      "metadata": {
+        "playback": "paused",
+        "timeSeconds": 0,
+        "clockEpoch": 0,
+        "frameId": "3",
+        "sdkVersion": "0.2.0",
+        "controlSchemaHash": "34d2674bcc50fb19507f3b21815f3e628307137ff80e72c99a77a862a1e5a542",
+        "controls": {
+          "backdrop": 1
+        },
+        "controlSequence": 2,
+        "width": 1920,
+        "height": 1080,
+        "seed": 0,
+        "colorSpace": "srgb",
+        "alphaMode": "straight",
+        "instanceId": "19b3cf20-b354-4faa-9c63-f79434706878",
+        "generation": 1,
+        "revisionId": "f39f1362812c2c3a4af0423341031867dc8d0ea191f55b318f114f1c3deba3e1"
+      }
+    },
+    {
+      "name": "unapplied-replacement",
+      "samples": [
+        [
+          255,
+          187,
+          187,
+          255
+        ],
+        [
+          0,
+          255,
+          0,
+          255
+        ],
+        [
+          255,
+          255,
+          255,
+          255
+        ],
+        [
+          255,
+          255,
+          255,
+          255
+        ]
+      ],
+      "metadata": {
+        "playback": "paused",
+        "timeSeconds": 0,
+        "clockEpoch": 0,
+        "frameId": "3",
+        "sdkVersion": "0.2.0",
+        "controlSchemaHash": "34d2674bcc50fb19507f3b21815f3e628307137ff80e72c99a77a862a1e5a542",
+        "controls": {
+          "backdrop": 1
+        },
+        "controlSequence": 2,
+        "width": 1920,
+        "height": 1080,
+        "seed": 0,
+        "colorSpace": "srgb",
+        "alphaMode": "straight",
+        "instanceId": "19b3cf20-b354-4faa-9c63-f79434706878",
+        "generation": 1,
+        "revisionId": "f39f1362812c2c3a4af0423341031867dc8d0ea191f55b318f114f1c3deba3e1"
+      }
+    },
+    {
+      "name": "replaced-png",
+      "samples": [
+        [
+          0,
+          0,
+          188,
+          255
+        ],
+        [
+          0,
+          255,
+          0,
+          255
+        ],
+        [
+          0,
+          0,
+          0,
+          255
+        ],
+        [
+          137,
+          137,
+          137,
+          255
+        ]
+      ],
+      "metadata": {
+        "playback": "paused",
+        "timeSeconds": 0,
+        "clockEpoch": 0,
+        "frameId": "2",
+        "sdkVersion": "0.2.0",
+        "controlSchemaHash": "34d2674bcc50fb19507f3b21815f3e628307137ff80e72c99a77a862a1e5a542",
+        "controls": {
+          "backdrop": 0
+        },
+        "controlSequence": 1,
+        "width": 1920,
+        "height": 1080,
+        "seed": 0,
+        "colorSpace": "srgb",
+        "alphaMode": "straight",
+        "instanceId": "19b3cf20-b354-4faa-9c63-f79434706878",
+        "generation": 2,
+        "revisionId": "aaa1b9ddd910394ff57128322b9231b6340e7954d7f3352517fd9a6d185bd8b0"
+      }
+    },
+    {
+      "name": "jpeg-exif-clockwise",
+      "samples": [
+        [
+          229,
+          20,
+          40,
+          255
+        ],
+        [
+          229,
+          20,
+          40,
+          255
+        ],
+        [
+          20,
+          199,
+          68,
+          255
+        ],
+        [
+          20,
+          199,
+          68,
+          255
+        ]
+      ],
+      "metadata": {
+        "playback": "paused",
+        "timeSeconds": 0,
+        "clockEpoch": 0,
+        "frameId": "1",
+        "sdkVersion": "0.2.0",
+        "controlSchemaHash": "34d2674bcc50fb19507f3b21815f3e628307137ff80e72c99a77a862a1e5a542",
+        "controls": {
+          "backdrop": 0
+        },
+        "controlSequence": 0,
+        "width": 1920,
+        "height": 1080,
+        "seed": 0,
+        "colorSpace": "srgb",
+        "alphaMode": "straight",
+        "instanceId": "19b3cf20-b354-4faa-9c63-f79434706878",
+        "generation": 3,
+        "revisionId": "57be6ef504659e2809a531dad2b4ffcb6f7860ab8f8188e0624d7d48cc88c2da"
+      }
+    },
+    {
+      "name": "last-good-after-remove",
+      "samples": [
+        [
+          229,
+          20,
+          40,
+          255
+        ],
+        [
+          229,
+          20,
+          40,
+          255
+        ],
+        [
+          20,
+          199,
+          68,
+          255
+        ],
+        [
+          20,
+          199,
+          68,
+          255
+        ]
+      ],
+      "metadata": {
+        "playback": "paused",
+        "timeSeconds": 0,
+        "clockEpoch": 0,
+        "frameId": "1",
+        "sdkVersion": "0.2.0",
+        "controlSchemaHash": "34d2674bcc50fb19507f3b21815f3e628307137ff80e72c99a77a862a1e5a542",
+        "controls": {
+          "backdrop": 0
+        },
+        "controlSequence": 0,
+        "width": 1920,
+        "height": 1080,
+        "seed": 0,
+        "colorSpace": "srgb",
+        "alphaMode": "straight",
+        "instanceId": "19b3cf20-b354-4faa-9c63-f79434706878",
+        "generation": 3,
+        "revisionId": "57be6ef504659e2809a531dad2b4ffcb6f7860ab8f8188e0624d7d48cc88c2da"
+      }
+    },
+    {
+      "name": "reopened",
+      "samples": [
+        [
+          187,
+          187,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0,
+          255
+        ],
+        [
+          255,
+          255,
+          255,
+          255
+        ],
+        [
+          255,
+          255,
+          255,
+          255
+        ]
+      ],
+      "metadata": {
+        "playback": "paused",
+        "timeSeconds": 0,
+        "clockEpoch": 0,
+        "frameId": "1",
+        "sdkVersion": "0.2.0",
+        "controlSchemaHash": "34d2674bcc50fb19507f3b21815f3e628307137ff80e72c99a77a862a1e5a542",
+        "controls": {
+          "backdrop": 1
+        },
+        "controlSequence": 0,
+        "width": 1920,
+        "height": 1080,
+        "seed": 0,
+        "colorSpace": "srgb",
+        "alphaMode": "straight",
+        "instanceId": "19b3cf20-b354-4faa-9c63-f79434706878",
+        "generation": 6,
+        "revisionId": "a94eca9fb052b23ad569cebbfeb110fffffa9d32312ff05d192def1b68492805"
+      }
+    },
+    {
+      "name": "restarted",
+      "samples": [
+        [
+          187,
+          187,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0,
+          255
+        ],
+        [
+          255,
+          255,
+          255,
+          255
+        ],
+        [
+          255,
+          255,
+          255,
+          255
+        ]
+      ],
+      "metadata": {
+        "playback": "paused",
+        "timeSeconds": 0,
+        "clockEpoch": 0,
+        "frameId": "1",
+        "sdkVersion": "0.2.0",
+        "controlSchemaHash": "34d2674bcc50fb19507f3b21815f3e628307137ff80e72c99a77a862a1e5a542",
+        "controls": {
+          "backdrop": 1
+        },
+        "controlSequence": 0,
+        "width": 1920,
+        "height": 1080,
+        "seed": 0,
+        "colorSpace": "srgb",
+        "alphaMode": "straight",
+        "instanceId": "19b3cf20-b354-4faa-9c63-f79434706878",
+        "generation": 7,
+        "revisionId": "a94eca9fb052b23ad569cebbfeb110fffffa9d32312ff05d192def1b68492805"
+      }
+    }
+  ],
+  "errors": []
+}

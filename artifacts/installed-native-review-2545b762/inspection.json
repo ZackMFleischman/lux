@@ -1,0 +1,177 @@
+{
+  "ok": true,
+  "scope": "single-installed-native-fixture-pixel-check",
+  "actualResolumeTested": false,
+  "performanceAcceptance": false,
+  "releaseId": "2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2",
+  "runtimeId": "8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539",
+  "tolerance": 5,
+  "limitations": [
+    "This is a native fixture test, not actual Resolume acceptance, composition persistence, multi-instance, parameter-gesture or restart testing.",
+    "The fixture does not call FF_SETPARAMETER; immutable saved/default normalized backdrop=1 drives startup. It reads one final bottom-up RGBA8 framebuffer. Pixel inspection is a separate required step.",
+    "The reopened reference renders the PNG asset. Both original PNG and oriented JPEG bytes are pinned in the release, but this scene does not render the JPEG in this run.",
+    "The fixture runs 10 seconds after FFGL initialization; the outer Windows Job budget is 30 seconds total and then confirms descendant cleanup. Cold installed validation consumes part of these budgets.",
+    "The outer Job can kill the idle supervisor immediately after host exit; missing producer lifecycle completion logs must not be treated as complete per-attempt lifecycle evidence.",
+    "No development modules are needed by the installed runtime. CPU require resolution was constrained to packaged/installed runtime modules plus Node builtins; this is not a system loader trace or absence-of-files experiment.",
+    "Harness code, its Node interpreter and fixture executable are checkout-based. Installed application executes its package-local main/worker and bundled validators; system graphics drivers and Windows DLLs remain external.",
+    "Exact runtime/package bytes and source snapshots are inventoried. Reproducible compiler provenance, OS file-cache clearing and system/driver immutability are not established.",
+    "No worker/compositor correspondence or performance acceptance follows from the pixels. LUX_CONTROLLED_FRAMES is deliberately unset.",
+    "A Job deadline cannot recover a whole-system GPU/driver freeze; ordinary existing runner isolation and lock rules still apply."
+  ],
+  "experiment": {
+    "id": "48543b02-8dea-4113-a518-2f219e4aa2b0",
+    "outcome": "success",
+    "cleanupComplete": true
+  },
+  "captureSha256": "d5e4d32f7ad74e28cafd3da1862a0f1fedce7075c7210af0c0519921f5975c2e",
+  "samples": [
+    [
+      187,
+      187,
+      255,
+      255
+    ],
+    [
+      0,
+      255,
+      0,
+      255
+    ],
+    [
+      255,
+      255,
+      255,
+      255
+    ],
+    [
+      255,
+      255,
+      255,
+      255
+    ]
+  ],
+  "expected": [
+    [
+      187,
+      187,
+      255,
+      255
+    ],
+    [
+      0,
+      255,
+      0,
+      255
+    ],
+    [
+      255,
+      255,
+      255,
+      255
+    ],
+    [
+      255,
+      255,
+      255,
+      255
+    ]
+  ],
+  "referenceMetadata": {
+    "playback": "paused",
+    "timeSeconds": 0,
+    "clockEpoch": 0,
+    "frameId": "1",
+    "sdkVersion": "0.2.0",
+    "controlSchemaHash": "34d2674bcc50fb19507f3b21815f3e628307137ff80e72c99a77a862a1e5a542",
+    "controls": {
+      "backdrop": 1
+    },
+    "controlSequence": 0,
+    "width": 1920,
+    "height": 1080,
+    "seed": 0,
+    "colorSpace": "srgb",
+    "alphaMode": "straight",
+    "instanceId": "19b3cf20-b354-4faa-9c63-f79434706878",
+    "generation": 6,
+    "revisionId": "a94eca9fb052b23ad569cebbfeb110fffffa9d32312ff05d192def1b68492805"
+  },
+  "grid": [
+    {
+      "actual": [
+        187,
+        187,
+        255,
+        255
+      ],
+      "expected": [
+        187,
+        187,
+        255,
+        255
+      ],
+      "pass": true
+    },
+    {
+      "actual": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "expected": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "pass": true
+    },
+    {
+      "actual": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "expected": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "pass": true
+    },
+    {
+      "actual": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "expected": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "pass": true
+    }
+  ],
+  "failures": [],
+  "lastCounters": {
+    "kind": "counters",
+    "callbacks": 334,
+    "consumed": 92
+  },
+  "telemetrySummaries": [
+    {
+      "kind": "host-telemetry-summary",
+      "instanceId": "000000000000707c0000008fd73c24d6",
+      "lostRecords": 0,
+      "recorded": 343
+    }
+  ],
+  "opportunities": 343,
+  "telemetryComplete": true
+}

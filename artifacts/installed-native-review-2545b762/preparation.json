@@ -1,0 +1,78 @@
+{
+  "prepared": true,
+  "gpuLaunched": false,
+  "hostTested": false,
+  "releaseId": "2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2",
+  "runtimeId": "8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539",
+  "registration": {
+    "releaseId": "2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2",
+    "dllPath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-native-review-2545b762\\plugins\\Lux_2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2.dll",
+    "sidecarPath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-native-review-2545b762\\plugins\\Lux_2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2.dll.lux-source",
+    "pluginId": "51ZR",
+    "displayName": "Lux Image Tracer",
+    "sidecar": "lux-installed-source-v2\n2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\n8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\n51ZR\nLux Image Tracer\n34d2674bcc50fb19507f3b21815f3e628307137ff80e72c99a77a862a1e5a542\n1\nbackdrop\tBackdrop\t1\n",
+    "alreadyRegistered": true
+  },
+  "sourceFiles": 297,
+  "binaryFiles": 159,
+  "moduleLookupAudit": {
+    "outsideRuntimeDenied": true,
+    "modules": [
+      "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\apps\\installed-runtime\\src\\registry.cjs",
+      "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\package.cjs",
+      "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\parameter-mapping.cjs",
+      "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\register.cjs",
+      "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\runtime-capability.cjs",
+      "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\runtime-validation.cjs",
+      "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\tools\\gpu-spike\\frame-gate.cjs",
+      "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\tools\\gpu-spike\\host-startup.cjs",
+      "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\tools\\gpu-spike\\producer-session.cjs",
+      "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\transport-release.cjs"
+    ]
+  },
+  "assets": [
+    {
+      "name": "assets/alpha.png",
+      "mediaType": "image/png",
+      "bytes": 81,
+      "sha256": "69d8fc57241bb30c08174d60c468a29e8ccb7975137a2bf6c54ed75e54c47f83"
+    },
+    {
+      "name": "assets/oriented.jpg",
+      "mediaType": "image/jpeg",
+      "bytes": 587,
+      "sha256": "f88778632d2475314123c17fbdf24a274d6564ffd9194f4af4736728f0ad5693"
+    }
+  ],
+  "attribution": {
+    "reportedNativeBuildCommit": "d302558",
+    "reportedPackageWorker": "Includes capture alpha correction; predates scheduler-only commit 60297e1",
+    "inspectedCheckout": "a7f9494e09e4616f43fd4a955bbec3ed7b901947",
+    "nativeMatches": [
+      {
+        "name": "LuxTracerTR02.dll",
+        "package": "ff3937d5dc6c6e8735dd80fceb3fa551c01afdd4122cf79b8f7ab810da326449",
+        "workspace": "ff3937d5dc6c6e8735dd80fceb3fa551c01afdd4122cf79b8f7ab810da326449"
+      },
+      {
+        "name": "lux_texture_bridge.node",
+        "package": "91acec58e0258c1fd2d4e111f14fda30b4b16e92f2edccbc849ba1703602ed93",
+        "workspace": "91acec58e0258c1fd2d4e111f14fda30b4b16e92f2edccbc849ba1703602ed93"
+      }
+    ],
+    "mainEmissionMatches": true,
+    "status": "Exact distribution hashes verified; build commit attribution supplied by coordinator, not independently reproducible-build proof",
+    "host": {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\build\\Release\\lux_standalone_host.exe",
+      "sha256": "5150c17e4da25e3bb3f3668f0d4dc694f4b6fdea5afde503a01d7c2e04cd2958",
+      "bytes": 373760,
+      "modifiedUtc": "2026-09-13T00:49:48.833Z"
+    },
+    "compilerCacheExcerpt": [
+      "CMAKE_GENERATOR:INTERNAL=Visual Studio 18 2026",
+      "CMAKE_GENERATOR_INSTANCE:INTERNAL=C:/Program Files (x86)/Microsoft Visual Studio/18/BuildTools",
+      "CMAKE_GENERATOR_PLATFORM:INTERNAL=x64",
+      "CMAKE_GENERATOR_TOOLSET:INTERNAL=v145,version=14.50.35717"
+    ]
+  }
+}

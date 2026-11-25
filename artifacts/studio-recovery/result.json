@@ -1,0 +1,827 @@
+{
+  "ok": true,
+  "checks": [
+    "throw: one automatic retry preserves playing and controls; second failure suppresses retries; source survives and explicit paused restart captures successfully",
+    "unresponsive: one automatic retry preserves playing and controls; second failure suppresses retries; source survives and explicit paused restart captures successfully"
+  ],
+  "runs": [
+    {
+      "mode": "throw",
+      "samples": [
+        {
+          "elapsedMs": 7.9891999999999825,
+          "generation": 1,
+          "playback": "playing",
+          "frameId": "5",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 79.32459999999992,
+          "generation": 1,
+          "playback": "playing",
+          "frameId": "9",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 149.54240000000027,
+          "generation": 1,
+          "playback": "playing",
+          "frameId": "11",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 219.5637000000006,
+          "generation": 1,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 291.53720000000067,
+          "generation": 1,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 374.03089999999975,
+          "generation": 1,
+          "playback": "failed",
+          "frameId": "20",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "LUX_QA_RUNTIME_THROW"
+          },
+          "message": "Preview failed. One automatic restart is queued."
+        },
+        {
+          "elapsedMs": 431.988800000001,
+          "generation": 1,
+          "playback": "failed",
+          "frameId": "20",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "LUX_QA_RUNTIME_THROW"
+          },
+          "message": "Preview failed. One automatic restart is queued."
+        },
+        {
+          "elapsedMs": 491.9983000000011,
+          "generation": 1,
+          "playback": "failed",
+          "frameId": "20",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "LUX_QA_RUNTIME_THROW"
+          },
+          "message": "Preview failed. One automatic restart is queued."
+        },
+        {
+          "elapsedMs": 554.2537000000011,
+          "generation": 1,
+          "playback": "failed",
+          "frameId": "20",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "LUX_QA_RUNTIME_THROW"
+          },
+          "message": "Preview failed. One automatic restart is queued."
+        },
+        {
+          "elapsedMs": 617.8196000000007,
+          "generation": 1,
+          "playback": "failed",
+          "frameId": "20",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "LUX_QA_RUNTIME_THROW"
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 679.7762000000002,
+          "generation": 1,
+          "playback": "failed",
+          "frameId": "20",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "LUX_QA_RUNTIME_THROW"
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 742.3801000000003,
+          "generation": 1,
+          "playback": "failed",
+          "frameId": "20",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "LUX_QA_RUNTIME_THROW"
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 802.9056,
+          "generation": 1,
+          "playback": "failed",
+          "frameId": "20",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "LUX_QA_RUNTIME_THROW"
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 865.0400000000009,
+          "generation": 1,
+          "playback": "failed",
+          "frameId": "20",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "LUX_QA_RUNTIME_THROW"
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 927.4543000000012,
+          "generation": 1,
+          "playback": "failed",
+          "frameId": "20",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "LUX_QA_RUNTIME_THROW"
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 988.3940000000002,
+          "generation": 1,
+          "playback": "failed",
+          "frameId": "20",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "LUX_QA_RUNTIME_THROW"
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 1050.9598000000005,
+          "generation": 1,
+          "playback": "failed",
+          "frameId": "20",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "LUX_QA_RUNTIME_THROW"
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 1113.4647000000004,
+          "generation": 1,
+          "playback": "failed",
+          "frameId": "20",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "LUX_QA_RUNTIME_THROW"
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 1244.4668000000001,
+          "generation": 2,
+          "playback": "playing",
+          "frameId": "1",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 1300.3106000000007,
+          "generation": 2,
+          "playback": "playing",
+          "frameId": "8",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 1394.5501000000004,
+          "generation": 2,
+          "playback": "playing",
+          "frameId": "11",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 1458.8720000000012,
+          "generation": 2,
+          "playback": "playing",
+          "frameId": "15",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 1521.2813999999998,
+          "generation": 2,
+          "playback": "failed",
+          "frameId": "16",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "LUX_QA_RUNTIME_THROW"
+          },
+          "message": "Preview failed twice within 30 seconds. Restart explicitly to retry."
+        }
+      ],
+      "firstFaultObservedFromPlayMs": 374.03089999999975
+    },
+    {
+      "mode": "unresponsive",
+      "samples": [
+        {
+          "elapsedMs": 5.717000000000553,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "4",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 75.00560000000041,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "7",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 142.39949999999953,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "10",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 214.5018999999993,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "15",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 285.0573000000004,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "18",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 351.62119999999777,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 430.08380000000034,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 488.413700000001,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 548.574099999998,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 615.5740000000005,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 676.2864000000009,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 771.9781000000003,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 835.0318999999981,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 904.768,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 965.6974999999984,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 1034.7404999999999,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 1105.2911999999997,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 1166.6326000000008,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 1236.6993000000002,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 1332.4148999999998,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 1399.6074000000008,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 1461.9773999999998,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 1524.6196999999993,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 1586.974900000001,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 1646.634299999998,
+          "generation": 4,
+          "playback": "playing",
+          "frameId": "19",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 1749.6525000000001,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Preview failed. One automatic restart is queued."
+        },
+        {
+          "elapsedMs": 1815.854299999999,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Preview failed. One automatic restart is queued."
+        },
+        {
+          "elapsedMs": 1886.9114999999983,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Preview failed. One automatic restart is queued."
+        },
+        {
+          "elapsedMs": 1998.8083000000006,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 2064.3100000000013,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 2127.314900000001,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 2191.208699999999,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 2253.292699999998,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 2337.5907000000007,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 2407.8992,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 2469.4874999999993,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 2534.1454000000012,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 2596.047699999999,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 2655.8368999999984,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 2717.268100000001,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 2778.7214999999997,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 2841.5419,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 2902.2854000000007,
+          "generation": 4,
+          "playback": "failed",
+          "frameId": "19",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Automatically restarting the accepted visual…"
+        },
+        {
+          "elapsedMs": 3016.268,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "4",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 3087.203999999998,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "11",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 3155.1686999999984,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "14",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 3225.0649999999987,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 3316.812900000001,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 3381.3511,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 3441.6117999999988,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 3509.4874999999993,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 3602.810099999999,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 3676.3862999999983,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 3733.752400000001,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 3797.4786999999997,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 3858.2261,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 3919.2178999999996,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 3978.3657999999996,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 4036.9691999999995,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 4103.5749,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 4167.069899999999,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 4230.8626,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 4350.076099999998,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 4413.396099999998,
+          "generation": 5,
+          "playback": "playing",
+          "frameId": "16",
+          "fault": null,
+          "message": null
+        },
+        {
+          "elapsedMs": 4502.711500000001,
+          "generation": 5,
+          "playback": "failed",
+          "frameId": "16",
+          "fault": {
+            "code": "RUNTIME_FAILED",
+            "message": "Visual stopped making progress. Restart the runtime to retry."
+          },
+          "message": "Preview failed twice within 30 seconds. Restart explicitly to retry."
+        }
+      ],
+      "firstFaultObservedFromPlayMs": 1749.6525000000001
+    }
+  ],
+  "errors": [],
+  "physicalStopVerified": false,
+  "gpuCleanupVerified": false
+}

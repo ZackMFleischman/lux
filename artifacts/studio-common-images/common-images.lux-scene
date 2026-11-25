@@ -1,0 +1,49 @@
+{
+  "format": "lux-scene",
+  "version": 3,
+  "source": {
+    "sourceVersion": 2,
+    "sdkVersion": "0.2.0",
+    "entry": "visual.ts",
+    "files": {
+      "visual.ts": "import { defineVisual } from '@lux/visual-sdk';\nimport { Color, Scene, Mesh, PlaneGeometry, MeshBasicNodeMaterial, OrthographicCamera, DataTexture, RGBAFormat, UnsignedByteType, NearestFilter, SRGBColorSpace } from 'three/webgpu';\n\nexport default defineVisual({\n  controls: { backdrop: { type: 'number', label: 'Backdrop', min: -1, max: 1, default: -1, step: 1 } },\n  async create(context) {\n    const pixels = context.images.get('assets/alpha.png');\n    if (!pixels) throw Error('Missing required decoded image: assets/alpha.png');\n    const image = new DataTexture(pixels.data, pixels.width, pixels.height, RGBAFormat, UnsignedByteType);\n    image.colorSpace = SRGBColorSpace;\n    image.minFilter = NearestFilter; image.magFilter = NearestFilter;\n    image.flipY = true; image.generateMipmaps = false; image.premultiplyAlpha = false; image.needsUpdate = true;\n    const material = new MeshBasicNodeMaterial();\n    material.map = image; material.toneMapped = false; material.transparent = true; material.depthWrite = false;\n    const geometry = new PlaneGeometry(2, 2), scene = new Scene();\n    scene.add(new Mesh(geometry, material));\n    const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);\n    return {\n      update(frame) { const value = frame.controls.backdrop; scene.background = value < 0 ? null : new Color(value, value, value); },\n      render(target) { return context.renderer.render(scene, camera, target); },\n      reset(_seed) {},\n      dispose() { image.dispose(); material.dispose(); geometry.dispose(); },\n    };\n  },\n});\n"
+    },
+    "assets": {
+      "assets/alpha.png": {
+        "mediaType": "image/png",
+        "encoding": "base64",
+        "data": "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAGElEQVR4XmNgYPjfwPAfCIEMhv///zsAADseB7pE0Fj+AAAAAElFTkSuQmCC"
+      },
+      "assets/oriented.jpg": {
+        "mediaType": "image/jpeg",
+        "encoding": "base64",
+        "data": "/9j/4QAiRXhpZgAASUkqAAgAAAABABIBAwABAAAABgAAAAAAAAD/4AAQSkZJRgABAQAAAQABAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wgARCAAYACADAREAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAj/xAAYAQEBAQEBAAAAAAAAAAAAAAAABgoHCf/aAAwDAQACEAMQAAABlPjfs4K4l8k4keo1sCuJfJOJHqNbAriXyTj/xAAUEAEAAAAAAAAAAAAAAAAAAAAw/9oACAEBAAEFAk//xAAUEQEAAAAAAAAAAAAAAAAAAAAw/9oACAEDAQE/AU//xAAUEQEAAAAAAAAAAAAAAAAAAAAw/9oACAECAQE/AU//xAAUEAEAAAAAAAAAAAAAAAAAAAAw/9oACAEBAAY/Ak//xAAUEAEAAAAAAAAAAAAAAAAAAAAw/9oACAEBAAE/IU//2gAMAwEAAgADAAAAEAAAAAAP/8QAFBEBAAAAAAAAAAAAAAAAAAAAMP/aAAgBAwEBPxBP/8QAFBEBAAAAAAAAAAAAAAAAAAAAMP/aAAgBAgEBPxBP/8QAFBABAAAAAAAAAAAAAAAAAAAAMP/aAAgBAQABPxBP/9k="
+      }
+    }
+  },
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "seed": 0
+  },
+  "controls": {
+    "sourceHash": "a94eca9fb052b23ad569cebbfeb110fffffa9d32312ff05d192def1b68492805",
+    "schema": [
+      {
+        "id": "backdrop",
+        "type": "number",
+        "label": "Backdrop",
+        "default": -1,
+        "min": -1,
+        "max": 1,
+        "step": 1,
+        "changeCost": "live"
+      }
+    ],
+    "schemaHash": "34d2674bcc50fb19507f3b21815f3e628307137ff80e72c99a77a862a1e5a542",
+    "values": {
+      "backdrop": 1
+    }
+  }
+}
