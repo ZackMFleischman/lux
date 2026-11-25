@@ -1,0 +1,80 @@
+{
+  "format": "lux-scene",
+  "version": 3,
+  "source": {
+    "sdkVersion": "0.2.0",
+    "entry": "visual.ts",
+    "files": {
+      "visual.ts": "import { defineVisual } from '@lux/visual-sdk';\nimport {\n  Scene, Color, Mesh, SphereGeometry, MeshStandardNodeMaterial,\n  PerspectiveCamera, AmbientLight, DirectionalLight,\n} from 'three/webgpu';\nimport { uniform, positionLocal, normalLocal, vec3, mx_noise_float } from 'three/tsl';\n\n// SDK 0.2: numeric controls are declared below; color remains a source setting.\nexport default defineVisual({\n  controls: {\n    spikeHeight: { type: 'number', label: 'Spike height', default: 0.85, min: 0, max: 2, step: 0.01 },\n    noiseScale: { type: 'number', label: 'Noise scale', default: 3.4, min: 0.5, max: 12, step: 0.1 },\n    sharpness: { type: 'number', label: 'Sharpness', default: 3.2, min: 0.25, max: 8, step: 0.05 },\n    motionSpeed: { type: 'number', label: 'Motion speed', default: 0.28, min: 0, max: 2, step: 0.01 },\n    roughness: { type: 'number', label: 'Roughness', default: 0.38, min: 0, max: 1, step: 0.01 },\n  },\n  async create(context) {\n    const time = uniform(0);\n    const spikeHeight = uniform(0.85), noiseScale = uniform(3.4), sharpness = uniform(3.2);\n    const drift = vec3(time.mul(0.31), time.mul(0.17), time.mul(0.23));\n    const noise = mx_noise_float(positionLocal.mul(noiseScale).add(drift));\n    const peaks = noise.mul(0.5).add(0.5).clamp(0, 1).pow(sharpness);\n    const material = new MeshStandardNodeMaterial({\n      color: '#8b5cff', roughness: 0.38, metalness: 0.15,\n      flatShading: true,\n    });\n    material.positionNode = positionLocal.add(\n      normalLocal.mul(peaks.mul(spikeHeight)),\n    );\n    const geometry = new SphereGeometry(1, 128, 64);\n    const sphere = new Mesh(geometry, material);\n    // Bound includes maximum GPU displacement, which CPU culling cannot see.\n    geometry.computeBoundingSphere();\n    geometry.boundingSphere!.radius = 3;\n    const scene = new Scene();\n    scene.background = new Color('#070b16');\n    scene.add(sphere, new AmbientLight('#b7c6ff', 1.4));\n    const key = new DirectionalLight('#e4d4ff', 4);\n    key.position.set(3, 4, 5);\n    const rim = new DirectionalLight('#35e6cf', 2.5);\n    rim.position.set(-3, 1, -2);\n    scene.add(key, rim);\n    const camera = new PerspectiveCamera(42, context.settings.width / context.settings.height, 0.1, 30);\n    camera.position.z = 5.6;\n    return {\n      update(frame) {\n        time.value += frame.deltaSeconds * frame.controls.motionSpeed;\n        spikeHeight.value = frame.controls.spikeHeight;\n        noiseScale.value = frame.controls.noiseScale;\n        sharpness.value = frame.controls.sharpness;\n        material.roughness = frame.controls.roughness;\n        sphere.rotation.y = frame.timeSeconds * 0.12;\n        sphere.rotation.x = Math.sin(frame.timeSeconds * 0.17) * 0.18;\n      },\n      render(target) { return context.renderer.render(scene, camera, target); },\n      reset(_seed) { time.value = 0; },\n      dispose() { geometry.dispose(); material.dispose(); },\n    };\n  },\n});\n"
+    }
+  },
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "seed": 0
+  },
+  "controls": {
+    "sourceHash": "cee01f784742b5f445229b1dc2312ac0b4a951cd95e8a9fb0ae0b35e4b5749ab",
+    "schema": [
+      {
+        "id": "spikeHeight",
+        "type": "number",
+        "label": "Spike height",
+        "default": 0.85,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "changeCost": "live"
+      },
+      {
+        "id": "noiseScale",
+        "type": "number",
+        "label": "Noise scale",
+        "default": 3.4,
+        "min": 0.5,
+        "max": 12,
+        "step": 0.1,
+        "changeCost": "live"
+      },
+      {
+        "id": "sharpness",
+        "type": "number",
+        "label": "Sharpness",
+        "default": 3.2,
+        "min": 0.25,
+        "max": 8,
+        "step": 0.05,
+        "changeCost": "live"
+      },
+      {
+        "id": "motionSpeed",
+        "type": "number",
+        "label": "Motion speed",
+        "default": 0.28,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "changeCost": "live"
+      },
+      {
+        "id": "roughness",
+        "type": "number",
+        "label": "Roughness",
+        "default": 0.38,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "changeCost": "live"
+      }
+    ],
+    "schemaHash": "297bc0bf1131f8a46dcb56f87631f45c0f0d7a66f583d9605ff2b06c795dd3a2",
+    "values": {
+      "spikeHeight": 0.85,
+      "noiseScale": 8,
+      "sharpness": 2,
+      "motionSpeed": 0.28,
+      "roughness": 0.38
+    }
+  }
+}
