@@ -1,0 +1,12 @@
+[
+  "ticket",
+  "claim",
+  "LUX-13",
+  "--session",
+  "318ddc5e-f6a1-495b-8e07-e702072e6357",
+  "--expect-revision",
+  "2",
+  "--request",
+  "lux-input-mapping-claim-01a09967-1",
+  "--json"
+]

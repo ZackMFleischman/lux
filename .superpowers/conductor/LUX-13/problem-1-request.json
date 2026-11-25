@@ -1,0 +1,13 @@
+[
+  "problem",
+  "add",
+  "--ticket",
+  "LUX-13",
+  "--session",
+  "318ddc5e-f6a1-495b-8e07-e702072e6357",
+  "--body-file",
+  ".superpowers/conductor/LUX-13/problem.json",
+  "--request",
+  "lux-input-mapping-01a09967-problem-1",
+  "--json"
+]

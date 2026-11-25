@@ -1,0 +1,22 @@
+[
+  "ticket",
+  "submit",
+  "LUX-13",
+  "--session",
+  "318ddc5e-f6a1-495b-8e07-e702072e6357",
+  "--claim",
+  "174c02b7-64ef-4b5b-b86f-0141b2920126",
+  "--expect-revision",
+  "4",
+  "--commit",
+  "fab83026c7baadb845bb6617c355dc6c6df421db",
+  "--summary-file",
+  ".superpowers/conductor/LUX-13/summary.md",
+  "--evidence-file",
+  ".superpowers/conductor/LUX-13/evidence.md",
+  "--qa-file",
+  ".superpowers/conductor/LUX-13/qa.md",
+  "--request",
+  "lux-input-mapping-01a09967-submit-1",
+  "--json"
+]

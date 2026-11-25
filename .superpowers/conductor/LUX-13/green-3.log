@@ -1,0 +1,39 @@
+✔ strict plan fields, definitions, ranges and identities reject malformed or duplicate data (14.2601ms)
+✔ frame admission is complete, finite, in-range and unique even for unused signals (4.6697ms)
+✔ accessors, symbols, hidden properties, custom prototypes and sparse arrays never pass admission (1.2519ms)
+✔ finite operands that overflow intermediate subtraction, division, add or multiply fail atomically (2.794ms)
+✔ exact count/depth boundaries pass while the next element fails including disabled/unused data (89.6558ms)
+✔ raw UTF-8 metadata budget is bounded before normalization can trim it away (6.7313ms)
+✔ exact UTF-8 budget admits the last byte and rejects the next byte (2.6771ms)
+✔ macro phase precedes modulation and UI step does not quantize (4.4233ms)
+✔ same-phase array order is preserved rather than sorted by ID (2.3802ms)
+✔ clamp happens once after both phases (0.967ms)
+✔ power curve (0.4269ms)
+✔ invert before shaping (0.3959ms)
+✔ low saturation (0.5028ms)
+✔ high saturation (0.5147ms)
+✔ constant output (0.4364ms)
+✔ unresolved and disabled bindings preserve base with distinct traces (0.6329ms)
+✔ host subset bypasses all its bindings while explicit internal targets evaluate (1.255ms)
+✔ structured scene and node identities remain independent regardless of label (0.9538ms)
+✔ empty catalogue adds no implicit controls and all output is detached and frozen (0.5579ms)
+✔ negative zero is normalized in base, source arithmetic and results (0.3752ms)
+✔ declarations preserve semantic IDs/order, normalize metadata, and freeze independent snapshots (3.061ms)
+✔ empty declarations produce no implicit control and support an empty full snapshot (0.5486ms)
+✔ schema canonicalization ignores input field order, preserves control order, and normalizes negative zero (0.5516ms)
+✔ invalid IDs, duplicate normalized IDs and unsupported descriptor fields are rejected (0.7714ms)
+✔ descriptor finite range/default/step invariants reject invalid values without clamping (0.7001ms)
+✔ metadata enforces Unicode validity, code-point lengths, controls, and UTF-8/count budgets (2.839ms)
+✔ untrusted records and schema arrays never invoke accessors or accept inherited/hidden/symbol data (0.6019ms)
+✔ patches permit finite values between UI steps and full snapshots require exactly all keys (0.8945ms)
+✔ invalid multi-key patch is atomic and rejects own-record attacks without evaluating values (0.5487ms)
+✔ reconciliation preserves compatible values and reports added, removed, narrowed-range and unit changes (0.7202ms)
+✔ reconciliation validates saved snapshots and handles first build, empty schema and removed units (0.5587ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 31
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 224.9486

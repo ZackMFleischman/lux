@@ -1,0 +1,9 @@
+[
+  "session",
+  "stop",
+  "--session",
+  "318ddc5e-f6a1-495b-8e07-e702072e6357",
+  "--request",
+  "lux-input-mapping-01a09967-stop-1",
+  "--json"
+]

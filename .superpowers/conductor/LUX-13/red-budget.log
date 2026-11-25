@@ -1,0 +1,34 @@
+✔ strict plan fields, definitions, ranges and identities reject malformed or duplicate data (18.8765ms)
+✔ frame admission is complete, finite, in-range and unique even for unused signals (5.5933ms)
+✔ accessors, symbols, hidden properties, custom prototypes and sparse arrays never pass admission (1.7718ms)
+✔ finite operands that overflow intermediate subtraction, division, add or multiply fail atomically (2.4736ms)
+✔ exact count/depth boundaries pass while the next element fails including disabled/unused data (119.8528ms)
+✔ raw UTF-8 metadata budget is bounded before normalization can trim it away (10.8928ms)
+✖ exact UTF-8 budget admits the last byte and rejects the next byte (2.6846ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 6
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 282.0517
+
+✖ failing tests:
+
+test at tests\unit\input-mapping-admission.test.mjs:98:1
+✖ exact UTF-8 budget admits the last byte and rejects the next byte (2.6846ms)
+  Error: plan.bindings[0].inputMin: metadata exceeds 256 KiB UTF-8
+      at invalid (file:///C:/Users/zFlei/repos/lux/.worktrees/input-mapping/packages/inputs/src/mapping.mjs:13:23)
+      at charge (file:///C:/Users/zFlei/repos/lux/.worktrees/input-mapping/packages/inputs/src/mapping.mjs:22:51)
+      at copy (file:///C:/Users/zFlei/repos/lux/.worktrees/input-mapping/packages/inputs/src/mapping.mjs:30:38)
+      at copy (file:///C:/Users/zFlei/repos/lux/.worktrees/input-mapping/packages/inputs/src/mapping.mjs:55:21)
+      at copy (file:///C:/Users/zFlei/repos/lux/.worktrees/input-mapping/packages/inputs/src/mapping.mjs:44:21)
+      at copy (file:///C:/Users/zFlei/repos/lux/.worktrees/input-mapping/packages/inputs/src/mapping.mjs:55:21)
+      at data (file:///C:/Users/zFlei/repos/lux/.worktrees/input-mapping/packages/inputs/src/mapping.mjs:59:10)
+      at normalizeNumericMappingPlan (file:///C:/Users/zFlei/repos/lux/.worktrees/input-mapping/packages/inputs/src/mapping.mjs:116:22)
+      at TestContext.<anonymous> (file:///C:/Users/zFlei/repos/lux/.worktrees/input-mapping/tests/unit/input-mapping-admission.test.mjs:103:16)
+      at Test.runInAsyncScope (node:async_hooks:214:14) {
+    code: 'INVALID_INPUT_MAPPING',
+    path: 'plan.bindings[0].inputMin'
+  }

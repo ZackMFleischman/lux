@@ -1,0 +1,19 @@
+✔ declarations preserve semantic IDs/order, normalize metadata, and freeze independent snapshots (3.6205ms)
+✔ empty declarations produce no implicit control and support an empty full snapshot (0.6648ms)
+✔ schema canonicalization ignores input field order, preserves control order, and normalizes negative zero (0.9303ms)
+✔ invalid IDs, duplicate normalized IDs and unsupported descriptor fields are rejected (1.2728ms)
+✔ descriptor finite range/default/step invariants reject invalid values without clamping (0.8145ms)
+✔ metadata enforces Unicode validity, code-point lengths, controls, and UTF-8/count budgets (2.9693ms)
+✔ untrusted records and schema arrays never invoke accessors or accept inherited/hidden/symbol data (0.6699ms)
+✔ patches permit finite values between UI steps and full snapshots require exactly all keys (1.0198ms)
+✔ invalid multi-key patch is atomic and rejects own-record attacks without evaluating values (0.8492ms)
+✔ reconciliation preserves compatible values and reports added, removed, narrowed-range and unit changes (0.9474ms)
+✔ reconciliation validates saved snapshots and handles first build, empty schema and removed units (0.6444ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 127.4025

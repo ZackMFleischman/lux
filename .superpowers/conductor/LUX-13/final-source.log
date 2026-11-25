@@ -1,0 +1,13 @@
+commit fab83026c7baadb845bb6617c355dc6c6df421db
+Author:     Zack M Fleischman <ZackMFleischman@gmail.com>
+AuthorDate: Sun Sep 13 00:16:41 2026 -0700
+Commit:     Zack M Fleischman <ZackMFleischman@gmail.com>
+CommitDate: Sun Sep 13 00:16:41 2026 -0700
+
+    feat(inputs): add pure numeric mapping policy
+
+ packages/inputs/src/mapping.d.mts           |  29 ++++
+ packages/inputs/src/mapping.mjs             | 216 ++++++++++++++++++++++++++++
+ tests/unit/input-mapping-admission.test.mjs | 108 ++++++++++++++
+ tests/unit/input-mapping.test.mjs           |  89 ++++++++++++
+ 4 files changed, 442 insertions(+)

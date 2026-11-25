@@ -1,0 +1,14 @@
+[
+  "ticket",
+  "note",
+  "LUX-13",
+  "--session",
+  "318ddc5e-f6a1-495b-8e07-e702072e6357",
+  "--claim",
+  "174c02b7-64ef-4b5b-b86f-0141b2920126",
+  "--body-file",
+  ".superpowers/conductor/LUX-13/progress.md",
+  "--request",
+  "lux-input-mapping-01a09967-note-1",
+  "--json"
+]

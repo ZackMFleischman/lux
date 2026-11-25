@@ -1,0 +1,9 @@
+[
+  "session",
+  "start",
+  "--agent",
+  "c7f5d7aa-3538-43be-ac01-de47bb6e083d",
+  "--request",
+  "lux-input-mapping-start-01a09967-1",
+  "--json"
+]

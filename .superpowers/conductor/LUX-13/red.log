@@ -1,0 +1,71 @@
+node:internal/modules/esm/resolve:274
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\Users\zFlei\repos\lux\.worktrees\input-mapping\packages\inputs\src\mapping.mjs' imported from C:\Users\zFlei\repos\lux\.worktrees\input-mapping\tests\unit\input-mapping-admission.test.mjs
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:864:10)
+    at defaultResolve (node:internal/modules/esm/resolve:990:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:718:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:735:38)
+    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:764:52)
+    at #resolve (node:internal/modules/esm/loader:700:17)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:620:35)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:143:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:228:17) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/Users/zFlei/repos/lux/.worktrees/input-mapping/packages/inputs/src/mapping.mjs'
+}
+
+Node.js v24.12.0
+✖ tests\unit\input-mapping-admission.test.mjs (67.7314ms)
+node:internal/modules/esm/resolve:274
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\Users\zFlei\repos\lux\.worktrees\input-mapping\packages\inputs\src\mapping.mjs' imported from C:\Users\zFlei\repos\lux\.worktrees\input-mapping\tests\unit\input-mapping.test.mjs
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:864:10)
+    at defaultResolve (node:internal/modules/esm/resolve:990:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:718:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:735:38)
+    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:764:52)
+    at #resolve (node:internal/modules/esm/loader:700:17)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:620:35)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:143:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:228:17) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/Users/zFlei/repos/lux/.worktrees/input-mapping/packages/inputs/src/mapping.mjs'
+}
+
+Node.js v24.12.0
+✖ tests\unit\input-mapping.test.mjs (69.3016ms)
+✔ declarations preserve semantic IDs/order, normalize metadata, and freeze independent snapshots (2.7233ms)
+✔ empty declarations produce no implicit control and support an empty full snapshot (0.4529ms)
+✔ schema canonicalization ignores input field order, preserves control order, and normalizes negative zero (0.4881ms)
+✔ invalid IDs, duplicate normalized IDs and unsupported descriptor fields are rejected (0.848ms)
+✔ descriptor finite range/default/step invariants reject invalid values without clamping (0.5449ms)
+✔ metadata enforces Unicode validity, code-point lengths, controls, and UTF-8/count budgets (1.9746ms)
+✔ untrusted records and schema arrays never invoke accessors or accept inherited/hidden/symbol data (0.4712ms)
+✔ patches permit finite values between UI steps and full snapshots require exactly all keys (0.732ms)
+✔ invalid multi-key patch is atomic and rejects own-record attacks without evaluating values (0.4466ms)
+✔ reconciliation preserves compatible values and reports added, removed, narrowed-range and unit changes (0.6144ms)
+✔ reconciliation validates saved snapshots and handles first build, empty schema and removed units (0.4441ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 11
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 129.2418
+
+✖ failing tests:
+
+test at tests\unit\input-mapping-admission.test.mjs:1:1
+✖ tests\unit\input-mapping-admission.test.mjs (67.7314ms)
+  'test failed'
+
+test at tests\unit\input-mapping.test.mjs:1:1
+✖ tests\unit\input-mapping.test.mjs (69.3016ms)
+  'test failed'

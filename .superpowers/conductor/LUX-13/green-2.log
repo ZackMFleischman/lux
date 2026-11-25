@@ -1,0 +1,59 @@
+✔ strict plan fields, definitions, ranges and identities reject malformed or duplicate data (14.1443ms)
+✔ frame admission is complete, finite, in-range and unique even for unused signals (4.2611ms)
+✔ accessors, symbols, hidden properties, custom prototypes and sparse arrays never pass admission (1.3093ms)
+✔ finite operands that overflow intermediate subtraction, division, add or multiply fail atomically (3.4396ms)
+✔ exact count/depth boundaries pass while the next element fails including disabled/unused data (91.2461ms)
+✖ raw UTF-8 metadata budget is bounded before normalization can trim it away (10.1748ms)
+✔ exact UTF-8 budget admits the last byte and rejects the next byte (2.693ms)
+✔ macro phase precedes modulation and UI step does not quantize (4.315ms)
+✔ same-phase array order is preserved rather than sorted by ID (2.0481ms)
+✔ clamp happens once after both phases (0.9663ms)
+✔ power curve (0.4543ms)
+✔ invert before shaping (0.388ms)
+✔ low saturation (0.4344ms)
+✔ high saturation (0.4491ms)
+✔ constant output (0.4619ms)
+✔ unresolved and disabled bindings preserve base with distinct traces (1.0467ms)
+✔ host subset bypasses all its bindings while explicit internal targets evaluate (2.1556ms)
+✔ structured scene and node identities remain independent regardless of label (1.4456ms)
+✔ empty catalogue adds no implicit controls and all output is detached and frozen (0.7739ms)
+✔ negative zero is normalized in base, source arithmetic and results (0.431ms)
+✔ declarations preserve semantic IDs/order, normalize metadata, and freeze independent snapshots (4.5257ms)
+✔ empty declarations produce no implicit control and support an empty full snapshot (0.6389ms)
+✔ schema canonicalization ignores input field order, preserves control order, and normalizes negative zero (0.6274ms)
+✔ invalid IDs, duplicate normalized IDs and unsupported descriptor fields are rejected (0.8153ms)
+✔ descriptor finite range/default/step invariants reject invalid values without clamping (1.5367ms)
+✔ metadata enforces Unicode validity, code-point lengths, controls, and UTF-8/count budgets (2.8439ms)
+✔ untrusted records and schema arrays never invoke accessors or accept inherited/hidden/symbol data (0.6047ms)
+✔ patches permit finite values between UI steps and full snapshots require exactly all keys (0.9091ms)
+✔ invalid multi-key patch is atomic and rejects own-record attacks without evaluating values (0.8083ms)
+✔ reconciliation preserves compatible values and reports added, removed, narrowed-range and unit changes (0.7965ms)
+✔ reconciliation validates saved snapshots and handles first build, empty schema and removed units (0.597ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 30
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 234.5282
+
+✖ failing tests:
+
+test at tests\unit\input-mapping-admission.test.mjs:92:1
+✖ raw UTF-8 metadata budget is bounded before normalization can trim it away (10.1748ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at invalid (file:///C:/Users/zFlei/repos/lux/.worktrees/input-mapping/tests/unit/input-mapping-admission.test.mjs:12:30)
+      at TestContext.<anonymous> (file:///C:/Users/zFlei/repos/lux/.worktrees/input-mapping/tests/unit/input-mapping-admission.test.mjs:95:3)
+      at Test.runInAsyncScope (node:async_hooks:214:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }

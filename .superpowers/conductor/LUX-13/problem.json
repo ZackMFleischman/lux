@@ -1,0 +1,7 @@
+{
+  "summary": "I01 validation setup and fixture corrections",
+  "actual": "Initial tsc explicit-file command returned TS5112 because installed TypeScript requires --ignoreConfig when cwd has tsconfig. Initial admission fixtures accidentally retained shared object aliases and combined 256 targets/bindings at depth8 above the independent UTF-8 budget. A later exact-byte test caught conservative 24-byte numeric charging rejecting valid metadata. A first oversized-ASCII fixture was below true budget after exact charging.",
+  "expected": "Direct declaration audit and independent boundary fixtures verify exact I01 contract.",
+  "correction": "Used --ignoreConfig without shared config changes; declaration fixture passes with TypeScript7.0.2. JSON-cloned mutation fixture removes shared aliases, count test uses depth8 on one target, and large multibyte-whitespace fixture asserts both UTF-16 below and UTF-8 above budget. Exact JSON number-byte charging passes 262144-byte/next-byte test. Focused suite31/31.",
+  "evidence": "Exact worktree C:/Users/zFlei/repos/lux/.worktrees/input-mapping; .superpowers/conductor/LUX-13/green-1.log, red-budget.log, green-2.log, green-3.log, declarations.log, declarations-2.log; own source edits still uncommitted at baselineaf0d739. Expected initial missing-module red is separately retained in red.log."
+}
