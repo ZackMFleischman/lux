@@ -1,0 +1,526 @@
+{
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-timeline-ui",
+  "profile": "test-3e49d440-2ff1-4c21-9ece-b089123189ca",
+  "checks": [],
+  "errors": [],
+  "geometry": {
+    "panel": {
+      "x": 0,
+      "y": 672,
+      "width": 1200,
+      "height": 264
+    },
+    "ribbon": {
+      "y": 1002,
+      "height": 83.5,
+      "bottom": 1085.5
+    },
+    "visible": false
+  },
+  "runtime": {
+    "connection": "connected",
+    "message": null,
+    "receivedAtMs": 1789688420805,
+    "authoring": {
+      "instanceId": "3c8719ee-0dfe-4a3b-900d-33e059c0fd9b",
+      "generation": 1,
+      "revisionId": "677125989e670ff107718174e35a74da1e955063cf3f10347d772ead9b382f8b",
+      "sceneName": "Story scene",
+      "authority": "studio",
+      "playback": "playing",
+      "visualId": "ambient",
+      "sdkVersion": "0.2.0",
+      "controlSchema": [
+        {
+          "id": "intensity",
+          "type": "number",
+          "label": "Ambient intensity",
+          "default": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.05,
+          "changeCost": "live"
+        },
+        {
+          "id": "variant",
+          "type": "enum",
+          "label": "Ambient variant",
+          "default": "calm",
+          "options": [
+            {
+              "id": "calm",
+              "label": "Calm"
+            },
+            {
+              "id": "bright",
+              "label": "Bright"
+            }
+          ],
+          "presentation": "segmented",
+          "changeCost": "live"
+        }
+      ],
+      "controlSchemaHash": "201ba2fa406981ef66cd4767a10214ec63af366a77cb1664a019b31c137c197d",
+      "controlSequence": 0,
+      "animationSequence": 0,
+      "controlAnimationIssues": [],
+      "controls": {
+        "intensity": 0.6,
+        "variant": "calm"
+      },
+      "effectiveControls": {
+        "intensity": 0.6,
+        "variant": "calm"
+      },
+      "controlAnimations": [],
+      "selectedVisualId": "ambient",
+      "visualControlMigrations": [
+        {
+          "visualId": "ambient",
+          "id": "intensity",
+          "reason": "added",
+          "value": 0.6
+        },
+        {
+          "visualId": "ambient",
+          "id": "variant",
+          "reason": "added",
+          "value": "calm"
+        },
+        {
+          "visualId": "lead",
+          "id": "intensity",
+          "reason": "added",
+          "value": 0.6
+        },
+        {
+          "visualId": "lead",
+          "id": "variant",
+          "reason": "added",
+          "value": "calm"
+        }
+      ],
+      "controlMigration": [
+        {
+          "id": "intensity",
+          "reason": "added",
+          "value": 0.6
+        },
+        {
+          "id": "variant",
+          "reason": "added",
+          "value": "calm"
+        }
+      ],
+      "visualStates": [
+        {
+          "visualId": "ambient",
+          "sdkVersion": "0.2.0",
+          "controlSchema": [
+            {
+              "id": "intensity",
+              "type": "number",
+              "label": "Ambient intensity",
+              "default": 0.6,
+              "min": 0,
+              "max": 1,
+              "step": 0.05,
+              "changeCost": "live"
+            },
+            {
+              "id": "variant",
+              "type": "enum",
+              "label": "Ambient variant",
+              "default": "calm",
+              "options": [
+                {
+                  "id": "calm",
+                  "label": "Calm"
+                },
+                {
+                  "id": "bright",
+                  "label": "Bright"
+                }
+              ],
+              "presentation": "segmented",
+              "changeCost": "live"
+            }
+          ],
+          "controlSchemaHash": "201ba2fa406981ef66cd4767a10214ec63af366a77cb1664a019b31c137c197d",
+          "controlSequence": 0,
+          "animationSequence": 0,
+          "controlAnimationIssues": [],
+          "controls": {
+            "intensity": 0.6,
+            "variant": "calm"
+          },
+          "effectiveControls": {
+            "intensity": 0.6,
+            "variant": "calm"
+          },
+          "controlAnimations": []
+        },
+        {
+          "visualId": "lead",
+          "sdkVersion": "0.2.0",
+          "controlSchema": [
+            {
+              "id": "intensity",
+              "type": "number",
+              "label": "Lead intensity",
+              "default": 0.6,
+              "min": 0,
+              "max": 1,
+              "step": 0.05,
+              "changeCost": "live"
+            },
+            {
+              "id": "variant",
+              "type": "enum",
+              "label": "Lead variant",
+              "default": "calm",
+              "options": [
+                {
+                  "id": "calm",
+                  "label": "Calm"
+                },
+                {
+                  "id": "bright",
+                  "label": "Bright"
+                }
+              ],
+              "presentation": "segmented",
+              "changeCost": "live"
+            }
+          ],
+          "controlSchemaHash": "0426d34a08b582be1bc5840558911306ed452d745f1d833419c33a9f428c645c",
+          "controlSequence": 0,
+          "animationSequence": 0,
+          "controlAnimationIssues": [],
+          "controls": {
+            "intensity": 0.6,
+            "variant": "calm"
+          },
+          "effectiveControls": {
+            "intensity": 0.6,
+            "variant": "calm"
+          },
+          "controlAnimations": []
+        }
+      ],
+      "storySchedule": {
+        "instanceId": "3c8719ee-0dfe-4a3b-900d-33e059c0fd9b",
+        "generation": 1,
+        "scheduleHash": "677125989e670ff107718174e35a74da1e955063cf3f10347d772ead9b382f8b",
+        "capsuleHash": "f81f4c54e0d08ebb9b67ef8f5d2684dfcda46195efa98e4fba039b1226e64079",
+        "definition": {
+          "version": 2,
+          "normalVisualId": "ambient",
+          "crossfadeSeconds": 0,
+          "beats": [
+            {
+              "id": "arrival",
+              "label": "Arrival",
+              "timing": {
+                "kind": "timed",
+                "durationSeconds": 4
+              },
+              "visualId": "lead"
+            },
+            {
+              "id": "hold",
+              "label": "Orbital drift and tidal distortion",
+              "timing": {
+                "kind": "sustained"
+              },
+              "visualId": "lead"
+            }
+          ],
+          "sequence": [
+            {
+              "id": "pass-1",
+              "beatId": "arrival",
+              "follow": {
+                "kind": "after",
+                "seconds": 12
+              },
+              "visualId": "ambient"
+            },
+            {
+              "id": "pass-2",
+              "beatId": "hold",
+              "follow": {
+                "kind": "manual"
+              },
+              "visualId": "lead"
+            },
+            {
+              "id": "pass-3",
+              "beatId": "arrival",
+              "follow": {
+                "kind": "after",
+                "seconds": 20
+              },
+              "visualId": "ambient"
+            },
+            {
+              "id": "pass-4",
+              "beatId": "arrival",
+              "follow": {
+                "kind": "after",
+                "seconds": 12
+              },
+              "visualId": "lead"
+            },
+            {
+              "id": "pass-5",
+              "beatId": "hold",
+              "follow": {
+                "kind": "manual"
+              },
+              "visualId": "ambient"
+            },
+            {
+              "id": "pass-6",
+              "beatId": "arrival",
+              "follow": {
+                "kind": "after",
+                "seconds": 20
+              },
+              "visualId": "lead"
+            },
+            {
+              "id": "pass-7",
+              "beatId": "arrival",
+              "follow": {
+                "kind": "after",
+                "seconds": 12
+              },
+              "visualId": "ambient"
+            },
+            {
+              "id": "pass-8",
+              "beatId": "hold",
+              "follow": {
+                "kind": "manual"
+              },
+              "visualId": "lead"
+            },
+            {
+              "id": "pass-9",
+              "beatId": "arrival",
+              "follow": {
+                "kind": "after",
+                "seconds": 20
+              },
+              "visualId": "ambient"
+            }
+          ]
+        },
+        "storyHash": "6fd6b0c6e35177f301671eb3a03beb5fd00ab5666b767ec7e77a101a442680fd",
+        "visualCapabilities": [
+          {
+            "visualId": "ambient",
+            "storyCapability": {
+              "version": 1,
+              "beats": [
+                {
+                  "id": "arrival",
+                  "kind": "timed",
+                  "seek": "direct"
+                },
+                {
+                  "id": "hold",
+                  "kind": "sustained",
+                  "seek": "none"
+                }
+              ]
+            }
+          },
+          {
+            "visualId": "lead",
+            "storyCapability": {
+              "version": 1,
+              "beats": [
+                {
+                  "id": "arrival",
+                  "kind": "timed",
+                  "seek": "direct"
+                },
+                {
+                  "id": "hold",
+                  "kind": "sustained",
+                  "seek": "none"
+                }
+              ]
+            }
+          }
+        ],
+        "storyRevision": 3,
+        "phase": "paused",
+        "autoAdvance": true,
+        "loop": false,
+        "effectiveAdvancing": false,
+        "committed": {
+          "slotId": "story:1:2",
+          "visualId": "ambient",
+          "beatId": "arrival",
+          "occurrenceId": "pass-1",
+          "activationId": 2,
+          "storyEpoch": 2,
+          "frame": {
+            "state": "active",
+            "beatId": "arrival",
+            "activationId": 2,
+            "occurrenceId": "pass-1",
+            "elapsedSeconds": 1.3696000000089408,
+            "localTimeSeconds": 0.44140000000596036,
+            "progress": 0.11035000000149009,
+            "storyEpoch": 2
+          }
+        },
+        "outgoing": null,
+        "incoming": null,
+        "crossfadeProgress": null,
+        "pendingPreparation": null,
+        "dueNext": null,
+        "preparationFailure": null,
+        "sequence": {
+          "state": "attached",
+          "occurrenceId": "pass-1",
+          "index": 0,
+          "nextOccurrenceId": "pass-2",
+          "dwellElapsedSeconds": 0.44140000000596036,
+          "dwellRemainingSeconds": 11.55859999999404,
+          "awaitingCue": false
+        },
+        "disabledReasons": {},
+        "resources": {
+          "slots": 1,
+          "slotStates": {
+            "preparing": 0,
+            "ready": 0,
+            "active": 1,
+            "retiring": 0,
+            "unsettled": 0
+          },
+          "pendingCreates": 0,
+          "storyTargetBytes": 5529600,
+          "assetLeases": 1,
+          "assetLeaseBytes": 0,
+          "assetStagingJobs": 0,
+          "assetStagingBytes": 0,
+          "pendingImports": 0,
+          "ownedModuleURLs": 4,
+          "pendingCallbacks": 0,
+          "gpuSubmissions": 0,
+          "readbackGrants": 0,
+          "readbackBytes": 0
+        }
+      },
+      "clockEpoch": 0,
+      "timeSeconds": 2.692100000008941,
+      "frameId": "153",
+      "tempo": {
+        "bpm": 120,
+        "beatPosition": 5.384200000017882,
+        "beatPhase": 0.38420000001788157,
+        "tempoSequence": 0
+      },
+      "tempoSequence": 0,
+      "triggerSequence": 0,
+      "output": {
+        "width": 640,
+        "height": 360
+      },
+      "fault": null
+    },
+    "host": null,
+    "jobs": [
+      {
+        "jobId": "25f513a7-7f2f-496b-b318-5eb1291b1c72",
+        "state": "succeeded",
+        "summary": "Story scene is ready in Lux."
+      }
+    ],
+    "visualFps": null,
+    "uiFps": null,
+    "performance": {
+      "owner": {
+        "instanceId": "3c8719ee-0dfe-4a3b-900d-33e059c0fd9b",
+        "generation": 1,
+        "scheduleHash": "677125989e670ff107718174e35a74da1e955063cf3f10347d772ead9b382f8b",
+        "capsuleHash": "f81f4c54e0d08ebb9b67ef8f5d2684dfcda46195efa98e4fba039b1226e64079",
+        "revisionId": "677125989e670ff107718174e35a74da1e955063cf3f10347d772ead9b382f8b"
+      },
+      "status": "stale",
+      "observedAtMs": null,
+      "worker": null
+    },
+    "capabilities": {
+      "protocolVersion": 4,
+      "supportedSdkVersions": [
+        "0.1.0",
+        "0.2.0",
+        "0.4.0"
+      ],
+      "codeDeclaredParameters": true,
+      "parameterKinds": [
+        "number",
+        "boolean",
+        "enum"
+      ],
+      "maxParameterMetadataBytes": 32768,
+      "controlTriggers": {
+        "commandReceipts": true,
+        "pausedFrame": true,
+        "maxCommandIds": 16384
+      },
+      "story": {
+        "version": 1,
+        "rootSdkVersion": "0.2.0",
+        "sustained": true,
+        "timedDirectSeek": true,
+        "commandReceipts": true
+      },
+      "imageFormats": [
+        "image/bmp",
+        "image/png",
+        "image/jpeg"
+      ],
+      "assetExport": true,
+      "sceneVersions": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "controlVariation": {
+        "stableInstanceKeys": true,
+        "distributions": [
+          "random",
+          "centered",
+          "spread"
+        ]
+      },
+      "tempo": {
+        "manual": true,
+        "tap": true,
+        "bpm": {
+          "min": 20,
+          "max": 300
+        }
+      }
+    },
+    "studioSession": {
+      "profile": "test-3e49d440-2ff1-4c21-9ece-b089123189ca",
+      "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\story-timeline-ui",
+      "sessionId": "f4e9d896eb3cdeabb9894dc42493e53dfc9c",
+      "pid": 32756
+    }
+  },
+  "ok": true,
+  "pid": 37868
+}

@@ -1,0 +1,1 @@
+Story now prioritizes the horizontal sequence in the bottom dock. Compact toolbar, explicit dwell/manual-cue labels, selected-step details, local scrub and horizontal beat launch controls preserve the existing guarded transport. Actual isolated native interaction checks and independent code/UI review are linked in evidence.

@@ -1,0 +1,8 @@
+{
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-timeline-ui",
+  "profile": "test-bdfea1aa-72aa-442b-8b9a-5213c221989e",
+  "checks": [],
+  "errors": [],
+  "error": "Error: Story worker stopped making progress; resources remain reserved.\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/story-timeline-ui/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/story-timeline-ui/artifacts/story-timeline-ui/native.mjs:23:35",
+  "pid": 14988
+}

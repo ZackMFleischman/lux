@@ -1,0 +1,27 @@
+import {readFileSync,writeFileSync} from 'node:fs';
+const path='apps/studio/src/story/StoryPanel.tsx';let s=readFileSync(path,'utf8');
+const start=s.indexOf('  return <section className="story-panel"',s.indexOf('const selectedMoveReason'));
+let body=s.slice(start);
+// Move the existing guarded controls, without changing their transport handlers.
+const primary=body.slice(body.indexOf('    <div className="story-primary-actions">'),body.indexOf('    {status.frame.state===\'active\'&&<div className="story-active-summary">'));
+body=body.replace(primary,'');
+const summary=body.slice(body.indexOf('    {status.frame.state===\'active\'&&<div className="story-active-summary">'),body.indexOf('    {status.frame.state===\'active\'&&activeBeat?.timing.kind===\'timed\''));
+body=body.replace(summary,'');
+const local=body.slice(body.indexOf('    {status.frame.state===\'active\'&&activeBeat?.timing.kind===\'timed\''),body.indexOf('    {status.definition.sequence.length>0&&<section'));
+body=body.replace(local,'');
+const followStart=body.indexOf('      {status.frame.state===\'active\'&&status.sequence.state!==\'detached\'&&<div className="story-follow-actions">');
+const followEnd=body.indexOf('\n',followStart);
+const follow=body.slice(followStart,followEnd);body=body.replace(follow,'');
+const headerStart=body.indexOf('    <header'),headerEnd=body.indexOf('</header>',headerStart)+9;
+body=body.slice(0,headerStart)+`    <header className="story-header"><div className="story-heading"><h2 title={storyStatusLabel(status)}>{storyStatusLabel(status)}</h2><span className={\`story-state story-state-\${status.frame.state}\`}>{status.frame.state==='normal'?'Normal':status.phase==='running'?'Running':'Paused'}</span></div>\n${primary}${follow}\n    </header>\n`+body.slice(headerEnd);
+body=body.replace('    <section className="story-beats"',summary+local+'    <section className="story-beats"');
+body=body.replace('<h3 id="story-sequence-heading">Sequence</h3>','<h3 id="story-sequence-heading">Sequence <span className="story-count">{status.definition.sequence.length} steps</span></h3>');
+body=body.replace("style={{'--story-dwell-weight':after?occurrence.follow.seconds:1} as React.CSSProperties}","style={{'--story-dwell-weight':after?Math.min(4,Math.max(1,occurrence.follow.seconds/4)):1,'--story-progress':`${progress}%`} as React.CSSProperties}");
+body=body.replace('<button type="button" aria-label={`${name} · ${occurrence.id}`}','<button type="button" title={`${name} · ${occurrence.id}${\'visualId\'in occurrence?` · source ${occurrence.visualId}`:\'\'} · ${after?`${seconds(occurrence.follow.seconds)} dwell`:\'Manual cue\'}`} aria-label={`${name} · ${occurrence.id}`}');
+body=body.replace('<small>{index+1} · {occurrence.id}{\'visualId\'in occurrence?` · source ${occurrence.visualId}`:\'\'}</small>','<small>{index+1}{\'visualId\'in occurrence?` · ${occurrence.visualId}`:\'\'}</small><span className="story-occurrence-timing">{after?seconds(occurrence.follow.seconds):\'Manual cue\'}</span>');
+body=body.replace('      {selectedOccurrence&&selectedMoveAction&&<Button','      <div className="story-selection">{selectedOccurrence&&<span className="story-selected-detail" title={selectedOccurrence.id}>Selected {selectedOccurrenceIndex+1} · {beats.get(selectedOccurrence.beatId)?.label??selectedOccurrence.beatId}{selectedOccurrenceVisual?` · ${selectedOccurrenceVisual}`:\'\'}</span>}\n      {selectedOccurrence&&selectedMoveAction&&<Button');
+body=body.replace("</Button>}\n\n    </section>}","</Button>}\n      </div>\n    </section>}");
+body=body.replace('<strong>{activeBeat?.label??status.frame.beatId}</strong>','<strong>Live: {activeBeat?.label??status.frame.beatId}</strong>');
+body=body.replace('<h3 id="story-beats-heading">Beats</h3>','<h3 id="story-beats-heading">Launch beat</h3>');
+body=body.replace('<span>{beat.label}</span><small>','<span title={beat.label}>{beat.label}</span><small title={beat.id}>');
+s=s.slice(0,start)+body;writeFileSync(path,s);

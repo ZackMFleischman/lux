@@ -1,0 +1,558 @@
+{
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-timeline-ui",
+  "profile": "test-0db41885-480e-4abc-80c1-7dfab8505393",
+  "testedSource": {
+    "apps/studio/src/story/StoryPanel.tsx": "e344dcb1cdf8644ae461d579deee3b44ef581e4827496ae321a45e97e8b0a495",
+    "apps/studio/src/studio.css": "8960387750d9ab7d023eda44958a011016d0c3cf5539c68e92cd90f84fab9f7e",
+    "apps/studio/dist/renderer.js": "93a19b5641f7f331416c82d3a95c63abfd9d86498559f6484402946b9df96d43",
+    "apps/studio/dist/renderer.css": "e644d1832869e1db4733fe625c69f94ecb20b10221c31ff31b0b8627b1bdf707"
+  },
+  "checks": [
+    "Pointer selection does not move the active occurrence",
+    "Keyboard focus reveals and selects the final occurrence",
+    "Start selected occurrence and keyboard local seek",
+    "Replay and loop",
+    "Manual launch detaches without a fabricated sustained scrub",
+    "Narrow panel contains horizontal scrolling inside the sequence and beat strip",
+    "Return to normal"
+  ],
+  "errors": [],
+  "geometry": {
+    "panel": {
+      "x": 0,
+      "y": 672,
+      "width": 1200,
+      "height": 264
+    },
+    "ribbon": {
+      "y": 739,
+      "height": 82,
+      "bottom": 821
+    },
+    "visible": true
+  },
+  "runtime": {
+    "connection": "connected",
+    "message": null,
+    "receivedAtMs": 1789689726490,
+    "authoring": {
+      "instanceId": "beff454c-4312-421f-92ec-f8f88d8f9b88",
+      "generation": 1,
+      "revisionId": "677125989e670ff107718174e35a74da1e955063cf3f10347d772ead9b382f8b",
+      "sceneName": "Story scene",
+      "authority": "studio",
+      "playback": "playing",
+      "visualId": "ambient",
+      "sdkVersion": "0.2.0",
+      "controlSchema": [
+        {
+          "id": "intensity",
+          "type": "number",
+          "label": "Ambient intensity",
+          "default": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.05,
+          "changeCost": "live"
+        },
+        {
+          "id": "variant",
+          "type": "enum",
+          "label": "Ambient variant",
+          "default": "calm",
+          "options": [
+            {
+              "id": "calm",
+              "label": "Calm"
+            },
+            {
+              "id": "bright",
+              "label": "Bright"
+            }
+          ],
+          "presentation": "segmented",
+          "changeCost": "live"
+        }
+      ],
+      "controlSchemaHash": "201ba2fa406981ef66cd4767a10214ec63af366a77cb1664a019b31c137c197d",
+      "controlSequence": 0,
+      "animationSequence": 0,
+      "controlAnimationIssues": [],
+      "controls": {
+        "intensity": 0.6,
+        "variant": "calm"
+      },
+      "effectiveControls": {
+        "intensity": 0.6,
+        "variant": "calm"
+      },
+      "controlAnimations": [],
+      "selectedVisualId": "ambient",
+      "visualControlMigrations": [
+        {
+          "visualId": "ambient",
+          "id": "intensity",
+          "reason": "added",
+          "value": 0.6
+        },
+        {
+          "visualId": "ambient",
+          "id": "variant",
+          "reason": "added",
+          "value": "calm"
+        },
+        {
+          "visualId": "lead",
+          "id": "intensity",
+          "reason": "added",
+          "value": 0.6
+        },
+        {
+          "visualId": "lead",
+          "id": "variant",
+          "reason": "added",
+          "value": "calm"
+        }
+      ],
+      "controlMigration": [
+        {
+          "id": "intensity",
+          "reason": "added",
+          "value": 0.6
+        },
+        {
+          "id": "variant",
+          "reason": "added",
+          "value": "calm"
+        }
+      ],
+      "visualStates": [
+        {
+          "visualId": "ambient",
+          "sdkVersion": "0.2.0",
+          "controlSchema": [
+            {
+              "id": "intensity",
+              "type": "number",
+              "label": "Ambient intensity",
+              "default": 0.6,
+              "min": 0,
+              "max": 1,
+              "step": 0.05,
+              "changeCost": "live"
+            },
+            {
+              "id": "variant",
+              "type": "enum",
+              "label": "Ambient variant",
+              "default": "calm",
+              "options": [
+                {
+                  "id": "calm",
+                  "label": "Calm"
+                },
+                {
+                  "id": "bright",
+                  "label": "Bright"
+                }
+              ],
+              "presentation": "segmented",
+              "changeCost": "live"
+            }
+          ],
+          "controlSchemaHash": "201ba2fa406981ef66cd4767a10214ec63af366a77cb1664a019b31c137c197d",
+          "controlSequence": 0,
+          "animationSequence": 0,
+          "controlAnimationIssues": [],
+          "controls": {
+            "intensity": 0.6,
+            "variant": "calm"
+          },
+          "effectiveControls": {
+            "intensity": 0.6,
+            "variant": "calm"
+          },
+          "controlAnimations": []
+        },
+        {
+          "visualId": "lead",
+          "sdkVersion": "0.2.0",
+          "controlSchema": [
+            {
+              "id": "intensity",
+              "type": "number",
+              "label": "Lead intensity",
+              "default": 0.6,
+              "min": 0,
+              "max": 1,
+              "step": 0.05,
+              "changeCost": "live"
+            },
+            {
+              "id": "variant",
+              "type": "enum",
+              "label": "Lead variant",
+              "default": "calm",
+              "options": [
+                {
+                  "id": "calm",
+                  "label": "Calm"
+                },
+                {
+                  "id": "bright",
+                  "label": "Bright"
+                }
+              ],
+              "presentation": "segmented",
+              "changeCost": "live"
+            }
+          ],
+          "controlSchemaHash": "0426d34a08b582be1bc5840558911306ed452d745f1d833419c33a9f428c645c",
+          "controlSequence": 0,
+          "animationSequence": 0,
+          "controlAnimationIssues": [],
+          "controls": {
+            "intensity": 0.6,
+            "variant": "calm"
+          },
+          "effectiveControls": {
+            "intensity": 0.6,
+            "variant": "calm"
+          },
+          "controlAnimations": []
+        }
+      ],
+      "storySchedule": {
+        "instanceId": "beff454c-4312-421f-92ec-f8f88d8f9b88",
+        "generation": 1,
+        "scheduleHash": "677125989e670ff107718174e35a74da1e955063cf3f10347d772ead9b382f8b",
+        "capsuleHash": "f81f4c54e0d08ebb9b67ef8f5d2684dfcda46195efa98e4fba039b1226e64079",
+        "definition": {
+          "version": 2,
+          "normalVisualId": "ambient",
+          "crossfadeSeconds": 0,
+          "beats": [
+            {
+              "id": "arrival",
+              "label": "Arrival",
+              "timing": {
+                "kind": "timed",
+                "durationSeconds": 4
+              },
+              "visualId": "lead"
+            },
+            {
+              "id": "hold",
+              "label": "Orbital drift and tidal distortion",
+              "timing": {
+                "kind": "sustained"
+              },
+              "visualId": "lead"
+            }
+          ],
+          "sequence": [
+            {
+              "id": "pass-1",
+              "beatId": "arrival",
+              "follow": {
+                "kind": "after",
+                "seconds": 12
+              },
+              "visualId": "ambient"
+            },
+            {
+              "id": "pass-2",
+              "beatId": "hold",
+              "follow": {
+                "kind": "manual"
+              },
+              "visualId": "lead"
+            },
+            {
+              "id": "pass-3",
+              "beatId": "arrival",
+              "follow": {
+                "kind": "after",
+                "seconds": 20
+              },
+              "visualId": "ambient"
+            },
+            {
+              "id": "pass-4",
+              "beatId": "arrival",
+              "follow": {
+                "kind": "after",
+                "seconds": 12
+              },
+              "visualId": "lead"
+            },
+            {
+              "id": "pass-5",
+              "beatId": "hold",
+              "follow": {
+                "kind": "manual"
+              },
+              "visualId": "ambient"
+            },
+            {
+              "id": "pass-6",
+              "beatId": "arrival",
+              "follow": {
+                "kind": "after",
+                "seconds": 20
+              },
+              "visualId": "lead"
+            },
+            {
+              "id": "pass-7",
+              "beatId": "arrival",
+              "follow": {
+                "kind": "after",
+                "seconds": 12
+              },
+              "visualId": "ambient"
+            },
+            {
+              "id": "pass-8",
+              "beatId": "hold",
+              "follow": {
+                "kind": "manual"
+              },
+              "visualId": "lead"
+            },
+            {
+              "id": "pass-9",
+              "beatId": "arrival",
+              "follow": {
+                "kind": "after",
+                "seconds": 20
+              },
+              "visualId": "ambient"
+            }
+          ]
+        },
+        "storyHash": "6fd6b0c6e35177f301671eb3a03beb5fd00ab5666b767ec7e77a101a442680fd",
+        "visualCapabilities": [
+          {
+            "visualId": "ambient",
+            "storyCapability": {
+              "version": 1,
+              "beats": [
+                {
+                  "id": "arrival",
+                  "kind": "timed",
+                  "seek": "direct"
+                },
+                {
+                  "id": "hold",
+                  "kind": "sustained",
+                  "seek": "none"
+                }
+              ]
+            }
+          },
+          {
+            "visualId": "lead",
+            "storyCapability": {
+              "version": 1,
+              "beats": [
+                {
+                  "id": "arrival",
+                  "kind": "timed",
+                  "seek": "direct"
+                },
+                {
+                  "id": "hold",
+                  "kind": "sustained",
+                  "seek": "none"
+                }
+              ]
+            }
+          }
+        ],
+        "storyRevision": 10,
+        "phase": "running",
+        "autoAdvance": false,
+        "loop": false,
+        "effectiveAdvancing": true,
+        "committed": {
+          "slotId": "story:1:6",
+          "visualId": "ambient",
+          "beatId": null,
+          "occurrenceId": null,
+          "activationId": 7,
+          "storyEpoch": 8,
+          "frame": {
+            "state": "normal",
+            "storyEpoch": 8
+          }
+        },
+        "outgoing": null,
+        "incoming": null,
+        "crossfadeProgress": null,
+        "pendingPreparation": null,
+        "dueNext": null,
+        "preparationFailure": null,
+        "sequence": {
+          "state": "detached",
+          "occurrenceId": null,
+          "index": null,
+          "nextOccurrenceId": null,
+          "dwellElapsedSeconds": 0,
+          "dwellRemainingSeconds": null,
+          "awaitingCue": false
+        },
+        "disabledReasons": {
+          "pause": {
+            "code": "NO_ACTIVE_BEAT",
+            "message": "No Story beat is active"
+          },
+          "play": {
+            "code": "NO_ACTIVE_BEAT",
+            "message": "No Story beat is active"
+          },
+          "seek": {
+            "code": "NO_ACTIVE_BEAT",
+            "message": "No Story beat is active"
+          },
+          "set-auto-advance": {
+            "code": "NO_ACTIVE_BEAT",
+            "message": "No Story beat is active"
+          },
+          "advance": {
+            "code": "NO_ACTIVE_BEAT",
+            "message": "No Story beat is active"
+          }
+        },
+        "resources": {
+          "slots": 1,
+          "slotStates": {
+            "preparing": 0,
+            "ready": 0,
+            "active": 1,
+            "retiring": 0,
+            "unsettled": 0
+          },
+          "pendingCreates": 0,
+          "storyTargetBytes": 5529600,
+          "assetLeases": 1,
+          "assetLeaseBytes": 0,
+          "assetStagingJobs": 0,
+          "assetStagingBytes": 0,
+          "pendingImports": 0,
+          "ownedModuleURLs": 4,
+          "pendingCallbacks": 0,
+          "gpuSubmissions": 0,
+          "readbackGrants": 0,
+          "readbackBytes": 0
+        }
+      },
+      "clockEpoch": 0,
+      "timeSeconds": 6.243400000005961,
+      "frameId": "315",
+      "tempo": {
+        "bpm": 120,
+        "beatPosition": 12.486800000011922,
+        "beatPhase": 0.4868000000119217,
+        "tempoSequence": 0
+      },
+      "tempoSequence": 0,
+      "triggerSequence": 0,
+      "output": {
+        "width": 640,
+        "height": 360
+      },
+      "fault": null
+    },
+    "host": null,
+    "jobs": [
+      {
+        "jobId": "d8ccaaf4-8603-4014-97a7-5db0e6c776f3",
+        "state": "succeeded",
+        "summary": "Story scene is ready in Lux."
+      }
+    ],
+    "visualFps": null,
+    "uiFps": null,
+    "performance": {
+      "owner": {
+        "instanceId": "beff454c-4312-421f-92ec-f8f88d8f9b88",
+        "generation": 1,
+        "scheduleHash": "677125989e670ff107718174e35a74da1e955063cf3f10347d772ead9b382f8b",
+        "capsuleHash": "f81f4c54e0d08ebb9b67ef8f5d2684dfcda46195efa98e4fba039b1226e64079",
+        "revisionId": "677125989e670ff107718174e35a74da1e955063cf3f10347d772ead9b382f8b"
+      },
+      "status": "stale",
+      "observedAtMs": null,
+      "worker": null
+    },
+    "capabilities": {
+      "protocolVersion": 4,
+      "supportedSdkVersions": [
+        "0.1.0",
+        "0.2.0",
+        "0.4.0"
+      ],
+      "codeDeclaredParameters": true,
+      "parameterKinds": [
+        "number",
+        "boolean",
+        "enum"
+      ],
+      "maxParameterMetadataBytes": 32768,
+      "controlTriggers": {
+        "commandReceipts": true,
+        "pausedFrame": true,
+        "maxCommandIds": 16384
+      },
+      "story": {
+        "version": 1,
+        "rootSdkVersion": "0.2.0",
+        "sustained": true,
+        "timedDirectSeek": true,
+        "commandReceipts": true
+      },
+      "imageFormats": [
+        "image/bmp",
+        "image/png",
+        "image/jpeg"
+      ],
+      "assetExport": true,
+      "sceneVersions": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "controlVariation": {
+        "stableInstanceKeys": true,
+        "distributions": [
+          "random",
+          "centered",
+          "spread"
+        ]
+      },
+      "tempo": {
+        "manual": true,
+        "tap": true,
+        "bpm": {
+          "min": 20,
+          "max": 300
+        }
+      }
+    },
+    "studioSession": {
+      "profile": "test-0db41885-480e-4abc-80c1-7dfab8505393",
+      "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\story-timeline-ui",
+      "sessionId": "64d6fc76f1c16319fd067bef5efc44d35ac3",
+      "pid": 36580
+    }
+  },
+  "ok": true,
+  "pid": 31840,
+  "stderr": [
+    "Waiting for the debugger to disconnect...\r\n"
+  ]
+}

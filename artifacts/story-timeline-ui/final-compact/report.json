@@ -1,0 +1,17 @@
+{
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-timeline-ui",
+  "profile": "test-88aa9193-790b-4583-bfec-8672c2b8dbfa",
+  "testedSource": {
+    "apps/studio/src/story/StoryPanel.tsx": "e344dcb1cdf8644ae461d579deee3b44ef581e4827496ae321a45e97e8b0a495",
+    "apps/studio/src/studio.css": "093e7a545b590a68d03fecafcc53ded698c8fa6320ddbe86f46453ff44a32753",
+    "apps/studio/dist/renderer.js": "93a19b5641f7f331416c82d3a95c63abfd9d86498559f6484402946b9df96d43",
+    "apps/studio/dist/renderer.css": "662ebdec676c8a3f1250f136a2014aa8d1827eabe81d67d321a30dde2cd81475"
+  },
+  "checks": [],
+  "errors": [],
+  "error": "Error: Story worker stopped making progress; resources remain reserved.\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/story-timeline-ui/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/story-timeline-ui/artifacts/story-timeline-ui/native.mjs:26:35",
+  "pid": 14068,
+  "stderr": [
+    "Debugger ending on ws://127.0.0.1:52947/a61a7fdb-04cd-4a7d-bc7f-5671f2de9b2e\r\nFor help, see: https://nodejs.org/learn/getting-started/debugging\r\n"
+  ]
+}

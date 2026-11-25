@@ -1,0 +1,82 @@
+✔ RTL: frame bursts leave Performance responsive and applied controls publish immediately (515.0535ms)
+✔ RTL: discard confirmation is an accessible in-app dialog with safe cancel, Escape and explicit approval (1077.5751ms)
+✔ RTL: code-defined controls expose independent values, numeric entry and defaults without Intensity (678.9061ms)
+✔ RTL: Boolean and dropdown controls expose typed values, descriptions and defaults without animation (1619.2358ms)
+✔ RTL: trigger actions use one native button, isolate pending state and never mark persistent edits (961.3063ms)
+✔ RTL: a trigger visibly requires the selected source to be the active Story visual (27.3564ms)
+✔ RTL: an uncertain trigger failure retries manually with the same command ID (296.6897ms)
+✔ RTL: a selected component trigger targets its canonical node without a persisted value (43.123ms)
+✔ RTL: Story v2 exposes source-specific capabilities, overlap and preparation state (60.2775ms)
+✔ RTL: Story v2 reports a failed next-source preparation while keeping the committed preview active (48.9705ms)
+✔ RTL: Story ribbon keeps selection separate from the attached occurrence and shows sustained dwell (57.0734ms)
+✔ RTL: Story ribbon shows scheduled dwell progress independently of a sustained beat (23.7267ms)
+✔ RTL: uncertain Story transport exposes an explicit exact retry (100.6395ms)
+✔ RTL: timed Story scrub admits one seek and replaces the queued target with the latest position (96.395ms)
+✔ RTL: an acknowledgement from an earlier Story activation cannot overwrite the current scrub (52.5676ms)
+✔ RTL: a rejected seek reconciles a newer revision on the same Story activation (62.346ms)
+An update to ForwardRef(Tooltip) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+✔ RTL: a sub-10ms timed Story beat retains a usable local-time step and readable position (20.3632ms)
+✔ RTL: segmented enum uses one roving tab stop and keyboard selection by stable option ID (606.8046ms)
+✔ RTL: radio enum exposes a radiogroup and arrow keys select the next stable option ID (510.3935ms)
+✔ RTL: an older Boolean acknowledgement cannot revert a newer local edit (150.2313ms)
+✔ RTL: an older acknowledgement preserves a newer segmented enum selection and roving tab stop (169.6525ms)
+✔ RTL: an older acknowledgement preserves a newer radio enum selection and roving tab stop (237.9397ms)
+✔ RTL: a rejected segmented enum edit restores its confirmed selection and roving tab stop (40.9427ms)
+✔ RTL: a rejected radio enum edit restores its confirmed selection and roving tab stop (102.4394ms)
+✔ RTL: a flat control can add the strict shared-audio binding (431.4982ms)
+✔ RTL: a flat control can configure stable per-instance variation (410.4817ms)
+✔ RTL: a flat control can add and tune the strict kick binding (371.6774ms)
+✔ RTL: audio configuration changes cancel an in-flight connection and ignore its stale completion (48.8186ms)
+✔ RTL: a failed default connection keeps the prelisted CABLE input available for an exact retry (257.2867ms)
+✔ RTL: a missing saved audio input blocks connection until the user chooses an available device (387.5492ms)
+✔ RTL: an audio device change refreshes inputs and unmount removes the listener (129.165ms)
+✔ RTL: direct component selection edits flat controls and keeps empty-path animation identity (413.5663ms)
+✔ RTL: control descriptions appear on hover and keyboard focus without creating empty help (223.1683ms)
+✔ RTL: duplicate component labels show and announce their public aliases (146.5045ms)
+✔ RTL: grouped controls use independent keyboard disclosures and preserve live values while collapsed (281.975ms)
+✔ RTL: Inspector filtering matches control and group names without changing values (419.4151ms)
+✔ RTL: Inspector group actions clear filters and apply to every group without changing values (409.3384ms)
+✔ RTL: an empty authored schema has no invented control (80.1094ms)
+✔ RTL: typing and pending control writes mark unsaved intent before acknowledgement (156.8676ms)
+✔ RTL: merely focusing numeric input cannot overwrite a later agent parameter change (181.2754ms)
+✔ RTL: disconnected controls refuse input while workspace remains operable (258.5768ms)
+✔ RTL: playback and intensity invoke guarded shared operations and wait for applied state (761.4671ms)
+✔ RTL: failed runtime command shows actionable error without a successful-state claim (820.1651ms)
+✔ RTL: pending playback preserves button styling and ignores duplicate transport commands (1060.819ms)
+✔ RTL: intensity writes do not disable transport or insert a success alert (251.1257ms)
+✔ RTL: delayed applied values never pull a slider away from the latest input (557.5591ms)
+✔ RTL: rejected slider input restores confirmed value and replacement ignores old completion (503.6825ms)
+✔ RTL: a replaced runtime has an independent input queue while old writes are pending (493.8297ms)
+✔ RTL: Escape exits native fullscreen even before its state notification arrives (197.8419ms)
+An update to StudioLayout inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+✔ RTL: fullscreen shows only preview, ignores stale initial state, and exits on first Escape (4113.2914ms)
+✔ RTL: unavailable popout is absent while fullscreen remains available (164.838ms)
+✔ RTL: global authoring shortcuts dispatch one shared action and suppress repeats (104.8552ms)
+✔ RTL: question mark opens the shortcut reference without intercepting text entry or repeats (193.8225ms)
+✔ RTL: sequence timing is visible before launch and selection does not alter transport (77.2717ms)
+ℹ tests 54
+ℹ suites 0
+ℹ pass 54
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 27347.2996

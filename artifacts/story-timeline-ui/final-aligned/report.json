@@ -1,0 +1,17 @@
+{
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-timeline-ui",
+  "profile": "test-fd7bd34d-3522-4043-b0af-b730143dd1db",
+  "testedSource": {
+    "apps/studio/src/story/StoryPanel.tsx": "e344dcb1cdf8644ae461d579deee3b44ef581e4827496ae321a45e97e8b0a495",
+    "apps/studio/src/studio.css": "5b101ef701a2e4d616f90f21be361b39cde2a3de6d30a1bac1a4ebf420117522",
+    "apps/studio/dist/renderer.js": "71434e85fa8f1adc54f464f956f72e46060656dfb55cb2c3e03fe07a1e8d2b6c",
+    "apps/studio/dist/renderer.css": "d02b046016ade05d7276d23da3c8291c81854943558df1e643a81cc6e0b5eab2"
+  },
+  "checks": [],
+  "errors": [],
+  "error": "Error: Story worker stopped making progress; resources remain reserved.\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/story-timeline-ui/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/story-timeline-ui/artifacts/story-timeline-ui/native.mjs:26:35",
+  "pid": 35476,
+  "stderr": [
+    "Waiting for the debugger to disconnect...\r\n"
+  ]
+}

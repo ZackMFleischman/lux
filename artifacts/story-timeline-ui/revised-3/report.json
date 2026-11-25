@@ -1,0 +1,11 @@
+{
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\story-timeline-ui",
+  "profile": "test-0b7db5f7-a311-4d89-91c8-a249f5ed8d78",
+  "checks": [],
+  "errors": [],
+  "error": "Error: A visual build is already running\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/story-timeline-ui/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/story-timeline-ui/artifacts/story-timeline-ui/native.mjs:24:94",
+  "pid": 31532,
+  "stderr": [
+    "Waiting for the debugger to disconnect...\r\n"
+  ]
+}
