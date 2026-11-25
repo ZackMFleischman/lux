@@ -1,0 +1,18 @@
+{
+  "ok": false,
+  "output": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\preview-actions\\artifacts\\preview-actions-native\\run-1789537015286",
+  "checks": [
+    "Selected output resolution is 1920 × 1080",
+    "File, View, Preview order and keyboard traversal",
+    "Header camera saves a 1920 × 1080 PNG through native capture IPC"
+  ],
+  "errors": [],
+  "resolution": "1920 × 1080",
+  "png": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\preview-actions\\artifacts\\preview-actions-native\\run-1789537015286\\header-frame.png",
+    "bytes": 14581,
+    "width": 1920,
+    "height": 1080
+  },
+  "failure": "page.evaluate: Error: Recorded WebM metadata failed to load\n    at element.onerror (eval at evaluate (:311:30), <anonymous>:9:65)\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\preview-actions\\artifacts\\preview-actions-native-qa.mjs:90:36"
+}

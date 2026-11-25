@@ -1,0 +1,37 @@
+{
+  "ok": true,
+  "output": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\preview-actions\\artifacts\\preview-actions-native",
+  "checks": [
+    "Selected output resolution is 1920 × 1080",
+    "File, View, Preview order and keyboard traversal",
+    "Header camera saves a 1920 × 1080 PNG through native capture IPC",
+    "Header recording and Preview-menu stop share one recorder and commit a WebM",
+    "Capture actions remain inside the compact Preview header"
+  ],
+  "errors": [],
+  "resolution": "1920 × 1080",
+  "png": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\preview-actions\\artifacts\\preview-actions-native\\header-frame.png",
+    "bytes": 14547,
+    "width": 1920,
+    "height": 1080
+  },
+  "webm": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\preview-actions\\artifacts\\preview-actions-native\\header-recording.webm",
+    "bytes": 18035
+  },
+  "narrow": {
+    "headerBox": {
+      "x": 194,
+      "y": 171,
+      "width": 389,
+      "height": 65
+    },
+    "actionsBox": {
+      "x": 202,
+      "y": 173,
+      "width": 58,
+      "height": 28
+    }
+  }
+}

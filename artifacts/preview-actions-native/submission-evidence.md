@@ -1,0 +1,3 @@
+CPU validation: node apps/studio/test-cpu.mjs passed with 193 CPU tests and RTL suites. pnpm typecheck passed. Focused Preview capture test passed with four tests after the live-announcement fix.
+
+Native validation: artifacts/preview-actions-native/result.json. The header saved header-frame.png, 14,547 bytes, 1920 × 1080. The header began header-recording.webm and the Preview menu stopped it; the committed file is 18,035 bytes. The run verified one .preview-recording-status[role=status], File/View/Preview keyboard navigation, and desktop/narrow header geometry. Screenshots: desktop-header.png and narrow-header.png.
