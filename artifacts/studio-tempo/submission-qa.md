@@ -1,0 +1,7 @@
+- COMPLETE: deterministic 20-300 BPM clock, inclusive 200-2000 ms tap window, newest-four averaging, same/ignored/restarted/accepted acknowledgements, pause/reset/reopen semantics, and safe numeric boundaries.
+- COMPLETE: exact tempo binding target identity, waveform/phase/amount/beats-per-cycle validation, frame-clock evaluation, and legacy LFO/audio/kick compatibility.
+- COMPLETE: v1-v5 scene normalization, BPM-only persistence and dirty detection, save/reopen, guarded Studio/bridge/MCP protocol 3 dispatch, and exact capability rejection.
+- COMPLETE: latest-acknowledged BPM synchronization during background build, fresh candidate beat zero/history, and failed-build incumbent retention.
+- COMPLETE: actual isolated Studio demonstration at routine 640x360 with screenshots and independent source plus native/UI review.
+- ROOT HANDOFF: land reviewed commits on main; reinstall `skills/lux-visual-creation` from main and run its install check; run combined validation on landed source. Root owns packaging/activation.
+- EXCLUDED BY USER: automatic audio beat estimation and Resolume host/export BPM or phase QA.

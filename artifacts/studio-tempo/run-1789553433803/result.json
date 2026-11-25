@@ -1,0 +1,98 @@
+{
+  "ok": false,
+  "profile": "test-ba8059d1-9647-4ebd-9094-079d59ebf75a",
+  "source": "2eaee8b78b4fe499419cf2e748c0bb2ad75285a4",
+  "checks": [
+    "Default startup completed in a normal window before routine preview resize",
+    "Real preview rendered at routine 640x360",
+    "Visible BPM field set and acknowledged 150 BPM",
+    "Visible Tap control rephased and derived BPM from monotonic tap spacing",
+    "Tempo binding visibly modulated Spike height by beat position",
+    "Pause froze modulation and Tap established beat zero while paused"
+  ],
+  "errors": [],
+  "userPid12564AliveBefore": false,
+  "userPid12564AliveAfter": false,
+  "pid": 23448,
+  "startupWindow": {
+    "innerWidth": 1424,
+    "innerHeight": 861,
+    "outerWidth": 1440,
+    "outerHeight": 900
+  },
+  "defaultOutput": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "seed": 0
+  },
+  "tap": {
+    "firstTapPhase": 0.36375000000000046,
+    "bpm": 63.653723743241464,
+    "sequence": 3
+  },
+  "animation": {
+    "min": 0.4916276096407076,
+    "max": 1.216803648794309,
+    "samples": [
+      {
+        "phase": 0.5621684702303344,
+        "value": 1.1316619029264863
+      },
+      {
+        "phase": 0.6704858901270949,
+        "value": 1.186416206091772
+      },
+      {
+        "phase": 0.9508805432208156,
+        "value": 0.6184810039172451
+      },
+      {
+        "phase": 0.05484829200144148,
+        "value": 1.1043815645062591
+      },
+      {
+        "phase": 0.32208784218190356,
+        "value": 0.5352120072536807
+      },
+      {
+        "phase": 0.43634627630418343,
+        "value": 0.563086469330548
+      },
+      {
+        "phase": 0.7298960322953558,
+        "value": 0.9499820501072868
+      },
+      {
+        "phase": 0.06482070872753987,
+        "value": 1.1409697864511061
+      },
+      {
+        "phase": 0.15764905585310007,
+        "value": 1.216803648794309
+      },
+      {
+        "phase": 0.4731593465388526,
+        "value": 0.7176277491732554
+      },
+      {
+        "phase": 0.8063865903363023,
+        "value": 0.5896990856600479
+      },
+      {
+        "phase": 0.9116274135870537,
+        "value": 0.4916276096407076
+      },
+      {
+        "phase": 0.16008911526800063,
+        "value": 1.2117398695718222
+      },
+      {
+        "phase": 0.23520050928186365,
+        "value": 0.9239622715164438
+      }
+    ]
+  },
+  "failure": "AssertionError [ERR_ASSERTION]: reopen starts near fresh beat zero\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/lux153-tempo/artifacts/studio-tempo/native-qa.mjs:104:10\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)",
+  "exitCode": 0
+}

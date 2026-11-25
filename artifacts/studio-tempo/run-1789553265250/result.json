@@ -1,0 +1,28 @@
+{
+  "ok": false,
+  "profile": "test-3fb9b7d2-58d6-48b0-bde4-432544cb1e65",
+  "source": "2eaee8b78b4fe499419cf2e748c0bb2ad75285a4",
+  "checks": [
+    "Default startup completed in a normal window before routine preview resize",
+    "Real preview rendered at routine 640x360",
+    "Visible BPM field set and acknowledged 150 BPM"
+  ],
+  "errors": [],
+  "userPid12564AliveBefore": false,
+  "userPid12564AliveAfter": false,
+  "pid": 33856,
+  "startupWindow": {
+    "innerWidth": 1424,
+    "innerHeight": 861,
+    "outerWidth": 1440,
+    "outerHeight": 900
+  },
+  "defaultOutput": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "seed": 0
+  },
+  "failure": "locator.click: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Tap', exact: true })\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\lux153-tempo\\artifacts\\studio-tempo\\native-qa.mjs:62:13",
+  "exitCode": 0
+}

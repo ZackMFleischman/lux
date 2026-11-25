@@ -1,0 +1,117 @@
+{
+  "ok": true,
+  "profile": "test-8134c951-8265-4cc1-bb9b-7af18d36ba94",
+  "source": "2eaee8b78b4fe499419cf2e748c0bb2ad75285a4",
+  "checks": [
+    "Default startup completed in a normal window before routine preview resize",
+    "Real preview rendered at routine 640x360",
+    "Visible BPM field set and acknowledged 150 BPM",
+    "Visible Tap control rephased and derived BPM from monotonic tap spacing",
+    "Tempo binding visibly modulated Spike height by beat position",
+    "Pause froze modulation and Tap established beat zero while paused",
+    "Save/reopen persisted only BPM and tempo binding, with a fresh beat phase",
+    "Invalid build retained the incumbent preview, BPM, phase owner, and saved scene"
+  ],
+  "errors": [],
+  "userPid12564AliveBefore": false,
+  "userPid12564AliveAfter": false,
+  "pid": 27788,
+  "startupWindow": {
+    "innerWidth": 1424,
+    "innerHeight": 861,
+    "outerWidth": 1440,
+    "outerHeight": 900
+  },
+  "defaultOutput": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "seed": 0
+  },
+  "tap": {
+    "firstTapPhase": 0.1967499999888238,
+    "bpm": 93.94081728467205,
+    "sequence": 3
+  },
+  "animation": {
+    "min": 0.4506231818936999,
+    "max": 1.2486269476420366,
+    "samples": [
+      {
+        "phase": 0.264286832622878,
+        "value": 0.7785717110497103
+      },
+      {
+        "phase": 0.47737591982094374,
+        "value": 0.7378047631084096
+      },
+      {
+        "phase": 0.6315954281966136,
+        "value": 1.2486269476420366
+      },
+      {
+        "phase": 0.7684358853839517,
+        "value": 0.7581578647338981
+      },
+      {
+        "phase": 0.11351182087398026,
+        "value": 1.2458389999344037
+      },
+      {
+        "phase": 0.2442461249284822,
+        "value": 0.8788969361268264
+      },
+      {
+        "phase": 0.4809769844788576,
+        "value": 0.7552879984071218
+      },
+      {
+        "phase": 0.6129638327708204,
+        "value": 1.245433346592921
+      },
+      {
+        "phase": 0.8794426177946737,
+        "value": 0.4506231818936999
+      },
+      {
+        "phase": 0.032879286026306076,
+        "value": 1.0106070439651198
+      },
+      {
+        "phase": 0.16674495065696338,
+        "value": 1.1962132447983103
+      },
+      {
+        "phase": 0.4047283544447975,
+        "value": 0.477588921690859
+      },
+      {
+        "phase": 0.5592609988827499,
+        "value": 1.1210992293571083
+      },
+      {
+        "phase": 0.7986535149275227,
+        "value": 0.6203948600179281
+      }
+    ]
+  },
+  "saved": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\lux153-tempo\\artifacts\\studio-tempo\\run-1789553518556\\manual-tap-tempo.lux-scene",
+    "tempo": {
+      "bpm": 93.94081728467205
+    },
+    "animation": {
+      "kind": "tempo",
+      "nodePath": [],
+      "definitionHash": "01cb518440758b4cca0d9b2e963fc77c6f8db968788b1f95ac1014bbfeed4484",
+      "schemaHash": "01cb518440758b4cca0d9b2e963fc77c6f8db968788b1f95ac1014bbfeed4484",
+      "controlId": "spikeHeight",
+      "shape": "sine",
+      "beatsPerCycle": 0.5,
+      "amount": 0.4,
+      "phase": 0,
+      "enabled": true
+    }
+  },
+  "exitCode": 0
+}

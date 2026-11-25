@@ -1,0 +1,18 @@
+{
+  "ok": false,
+  "profile": "test-0fe43c18-83a3-44e6-94c2-99e4c92be31b",
+  "source": "2eaee8b78b4fe499419cf2e748c0bb2ad75285a4",
+  "checks": [],
+  "errors": [],
+  "userPid12564AliveBefore": false,
+  "userPid12564AliveAfter": false,
+  "pid": 14616,
+  "startupWindow": {
+    "innerWidth": 1424,
+    "innerHeight": 861,
+    "outerWidth": 1440,
+    "outerHeight": 900
+  },
+  "failure": "AssertionError [ERR_ASSERTION]: Studio remained busy during source activation\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/lux153-tempo/artifacts/studio-tempo/native-qa.mjs:40:10",
+  "exitCode": 0
+}

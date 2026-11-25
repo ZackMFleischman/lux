@@ -1,0 +1,28 @@
+{
+  "ok": false,
+  "profile": "test-d066e4d1-f31d-45f0-8cb0-6049f3d61ac4",
+  "source": "2eaee8b78b4fe499419cf2e748c0bb2ad75285a4",
+  "checks": [
+    "Default startup completed in a normal window before routine preview resize",
+    "Real preview rendered at routine 640x360",
+    "Visible BPM field set and acknowledged 150 BPM"
+  ],
+  "errors": [],
+  "userPid12564AliveBefore": false,
+  "userPid12564AliveAfter": false,
+  "pid": 16044,
+  "startupWindow": {
+    "innerWidth": 1424,
+    "innerHeight": 861,
+    "outerWidth": 1440,
+    "outerHeight": 900
+  },
+  "defaultOutput": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "seed": 0
+  },
+  "failure": "AssertionError [ERR_ASSERTION]: two 500ms taps produced 79.8084596962533\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/lux153-tempo/artifacts/studio-tempo/native-qa.mjs:68:10\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)",
+  "exitCode": 0
+}
