@@ -1,0 +1,11 @@
+{
+  "ok": false,
+  "source": "3563bcf3f98331ada4b1e52bf7c5eac23e1866d2",
+  "installation": null,
+  "profile": "test-1b3e394c-40ee-47e4-9297-5e89be977a83",
+  "checks": [],
+  "errors": [],
+  "pid": 24616,
+  "failure": "locator.click: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'View', exact: true })\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-count\\scripts\\diagnose-control-component.mjs:32:58",
+  "exitCode": 0
+}

@@ -1,0 +1,401 @@
+{
+  "format": "lux-scene",
+  "version": 4,
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "composition.ts",
+    "files": {
+      "ball.ts": "import {defineComponent} from '@lux/visual-sdk';\n import {Scene,Mesh,PlaneGeometry,MeshBasicNodeMaterial,OrthographicCamera} from 'three/webgpu';\n import {uniform,vec3} from 'three/tsl';\n export default defineComponent({metadata:{declarationVersion:1,key:'test/many-controls',label:'Many controls',description:'Control-count test',tags:[],inputs:{},outputs:{image:{type:{kind:'image',colorSpace:'linear-srgb',alphaMode:'premultiplied'},label:'Image',description:'Preview'}},controls:{\"intensity\":{\"type\":\"number\",\"label\":\"Component control 1\",\"group\":\"Motion 1\",\"min\":0,\"max\":1,\"default\":0.5},\"control1\":{\"type\":\"number\",\"label\":\"Component control 2\",\"group\":\"Motion 1\",\"min\":0,\"max\":1,\"default\":0.5},\"control2\":{\"type\":\"number\",\"label\":\"Component control 3\",\"group\":\"Motion 1\",\"min\":0,\"max\":1,\"default\":0.5},\"control3\":{\"type\":\"number\",\"label\":\"Component control 4\",\"group\":\"Motion 1\",\"min\":0,\"max\":1,\"default\":0.5},\"control4\":{\"type\":\"number\",\"label\":\"Component control 5\",\"group\":\"Motion 1\",\"min\":0,\"max\":1,\"default\":0.5},\"control5\":{\"type\":\"number\",\"label\":\"Component control 6\",\"group\":\"Motion 1\",\"min\":0,\"max\":1,\"default\":0.5},\"control6\":{\"type\":\"number\",\"label\":\"Component control 7\",\"group\":\"Motion 1\",\"min\":0,\"max\":1,\"default\":0.5},\"control7\":{\"type\":\"number\",\"label\":\"Component control 8\",\"group\":\"Motion 1\",\"min\":0,\"max\":1,\"default\":0.5},\"control8\":{\"type\":\"number\",\"label\":\"Component control 9\",\"group\":\"Motion 2\",\"min\":0,\"max\":1,\"default\":0.5},\"control9\":{\"type\":\"number\",\"label\":\"Component control 10\",\"group\":\"Motion 2\",\"min\":0,\"max\":1,\"default\":0.5},\"control10\":{\"type\":\"number\",\"label\":\"Component control 11\",\"group\":\"Motion 2\",\"min\":0,\"max\":1,\"default\":0.5},\"control11\":{\"type\":\"number\",\"label\":\"Component control 12\",\"group\":\"Motion 2\",\"min\":0,\"max\":1,\"default\":0.5},\"control12\":{\"type\":\"number\",\"label\":\"Component control 13\",\"group\":\"Motion 2\",\"min\":0,\"max\":1,\"default\":0.5},\"control13\":{\"type\":\"number\",\"label\":\"Component control 14\",\"group\":\"Motion 2\",\"min\":0,\"max\":1,\"default\":0.5},\"control14\":{\"type\":\"number\",\"label\":\"Component control 15\",\"group\":\"Motion 2\",\"min\":0,\"max\":1,\"default\":0.5},\"control15\":{\"type\":\"number\",\"label\":\"Component control 16\",\"group\":\"Motion 2\",\"min\":0,\"max\":1,\"default\":0.5},\"control16\":{\"type\":\"number\",\"label\":\"Component control 17\",\"group\":\"Motion 3\",\"min\":0,\"max\":1,\"default\":0.5},\"control17\":{\"type\":\"number\",\"label\":\"Component control 18\",\"group\":\"Motion 3\",\"min\":0,\"max\":1,\"default\":0.5},\"control18\":{\"type\":\"number\",\"label\":\"Component control 19\",\"group\":\"Motion 3\",\"min\":0,\"max\":1,\"default\":0.5},\"control19\":{\"type\":\"number\",\"label\":\"Component control 20\",\"group\":\"Motion 3\",\"min\":0,\"max\":1,\"default\":0.5},\"control20\":{\"type\":\"number\",\"label\":\"Component control 21\",\"group\":\"Motion 3\",\"min\":0,\"max\":1,\"default\":0.5},\"control21\":{\"type\":\"number\",\"label\":\"Component control 22\",\"group\":\"Motion 3\",\"min\":0,\"max\":1,\"default\":0.5},\"control22\":{\"type\":\"number\",\"label\":\"Component control 23\",\"group\":\"Motion 3\",\"min\":0,\"max\":1,\"default\":0.5},\"control23\":{\"type\":\"number\",\"label\":\"Component control 24\",\"group\":\"Motion 3\",\"min\":0,\"max\":1,\"default\":0.5},\"control24\":{\"type\":\"number\",\"label\":\"Component control 25\",\"group\":\"Motion 4\",\"min\":0,\"max\":1,\"default\":0.5},\"control25\":{\"type\":\"number\",\"label\":\"Component control 26\",\"group\":\"Motion 4\",\"min\":0,\"max\":1,\"default\":0.5},\"control26\":{\"type\":\"number\",\"label\":\"Component control 27\",\"group\":\"Motion 4\",\"min\":0,\"max\":1,\"default\":0.5},\"control27\":{\"type\":\"number\",\"label\":\"Component control 28\",\"group\":\"Motion 4\",\"min\":0,\"max\":1,\"default\":0.5},\"control28\":{\"type\":\"number\",\"label\":\"Component control 29\",\"group\":\"Motion 4\",\"min\":0,\"max\":1,\"default\":0.5},\"control29\":{\"type\":\"number\",\"label\":\"Component control 30\",\"group\":\"Motion 4\",\"min\":0,\"max\":1,\"default\":0.5},\"control30\":{\"type\":\"number\",\"label\":\"Component control 31\",\"group\":\"Motion 4\",\"min\":0,\"max\":1,\"default\":0.5},\"control31\":{\"type\":\"number\",\"label\":\"Component control 32\",\"group\":\"Motion 4\",\"min\":0,\"max\":1,\"default\":0.5}},controlDescriptions:{\"intensity\":\"Live value\",\"control1\":\"Live value\",\"control2\":\"Live value\",\"control3\":\"Live value\",\"control4\":\"Live value\",\"control5\":\"Live value\",\"control6\":\"Live value\",\"control7\":\"Live value\",\"control8\":\"Live value\",\"control9\":\"Live value\",\"control10\":\"Live value\",\"control11\":\"Live value\",\"control12\":\"Live value\",\"control13\":\"Live value\",\"control14\":\"Live value\",\"control15\":\"Live value\",\"control16\":\"Live value\",\"control17\":\"Live value\",\"control18\":\"Live value\",\"control19\":\"Live value\",\"control20\":\"Live value\",\"control21\":\"Live value\",\"control22\":\"Live value\",\"control23\":\"Live value\",\"control24\":\"Live value\",\"control25\":\"Live value\",\"control26\":\"Live value\",\"control27\":\"Live value\",\"control28\":\"Live value\",\"control29\":\"Live value\",\"control30\":\"Live value\",\"control31\":\"Live value\"},lifecycle:{state:'stateless',reset:'seed'}},async create(){\n const value=uniform(.5),material=new MeshBasicNodeMaterial();material.colorNode=vec3(value,.25,.75);\n const geometry=new PlaneGeometry(2,2),scene=new Scene();scene.add(new Mesh(geometry,material));const camera=new OrthographicCamera(-1,1,1,-1,.1,10);camera.position.z=1;\n return {update(frame){value.value=frame.controls.control31;},async evaluate(_inputs,evaluation){return {image:await evaluation.render(scene,camera)};},reset(){},dispose(){geometry.dispose();material.dispose();}};}});",
+      "composition.ts": "import {defineComposition} from '@lux/visual-sdk';import ball from './ball.ts';export default defineComposition({definitions:{ball},nodes:[{id:'11111111-1111-4111-8111-111111111111',definition:'ball'}],edges:[],output:{nodeId:'11111111-1111-4111-8111-111111111111',portId:'image'},expose:[{\"id\":\"intensity\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"intensity\"},{\"id\":\"control1\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control1\"},{\"id\":\"control2\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control2\"},{\"id\":\"control3\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control3\"},{\"id\":\"control4\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control4\"},{\"id\":\"control5\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control5\"},{\"id\":\"control6\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control6\"},{\"id\":\"control7\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control7\"},{\"id\":\"control8\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control8\"},{\"id\":\"control9\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control9\"},{\"id\":\"control10\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control10\"},{\"id\":\"control11\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control11\"},{\"id\":\"control12\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control12\"},{\"id\":\"control13\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control13\"},{\"id\":\"control14\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control14\"},{\"id\":\"control15\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control15\"},{\"id\":\"control16\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control16\"},{\"id\":\"control17\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control17\"},{\"id\":\"control18\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control18\"},{\"id\":\"control19\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control19\"},{\"id\":\"control20\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control20\"},{\"id\":\"control21\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control21\"},{\"id\":\"control22\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control22\"},{\"id\":\"control23\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control23\"},{\"id\":\"control24\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control24\"},{\"id\":\"control25\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control25\"},{\"id\":\"control26\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control26\"},{\"id\":\"control27\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control27\"},{\"id\":\"control28\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control28\"},{\"id\":\"control29\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control29\"},{\"id\":\"control30\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control30\"},{\"id\":\"control31\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control31\"}]});"
+    }
+  },
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "seed": 0
+  },
+  "controls": {
+    "sourceHash": "c9ef1765d9d726fad1b6f19df0f52ae7587f11ea5be3c0ae8574ac4496e05da3",
+    "nodes": [
+      {
+        "nodePath": [
+          "11111111-1111-4111-8111-111111111111"
+        ],
+        "definitionHash": "85678c4a50e92d75a4914a8996a9fcb2b0561d387e1f88a7ae04ba700cdcecc3",
+        "schema": [
+          {
+            "id": "intensity",
+            "type": "number",
+            "label": "Component control 1",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 1",
+            "changeCost": "live"
+          },
+          {
+            "id": "control1",
+            "type": "number",
+            "label": "Component control 2",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 1",
+            "changeCost": "live"
+          },
+          {
+            "id": "control2",
+            "type": "number",
+            "label": "Component control 3",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 1",
+            "changeCost": "live"
+          },
+          {
+            "id": "control3",
+            "type": "number",
+            "label": "Component control 4",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 1",
+            "changeCost": "live"
+          },
+          {
+            "id": "control4",
+            "type": "number",
+            "label": "Component control 5",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 1",
+            "changeCost": "live"
+          },
+          {
+            "id": "control5",
+            "type": "number",
+            "label": "Component control 6",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 1",
+            "changeCost": "live"
+          },
+          {
+            "id": "control6",
+            "type": "number",
+            "label": "Component control 7",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 1",
+            "changeCost": "live"
+          },
+          {
+            "id": "control7",
+            "type": "number",
+            "label": "Component control 8",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 1",
+            "changeCost": "live"
+          },
+          {
+            "id": "control8",
+            "type": "number",
+            "label": "Component control 9",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 2",
+            "changeCost": "live"
+          },
+          {
+            "id": "control9",
+            "type": "number",
+            "label": "Component control 10",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 2",
+            "changeCost": "live"
+          },
+          {
+            "id": "control10",
+            "type": "number",
+            "label": "Component control 11",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 2",
+            "changeCost": "live"
+          },
+          {
+            "id": "control11",
+            "type": "number",
+            "label": "Component control 12",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 2",
+            "changeCost": "live"
+          },
+          {
+            "id": "control12",
+            "type": "number",
+            "label": "Component control 13",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 2",
+            "changeCost": "live"
+          },
+          {
+            "id": "control13",
+            "type": "number",
+            "label": "Component control 14",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 2",
+            "changeCost": "live"
+          },
+          {
+            "id": "control14",
+            "type": "number",
+            "label": "Component control 15",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 2",
+            "changeCost": "live"
+          },
+          {
+            "id": "control15",
+            "type": "number",
+            "label": "Component control 16",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 2",
+            "changeCost": "live"
+          },
+          {
+            "id": "control16",
+            "type": "number",
+            "label": "Component control 17",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 3",
+            "changeCost": "live"
+          },
+          {
+            "id": "control17",
+            "type": "number",
+            "label": "Component control 18",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 3",
+            "changeCost": "live"
+          },
+          {
+            "id": "control18",
+            "type": "number",
+            "label": "Component control 19",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 3",
+            "changeCost": "live"
+          },
+          {
+            "id": "control19",
+            "type": "number",
+            "label": "Component control 20",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 3",
+            "changeCost": "live"
+          },
+          {
+            "id": "control20",
+            "type": "number",
+            "label": "Component control 21",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 3",
+            "changeCost": "live"
+          },
+          {
+            "id": "control21",
+            "type": "number",
+            "label": "Component control 22",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 3",
+            "changeCost": "live"
+          },
+          {
+            "id": "control22",
+            "type": "number",
+            "label": "Component control 23",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 3",
+            "changeCost": "live"
+          },
+          {
+            "id": "control23",
+            "type": "number",
+            "label": "Component control 24",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 3",
+            "changeCost": "live"
+          },
+          {
+            "id": "control24",
+            "type": "number",
+            "label": "Component control 25",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 4",
+            "changeCost": "live"
+          },
+          {
+            "id": "control25",
+            "type": "number",
+            "label": "Component control 26",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 4",
+            "changeCost": "live"
+          },
+          {
+            "id": "control26",
+            "type": "number",
+            "label": "Component control 27",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 4",
+            "changeCost": "live"
+          },
+          {
+            "id": "control27",
+            "type": "number",
+            "label": "Component control 28",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 4",
+            "changeCost": "live"
+          },
+          {
+            "id": "control28",
+            "type": "number",
+            "label": "Component control 29",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 4",
+            "changeCost": "live"
+          },
+          {
+            "id": "control29",
+            "type": "number",
+            "label": "Component control 30",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 4",
+            "changeCost": "live"
+          },
+          {
+            "id": "control30",
+            "type": "number",
+            "label": "Component control 31",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 4",
+            "changeCost": "live"
+          },
+          {
+            "id": "control31",
+            "type": "number",
+            "label": "Component control 32",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 4",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "84c3ec49a72ab8475b37712dabe5f9524cbbcbc6de92c78efe27346d590172e1",
+        "values": {
+          "intensity": 0.5,
+          "control1": 0.5,
+          "control2": 0.5,
+          "control3": 0.5,
+          "control4": 0.5,
+          "control5": 0.5,
+          "control6": 0.5,
+          "control7": 0.5,
+          "control8": 0.5,
+          "control9": 0.5,
+          "control10": 0.5,
+          "control11": 0.5,
+          "control12": 0.5,
+          "control13": 0.5,
+          "control14": 0.5,
+          "control15": 0.5,
+          "control16": 0.5,
+          "control17": 0.5,
+          "control18": 0.5,
+          "control19": 0.5,
+          "control20": 0.5,
+          "control21": 0.5,
+          "control22": 0.5,
+          "control23": 0.5,
+          "control24": 0.5,
+          "control25": 0.5,
+          "control26": 0.5,
+          "control27": 0.5,
+          "control28": 0.5,
+          "control29": 0.5,
+          "control30": 0.5,
+          "control31": 0.7
+        }
+      }
+    ]
+  },
+  "controlAnimations": [
+    {
+      "nodePath": [
+        "11111111-1111-4111-8111-111111111111"
+      ],
+      "definitionHash": "85678c4a50e92d75a4914a8996a9fcb2b0561d387e1f88a7ae04ba700cdcecc3",
+      "schemaHash": "84c3ec49a72ab8475b37712dabe5f9524cbbcbc6de92c78efe27346d590172e1",
+      "controlId": "control31",
+      "shape": "sine",
+      "periodSeconds": 2,
+      "amount": 0.1,
+      "phase": 0,
+      "enabled": true
+    }
+  ]
+}

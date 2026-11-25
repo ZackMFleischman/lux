@@ -1,0 +1,14 @@
+{
+  "ok": false,
+  "source": "c23e678b9a5a64c6df6a84288d30fd92f6fed5b9",
+  "installation": null,
+  "profile": "test-929c751f-6a1e-4b80-92db-4c7682511bb0",
+  "checks": [
+    "64-control scene builds;64-value patch succeeds;Control64 animates with base preserved",
+    "64 simultaneous animation bindings and all base values survive save/reopen"
+  ],
+  "errors": [],
+  "pid": 27408,
+  "failure": "AssertionError [ERR_ASSERTION]: Expected \"actual\" to be strictly unequal to: 0.7\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/control-count/scripts/test-studio-control-count.mjs:75:127\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)",
+  "exitCode": 0
+}

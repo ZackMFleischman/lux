@@ -1,0 +1,753 @@
+{
+  "format": "lux-scene",
+  "version": 4,
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "composition.ts",
+    "files": {
+      "ball.ts": "import {defineComponent} from '@lux/visual-sdk';\n import {Scene,Mesh,PlaneGeometry,MeshBasicNodeMaterial,OrthographicCamera} from 'three/webgpu';\n import {uniform,vec3} from 'three/tsl';\n export default defineComponent({metadata:{declarationVersion:1,key:'test/many-controls',label:'Many controls',description:'Control-count test',tags:[],inputs:{},outputs:{image:{type:{kind:'image',colorSpace:'linear-srgb',alphaMode:'premultiplied'},label:'Image',description:'Preview'}},controls:{\"intensity\":{\"type\":\"number\",\"label\":\"Component control 1\",\"group\":\"Motion 1\",\"min\":0,\"max\":1,\"default\":0.5},\"control1\":{\"type\":\"number\",\"label\":\"Component control 2\",\"group\":\"Motion 1\",\"min\":0,\"max\":1,\"default\":0.5},\"control2\":{\"type\":\"number\",\"label\":\"Component control 3\",\"group\":\"Motion 1\",\"min\":0,\"max\":1,\"default\":0.5},\"control3\":{\"type\":\"number\",\"label\":\"Component control 4\",\"group\":\"Motion 1\",\"min\":0,\"max\":1,\"default\":0.5},\"control4\":{\"type\":\"number\",\"label\":\"Component control 5\",\"group\":\"Motion 1\",\"min\":0,\"max\":1,\"default\":0.5},\"control5\":{\"type\":\"number\",\"label\":\"Component control 6\",\"group\":\"Motion 1\",\"min\":0,\"max\":1,\"default\":0.5},\"control6\":{\"type\":\"number\",\"label\":\"Component control 7\",\"group\":\"Motion 1\",\"min\":0,\"max\":1,\"default\":0.5},\"control7\":{\"type\":\"number\",\"label\":\"Component control 8\",\"group\":\"Motion 1\",\"min\":0,\"max\":1,\"default\":0.5},\"control8\":{\"type\":\"number\",\"label\":\"Component control 9\",\"group\":\"Motion 2\",\"min\":0,\"max\":1,\"default\":0.5},\"control9\":{\"type\":\"number\",\"label\":\"Component control 10\",\"group\":\"Motion 2\",\"min\":0,\"max\":1,\"default\":0.5},\"control10\":{\"type\":\"number\",\"label\":\"Component control 11\",\"group\":\"Motion 2\",\"min\":0,\"max\":1,\"default\":0.5},\"control11\":{\"type\":\"number\",\"label\":\"Component control 12\",\"group\":\"Motion 2\",\"min\":0,\"max\":1,\"default\":0.5},\"control12\":{\"type\":\"number\",\"label\":\"Component control 13\",\"group\":\"Motion 2\",\"min\":0,\"max\":1,\"default\":0.5},\"control13\":{\"type\":\"number\",\"label\":\"Component control 14\",\"group\":\"Motion 2\",\"min\":0,\"max\":1,\"default\":0.5},\"control14\":{\"type\":\"number\",\"label\":\"Component control 15\",\"group\":\"Motion 2\",\"min\":0,\"max\":1,\"default\":0.5},\"control15\":{\"type\":\"number\",\"label\":\"Component control 16\",\"group\":\"Motion 2\",\"min\":0,\"max\":1,\"default\":0.5},\"control16\":{\"type\":\"number\",\"label\":\"Component control 17\",\"group\":\"Motion 3\",\"min\":0,\"max\":1,\"default\":0.5},\"control17\":{\"type\":\"number\",\"label\":\"Component control 18\",\"group\":\"Motion 3\",\"min\":0,\"max\":1,\"default\":0.5},\"control18\":{\"type\":\"number\",\"label\":\"Component control 19\",\"group\":\"Motion 3\",\"min\":0,\"max\":1,\"default\":0.5},\"control19\":{\"type\":\"number\",\"label\":\"Component control 20\",\"group\":\"Motion 3\",\"min\":0,\"max\":1,\"default\":0.5},\"control20\":{\"type\":\"number\",\"label\":\"Component control 21\",\"group\":\"Motion 3\",\"min\":0,\"max\":1,\"default\":0.5},\"control21\":{\"type\":\"number\",\"label\":\"Component control 22\",\"group\":\"Motion 3\",\"min\":0,\"max\":1,\"default\":0.5},\"control22\":{\"type\":\"number\",\"label\":\"Component control 23\",\"group\":\"Motion 3\",\"min\":0,\"max\":1,\"default\":0.5},\"control23\":{\"type\":\"number\",\"label\":\"Component control 24\",\"group\":\"Motion 3\",\"min\":0,\"max\":1,\"default\":0.5},\"control24\":{\"type\":\"number\",\"label\":\"Component control 25\",\"group\":\"Motion 4\",\"min\":0,\"max\":1,\"default\":0.5},\"control25\":{\"type\":\"number\",\"label\":\"Component control 26\",\"group\":\"Motion 4\",\"min\":0,\"max\":1,\"default\":0.5},\"control26\":{\"type\":\"number\",\"label\":\"Component control 27\",\"group\":\"Motion 4\",\"min\":0,\"max\":1,\"default\":0.5},\"control27\":{\"type\":\"number\",\"label\":\"Component control 28\",\"group\":\"Motion 4\",\"min\":0,\"max\":1,\"default\":0.5},\"control28\":{\"type\":\"number\",\"label\":\"Component control 29\",\"group\":\"Motion 4\",\"min\":0,\"max\":1,\"default\":0.5},\"control29\":{\"type\":\"number\",\"label\":\"Component control 30\",\"group\":\"Motion 4\",\"min\":0,\"max\":1,\"default\":0.5},\"control30\":{\"type\":\"number\",\"label\":\"Component control 31\",\"group\":\"Motion 4\",\"min\":0,\"max\":1,\"default\":0.5},\"control31\":{\"type\":\"number\",\"label\":\"Component control 32\",\"group\":\"Motion 4\",\"min\":0,\"max\":1,\"default\":0.5},\"control32\":{\"type\":\"number\",\"label\":\"Component control 33\",\"group\":\"Motion 5\",\"min\":0,\"max\":1,\"default\":0.5},\"control33\":{\"type\":\"number\",\"label\":\"Component control 34\",\"group\":\"Motion 5\",\"min\":0,\"max\":1,\"default\":0.5},\"control34\":{\"type\":\"number\",\"label\":\"Component control 35\",\"group\":\"Motion 5\",\"min\":0,\"max\":1,\"default\":0.5},\"control35\":{\"type\":\"number\",\"label\":\"Component control 36\",\"group\":\"Motion 5\",\"min\":0,\"max\":1,\"default\":0.5},\"control36\":{\"type\":\"number\",\"label\":\"Component control 37\",\"group\":\"Motion 5\",\"min\":0,\"max\":1,\"default\":0.5},\"control37\":{\"type\":\"number\",\"label\":\"Component control 38\",\"group\":\"Motion 5\",\"min\":0,\"max\":1,\"default\":0.5},\"control38\":{\"type\":\"number\",\"label\":\"Component control 39\",\"group\":\"Motion 5\",\"min\":0,\"max\":1,\"default\":0.5},\"control39\":{\"type\":\"number\",\"label\":\"Component control 40\",\"group\":\"Motion 5\",\"min\":0,\"max\":1,\"default\":0.5},\"control40\":{\"type\":\"number\",\"label\":\"Component control 41\",\"group\":\"Motion 6\",\"min\":0,\"max\":1,\"default\":0.5},\"control41\":{\"type\":\"number\",\"label\":\"Component control 42\",\"group\":\"Motion 6\",\"min\":0,\"max\":1,\"default\":0.5},\"control42\":{\"type\":\"number\",\"label\":\"Component control 43\",\"group\":\"Motion 6\",\"min\":0,\"max\":1,\"default\":0.5},\"control43\":{\"type\":\"number\",\"label\":\"Component control 44\",\"group\":\"Motion 6\",\"min\":0,\"max\":1,\"default\":0.5},\"control44\":{\"type\":\"number\",\"label\":\"Component control 45\",\"group\":\"Motion 6\",\"min\":0,\"max\":1,\"default\":0.5},\"control45\":{\"type\":\"number\",\"label\":\"Component control 46\",\"group\":\"Motion 6\",\"min\":0,\"max\":1,\"default\":0.5},\"control46\":{\"type\":\"number\",\"label\":\"Component control 47\",\"group\":\"Motion 6\",\"min\":0,\"max\":1,\"default\":0.5},\"control47\":{\"type\":\"number\",\"label\":\"Component control 48\",\"group\":\"Motion 6\",\"min\":0,\"max\":1,\"default\":0.5},\"control48\":{\"type\":\"number\",\"label\":\"Component control 49\",\"group\":\"Motion 7\",\"min\":0,\"max\":1,\"default\":0.5},\"control49\":{\"type\":\"number\",\"label\":\"Component control 50\",\"group\":\"Motion 7\",\"min\":0,\"max\":1,\"default\":0.5},\"control50\":{\"type\":\"number\",\"label\":\"Component control 51\",\"group\":\"Motion 7\",\"min\":0,\"max\":1,\"default\":0.5},\"control51\":{\"type\":\"number\",\"label\":\"Component control 52\",\"group\":\"Motion 7\",\"min\":0,\"max\":1,\"default\":0.5},\"control52\":{\"type\":\"number\",\"label\":\"Component control 53\",\"group\":\"Motion 7\",\"min\":0,\"max\":1,\"default\":0.5},\"control53\":{\"type\":\"number\",\"label\":\"Component control 54\",\"group\":\"Motion 7\",\"min\":0,\"max\":1,\"default\":0.5},\"control54\":{\"type\":\"number\",\"label\":\"Component control 55\",\"group\":\"Motion 7\",\"min\":0,\"max\":1,\"default\":0.5},\"control55\":{\"type\":\"number\",\"label\":\"Component control 56\",\"group\":\"Motion 7\",\"min\":0,\"max\":1,\"default\":0.5},\"control56\":{\"type\":\"number\",\"label\":\"Component control 57\",\"group\":\"Motion 8\",\"min\":0,\"max\":1,\"default\":0.5},\"control57\":{\"type\":\"number\",\"label\":\"Component control 58\",\"group\":\"Motion 8\",\"min\":0,\"max\":1,\"default\":0.5},\"control58\":{\"type\":\"number\",\"label\":\"Component control 59\",\"group\":\"Motion 8\",\"min\":0,\"max\":1,\"default\":0.5},\"control59\":{\"type\":\"number\",\"label\":\"Component control 60\",\"group\":\"Motion 8\",\"min\":0,\"max\":1,\"default\":0.5},\"control60\":{\"type\":\"number\",\"label\":\"Component control 61\",\"group\":\"Motion 8\",\"min\":0,\"max\":1,\"default\":0.5},\"control61\":{\"type\":\"number\",\"label\":\"Component control 62\",\"group\":\"Motion 8\",\"min\":0,\"max\":1,\"default\":0.5},\"control62\":{\"type\":\"number\",\"label\":\"Component control 63\",\"group\":\"Motion 8\",\"min\":0,\"max\":1,\"default\":0.5},\"control63\":{\"type\":\"number\",\"label\":\"Component control 64\",\"group\":\"Motion 8\",\"min\":0,\"max\":1,\"default\":0.5}},controlDescriptions:{\"intensity\":\"Live value\",\"control1\":\"Live value\",\"control2\":\"Live value\",\"control3\":\"Live value\",\"control4\":\"Live value\",\"control5\":\"Live value\",\"control6\":\"Live value\",\"control7\":\"Live value\",\"control8\":\"Live value\",\"control9\":\"Live value\",\"control10\":\"Live value\",\"control11\":\"Live value\",\"control12\":\"Live value\",\"control13\":\"Live value\",\"control14\":\"Live value\",\"control15\":\"Live value\",\"control16\":\"Live value\",\"control17\":\"Live value\",\"control18\":\"Live value\",\"control19\":\"Live value\",\"control20\":\"Live value\",\"control21\":\"Live value\",\"control22\":\"Live value\",\"control23\":\"Live value\",\"control24\":\"Live value\",\"control25\":\"Live value\",\"control26\":\"Live value\",\"control27\":\"Live value\",\"control28\":\"Live value\",\"control29\":\"Live value\",\"control30\":\"Live value\",\"control31\":\"Live value\",\"control32\":\"Live value\",\"control33\":\"Live value\",\"control34\":\"Live value\",\"control35\":\"Live value\",\"control36\":\"Live value\",\"control37\":\"Live value\",\"control38\":\"Live value\",\"control39\":\"Live value\",\"control40\":\"Live value\",\"control41\":\"Live value\",\"control42\":\"Live value\",\"control43\":\"Live value\",\"control44\":\"Live value\",\"control45\":\"Live value\",\"control46\":\"Live value\",\"control47\":\"Live value\",\"control48\":\"Live value\",\"control49\":\"Live value\",\"control50\":\"Live value\",\"control51\":\"Live value\",\"control52\":\"Live value\",\"control53\":\"Live value\",\"control54\":\"Live value\",\"control55\":\"Live value\",\"control56\":\"Live value\",\"control57\":\"Live value\",\"control58\":\"Live value\",\"control59\":\"Live value\",\"control60\":\"Live value\",\"control61\":\"Live value\",\"control62\":\"Live value\",\"control63\":\"Live value\"},lifecycle:{state:'stateless',reset:'seed'}},async create(){\n const value=uniform(.5),material=new MeshBasicNodeMaterial();material.colorNode=vec3(value,.25,.75);\n const geometry=new PlaneGeometry(2,2),scene=new Scene();scene.add(new Mesh(geometry,material));const camera=new OrthographicCamera(-1,1,1,-1,.1,10);camera.position.z=1;\n return {update(frame){value.value=frame.controls.control63;},async evaluate(_inputs,evaluation){return {image:await evaluation.render(scene,camera)};},reset(){},dispose(){geometry.dispose();material.dispose();}};}});",
+      "composition.ts": "import {defineComposition} from '@lux/visual-sdk';import ball from './ball.ts';export default defineComposition({definitions:{ball},nodes:[{id:'11111111-1111-4111-8111-111111111111',definition:'ball'}],edges:[],output:{nodeId:'11111111-1111-4111-8111-111111111111',portId:'image'},expose:[{\"id\":\"intensity\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"intensity\"},{\"id\":\"control1\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control1\"},{\"id\":\"control2\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control2\"},{\"id\":\"control3\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control3\"},{\"id\":\"control4\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control4\"},{\"id\":\"control5\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control5\"},{\"id\":\"control6\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control6\"},{\"id\":\"control7\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control7\"},{\"id\":\"control8\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control8\"},{\"id\":\"control9\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control9\"},{\"id\":\"control10\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control10\"},{\"id\":\"control11\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control11\"},{\"id\":\"control12\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control12\"},{\"id\":\"control13\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control13\"},{\"id\":\"control14\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control14\"},{\"id\":\"control15\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control15\"},{\"id\":\"control16\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control16\"},{\"id\":\"control17\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control17\"},{\"id\":\"control18\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control18\"},{\"id\":\"control19\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control19\"},{\"id\":\"control20\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control20\"},{\"id\":\"control21\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control21\"},{\"id\":\"control22\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control22\"},{\"id\":\"control23\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control23\"},{\"id\":\"control24\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control24\"},{\"id\":\"control25\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control25\"},{\"id\":\"control26\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control26\"},{\"id\":\"control27\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control27\"},{\"id\":\"control28\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control28\"},{\"id\":\"control29\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control29\"},{\"id\":\"control30\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control30\"},{\"id\":\"control31\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control31\"},{\"id\":\"control32\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control32\"},{\"id\":\"control33\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control33\"},{\"id\":\"control34\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control34\"},{\"id\":\"control35\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control35\"},{\"id\":\"control36\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control36\"},{\"id\":\"control37\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control37\"},{\"id\":\"control38\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control38\"},{\"id\":\"control39\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control39\"},{\"id\":\"control40\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control40\"},{\"id\":\"control41\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control41\"},{\"id\":\"control42\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control42\"},{\"id\":\"control43\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control43\"},{\"id\":\"control44\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control44\"},{\"id\":\"control45\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control45\"},{\"id\":\"control46\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control46\"},{\"id\":\"control47\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control47\"},{\"id\":\"control48\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control48\"},{\"id\":\"control49\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control49\"},{\"id\":\"control50\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control50\"},{\"id\":\"control51\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control51\"},{\"id\":\"control52\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control52\"},{\"id\":\"control53\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control53\"},{\"id\":\"control54\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control54\"},{\"id\":\"control55\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control55\"},{\"id\":\"control56\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control56\"},{\"id\":\"control57\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control57\"},{\"id\":\"control58\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control58\"},{\"id\":\"control59\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control59\"},{\"id\":\"control60\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control60\"},{\"id\":\"control61\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control61\"},{\"id\":\"control62\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control62\"},{\"id\":\"control63\",\"nodeId\":\"11111111-1111-4111-8111-111111111111\",\"controlId\":\"control63\"}]});"
+    }
+  },
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "seed": 0
+  },
+  "controls": {
+    "sourceHash": "28f28dae1589248b9ece2c220d2b914f308f11700c1fecd2e4ba874ba9b817fe",
+    "nodes": [
+      {
+        "nodePath": [
+          "11111111-1111-4111-8111-111111111111"
+        ],
+        "definitionHash": "34c75176c9b845b4ac6f4a2c2b1ca0f727f94e03bd2761ebb2d595d8ea1c5c00",
+        "schema": [
+          {
+            "id": "intensity",
+            "type": "number",
+            "label": "Component control 1",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 1",
+            "changeCost": "live"
+          },
+          {
+            "id": "control1",
+            "type": "number",
+            "label": "Component control 2",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 1",
+            "changeCost": "live"
+          },
+          {
+            "id": "control2",
+            "type": "number",
+            "label": "Component control 3",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 1",
+            "changeCost": "live"
+          },
+          {
+            "id": "control3",
+            "type": "number",
+            "label": "Component control 4",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 1",
+            "changeCost": "live"
+          },
+          {
+            "id": "control4",
+            "type": "number",
+            "label": "Component control 5",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 1",
+            "changeCost": "live"
+          },
+          {
+            "id": "control5",
+            "type": "number",
+            "label": "Component control 6",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 1",
+            "changeCost": "live"
+          },
+          {
+            "id": "control6",
+            "type": "number",
+            "label": "Component control 7",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 1",
+            "changeCost": "live"
+          },
+          {
+            "id": "control7",
+            "type": "number",
+            "label": "Component control 8",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 1",
+            "changeCost": "live"
+          },
+          {
+            "id": "control8",
+            "type": "number",
+            "label": "Component control 9",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 2",
+            "changeCost": "live"
+          },
+          {
+            "id": "control9",
+            "type": "number",
+            "label": "Component control 10",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 2",
+            "changeCost": "live"
+          },
+          {
+            "id": "control10",
+            "type": "number",
+            "label": "Component control 11",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 2",
+            "changeCost": "live"
+          },
+          {
+            "id": "control11",
+            "type": "number",
+            "label": "Component control 12",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 2",
+            "changeCost": "live"
+          },
+          {
+            "id": "control12",
+            "type": "number",
+            "label": "Component control 13",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 2",
+            "changeCost": "live"
+          },
+          {
+            "id": "control13",
+            "type": "number",
+            "label": "Component control 14",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 2",
+            "changeCost": "live"
+          },
+          {
+            "id": "control14",
+            "type": "number",
+            "label": "Component control 15",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 2",
+            "changeCost": "live"
+          },
+          {
+            "id": "control15",
+            "type": "number",
+            "label": "Component control 16",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 2",
+            "changeCost": "live"
+          },
+          {
+            "id": "control16",
+            "type": "number",
+            "label": "Component control 17",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 3",
+            "changeCost": "live"
+          },
+          {
+            "id": "control17",
+            "type": "number",
+            "label": "Component control 18",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 3",
+            "changeCost": "live"
+          },
+          {
+            "id": "control18",
+            "type": "number",
+            "label": "Component control 19",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 3",
+            "changeCost": "live"
+          },
+          {
+            "id": "control19",
+            "type": "number",
+            "label": "Component control 20",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 3",
+            "changeCost": "live"
+          },
+          {
+            "id": "control20",
+            "type": "number",
+            "label": "Component control 21",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 3",
+            "changeCost": "live"
+          },
+          {
+            "id": "control21",
+            "type": "number",
+            "label": "Component control 22",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 3",
+            "changeCost": "live"
+          },
+          {
+            "id": "control22",
+            "type": "number",
+            "label": "Component control 23",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 3",
+            "changeCost": "live"
+          },
+          {
+            "id": "control23",
+            "type": "number",
+            "label": "Component control 24",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 3",
+            "changeCost": "live"
+          },
+          {
+            "id": "control24",
+            "type": "number",
+            "label": "Component control 25",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 4",
+            "changeCost": "live"
+          },
+          {
+            "id": "control25",
+            "type": "number",
+            "label": "Component control 26",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 4",
+            "changeCost": "live"
+          },
+          {
+            "id": "control26",
+            "type": "number",
+            "label": "Component control 27",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 4",
+            "changeCost": "live"
+          },
+          {
+            "id": "control27",
+            "type": "number",
+            "label": "Component control 28",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 4",
+            "changeCost": "live"
+          },
+          {
+            "id": "control28",
+            "type": "number",
+            "label": "Component control 29",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 4",
+            "changeCost": "live"
+          },
+          {
+            "id": "control29",
+            "type": "number",
+            "label": "Component control 30",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 4",
+            "changeCost": "live"
+          },
+          {
+            "id": "control30",
+            "type": "number",
+            "label": "Component control 31",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 4",
+            "changeCost": "live"
+          },
+          {
+            "id": "control31",
+            "type": "number",
+            "label": "Component control 32",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 4",
+            "changeCost": "live"
+          },
+          {
+            "id": "control32",
+            "type": "number",
+            "label": "Component control 33",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 5",
+            "changeCost": "live"
+          },
+          {
+            "id": "control33",
+            "type": "number",
+            "label": "Component control 34",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 5",
+            "changeCost": "live"
+          },
+          {
+            "id": "control34",
+            "type": "number",
+            "label": "Component control 35",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 5",
+            "changeCost": "live"
+          },
+          {
+            "id": "control35",
+            "type": "number",
+            "label": "Component control 36",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 5",
+            "changeCost": "live"
+          },
+          {
+            "id": "control36",
+            "type": "number",
+            "label": "Component control 37",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 5",
+            "changeCost": "live"
+          },
+          {
+            "id": "control37",
+            "type": "number",
+            "label": "Component control 38",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 5",
+            "changeCost": "live"
+          },
+          {
+            "id": "control38",
+            "type": "number",
+            "label": "Component control 39",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 5",
+            "changeCost": "live"
+          },
+          {
+            "id": "control39",
+            "type": "number",
+            "label": "Component control 40",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 5",
+            "changeCost": "live"
+          },
+          {
+            "id": "control40",
+            "type": "number",
+            "label": "Component control 41",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 6",
+            "changeCost": "live"
+          },
+          {
+            "id": "control41",
+            "type": "number",
+            "label": "Component control 42",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 6",
+            "changeCost": "live"
+          },
+          {
+            "id": "control42",
+            "type": "number",
+            "label": "Component control 43",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 6",
+            "changeCost": "live"
+          },
+          {
+            "id": "control43",
+            "type": "number",
+            "label": "Component control 44",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 6",
+            "changeCost": "live"
+          },
+          {
+            "id": "control44",
+            "type": "number",
+            "label": "Component control 45",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 6",
+            "changeCost": "live"
+          },
+          {
+            "id": "control45",
+            "type": "number",
+            "label": "Component control 46",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 6",
+            "changeCost": "live"
+          },
+          {
+            "id": "control46",
+            "type": "number",
+            "label": "Component control 47",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 6",
+            "changeCost": "live"
+          },
+          {
+            "id": "control47",
+            "type": "number",
+            "label": "Component control 48",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 6",
+            "changeCost": "live"
+          },
+          {
+            "id": "control48",
+            "type": "number",
+            "label": "Component control 49",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 7",
+            "changeCost": "live"
+          },
+          {
+            "id": "control49",
+            "type": "number",
+            "label": "Component control 50",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 7",
+            "changeCost": "live"
+          },
+          {
+            "id": "control50",
+            "type": "number",
+            "label": "Component control 51",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 7",
+            "changeCost": "live"
+          },
+          {
+            "id": "control51",
+            "type": "number",
+            "label": "Component control 52",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 7",
+            "changeCost": "live"
+          },
+          {
+            "id": "control52",
+            "type": "number",
+            "label": "Component control 53",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 7",
+            "changeCost": "live"
+          },
+          {
+            "id": "control53",
+            "type": "number",
+            "label": "Component control 54",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 7",
+            "changeCost": "live"
+          },
+          {
+            "id": "control54",
+            "type": "number",
+            "label": "Component control 55",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 7",
+            "changeCost": "live"
+          },
+          {
+            "id": "control55",
+            "type": "number",
+            "label": "Component control 56",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 7",
+            "changeCost": "live"
+          },
+          {
+            "id": "control56",
+            "type": "number",
+            "label": "Component control 57",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 8",
+            "changeCost": "live"
+          },
+          {
+            "id": "control57",
+            "type": "number",
+            "label": "Component control 58",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 8",
+            "changeCost": "live"
+          },
+          {
+            "id": "control58",
+            "type": "number",
+            "label": "Component control 59",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 8",
+            "changeCost": "live"
+          },
+          {
+            "id": "control59",
+            "type": "number",
+            "label": "Component control 60",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 8",
+            "changeCost": "live"
+          },
+          {
+            "id": "control60",
+            "type": "number",
+            "label": "Component control 61",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 8",
+            "changeCost": "live"
+          },
+          {
+            "id": "control61",
+            "type": "number",
+            "label": "Component control 62",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 8",
+            "changeCost": "live"
+          },
+          {
+            "id": "control62",
+            "type": "number",
+            "label": "Component control 63",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 8",
+            "changeCost": "live"
+          },
+          {
+            "id": "control63",
+            "type": "number",
+            "label": "Component control 64",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "group": "Motion 8",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "084f58ab99072788e5eaa1f54e015fcb728a17b08bbc7db25a8aa661b5b2d8b7",
+        "values": {
+          "intensity": 0.5,
+          "control1": 0.5,
+          "control2": 0.5,
+          "control3": 0.5,
+          "control4": 0.5,
+          "control5": 0.5,
+          "control6": 0.5,
+          "control7": 0.5,
+          "control8": 0.5,
+          "control9": 0.5,
+          "control10": 0.5,
+          "control11": 0.5,
+          "control12": 0.5,
+          "control13": 0.5,
+          "control14": 0.5,
+          "control15": 0.5,
+          "control16": 0.5,
+          "control17": 0.5,
+          "control18": 0.5,
+          "control19": 0.5,
+          "control20": 0.5,
+          "control21": 0.5,
+          "control22": 0.5,
+          "control23": 0.5,
+          "control24": 0.5,
+          "control25": 0.5,
+          "control26": 0.5,
+          "control27": 0.5,
+          "control28": 0.5,
+          "control29": 0.5,
+          "control30": 0.5,
+          "control31": 0.5,
+          "control32": 0.5,
+          "control33": 0.5,
+          "control34": 0.5,
+          "control35": 0.5,
+          "control36": 0.5,
+          "control37": 0.5,
+          "control38": 0.5,
+          "control39": 0.5,
+          "control40": 0.5,
+          "control41": 0.5,
+          "control42": 0.5,
+          "control43": 0.5,
+          "control44": 0.5,
+          "control45": 0.5,
+          "control46": 0.5,
+          "control47": 0.5,
+          "control48": 0.5,
+          "control49": 0.5,
+          "control50": 0.5,
+          "control51": 0.5,
+          "control52": 0.5,
+          "control53": 0.5,
+          "control54": 0.5,
+          "control55": 0.5,
+          "control56": 0.5,
+          "control57": 0.5,
+          "control58": 0.5,
+          "control59": 0.5,
+          "control60": 0.5,
+          "control61": 0.5,
+          "control62": 0.5,
+          "control63": 0.7
+        }
+      }
+    ]
+  },
+  "controlAnimations": [
+    {
+      "nodePath": [
+        "11111111-1111-4111-8111-111111111111"
+      ],
+      "definitionHash": "34c75176c9b845b4ac6f4a2c2b1ca0f727f94e03bd2761ebb2d595d8ea1c5c00",
+      "schemaHash": "084f58ab99072788e5eaa1f54e015fcb728a17b08bbc7db25a8aa661b5b2d8b7",
+      "controlId": "control63",
+      "shape": "sine",
+      "periodSeconds": 2,
+      "amount": 0.1,
+      "phase": 0,
+      "enabled": true
+    }
+  ]
+}

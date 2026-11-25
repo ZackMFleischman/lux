@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "source": "3563bcf3f98331ada4b1e52bf7c5eac23e1866d2",
+  "installation": null,
+  "profile": "test-021dcf1f-9fe5-41c0-bfc1-428789356cc2",
+  "checks": [
+    "64-control component compiles and exposes64 aliases;late component control animates"
+  ],
+  "errors": [],
+  "pid": 28696,
+  "exitCode": 0
+}

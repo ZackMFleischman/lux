@@ -1,0 +1,14 @@
+{
+  "ok": false,
+  "source": "8141d6cf4c3f718af0044c4de696149a4f140b7b",
+  "installation": null,
+  "profile": "test-ec6068b4-e9aa-4d1f-8ad8-8231f502cbcc",
+  "checks": [
+    "64-control scene builds;64-value patch succeeds;Control64 animates with base preserved",
+    "64 simultaneous animation bindings and all base values survive save/reopen"
+  ],
+  "errors": [],
+  "pid": 26324,
+  "failure": "Error: Visual initialization stopped making progress\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/control-count/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/control-count/scripts/test-studio-control-count.mjs:78:224",
+  "exitCode": 0
+}

@@ -1,0 +1,14 @@
+{
+  "ok": false,
+  "source": "3563bcf3f98331ada4b1e52bf7c5eac23e1866d2",
+  "installation": null,
+  "profile": "test-69a68e7c-4714-414c-a7be-252ecadf1295",
+  "checks": [
+    "64-control scene builds;64-value patch succeeds;Control64 animates with base preserved",
+    "64 simultaneous animation bindings and all base values survive save/reopen"
+  ],
+  "errors": [],
+  "pid": 23244,
+  "failure": "locator.click: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'View', exact: true })\u001b[22m\n\u001b[2m    - locator resolved to <button tabindex=\"0\" type=\"button\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-studio-menu=\"true\" class=\"MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-sizeSmall MuiButton-colorInherit MuiButton-disableElevation studio-menu-trigger lux-ekt7kp-MuiButtonBase-root-MuiButton-root\">View</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-count\\scripts\\test-studio-control-count.mjs:63:58",
+  "exitCode": 3
+}

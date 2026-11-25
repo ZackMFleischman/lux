@@ -1,0 +1,34 @@
+{
+  "ok": false,
+  "source": "ebf3a72ac71532799310cebabaae2c6f5fb9a470",
+  "installation": {
+    "version": 1,
+    "name": "Lux",
+    "sourceCommit": "ebf3a72ac71532799310cebabaae2c6f5fb9a470",
+    "sourceTree": "working tree snapshot",
+    "canonicalLibraryRoot": "C:\\Users\\zFlei\\repos\\lux\\library",
+    "electron": {
+      "version": "44.3.0",
+      "archiveName": "electron-v44.3.0-win32-x64.zip",
+      "sha256": "26bf9a617d58d81772b3d68305d59ee48272969c15083c06db634a77358a8d9d",
+      "source": "https://github.com/electron/electron/releases/download/v44.3.0/electron-v44.3.0-win32-x64.zip"
+    },
+    "installedAt": "2026-09-16T02:45:47.276Z",
+    "directory": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\ebf3a72a-caab8a53",
+    "executable": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\ebf3a72a-caab8a53\\Lux.exe",
+    "workspace": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\ebf3a72a-caab8a53\\resources\\app\\runtime",
+    "node": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\ebf3a72a-caab8a53\\resources\\app\\node.exe",
+    "adapter": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\ebf3a72a-caab8a53\\resources\\app\\runtime\\scripts\\studio-installed-mcp.mjs",
+    "profile": "desktop",
+    "sourceDigest": "46a2d575943921c96fcc20c9d835b8a98b4a050aca7a2f83423996bfbec87f99"
+  },
+  "profile": "test-b1abd6fd-3f8c-4966-9fb1-f5c70f9afea4",
+  "checks": [
+    "64-control scene builds;64-value patch succeeds;Control64 animates with base preserved",
+    "64 simultaneous animation bindings and all base values survive save/reopen"
+  ],
+  "errors": [],
+  "pid": 26716,
+  "failure": "Error: Visual initialization stopped making progress\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/control-count/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/control-count/scripts/diagnose-baseline-replacements.mjs:77:224",
+  "exitCode": 0
+}

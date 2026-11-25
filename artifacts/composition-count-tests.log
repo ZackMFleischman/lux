@@ -1,0 +1,22 @@
+✔ compiler seals the first image composition as v5 and never evaluates authored modules (4146.9373ms)
+✔ compiler admits a one-node SDK 0.4 image composition with no edges (1617.8528ms)
+✔ compiler still rejects a multi-node SDK 0.4 composition without its connecting edge (871.8176ms)
+✔ compiler seals recursively imported compositions and their admitted nested dependencies (5427.4197ms)
+✔ compiler attributes a rejected nested declaration to its imported source module (870.9681ms)
+✔ composition exposes 64 controls without a cardinality ceiling (88.5584ms)
+✔ static composition extraction derives canonical controls and distinct same-named leaf bindings without executing source (8.4357ms)
+✔ composition extraction preserves authored exposure order without requiring sorted binding keys (11.6256ms)
+✔ composition exposure aliases inherit control groups through nested component metadata (8.3416ms)
+✔ composition extraction rejects duplicate exposure and a non-linear graph (3.8831ms)
+✔ composition extraction rejects a zero-input node pruned from the selected image chain (5.3896ms)
+✔ static extraction recursively admits reusable compositions and derives canonical leaf paths (9.0065ms)
+✔ recursive composition import cycles reject before authored code can execute (1.7801ms)
+✔ recursive extraction rejects flattened chains above eight leaves and graph depth above eight (8.4959ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13166.66

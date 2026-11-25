@@ -1,0 +1,14 @@
+{
+  "ok": false,
+  "source": "8f8eadff108d73185f73465d5ecd19732372cda9",
+  "installation": null,
+  "profile": "test-8a45d772-9626-461d-bdc7-96d594976d4a",
+  "checks": [
+    "64-control scene builds;64-value patch succeeds;Control64 animates with base preserved",
+    "64 simultaneous animation bindings and all base values survive save/reopen"
+  ],
+  "errors": [],
+  "pid": 25736,
+  "failure": "Error: composition.ts:1:1 image-chain-v1: declaration.expose must be a dense bounded array\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/control-count/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/control-count/scripts/test-studio-control-count.mjs:57:29",
+  "exitCode": 0
+}

@@ -1,0 +1,52 @@
+{
+  "visible": "visible",
+  "buttons": [
+    {
+      "rect": {
+        "x": 168.28125,
+        "y": 5.5,
+        "width": 42.296875,
+        "height": 28,
+        "top": 5.5,
+        "right": 210.578125,
+        "bottom": 33.5,
+        "left": 168.28125
+      },
+      "parent": true
+    }
+  ],
+  "groups": [
+    {
+      "open": true,
+      "text": "Motion 1"
+    },
+    {
+      "open": true,
+      "text": "Motion 2"
+    },
+    {
+      "open": true,
+      "text": "Motion 3"
+    },
+    {
+      "open": true,
+      "text": "Motion 4"
+    },
+    {
+      "open": true,
+      "text": "Motion 5"
+    },
+    {
+      "open": true,
+      "text": "Motion 6"
+    },
+    {
+      "open": true,
+      "text": "Motion 7"
+    },
+    {
+      "open": true,
+      "text": "Motion 8"
+    }
+  ]
+}

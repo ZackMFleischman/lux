@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "source": "2f51b3c941ebc367ec9d0e65572114fed10eae18",
+  "installation": null,
+  "profile": "test-8795073f-ad97-4859-b41b-0cd5e99e1ae5",
+  "checks": [
+    "64-control scene builds;64-value patch succeeds;Control64 animates with base preserved",
+    "64 simultaneous animation bindings and all base values survive save/reopen",
+    "64-control component compiles and exposes64 aliases;late component control animates"
+  ],
+  "errors": [],
+  "pid": 26756,
+  "exitCode": 0
+}
