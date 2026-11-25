@@ -1,0 +1,21 @@
+✔ worker composition state derives public values from canonical leaf rows and authenticates imported factories (19.4041ms)
+✔ worker rejects definition metadata disagreement before any factory call (9.2732ms)
+✔ worker evaluates one node LFO without replacing its base or changing a sibling instance (7.3287ms)
+✔ worker animation bypass freezes phase and restart returns to configured phase (4.3993ms)
+✔ worker keeps an incompatible same-path binding disabled instead of retargeting it (4.7795ms)
+✔ worker recursively authenticates nested composition objects and returns only sealed leaf factories (22.5055ms)
+✔ worker rejects nested runtime definition tampering before returning a leaf factory (21.4581ms)
+✔ scene animation bindings use the empty path as a distinct validated target (3.6218ms)
+✔ SDK 0.2 worker animates effective scene controls while retaining authored base controls (14.1885ms)
+✔ legacy intensity uses the same scene animation evaluator (2.0584ms)
+✔ changed scene schema disables a retained binding without retargeting it (1.8183ms)
+✔ scene animation evaluation retains captured intrinsics after authored code mutates prototypes (3.2311ms)
+✔ legacy visual has a view-only code occurrence at its existing empty control path (3.6052ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 507.6994

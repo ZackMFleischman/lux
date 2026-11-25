@@ -1,0 +1,11 @@
+✔ legacy visual has a view-only code occurrence at its existing empty control path (5.7646ms)
+✔ direct parameter visuals retain schema identity and missing graph state is never invented (0.9194ms)
+✔ direct-only selection returns to Scene when a graph visual replaces it (0.5871ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 416.4122

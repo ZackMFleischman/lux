@@ -1,0 +1,42 @@
+✔ node writes update only their instance and public aliases, rejecting stale or invalid writes atomically (103.7035ms)
+✔ composition controls keep one canonical leaf state and derive independent public aliases (13.08ms)
+✖ node snapshots survive declaration reorder and compatible definition updates without retargeting aliases (13.8666ms)
+✖ component updates retain compatible values and report values reset by a narrowed schema (19.1644ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 2
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 540.3602
+
+✖ failing tests:
+
+test at artifacts\component-model\baseline-controls.test.ts:27:1
+✖ node snapshots survive declaration reorder and compatible definition updates without retargeting aliases (13.8666ms)
+  Error: image-chain-v1: root module declaration mismatch
+      at bad (file:///C:/Users/zFlei/repos/lux/.worktrees/component-model/packages/runtime-contracts/src/composition-profile.mjs:6:29)
+      at normalizeImageCompositionProfile (file:///C:/Users/zFlei/repos/lux/.worktrees/component-model/packages/runtime-contracts/src/composition-profile.mjs:41:209)
+      at prepareCompositionControlState (file:///C:/Users/zFlei/repos/lux/.worktrees/component-model/packages/runtime/src/components/composition-controls.ts:14:16)
+      at createCompositionControlState (file:///C:/Users/zFlei/repos/lux/.worktrees/component-model/packages/runtime/src/components/composition-controls.ts:10:9)
+      at TestContext.<anonymous> (file:///C:/Users/zFlei/repos/lux/.worktrees/component-model/artifacts/component-model/baseline-controls.test.ts:29:120)
+      at Test.runInAsyncScope (node:async_hooks:214:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+
+test at artifacts\component-model\baseline-controls.test.ts:37:1
+✖ component updates retain compatible values and report values reset by a narrowed schema (19.1644ms)
+  Error: image-chain-v1: 5516cee8bb008873a86f2570ce147b68f7aa0f8758fb14d738860f1dd0a311ea: control binding schema mismatch
+      at bad (file:///C:/Users/zFlei/repos/lux/.worktrees/component-model/packages/runtime-contracts/src/composition-profile.mjs:6:29)
+      at normalizeImageCompositionProfile (file:///C:/Users/zFlei/repos/lux/.worktrees/component-model/packages/runtime-contracts/src/composition-profile.mjs:38:125)
+      at prepareCompositionControlState (file:///C:/Users/zFlei/repos/lux/.worktrees/component-model/packages/runtime/src/components/composition-controls.ts:14:16)
+      at createCompositionControlState (file:///C:/Users/zFlei/repos/lux/.worktrees/component-model/packages/runtime/src/components/composition-controls.ts:10:9)
+      at TestContext.<anonymous> (file:///C:/Users/zFlei/repos/lux/.worktrees/component-model/artifacts/component-model/baseline-controls.test.ts:42:16)
+      at Test.runInAsyncScope (node:async_hooks:214:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)

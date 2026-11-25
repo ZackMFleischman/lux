@@ -1,0 +1,23 @@
+{
+  "output": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\component-model\\artifacts\\component-model\\native-1789542533949",
+  "ok": false,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/component-model",
+  "profile": "test-87298ee0-5090-4028-859f-bcb758438083",
+  "commit": "b7af4f6c081eba04eb75539337b30737840999fa",
+  "checks": [
+    "legacy-direct: Graph/Inspector base edit and LFO identity, narrow layout, unchanged source save/reopen, failed-build retention and unchanged saved file"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\component-model\\artifacts\\component-model\\native-1789542533949\\legacy-direct-controls.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\component-model\\artifacts\\component-model\\native-1789542533949\\legacy-direct-narrow.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\component-model\\artifacts\\component-model\\native-1789542533949\\legacy-direct-failed-build.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\component-model\\artifacts\\component-model\\native-1789542533949\\legacy-graph-inside.png"
+  ],
+  "errors": [],
+  "launcherPid": 22928,
+  "pid": 15856,
+  "stage": "legacy-graph",
+  "error": "locator.click: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Animate Spike amount', exact: true })\u001b[22m\n\u001b[2m    - locator resolved to <button tabindex=\"0\" type=\"button\" aria-pressed=\"false\" aria-label=\"Animate Spike amount\" class=\"MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeSmall lux-1w2m9o0-MuiButtonBase-root-MuiIconButton-root\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <span data-index=\"0\" class=\"MuiSlider-thumb MuiSlider-thumb lux-34juzz-MuiSlider-thumb\">…</span> from <span class=\"MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeSmall lux-eh6vgx-MuiSlider-root\">…</span> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <span data-index=\"0\" class=\"MuiSlider-thumb MuiSlider-thumb lux-34juzz-MuiSlider-thumb\">…</span> from <span class=\"MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeSmall lux-eh6vgx-MuiSlider-root\">…</span> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    32 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <span data-index=\"0\" class=\"MuiSlider-thumb MuiSlider-thumb lux-34juzz-MuiSlider-thumb\">…</span> from <span class=\"MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeSmall lux-eh6vgx-MuiSlider-root\">…</span> subtree intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\component-model\\scripts\\test-component-model.mjs:56:73",
+  "exitCode": 0,
+  "processExited": true
+}

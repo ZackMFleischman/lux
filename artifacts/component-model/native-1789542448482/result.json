@@ -1,0 +1,14 @@
+{
+  "ok": false,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/component-model",
+  "profile": "test-f5e48a8e-2468-475f-8773-052df8f470d9",
+  "commit": "b31aec0f31c56d32a75995b44d677d35800161bc",
+  "checks": [],
+  "screenshots": [],
+  "errors": [],
+  "launcherPid": 19084,
+  "pid": 24688,
+  "error": "Error: Runtime state did not settle\n    at statusWhen (file:///C:/Users/zFlei/repos/lux/.worktrees/component-model/scripts/test-component-model.mjs:24:205)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/component-model/scripts/test-component-model.mjs:26:3",
+  "exitCode": 0,
+  "processExited": true
+}

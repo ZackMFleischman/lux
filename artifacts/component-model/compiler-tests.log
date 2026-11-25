@@ -1,0 +1,23 @@
+✔ component model admits defineVisual with reusable graph defineComponent and preserves leaf targets (129.9435ms)
+✔ component model preserves canonical legacy profiles and all saved identities (35.5391ms)
+✔ SDK author helpers normalize graph components and visuals to the existing runtime shape (1.7328ms)
+✔ component model rejects nested runnable visuals, non-visual roots and mixed author fields (13.3252ms)
+✔ ambiguous recognized author calls are rejected before declaration extraction (1.9743ms)
+✔ shipped component/visual templates compile and link through the existing image-chain runtime (10000.5562ms)
+✔ composition exposes 64 controls without a cardinality ceiling (235.1647ms)
+✔ static composition extraction derives canonical controls and distinct same-named leaf bindings without executing source (17.011ms)
+✔ composition extraction preserves authored exposure order without requiring sorted binding keys (41.9573ms)
+✔ composition exposure aliases inherit control groups through nested component metadata (33.684ms)
+✔ composition extraction rejects duplicate exposure and a non-linear graph (15.1856ms)
+✔ composition extraction rejects a zero-input node pruned from the selected image chain (10.8829ms)
+✔ static extraction recursively admits reusable compositions and derives canonical leaf paths (20.8563ms)
+✔ recursive composition import cycles reject before authored code can execute (4.8316ms)
+✔ recursive extraction rejects flattened chains above eight leaves and graph depth above eight (17.9716ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10695.6993

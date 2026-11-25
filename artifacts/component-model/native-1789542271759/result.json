@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/component-model",
+  "profile": "test-fec7b481-77ff-4c9f-8b89-9a5ca33506be",
+  "commit": "ccf7f8108500e36e0c2772f96d79f1470a586562",
+  "checks": [],
+  "screenshots": [],
+  "errors": [],
+  "pid": 18124,
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n14020 !== 18124\n\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/component-model/scripts/test-component-model.mjs:22:10",
+  "exitCode": 0
+}

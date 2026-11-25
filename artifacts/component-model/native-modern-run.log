@@ -1,0 +1,30 @@
+{
+  "output": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\component-model\\artifacts\\component-model\\native-1789543716942",
+  "ok": true,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/component-model",
+  "profile": "test-e56791ad-5658-4370-ac71-adeb0ef671f6",
+  "commit": "df472683234847f426f594ccdd414889c2783c61",
+  "checks": [
+    "component-graph: reopened output 1920x1080; routine test preview restored to 640x360",
+    "component-graph: Graph/Inspector base edit and LFO identity, narrow layout, unchanged source save/reopen, failed-build retention and unchanged saved file"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\component-model\\artifacts\\component-model\\native-1789543716942\\component-graph-inside.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\component-model\\artifacts\\component-model\\native-1789543716942\\component-graph-controls.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\component-model\\artifacts\\component-model\\native-1789543716942\\component-graph-narrow.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\component-model\\artifacts\\component-model\\native-1789543716942\\component-graph-failed-build.png"
+  ],
+  "errors": [],
+  "limitations": [
+    "Animate uses real keyboard activation. The pre-existing slider thumb mouse-hit overlap remains a separate UI defect."
+  ],
+  "launcherPid": 25052,
+  "pid": 28776,
+  "previewOutput": {
+    "width": 640,
+    "height": 360
+  },
+  "stage": "component-graph",
+  "exitCode": 0,
+  "processExited": true
+}

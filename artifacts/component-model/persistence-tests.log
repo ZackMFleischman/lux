@@ -1,0 +1,37 @@
+✔ library writes are atomic, revision guarded, validated before activation, and persist across store restart (209.7798ms)
+✔ linked source applies a newer revision while a fork keeps the mounted source and removes its link (2.1389ms)
+✔ missing library data retains the saved mounted fallback and reports it explicitly (0.6014ms)
+✔ checking an empty library link set does not require an SDK 0.4 scene (0.2219ms)
+✔ library reads reject an oversized profile file through the bounded file path (16.7987ms)
+✔ two profile stores share explicit additions as real source files without losing concurrent creates (133.2153ms)
+✔ separate stores serialize updates so a stale revision cannot overwrite the winner (95.2913ms)
+✔ legacy profile entries migrate once into the shared directory without changing IDs or revisions (27.0115ms)
+✔ a conflicting legacy migration keeps both complete sources and reports the collision (115.7195ms)
+✔ an installed writable library imports packaged seed components without writing back to the seed (278.8587ms)
+✔ a fallback update fast-forwards the canonical library only through matching immutable history (206.6877ms)
+✔ a new fallback component imports its complete immutable revision history (113.8639ms)
+✔ legacy revision suffix seeds a standalone library without inventing earlier history (137.3144ms)
+✔ seeding rejects gaps within available history without activating a partial component (150.1226ms)
+✔ a higher fallback revision without matching history is preserved as a conflict (98.4692ms)
+✔ a persistent lock is never stolen from a live or uncertain owner (36.6477ms)
+✔ parallel contenders never evict a persistent lock or enter the critical section (45.8223ms)
+✔ the repository seed exposes a useful Prismatic Ball component from an isolated copy (185.2079ms)
+✔ compact catalog summaries validate manifests without reading component source (108.6693ms)
+✔ flat scene saves animation separately from its base value and reopens it (16.641ms)
+✔ legacy intensity scenes retain their original controls and optional animation (1.4095ms)
+✔ scene v4 persists leaf identity and values without a mutable flat control copy (13.7964ms)
+✔ scene v4 rejects malformed node identity before save (1.7235ms)
+✔ scene v5 persists linked component identity, resolved revision, and mounted fallback source (24.2327ms)
+✔ scene v4 remains compatible when no animation bindings are stored (1.7839ms)
+✔ scene v5 rejects duplicate links and mounted files outside their mount path (1.1955ms)
+✔ scene animation validation rejects accessors without invoking them (0.5041ms)
+✔ legacy visual has a view-only code occurrence at its existing empty control path (5.2503ms)
+✔ direct parameter visuals retain schema identity and missing graph state is never invented (0.7746ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2329.8444

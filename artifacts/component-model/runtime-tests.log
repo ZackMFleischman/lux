@@ -1,0 +1,27 @@
+✔ image-chain runtime routes resources and independent same-named controls in plan order, then drains (116.1917ms)
+✔ node writes update only their instance and public aliases, rejecting stale or invalid writes atomically (257.7594ms)
+✔ composition controls keep one canonical leaf state and derive independent public aliases (36.619ms)
+✔ node snapshots survive declaration reorder and compatible definition updates without retargeting aliases (109.3891ms)
+✔ component updates retain compatible values and report values reset by a narrowed schema (62.5444ms)
+✔ worker composition state derives public values from canonical leaf rows and authenticates imported factories (38.0124ms)
+✔ worker rejects definition metadata disagreement before any factory call (35.5676ms)
+✔ worker evaluates one node LFO without replacing its base or changing a sibling instance (16.107ms)
+✔ worker animation bypass freezes phase and restart returns to configured phase (10.64ms)
+✔ worker keeps an incompatible same-path binding disabled instead of retargeting it (12.1639ms)
+✔ worker recursively authenticates nested composition objects and returns only sealed leaf factories (73.5566ms)
+✔ worker rejects nested runtime definition tampering before returning a leaf factory (60.3781ms)
+✔ scene animation bindings use the empty path as a distinct validated target (5.0068ms)
+✔ SDK 0.2 worker animates effective scene controls while retaining authored base controls (36.1113ms)
+✔ legacy intensity uses the same scene animation evaluator (2.2586ms)
+✔ changed scene schema disables a retained binding without retargeting it (2.3702ms)
+✔ scene animation evaluation retains captured intrinsics after authored code mutates prototypes (7.0601ms)
+✔ legacy visual has a view-only code occurrence at its existing empty control path (7.867ms)
+✔ direct parameter visuals retain schema identity and missing graph state is never invented (0.9312ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1553.3495

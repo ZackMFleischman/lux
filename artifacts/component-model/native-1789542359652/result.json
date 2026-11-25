@@ -1,0 +1,15 @@
+{
+  "ok": false,
+  "root": "C:/Users/zFlei/repos/lux/.worktrees/component-model",
+  "profile": "test-ece5343c-fdf4-4775-a1c0-593d1a19feec",
+  "commit": "297fc5145d5d93c35c0c20f6868544732ba2b240",
+  "checks": [],
+  "screenshots": [],
+  "errors": [],
+  "launcherPid": 972,
+  "pid": 25168,
+  "stage": "legacy-direct",
+  "error": "Error: Studio is busy or command is unsupported\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/component-model/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/component-model/scripts/test-component-model.mjs:33:34",
+  "exitCode": 0,
+  "processExited": true
+}
