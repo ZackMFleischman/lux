@@ -1,0 +1,14 @@
+[
+  "--home",
+  "C:\\Users\\zFlei\\AppData\\Local\\Conductor",
+  "team",
+  "ack",
+  "345554f0-0896-4ea2-8fb4-942317f65fda",
+  "--session",
+  "679835f9-243d-4aaa-a7b8-0774cbd13c0b",
+  "--body-file",
+  ".superpowers/conductor/LUX-10/ack.json",
+  "--request",
+  "reliability-plan-01a09967-ack-01",
+  "--json"
+]

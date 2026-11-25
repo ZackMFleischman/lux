@@ -1,0 +1,14 @@
+[
+  "--home",
+  "C:\\Users\\zFlei\\AppData\\Local\\Conductor",
+  "ticket",
+  "claim",
+  "LUX-10",
+  "--session",
+  "679835f9-243d-4aaa-a7b8-0774cbd13c0b",
+  "--expect-revision",
+  "2",
+  "--request",
+  "reliability-plan-01a09967-claim-01",
+  "--json"
+]

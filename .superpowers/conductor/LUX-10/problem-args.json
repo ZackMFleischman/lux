@@ -1,0 +1,15 @@
+[
+  "--home",
+  "C:\\Users\\zFlei\\AppData\\Local\\Conductor",
+  "problem",
+  "add",
+  "--ticket",
+  "LUX-10",
+  "--session",
+  "679835f9-243d-4aaa-a7b8-0774cbd13c0b",
+  "--body-file",
+  ".superpowers/conductor/LUX-10/problem.json",
+  "--request",
+  "reliability-plan-01a09967-problem-01",
+  "--json"
+]

@@ -1,0 +1,11 @@
+{
+  "launch_id": "f62325a2-47ef-407c-8ee3-38c0d3f0fc93",
+  "epoch": 1,
+  "challenge_generation": 1,
+  "host_id": "/root/reliability_plan",
+  "role": "worker",
+  "checkpoint": "Fresh LUX-10 planning-only worker; exact reliability-plan worktree f95f397; retained experiment read-only and no graphics or shared application edits.",
+  "agent_id": "8b1e7545-02c3-449b-8d45-a2451e5c81b0",
+  "skill_version": "layers-v1",
+  "scope": "Advance four authorized Lux roadmap workstreams; retain existing ordinary coordinator for filesystem/components and manage fresh planning, implementation, review and validation contexts for creative controls/inputs and reliability. Coordinate all shared-file integrations and serialized graphics."
+}
