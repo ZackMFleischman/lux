@@ -1,0 +1,38 @@
+
+  apps\studio\dist\main.cjs      982.6kb
+  apps\studio\dist\main.cjs.map    2.1mb
+
+Done in 3210ms
+
+  apps\studio\dist\preload.cjs      5.9kb
+  apps\studio\dist\preload.cjs.map  9.2kb
+
+Done in 75ms
+
+  apps\studio\dist\renderer.js                            5.2mb
+  apps\studio\dist\assets\InterVariable-AM3KRH5U.woff2  344.0kb
+  apps\studio\dist\renderer.css                         175.3kb
+  apps\studio\dist\renderer.js.map                        9.6mb
+  apps\studio\dist\renderer.css.map                     267.2kb
+
+Done in 7718ms
+
+  apps\studio\dist\visual-worker.js      1.2mb
+  apps\studio\dist\visual-worker.js.map  2.4mb
+
+Done in 1323ms
+
+  apps\studio\dist\source-admission-worker.js      195.8kb
+  apps\studio\dist\source-admission-worker.js.map  455.0kb
+
+Done in 189ms
+
+  apps\studio\dist\image-preview-worker.js      192.9kb
+  apps\studio\dist\image-preview-worker.js.map  453.3kb
+
+Done in 289ms
+
+  apps\studio\dist\story-asset-decoder-worker.js      190.2kb
+  apps\studio\dist\story-asset-decoder-worker.js.map  437.2kb
+
+Done in 608ms

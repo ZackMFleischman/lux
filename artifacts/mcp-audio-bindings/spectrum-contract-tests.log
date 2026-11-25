@@ -1,0 +1,27 @@
+✔ composition exposes 64 controls without a cardinality ceiling (422.2341ms)
+✔ static composition extraction derives canonical controls and distinct same-named leaf bindings without executing source (38.242ms)
+✔ composition extraction preserves authored exposure order without requiring sorted binding keys (33.416ms)
+✔ composition exposure aliases inherit control groups through nested component metadata (50.2931ms)
+✔ composition extraction rejects duplicate exposure and a non-linear graph (58.8388ms)
+✔ composition extraction rejects a zero-input node pruned from the selected image chain (17.0559ms)
+✔ static extraction recursively admits reusable compositions and derives canonical leaf paths (39.0685ms)
+✔ recursive composition import cycles reject before authored code can execute (7.7341ms)
+✔ recursive extraction accepts a 600-component flat chain while retaining the graph depth limit (886.2234ms)
+✔ typed composition inputs infer child port metadata and readable graph identities (14.8094ms)
+✔ typed composition inputs reject legacy input conflicts and duplicate boundary targets (6.651ms)
+✔ SDK 0.2 freezes declared controls without invoking create or adding Intensity (33.2657ms)
+✔ SDK 0.2 rejects missing controls, malformed definitions and getters without invoking them (0.8628ms)
+✔ SDK 0.2 freezes optional Story capability without changing legacy definition shape (1.9221ms)
+✔ SDK 0.2 exposes an optional per-instance control sampler with a base-value fallback (12793.9819ms)
+✔ real pinned TypeScript infers typed controls and restricts sampling and enum IDs (40156.3457ms)
+✔ image-chain runtime routes resources and independent same-named controls in plan order, then drains (61.3252ms)
+✔ real FFT tones populate their logarithmic frequency buckets without invented oscillations (7.9486ms)
+✔ spectrum snapshot bounds reject malformed values and the frame view freezes paused data and clears disconnect (5.4704ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 53506.5528

@@ -1,0 +1,21 @@
+✔ worker composition state derives public values from canonical leaf rows and authenticates imported factories (54.9387ms)
+✔ worker rejects definition metadata disagreement before any factory call (35.564ms)
+✔ worker evaluates one node LFO without replacing its base or changing a sibling instance (55.6039ms)
+✔ worker animation bypass freezes phase and restart returns to configured phase (62.0172ms)
+✔ worker keeps an incompatible same-path binding disabled instead of retargeting it (28.0164ms)
+✔ worker recursively authenticates nested composition objects and returns only sealed leaf factories (126.2303ms)
+✔ worker rejects nested runtime definition tampering before returning a leaf factory (146.7323ms)
+✔ public and direct trigger targets resolve to one canonical leaf while persistent snapshots omit actions (326.1054ms)
+✔ typed composition live writes retain captured validation after authored intrinsic mutation (257.3365ms)
+✔ generation imports only prepared visuals, publishes full visual state, and disposes exact ownership (58.3499ms)
+✔ initial and mid-create audio snapshots reach the delayed candidate before its first frame (43.7646ms)
+✔ authored top-level renderer mutation cannot replace the pre-import render backend (3.8506ms)
+✔ trigger admission revalidates activation inside the serialized runtime owner (7.0746ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3209.6373

@@ -1,0 +1,30 @@
+✔ band analysis separates bass, mids, and highs with hand-derived full-scale fixtures (200.6487ms)
+✔ band analysis rejects mismatched buffers and non-finite samples (4.2536ms)
+✔ Web Audio analyzer disables built-in smoothing and disconnects only owned nodes (20.8248ms)
+✔ kick detector emits one local peak for a sustained onset and ignores silence and steady noise (0.7515ms)
+✔ kick detector rearms below hysteresis and emits two separated onsets (0.6775ms)
+✔ kick detector retains an equal-score plateau and emits its strong peak before a weaker tail (0.4594ms)
+✔ audio binding is a strict variant while the legacy LFO record stays exact (92.927ms)
+✔ one scene audio configuration remains active and incompatible bindings stay disabled (3.0594ms)
+✔ audio attack and release use rendered frame time while manual base remains live (3.1059ms)
+✔ audio snapshots reject stale sequence and reset sequence on a newer generation (23.497ms)
+✔ kick envelope uses rendered time, finite shapes, retrigger interval, and smooth disconnect release (4.9312ms)
+✔ paused, reset, and disabled kick bindings consume events without replay (2.1146ms)
+✔ kick exponential envelope completes exactly and preserves audio configuration compatibility (3.6363ms)
+✔ explicit connect owns one capture while subscriptions only control sampling (199.227ms)
+✔ a stale connect completion cleans its resources without publishing (1.0441ms)
+✔ track end publishes unavailable zero before idempotent owned cleanup (18.6839ms)
+✔ interrupted audio context publishes unavailable zero and requires a new connect (7.793ms)
+✔ switching analyzer configuration closes the old capture before opening the new one (1.769ms)
+✔ kick peak increments once and remains latched through weaker tail samples (1.1933ms)
+✔ real FFT tones populate their logarithmic frequency buckets without invented oscillations (5.1684ms)
+✔ spectrum snapshot bounds reject malformed values and the frame view freezes paused data and clears disconnect (2.705ms)
+✔ runtime audio transport keeps one in-flight sample and one latest overwrite without publishing sampled state (29.1772ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3061.5542

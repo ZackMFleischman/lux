@@ -1,0 +1,6 @@
+[
+  "apps/studio/src/audio/studio-audio-provider.d.mts",
+  "apps/studio/src/audio/studio-audio-provider.mjs",
+  "apps/studio/src/audio/studio-audio-runtime.ts",
+  "apps/studio/src/audio/test-rhythm.ts"
+]

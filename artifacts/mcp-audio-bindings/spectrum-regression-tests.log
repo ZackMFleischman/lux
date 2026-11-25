@@ -1,0 +1,33 @@
+✔ Story host correlates completed-frame receipts and accepts an immutable duplicate after ambient frames (34775.4637ms)
+✔ generation imports only prepared visuals, publishes full visual state, and disposes exact ownership (40.474ms)
+✖ initial and mid-create audio snapshots reach the delayed candidate before its first frame (7.4457ms)
+✔ authored top-level renderer mutation cannot replace the pre-import render backend (55.4855ms)
+✔ trigger admission revalidates activation inside the serialized runtime owner (161.0247ms)
+✔ stdio adapter registers and dispatches the complete Studio build input (5762.2072ms)
+✔ MCP animation checks the running app capability before forwarding binding edits (6094.1316ms)
+✔ tracer retains fixed intensity schema and rejects invalid control snapshots (11.265ms)
+✔ output and compiler failures cannot masquerade as validated artifacts (9.1737ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 8
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 37126.7647
+
+✖ failing tests:
+
+test at tests\studio\story-worker-generation.test.mjs:34:1
+✖ initial and mid-create audio snapshots reach the delayed candidate before its first frame (7.4457ms)
+  Error: Invalid audio band snapshot
+      at invalid (file:///C:/Users/zFlei/.codex/worktrees/mcp-audio-bindings/lux/packages/runtime-contracts/src/audio-input.mjs:7:33)
+      at plain (file:///C:/Users/zFlei/.codex/worktrees/mcp-audio-bindings/lux/packages/runtime-contracts/src/audio-input.mjs:9:158)
+      at normalizeAudioBandSnapshot (file:///C:/Users/zFlei/.codex/worktrees/mcp-audio-bindings/lux/packages/runtime-contracts/src/audio-input.mjs:35:12)
+      at Object.apply (file:///C:/Users/zFlei/.codex/worktrees/mcp-audio-bindings/lux/packages/runtime-contracts/src/audio-input.mjs:55:31)
+      at Object.audio (file:///C:/Users/zFlei/.codex/worktrees/mcp-audio-bindings/lux/apps/studio/src/story/story-worker-generation.mjs:64:54)
+      at TestContext.<anonymous> (file:///C:/Users/zFlei/.codex/worktrees/mcp-audio-bindings/lux/tests/studio/story-worker-generation.test.mjs:35:145)
+      at Test.runInAsyncScope (node:async_hooks:214:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)

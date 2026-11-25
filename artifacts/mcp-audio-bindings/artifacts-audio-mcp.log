@@ -1,0 +1,20 @@
+AssertionError [ERR_ASSERTION]: {"content":[{"type":"text","text":"Studio is busy or command is unsupported"}],"isError":true}
++ actual - expected
+
++ true
+- undefined
+
+    at call (file:///C:/Users/zFlei/.codex/worktrees/mcp-audio-bindings/lux/scripts/test-studio-mcp.mjs:29:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async file:///C:/Users/zFlei/.codex/worktrees/mcp-audio-bindings/lux/scripts/test-studio-mcp.mjs:38:24 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: true,
+  expected: undefined,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Studio: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools
+You might need to use a local HTTP server (instead of file://): https://react.dev/link/react-devtools-faq font-weight:bold
+

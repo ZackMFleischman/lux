@@ -1,0 +1,37 @@
+✔ audio commands connect only an exact currently enumerated device through the existing provider (14.9129ms)
+✔ audio binding is a strict variant while the legacy LFO record stays exact (8.0721ms)
+✔ one scene audio configuration remains active and incompatible bindings stay disabled (3.0702ms)
+✔ audio attack and release use rendered frame time while manual base remains live (2.1432ms)
+✔ audio snapshots reject stale sequence and reset sequence on a newer generation (0.7951ms)
+✔ kick envelope uses rendered time, finite shapes, retrigger interval, and smooth disconnect release (1.6096ms)
+✔ paused, reset, and disabled kick bindings consume events without replay (1.8436ms)
+✔ kick exponential envelope completes exactly and preserves audio configuration compatibility (1.1253ms)
+✔ audio runtime discovers only input devices and always closes its discovery arm (5.976ms)
+✔ audio runtime reports device changes and removes its listener (0.7814ms)
+✔ audio runtime reuses active capture permission for device refresh (5.3271ms)
+✔ audio runtime does not replace a pending capture arm during device refresh (74.3201ms)
+✔ audio runtime arms one request, activates its token, and revokes on disconnect (1.7559ms)
+✔ failed permission activation stops the acquired stream and cancels the exact arm (1.963ms)
+✔ audio runtime fails closed when its context cannot enter running state (0.9328ms)
+✔ runtime audio transport keeps one in-flight sample and one latest overwrite without publishing sampled state (46.3524ms)
+✔ animation operation schema admits the empty scene path (14.9873ms)
+✔ variation operation schema accepts guarded per-instance settings (1.8213ms)
+✔ variation write reaches the worker and publishes inspectable runtime state (48.6913ms)
+✔ animation operation schema accepts exact audio and kick bindings without widening legacy LFOs (11.2731ms)
+✔ manual and tap tempo acknowledge guarded writes and persist only BPM (34.6436ms)
+✔ background build synchronizes the latest acknowledged BPM before promotion with fresh beat zero (38.6174ms)
+✔ flat runtime keeps base controls while accepting guarded animation state and rejecting stale or forged targets (25.0692ms)
+✔ background build promotes only after the latest compatible controls and animation reach its candidate (48.4139ms)
+✔ edits acknowledged during compilation initialize the eventual candidate with the latest state (18.976ms)
+✔ legacy runtime state preserves scene animation fields (0.6962ms)
+✔ MCP animation dispatch applies and removes audio on a numeric control with runtime guards (16.3097ms)
+✔ stdio adapter registers and dispatches the complete Studio build input (1540.1239ms)
+✔ MCP animation checks the running app capability before forwarding binding edits (2336.0327ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5773.0267

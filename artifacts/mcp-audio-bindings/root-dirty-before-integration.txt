@@ -1,0 +1,13 @@
+library/catalog.json
+tests/unit/live-copilot-codex.test.ts
+tests/unit/live-copilot-live.test.ts
+tools/live-copilot/README.md
+tools/live-copilot/client.js
+tools/live-copilot/codex.ts
+tools/live-copilot/delegation.ts
+tools/live-copilot/live.ts
+tools/live-copilot/prompt.ts
+tools/live-copilot/result.schema.json
+tools/live-copilot/server.ts
+visuals/Fiber Tracers and Glass Ribbons.lux-scene
+visuals/Quasar.lux-scene

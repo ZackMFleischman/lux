@@ -1,0 +1,42 @@
+✔ fresh arm permits one exact audio request and active capture only satisfies checks (4.8528ms)
+✔ discovery arm permits exact audio enumeration checks without permitting capture (0.6297ms)
+✔ a timely accepted audio request can finish after the intent deadline without admitting a second request (0.888ms)
+✔ first malformed main-window request consumes the arm and every foreign context is denied (0.4259ms)
+✔ arm expiry, navigation, renderer loss, and destruction revoke permission state (0.5106ms)
+✔ token-matched cancellation rejects stale activation (2.469ms)
+✔ accepted requests still revoke before late completion on cancel, navigation, loss, or destruction (0.5821ms)
+✔ late unconsumed intent cannot capture and successful completion rechecks exact page identity (0.3623ms)
+✔ an admitted but unsettled capture has a separate bounded deadline (0.4184ms)
+✔ explicit connect owns one capture while subscriptions only control sampling (19.7267ms)
+✔ a stale connect completion cleans its resources without publishing (0.8419ms)
+✔ track end publishes unavailable zero before idempotent owned cleanup (10.742ms)
+✔ interrupted audio context publishes unavailable zero and requires a new connect (2.4179ms)
+✔ switching analyzer configuration closes the old capture before opening the new one (1.265ms)
+✔ kick peak increments once and remains latched through weaker tail samples (1.027ms)
+✔ audio runtime discovers only input devices and always closes its discovery arm (3.6693ms)
+✔ audio runtime reports device changes and removes its listener (0.6204ms)
+✔ audio runtime reuses active capture permission for device refresh (3.0201ms)
+✔ audio runtime does not replace a pending capture arm during device refresh (8.9954ms)
+✔ audio runtime arms one request, activates its token, and revokes on disconnect (1.2159ms)
+✔ failed permission activation stops the acquired stream and cancels the exact arm (2.0377ms)
+✔ audio runtime fails closed when its context cannot enter running state (0.6666ms)
+✔ Test rhythm remains discoverable without hardware permission (0.3604ms)
+✔ Test rhythm connects through the shared analyzer silently and releases every resource (89.6734ms)
+✔ disconnect during Test rhythm context resume cleans the late capture and never publishes it (0.7022ms)
+✔ a newer connect promptly closes only its superseded synthetic context (14.0874ms)
+✔ an older disconnect never closes or revokes a newer pending connection (28.8068ms)
+✔ switching a physical capture to Test rhythm cancels only that capture permission token (16.6178ms)
+✔ real FFT tones populate their logarithmic frequency buckets without invented oscillations (5.7757ms)
+✔ spectrum snapshot bounds reject malformed values and the frame view freezes paused data and clears disconnect (3.1699ms)
+✔ diagnostics persist bounded rotated records and exclude arbitrary request fields (140.6135ms)
+✔ diagnostic messages strip source frames, paths, credentials, long IDs and data payloads (7.0109ms)
+✔ diagnostic write failure stays observable and does not throw into the app (3.3306ms)
+✔ arbitrary child output cannot persist authored JSON payloads through native summaries (6.6994ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 511.7665

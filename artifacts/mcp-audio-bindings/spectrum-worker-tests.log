@@ -1,0 +1,48 @@
+(node:38072) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ device loss during a post-init update retains resources until settlement and prevents evaluation (596.3247ms)
+✔ device loss during frame queue completion prevents late frame publication (514.7932ms)
+✔ device loss during reset or readback drains the command before cleanup and publishes no late result (1015.6847ms)
+✔ device loss during renderer initialization prevents factory creation after settlement (334.1455ms)
+✔ real worker executes submitted v4 code: heartbeat, update, evaluate, validated presentation, queue, ready and same-target capture (1185.5103ms)
+✔ message/profile mismatches reject before import; definition disagreement rejects before create (1061.9361ms)
+✔ partial and terminal failures retain original errors and attempt independent cleanup once (4616.1934ms)
+✔ post-import captured descriptor and resource checks survive modified validation globals (725.8206ms)
+✔ abandoned backend and GPU work delay cleanup independently; failure never presents or permits capture (1043.478ms)
+✔ explicit resets run individually, preserve controls, and reset rejection terminates once with the primary error (1319.5274ms)
+✔ backend rejection restores target; forced termination remains separate from graceful cleanup (980.9209ms)
+✔ component update receives the same measured spectrum frame field (542.6466ms)
+(node:25144) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ legacy class prototype dispose retains its receiver and runs once across repeated disposal (901.1597ms)
+✔ throwing legacy prototype dispose reports diagnostics and still releases owned resources once (309.253ms)
+✔ opt-in initialization gate waits before create and accepts only one exact owner GO outside its pending init chain (779.7795ms)
+✔ worker announces liveness before top-level/create and heartbeats continue through healthy async initialization (724.2488ms)
+✔ baseline worker retains controls, frames and heartbeat with no query allocations or optional CPU spans (1169.4992ms)
+✔ paused trigger draws once after hostile intrinsic mutation and duplicate IDs return the original receipt without regressing latest status (1232.2253ms)
+✔ paused Story commands survive authored intrinsic mutation, draw with zero delta, and dedupe after reset (31825.4826ms)
+✔ worker keeps routine sampling phase through unsampled frame notifications (274.8876ms)
+✔ playing cadence subtracts full completed-frame work from its next delay (315.9942ms)
+✔ over-budget frames and late timer wakeups rebase cadence without accumulating catch-up draws (573.4963ms)
+✔ a queued old timer cannot add a draw after a control command replaces its schedule (323.8446ms)
+✔ actual worker requests timestamp support and publishes a fresh correlated GPU pass result (349.7003ms)
+✔ externally driven worker advances only for explicit frames and existing control draws (661.7512ms)
+✔ actual worker reports separate CPU calls, asynchronous render wait, queue wait and honest GPU capability (277.0835ms)
+✔ actual worker applies complete initial/live controls and captures exact metadata; reset preserves values (1095.3527ms)
+✔ actual worker applies typed controls and acknowledges their exact values after a completed frame (992.8698ms)
+✔ actual worker exposes stable per-instance samples without changing the base control (375.6302ms)
+✔ audio snapshots update the evaluator cache and acknowledge without drawing (298.8303ms)
+✔ actual worker supports empty controls and rejects mismatched metadata before create (1374.2281ms)
+✔ post-import verification survives mutated Object/JSON/Map intrinsics and does not invoke getters (1293.6691ms)
+✔ legacy worker protocol remains scalar-compatible and invalid generic snapshots cannot draw a partial update (459.5847ms)
+✔ ordinary visuals await asynchronous shader preparation while heartbeats remain live (302.2249ms)
+✔ awaited startup render calls prepare and draw in authored order before ready (268.0337ms)
+✔ actual visual frames expose bounded measured spectrum and clear disconnected or stale audio (321.375ms)
+ℹ tests 36
+ℹ suites 0
+ℹ pass 36
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 49371.4277

@@ -1,0 +1,3 @@
+Implemented generic guarded animation bindings and explicit audio input selection/connect/disconnect through MCP. Any discovered numeric control can use the existing audio bands or kick engine. Live status reports normalized input samples. Device label follows actual connected input. Source skill installed and checked. Independent review passed after the label fix.
+Source commit: 2abdee4b44a91a2abefb3cc4b37776daa5822a0a.
+Main agent activated the matching app, reopened the saved scene, connected exact authorized CABLE Output, and observed changing band samples and effective spikeHeight/glow. This is actual connected-input evidence from the main agent, not a CPU test result.

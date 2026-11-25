@@ -1,0 +1,14 @@
+{
+  "recordPath": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\0e5758e2-f34cb8d0\\installation.json",
+  "overlayRoot": "C:\\Users\\zFlei\\.codex\\worktrees\\mcp-audio-bindings\\lux",
+  "overlayCommit": "f52e6b9fb29316e9fc14a31c6a40f9988a939222",
+  "files": [
+    "apps/studio/src/audio/studio-audio-provider.d.mts",
+    "apps/studio/src/audio/studio-audio-provider.mjs",
+    "apps/studio/src/audio/studio-audio-runtime.ts",
+    "apps/studio/src/audio/test-rhythm.ts"
+  ],
+  "sourceDigest": "45ac958a0982632e3972f307f3854673c0df8e346f9a6e49868eae12e923f955",
+  "closedPid": 38048,
+  "refreshedAt": "2026-11-13T04:42:18.208Z"
+}

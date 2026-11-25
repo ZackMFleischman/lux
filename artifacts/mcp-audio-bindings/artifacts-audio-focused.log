@@ -1,0 +1,45 @@
+✔ local agent bridge requires token, rejects browser origins and deduplicates requests (383.7857ms)
+✔ local agent bridge forwards every authoring method and rejects unknown methods (203.9857ms)
+✔ local agent bridge admits a Scene v7 sized request envelope and rejects bytes above its request limit (5289.7475ms)
+✔ audio binding is a strict variant while the legacy LFO record stays exact (9.8157ms)
+✔ one scene audio configuration remains active and incompatible bindings stay disabled (1.0411ms)
+✔ audio attack and release use rendered frame time while manual base remains live (2.0063ms)
+✔ audio snapshots reject stale sequence and reset sequence on a newer generation (3.5242ms)
+✔ kick envelope uses rendered time, finite shapes, retrigger interval, and smooth disconnect release (15.7105ms)
+✔ paused, reset, and disabled kick bindings consume events without replay (6.923ms)
+✔ kick exponential envelope completes exactly and preserves audio configuration compatibility (7.9667ms)
+✔ explicit connect owns one capture while subscriptions only control sampling (27.8651ms)
+✔ a stale connect completion cleans its resources without publishing (0.9921ms)
+✔ track end publishes unavailable zero before idempotent owned cleanup (21.2899ms)
+✔ interrupted audio context publishes unavailable zero and requires a new connect (8.0045ms)
+✔ switching analyzer configuration closes the old capture before opening the new one (1.5251ms)
+✔ kick peak increments once and remains latched through weaker tail samples (1.0304ms)
+✔ runtime audio transport keeps one in-flight sample and one latest overwrite without publishing sampled state (29.8802ms)
+✔ Studio saves, reopens, edits and restarts nested composition instances while a failed rebuild retains them (32015.2436ms)
+✔ animation operation schema admits the empty scene path (14.1494ms)
+✔ variation operation schema accepts guarded per-instance settings (2.0484ms)
+✔ variation write reaches the worker and publishes inspectable runtime state (104.019ms)
+✔ animation operation schema accepts exact audio and kick bindings without widening legacy LFOs (6.2172ms)
+✔ manual and tap tempo acknowledge guarded writes and persist only BPM (56.998ms)
+✔ background build synchronizes the latest acknowledged BPM before promotion with fresh beat zero (68.503ms)
+✔ flat runtime keeps base controls while accepting guarded animation state and rejecting stale or forged targets (23.1105ms)
+✔ background build promotes only after the latest compatible controls and animation reach its candidate (103.9306ms)
+✔ edits acknowledged during compilation initialize the eventual candidate with the latest state (64.5107ms)
+✔ legacy runtime state preserves scene animation fields (2.1945ms)
+✔ MCP animation dispatch applies and removes audio on a numeric control with runtime guards (45.1156ms)
+✔ a deterministic control rejection restores desired state before the next edit (20.4432ms)
+✔ edits to one visual serialize until the first completion settles (29.5901ms)
+✔ restart remains reachable after the accepted host has failed (7.5478ms)
+✔ accepted scene remains readable during replacement and after a runtime failure (1.0045ms)
+✔ an admitted pending edit still accepts an older acknowledged telemetry frame (14.3596ms)
+✔ choosing another source does not dirty the scene, while editing an inactive source does (1.9069ms)
+✔ stdio adapter registers and dispatches the complete Studio build input (4213.2259ms)
+✔ MCP animation checks the running app capability before forwarding binding edits (3945.3875ms)
+ℹ tests 37
+ℹ suites 0
+ℹ pass 37
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 33968.907

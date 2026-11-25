@@ -1,0 +1,28 @@
+✔ fresh arm permits one exact audio request and active capture only satisfies checks (5.0563ms)
+✔ discovery arm permits exact audio enumeration checks without permitting capture (0.6579ms)
+✔ a timely accepted audio request can finish after the intent deadline without admitting a second request (1.0461ms)
+✔ first malformed main-window request consumes the arm and every foreign context is denied (0.5555ms)
+✔ arm expiry, navigation, renderer loss, and destruction revoke permission state (0.8119ms)
+✔ token-matched cancellation rejects stale activation (2.4345ms)
+✔ accepted requests still revoke before late completion on cancel, navigation, loss, or destruction (0.7849ms)
+✔ late unconsumed intent cannot capture and successful completion rechecks exact page identity (0.4912ms)
+✔ an admitted but unsettled capture has a separate bounded deadline (0.8448ms)
+✔ audio runtime discovers only input devices and always closes its discovery arm (4.0355ms)
+✔ audio runtime reports device changes and removes its listener (0.7456ms)
+✔ audio runtime reuses active capture permission for device refresh (5.8987ms)
+✔ audio runtime does not replace a pending capture arm during device refresh (14.0332ms)
+✔ audio runtime arms one request, activates its token, and revokes on disconnect (1.5517ms)
+✔ failed permission activation stops the acquired stream and cancels the exact arm (1.4589ms)
+✔ audio runtime fails closed when its context cannot enter running state (1.2555ms)
+✔ diagnostics persist bounded rotated records and exclude arbitrary request fields (342.8466ms)
+✔ diagnostic messages strip source frames, paths, credentials, long IDs and data payloads (7.2814ms)
+✔ diagnostic write failure stays observable and does not throw into the app (4.5237ms)
+✔ arbitrary child output cannot persist authored JSON payloads through native summaries (8.8193ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 859.691

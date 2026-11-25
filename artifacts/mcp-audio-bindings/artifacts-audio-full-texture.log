@@ -1,0 +1,14 @@
+file:///C:/Users/zFlei/.codex/worktrees/mcp-audio-bindings/lux/packages/assets/src/index.mjs:12
+  throw Object.assign(new Error(path === undefined ? message : `${message}: ${path}`), {
+                      ^
+
+Error: PNG: unsupported chunk caBX: assets/organic-skin.png
+    at fail (file:///C:/Users/zFlei/.codex/worktrees/mcp-audio-bindings/lux/packages/assets/src/index.mjs:12:23)
+    at admit (file:///C:/Users/zFlei/.codex/worktrees/mcp-audio-bindings/lux/packages/assets/src/index.mjs:153:21)
+    at deriveAssets (file:///C:/Users/zFlei/.codex/worktrees/mcp-audio-bindings/lux/packages/assets/src/index.mjs:187:45)
+    at file:///C:/Users/zFlei/.codex/worktrees/mcp-audio-bindings/lux/[eval1]:1:315 {
+  code: 'ASSET_BOUNDARY_VIOLATION',
+  path: 'assets/organic-skin.png'
+}
+
+Node.js v24.12.0

@@ -1,0 +1,22 @@
+[
+  "apps/studio/src/audio/audio-analysis.d.mts",
+  "apps/studio/src/audio/audio-analysis.mjs",
+  "apps/studio/src/audio/studio-audio-provider.d.mts",
+  "apps/studio/src/audio/studio-audio-provider.mjs",
+  "apps/studio/src/capabilities.ts",
+  "apps/studio/src/controls/worker-composition-state.mjs",
+  "apps/studio/src/main.ts",
+  "apps/studio/src/story/story-worker-generation.mjs",
+  "apps/studio/src/visual-worker.mjs",
+  "packages/runtime-contracts/src/audio-input.d.mts",
+  "packages/runtime-contracts/src/audio-input.mjs",
+  "packages/runtime-contracts/src/index.ts",
+  "packages/visual-sdk/src/discovery.mjs",
+  "packages/visual-sdk/src/index.ts",
+  "packages/visual-sdk/src/sdk-components.ts",
+  "packages/visual-sdk/src/sdk-composition.ts",
+  "packages/visual-sdk/src/sdk-v2.ts",
+  "scripts/studio-desktop.mjs",
+  "scripts/studio-diagnostics.mjs",
+  "scripts/studio-mcp.mjs"
+]

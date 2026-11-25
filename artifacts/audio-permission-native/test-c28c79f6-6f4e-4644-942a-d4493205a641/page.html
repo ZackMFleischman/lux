@@ -1,0 +1,3 @@
+<!doctype html><meta charset="utf-8"><script>
+(async()=>{try{for(let i=0;i<2;i++){const arm=await permissionTest.arm();const stream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});if(i===0){let denied=false;try{const extra=await navigator.mediaDevices.getUserMedia({audio:true,video:false});extra.getTracks().forEach(t=>t.stop());}catch{denied=true;}if(!denied)throw Error('parallel capture bypassed one-attempt admission');await new Promise(r=>setTimeout(r,6000));}if(!await permissionTest.activate(arm.token))throw Error('activation rejected');stream.getTracks().forEach(t=>t.stop());await permissionTest.revoke();}permissionTest.done({ok:true});}catch(error){permissionTest.done({ok:false,message:error.message});}})();
+</script>

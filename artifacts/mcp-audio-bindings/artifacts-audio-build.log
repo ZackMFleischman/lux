@@ -1,0 +1,81 @@
+
+  apps\studio\dist\main.cjs      972.7kb
+  apps\studio\dist\main.cjs.map    2.1mb
+
+Done in 211ms
+
+  apps\studio\dist\preload.cjs      5.9kb
+  apps\studio\dist\preload.cjs.map  9.2kb
+
+Done in 15ms
+
+  apps\studio\dist\renderer.js                            5.2mb
+  apps\studio\dist\assets\InterVariable-AM3KRH5U.woff2  344.0kb
+  apps\studio\dist\renderer.css                         175.2kb
+  apps\studio\dist\renderer.js.map                        9.6mb
+  apps\studio\dist\renderer.css.map                     267.1kb
+
+Done in 1468ms
+
+  apps\studio\dist\visual-worker.js      1.2mb
+  apps\studio\dist\visual-worker.js.map  2.4mb
+
+Done in 250ms
+
+  apps\studio\dist\source-admission-worker.js      195.8kb
+  apps\studio\dist\source-admission-worker.js.map  455.0kb
+
+Done in 131ms
+
+  apps\studio\dist\image-preview-worker.js      192.9kb
+  apps\studio\dist\image-preview-worker.js.map  453.3kb
+
+Done in 144ms
+
+  apps\studio\dist\story-asset-decoder-worker.js      190.2kb
+  apps\studio\dist\story-asset-decoder-worker.js.map  437.2kb
+
+Done in 124ms
+
+  apps\studio\dist\view.test.cjs        3.7mb
+  apps\studio\dist\view.test.css      119.6kb
+  apps\studio\dist\view.test.cjs.map    6.5mb
+  apps\studio\dist\view.test.css.map  184.7kb
+
+Done in 1466ms
+
+  apps\studio\dist\interactions.test.mjs      393.6kb
+  apps\studio\dist\interactions.test.css      119.6kb
+  apps\studio\dist\interactions.test.mjs.map  893.4kb
+  apps\studio\dist\interactions.test.css.map  184.7kb
+
+Done in 105ms
+
+  apps\studio\dist\source-editor.test.mjs      829.9kb
+  apps\studio\dist\source-editor.test.css      119.6kb
+  apps\studio\dist\source-editor.test.mjs.map    1.5mb
+  apps\studio\dist\source-editor.test.css.map  184.7kb
+
+Done in 130ms
+
+  apps\studio\dist\library-panel.test.mjs      18.4kb
+  apps\studio\dist\library-panel.test.mjs.map  26.4kb
+
+Done in 32ms
+
+  apps\studio\dist\dock-shell.test.mjs      462.4kb
+  apps\studio\dist\dock-shell.test.css      119.6kb
+  apps\studio\dist\dock-shell.test.mjs.map  941.6kb
+  apps\studio\dist\dock-shell.test.css.map  184.7kb
+
+Done in 107ms
+
+  apps\studio\dist\preview-capture-menu.test.mjs      15.0kb
+  apps\studio\dist\preview-capture-menu.test.mjs.map  25.3kb
+
+Done in 119ms
+
+  apps\studio\dist\soundtrack-control.test.mjs       32.3kb
+  apps\studio\dist\soundtrack-control.test.mjs.map  115.5kb
+
+Done in 61ms

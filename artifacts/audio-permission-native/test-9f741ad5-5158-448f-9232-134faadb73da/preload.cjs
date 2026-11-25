@@ -1,0 +1,1 @@
+const {contextBridge,ipcRenderer}=require('electron');contextBridge.exposeInMainWorld('permissionTest',{arm:()=>ipcRenderer.invoke('test-arm'),activate:token=>ipcRenderer.invoke('test-activate',token),revoke:()=>ipcRenderer.invoke('test-revoke'),done:value=>ipcRenderer.send('test-done',value)});
