@@ -1,0 +1,13 @@
+{
+  "commit": "fc2c9bd2",
+  "criteria": "Accepted with one correction to stale explanatory submission text: routine isolated low-resolution functional QA may run concurrently after current resource checks; CPU work does not wait. An exclusive window is permitted only for an observed resource conflict or an uncontended performance measurement. The canonical shared-resource handoff preserves unique grant IDs, cancellation acknowledgement, owned cleanup, explicit release, and rejection of stale grants. Lux adds no scheduler or global GPU lock. Historical blanket-serialization language remains marked superseded.",
+  "evidence": "Independent fresh validator context codex-task:/root/policy_review_218, identity c1c279f7-b18d-4a9e-89d7-bdb8afdb0f98, session 8df79beb-d557-43b0-b936-69f6b9981544. Inspected landed Lux commit fc2c9bd2 and candidate 3653e7213a3234fe32b856ab1141f6fd39556922; git diff --check passed for the landed Lux commit. Inspected canonical main e717f25124e02e8b31f167cc5e9d7f0b94ccefa1 and its zero-edit setup verification in artifacts/easywin-delivery/conductor-setup-{apply,check}.json. artifacts/lux218-summary.md and artifacts/lux218-qa.md correct the stale submitted phrase; the ticket's original submitted summary and QA retain the historical 'heavy full-resolution work' phrase and are not accepted as current policy.",
+  "context_id": "codex-task:/root/policy_review_218",
+  "checks": {
+    "landed_lux_policy_source": "pass",
+    "lux_diff_check": "pass",
+    "canonical_handoff_review": "pass",
+    "installed_setup_zero_edit_check": "pass",
+    "stale_submission_policy_corrected": "pass"
+  }
+}
