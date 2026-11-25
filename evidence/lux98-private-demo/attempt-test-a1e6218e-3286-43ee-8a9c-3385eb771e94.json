@@ -1,0 +1,14 @@
+{
+  "sourceCommit": "c574a354df7ec0bffb7745951814a42f73cdf650",
+  "profile": "test-a1e6218e-3286-43ee-8a9c-3385eb771e94",
+  "checks": [],
+  "pid": 16196,
+  "console": [
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools\nYou might need to use a local HTTP server (instead of file://): https://react.dev/link/react-devtools-faq font-weight:bold"
+    }
+  ],
+  "error": "locator.hover: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('Mirror segments', { exact: true }).first()\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-help\\evidence\\lux98-private-demo.mjs:56:15",
+  "cleanedUp": true
+}

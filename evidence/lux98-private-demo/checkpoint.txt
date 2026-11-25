@@ -1,0 +1,17 @@
+Source commit: c574a354df7ec0bffb7745951814a42f73cdf650
+
+Completed source behavior:
+- Optional control descriptions validate and remain in the control schema.
+- Exposed component controls reuse their existing component descriptions.
+- Inspector help is available on hover and keyboard focus only when a description exists.
+
+Completed checks:
+- Studio interaction tests: 19 passing, including hover, focus, readable tooltip, and absent empty help.
+- Prismatic composition fixture: passing; all exposed descriptions match their component metadata.
+- TypeScript: tsc --noEmit passing.
+
+Private Studio demonstration:
+- First fresh test profile stopped before build because its adapter discovery reports SDK 0.2. This is adapter metadata, not a running-app version handshake.
+- Second fresh test profile accepted discovery compatibility but `lux.studio.build` returned: Visual initialization stopped making progress.
+- Each Playwright-owned Electron process exited in finally. No user creative profile or scene was selected or changed.
+- The required actual hover/focus screenshots cannot be claimed until the private composition build initializes.
