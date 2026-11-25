@@ -1,0 +1,10 @@
+import fs from 'node:fs';import path from 'node:path';import {fileURLToPath,pathToFileURL} from 'node:url';
+const out=path.dirname(fileURLToPath(import.meta.url)),c=JSON.parse(fs.readFileSync(path.join(out,'configuration.json')));
+if(!process.argv[2])throw Error('Pass fresh independently authorized review JSON');
+const reviewFile=path.resolve(process.argv[2]),review=JSON.parse(fs.readFileSync(reviewFile));
+if(review.executable!==c.executable||JSON.stringify(review.args)!==JSON.stringify([c.entry]))throw Error('Review target mismatch');
+if(fs.existsSync(path.join(out,'last-experiment.json')))throw Error('Refusing reused experiment evidence');
+for(const name of Object.keys(process.env))if(name.startsWith('LUX_')||['NODE_OPTIONS','NODE_PATH','ELECTRON_RUN_AS_NODE'].includes(name))delete process.env[name];
+const {runExperiment,experimentSummary}=await import(pathToFileURL(path.join(c.root,'scripts/experiment-runner.mjs')));
+const result=await runExperiment({mode:'hardware',reviewFile,timeoutMs:30000,output:path.join(out,'experiments')});
+fs.writeFileSync(path.join(out,'last-experiment.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(experimentSummary(result),null,2));process.exitCode=result.outcome==='success'?0:1;

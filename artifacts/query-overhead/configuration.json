@@ -1,0 +1,8 @@
+{
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\query-overhead-probe",
+  "out": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\query-overhead-probe\\artifacts\\query-overhead",
+  "executable": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\query-overhead-probe\\node_modules\\electron\\dist\\electron.exe",
+  "entry": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\query-overhead-probe\\tools\\gpu-spike\\query-overhead\\main.cjs",
+  "timeoutMs": 30000,
+  "commit": "4263b3b48451c3c0c0e723aa3e1e6b6d009f30ff"
+}

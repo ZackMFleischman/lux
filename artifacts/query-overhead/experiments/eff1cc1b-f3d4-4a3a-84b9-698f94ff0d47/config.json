@@ -1,0 +1,7 @@
+{
+  "executable": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\query-overhead-probe\\node_modules\\electron\\dist\\electron.exe",
+  "commandLine": "\"C:\\Users\\zFlei\\repos\\lux\\.worktrees\\query-overhead-probe\\node_modules\\electron\\dist\\electron.exe\" \"C:\\Users\\zFlei\\repos\\lux\\.worktrees\\query-overhead-probe\\tools\\gpu-spike\\query-overhead\\main.cjs\"",
+  "cwd": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\query-overhead-probe",
+  "directory": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\query-overhead-probe\\artifacts\\query-overhead\\experiments\\eff1cc1b-f3d4-4a3a-84b9-698f94ff0d47",
+  "timeoutMs": 30000
+}
