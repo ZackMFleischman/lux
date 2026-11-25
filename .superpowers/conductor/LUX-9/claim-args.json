@@ -1,0 +1,14 @@
+[
+  "--home",
+  "C:/Users/zFlei/AppData/Local/Conductor",
+  "ticket",
+  "claim",
+  "LUX-9",
+  "--session",
+  "44758989-a80f-4dc0-abbd-e0e5663a7961",
+  "--expect-revision",
+  "2",
+  "--request",
+  "lux9-inputs-claim-01a09967",
+  "--json"
+]

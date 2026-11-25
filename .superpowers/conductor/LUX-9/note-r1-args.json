@@ -1,0 +1,16 @@
+[
+  "--home",
+  "C:/Users/zFlei/AppData/Local/Conductor",
+  "ticket",
+  "note",
+  "LUX-9",
+  "--session",
+  "44758989-a80f-4dc0-abbd-e0e5663a7961",
+  "--claim",
+  "54b7db36-7a19-468b-a353-773698fa7238",
+  "--body-file",
+  ".superpowers/conductor/LUX-9/progress.md",
+  "--request",
+  "lux9-plan-r1-note-01a09967",
+  "--json"
+]

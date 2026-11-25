@@ -1,0 +1,38 @@
+[
+  {
+    "link": "../requirements.md",
+    "exists": true
+  },
+  {
+    "link": "roadmap.md",
+    "exists": true
+  },
+  {
+    "link": "../design/runtime.md#clock-scheduling-and-bounds",
+    "exists": true
+  },
+  {
+    "link": "../design/studio.md#inputs-source-analysis-mapping",
+    "exists": true
+  },
+  {
+    "link": "../design/project-model.md",
+    "exists": true
+  },
+  {
+    "link": "../design/components.md",
+    "exists": true
+  },
+  {
+    "link": "../design/filesystem-projects.md",
+    "exists": true
+  },
+  {
+    "link": "../design/filesystem-projects.md",
+    "exists": true
+  },
+  {
+    "link": "tracer-acceptance.md",
+    "exists": true
+  }
+]

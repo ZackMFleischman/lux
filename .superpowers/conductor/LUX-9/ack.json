@@ -1,0 +1,11 @@
+{
+  "challenge_generation": 1,
+  "role": "worker",
+  "host_id": "/root/inputs_plan",
+  "launch_id": "6de369eb-0810-4940-828f-dde94d182578",
+  "skill_version": "layers-v1",
+  "agent_id": "56977963-bf35-43e6-ac08-31287fb5a84c",
+  "epoch": 1,
+  "checkpoint": "Fresh LUX-9 planning worker at f95f397 in exact creative-inputs-plan worktree; no implementation/GPU/merge/push; read root ownership reservations.",
+  "scope": "Advance four authorized Lux roadmap workstreams; retain existing ordinary coordinator for filesystem/components and manage fresh planning, implementation, review and validation contexts for creative controls/inputs and reliability. Coordinate all shared-file integrations and serialized graphics."
+}

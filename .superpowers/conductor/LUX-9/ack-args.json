@@ -1,0 +1,14 @@
+[
+  "--home",
+  "C:/Users/zFlei/AppData/Local/Conductor",
+  "team",
+  "ack",
+  "345554f0-0896-4ea2-8fb4-942317f65fda",
+  "--session",
+  "44758989-a80f-4dc0-abbd-e0e5663a7961",
+  "--body-file",
+  ".superpowers/conductor/LUX-9/ack.json",
+  "--request",
+  "lux9-inputs-ack-01a09967",
+  "--json"
+]

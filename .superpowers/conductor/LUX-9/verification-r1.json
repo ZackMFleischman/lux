@@ -1,0 +1,13 @@
+{
+  "nodeVersion": "v24.12.0",
+  "host": "/root/inputs_plan",
+  "executor": "56977963-bf35-43e6-ac08-31287fb5a84c",
+  "session": "44758989-a80f-4dc0-abbd-e0e5663a7961",
+  "status": "?? .superpowers/",
+  "checkExit": 0,
+  "planSha256": "33B7AF89D51C8F607230D82B664C2F721EB36379B184FC5AD55E75B5ACBF08A5",
+  "changedFiles": "docs/implementation/creative-inputs-plan.md",
+  "note": "Documentation-only source validation; no application or hardware tests executed.",
+  "checkOutput": null,
+  "head": "61305e081ac3e9bba91055b93ec63912d43a718b"
+}

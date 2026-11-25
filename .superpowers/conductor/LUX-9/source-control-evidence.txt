@@ -1,0 +1,5 @@
+apps/studio/src/visual-worker.mjs:36:    deltaSeconds: Math.max(0, time.timeSeconds - lastTime), controls: controlState.values(), events: freeze([]) }));
+apps/studio/src/visual-worker.mjs:129:      controlState.apply(message.values,message.controlSequence,message.controlSchemaHash);
+packages/visual-sdk/src/sdk-v2.ts:15:  readonly controls: ControlsOf<C>; readonly events: readonly never[];
+apps/studio/src/controls/worker-control-state.mjs:47:    apply(input,nextSequence,hash){
+apps/studio/src/controls/worker-control-state.mjs:51:    state:()=>({sdkVersion,controlSchemaHash:schemaHash,controls:values,controlSequence:sequence,...(sdkVersion==='0.1.0'?{intensity:values.intensity}:{})}),

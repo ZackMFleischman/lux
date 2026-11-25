@@ -1,0 +1,15 @@
+[
+  "--home",
+  "C:/Users/zFlei/AppData/Local/Conductor",
+  "problem",
+  "add",
+  "--ticket",
+  "LUX-9",
+  "--session",
+  "44758989-a80f-4dc0-abbd-e0e5663a7961",
+  "--body-file",
+  ".superpowers/conductor/LUX-9/problem-source-inventory.json",
+  "--request",
+  "lux9-source-inventory-problem-01a09967",
+  "--json"
+]

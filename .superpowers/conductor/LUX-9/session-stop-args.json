@@ -1,0 +1,11 @@
+[
+  "--home",
+  "C:/Users/zFlei/AppData/Local/Conductor",
+  "session",
+  "stop",
+  "--session",
+  "44758989-a80f-4dc0-abbd-e0e5663a7961",
+  "--request",
+  "lux9-session-stop-01a09967",
+  "--json"
+]

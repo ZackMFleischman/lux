@@ -1,0 +1,70 @@
+[
+  {
+    "sha256": "2EDE11224B0E951B9525A877C4386CBC17EEEC10085B7D7E136D8FA6FE58B340",
+    "path": "docs/design/runtime.md"
+  },
+  {
+    "sha256": "561D651C4C1806DFDA5169B49D6D3A28E620F08E6158638E981E478262C868BC",
+    "path": "docs/design/studio.md"
+  },
+  {
+    "sha256": "C60333F140043033FFC65450C373D52BB904914688DF0AAB7B54E51DD1B7FD12",
+    "path": "docs/design/project-model.md"
+  },
+  {
+    "sha256": "B90348CE7A5E77AB9895993950200E775EEFD1F08CEBB5FDED54CEC31C64B23C",
+    "path": "docs/design/components.md"
+  },
+  {
+    "sha256": "BC8C9633470A80AF97953F2D6999618681DCE2F2966E5F097F24A981CD16D5C0",
+    "path": "docs/design/filesystem-projects.md"
+  },
+  {
+    "sha256": "99F2B3631B797A38FE269D18EAD87D84F39F1DDE58F22AC0BD4D921DB43C0319",
+    "path": "docs/implementation/roadmap.md"
+  },
+  {
+    "sha256": "F1A5A2BAC44C1BA72899F5B210727C63E39EA36943D08B0CF31A8049B41428E2",
+    "path": "packages/runtime-contracts/src/parameters.mjs"
+  },
+  {
+    "sha256": "3F002921CD0CC2BD65F3D25303BC57D8F40EFD0EAA03DE1427DDD6D86E03FD48",
+    "path": "packages/runtime-contracts/src/parameters.d.mts"
+  },
+  {
+    "sha256": "6D479F280332514E076D7B3A15BDCAE81DC8BA02535FDBBA87FBC53A0216DC6E",
+    "path": "packages/runtime-contracts/src/index.ts"
+  },
+  {
+    "sha256": "AA940865AFEBDDAD8A02429DE553623C5D57FD2A28EF51B022C3552413ACBADD",
+    "path": "packages/runtime/src/clock.ts"
+  },
+  {
+    "sha256": "34DF2E7233011F8D291E5DA7804987681906B2C0339C568350E39315582A14BA",
+    "path": "packages/visual-sdk/src/sdk-v2.ts"
+  },
+  {
+    "sha256": "F4BADB8E39A4F150C9295CF42627D244DE9753D6C4732A685C7FE75FA8D1842A",
+    "path": "apps/studio/src/controls/control-state.ts"
+  },
+  {
+    "sha256": "BDDEDAEDF3DCBAADAF8ADB316D12565C38910A540E55B31C53F1B40BF6E78B92",
+    "path": "apps/studio/src/controls/worker-control-state.mjs"
+  },
+  {
+    "sha256": "3DC9EE34F0C0C2BDD8C15865FED45CF2CE41BFA9E85FBAA583BB0A41C02651A1",
+    "path": "apps/studio/src/visual-worker.mjs"
+  },
+  {
+    "sha256": "784930DFC6C1A67FD4B202663BFB00FDC5B33903C566466102188B770747E35A",
+    "path": "packages/core/src/project/contracts.ts"
+  },
+  {
+    "sha256": "636EF384D0A62D165066926B9DC1C68B8BFCC8F14841649429AE31E4442B1094",
+    "path": "packages/core/src/scene-document.ts"
+  },
+  {
+    "sha256": "33FE84F38A98D45C2738CAE5A5A206E1EE9F51742159EB55BCF0F63E6F777AC1",
+    "path": "native/texture-bridge/include/host_control_snapshot_v4.h"
+  }
+]

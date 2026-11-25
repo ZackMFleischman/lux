@@ -1,0 +1,12 @@
+# LUX-9 evidence draft
+
+Stable executor56977963-bf35-43e6-ac08-31287fb5a84c, host/root/inputs_plan, session44758989-a80f-4dc0-abbd-e0e5663a7961, claim54b7db36-7a19-468b-a353-773698fa7238. Exact checkout C:/Users/zFlei/repos/lux/.worktrees/creative-inputs-plan; branch codex/creative-inputs-plan; initial SHA f95f3975892bf612bb63b94111893b18b84fff20; r1 source61305e081ac3e9bba91055b93ec63912d43a718b. Ticket specification2 unchanged.
+
+1. Requirement scope/current code: plan Current-code evidence table and source-hashes.json cover runtime, Studio, project/component/filesystem sources. source-control-evidence.txt proves current events remain empty and monotonic numeric control application. Plan baseline explicitly distinguishes current from proposed; source inventory error/correction preserved as LUX-P3.
+2. Whole-lane ordering: plan I01-I09 table covers T11,S02,S03,S04,U09; final self-review gives requirement-to-slice trace. Actual implementation is not claimed.
+3. Independent first patch: I01 reserves four new files only; interface/types/formulas/A1-A6 and seven execution steps prescribe CPU tests and parameter regression coverage without C02/native/persistence changes. Root shared-file exclusions read from main docs/conductor-orchestration.md.
+4. Shared interfaces/evidence: plan timing/authority/replay and persistence/component handshake sections retain generation/epoch, structured node UUID targets, public host alias resolution, optional intensity, physical-root session scope and saved/live distinction. Validation table specifies exact setup/method/expectation/executor/artifacts by stage; future hardware requirements explicitly outstanding.
+5. Doc verification: plan-link-check.json shows9/9 relative file links exist; actual runtime/Studio heading anchors inspected. verification-r1.json records pinned Node v24.12.0, source commit/digest, one changed plan file and git show --check exit0. No application code tests, devices, graphics, merge or push performed.
+6. Review: independent critique/disposition not yet available in this draft. This draft cannot support a claim that plan critique is complete.
+
+Startup corrections CON-24/LUX-P1/READ-P9/CON-P38 matched this host/resource and were applied as recorded in progress.md. Conductor mutation args/payload/result files preserve logical request IDs; no global Git trust was changed. LUX-P6 records default staging permission failure and successful escalated shared Git metadata operation, not remote authority.
