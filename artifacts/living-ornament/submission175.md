@@ -1,0 +1,1 @@
+Added five tiny companion birds in a pair/triplet, with helical ribbon flight, depth occlusion, independent wings, smooth shape perches and continuous speed controls. New Companion Birds scene is saved and playing; prior Finished scene and published renderer remain preserved.

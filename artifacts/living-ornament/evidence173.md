@@ -1,0 +1,1 @@
+artifacts/living-ornament/milestone173-delivery.md; lux-173-independent-review.md; milestone173-publication.json; milestone173-qa-2026-09-16T11-35-04-890Z-c4b4915b/result.json. Installed persistent desktop43119807; source/controls/time and actual PNGs committed.

@@ -1,0 +1,11 @@
+{
+  "label": "pattern-milestone-first",
+  "profile": "test-0a240ac2-7e5c-4bb4-b37c-a8b9225dd10b",
+  "seconds": 18,
+  "testOnly": "Frozen time; controls and shader code otherwise unchanged",
+  "captures": [],
+  "ok": false,
+  "pid": 35524,
+  "error": "Error: ornament-renderer.ts:64:1 controlDescriptions: expected exactly one description per control\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/living-ornament/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/living-ornament/scripts/inspect-ornament.mjs:25:49",
+  "exitCode": 0
+}

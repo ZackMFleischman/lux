@@ -1,0 +1,10 @@
+{
+  "commit": "91dead39144be4112cc1fd2f79d34b53eaf02f40",
+  "criteria": "Accepted LUX-175 at its current specification: Living Ornament adds five small companion birds in two coordinated flocks. They follow the existing moving ribbon paths, orbit in front of and behind ribbon fill and ink, and make bounded visits to animated shape contours. The subjects keep readable silhouettes, stable alpha edges, continuous facing and speed changes, and expose live size, speed, orbit, and visit controls. The existing eleven-node graph and ten links remain intact, the prior finished scene is preserved, the companion scene renders at the target frame rate, saves and reopens, restores normal playback without a fault, and the reviewed source is committed and landed.",
+  "evidence": "Independent source, lifecycle, control, motion, occlusion, alpha, and artistic review: artifacts/living-ornament/lux-175-independent-review.md. Full-cycle installed-app QA: artifacts/living-ornament/birds-1789574954078/result.json and flight-6/15/25/32/40.png; five checkpoints covered both flocks, front/back ribbon orbit, entry/exit, and perching, while 20.02 seconds ran at 60.785 observed FPS at 1920x1080, save/reopen succeeded, playback returned playing, and fault was null. Final-source targeted QA: artifacts/living-ornament/birds-1789575134015/result.json and PNGs; speed 0x and 2x retained stable positions/headings and clean edges, 20.06 seconds ran at 61.501 observed FPS, the ten-link scene saved and reopened, playback returned playing, and fault was null. Submitted source commit 91dead39144be4112cc1fd2f79d34b53eaf02f40. The delivery coordinator confirmed main b838d0e87b4295d5a7d8a1677d0cdfae9f85ff89 contained the reviewed source with only a trailing EOF blank removed from the helper, a semantic-empty source comparison and clean diff check, no Library changes, and live PID 8600 untouched. Final main 583a3676c2b7a174640d78c9810b82dcf131c085 additionally contains evidence-only review commit 2b9a06a10be33037039dd55248aeaa5df07cf01c.",
+  "context_id": "codex-01a0a5cb-lux175-final-independent-review",
+  "checks": {
+    "unit": "pass",
+    "integration": "pass"
+  }
+}

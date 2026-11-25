@@ -1,0 +1,1 @@
+Live installed desktop43119807; artifacts/living-ornament/milestone172-qa-2026-09-16T11-15-55-536Z-5679f7bb/result.json; lux-172-independent-review.md; milestone172-publication.json. All sources and evidence committed08bebbb329c196542bf21c9a687340ce522eb672.

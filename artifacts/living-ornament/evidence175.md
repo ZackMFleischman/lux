@@ -1,0 +1,1 @@
+See artifacts/living-ornament/birds-delivery.md and lux-175-independent-review.md. Polished full-cycle birds-1789574954078/result.json measured60.79FPS1080p. Final exact-source birds-1789575134015/result.json passed,61.50FPS sample, speed0/2, flight/perch screenshots and exactsource/tenlink save/reopen. Actual usercontrols preserved.

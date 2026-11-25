@@ -1,0 +1,12 @@
+{
+  "beforePath": "C:/Users/zFlei/repos/lux/.worktrees/tracer-components/artifacts/painting-extractions/baseline-42/frame.png",
+  "afterPath": "artifacts/painting-extractions/ornament-legacy-42/frame.png",
+  "width": 1920,
+  "height": 1080,
+  "channels": 4,
+  "maxChannelDifference": 0,
+  "meanChannelDifference": 0,
+  "changedChannels": 0,
+  "channelsBeyondOneLevel": 0,
+  "exactMatch": true
+}

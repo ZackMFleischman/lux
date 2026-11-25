@@ -1,0 +1,1 @@
+See artifacts/living-ornament/milestone174-delivery.md, lux-174-independent-review.md, milestone174-publication.json and both milestone174-qa result folders. Final normal playback measured 60.40 FPS at 1920x1080. Save/reopen and invalid-edit retention were exact.

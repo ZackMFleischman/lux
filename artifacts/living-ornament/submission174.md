@@ -1,0 +1,1 @@
+Living Ornament now grows curved region divisions, distinct inherited daughter styles and a visible violet island. Activity is adjustable; eleven reusable Library components are linked and the finished scene is saved.

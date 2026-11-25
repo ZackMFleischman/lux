@@ -1,0 +1,3 @@
+- User requests a fast integrated visual and milestone-end QA (LUX-P113).
+- Extend the current F16 scene prototype with six local pattern helpers in the existing renderer; defer separate reusable pattern-node extraction and publication to LUX-172.
+- Preserve existing Library revisions. Finish one combined visual/FPS/save check after the pattern visual is working, not per helper.

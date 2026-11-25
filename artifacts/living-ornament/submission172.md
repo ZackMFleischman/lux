@@ -1,0 +1,1 @@
+Six independent pattern fields published and linked in a saved eleven-node scene. Exact prototype pixel parity, about60FPS, save/reopen and invalid-edit retention passed. Reviewed source08bebbb329c196542bf21c9a687340ce522eb672. See milestone172-delivery.md and publication receipt. Main integration pending coordinator.

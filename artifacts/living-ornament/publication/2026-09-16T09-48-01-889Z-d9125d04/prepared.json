@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "prepared": true,
+  "runId": "2026-09-16T09-48-01-889Z-d9125d04",
+  "output": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\living-ornament\\artifacts\\living-ornament\\publication\\2026-09-16T09-48-01-889Z-d9125d04",
+  "label": "Batch 1",
+  "sourceCommit": "17f1f3b951c4325c3df7fea4fe3e4ddb187494ce",
+  "sourceSha256": "a61a3cfce700da6d4dbe6ec6480a5b7f4160f044dc31b378351f3446a995fa8e",
+  "parts": [],
+  "checks": [],
+  "errors": [],
+  "provenance": "Isolated test-profile Studio and matching adapter. Scripted Playwright inspection; no native-input provenance claim."
+}

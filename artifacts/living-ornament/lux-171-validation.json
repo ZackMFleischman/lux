@@ -1,0 +1,10 @@
+{
+  "commit": "8c36efff65a60732301b8d84e00fd313e7a3ee7e",
+  "criteria": "Accepted LUX-171 at specification revision 3: the five-node Living Ornament preserves exact legacy painting outputs while adding explicit ornament ABIs; provides varied lobes, corridors, bays, nesting, fitted boundaries, watercolor/ink treatment, grouped controls, stable attached motif coordinates, calm and intricate areas, and an integrated six-family prototype; publishes compatible provider and renderer Library entries; saves and reopens the linked scene; preserves the last working preview after an invalid edit; commits and lands the reviewed source.",
+  "evidence": "Independent source, ABI, resource-lifetime, art, UI, and final-delta review: artifacts/living-ornament/lux-171-independent-review.md and artifacts/living-ornament/pattern-milestone-review.md. Three-seed and detail captures: artifacts/living-ornament/batch1-reviewed and pattern-milestone-final. Final live visual after localized refinements: artifacts/living-ornament/live-1789555593106.png; runtime playing with fault null. Legacy preservation: legacy-18-comparison.json and legacy-42-comparison.json, both exact 1920x1080 RGBA with zero changed channels. Performance and interaction QA: pattern-milestone-performance/result.json, 59.92 observed FPS at 1080p, 58.43 minimum interval FPS, maximum interval GPU p95 4.52 ms, no fault; linked save/reopen and invalid-edit pixels exact. Publication/readback: live-foundation-publication.json and live-renderer-publication.json, including renderer 0b92b112-f315-4479-9331-7a815deec27e. Submitted source commit 8c36efff65a60732301b8d84e00fd313e7a3ee7e. Delivery coordinator confirmed main landing 167554da43b0b8472738aa21a8d4deea154240d9 with all 28 Library files hash-identical to the reviewed commit and unrelated files preserved.",
+  "context_id": "codex-01a0a5cb-lux171-final-independent-review",
+  "checks": {
+    "unit": "pass",
+    "integration": "pass"
+  }
+}
