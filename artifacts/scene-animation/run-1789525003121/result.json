@@ -1,0 +1,13 @@
+{
+  "ok": true,
+  "profile": "test-4f776ffe-a382-4e76-8522-6378d3046b1a",
+  "source": "0ae299d6671a7687e41811f95d9c673d4c3a378d",
+  "checks": [
+    "Flat SDK 0.2 scene animation changes effective output while preserving base",
+    "Save/reopen retains animation; invalid edit preserves working runtime and animation",
+    "Composition Scene alias still animates its canonical component control"
+  ],
+  "errors": [],
+  "pid": 26804,
+  "exitCode": 0
+}

@@ -1,0 +1,16 @@
+{
+  "ok": false,
+  "profile": "test-450405fa-3222-4ff7-9ccf-af243995a09f",
+  "source": "9e5ee83580f85194300a419b0ae47b35313f73e0",
+  "checks": [
+    "Flat SDK 0.2 scene animation changes effective output while preserving base",
+    "Save/reopen retains animation; invalid edit preserves working runtime and animation"
+  ],
+  "errors": [
+    "Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. React limits the number of nested updates to prevent infinite loops.",
+    "Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. React limits the number of nested updates to prevent infinite loops."
+  ],
+  "pid": 25440,
+  "failure": "locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Animate Intensity', exact: true })\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\creative-feedback\\scripts\\test-scene-control-animation.mjs:61:72",
+  "exitCode": 0
+}

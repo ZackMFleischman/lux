@@ -1,0 +1,10 @@
+{
+  "commit": "0ae299d6671a7687e41811f95d9c673d4c3a378d",
+  "criteria": "PASS. The same Inspector animation editor now controls SDK 0.1 and 0.2 scene controls, SDK 0.4 Scene aliases resolved to canonical leaves, and selected component controls. Base values and reset remain independent. Animation bindings, playback semantics, scene save/reopen, Look paths, invalid-build preservation, schema incompatibility, stale responses, and forged equal-sequence acknowledgements are covered. The actual app demonstrates a flat SDK 0.2 scene and an SDK 0.4 component alias. The shipped authoring skill is updated, installed, and current.",
+  "evidence": "Independent validator context 01a0a7bb-ee60-76f1-bcd6-5d179614f551 reviewed the full 9e5ee83580f85194300a419b0ae47b35313f73e0..0ae299d6671a7687e41811f95d9c673d4c3a378d source and tests. Routing: GPT-5.6 Sol high for the runtime, persistence, and ownership boundary. Review found an equal-sequence binding substitution defect; the final commit requires exact current bindings for repeated sequences and exact pending request, sequence, and bindings for advances. Independent final commands passed: 18/18 focused scene/runtime/composition/parameter/renderer tests; apps/studio TypeScript; root TypeScript. Root full Studio CPU log is artifacts/lux136-cpu.log. Exact-source native result artifacts/scene-animation/run-1789525003121/result.json reports source 0ae299d6671a7687e41811f95d9c673d4c3a378d, private profile test-4f776ffe-a382-4e76-8522-6378d3046b1a, PID 26804, exitCode 0, errors empty. It verifies flat animation with unchanged base, save/reopen, invalid-edit preservation, and canonical SDK 0.4 alias animation. Independent visual review of scene-animation.png and component-animation.png found clear hierarchy, readable values and ranges, keyboard-reachable controls, and usable narrow Inspector layout. artifacts/lux136-handoff/skill-check.json reports current true with no missing, changed, or unexpected files.",
+  "context_id": "01a0a7bb-ee60-76f1-bcd6-5d179614f551/review_scene_animation",
+  "checks": {
+    "unit": "pass",
+    "integration": "pass"
+  }
+}

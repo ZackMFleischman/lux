@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "profile": "test-737a3b5d-f755-43df-bca1-2fda84c76c32",
+  "source": "9e5ee83580f85194300a419b0ae47b35313f73e0",
+  "checks": [],
+  "errors": [],
+  "pid": 28096,
+  "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/creative-feedback/scripts/test-scene-control-animation.mjs:35:10\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)",
+  "exitCode": 0
+}
