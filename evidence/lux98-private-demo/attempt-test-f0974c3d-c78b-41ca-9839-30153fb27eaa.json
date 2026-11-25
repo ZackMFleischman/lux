@@ -1,0 +1,9 @@
+{
+  "sourceCommit": "a9e86e78f82d6af6edecaab7386410be695c67f4",
+  "profile": "test-f0974c3d-c78b-41ca-9839-30153fb27eaa",
+  "workspace": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-help-final",
+  "checks": [],
+  "pid": 36696,
+  "error": "AssertionError [ERR_ASSERTION]: endpoint belongs to this invocation checkout\n+ actual - expected\n\n+ 'c:\\\\users\\\\zflei\\\\repos\\\\lux\\\\.worktrees\\\\control-help-final'\n- 'C:\\\\Users\\\\zFlei\\\\repos\\\\lux\\\\.worktrees\\\\control-help-final'\n\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/control-help-final/evidence/lux98-private-demo.mjs:38:10",
+  "cleanedUp": true
+}

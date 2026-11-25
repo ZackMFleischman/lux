@@ -1,0 +1,14 @@
+{
+  "sourceCommit": "2646d5963ce3ea34b4336073b0a46cf7430961a5",
+  "profile": "test-7708303f-0c60-4212-afac-8add32144686",
+  "checks": [],
+  "pid": 11524,
+  "console": [
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools\nYou might need to use a local HTTP server (instead of file://): https://react.dev/link/react-devtools-faq font-weight:bold"
+    }
+  ],
+  "error": "locator.waitFor: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('tooltip', { name: 'Sets the number of independently mirrored wedges.' }) to be visible\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-help\\evidence\\lux98-private-demo.mjs:67:98",
+  "cleanedUp": true
+}

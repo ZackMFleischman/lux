@@ -1,0 +1,7 @@
+{
+  "summary": "LUX98 private QA harness compared the same Windows checkout path case-sensitively",
+  "expected": "The unique test endpoint must identify the exact invocation checkout before Studio build.",
+  "actual": "The first combined-candidate run returned the exact checkout in lowercase. The harness compared it to the mixed-case resolved checkout and stopped with an assertion before build. Owned PID 36696 was confirmed absent after cleanup.",
+  "correction": "Compare resolved Windows checkout paths case-insensitively while retaining exact endpoint PID, profile, source commit and tracked-clean assertions. Preserve attempt-test-f0974c3d-c78b-41ca-9839-30153fb27eaa.json and retry under a fresh unique test profile.",
+  "evidence": "C:/Users/zFlei/repos/lux/.worktrees/control-help-final/evidence/lux98-private-demo/attempt-test-f0974c3d-c78b-41ca-9839-30153fb27eaa.json; source a9e86e78f82d6af6edecaab7386410be695c67f4; native process inspection reported PID 36696 absent."
+}

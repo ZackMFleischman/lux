@@ -1,0 +1,33 @@
+{
+  "sourceCommit": "a9e86e78f82d6af6edecaab7386410be695c67f4",
+  "profile": "test-22bb23e6-c003-4944-8988-018b4455bf1f",
+  "workspace": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-help-final",
+  "checks": [
+    "Private SDK 0.4 Prismatic composition build retained component descriptions on exposed controls.",
+    "Hover tooltip visible above the described control.",
+    "The described control remained adjustable while hover help was visible and was reset to its prior value.",
+    "Keyboard-focus tooltip and visible focus indicator present.",
+    "Controls and playback unchanged after the adjustment/reset check."
+  ],
+  "pid": 34072,
+  "console": [
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools\nYou might need to use a local HTTP server (instead of file://): https://react.dev/link/react-devtools-faq font-weight:bold"
+    }
+  ],
+  "endpoint": {
+    "pid": 34072,
+    "sessionId": "ad1a949e57fa744e7bcad2b53d87022bab7f",
+    "profile": "test-22bb23e6-c003-4944-8988-018b4455bf1f",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\control-help-final"
+  },
+  "controls": {
+    "ballIntensity": 0.67,
+    "segmentsA": 6,
+    "segmentsB": 6
+  },
+  "playback": "paused",
+  "ok": true,
+  "cleanedUp": true
+}

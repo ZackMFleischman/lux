@@ -1,0 +1,31 @@
+{
+  "sourceCommit": "c574a354df7ec0bffb7745951814a42f73cdf650",
+  "profile": "test-3fda2c38-e14c-4d28-b5f7-c3371c9e51aa",
+  "checks": [
+    "Private SDK 0.4 Prismatic composition build retained component descriptions on exposed controls.",
+    "Hover tooltip visible.",
+    "Keyboard-focus tooltip visible.",
+    "Controls and playback unchanged."
+  ],
+  "pid": 30304,
+  "console": [
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools\nYou might need to use a local HTTP server (instead of file://): https://react.dev/link/react-devtools-faq font-weight:bold"
+    }
+  ],
+  "endpoint": {
+    "pid": 30304,
+    "sessionId": "40f62000d4a1bd95c39d9eb0e7dfae541915",
+    "profile": "test-3fda2c38-e14c-4d28-b5f7-c3371c9e51aa",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\control-help"
+  },
+  "controls": {
+    "ballIntensity": 0.67,
+    "segmentsA": 6,
+    "segmentsB": 6
+  },
+  "playback": "paused",
+  "ok": true,
+  "cleanedUp": true
+}
