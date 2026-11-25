@@ -1,0 +1,1 @@
+Source inspection confirms aria-label="Final authoring output" and data-output-width/data-output-height remain on preview-surface. `git diff --check` passed. No build or native launch was required for this attribute removal.
