@@ -1,0 +1,10 @@
+{
+  "label": "pigment-audio",
+  "profile": "test-b626415d-7143-4ac1-9929-46baba74b927",
+  "checks": [
+    "saved scene opened with all audio bindings intact and no binding issues",
+    "source admitted and GPU runtime started",
+    "scene saved in isolated test folder; reopen is a separate check"
+  ],
+  "errors": []
+}

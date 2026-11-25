@@ -1,0 +1,8 @@
+{
+  "label": "fiber",
+  "profile": "test-99a5182f-bf43-4642-89f3-8b3db03681a2",
+  "checks": [],
+  "errors": [
+    "Error: Studio is busy or command is unsupported\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/fiber-optic-heart/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/fiber-optic-heart/scripts/render-reference-previews.mjs:42:17"
+  ]
+}

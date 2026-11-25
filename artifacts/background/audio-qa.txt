@@ -1,0 +1,1 @@
+Live music/device listening test remains unperformed. No GPU rerun was needed for byte-identical scene relocation and filenames. Local main merge completed; no remote push.

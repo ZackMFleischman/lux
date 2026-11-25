@@ -1,0 +1,10 @@
+{
+  "label": "pigment",
+  "profile": "test-faa3c561-6b1c-4203-abcb-d14ef4730527",
+  "checks": [
+    "source admitted and GPU runtime started"
+  ],
+  "errors": [
+    "Error: Runtime changed before command completed\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/fiber-optic-heart/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/fiber-optic-heart/scripts/render-reference-previews.mjs:59:22"
+  ]
+}

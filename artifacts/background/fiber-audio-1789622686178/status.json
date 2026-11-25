@@ -1,0 +1,3479 @@
+{
+  "connection": "connected",
+  "message": null,
+  "receivedAtMs": 1789622722587,
+  "authoring": {
+    "instanceId": "0faba169-1cb4-447c-a121-67b223bc1d44",
+    "generation": 2,
+    "revisionId": "13a16ad56f4b637464e8da864d1141b2ac433a6e56341190a5a9a157fe91dc5d",
+    "composition": {
+      "version": 2,
+      "declaration": {
+        "definitions": {
+          "core": "fiber-optic-heart/core.ts",
+          "paths": "fiber-optic-heart/paths.ts",
+          "renderer": "fiber-optic-heart/renderer.ts",
+          "dust": "fiber-optic-heart/dust.ts"
+        },
+        "nodes": [
+          {
+            "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+            "definition": "core"
+          },
+          {
+            "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+            "definition": "paths"
+          },
+          {
+            "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+            "definition": "renderer"
+          },
+          {
+            "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+            "definition": "dust"
+          }
+        ],
+        "edges": [
+          {
+            "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0011",
+            "from": {
+              "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+              "portId": "image"
+            },
+            "to": {
+              "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+              "portId": "image"
+            },
+            "delay": "none"
+          },
+          {
+            "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0012",
+            "from": {
+              "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+              "portId": "paths"
+            },
+            "to": {
+              "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+              "portId": "paths"
+            },
+            "delay": "none"
+          },
+          {
+            "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0013",
+            "from": {
+              "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+              "portId": "image"
+            },
+            "to": {
+              "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+              "portId": "image"
+            },
+            "delay": "none"
+          }
+        ],
+        "output": {
+          "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+          "portId": "image"
+        },
+        "expose": [
+          {
+            "id": "coreBrightness",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+            "controlId": "brightness"
+          },
+          {
+            "id": "coreRadius",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+            "controlId": "radius"
+          },
+          {
+            "id": "haze",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+            "controlId": "haze"
+          },
+          {
+            "id": "breath",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+            "controlId": "breath"
+          },
+          {
+            "id": "flare",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+            "controlId": "flare"
+          },
+          {
+            "id": "strandCount",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+            "controlId": "count"
+          },
+          {
+            "id": "spread",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+            "controlId": "spread"
+          },
+          {
+            "id": "cableWidth",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+            "controlId": "width"
+          },
+          {
+            "id": "arrangement",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+            "controlId": "seed"
+          },
+          {
+            "id": "drift",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+            "controlId": "motion"
+          },
+          {
+            "id": "strandBrightness",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+            "controlId": "brightness"
+          },
+          {
+            "id": "palette",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+            "controlId": "palette"
+          },
+          {
+            "id": "pulseSpeed",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+            "controlId": "pulseSpeed"
+          },
+          {
+            "id": "pulseWidth",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+            "controlId": "pulseWidth"
+          },
+          {
+            "id": "pulseStrength",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+            "controlId": "pulseStrength"
+          },
+          {
+            "id": "ribbons",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+            "controlId": "ribbons"
+          },
+          {
+            "id": "ribbonWidth",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+            "controlId": "ribbonWidth"
+          },
+          {
+            "id": "cables",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+            "controlId": "cables"
+          },
+          {
+            "id": "collars",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+            "controlId": "collars"
+          },
+          {
+            "id": "dustCount",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+            "controlId": "count"
+          },
+          {
+            "id": "dustSize",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+            "controlId": "size"
+          },
+          {
+            "id": "dustDrift",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+            "controlId": "drift"
+          },
+          {
+            "id": "dustBrightness",
+            "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+            "controlId": "brightness"
+          }
+        ],
+        "label": "Fiber-Optic Heart"
+      },
+      "definitionNames": {
+        "core": "1ccf7913af7e147c7c65d80bdd0e276e3bd27260d642e15c5214c9c78d32bca2",
+        "paths": "e8f4c77173313702c88c3fef1acc3d5c2067ff25d319a6c5cfccc74a39cc7eea",
+        "renderer": "c77fd5d968a249f4d3d28b72e9f844278d3a37d176ca0442c88a1b25fc88c2cf",
+        "dust": "546db09082881eef9507e2eea315aa7bc2e5b4f232386bf3f5b2eff6026289c2"
+      },
+      "moduleDeclarations": {
+        "fd7820ad429bb79e881e2ecf2c9ff55a199bdd50c2f250f26a152286d6139230": {
+          "modulePath": "fiber-optic-heart/composition.ts",
+          "definitionNames": {
+            "core": "1ccf7913af7e147c7c65d80bdd0e276e3bd27260d642e15c5214c9c78d32bca2",
+            "paths": "e8f4c77173313702c88c3fef1acc3d5c2067ff25d319a6c5cfccc74a39cc7eea",
+            "renderer": "c77fd5d968a249f4d3d28b72e9f844278d3a37d176ca0442c88a1b25fc88c2cf",
+            "dust": "546db09082881eef9507e2eea315aa7bc2e5b4f232386bf3f5b2eff6026289c2"
+          },
+          "declaration": {
+            "definitions": {
+              "core": "fiber-optic-heart/core.ts",
+              "paths": "fiber-optic-heart/paths.ts",
+              "renderer": "fiber-optic-heart/renderer.ts",
+              "dust": "fiber-optic-heart/dust.ts"
+            },
+            "nodes": [
+              {
+                "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+                "definition": "core"
+              },
+              {
+                "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+                "definition": "paths"
+              },
+              {
+                "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                "definition": "renderer"
+              },
+              {
+                "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+                "definition": "dust"
+              }
+            ],
+            "edges": [
+              {
+                "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0011",
+                "from": {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+                  "portId": "image"
+                },
+                "to": {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                  "portId": "image"
+                },
+                "delay": "none"
+              },
+              {
+                "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0012",
+                "from": {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+                  "portId": "paths"
+                },
+                "to": {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                  "portId": "paths"
+                },
+                "delay": "none"
+              },
+              {
+                "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0013",
+                "from": {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                  "portId": "image"
+                },
+                "to": {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+                  "portId": "image"
+                },
+                "delay": "none"
+              }
+            ],
+            "output": {
+              "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+              "portId": "image"
+            },
+            "expose": [
+              {
+                "id": "coreBrightness",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+                "controlId": "brightness"
+              },
+              {
+                "id": "coreRadius",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+                "controlId": "radius"
+              },
+              {
+                "id": "haze",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+                "controlId": "haze"
+              },
+              {
+                "id": "breath",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+                "controlId": "breath"
+              },
+              {
+                "id": "flare",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+                "controlId": "flare"
+              },
+              {
+                "id": "strandCount",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+                "controlId": "count"
+              },
+              {
+                "id": "spread",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+                "controlId": "spread"
+              },
+              {
+                "id": "cableWidth",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+                "controlId": "width"
+              },
+              {
+                "id": "arrangement",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+                "controlId": "seed"
+              },
+              {
+                "id": "drift",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+                "controlId": "motion"
+              },
+              {
+                "id": "strandBrightness",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                "controlId": "brightness"
+              },
+              {
+                "id": "palette",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                "controlId": "palette"
+              },
+              {
+                "id": "pulseSpeed",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                "controlId": "pulseSpeed"
+              },
+              {
+                "id": "pulseWidth",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                "controlId": "pulseWidth"
+              },
+              {
+                "id": "pulseStrength",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                "controlId": "pulseStrength"
+              },
+              {
+                "id": "ribbons",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                "controlId": "ribbons"
+              },
+              {
+                "id": "ribbonWidth",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                "controlId": "ribbonWidth"
+              },
+              {
+                "id": "cables",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                "controlId": "cables"
+              },
+              {
+                "id": "collars",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                "controlId": "collars"
+              },
+              {
+                "id": "dustCount",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+                "controlId": "count"
+              },
+              {
+                "id": "dustSize",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+                "controlId": "size"
+              },
+              {
+                "id": "dustDrift",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+                "controlId": "drift"
+              },
+              {
+                "id": "dustBrightness",
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+                "controlId": "brightness"
+              }
+            ],
+            "label": "Fiber-Optic Heart"
+          }
+        }
+      },
+      "graph": {
+        "version": 2,
+        "rootDefinitionHash": "fd7820ad429bb79e881e2ecf2c9ff55a199bdd50c2f250f26a152286d6139230",
+        "outputPort": "image"
+      },
+      "definitions": {
+        "1ccf7913af7e147c7c65d80bdd0e276e3bd27260d642e15c5214c9c78d32bca2": {
+          "kind": "code",
+          "metadata": {
+            "declarationVersion": 1,
+            "key": "fiber-heart/radial-core",
+            "label": "Radiant Core",
+            "description": "White-gold breathing core with magenta atmosphere and a horizontal optical flare.",
+            "tags": [
+              "background",
+              "core",
+              "glow"
+            ],
+            "inputs": {},
+            "outputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Opaque radiant core background."
+              }
+            },
+            "controls": [
+              {
+                "id": "radius",
+                "type": "number",
+                "label": "Radius",
+                "default": 0.14,
+                "min": 0.02,
+                "max": 0.35,
+                "step": 0.005,
+                "group": "Core",
+                "changeCost": "live"
+              },
+              {
+                "id": "brightness",
+                "type": "number",
+                "label": "Brightness",
+                "default": 2.3,
+                "min": 0,
+                "max": 5,
+                "step": 0.01,
+                "group": "Core",
+                "changeCost": "live"
+              },
+              {
+                "id": "haze",
+                "type": "number",
+                "label": "Magenta haze",
+                "default": 0.7,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Atmosphere",
+                "changeCost": "live"
+              },
+              {
+                "id": "breath",
+                "type": "number",
+                "label": "Breathing",
+                "default": 0.55,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Core",
+                "changeCost": "live"
+              },
+              {
+                "id": "flare",
+                "type": "number",
+                "label": "Horizontal flare",
+                "default": 0.45,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Atmosphere",
+                "changeCost": "live"
+              }
+            ],
+            "controlDescriptions": {
+              "breath": "Depth of slow breathing driven by the Lux scene clock.",
+              "brightness": "Linear light strength; values above one intentionally produce an exposed center.",
+              "flare": "Strength of the thin horizontal flare through the core.",
+              "haze": "Amount of broad magenta atmosphere behind the strands.",
+              "radius": "Radius of the central light in canvas-height units."
+            },
+            "lifecycle": {
+              "state": "stateless",
+              "reset": "seed"
+            }
+          }
+        },
+        "546db09082881eef9507e2eea315aa7bc2e5b4f232386bf3f5b2eff6026289c2": {
+          "kind": "code",
+          "metadata": {
+            "declarationVersion": 1,
+            "key": "fiber-heart/dust-field",
+            "label": "Luminous Dust",
+            "description": "Sparse seeded golden dust with scene-clock drift and soft additive sprites.",
+            "tags": [
+              "dust",
+              "overlay",
+              "particles"
+            ],
+            "inputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Background",
+                "description": "Image under the dust."
+              }
+            },
+            "outputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Background with luminous dust."
+              }
+            },
+            "controls": [
+              {
+                "id": "count",
+                "type": "number",
+                "label": "Particles",
+                "default": 44,
+                "min": 0,
+                "max": 96,
+                "step": 1,
+                "group": "Dust",
+                "changeCost": "live"
+              },
+              {
+                "id": "size",
+                "type": "number",
+                "label": "Size",
+                "default": 0.009,
+                "min": 0.002,
+                "max": 0.03,
+                "step": 0.001,
+                "group": "Dust",
+                "changeCost": "live"
+              },
+              {
+                "id": "drift",
+                "type": "number",
+                "label": "Drift",
+                "default": 0.35,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Dust",
+                "changeCost": "live"
+              },
+              {
+                "id": "brightness",
+                "type": "number",
+                "label": "Brightness",
+                "default": 0.55,
+                "min": 0,
+                "max": 3,
+                "step": 0.01,
+                "group": "Dust",
+                "changeCost": "live"
+              }
+            ],
+            "controlDescriptions": {
+              "brightness": "Additive golden light strength; zero removes dust light.",
+              "count": "Visible particles out of a fixed pool of 96; identities do not shuffle.",
+              "drift": "Slow upward flow and lateral sway; zero freezes dust motion and twinkle.",
+              "size": "Base sprite diameter in canvas-height units. Supports stable per-instance variation."
+            },
+            "lifecycle": {
+              "state": "stateless",
+              "reset": "seed"
+            }
+          }
+        },
+        "c77fd5d968a249f4d3d28b72e9f844278d3a37d176ca0442c88a1b25fc88c2cf": {
+          "kind": "code",
+          "metadata": {
+            "declarationVersion": 1,
+            "key": "fiber-heart/neon-path-renderer",
+            "label": "Neon Cables & Ribbons",
+            "description": "Mesh-strip path renderer with luminous filaments, traveling pulses, glossy ribbons, glass-style cables and attached metallic collars.",
+            "tags": [
+              "cables",
+              "neon",
+              "renderer",
+              "ribbons"
+            ],
+            "inputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Background",
+                "description": "Image behind the strands."
+              },
+              "paths": {
+                "type": {
+                  "kind": "paths2d",
+                  "version": 1,
+                  "coordinateSpace": "canvas-height"
+                },
+                "label": "Paths",
+                "description": "Up to 16 paths with at most 97 points per path."
+              }
+            },
+            "outputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Strands composited over the background."
+              }
+            },
+            "controls": [
+              {
+                "id": "brightness",
+                "type": "number",
+                "label": "Strand brightness",
+                "default": 1.3,
+                "min": 0,
+                "max": 4,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "palette",
+                "type": "number",
+                "label": "Cyan to magenta",
+                "default": 0.5,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "pulseSpeed",
+                "type": "number",
+                "label": "Pulse speed",
+                "default": 0.12,
+                "min": -1,
+                "max": 1,
+                "step": 0.01,
+                "group": "Energy",
+                "changeCost": "live"
+              },
+              {
+                "id": "pulseWidth",
+                "type": "number",
+                "label": "Pulse length",
+                "default": 0.07,
+                "min": 0.01,
+                "max": 0.3,
+                "step": 0.005,
+                "group": "Energy",
+                "changeCost": "live"
+              },
+              {
+                "id": "pulseStrength",
+                "type": "number",
+                "label": "Pulse strength",
+                "default": 2,
+                "min": 0,
+                "max": 6,
+                "step": 0.01,
+                "group": "Energy",
+                "changeCost": "live"
+              },
+              {
+                "id": "ribbons",
+                "type": "number",
+                "label": "Broad ribbons",
+                "default": 3,
+                "min": 0,
+                "max": 6,
+                "step": 1,
+                "group": "Structure",
+                "changeCost": "live"
+              },
+              {
+                "id": "ribbonWidth",
+                "type": "number",
+                "label": "Ribbon width",
+                "default": 4,
+                "min": 1,
+                "max": 8,
+                "step": 0.05,
+                "group": "Structure",
+                "changeCost": "live"
+              },
+              {
+                "id": "cables",
+                "type": "number",
+                "label": "Glass-style cables",
+                "default": 4,
+                "min": 0,
+                "max": 8,
+                "step": 1,
+                "group": "Structure",
+                "changeCost": "live"
+              },
+              {
+                "id": "collars",
+                "type": "number",
+                "label": "Cable collars",
+                "default": 0.7,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Structure",
+                "changeCost": "live"
+              }
+            ],
+            "controlDescriptions": {
+              "brightness": "Strength of strand color and highlights; zero leaves the background untouched.",
+              "cables": "Paths after the ribbons rendered as glass-style strips, without physical refraction.",
+              "collars": "Visibility of two metallic collars on each glass-style cable.",
+              "palette": "Shifts alternating strands toward cyan or magenta.",
+              "pulseSpeed": "Signed circuits per second. Zero freezes each pulse at its phase.",
+              "pulseStrength": "Extra energy in traveling packets; zero gives steady strands.",
+              "pulseWidth": "Fraction of the route illuminated by each traveling packet.",
+              "ribbonWidth": "Ribbon width as a multiple of the incoming path width.",
+              "ribbons": "First paths rendered as broad dark glossy ribbons. Remaining paths become cables or neon."
+            },
+            "lifecycle": {
+              "state": "stateless",
+              "reset": "seed"
+            }
+          }
+        },
+        "e8f4c77173313702c88c3fef1acc3d5c2067ff25d319a6c5cfccc74a39cc7eea": {
+          "kind": "code",
+          "metadata": {
+            "declarationVersion": 1,
+            "key": "fiber-heart/looping-paths",
+            "label": "Looping Spline Paths",
+            "description": "Persistent closed figure-eight strands around a central opening; sampled paths2d for independent renderers.",
+            "tags": [
+              "cables",
+              "loops",
+              "paths"
+            ],
+            "inputs": {},
+            "outputs": {
+              "paths": {
+                "type": {
+                  "kind": "paths2d",
+                  "version": 1,
+                  "coordinateSpace": "canvas-height"
+                },
+                "label": "Paths",
+                "description": "Up to sixteen closed paths, 97 points each."
+              }
+            },
+            "controls": [
+              {
+                "id": "count",
+                "type": "number",
+                "label": "Strands",
+                "default": 12,
+                "min": 0,
+                "max": 16,
+                "step": 1,
+                "group": "Shape",
+                "changeCost": "live"
+              },
+              {
+                "id": "spread",
+                "type": "number",
+                "label": "Spread",
+                "default": 1,
+                "min": 0.3,
+                "max": 1.4,
+                "step": 0.01,
+                "group": "Shape",
+                "changeCost": "live"
+              },
+              {
+                "id": "width",
+                "type": "number",
+                "label": "Cable width",
+                "default": 0.018,
+                "min": 0.002,
+                "max": 0.05,
+                "step": 0.001,
+                "group": "Shape",
+                "changeCost": "live"
+              },
+              {
+                "id": "seed",
+                "type": "number",
+                "label": "Arrangement",
+                "default": 7,
+                "min": 0,
+                "max": 999,
+                "step": 1,
+                "group": "Shape",
+                "changeCost": "live"
+              },
+              {
+                "id": "motion",
+                "type": "number",
+                "label": "Drift",
+                "default": 0.35,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Motion",
+                "changeCost": "live"
+              }
+            ],
+            "controlDescriptions": {
+              "count": "Number of persistent strands. Existing identities stay stable as more are added.",
+              "motion": "Slow analytic deformation; zero freezes the routes.",
+              "seed": "Chooses a repeatable arrangement of looping strands.",
+              "spread": "Scales the knot around its central opening.",
+              "width": "Full base width in canvas-height units; renderer style scales this width."
+            },
+            "lifecycle": {
+              "state": "stateless",
+              "reset": "seed"
+            }
+          }
+        },
+        "fd7820ad429bb79e881e2ecf2c9ff55a199bdd50c2f250f26a152286d6139230": {
+          "kind": "graph",
+          "metadata": {
+            "declarationVersion": 1,
+            "key": "lux/image-composition",
+            "label": "Fiber-Optic Heart",
+            "description": "Authored image component chain",
+            "tags": [],
+            "inputs": {},
+            "outputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Image"
+              }
+            },
+            "controls": [
+              {
+                "id": "coreBrightness",
+                "type": "number",
+                "label": "Brightness",
+                "default": 2.3,
+                "min": 0,
+                "max": 5,
+                "step": 0.01,
+                "description": "Linear light strength; values above one intentionally produce an exposed center.",
+                "group": "Core",
+                "changeCost": "live"
+              },
+              {
+                "id": "coreRadius",
+                "type": "number",
+                "label": "Radius",
+                "default": 0.14,
+                "min": 0.02,
+                "max": 0.35,
+                "step": 0.005,
+                "description": "Radius of the central light in canvas-height units.",
+                "group": "Core",
+                "changeCost": "live"
+              },
+              {
+                "id": "haze",
+                "type": "number",
+                "label": "Magenta haze",
+                "default": 0.7,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "description": "Amount of broad magenta atmosphere behind the strands.",
+                "group": "Atmosphere",
+                "changeCost": "live"
+              },
+              {
+                "id": "breath",
+                "type": "number",
+                "label": "Breathing",
+                "default": 0.55,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Depth of slow breathing driven by the Lux scene clock.",
+                "group": "Core",
+                "changeCost": "live"
+              },
+              {
+                "id": "flare",
+                "type": "number",
+                "label": "Horizontal flare",
+                "default": 0.45,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "description": "Strength of the thin horizontal flare through the core.",
+                "group": "Atmosphere",
+                "changeCost": "live"
+              },
+              {
+                "id": "strandCount",
+                "type": "number",
+                "label": "Strands",
+                "default": 12,
+                "min": 0,
+                "max": 16,
+                "step": 1,
+                "description": "Number of persistent strands. Existing identities stay stable as more are added.",
+                "group": "Shape",
+                "changeCost": "live"
+              },
+              {
+                "id": "spread",
+                "type": "number",
+                "label": "Spread",
+                "default": 1,
+                "min": 0.3,
+                "max": 1.4,
+                "step": 0.01,
+                "description": "Scales the knot around its central opening.",
+                "group": "Shape",
+                "changeCost": "live"
+              },
+              {
+                "id": "cableWidth",
+                "type": "number",
+                "label": "Cable width",
+                "default": 0.018,
+                "min": 0.002,
+                "max": 0.05,
+                "step": 0.001,
+                "description": "Full base width in canvas-height units; renderer style scales this width.",
+                "group": "Shape",
+                "changeCost": "live"
+              },
+              {
+                "id": "arrangement",
+                "type": "number",
+                "label": "Arrangement",
+                "default": 7,
+                "min": 0,
+                "max": 999,
+                "step": 1,
+                "description": "Chooses a repeatable arrangement of looping strands.",
+                "group": "Shape",
+                "changeCost": "live"
+              },
+              {
+                "id": "drift",
+                "type": "number",
+                "label": "Drift",
+                "default": 0.35,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "description": "Slow analytic deformation; zero freezes the routes.",
+                "group": "Motion",
+                "changeCost": "live"
+              },
+              {
+                "id": "strandBrightness",
+                "type": "number",
+                "label": "Strand brightness",
+                "default": 1.3,
+                "min": 0,
+                "max": 4,
+                "step": 0.01,
+                "description": "Strength of strand color and highlights; zero leaves the background untouched.",
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "palette",
+                "type": "number",
+                "label": "Cyan to magenta",
+                "default": 0.5,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Shifts alternating strands toward cyan or magenta.",
+                "group": "Light",
+                "changeCost": "live"
+              },
+              {
+                "id": "pulseSpeed",
+                "type": "number",
+                "label": "Pulse speed",
+                "default": 0.12,
+                "min": -1,
+                "max": 1,
+                "step": 0.01,
+                "description": "Signed circuits per second. Zero freezes each pulse at its phase.",
+                "group": "Energy",
+                "changeCost": "live"
+              },
+              {
+                "id": "pulseWidth",
+                "type": "number",
+                "label": "Pulse length",
+                "default": 0.07,
+                "min": 0.01,
+                "max": 0.3,
+                "step": 0.005,
+                "description": "Fraction of the route illuminated by each traveling packet.",
+                "group": "Energy",
+                "changeCost": "live"
+              },
+              {
+                "id": "pulseStrength",
+                "type": "number",
+                "label": "Pulse strength",
+                "default": 2,
+                "min": 0,
+                "max": 6,
+                "step": 0.01,
+                "description": "Extra energy in traveling packets; zero gives steady strands.",
+                "group": "Energy",
+                "changeCost": "live"
+              },
+              {
+                "id": "ribbons",
+                "type": "number",
+                "label": "Broad ribbons",
+                "default": 3,
+                "min": 0,
+                "max": 6,
+                "step": 1,
+                "description": "First paths rendered as broad dark glossy ribbons. Remaining paths become cables or neon.",
+                "group": "Structure",
+                "changeCost": "live"
+              },
+              {
+                "id": "ribbonWidth",
+                "type": "number",
+                "label": "Ribbon width",
+                "default": 4,
+                "min": 1,
+                "max": 8,
+                "step": 0.05,
+                "description": "Ribbon width as a multiple of the incoming path width.",
+                "group": "Structure",
+                "changeCost": "live"
+              },
+              {
+                "id": "cables",
+                "type": "number",
+                "label": "Glass-style cables",
+                "default": 4,
+                "min": 0,
+                "max": 8,
+                "step": 1,
+                "description": "Paths after the ribbons rendered as glass-style strips, without physical refraction.",
+                "group": "Structure",
+                "changeCost": "live"
+              },
+              {
+                "id": "collars",
+                "type": "number",
+                "label": "Cable collars",
+                "default": 0.7,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Visibility of two metallic collars on each glass-style cable.",
+                "group": "Structure",
+                "changeCost": "live"
+              },
+              {
+                "id": "dustCount",
+                "type": "number",
+                "label": "Particles",
+                "default": 44,
+                "min": 0,
+                "max": 96,
+                "step": 1,
+                "description": "Visible particles out of a fixed pool of 96; identities do not shuffle.",
+                "group": "Dust",
+                "changeCost": "live"
+              },
+              {
+                "id": "dustSize",
+                "type": "number",
+                "label": "Size",
+                "default": 0.009,
+                "min": 0.002,
+                "max": 0.03,
+                "step": 0.001,
+                "description": "Base sprite diameter in canvas-height units. Supports stable per-instance variation.",
+                "group": "Dust",
+                "changeCost": "live"
+              },
+              {
+                "id": "dustDrift",
+                "type": "number",
+                "label": "Drift",
+                "default": 0.35,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "description": "Slow upward flow and lateral sway; zero freezes dust motion and twinkle.",
+                "group": "Dust",
+                "changeCost": "live"
+              },
+              {
+                "id": "dustBrightness",
+                "type": "number",
+                "label": "Brightness",
+                "default": 0.55,
+                "min": 0,
+                "max": 3,
+                "step": 0.01,
+                "description": "Additive golden light strength; zero removes dust light.",
+                "group": "Dust",
+                "changeCost": "live"
+              }
+            ],
+            "controlDescriptions": {
+              "arrangement": "Chooses a repeatable arrangement of looping strands.",
+              "breath": "Depth of slow breathing driven by the Lux scene clock.",
+              "cableWidth": "Full base width in canvas-height units; renderer style scales this width.",
+              "cables": "Paths after the ribbons rendered as glass-style strips, without physical refraction.",
+              "collars": "Visibility of two metallic collars on each glass-style cable.",
+              "coreBrightness": "Linear light strength; values above one intentionally produce an exposed center.",
+              "coreRadius": "Radius of the central light in canvas-height units.",
+              "drift": "Slow analytic deformation; zero freezes the routes.",
+              "dustBrightness": "Additive golden light strength; zero removes dust light.",
+              "dustCount": "Visible particles out of a fixed pool of 96; identities do not shuffle.",
+              "dustDrift": "Slow upward flow and lateral sway; zero freezes dust motion and twinkle.",
+              "dustSize": "Base sprite diameter in canvas-height units. Supports stable per-instance variation.",
+              "flare": "Strength of the thin horizontal flare through the core.",
+              "haze": "Amount of broad magenta atmosphere behind the strands.",
+              "palette": "Shifts alternating strands toward cyan or magenta.",
+              "pulseSpeed": "Signed circuits per second. Zero freezes each pulse at its phase.",
+              "pulseStrength": "Extra energy in traveling packets; zero gives steady strands.",
+              "pulseWidth": "Fraction of the route illuminated by each traveling packet.",
+              "ribbonWidth": "Ribbon width as a multiple of the incoming path width.",
+              "ribbons": "First paths rendered as broad dark glossy ribbons. Remaining paths become cables or neon.",
+              "spread": "Scales the knot around its central opening.",
+              "strandBrightness": "Strength of strand color and highlights; zero leaves the background untouched.",
+              "strandCount": "Number of persistent strands. Existing identities stay stable as more are added."
+            },
+            "lifecycle": {
+              "state": "stateless",
+              "reset": "seed"
+            }
+          },
+          "body": {
+            "nodes": [
+              {
+                "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+                "definitionHash": "1ccf7913af7e147c7c65d80bdd0e276e3bd27260d642e15c5214c9c78d32bca2",
+                "controlDefaults": {}
+              },
+              {
+                "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+                "definitionHash": "e8f4c77173313702c88c3fef1acc3d5c2067ff25d319a6c5cfccc74a39cc7eea",
+                "controlDefaults": {}
+              },
+              {
+                "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                "definitionHash": "c77fd5d968a249f4d3d28b72e9f844278d3a37d176ca0442c88a1b25fc88c2cf",
+                "controlDefaults": {}
+              },
+              {
+                "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+                "definitionHash": "546db09082881eef9507e2eea315aa7bc2e5b4f232386bf3f5b2eff6026289c2",
+                "controlDefaults": {}
+              }
+            ],
+            "edges": [
+              {
+                "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0011",
+                "from": {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+                  "portId": "image"
+                },
+                "to": {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                  "portId": "image"
+                },
+                "delay": "none"
+              },
+              {
+                "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0012",
+                "from": {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+                  "portId": "paths"
+                },
+                "to": {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                  "portId": "paths"
+                },
+                "delay": "none"
+              },
+              {
+                "id": "a2ca5401-1e17-4c40-8dd6-6595f78a0013",
+                "from": {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                  "portId": "image"
+                },
+                "to": {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+                  "portId": "image"
+                },
+                "delay": "none"
+              }
+            ],
+            "inputBindings": {},
+            "outputBindings": {
+              "image": {
+                "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+                "portId": "image"
+              }
+            },
+            "controlBindings": {
+              "arrangement": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+                  "controlId": "seed"
+                }
+              ],
+              "breath": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+                  "controlId": "breath"
+                }
+              ],
+              "cableWidth": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+                  "controlId": "width"
+                }
+              ],
+              "cables": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                  "controlId": "cables"
+                }
+              ],
+              "collars": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                  "controlId": "collars"
+                }
+              ],
+              "coreBrightness": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+                  "controlId": "brightness"
+                }
+              ],
+              "coreRadius": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+                  "controlId": "radius"
+                }
+              ],
+              "drift": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+                  "controlId": "motion"
+                }
+              ],
+              "dustBrightness": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+                  "controlId": "brightness"
+                }
+              ],
+              "dustCount": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+                  "controlId": "count"
+                }
+              ],
+              "dustDrift": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+                  "controlId": "drift"
+                }
+              ],
+              "dustSize": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0004",
+                  "controlId": "size"
+                }
+              ],
+              "flare": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+                  "controlId": "flare"
+                }
+              ],
+              "haze": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0001",
+                  "controlId": "haze"
+                }
+              ],
+              "palette": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                  "controlId": "palette"
+                }
+              ],
+              "pulseSpeed": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                  "controlId": "pulseSpeed"
+                }
+              ],
+              "pulseStrength": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                  "controlId": "pulseStrength"
+                }
+              ],
+              "pulseWidth": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                  "controlId": "pulseWidth"
+                }
+              ],
+              "ribbonWidth": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                  "controlId": "ribbonWidth"
+                }
+              ],
+              "ribbons": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                  "controlId": "ribbons"
+                }
+              ],
+              "spread": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+                  "controlId": "spread"
+                }
+              ],
+              "strandBrightness": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0003",
+                  "controlId": "brightness"
+                }
+              ],
+              "strandCount": [
+                {
+                  "nodeId": "a2ca5401-1e17-4c40-8dd6-6595f78a0002",
+                  "controlId": "count"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "publicControls": [
+        {
+          "id": "coreBrightness",
+          "type": "number",
+          "label": "Brightness",
+          "default": 2.3,
+          "min": 0,
+          "max": 5,
+          "step": 0.01,
+          "description": "Linear light strength; values above one intentionally produce an exposed center.",
+          "group": "Core",
+          "changeCost": "live"
+        },
+        {
+          "id": "coreRadius",
+          "type": "number",
+          "label": "Radius",
+          "default": 0.14,
+          "min": 0.02,
+          "max": 0.35,
+          "step": 0.005,
+          "description": "Radius of the central light in canvas-height units.",
+          "group": "Core",
+          "changeCost": "live"
+        },
+        {
+          "id": "haze",
+          "type": "number",
+          "label": "Magenta haze",
+          "default": 0.7,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "Amount of broad magenta atmosphere behind the strands.",
+          "group": "Atmosphere",
+          "changeCost": "live"
+        },
+        {
+          "id": "breath",
+          "type": "number",
+          "label": "Breathing",
+          "default": 0.55,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Depth of slow breathing driven by the Lux scene clock.",
+          "group": "Core",
+          "changeCost": "live"
+        },
+        {
+          "id": "flare",
+          "type": "number",
+          "label": "Horizontal flare",
+          "default": 0.45,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "Strength of the thin horizontal flare through the core.",
+          "group": "Atmosphere",
+          "changeCost": "live"
+        },
+        {
+          "id": "strandCount",
+          "type": "number",
+          "label": "Strands",
+          "default": 12,
+          "min": 0,
+          "max": 16,
+          "step": 1,
+          "description": "Number of persistent strands. Existing identities stay stable as more are added.",
+          "group": "Shape",
+          "changeCost": "live"
+        },
+        {
+          "id": "spread",
+          "type": "number",
+          "label": "Spread",
+          "default": 1,
+          "min": 0.3,
+          "max": 1.4,
+          "step": 0.01,
+          "description": "Scales the knot around its central opening.",
+          "group": "Shape",
+          "changeCost": "live"
+        },
+        {
+          "id": "cableWidth",
+          "type": "number",
+          "label": "Cable width",
+          "default": 0.018,
+          "min": 0.002,
+          "max": 0.05,
+          "step": 0.001,
+          "description": "Full base width in canvas-height units; renderer style scales this width.",
+          "group": "Shape",
+          "changeCost": "live"
+        },
+        {
+          "id": "arrangement",
+          "type": "number",
+          "label": "Arrangement",
+          "default": 7,
+          "min": 0,
+          "max": 999,
+          "step": 1,
+          "description": "Chooses a repeatable arrangement of looping strands.",
+          "group": "Shape",
+          "changeCost": "live"
+        },
+        {
+          "id": "drift",
+          "type": "number",
+          "label": "Drift",
+          "default": 0.35,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "Slow analytic deformation; zero freezes the routes.",
+          "group": "Motion",
+          "changeCost": "live"
+        },
+        {
+          "id": "strandBrightness",
+          "type": "number",
+          "label": "Strand brightness",
+          "default": 1.3,
+          "min": 0,
+          "max": 4,
+          "step": 0.01,
+          "description": "Strength of strand color and highlights; zero leaves the background untouched.",
+          "group": "Light",
+          "changeCost": "live"
+        },
+        {
+          "id": "palette",
+          "type": "number",
+          "label": "Cyan to magenta",
+          "default": 0.5,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Shifts alternating strands toward cyan or magenta.",
+          "group": "Light",
+          "changeCost": "live"
+        },
+        {
+          "id": "pulseSpeed",
+          "type": "number",
+          "label": "Pulse speed",
+          "default": 0.12,
+          "min": -1,
+          "max": 1,
+          "step": 0.01,
+          "description": "Signed circuits per second. Zero freezes each pulse at its phase.",
+          "group": "Energy",
+          "changeCost": "live"
+        },
+        {
+          "id": "pulseWidth",
+          "type": "number",
+          "label": "Pulse length",
+          "default": 0.07,
+          "min": 0.01,
+          "max": 0.3,
+          "step": 0.005,
+          "description": "Fraction of the route illuminated by each traveling packet.",
+          "group": "Energy",
+          "changeCost": "live"
+        },
+        {
+          "id": "pulseStrength",
+          "type": "number",
+          "label": "Pulse strength",
+          "default": 2,
+          "min": 0,
+          "max": 6,
+          "step": 0.01,
+          "description": "Extra energy in traveling packets; zero gives steady strands.",
+          "group": "Energy",
+          "changeCost": "live"
+        },
+        {
+          "id": "ribbons",
+          "type": "number",
+          "label": "Broad ribbons",
+          "default": 3,
+          "min": 0,
+          "max": 6,
+          "step": 1,
+          "description": "First paths rendered as broad dark glossy ribbons. Remaining paths become cables or neon.",
+          "group": "Structure",
+          "changeCost": "live"
+        },
+        {
+          "id": "ribbonWidth",
+          "type": "number",
+          "label": "Ribbon width",
+          "default": 4,
+          "min": 1,
+          "max": 8,
+          "step": 0.05,
+          "description": "Ribbon width as a multiple of the incoming path width.",
+          "group": "Structure",
+          "changeCost": "live"
+        },
+        {
+          "id": "cables",
+          "type": "number",
+          "label": "Glass-style cables",
+          "default": 4,
+          "min": 0,
+          "max": 8,
+          "step": 1,
+          "description": "Paths after the ribbons rendered as glass-style strips, without physical refraction.",
+          "group": "Structure",
+          "changeCost": "live"
+        },
+        {
+          "id": "collars",
+          "type": "number",
+          "label": "Cable collars",
+          "default": 0.7,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Visibility of two metallic collars on each glass-style cable.",
+          "group": "Structure",
+          "changeCost": "live"
+        },
+        {
+          "id": "dustCount",
+          "type": "number",
+          "label": "Particles",
+          "default": 44,
+          "min": 0,
+          "max": 96,
+          "step": 1,
+          "description": "Visible particles out of a fixed pool of 96; identities do not shuffle.",
+          "group": "Dust",
+          "changeCost": "live"
+        },
+        {
+          "id": "dustSize",
+          "type": "number",
+          "label": "Size",
+          "default": 0.009,
+          "min": 0.002,
+          "max": 0.03,
+          "step": 0.001,
+          "description": "Base sprite diameter in canvas-height units. Supports stable per-instance variation.",
+          "group": "Dust",
+          "changeCost": "live"
+        },
+        {
+          "id": "dustDrift",
+          "type": "number",
+          "label": "Drift",
+          "default": 0.35,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "Slow upward flow and lateral sway; zero freezes dust motion and twinkle.",
+          "group": "Dust",
+          "changeCost": "live"
+        },
+        {
+          "id": "dustBrightness",
+          "type": "number",
+          "label": "Brightness",
+          "default": 0.55,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "description": "Additive golden light strength; zero removes dust light.",
+          "group": "Dust",
+          "changeCost": "live"
+        }
+      ],
+      "publicControlBindings": {
+        "coreBrightness": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0001"
+            ],
+            "controlId": "brightness",
+            "active": true
+          }
+        ],
+        "coreRadius": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0001"
+            ],
+            "controlId": "radius",
+            "active": true
+          }
+        ],
+        "haze": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0001"
+            ],
+            "controlId": "haze",
+            "active": true
+          }
+        ],
+        "breath": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0001"
+            ],
+            "controlId": "breath",
+            "active": true
+          }
+        ],
+        "flare": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0001"
+            ],
+            "controlId": "flare",
+            "active": true
+          }
+        ],
+        "strandCount": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0002"
+            ],
+            "controlId": "count",
+            "active": true
+          }
+        ],
+        "spread": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0002"
+            ],
+            "controlId": "spread",
+            "active": true
+          }
+        ],
+        "cableWidth": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0002"
+            ],
+            "controlId": "width",
+            "active": true
+          }
+        ],
+        "arrangement": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0002"
+            ],
+            "controlId": "seed",
+            "active": true
+          }
+        ],
+        "drift": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0002"
+            ],
+            "controlId": "motion",
+            "active": true
+          }
+        ],
+        "strandBrightness": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0003"
+            ],
+            "controlId": "brightness",
+            "active": true
+          }
+        ],
+        "palette": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0003"
+            ],
+            "controlId": "palette",
+            "active": true
+          }
+        ],
+        "pulseSpeed": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0003"
+            ],
+            "controlId": "pulseSpeed",
+            "active": true
+          }
+        ],
+        "pulseWidth": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0003"
+            ],
+            "controlId": "pulseWidth",
+            "active": true
+          }
+        ],
+        "pulseStrength": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0003"
+            ],
+            "controlId": "pulseStrength",
+            "active": true
+          }
+        ],
+        "ribbons": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0003"
+            ],
+            "controlId": "ribbons",
+            "active": true
+          }
+        ],
+        "ribbonWidth": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0003"
+            ],
+            "controlId": "ribbonWidth",
+            "active": true
+          }
+        ],
+        "cables": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0003"
+            ],
+            "controlId": "cables",
+            "active": true
+          }
+        ],
+        "collars": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0003"
+            ],
+            "controlId": "collars",
+            "active": true
+          }
+        ],
+        "dustCount": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0004"
+            ],
+            "controlId": "count",
+            "active": true
+          }
+        ],
+        "dustSize": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0004"
+            ],
+            "controlId": "size",
+            "active": true
+          }
+        ],
+        "dustDrift": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0004"
+            ],
+            "controlId": "drift",
+            "active": true
+          }
+        ],
+        "dustBrightness": [
+          {
+            "nodePath": [
+              "a2ca5401-1e17-4c40-8dd6-6595f78a0004"
+            ],
+            "controlId": "brightness",
+            "active": true
+          }
+        ]
+      },
+      "nodes": [
+        {
+          "nodePath": [
+            "a2ca5401-1e17-4c40-8dd6-6595f78a0001"
+          ],
+          "definitionHash": "1ccf7913af7e147c7c65d80bdd0e276e3bd27260d642e15c5214c9c78d32bca2",
+          "schema": [
+            {
+              "id": "radius",
+              "type": "number",
+              "label": "Radius",
+              "default": 0.14,
+              "min": 0.02,
+              "max": 0.35,
+              "step": 0.005,
+              "group": "Core",
+              "changeCost": "live"
+            },
+            {
+              "id": "brightness",
+              "type": "number",
+              "label": "Brightness",
+              "default": 2.3,
+              "min": 0,
+              "max": 5,
+              "step": 0.01,
+              "group": "Core",
+              "changeCost": "live"
+            },
+            {
+              "id": "haze",
+              "type": "number",
+              "label": "Magenta haze",
+              "default": 0.7,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Atmosphere",
+              "changeCost": "live"
+            },
+            {
+              "id": "breath",
+              "type": "number",
+              "label": "Breathing",
+              "default": 0.55,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Core",
+              "changeCost": "live"
+            },
+            {
+              "id": "flare",
+              "type": "number",
+              "label": "Horizontal flare",
+              "default": 0.45,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Atmosphere",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "52b6d321b5a99f9b8eaf1685d7f96558f69d84fee04b6ff8c6c8c2d393580f7a"
+        },
+        {
+          "nodePath": [
+            "a2ca5401-1e17-4c40-8dd6-6595f78a0002"
+          ],
+          "definitionHash": "e8f4c77173313702c88c3fef1acc3d5c2067ff25d319a6c5cfccc74a39cc7eea",
+          "schema": [
+            {
+              "id": "count",
+              "type": "number",
+              "label": "Strands",
+              "default": 12,
+              "min": 0,
+              "max": 16,
+              "step": 1,
+              "group": "Shape",
+              "changeCost": "live"
+            },
+            {
+              "id": "spread",
+              "type": "number",
+              "label": "Spread",
+              "default": 1,
+              "min": 0.3,
+              "max": 1.4,
+              "step": 0.01,
+              "group": "Shape",
+              "changeCost": "live"
+            },
+            {
+              "id": "width",
+              "type": "number",
+              "label": "Cable width",
+              "default": 0.018,
+              "min": 0.002,
+              "max": 0.05,
+              "step": 0.001,
+              "group": "Shape",
+              "changeCost": "live"
+            },
+            {
+              "id": "seed",
+              "type": "number",
+              "label": "Arrangement",
+              "default": 7,
+              "min": 0,
+              "max": 999,
+              "step": 1,
+              "group": "Shape",
+              "changeCost": "live"
+            },
+            {
+              "id": "motion",
+              "type": "number",
+              "label": "Drift",
+              "default": 0.35,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Motion",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "74fa7702c50a343f2e05a88f18c7164e675766ceb81bc4805f65b7f3e85a59d7"
+        },
+        {
+          "nodePath": [
+            "a2ca5401-1e17-4c40-8dd6-6595f78a0003"
+          ],
+          "definitionHash": "c77fd5d968a249f4d3d28b72e9f844278d3a37d176ca0442c88a1b25fc88c2cf",
+          "schema": [
+            {
+              "id": "brightness",
+              "type": "number",
+              "label": "Strand brightness",
+              "default": 1.3,
+              "min": 0,
+              "max": 4,
+              "step": 0.01,
+              "group": "Light",
+              "changeCost": "live"
+            },
+            {
+              "id": "palette",
+              "type": "number",
+              "label": "Cyan to magenta",
+              "default": 0.5,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Light",
+              "changeCost": "live"
+            },
+            {
+              "id": "pulseSpeed",
+              "type": "number",
+              "label": "Pulse speed",
+              "default": 0.12,
+              "min": -1,
+              "max": 1,
+              "step": 0.01,
+              "group": "Energy",
+              "changeCost": "live"
+            },
+            {
+              "id": "pulseWidth",
+              "type": "number",
+              "label": "Pulse length",
+              "default": 0.07,
+              "min": 0.01,
+              "max": 0.3,
+              "step": 0.005,
+              "group": "Energy",
+              "changeCost": "live"
+            },
+            {
+              "id": "pulseStrength",
+              "type": "number",
+              "label": "Pulse strength",
+              "default": 2,
+              "min": 0,
+              "max": 6,
+              "step": 0.01,
+              "group": "Energy",
+              "changeCost": "live"
+            },
+            {
+              "id": "ribbons",
+              "type": "number",
+              "label": "Broad ribbons",
+              "default": 3,
+              "min": 0,
+              "max": 6,
+              "step": 1,
+              "group": "Structure",
+              "changeCost": "live"
+            },
+            {
+              "id": "ribbonWidth",
+              "type": "number",
+              "label": "Ribbon width",
+              "default": 4,
+              "min": 1,
+              "max": 8,
+              "step": 0.05,
+              "group": "Structure",
+              "changeCost": "live"
+            },
+            {
+              "id": "cables",
+              "type": "number",
+              "label": "Glass-style cables",
+              "default": 4,
+              "min": 0,
+              "max": 8,
+              "step": 1,
+              "group": "Structure",
+              "changeCost": "live"
+            },
+            {
+              "id": "collars",
+              "type": "number",
+              "label": "Cable collars",
+              "default": 0.7,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Structure",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "8e0aef23161068157edf0d77246285a7673a68fae9106180cccce452bb1993d5"
+        },
+        {
+          "nodePath": [
+            "a2ca5401-1e17-4c40-8dd6-6595f78a0004"
+          ],
+          "definitionHash": "546db09082881eef9507e2eea315aa7bc2e5b4f232386bf3f5b2eff6026289c2",
+          "schema": [
+            {
+              "id": "count",
+              "type": "number",
+              "label": "Particles",
+              "default": 44,
+              "min": 0,
+              "max": 96,
+              "step": 1,
+              "group": "Dust",
+              "changeCost": "live"
+            },
+            {
+              "id": "size",
+              "type": "number",
+              "label": "Size",
+              "default": 0.009,
+              "min": 0.002,
+              "max": 0.03,
+              "step": 0.001,
+              "group": "Dust",
+              "changeCost": "live"
+            },
+            {
+              "id": "drift",
+              "type": "number",
+              "label": "Drift",
+              "default": 0.35,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Dust",
+              "changeCost": "live"
+            },
+            {
+              "id": "brightness",
+              "type": "number",
+              "label": "Brightness",
+              "default": 0.55,
+              "min": 0,
+              "max": 3,
+              "step": 0.01,
+              "group": "Dust",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "154c4af5822a2ffa048adf66d6f5efbc4c43e42f0d094f2d816fd980c26e52f6"
+        }
+      ]
+    },
+    "sceneName": "Untitled visual",
+    "authority": "studio",
+    "playback": "playing",
+    "sdkVersion": "0.4.0",
+    "controlSchema": [
+      {
+        "id": "coreBrightness",
+        "type": "number",
+        "label": "Brightness",
+        "default": 2.3,
+        "min": 0,
+        "max": 5,
+        "step": 0.01,
+        "description": "Linear light strength; values above one intentionally produce an exposed center.",
+        "group": "Core",
+        "changeCost": "live"
+      },
+      {
+        "id": "coreRadius",
+        "type": "number",
+        "label": "Radius",
+        "default": 0.14,
+        "min": 0.02,
+        "max": 0.35,
+        "step": 0.005,
+        "description": "Radius of the central light in canvas-height units.",
+        "group": "Core",
+        "changeCost": "live"
+      },
+      {
+        "id": "haze",
+        "type": "number",
+        "label": "Magenta haze",
+        "default": 0.7,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "description": "Amount of broad magenta atmosphere behind the strands.",
+        "group": "Atmosphere",
+        "changeCost": "live"
+      },
+      {
+        "id": "breath",
+        "type": "number",
+        "label": "Breathing",
+        "default": 0.55,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "description": "Depth of slow breathing driven by the Lux scene clock.",
+        "group": "Core",
+        "changeCost": "live"
+      },
+      {
+        "id": "flare",
+        "type": "number",
+        "label": "Horizontal flare",
+        "default": 0.45,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "description": "Strength of the thin horizontal flare through the core.",
+        "group": "Atmosphere",
+        "changeCost": "live"
+      },
+      {
+        "id": "strandCount",
+        "type": "number",
+        "label": "Strands",
+        "default": 12,
+        "min": 0,
+        "max": 16,
+        "step": 1,
+        "description": "Number of persistent strands. Existing identities stay stable as more are added.",
+        "group": "Shape",
+        "changeCost": "live"
+      },
+      {
+        "id": "spread",
+        "type": "number",
+        "label": "Spread",
+        "default": 1,
+        "min": 0.3,
+        "max": 1.4,
+        "step": 0.01,
+        "description": "Scales the knot around its central opening.",
+        "group": "Shape",
+        "changeCost": "live"
+      },
+      {
+        "id": "cableWidth",
+        "type": "number",
+        "label": "Cable width",
+        "default": 0.018,
+        "min": 0.002,
+        "max": 0.05,
+        "step": 0.001,
+        "description": "Full base width in canvas-height units; renderer style scales this width.",
+        "group": "Shape",
+        "changeCost": "live"
+      },
+      {
+        "id": "arrangement",
+        "type": "number",
+        "label": "Arrangement",
+        "default": 7,
+        "min": 0,
+        "max": 999,
+        "step": 1,
+        "description": "Chooses a repeatable arrangement of looping strands.",
+        "group": "Shape",
+        "changeCost": "live"
+      },
+      {
+        "id": "drift",
+        "type": "number",
+        "label": "Drift",
+        "default": 0.35,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "description": "Slow analytic deformation; zero freezes the routes.",
+        "group": "Motion",
+        "changeCost": "live"
+      },
+      {
+        "id": "strandBrightness",
+        "type": "number",
+        "label": "Strand brightness",
+        "default": 1.3,
+        "min": 0,
+        "max": 4,
+        "step": 0.01,
+        "description": "Strength of strand color and highlights; zero leaves the background untouched.",
+        "group": "Light",
+        "changeCost": "live"
+      },
+      {
+        "id": "palette",
+        "type": "number",
+        "label": "Cyan to magenta",
+        "default": 0.5,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "description": "Shifts alternating strands toward cyan or magenta.",
+        "group": "Light",
+        "changeCost": "live"
+      },
+      {
+        "id": "pulseSpeed",
+        "type": "number",
+        "label": "Pulse speed",
+        "default": 0.12,
+        "min": -1,
+        "max": 1,
+        "step": 0.01,
+        "description": "Signed circuits per second. Zero freezes each pulse at its phase.",
+        "group": "Energy",
+        "changeCost": "live"
+      },
+      {
+        "id": "pulseWidth",
+        "type": "number",
+        "label": "Pulse length",
+        "default": 0.07,
+        "min": 0.01,
+        "max": 0.3,
+        "step": 0.005,
+        "description": "Fraction of the route illuminated by each traveling packet.",
+        "group": "Energy",
+        "changeCost": "live"
+      },
+      {
+        "id": "pulseStrength",
+        "type": "number",
+        "label": "Pulse strength",
+        "default": 2,
+        "min": 0,
+        "max": 6,
+        "step": 0.01,
+        "description": "Extra energy in traveling packets; zero gives steady strands.",
+        "group": "Energy",
+        "changeCost": "live"
+      },
+      {
+        "id": "ribbons",
+        "type": "number",
+        "label": "Broad ribbons",
+        "default": 3,
+        "min": 0,
+        "max": 6,
+        "step": 1,
+        "description": "First paths rendered as broad dark glossy ribbons. Remaining paths become cables or neon.",
+        "group": "Structure",
+        "changeCost": "live"
+      },
+      {
+        "id": "ribbonWidth",
+        "type": "number",
+        "label": "Ribbon width",
+        "default": 4,
+        "min": 1,
+        "max": 8,
+        "step": 0.05,
+        "description": "Ribbon width as a multiple of the incoming path width.",
+        "group": "Structure",
+        "changeCost": "live"
+      },
+      {
+        "id": "cables",
+        "type": "number",
+        "label": "Glass-style cables",
+        "default": 4,
+        "min": 0,
+        "max": 8,
+        "step": 1,
+        "description": "Paths after the ribbons rendered as glass-style strips, without physical refraction.",
+        "group": "Structure",
+        "changeCost": "live"
+      },
+      {
+        "id": "collars",
+        "type": "number",
+        "label": "Cable collars",
+        "default": 0.7,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "description": "Visibility of two metallic collars on each glass-style cable.",
+        "group": "Structure",
+        "changeCost": "live"
+      },
+      {
+        "id": "dustCount",
+        "type": "number",
+        "label": "Particles",
+        "default": 44,
+        "min": 0,
+        "max": 96,
+        "step": 1,
+        "description": "Visible particles out of a fixed pool of 96; identities do not shuffle.",
+        "group": "Dust",
+        "changeCost": "live"
+      },
+      {
+        "id": "dustSize",
+        "type": "number",
+        "label": "Size",
+        "default": 0.009,
+        "min": 0.002,
+        "max": 0.03,
+        "step": 0.001,
+        "description": "Base sprite diameter in canvas-height units. Supports stable per-instance variation.",
+        "group": "Dust",
+        "changeCost": "live"
+      },
+      {
+        "id": "dustDrift",
+        "type": "number",
+        "label": "Drift",
+        "default": 0.35,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "description": "Slow upward flow and lateral sway; zero freezes dust motion and twinkle.",
+        "group": "Dust",
+        "changeCost": "live"
+      },
+      {
+        "id": "dustBrightness",
+        "type": "number",
+        "label": "Brightness",
+        "default": 0.55,
+        "min": 0,
+        "max": 3,
+        "step": 0.01,
+        "description": "Additive golden light strength; zero removes dust light.",
+        "group": "Dust",
+        "changeCost": "live"
+      }
+    ],
+    "controlSchemaHash": "b002d04686195be9b8a38f3775d217cbcded1b9abdac9e348a1a5d5f2d01ce86",
+    "controls": {
+      "coreBrightness": 2.3,
+      "coreRadius": 0.14,
+      "haze": 0.7,
+      "breath": 0.55,
+      "flare": 0.45,
+      "strandCount": 12,
+      "spread": 1,
+      "cableWidth": 0.018,
+      "arrangement": 7,
+      "drift": 0.35,
+      "strandBrightness": 1.3,
+      "palette": 0.5,
+      "pulseSpeed": 0.12,
+      "pulseWidth": 0.07,
+      "pulseStrength": 2,
+      "ribbons": 3,
+      "ribbonWidth": 4,
+      "cables": 4,
+      "collars": 0.7,
+      "dustCount": 44,
+      "dustSize": 0.009,
+      "dustDrift": 0.35,
+      "dustBrightness": 0.55
+    },
+    "controlSequence": 0,
+    "nodeControls": {
+      "sourceHash": "13a16ad56f4b637464e8da864d1141b2ac433a6e56341190a5a9a157fe91dc5d",
+      "nodes": [
+        {
+          "nodePath": [
+            "a2ca5401-1e17-4c40-8dd6-6595f78a0001"
+          ],
+          "definitionHash": "1ccf7913af7e147c7c65d80bdd0e276e3bd27260d642e15c5214c9c78d32bca2",
+          "schema": [
+            {
+              "id": "radius",
+              "type": "number",
+              "label": "Radius",
+              "default": 0.14,
+              "min": 0.02,
+              "max": 0.35,
+              "step": 0.005,
+              "group": "Core",
+              "changeCost": "live"
+            },
+            {
+              "id": "brightness",
+              "type": "number",
+              "label": "Brightness",
+              "default": 2.3,
+              "min": 0,
+              "max": 5,
+              "step": 0.01,
+              "group": "Core",
+              "changeCost": "live"
+            },
+            {
+              "id": "haze",
+              "type": "number",
+              "label": "Magenta haze",
+              "default": 0.7,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Atmosphere",
+              "changeCost": "live"
+            },
+            {
+              "id": "breath",
+              "type": "number",
+              "label": "Breathing",
+              "default": 0.55,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Core",
+              "changeCost": "live"
+            },
+            {
+              "id": "flare",
+              "type": "number",
+              "label": "Horizontal flare",
+              "default": 0.45,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Atmosphere",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "52b6d321b5a99f9b8eaf1685d7f96558f69d84fee04b6ff8c6c8c2d393580f7a",
+          "values": {
+            "radius": 0.14,
+            "brightness": 2.3,
+            "haze": 0.7,
+            "breath": 0.55,
+            "flare": 0.45
+          }
+        },
+        {
+          "nodePath": [
+            "a2ca5401-1e17-4c40-8dd6-6595f78a0002"
+          ],
+          "definitionHash": "e8f4c77173313702c88c3fef1acc3d5c2067ff25d319a6c5cfccc74a39cc7eea",
+          "schema": [
+            {
+              "id": "count",
+              "type": "number",
+              "label": "Strands",
+              "default": 12,
+              "min": 0,
+              "max": 16,
+              "step": 1,
+              "group": "Shape",
+              "changeCost": "live"
+            },
+            {
+              "id": "spread",
+              "type": "number",
+              "label": "Spread",
+              "default": 1,
+              "min": 0.3,
+              "max": 1.4,
+              "step": 0.01,
+              "group": "Shape",
+              "changeCost": "live"
+            },
+            {
+              "id": "width",
+              "type": "number",
+              "label": "Cable width",
+              "default": 0.018,
+              "min": 0.002,
+              "max": 0.05,
+              "step": 0.001,
+              "group": "Shape",
+              "changeCost": "live"
+            },
+            {
+              "id": "seed",
+              "type": "number",
+              "label": "Arrangement",
+              "default": 7,
+              "min": 0,
+              "max": 999,
+              "step": 1,
+              "group": "Shape",
+              "changeCost": "live"
+            },
+            {
+              "id": "motion",
+              "type": "number",
+              "label": "Drift",
+              "default": 0.35,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Motion",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "74fa7702c50a343f2e05a88f18c7164e675766ceb81bc4805f65b7f3e85a59d7",
+          "values": {
+            "count": 12,
+            "spread": 1,
+            "width": 0.018,
+            "seed": 7,
+            "motion": 0.35
+          }
+        },
+        {
+          "nodePath": [
+            "a2ca5401-1e17-4c40-8dd6-6595f78a0003"
+          ],
+          "definitionHash": "c77fd5d968a249f4d3d28b72e9f844278d3a37d176ca0442c88a1b25fc88c2cf",
+          "schema": [
+            {
+              "id": "brightness",
+              "type": "number",
+              "label": "Strand brightness",
+              "default": 1.3,
+              "min": 0,
+              "max": 4,
+              "step": 0.01,
+              "group": "Light",
+              "changeCost": "live"
+            },
+            {
+              "id": "palette",
+              "type": "number",
+              "label": "Cyan to magenta",
+              "default": 0.5,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Light",
+              "changeCost": "live"
+            },
+            {
+              "id": "pulseSpeed",
+              "type": "number",
+              "label": "Pulse speed",
+              "default": 0.12,
+              "min": -1,
+              "max": 1,
+              "step": 0.01,
+              "group": "Energy",
+              "changeCost": "live"
+            },
+            {
+              "id": "pulseWidth",
+              "type": "number",
+              "label": "Pulse length",
+              "default": 0.07,
+              "min": 0.01,
+              "max": 0.3,
+              "step": 0.005,
+              "group": "Energy",
+              "changeCost": "live"
+            },
+            {
+              "id": "pulseStrength",
+              "type": "number",
+              "label": "Pulse strength",
+              "default": 2,
+              "min": 0,
+              "max": 6,
+              "step": 0.01,
+              "group": "Energy",
+              "changeCost": "live"
+            },
+            {
+              "id": "ribbons",
+              "type": "number",
+              "label": "Broad ribbons",
+              "default": 3,
+              "min": 0,
+              "max": 6,
+              "step": 1,
+              "group": "Structure",
+              "changeCost": "live"
+            },
+            {
+              "id": "ribbonWidth",
+              "type": "number",
+              "label": "Ribbon width",
+              "default": 4,
+              "min": 1,
+              "max": 8,
+              "step": 0.05,
+              "group": "Structure",
+              "changeCost": "live"
+            },
+            {
+              "id": "cables",
+              "type": "number",
+              "label": "Glass-style cables",
+              "default": 4,
+              "min": 0,
+              "max": 8,
+              "step": 1,
+              "group": "Structure",
+              "changeCost": "live"
+            },
+            {
+              "id": "collars",
+              "type": "number",
+              "label": "Cable collars",
+              "default": 0.7,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Structure",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "8e0aef23161068157edf0d77246285a7673a68fae9106180cccce452bb1993d5",
+          "values": {
+            "brightness": 1.3,
+            "palette": 0.5,
+            "pulseSpeed": 0.12,
+            "pulseWidth": 0.07,
+            "pulseStrength": 2,
+            "ribbons": 3,
+            "ribbonWidth": 4,
+            "cables": 4,
+            "collars": 0.7
+          }
+        },
+        {
+          "nodePath": [
+            "a2ca5401-1e17-4c40-8dd6-6595f78a0004"
+          ],
+          "definitionHash": "546db09082881eef9507e2eea315aa7bc2e5b4f232386bf3f5b2eff6026289c2",
+          "schema": [
+            {
+              "id": "count",
+              "type": "number",
+              "label": "Particles",
+              "default": 44,
+              "min": 0,
+              "max": 96,
+              "step": 1,
+              "group": "Dust",
+              "changeCost": "live"
+            },
+            {
+              "id": "size",
+              "type": "number",
+              "label": "Size",
+              "default": 0.009,
+              "min": 0.002,
+              "max": 0.03,
+              "step": 0.001,
+              "group": "Dust",
+              "changeCost": "live"
+            },
+            {
+              "id": "drift",
+              "type": "number",
+              "label": "Drift",
+              "default": 0.35,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Dust",
+              "changeCost": "live"
+            },
+            {
+              "id": "brightness",
+              "type": "number",
+              "label": "Brightness",
+              "default": 0.55,
+              "min": 0,
+              "max": 3,
+              "step": 0.01,
+              "group": "Dust",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "154c4af5822a2ffa048adf66d6f5efbc4c43e42f0d094f2d816fd980c26e52f6",
+          "values": {
+            "count": 44,
+            "size": 0.009,
+            "drift": 0.35,
+            "brightness": 0.55
+          }
+        }
+      ]
+    },
+    "controlAnimations": [
+      {
+        "kind": "kick",
+        "nodePath": [
+          "a2ca5401-1e17-4c40-8dd6-6595f78a0001"
+        ],
+        "definitionHash": "1ccf7913af7e147c7c65d80bdd0e276e3bd27260d642e15c5214c9c78d32bca2",
+        "schemaHash": "52b6d321b5a99f9b8eaf1685d7f96558f69d84fee04b6ff8c6c8c2d393580f7a",
+        "controlId": "brightness",
+        "source": {
+          "kind": "audio-kick",
+          "logicalInputId": "primary-audio",
+          "analyzer": {
+            "version": 1,
+            "fftSize": 2048,
+            "minDecibels": -100,
+            "maxDecibels": -30
+          }
+        },
+        "amount": 1.3,
+        "attackMs": 15,
+        "releaseMs": 400,
+        "sensitivity": 0.65,
+        "retriggerMs": 180,
+        "envelope": "exponential",
+        "enabled": true
+      },
+      {
+        "kind": "audio",
+        "nodePath": [
+          "a2ca5401-1e17-4c40-8dd6-6595f78a0001"
+        ],
+        "definitionHash": "1ccf7913af7e147c7c65d80bdd0e276e3bd27260d642e15c5214c9c78d32bca2",
+        "schemaHash": "52b6d321b5a99f9b8eaf1685d7f96558f69d84fee04b6ff8c6c8c2d393580f7a",
+        "controlId": "radius",
+        "source": {
+          "kind": "audio-band",
+          "logicalInputId": "primary-audio",
+          "band": "bass",
+          "analyzer": {
+            "version": 1,
+            "fftSize": 2048,
+            "minDecibels": -100,
+            "maxDecibels": -30
+          }
+        },
+        "amount": 0.018,
+        "attackMs": 120,
+        "releaseMs": 500,
+        "enabled": true
+      },
+      {
+        "kind": "kick",
+        "nodePath": [
+          "a2ca5401-1e17-4c40-8dd6-6595f78a0003"
+        ],
+        "definitionHash": "c77fd5d968a249f4d3d28b72e9f844278d3a37d176ca0442c88a1b25fc88c2cf",
+        "schemaHash": "8e0aef23161068157edf0d77246285a7673a68fae9106180cccce452bb1993d5",
+        "controlId": "pulseStrength",
+        "source": {
+          "kind": "audio-kick",
+          "logicalInputId": "primary-audio",
+          "analyzer": {
+            "version": 1,
+            "fftSize": 2048,
+            "minDecibels": -100,
+            "maxDecibels": -30
+          }
+        },
+        "amount": 1.8,
+        "attackMs": 10,
+        "releaseMs": 500,
+        "sensitivity": 0.65,
+        "retriggerMs": 180,
+        "envelope": "exponential",
+        "enabled": true
+      },
+      {
+        "kind": "audio",
+        "nodePath": [
+          "a2ca5401-1e17-4c40-8dd6-6595f78a0003"
+        ],
+        "definitionHash": "c77fd5d968a249f4d3d28b72e9f844278d3a37d176ca0442c88a1b25fc88c2cf",
+        "schemaHash": "8e0aef23161068157edf0d77246285a7673a68fae9106180cccce452bb1993d5",
+        "controlId": "brightness",
+        "source": {
+          "kind": "audio-band",
+          "logicalInputId": "primary-audio",
+          "band": "mids",
+          "analyzer": {
+            "version": 1,
+            "fftSize": 2048,
+            "minDecibels": -100,
+            "maxDecibels": -30
+          }
+        },
+        "amount": 0.45,
+        "attackMs": 100,
+        "releaseMs": 400,
+        "enabled": true
+      },
+      {
+        "kind": "audio",
+        "nodePath": [
+          "a2ca5401-1e17-4c40-8dd6-6595f78a0004"
+        ],
+        "definitionHash": "546db09082881eef9507e2eea315aa7bc2e5b4f232386bf3f5b2eff6026289c2",
+        "schemaHash": "154c4af5822a2ffa048adf66d6f5efbc4c43e42f0d094f2d816fd980c26e52f6",
+        "controlId": "brightness",
+        "source": {
+          "kind": "audio-band",
+          "logicalInputId": "primary-audio",
+          "band": "highs",
+          "analyzer": {
+            "version": 1,
+            "fftSize": 2048,
+            "minDecibels": -100,
+            "maxDecibels": -30
+          }
+        },
+        "amount": 0.45,
+        "attackMs": 40,
+        "releaseMs": 250,
+        "enabled": true
+      }
+    ],
+    "controlAnimationIssues": [],
+    "animationSequence": 0,
+    "effectiveControls": {
+      "coreBrightness": 2.3,
+      "coreRadius": 0.14,
+      "haze": 0.7,
+      "breath": 0.55,
+      "flare": 0.45,
+      "strandCount": 12,
+      "spread": 1,
+      "cableWidth": 0.018,
+      "arrangement": 7,
+      "drift": 0.35,
+      "strandBrightness": 1.3,
+      "palette": 0.5,
+      "pulseSpeed": 0.12,
+      "pulseWidth": 0.07,
+      "pulseStrength": 2,
+      "ribbons": 3,
+      "ribbonWidth": 4,
+      "cables": 4,
+      "collars": 0.7,
+      "dustCount": 44,
+      "dustSize": 0.009,
+      "dustDrift": 0.35,
+      "dustBrightness": 0.55
+    },
+    "effectiveNodeControls": {
+      "sourceHash": "13a16ad56f4b637464e8da864d1141b2ac433a6e56341190a5a9a157fe91dc5d",
+      "nodes": [
+        {
+          "nodePath": [
+            "a2ca5401-1e17-4c40-8dd6-6595f78a0001"
+          ],
+          "definitionHash": "1ccf7913af7e147c7c65d80bdd0e276e3bd27260d642e15c5214c9c78d32bca2",
+          "schema": [
+            {
+              "id": "radius",
+              "type": "number",
+              "label": "Radius",
+              "default": 0.14,
+              "min": 0.02,
+              "max": 0.35,
+              "step": 0.005,
+              "group": "Core",
+              "changeCost": "live"
+            },
+            {
+              "id": "brightness",
+              "type": "number",
+              "label": "Brightness",
+              "default": 2.3,
+              "min": 0,
+              "max": 5,
+              "step": 0.01,
+              "group": "Core",
+              "changeCost": "live"
+            },
+            {
+              "id": "haze",
+              "type": "number",
+              "label": "Magenta haze",
+              "default": 0.7,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Atmosphere",
+              "changeCost": "live"
+            },
+            {
+              "id": "breath",
+              "type": "number",
+              "label": "Breathing",
+              "default": 0.55,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Core",
+              "changeCost": "live"
+            },
+            {
+              "id": "flare",
+              "type": "number",
+              "label": "Horizontal flare",
+              "default": 0.45,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Atmosphere",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "52b6d321b5a99f9b8eaf1685d7f96558f69d84fee04b6ff8c6c8c2d393580f7a",
+          "values": {
+            "radius": 0.14,
+            "brightness": 2.3,
+            "haze": 0.7,
+            "breath": 0.55,
+            "flare": 0.45
+          }
+        },
+        {
+          "nodePath": [
+            "a2ca5401-1e17-4c40-8dd6-6595f78a0002"
+          ],
+          "definitionHash": "e8f4c77173313702c88c3fef1acc3d5c2067ff25d319a6c5cfccc74a39cc7eea",
+          "schema": [
+            {
+              "id": "count",
+              "type": "number",
+              "label": "Strands",
+              "default": 12,
+              "min": 0,
+              "max": 16,
+              "step": 1,
+              "group": "Shape",
+              "changeCost": "live"
+            },
+            {
+              "id": "spread",
+              "type": "number",
+              "label": "Spread",
+              "default": 1,
+              "min": 0.3,
+              "max": 1.4,
+              "step": 0.01,
+              "group": "Shape",
+              "changeCost": "live"
+            },
+            {
+              "id": "width",
+              "type": "number",
+              "label": "Cable width",
+              "default": 0.018,
+              "min": 0.002,
+              "max": 0.05,
+              "step": 0.001,
+              "group": "Shape",
+              "changeCost": "live"
+            },
+            {
+              "id": "seed",
+              "type": "number",
+              "label": "Arrangement",
+              "default": 7,
+              "min": 0,
+              "max": 999,
+              "step": 1,
+              "group": "Shape",
+              "changeCost": "live"
+            },
+            {
+              "id": "motion",
+              "type": "number",
+              "label": "Drift",
+              "default": 0.35,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Motion",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "74fa7702c50a343f2e05a88f18c7164e675766ceb81bc4805f65b7f3e85a59d7",
+          "values": {
+            "count": 12,
+            "spread": 1,
+            "width": 0.018,
+            "seed": 7,
+            "motion": 0.35
+          }
+        },
+        {
+          "nodePath": [
+            "a2ca5401-1e17-4c40-8dd6-6595f78a0003"
+          ],
+          "definitionHash": "c77fd5d968a249f4d3d28b72e9f844278d3a37d176ca0442c88a1b25fc88c2cf",
+          "schema": [
+            {
+              "id": "brightness",
+              "type": "number",
+              "label": "Strand brightness",
+              "default": 1.3,
+              "min": 0,
+              "max": 4,
+              "step": 0.01,
+              "group": "Light",
+              "changeCost": "live"
+            },
+            {
+              "id": "palette",
+              "type": "number",
+              "label": "Cyan to magenta",
+              "default": 0.5,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Light",
+              "changeCost": "live"
+            },
+            {
+              "id": "pulseSpeed",
+              "type": "number",
+              "label": "Pulse speed",
+              "default": 0.12,
+              "min": -1,
+              "max": 1,
+              "step": 0.01,
+              "group": "Energy",
+              "changeCost": "live"
+            },
+            {
+              "id": "pulseWidth",
+              "type": "number",
+              "label": "Pulse length",
+              "default": 0.07,
+              "min": 0.01,
+              "max": 0.3,
+              "step": 0.005,
+              "group": "Energy",
+              "changeCost": "live"
+            },
+            {
+              "id": "pulseStrength",
+              "type": "number",
+              "label": "Pulse strength",
+              "default": 2,
+              "min": 0,
+              "max": 6,
+              "step": 0.01,
+              "group": "Energy",
+              "changeCost": "live"
+            },
+            {
+              "id": "ribbons",
+              "type": "number",
+              "label": "Broad ribbons",
+              "default": 3,
+              "min": 0,
+              "max": 6,
+              "step": 1,
+              "group": "Structure",
+              "changeCost": "live"
+            },
+            {
+              "id": "ribbonWidth",
+              "type": "number",
+              "label": "Ribbon width",
+              "default": 4,
+              "min": 1,
+              "max": 8,
+              "step": 0.05,
+              "group": "Structure",
+              "changeCost": "live"
+            },
+            {
+              "id": "cables",
+              "type": "number",
+              "label": "Glass-style cables",
+              "default": 4,
+              "min": 0,
+              "max": 8,
+              "step": 1,
+              "group": "Structure",
+              "changeCost": "live"
+            },
+            {
+              "id": "collars",
+              "type": "number",
+              "label": "Cable collars",
+              "default": 0.7,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Structure",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "8e0aef23161068157edf0d77246285a7673a68fae9106180cccce452bb1993d5",
+          "values": {
+            "brightness": 1.3,
+            "palette": 0.5,
+            "pulseSpeed": 0.12,
+            "pulseWidth": 0.07,
+            "pulseStrength": 2,
+            "ribbons": 3,
+            "ribbonWidth": 4,
+            "cables": 4,
+            "collars": 0.7
+          }
+        },
+        {
+          "nodePath": [
+            "a2ca5401-1e17-4c40-8dd6-6595f78a0004"
+          ],
+          "definitionHash": "546db09082881eef9507e2eea315aa7bc2e5b4f232386bf3f5b2eff6026289c2",
+          "schema": [
+            {
+              "id": "count",
+              "type": "number",
+              "label": "Particles",
+              "default": 44,
+              "min": 0,
+              "max": 96,
+              "step": 1,
+              "group": "Dust",
+              "changeCost": "live"
+            },
+            {
+              "id": "size",
+              "type": "number",
+              "label": "Size",
+              "default": 0.009,
+              "min": 0.002,
+              "max": 0.03,
+              "step": 0.001,
+              "group": "Dust",
+              "changeCost": "live"
+            },
+            {
+              "id": "drift",
+              "type": "number",
+              "label": "Drift",
+              "default": 0.35,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Dust",
+              "changeCost": "live"
+            },
+            {
+              "id": "brightness",
+              "type": "number",
+              "label": "Brightness",
+              "default": 0.55,
+              "min": 0,
+              "max": 3,
+              "step": 0.01,
+              "group": "Dust",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "154c4af5822a2ffa048adf66d6f5efbc4c43e42f0d094f2d816fd980c26e52f6",
+          "values": {
+            "count": 44,
+            "size": 0.009,
+            "drift": 0.35,
+            "brightness": 0.55
+          }
+        }
+      ]
+    },
+    "controlMigration": [],
+    "clockEpoch": 0,
+    "timeSeconds": 8.9875,
+    "tempo": {
+      "bpm": 120,
+      "beatPosition": 18.013199999999255,
+      "beatPhase": 0.013199999999255141,
+      "tempoSequence": 0
+    },
+    "tempoSequence": 0,
+    "frameId": "425",
+    "output": {
+      "width": 1920,
+      "height": 1080,
+      "fps": 60,
+      "seed": 0
+    },
+    "fault": null
+  },
+  "host": null,
+  "jobs": [
+    {
+      "jobId": "08d20e00-392e-4c43-a813-87d6327e6b39",
+      "state": "succeeded",
+      "summary": "Visual is ready in Lux."
+    }
+  ],
+  "visualFps": null,
+  "uiFps": null,
+  "performance": {
+    "owner": {
+      "instanceId": "0faba169-1cb4-447c-a121-67b223bc1d44",
+      "generation": 2,
+      "revisionId": "13a16ad56f4b637464e8da864d1141b2ac433a6e56341190a5a9a157fe91dc5d"
+    },
+    "status": "live",
+    "observedAtMs": 36010.5,
+    "worker": {
+      "schemaVersion": 1,
+      "mode": "routine",
+      "clockDomain": "dedicated-worker-monotonic-ms",
+      "sequence": 18,
+      "windowStartMs": 9296.300000000745,
+      "windowEndMs": 9792,
+      "lostRecords": 0,
+      "invalidRecords": 0,
+      "intervalLostRecords": 0,
+      "intervalInvalidRecords": 0,
+      "retainedRecords": 28,
+      "produced": {
+        "unit": "Hz",
+        "availability": "available",
+        "validity": "complete",
+        "gate": "not_evaluated",
+        "sampleCount": 28,
+        "expectedCount": 28,
+        "missingCount": 0,
+        "samplingPolicy": "completed frames over independent summary interval",
+        "value": 56.48577768820272
+      },
+      "update": {
+        "unit": "ms",
+        "availability": "available",
+        "validity": "complete",
+        "gate": "not_evaluated",
+        "sampleCount": 28,
+        "expectedCount": 28,
+        "missingCount": 0,
+        "samplingPolicy": "all completed frames in this summary interval",
+        "p50": 0.2000000011175871,
+        "p95": 0.40000000037252903,
+        "p99": 0.6000000014901161,
+        "max": 0.6000000014901161
+      },
+      "renderCall": {
+        "unit": "ms",
+        "availability": "available",
+        "validity": "complete",
+        "gate": "not_evaluated",
+        "sampleCount": 28,
+        "expectedCount": 28,
+        "missingCount": 0,
+        "samplingPolicy": "all completed frames in this summary interval",
+        "p50": 0.5,
+        "p95": 1.299999998882413,
+        "p99": 1.599999999627471,
+        "max": 1.599999999627471
+      },
+      "cpuCall": {
+        "unit": "ms",
+        "availability": "available",
+        "validity": "incomplete",
+        "gate": "not_evaluated",
+        "sampleCount": 28,
+        "expectedCount": 28,
+        "missingCount": 0,
+        "samplingPolicy": "all completed frames in this summary interval",
+        "reason": "Asynchronous render continuation CPU work is not fully measured",
+        "p50": 0.7000000011175871,
+        "p95": 1.799999998882413,
+        "p99": 1.900000000372529,
+        "max": 1.900000000372529
+      },
+      "renderAwait": {
+        "unit": "ms",
+        "availability": "available",
+        "validity": "complete",
+        "gate": "not_evaluated",
+        "sampleCount": 28,
+        "expectedCount": 28,
+        "missingCount": 0,
+        "samplingPolicy": "all completed frames in this summary interval",
+        "p50": 7,
+        "p95": 8.200000001117587,
+        "p99": 8.200000001117587,
+        "max": 8.200000001117587
+      },
+      "queueWait": {
+        "unit": "ms",
+        "availability": "available",
+        "validity": "complete",
+        "gate": "not_evaluated",
+        "sampleCount": 28,
+        "expectedCount": 28,
+        "missingCount": 0,
+        "samplingPolicy": "all completed frames in this summary interval",
+        "p50": 8.599999999627471,
+        "p95": 11.699999999254942,
+        "p99": 18,
+        "max": 18
+      },
+      "gpu": {
+        "unit": "ms",
+        "availability": "available",
+        "validity": "incomplete",
+        "gate": "not_evaluated",
+        "sampleCount": 1,
+        "expectedCount": 1,
+        "missingCount": 0,
+        "samplingPolicy": "one in 30 frames (frame IDs 1,31,61,...)",
+        "reason": "GPU copies, uploads or clears outside passes are excluded",
+        "p50": 0.393216,
+        "p95": 0.393216,
+        "p99": 0.393216,
+        "max": 0.393216,
+        "timestampQuerySupported": true,
+        "timestampQueryEnabled": true,
+        "failedSamples": 0,
+        "droppedSamples": 0,
+        "pendingSamples": 0
+      }
+    }
+  },
+  "capabilities": {
+    "protocolVersion": 4,
+    "supportedSdkVersions": [
+      "0.1.0",
+      "0.2.0",
+      "0.4.0"
+    ],
+    "codeDeclaredParameters": true,
+    "parameterKinds": [
+      "number"
+    ],
+    "maxParameterMetadataBytes": 32768,
+    "imageFormats": [
+      "image/bmp",
+      "image/png",
+      "image/jpeg"
+    ],
+    "assetExport": true,
+    "sceneVersions": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "controlVariation": {
+      "stableInstanceKeys": true,
+      "distributions": [
+        "random",
+        "centered",
+        "spread"
+      ]
+    },
+    "tempo": {
+      "manual": true,
+      "tap": true,
+      "bpm": {
+        "min": 20,
+        "max": 300
+      }
+    }
+  },
+  "studioSession": {
+    "profile": "test-8e068d2b-4f03-4fad-a214-8862d00879cc",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\fiber-optic-heart",
+    "sessionId": "cfad7818495d4a97432b893f844307dd8ec8",
+    "pid": 30704
+  }
+}

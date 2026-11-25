@@ -1,0 +1,1 @@
+Committed component-named scenes under visuals/ and merged to main bee43888ffae8990558adb2a011a31d6069ee53f. All nine saved audio mappings retained.

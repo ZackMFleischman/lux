@@ -1,0 +1,3999 @@
+{
+  "draftVersion": 3,
+  "status": {
+    "connection": "connected",
+    "message": null,
+    "receivedAtMs": 1789621986224,
+    "authoring": {
+      "instanceId": "ef867dd8-6dbc-49a3-9f01-46aac01dfb17",
+      "generation": 2,
+      "revisionId": "7f64b537464ef980e82e93bfc16a47b775fe6e3f19c30b097c988b02c57c5efe",
+      "composition": {
+        "version": 2,
+        "declaration": {
+          "definitions": {
+            "bands": "pigment-rivers/bands.ts",
+            "phrasing": "wandering-tracers/phrasing.ts",
+            "watercolor": "wandering-tracers/watercolor.ts",
+            "boundary": "wandering-tracers/boundary.ts",
+            "contours": "wandering-tracers/contours.ts",
+            "renderer": "pigment-rivers/renderer.ts",
+            "surface": "pigment-rivers/surface.ts"
+          },
+          "nodes": [
+            {
+              "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+              "definition": "bands"
+            },
+            {
+              "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0002",
+              "definition": "phrasing"
+            },
+            {
+              "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0003",
+              "definition": "watercolor"
+            },
+            {
+              "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0004",
+              "definition": "boundary"
+            },
+            {
+              "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0005",
+              "definition": "contours"
+            },
+            {
+              "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+              "definition": "renderer"
+            },
+            {
+              "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+              "definition": "surface"
+            }
+          ],
+          "edges": [
+            {
+              "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0011",
+              "from": {
+                "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+                "portId": "field"
+              },
+              "to": {
+                "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                "portId": "bands"
+              },
+              "delay": "none"
+            },
+            {
+              "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0012",
+              "from": {
+                "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0002",
+                "portId": "ornament"
+              },
+              "to": {
+                "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                "portId": "phrasing"
+              },
+              "delay": "none"
+            },
+            {
+              "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0013",
+              "from": {
+                "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0003",
+                "portId": "ornament"
+              },
+              "to": {
+                "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                "portId": "watercolor"
+              },
+              "delay": "none"
+            },
+            {
+              "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0014",
+              "from": {
+                "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0004",
+                "portId": "ornament"
+              },
+              "to": {
+                "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                "portId": "boundary"
+              },
+              "delay": "none"
+            },
+            {
+              "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0015",
+              "from": {
+                "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0005",
+                "portId": "pattern"
+              },
+              "to": {
+                "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                "portId": "contours"
+              },
+              "delay": "none"
+            },
+            {
+              "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0016",
+              "from": {
+                "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                "portId": "image"
+              },
+              "to": {
+                "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+                "portId": "image"
+              },
+              "delay": "none"
+            }
+          ],
+          "output": {
+            "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+            "portId": "image"
+          },
+          "expose": [
+            {
+              "id": "bandDensity",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+              "controlId": "scale"
+            },
+            {
+              "id": "folding",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+              "controlId": "fold"
+            },
+            {
+              "id": "flow",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+              "controlId": "flow"
+            },
+            {
+              "id": "arrangement",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+              "controlId": "seed"
+            },
+            {
+              "id": "pace",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0002",
+              "controlId": "pace"
+            },
+            {
+              "id": "phrasing",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0002",
+              "controlId": "phrasing"
+            },
+            {
+              "id": "warmth",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0003",
+              "controlId": "warmth"
+            },
+            {
+              "id": "pooling",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0003",
+              "controlId": "pooling"
+            },
+            {
+              "id": "blooms",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0003",
+              "controlId": "blooms"
+            },
+            {
+              "id": "inkWidth",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0004",
+              "controlId": "ornamentWidth"
+            },
+            {
+              "id": "inkCharacter",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0004",
+              "controlId": "handDrawn"
+            },
+            {
+              "id": "contourDensity",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0005",
+              "controlId": "density"
+            },
+            {
+              "id": "contourWidth",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0005",
+              "controlId": "width"
+            },
+            {
+              "id": "acidPalette",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+              "controlId": "acidPalette"
+            },
+            {
+              "id": "contourStrength",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+              "controlId": "contourStrength"
+            },
+            {
+              "id": "scumble",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+              "controlId": "scumble"
+            },
+            {
+              "id": "paperTooth",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+              "controlId": "tooth"
+            },
+            {
+              "id": "pigmentDrag",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+              "controlId": "drag"
+            },
+            {
+              "id": "dryBrush",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+              "controlId": "dryBrush"
+            },
+            {
+              "id": "margin",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+              "controlId": "margin"
+            },
+            {
+              "id": "splatter",
+              "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+              "controlId": "splatter"
+            }
+          ],
+          "label": "Pigment Rivers"
+        },
+        "definitionNames": {
+          "bands": "569a767759fee1ec504c7c4abfcc5df84764e8882e51a87526c17454f5b1f368",
+          "phrasing": "ddf375b531bf741eeec6ba07f6d4136b5214e3148e156fda4a0dbc93b8b6cc09",
+          "watercolor": "b159577b4ab913809499efdb6a24ab41fd2fbbdeb31f55962a9ad32fb9daf69a",
+          "boundary": "c0f808de02081671138f31f078565b179ce928a8b2cffafb9a9859b56f6576dd",
+          "contours": "6bfd2bfd7746c9cff0c9776f370866c5229d9ef0883e9b0e0d1384fde2e6b6bc",
+          "renderer": "7e1cd6daded9c7fe65f3285882d536e29661a193948bfe9b7b4a430da393e6d1",
+          "surface": "a86d69c1245a7c287c3f47810d0be4ba8010782ce7e9ac476b69b59c084acf55"
+        },
+        "moduleDeclarations": {
+          "b9c15e7ab806ad80df06edc3e3a71b525442e3ccb4c61017352561ccf1d6c6f7": {
+            "modulePath": "pigment-rivers/composition.ts",
+            "definitionNames": {
+              "bands": "569a767759fee1ec504c7c4abfcc5df84764e8882e51a87526c17454f5b1f368",
+              "phrasing": "ddf375b531bf741eeec6ba07f6d4136b5214e3148e156fda4a0dbc93b8b6cc09",
+              "watercolor": "b159577b4ab913809499efdb6a24ab41fd2fbbdeb31f55962a9ad32fb9daf69a",
+              "boundary": "c0f808de02081671138f31f078565b179ce928a8b2cffafb9a9859b56f6576dd",
+              "contours": "6bfd2bfd7746c9cff0c9776f370866c5229d9ef0883e9b0e0d1384fde2e6b6bc",
+              "renderer": "7e1cd6daded9c7fe65f3285882d536e29661a193948bfe9b7b4a430da393e6d1",
+              "surface": "a86d69c1245a7c287c3f47810d0be4ba8010782ce7e9ac476b69b59c084acf55"
+            },
+            "declaration": {
+              "definitions": {
+                "bands": "pigment-rivers/bands.ts",
+                "phrasing": "wandering-tracers/phrasing.ts",
+                "watercolor": "wandering-tracers/watercolor.ts",
+                "boundary": "wandering-tracers/boundary.ts",
+                "contours": "wandering-tracers/contours.ts",
+                "renderer": "pigment-rivers/renderer.ts",
+                "surface": "pigment-rivers/surface.ts"
+              },
+              "nodes": [
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+                  "definition": "bands"
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0002",
+                  "definition": "phrasing"
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0003",
+                  "definition": "watercolor"
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0004",
+                  "definition": "boundary"
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0005",
+                  "definition": "contours"
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                  "definition": "renderer"
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+                  "definition": "surface"
+                }
+              ],
+              "edges": [
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0011",
+                  "from": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+                    "portId": "field"
+                  },
+                  "to": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                    "portId": "bands"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0012",
+                  "from": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0002",
+                    "portId": "ornament"
+                  },
+                  "to": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                    "portId": "phrasing"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0013",
+                  "from": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0003",
+                    "portId": "ornament"
+                  },
+                  "to": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                    "portId": "watercolor"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0014",
+                  "from": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0004",
+                    "portId": "ornament"
+                  },
+                  "to": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                    "portId": "boundary"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0015",
+                  "from": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0005",
+                    "portId": "pattern"
+                  },
+                  "to": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                    "portId": "contours"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0016",
+                  "from": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                    "portId": "image"
+                  },
+                  "to": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+                    "portId": "image"
+                  },
+                  "delay": "none"
+                }
+              ],
+              "output": {
+                "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+                "portId": "image"
+              },
+              "expose": [
+                {
+                  "id": "bandDensity",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+                  "controlId": "scale"
+                },
+                {
+                  "id": "folding",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+                  "controlId": "fold"
+                },
+                {
+                  "id": "flow",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+                  "controlId": "flow"
+                },
+                {
+                  "id": "arrangement",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+                  "controlId": "seed"
+                },
+                {
+                  "id": "pace",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0002",
+                  "controlId": "pace"
+                },
+                {
+                  "id": "phrasing",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0002",
+                  "controlId": "phrasing"
+                },
+                {
+                  "id": "warmth",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0003",
+                  "controlId": "warmth"
+                },
+                {
+                  "id": "pooling",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0003",
+                  "controlId": "pooling"
+                },
+                {
+                  "id": "blooms",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0003",
+                  "controlId": "blooms"
+                },
+                {
+                  "id": "inkWidth",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0004",
+                  "controlId": "ornamentWidth"
+                },
+                {
+                  "id": "inkCharacter",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0004",
+                  "controlId": "handDrawn"
+                },
+                {
+                  "id": "contourDensity",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0005",
+                  "controlId": "density"
+                },
+                {
+                  "id": "contourWidth",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0005",
+                  "controlId": "width"
+                },
+                {
+                  "id": "acidPalette",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                  "controlId": "acidPalette"
+                },
+                {
+                  "id": "contourStrength",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                  "controlId": "contourStrength"
+                },
+                {
+                  "id": "scumble",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                  "controlId": "scumble"
+                },
+                {
+                  "id": "paperTooth",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+                  "controlId": "tooth"
+                },
+                {
+                  "id": "pigmentDrag",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+                  "controlId": "drag"
+                },
+                {
+                  "id": "dryBrush",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+                  "controlId": "dryBrush"
+                },
+                {
+                  "id": "margin",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+                  "controlId": "margin"
+                },
+                {
+                  "id": "splatter",
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+                  "controlId": "splatter"
+                }
+              ],
+              "label": "Pigment Rivers"
+            }
+          }
+        },
+        "graph": {
+          "version": 2,
+          "rootDefinitionHash": "b9c15e7ab806ad80df06edc3e3a71b525442e3ccb4c61017352561ccf1d6c6f7",
+          "outputPort": "image"
+        },
+        "definitions": {
+          "569a767759fee1ec504c7c4abfcc5df84764e8882e51a87526c17454f5b1f368": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "pigment-rivers/folded-bands",
+              "label": "Folded Pigment Bands",
+              "description": "Long folded color regions with a LoRegion-compatible local frame and estimated boundary distance.",
+              "tags": [
+                "bands",
+                "field",
+                "painting"
+              ],
+              "inputs": {},
+              "outputs": {
+                "field": {
+                  "type": {
+                    "kind": "shader-field",
+                    "version": 1,
+                    "abi": "examples/folded-pigment-bands/v1"
+                  },
+                  "label": "Bands",
+                  "description": "Helpers require the ornament phrasing noise basis. Values: scale, fold, flow, seed."
+                }
+              },
+              "controls": [
+                {
+                  "id": "scale",
+                  "type": "number",
+                  "label": "Band density",
+                  "default": 1,
+                  "min": 0.4,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Pigment shape",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "fold",
+                  "type": "number",
+                  "label": "Folding",
+                  "default": 1.15,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Pigment shape",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "flow",
+                  "type": "number",
+                  "label": "Flow",
+                  "default": 0.3,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Pigment shape",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "seed",
+                  "type": "number",
+                  "label": "Arrangement",
+                  "default": 7,
+                  "min": 0,
+                  "max": 999,
+                  "step": 1,
+                  "group": "Pigment shape",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "flow": "Speed of large shape deformation, using upstream artistic time.",
+                "fold": "Large directional folds and bends; zero leaves quieter wavy strata.",
+                "scale": "Spatial density of pigment bands, independent of canvas aspect ratio.",
+                "seed": "Stable arrangement of the folds and paper-like edge perturbations."
+              },
+              "lifecycle": {
+                "state": "stateless",
+                "reset": "seed"
+              }
+            }
+          },
+          "6bfd2bfd7746c9cff0c9776f370866c5229d9ef0883e9b0e0d1384fde2e6b6bc": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "lux/nested-contours",
+              "label": "Nested Contours",
+              "description": "Wavy nested contour lines for compatible Living Ornament renderers.",
+              "tags": [
+                "contour",
+                "ornament",
+                "pattern"
+              ],
+              "inputs": {},
+              "outputs": {
+                "pattern": {
+                  "type": {
+                    "kind": "shader-field",
+                    "version": 1,
+                    "abi": "lux/ornament-contours/v1"
+                  },
+                  "label": "Contours",
+                  "description": "Contour coverage helper and live pattern multipliers."
+                }
+              },
+              "controls": [
+                {
+                  "id": "density",
+                  "type": "number",
+                  "label": "Density",
+                  "default": 1,
+                  "min": 0.3,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Contours",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "width",
+                  "type": "number",
+                  "label": "Width",
+                  "default": 1,
+                  "min": 0.3,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Contours",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "variation",
+                  "type": "number",
+                  "label": "Variation",
+                  "default": 1,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "group": "Contours",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "motion",
+                  "type": "number",
+                  "label": "Motion",
+                  "default": 1,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Contours",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "density": "Multiplier for nested contour density.",
+                "motion": "Multiplier for nested contour motion.",
+                "variation": "Multiplier for nested contour waviness.",
+                "width": "Multiplier for nested contour width."
+              },
+              "lifecycle": {
+                "state": "stateless",
+                "reset": "seed"
+              }
+            }
+          },
+          "7e1cd6daded9c7fe65f3285882d536e29661a193948bfe9b7b4a430da393e6d1": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "pigment-rivers/renderer",
+              "label": "Pigment River Paint",
+              "description": "Acid-green and pink flowing paint with reusable watercolor, ink and contour fields.",
+              "tags": [
+                "painting",
+                "pigment",
+                "renderer"
+              ],
+              "inputs": {
+                "bands": {
+                  "type": {
+                    "kind": "shader-field",
+                    "version": 1,
+                    "abi": "examples/folded-pigment-bands/v1"
+                  },
+                  "label": "Bands",
+                  "description": "Folded LoRegion geometry helpers."
+                },
+                "boundary": {
+                  "type": {
+                    "kind": "shader-field",
+                    "version": 1,
+                    "abi": "lux/ornament-boundary-ink/v1"
+                  },
+                  "label": "Ink",
+                  "description": "Existing hand-drawn dark seams."
+                },
+                "contours": {
+                  "type": {
+                    "kind": "shader-field",
+                    "version": 1,
+                    "abi": "lux/ornament-contours/v1"
+                  },
+                  "label": "Contours",
+                  "description": "Existing nested contour line pattern."
+                },
+                "phrasing": {
+                  "type": {
+                    "kind": "shader-field",
+                    "version": 1,
+                    "abi": "lux/ornament-phrasing/v1"
+                  },
+                  "label": "Phrasing",
+                  "description": "Existing artistic clock and noise helpers."
+                },
+                "watercolor": {
+                  "type": {
+                    "kind": "shader-field",
+                    "version": 1,
+                    "abi": "lux/ornament-watercolor/v1"
+                  },
+                  "label": "Watercolor",
+                  "description": "Existing wash and pigment pooling."
+                }
+              },
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Opaque pigment painting."
+                }
+              },
+              "controls": [
+                {
+                  "id": "acidPalette",
+                  "type": "number",
+                  "label": "Acid palette",
+                  "default": 0.9,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Pigment",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "contourStrength",
+                  "type": "number",
+                  "label": "Contour ink",
+                  "default": 0.55,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Pigment",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "scumble",
+                  "type": "number",
+                  "label": "Uneven pigment",
+                  "default": 0.7,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Pigment",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "acidPalette": "Blends the existing wash palette toward green, hot pink, cyan and lemon.",
+                "contourStrength": "Adds nested contour scribbles only in selected quieter color families.",
+                "scumble": "Irregular light and dark pigment attached to each flowing band."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            }
+          },
+          "a86d69c1245a7c287c3f47810d0be4ba8010782ce7e9ac476b69b59c084acf55": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "pigment-rivers/dry-brush-paper",
+              "label": "Dry Brush & Paper",
+              "description": "Stationary paper tooth, directional paint breaks, dragged pigment and optional splattered margins over any image.",
+              "tags": [
+                "effect",
+                "painting",
+                "paper",
+                "texture"
+              ],
+              "inputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Paint",
+                  "description": "Input painting to give a physical surface."
+                }
+              },
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Textured painting; preserves input alpha outside optional opaque margins."
+                }
+              },
+              "controls": [
+                {
+                  "id": "tooth",
+                  "type": "number",
+                  "label": "Paper tooth",
+                  "default": 0.7,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Surface",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "drag",
+                  "type": "number",
+                  "label": "Pigment drag",
+                  "default": 0.6,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Surface",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "dryBrush",
+                  "type": "number",
+                  "label": "Dry brush",
+                  "default": 0.8,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Surface",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "margin",
+                  "type": "number",
+                  "label": "Margin",
+                  "default": 0.018,
+                  "min": 0,
+                  "max": 0.08,
+                  "step": 0.001,
+                  "group": "Paper edge",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "splatter",
+                  "type": "number",
+                  "label": "Splatter",
+                  "default": 0.6,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Paper edge",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "drag": "Small sideways pigment smear through intermittent bristle marks.",
+                "dryBrush": "Warm paper showing through dry paint gaps.",
+                "margin": "Rough paper border in canvas-height units. Zero removes it.",
+                "splatter": "Seeded-looking static pink flecks concentrated near the paper edge.",
+                "tooth": "Static fine grain. The paper never moves with the pigment."
+              },
+              "lifecycle": {
+                "state": "stateless",
+                "reset": "seed"
+              }
+            }
+          },
+          "b159577b4ab913809499efdb6a24ab41fd2fbbdeb31f55962a9ad32fb9daf69a": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "lux/animated-watercolor",
+              "label": "Animated Watercolor",
+              "description": "Reusable animated watercolor washes, warm pools, blooms, and pigment pooling.",
+              "tags": [
+                "color",
+                "painting",
+                "watercolor"
+              ],
+              "inputs": {},
+              "outputs": {
+                "field": {
+                  "type": {
+                    "kind": "shader-field",
+                    "version": 1,
+                    "abi": "lux/watercolor/v1"
+                  },
+                  "label": "Watercolor",
+                  "description": "Animated watercolor shader block with its current numeric values."
+                },
+                "ornament": {
+                  "type": {
+                    "kind": "shader-field",
+                    "version": 1,
+                    "abi": "lux/ornament-watercolor/v1"
+                  },
+                  "label": "Ornament watercolor",
+                  "description": "Shape-aware ornament color shader helper with its current material values."
+                }
+              },
+              "controls": [
+                {
+                  "id": "palette",
+                  "type": "number",
+                  "label": "Wash lightness",
+                  "default": 0.07,
+                  "min": -1,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "warmth",
+                  "type": "number",
+                  "label": "Warm pools",
+                  "default": 1.3,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "contrast",
+                  "type": "number",
+                  "label": "Region contrast",
+                  "default": 1.05,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "pooling",
+                  "type": "number",
+                  "label": "Pigment pooling",
+                  "default": 0.74,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "blooms",
+                  "type": "number",
+                  "label": "Watercolor blooms",
+                  "default": 0.94,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "ornamentSaturation",
+                  "type": "number",
+                  "label": "Saturation",
+                  "default": 1,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "group": "Ornament Color",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "blooms": "blooms setting for the painting.",
+                "contrast": "contrast setting for the painting.",
+                "ornamentSaturation": "Saturation for Living Ornament watercolor anchors and supporting shapes.",
+                "palette": "palette setting for the painting.",
+                "pooling": "pooling setting for the painting.",
+                "warmth": "warmth setting for the painting."
+              },
+              "lifecycle": {
+                "state": "stateless",
+                "reset": "seed"
+              }
+            }
+          },
+          "b9c15e7ab806ad80df06edc3e3a71b525442e3ccb4c61017352561ccf1d6c6f7": {
+            "kind": "graph",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "lux/image-composition",
+              "label": "Pigment Rivers",
+              "description": "Authored image component chain",
+              "tags": [],
+              "inputs": {},
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Image"
+                }
+              },
+              "controls": [
+                {
+                  "id": "bandDensity",
+                  "type": "number",
+                  "label": "Band density",
+                  "default": 1,
+                  "min": 0.4,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "Spatial density of pigment bands, independent of canvas aspect ratio.",
+                  "group": "Pigment shape",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "folding",
+                  "type": "number",
+                  "label": "Folding",
+                  "default": 1.15,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "Large directional folds and bends; zero leaves quieter wavy strata.",
+                  "group": "Pigment shape",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "flow",
+                  "type": "number",
+                  "label": "Flow",
+                  "default": 0.3,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "Speed of large shape deformation, using upstream artistic time.",
+                  "group": "Pigment shape",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "arrangement",
+                  "type": "number",
+                  "label": "Arrangement",
+                  "default": 7,
+                  "min": 0,
+                  "max": 999,
+                  "step": 1,
+                  "description": "Stable arrangement of the folds and paper-like edge perturbations.",
+                  "group": "Pigment shape",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "pace",
+                  "type": "number",
+                  "label": "Pace",
+                  "default": 1.24,
+                  "min": 0,
+                  "max": 3,
+                  "step": 0.01,
+                  "description": "pace setting for the painting.",
+                  "group": "Motion",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "phrasing",
+                  "type": "number",
+                  "label": "Tension and release",
+                  "default": 1,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "phrasing setting for the painting.",
+                  "group": "Motion",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "warmth",
+                  "type": "number",
+                  "label": "Warm pools",
+                  "default": 1.3,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "warmth setting for the painting.",
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "pooling",
+                  "type": "number",
+                  "label": "Pigment pooling",
+                  "default": 0.74,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "pooling setting for the painting.",
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "blooms",
+                  "type": "number",
+                  "label": "Watercolor blooms",
+                  "default": 0.94,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "blooms setting for the painting.",
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "inkWidth",
+                  "type": "number",
+                  "label": "Boundary width",
+                  "default": 0.008,
+                  "min": 0.001,
+                  "max": 0.025,
+                  "step": 0.001,
+                  "description": "Boundary width for Living Ornament shared visible edges.",
+                  "group": "Ornament Ink",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "inkCharacter",
+                  "type": "number",
+                  "label": "Hand-drawn character",
+                  "default": 1.34,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "handDrawn setting for the painting.",
+                  "group": "Ink & paper",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "contourDensity",
+                  "type": "number",
+                  "label": "Density",
+                  "default": 1,
+                  "min": 0.3,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "Multiplier for nested contour density.",
+                  "group": "Contours",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "contourWidth",
+                  "type": "number",
+                  "label": "Width",
+                  "default": 1,
+                  "min": 0.3,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "Multiplier for nested contour width.",
+                  "group": "Contours",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "acidPalette",
+                  "type": "number",
+                  "label": "Acid palette",
+                  "default": 0.9,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Blends the existing wash palette toward green, hot pink, cyan and lemon.",
+                  "group": "Pigment",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "contourStrength",
+                  "type": "number",
+                  "label": "Contour ink",
+                  "default": 0.55,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Adds nested contour scribbles only in selected quieter color families.",
+                  "group": "Pigment",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "scumble",
+                  "type": "number",
+                  "label": "Uneven pigment",
+                  "default": 0.7,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "Irregular light and dark pigment attached to each flowing band.",
+                  "group": "Pigment",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "paperTooth",
+                  "type": "number",
+                  "label": "Paper tooth",
+                  "default": 0.7,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "Static fine grain. The paper never moves with the pigment.",
+                  "group": "Surface",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "pigmentDrag",
+                  "type": "number",
+                  "label": "Pigment drag",
+                  "default": 0.6,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Small sideways pigment smear through intermittent bristle marks.",
+                  "group": "Surface",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "dryBrush",
+                  "type": "number",
+                  "label": "Dry brush",
+                  "default": 0.8,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "Warm paper showing through dry paint gaps.",
+                  "group": "Surface",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "margin",
+                  "type": "number",
+                  "label": "Margin",
+                  "default": 0.018,
+                  "min": 0,
+                  "max": 0.08,
+                  "step": 0.001,
+                  "description": "Rough paper border in canvas-height units. Zero removes it.",
+                  "group": "Paper edge",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "splatter",
+                  "type": "number",
+                  "label": "Splatter",
+                  "default": 0.6,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Seeded-looking static pink flecks concentrated near the paper edge.",
+                  "group": "Paper edge",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "acidPalette": "Blends the existing wash palette toward green, hot pink, cyan and lemon.",
+                "arrangement": "Stable arrangement of the folds and paper-like edge perturbations.",
+                "bandDensity": "Spatial density of pigment bands, independent of canvas aspect ratio.",
+                "blooms": "blooms setting for the painting.",
+                "contourDensity": "Multiplier for nested contour density.",
+                "contourStrength": "Adds nested contour scribbles only in selected quieter color families.",
+                "contourWidth": "Multiplier for nested contour width.",
+                "dryBrush": "Warm paper showing through dry paint gaps.",
+                "flow": "Speed of large shape deformation, using upstream artistic time.",
+                "folding": "Large directional folds and bends; zero leaves quieter wavy strata.",
+                "inkCharacter": "handDrawn setting for the painting.",
+                "inkWidth": "Boundary width for Living Ornament shared visible edges.",
+                "margin": "Rough paper border in canvas-height units. Zero removes it.",
+                "pace": "pace setting for the painting.",
+                "paperTooth": "Static fine grain. The paper never moves with the pigment.",
+                "phrasing": "phrasing setting for the painting.",
+                "pigmentDrag": "Small sideways pigment smear through intermittent bristle marks.",
+                "pooling": "pooling setting for the painting.",
+                "scumble": "Irregular light and dark pigment attached to each flowing band.",
+                "splatter": "Seeded-looking static pink flecks concentrated near the paper edge.",
+                "warmth": "warmth setting for the painting."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            },
+            "body": {
+              "nodes": [
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+                  "definitionHash": "569a767759fee1ec504c7c4abfcc5df84764e8882e51a87526c17454f5b1f368",
+                  "controlDefaults": {}
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0002",
+                  "definitionHash": "ddf375b531bf741eeec6ba07f6d4136b5214e3148e156fda4a0dbc93b8b6cc09",
+                  "controlDefaults": {}
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0003",
+                  "definitionHash": "b159577b4ab913809499efdb6a24ab41fd2fbbdeb31f55962a9ad32fb9daf69a",
+                  "controlDefaults": {}
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0004",
+                  "definitionHash": "c0f808de02081671138f31f078565b179ce928a8b2cffafb9a9859b56f6576dd",
+                  "controlDefaults": {}
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0005",
+                  "definitionHash": "6bfd2bfd7746c9cff0c9776f370866c5229d9ef0883e9b0e0d1384fde2e6b6bc",
+                  "controlDefaults": {}
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                  "definitionHash": "7e1cd6daded9c7fe65f3285882d536e29661a193948bfe9b7b4a430da393e6d1",
+                  "controlDefaults": {}
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+                  "definitionHash": "a86d69c1245a7c287c3f47810d0be4ba8010782ce7e9ac476b69b59c084acf55",
+                  "controlDefaults": {}
+                }
+              ],
+              "edges": [
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0011",
+                  "from": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+                    "portId": "field"
+                  },
+                  "to": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                    "portId": "bands"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0012",
+                  "from": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0002",
+                    "portId": "ornament"
+                  },
+                  "to": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                    "portId": "phrasing"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0013",
+                  "from": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0003",
+                    "portId": "ornament"
+                  },
+                  "to": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                    "portId": "watercolor"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0014",
+                  "from": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0004",
+                    "portId": "ornament"
+                  },
+                  "to": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                    "portId": "boundary"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0015",
+                  "from": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0005",
+                    "portId": "pattern"
+                  },
+                  "to": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                    "portId": "contours"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "b8dc8301-67a4-47d0-9c72-18dc6abf0016",
+                  "from": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                    "portId": "image"
+                  },
+                  "to": {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+                    "portId": "image"
+                  },
+                  "delay": "none"
+                }
+              ],
+              "inputBindings": {},
+              "outputBindings": {
+                "image": {
+                  "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+                  "portId": "image"
+                }
+              },
+              "controlBindings": {
+                "acidPalette": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                    "controlId": "acidPalette"
+                  }
+                ],
+                "arrangement": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+                    "controlId": "seed"
+                  }
+                ],
+                "bandDensity": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+                    "controlId": "scale"
+                  }
+                ],
+                "blooms": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0003",
+                    "controlId": "blooms"
+                  }
+                ],
+                "contourDensity": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0005",
+                    "controlId": "density"
+                  }
+                ],
+                "contourStrength": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                    "controlId": "contourStrength"
+                  }
+                ],
+                "contourWidth": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0005",
+                    "controlId": "width"
+                  }
+                ],
+                "dryBrush": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+                    "controlId": "dryBrush"
+                  }
+                ],
+                "flow": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+                    "controlId": "flow"
+                  }
+                ],
+                "folding": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0001",
+                    "controlId": "fold"
+                  }
+                ],
+                "inkCharacter": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0004",
+                    "controlId": "handDrawn"
+                  }
+                ],
+                "inkWidth": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0004",
+                    "controlId": "ornamentWidth"
+                  }
+                ],
+                "margin": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+                    "controlId": "margin"
+                  }
+                ],
+                "pace": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0002",
+                    "controlId": "pace"
+                  }
+                ],
+                "paperTooth": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+                    "controlId": "tooth"
+                  }
+                ],
+                "phrasing": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0002",
+                    "controlId": "phrasing"
+                  }
+                ],
+                "pigmentDrag": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+                    "controlId": "drag"
+                  }
+                ],
+                "pooling": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0003",
+                    "controlId": "pooling"
+                  }
+                ],
+                "scumble": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0006",
+                    "controlId": "scumble"
+                  }
+                ],
+                "splatter": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0007",
+                    "controlId": "splatter"
+                  }
+                ],
+                "warmth": [
+                  {
+                    "nodeId": "b8dc8301-67a4-47d0-9c72-18dc6abf0003",
+                    "controlId": "warmth"
+                  }
+                ]
+              }
+            }
+          },
+          "c0f808de02081671138f31f078565b179ce928a8b2cffafb9a9859b56f6576dd": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "lux/organic-boundary-ink",
+              "label": "Organic Boundary Ink",
+              "description": "Uneven warm outlines, hand-drawn character, and stationary paper grain for compatible painting renderers.",
+              "tags": [
+                "ink",
+                "painting",
+                "paper"
+              ],
+              "inputs": {},
+              "outputs": {
+                "field": {
+                  "type": {
+                    "kind": "shader-field",
+                    "version": 1,
+                    "abi": "lux/boundary-ink/v1"
+                  },
+                  "label": "Boundary ink",
+                  "description": "Boundary and paper-finish shader fragment with its current numeric values."
+                },
+                "ornament": {
+                  "type": {
+                    "kind": "shader-field",
+                    "version": 1,
+                    "abi": "lux/ornament-boundary-ink/v1"
+                  },
+                  "label": "Ornament boundary ink",
+                  "description": "Shared-boundary ornament ink helper with its current stroke values."
+                }
+              },
+              "controls": [
+                {
+                  "id": "outline",
+                  "type": "number",
+                  "label": "Boundary width",
+                  "default": 0.005,
+                  "min": 0.002,
+                  "max": 0.03,
+                  "step": 0.001,
+                  "group": "Ink & paper",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "inkWarmth",
+                  "type": "number",
+                  "label": "Warmth",
+                  "default": 0.15,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Ink & paper",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "handDrawn",
+                  "type": "number",
+                  "label": "Hand-drawn character",
+                  "default": 1.34,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "group": "Ink & paper",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "grain",
+                  "type": "number",
+                  "label": "Grain",
+                  "default": 1.48,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Ink & paper",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "ornamentWidth",
+                  "type": "number",
+                  "label": "Boundary width",
+                  "default": 0.008,
+                  "min": 0.001,
+                  "max": 0.025,
+                  "step": 0.001,
+                  "group": "Ornament Ink",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "ornamentAccent",
+                  "type": "number",
+                  "label": "Secondary edge",
+                  "default": 0.55,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Ornament Ink",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "grain": "grain setting for the painting.",
+                "handDrawn": "handDrawn setting for the painting.",
+                "inkWarmth": "inkWarmth setting for the painting.",
+                "ornamentAccent": "Teal and purple secondary-edge strength for Living Ornament.",
+                "ornamentWidth": "Boundary width for Living Ornament shared visible edges.",
+                "outline": "outline setting for the painting."
+              },
+              "lifecycle": {
+                "state": "stateless",
+                "reset": "seed"
+              }
+            }
+          },
+          "ddf375b531bf741eeec6ba07f6d4136b5214e3148e156fda4a0dbc93b8b6cc09": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "lux/composition-phrasing",
+              "label": "Composition Phrasing",
+              "description": "Shared artistic clock, phrase rhythm, spatial composition, and deterministic noise basis.",
+              "tags": [
+                "composition",
+                "motion",
+                "painting"
+              ],
+              "inputs": {},
+              "outputs": {
+                "field": {
+                  "type": {
+                    "kind": "shader-field",
+                    "version": 1,
+                    "abi": "lux/composition-phrasing/v1"
+                  },
+                  "label": "Phrasing",
+                  "description": "Phrase and noise shader helpers with the current artistic time and composition values."
+                },
+                "ornament": {
+                  "type": {
+                    "kind": "shader-field",
+                    "version": 1,
+                    "abi": "lux/ornament-phrasing/v1"
+                  },
+                  "label": "Ornament phrasing",
+                  "description": "Shared artistic time and noise helpers for compatible ornament renderers."
+                }
+              },
+              "controls": [
+                {
+                  "id": "pace",
+                  "type": "number",
+                  "label": "Pace",
+                  "default": 1.24,
+                  "min": 0,
+                  "max": 3,
+                  "step": 0.01,
+                  "group": "Motion",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "phrasing",
+                  "type": "number",
+                  "label": "Tension and release",
+                  "default": 1,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Slow build, crest, release, and rest. Shapes lead; linework and color follow.",
+                  "group": "Motion",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "composition",
+                  "type": "number",
+                  "label": "Quiet to intricate",
+                  "default": 0.44,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "group": "Composition",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "tension",
+                  "type": "number",
+                  "label": "Tension",
+                  "default": 0.72,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "Strength of local pressure, contrasting line directions, and rhythmic compression.",
+                  "group": "Composition",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "hierarchy",
+                  "type": "number",
+                  "label": "Large and small rhythm",
+                  "default": 0.99,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "Large anchor regions alternate with smaller supporting regions.",
+                  "group": "Composition",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "composition": "composition setting for the painting.",
+                "hierarchy": "hierarchy setting for the painting.",
+                "pace": "pace setting for the painting.",
+                "phrasing": "phrasing setting for the painting.",
+                "tension": "tension setting for the painting."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            }
+          }
+        },
+        "publicControls": [
+          {
+            "id": "bandDensity",
+            "type": "number",
+            "label": "Band density",
+            "default": 1,
+            "min": 0.4,
+            "max": 2,
+            "step": 0.01,
+            "description": "Spatial density of pigment bands, independent of canvas aspect ratio.",
+            "group": "Pigment shape",
+            "changeCost": "live"
+          },
+          {
+            "id": "folding",
+            "type": "number",
+            "label": "Folding",
+            "default": 1.15,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "description": "Large directional folds and bends; zero leaves quieter wavy strata.",
+            "group": "Pigment shape",
+            "changeCost": "live"
+          },
+          {
+            "id": "flow",
+            "type": "number",
+            "label": "Flow",
+            "default": 0.3,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "description": "Speed of large shape deformation, using upstream artistic time.",
+            "group": "Pigment shape",
+            "changeCost": "live"
+          },
+          {
+            "id": "arrangement",
+            "type": "number",
+            "label": "Arrangement",
+            "default": 7,
+            "min": 0,
+            "max": 999,
+            "step": 1,
+            "description": "Stable arrangement of the folds and paper-like edge perturbations.",
+            "group": "Pigment shape",
+            "changeCost": "live"
+          },
+          {
+            "id": "pace",
+            "type": "number",
+            "label": "Pace",
+            "default": 1.24,
+            "min": 0,
+            "max": 3,
+            "step": 0.01,
+            "description": "pace setting for the painting.",
+            "group": "Motion",
+            "changeCost": "live"
+          },
+          {
+            "id": "phrasing",
+            "type": "number",
+            "label": "Tension and release",
+            "default": 1,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "phrasing setting for the painting.",
+            "group": "Motion",
+            "changeCost": "live"
+          },
+          {
+            "id": "warmth",
+            "type": "number",
+            "label": "Warm pools",
+            "default": 1.3,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "description": "warmth setting for the painting.",
+            "group": "Color & watercolor",
+            "changeCost": "live"
+          },
+          {
+            "id": "pooling",
+            "type": "number",
+            "label": "Pigment pooling",
+            "default": 0.74,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "description": "pooling setting for the painting.",
+            "group": "Color & watercolor",
+            "changeCost": "live"
+          },
+          {
+            "id": "blooms",
+            "type": "number",
+            "label": "Watercolor blooms",
+            "default": 0.94,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "description": "blooms setting for the painting.",
+            "group": "Color & watercolor",
+            "changeCost": "live"
+          },
+          {
+            "id": "inkWidth",
+            "type": "number",
+            "label": "Boundary width",
+            "default": 0.008,
+            "min": 0.001,
+            "max": 0.025,
+            "step": 0.001,
+            "description": "Boundary width for Living Ornament shared visible edges.",
+            "group": "Ornament Ink",
+            "changeCost": "live"
+          },
+          {
+            "id": "inkCharacter",
+            "type": "number",
+            "label": "Hand-drawn character",
+            "default": 1.34,
+            "min": 0,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "handDrawn setting for the painting.",
+            "group": "Ink & paper",
+            "changeCost": "live"
+          },
+          {
+            "id": "contourDensity",
+            "type": "number",
+            "label": "Density",
+            "default": 1,
+            "min": 0.3,
+            "max": 2,
+            "step": 0.01,
+            "description": "Multiplier for nested contour density.",
+            "group": "Contours",
+            "changeCost": "live"
+          },
+          {
+            "id": "contourWidth",
+            "type": "number",
+            "label": "Width",
+            "default": 1,
+            "min": 0.3,
+            "max": 2,
+            "step": 0.01,
+            "description": "Multiplier for nested contour width.",
+            "group": "Contours",
+            "changeCost": "live"
+          },
+          {
+            "id": "acidPalette",
+            "type": "number",
+            "label": "Acid palette",
+            "default": 0.9,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "Blends the existing wash palette toward green, hot pink, cyan and lemon.",
+            "group": "Pigment",
+            "changeCost": "live"
+          },
+          {
+            "id": "contourStrength",
+            "type": "number",
+            "label": "Contour ink",
+            "default": 0.55,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "Adds nested contour scribbles only in selected quieter color families.",
+            "group": "Pigment",
+            "changeCost": "live"
+          },
+          {
+            "id": "scumble",
+            "type": "number",
+            "label": "Uneven pigment",
+            "default": 0.7,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "description": "Irregular light and dark pigment attached to each flowing band.",
+            "group": "Pigment",
+            "changeCost": "live"
+          },
+          {
+            "id": "paperTooth",
+            "type": "number",
+            "label": "Paper tooth",
+            "default": 0.7,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "description": "Static fine grain. The paper never moves with the pigment.",
+            "group": "Surface",
+            "changeCost": "live"
+          },
+          {
+            "id": "pigmentDrag",
+            "type": "number",
+            "label": "Pigment drag",
+            "default": 0.6,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "Small sideways pigment smear through intermittent bristle marks.",
+            "group": "Surface",
+            "changeCost": "live"
+          },
+          {
+            "id": "dryBrush",
+            "type": "number",
+            "label": "Dry brush",
+            "default": 0.8,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "description": "Warm paper showing through dry paint gaps.",
+            "group": "Surface",
+            "changeCost": "live"
+          },
+          {
+            "id": "margin",
+            "type": "number",
+            "label": "Margin",
+            "default": 0.018,
+            "min": 0,
+            "max": 0.08,
+            "step": 0.001,
+            "description": "Rough paper border in canvas-height units. Zero removes it.",
+            "group": "Paper edge",
+            "changeCost": "live"
+          },
+          {
+            "id": "splatter",
+            "type": "number",
+            "label": "Splatter",
+            "default": 0.6,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "Seeded-looking static pink flecks concentrated near the paper edge.",
+            "group": "Paper edge",
+            "changeCost": "live"
+          }
+        ],
+        "publicControlBindings": {
+          "bandDensity": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0001"
+              ],
+              "controlId": "scale",
+              "active": true
+            }
+          ],
+          "folding": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0001"
+              ],
+              "controlId": "fold",
+              "active": true
+            }
+          ],
+          "flow": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0001"
+              ],
+              "controlId": "flow",
+              "active": true
+            }
+          ],
+          "arrangement": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0001"
+              ],
+              "controlId": "seed",
+              "active": true
+            }
+          ],
+          "pace": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0002"
+              ],
+              "controlId": "pace",
+              "active": true
+            }
+          ],
+          "phrasing": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0002"
+              ],
+              "controlId": "phrasing",
+              "active": true
+            }
+          ],
+          "warmth": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0003"
+              ],
+              "controlId": "warmth",
+              "active": true
+            }
+          ],
+          "pooling": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0003"
+              ],
+              "controlId": "pooling",
+              "active": true
+            }
+          ],
+          "blooms": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0003"
+              ],
+              "controlId": "blooms",
+              "active": true
+            }
+          ],
+          "inkWidth": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0004"
+              ],
+              "controlId": "ornamentWidth",
+              "active": true
+            }
+          ],
+          "inkCharacter": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0004"
+              ],
+              "controlId": "handDrawn",
+              "active": true
+            }
+          ],
+          "contourDensity": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0005"
+              ],
+              "controlId": "density",
+              "active": true
+            }
+          ],
+          "contourWidth": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0005"
+              ],
+              "controlId": "width",
+              "active": true
+            }
+          ],
+          "acidPalette": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0006"
+              ],
+              "controlId": "acidPalette",
+              "active": true
+            }
+          ],
+          "contourStrength": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0006"
+              ],
+              "controlId": "contourStrength",
+              "active": true
+            }
+          ],
+          "scumble": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0006"
+              ],
+              "controlId": "scumble",
+              "active": true
+            }
+          ],
+          "paperTooth": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0007"
+              ],
+              "controlId": "tooth",
+              "active": true
+            }
+          ],
+          "pigmentDrag": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0007"
+              ],
+              "controlId": "drag",
+              "active": true
+            }
+          ],
+          "dryBrush": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0007"
+              ],
+              "controlId": "dryBrush",
+              "active": true
+            }
+          ],
+          "margin": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0007"
+              ],
+              "controlId": "margin",
+              "active": true
+            }
+          ],
+          "splatter": [
+            {
+              "nodePath": [
+                "b8dc8301-67a4-47d0-9c72-18dc6abf0007"
+              ],
+              "controlId": "splatter",
+              "active": true
+            }
+          ]
+        },
+        "nodes": [
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0001"
+            ],
+            "definitionHash": "569a767759fee1ec504c7c4abfcc5df84764e8882e51a87526c17454f5b1f368",
+            "schema": [
+              {
+                "id": "scale",
+                "type": "number",
+                "label": "Band density",
+                "default": 1,
+                "min": 0.4,
+                "max": 2,
+                "step": 0.01,
+                "group": "Pigment shape",
+                "changeCost": "live"
+              },
+              {
+                "id": "fold",
+                "type": "number",
+                "label": "Folding",
+                "default": 1.15,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Pigment shape",
+                "changeCost": "live"
+              },
+              {
+                "id": "flow",
+                "type": "number",
+                "label": "Flow",
+                "default": 0.3,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Pigment shape",
+                "changeCost": "live"
+              },
+              {
+                "id": "seed",
+                "type": "number",
+                "label": "Arrangement",
+                "default": 7,
+                "min": 0,
+                "max": 999,
+                "step": 1,
+                "group": "Pigment shape",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "68b45b1940a375c2a9989e794168480dc44e4c30371c7c2ac3164f45173e526c"
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0002"
+            ],
+            "definitionHash": "ddf375b531bf741eeec6ba07f6d4136b5214e3148e156fda4a0dbc93b8b6cc09",
+            "schema": [
+              {
+                "id": "pace",
+                "type": "number",
+                "label": "Pace",
+                "default": 1.24,
+                "min": 0,
+                "max": 3,
+                "step": 0.01,
+                "group": "Motion",
+                "changeCost": "live"
+              },
+              {
+                "id": "phrasing",
+                "type": "number",
+                "label": "Tension and release",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Slow build, crest, release, and rest. Shapes lead; linework and color follow.",
+                "group": "Motion",
+                "changeCost": "live"
+              },
+              {
+                "id": "composition",
+                "type": "number",
+                "label": "Quiet to intricate",
+                "default": 0.44,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Composition",
+                "changeCost": "live"
+              },
+              {
+                "id": "tension",
+                "type": "number",
+                "label": "Tension",
+                "default": 0.72,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "description": "Strength of local pressure, contrasting line directions, and rhythmic compression.",
+                "group": "Composition",
+                "changeCost": "live"
+              },
+              {
+                "id": "hierarchy",
+                "type": "number",
+                "label": "Large and small rhythm",
+                "default": 0.99,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "description": "Large anchor regions alternate with smaller supporting regions.",
+                "group": "Composition",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "ab4e921d2d2dafe49ae81670559d6f697d6ceffab57af7f22f49033723eff283"
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0003"
+            ],
+            "definitionHash": "b159577b4ab913809499efdb6a24ab41fd2fbbdeb31f55962a9ad32fb9daf69a",
+            "schema": [
+              {
+                "id": "palette",
+                "type": "number",
+                "label": "Wash lightness",
+                "default": 0.07,
+                "min": -1,
+                "max": 1,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "warmth",
+                "type": "number",
+                "label": "Warm pools",
+                "default": 1.3,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "contrast",
+                "type": "number",
+                "label": "Region contrast",
+                "default": 1.05,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "pooling",
+                "type": "number",
+                "label": "Pigment pooling",
+                "default": 0.74,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "blooms",
+                "type": "number",
+                "label": "Watercolor blooms",
+                "default": 0.94,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "ornamentSaturation",
+                "type": "number",
+                "label": "Saturation",
+                "default": 1,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Ornament Color",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "da8cfed66633190993648e19984215219790b2ddb617e76f69aaefea53553158"
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0004"
+            ],
+            "definitionHash": "c0f808de02081671138f31f078565b179ce928a8b2cffafb9a9859b56f6576dd",
+            "schema": [
+              {
+                "id": "outline",
+                "type": "number",
+                "label": "Boundary width",
+                "default": 0.005,
+                "min": 0.002,
+                "max": 0.03,
+                "step": 0.001,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "inkWarmth",
+                "type": "number",
+                "label": "Warmth",
+                "default": 0.15,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "handDrawn",
+                "type": "number",
+                "label": "Hand-drawn character",
+                "default": 1.34,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "grain",
+                "type": "number",
+                "label": "Grain",
+                "default": 1.48,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "ornamentWidth",
+                "type": "number",
+                "label": "Boundary width",
+                "default": 0.008,
+                "min": 0.001,
+                "max": 0.025,
+                "step": 0.001,
+                "group": "Ornament Ink",
+                "changeCost": "live"
+              },
+              {
+                "id": "ornamentAccent",
+                "type": "number",
+                "label": "Secondary edge",
+                "default": 0.55,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Ornament Ink",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "ca5522adabfb4cf8c74bcfdd8bddf2fe86a7959b448a376a0476f0313c959f34"
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0005"
+            ],
+            "definitionHash": "6bfd2bfd7746c9cff0c9776f370866c5229d9ef0883e9b0e0d1384fde2e6b6bc",
+            "schema": [
+              {
+                "id": "density",
+                "type": "number",
+                "label": "Density",
+                "default": 1,
+                "min": 0.3,
+                "max": 2,
+                "step": 0.01,
+                "group": "Contours",
+                "changeCost": "live"
+              },
+              {
+                "id": "width",
+                "type": "number",
+                "label": "Width",
+                "default": 1,
+                "min": 0.3,
+                "max": 2,
+                "step": 0.01,
+                "group": "Contours",
+                "changeCost": "live"
+              },
+              {
+                "id": "variation",
+                "type": "number",
+                "label": "Variation",
+                "default": 1,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Contours",
+                "changeCost": "live"
+              },
+              {
+                "id": "motion",
+                "type": "number",
+                "label": "Motion",
+                "default": 1,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Contours",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "0f1e29e1d3a061f160398bd628c410b9ee854c48569717835f093c07d8b0e6de"
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0006"
+            ],
+            "definitionHash": "7e1cd6daded9c7fe65f3285882d536e29661a193948bfe9b7b4a430da393e6d1",
+            "schema": [
+              {
+                "id": "acidPalette",
+                "type": "number",
+                "label": "Acid palette",
+                "default": 0.9,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Pigment",
+                "changeCost": "live"
+              },
+              {
+                "id": "contourStrength",
+                "type": "number",
+                "label": "Contour ink",
+                "default": 0.55,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Pigment",
+                "changeCost": "live"
+              },
+              {
+                "id": "scumble",
+                "type": "number",
+                "label": "Uneven pigment",
+                "default": 0.7,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Pigment",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "c4fa879c51bf6a3113958c4d5f1b65ac011b77a6ca976eb79ca8bb851fbf16d9"
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0007"
+            ],
+            "definitionHash": "a86d69c1245a7c287c3f47810d0be4ba8010782ce7e9ac476b69b59c084acf55",
+            "schema": [
+              {
+                "id": "tooth",
+                "type": "number",
+                "label": "Paper tooth",
+                "default": 0.7,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Surface",
+                "changeCost": "live"
+              },
+              {
+                "id": "drag",
+                "type": "number",
+                "label": "Pigment drag",
+                "default": 0.6,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Surface",
+                "changeCost": "live"
+              },
+              {
+                "id": "dryBrush",
+                "type": "number",
+                "label": "Dry brush",
+                "default": 0.8,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Surface",
+                "changeCost": "live"
+              },
+              {
+                "id": "margin",
+                "type": "number",
+                "label": "Margin",
+                "default": 0.018,
+                "min": 0,
+                "max": 0.08,
+                "step": 0.001,
+                "group": "Paper edge",
+                "changeCost": "live"
+              },
+              {
+                "id": "splatter",
+                "type": "number",
+                "label": "Splatter",
+                "default": 0.6,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Paper edge",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "b5139a9119978ba63bc3b3487020c5aaa2ab0b0639c6935c34b941ffdaf08fdb"
+          }
+        ]
+      },
+      "sceneName": "Untitled visual",
+      "authority": "studio",
+      "playback": "playing",
+      "sdkVersion": "0.4.0",
+      "controlSchema": [
+        {
+          "id": "bandDensity",
+          "type": "number",
+          "label": "Band density",
+          "default": 1,
+          "min": 0.4,
+          "max": 2,
+          "step": 0.01,
+          "description": "Spatial density of pigment bands, independent of canvas aspect ratio.",
+          "group": "Pigment shape",
+          "changeCost": "live"
+        },
+        {
+          "id": "folding",
+          "type": "number",
+          "label": "Folding",
+          "default": 1.15,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "Large directional folds and bends; zero leaves quieter wavy strata.",
+          "group": "Pigment shape",
+          "changeCost": "live"
+        },
+        {
+          "id": "flow",
+          "type": "number",
+          "label": "Flow",
+          "default": 0.3,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "Speed of large shape deformation, using upstream artistic time.",
+          "group": "Pigment shape",
+          "changeCost": "live"
+        },
+        {
+          "id": "arrangement",
+          "type": "number",
+          "label": "Arrangement",
+          "default": 7,
+          "min": 0,
+          "max": 999,
+          "step": 1,
+          "description": "Stable arrangement of the folds and paper-like edge perturbations.",
+          "group": "Pigment shape",
+          "changeCost": "live"
+        },
+        {
+          "id": "pace",
+          "type": "number",
+          "label": "Pace",
+          "default": 1.24,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "description": "pace setting for the painting.",
+          "group": "Motion",
+          "changeCost": "live"
+        },
+        {
+          "id": "phrasing",
+          "type": "number",
+          "label": "Tension and release",
+          "default": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "phrasing setting for the painting.",
+          "group": "Motion",
+          "changeCost": "live"
+        },
+        {
+          "id": "warmth",
+          "type": "number",
+          "label": "Warm pools",
+          "default": 1.3,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "warmth setting for the painting.",
+          "group": "Color & watercolor",
+          "changeCost": "live"
+        },
+        {
+          "id": "pooling",
+          "type": "number",
+          "label": "Pigment pooling",
+          "default": 0.74,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "pooling setting for the painting.",
+          "group": "Color & watercolor",
+          "changeCost": "live"
+        },
+        {
+          "id": "blooms",
+          "type": "number",
+          "label": "Watercolor blooms",
+          "default": 0.94,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "blooms setting for the painting.",
+          "group": "Color & watercolor",
+          "changeCost": "live"
+        },
+        {
+          "id": "inkWidth",
+          "type": "number",
+          "label": "Boundary width",
+          "default": 0.008,
+          "min": 0.001,
+          "max": 0.025,
+          "step": 0.001,
+          "description": "Boundary width for Living Ornament shared visible edges.",
+          "group": "Ornament Ink",
+          "changeCost": "live"
+        },
+        {
+          "id": "inkCharacter",
+          "type": "number",
+          "label": "Hand-drawn character",
+          "default": 1.34,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "handDrawn setting for the painting.",
+          "group": "Ink & paper",
+          "changeCost": "live"
+        },
+        {
+          "id": "contourDensity",
+          "type": "number",
+          "label": "Density",
+          "default": 1,
+          "min": 0.3,
+          "max": 2,
+          "step": 0.01,
+          "description": "Multiplier for nested contour density.",
+          "group": "Contours",
+          "changeCost": "live"
+        },
+        {
+          "id": "contourWidth",
+          "type": "number",
+          "label": "Width",
+          "default": 1,
+          "min": 0.3,
+          "max": 2,
+          "step": 0.01,
+          "description": "Multiplier for nested contour width.",
+          "group": "Contours",
+          "changeCost": "live"
+        },
+        {
+          "id": "acidPalette",
+          "type": "number",
+          "label": "Acid palette",
+          "default": 0.9,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Blends the existing wash palette toward green, hot pink, cyan and lemon.",
+          "group": "Pigment",
+          "changeCost": "live"
+        },
+        {
+          "id": "contourStrength",
+          "type": "number",
+          "label": "Contour ink",
+          "default": 0.55,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Adds nested contour scribbles only in selected quieter color families.",
+          "group": "Pigment",
+          "changeCost": "live"
+        },
+        {
+          "id": "scumble",
+          "type": "number",
+          "label": "Uneven pigment",
+          "default": 0.7,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "Irregular light and dark pigment attached to each flowing band.",
+          "group": "Pigment",
+          "changeCost": "live"
+        },
+        {
+          "id": "paperTooth",
+          "type": "number",
+          "label": "Paper tooth",
+          "default": 0.7,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "Static fine grain. The paper never moves with the pigment.",
+          "group": "Surface",
+          "changeCost": "live"
+        },
+        {
+          "id": "pigmentDrag",
+          "type": "number",
+          "label": "Pigment drag",
+          "default": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Small sideways pigment smear through intermittent bristle marks.",
+          "group": "Surface",
+          "changeCost": "live"
+        },
+        {
+          "id": "dryBrush",
+          "type": "number",
+          "label": "Dry brush",
+          "default": 0.8,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "Warm paper showing through dry paint gaps.",
+          "group": "Surface",
+          "changeCost": "live"
+        },
+        {
+          "id": "margin",
+          "type": "number",
+          "label": "Margin",
+          "default": 0.018,
+          "min": 0,
+          "max": 0.08,
+          "step": 0.001,
+          "description": "Rough paper border in canvas-height units. Zero removes it.",
+          "group": "Paper edge",
+          "changeCost": "live"
+        },
+        {
+          "id": "splatter",
+          "type": "number",
+          "label": "Splatter",
+          "default": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Seeded-looking static pink flecks concentrated near the paper edge.",
+          "group": "Paper edge",
+          "changeCost": "live"
+        }
+      ],
+      "controlSchemaHash": "58a3b3c526af61684a78fec366e328ddf141b3a56caeef90921b5a2cf16700bd",
+      "controls": {
+        "bandDensity": 1,
+        "folding": 1.15,
+        "flow": 0.3,
+        "arrangement": 7,
+        "pace": 1.24,
+        "phrasing": 1,
+        "warmth": 1.3,
+        "pooling": 0.74,
+        "blooms": 0.94,
+        "inkWidth": 0.008,
+        "inkCharacter": 1.34,
+        "contourDensity": 1,
+        "contourWidth": 1,
+        "acidPalette": 0.9,
+        "contourStrength": 0.55,
+        "scumble": 0.7,
+        "paperTooth": 0.7,
+        "pigmentDrag": 0.6,
+        "dryBrush": 0.8,
+        "margin": 0.018,
+        "splatter": 0.6
+      },
+      "controlSequence": 0,
+      "nodeControls": {
+        "sourceHash": "7f64b537464ef980e82e93bfc16a47b775fe6e3f19c30b097c988b02c57c5efe",
+        "nodes": [
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0001"
+            ],
+            "definitionHash": "569a767759fee1ec504c7c4abfcc5df84764e8882e51a87526c17454f5b1f368",
+            "schema": [
+              {
+                "id": "scale",
+                "type": "number",
+                "label": "Band density",
+                "default": 1,
+                "min": 0.4,
+                "max": 2,
+                "step": 0.01,
+                "group": "Pigment shape",
+                "changeCost": "live"
+              },
+              {
+                "id": "fold",
+                "type": "number",
+                "label": "Folding",
+                "default": 1.15,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Pigment shape",
+                "changeCost": "live"
+              },
+              {
+                "id": "flow",
+                "type": "number",
+                "label": "Flow",
+                "default": 0.3,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Pigment shape",
+                "changeCost": "live"
+              },
+              {
+                "id": "seed",
+                "type": "number",
+                "label": "Arrangement",
+                "default": 7,
+                "min": 0,
+                "max": 999,
+                "step": 1,
+                "group": "Pigment shape",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "68b45b1940a375c2a9989e794168480dc44e4c30371c7c2ac3164f45173e526c",
+            "values": {
+              "scale": 1,
+              "fold": 1.15,
+              "flow": 0.3,
+              "seed": 7
+            }
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0002"
+            ],
+            "definitionHash": "ddf375b531bf741eeec6ba07f6d4136b5214e3148e156fda4a0dbc93b8b6cc09",
+            "schema": [
+              {
+                "id": "pace",
+                "type": "number",
+                "label": "Pace",
+                "default": 1.24,
+                "min": 0,
+                "max": 3,
+                "step": 0.01,
+                "group": "Motion",
+                "changeCost": "live"
+              },
+              {
+                "id": "phrasing",
+                "type": "number",
+                "label": "Tension and release",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Slow build, crest, release, and rest. Shapes lead; linework and color follow.",
+                "group": "Motion",
+                "changeCost": "live"
+              },
+              {
+                "id": "composition",
+                "type": "number",
+                "label": "Quiet to intricate",
+                "default": 0.44,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Composition",
+                "changeCost": "live"
+              },
+              {
+                "id": "tension",
+                "type": "number",
+                "label": "Tension",
+                "default": 0.72,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "description": "Strength of local pressure, contrasting line directions, and rhythmic compression.",
+                "group": "Composition",
+                "changeCost": "live"
+              },
+              {
+                "id": "hierarchy",
+                "type": "number",
+                "label": "Large and small rhythm",
+                "default": 0.99,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "description": "Large anchor regions alternate with smaller supporting regions.",
+                "group": "Composition",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "ab4e921d2d2dafe49ae81670559d6f697d6ceffab57af7f22f49033723eff283",
+            "values": {
+              "pace": 1.24,
+              "phrasing": 1,
+              "composition": 0.44,
+              "tension": 0.72,
+              "hierarchy": 0.99
+            }
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0003"
+            ],
+            "definitionHash": "b159577b4ab913809499efdb6a24ab41fd2fbbdeb31f55962a9ad32fb9daf69a",
+            "schema": [
+              {
+                "id": "palette",
+                "type": "number",
+                "label": "Wash lightness",
+                "default": 0.07,
+                "min": -1,
+                "max": 1,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "warmth",
+                "type": "number",
+                "label": "Warm pools",
+                "default": 1.3,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "contrast",
+                "type": "number",
+                "label": "Region contrast",
+                "default": 1.05,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "pooling",
+                "type": "number",
+                "label": "Pigment pooling",
+                "default": 0.74,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "blooms",
+                "type": "number",
+                "label": "Watercolor blooms",
+                "default": 0.94,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "ornamentSaturation",
+                "type": "number",
+                "label": "Saturation",
+                "default": 1,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Ornament Color",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "da8cfed66633190993648e19984215219790b2ddb617e76f69aaefea53553158",
+            "values": {
+              "palette": 0.07,
+              "warmth": 1.3,
+              "contrast": 1.05,
+              "pooling": 0.74,
+              "blooms": 0.94,
+              "ornamentSaturation": 1
+            }
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0004"
+            ],
+            "definitionHash": "c0f808de02081671138f31f078565b179ce928a8b2cffafb9a9859b56f6576dd",
+            "schema": [
+              {
+                "id": "outline",
+                "type": "number",
+                "label": "Boundary width",
+                "default": 0.005,
+                "min": 0.002,
+                "max": 0.03,
+                "step": 0.001,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "inkWarmth",
+                "type": "number",
+                "label": "Warmth",
+                "default": 0.15,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "handDrawn",
+                "type": "number",
+                "label": "Hand-drawn character",
+                "default": 1.34,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "grain",
+                "type": "number",
+                "label": "Grain",
+                "default": 1.48,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "ornamentWidth",
+                "type": "number",
+                "label": "Boundary width",
+                "default": 0.008,
+                "min": 0.001,
+                "max": 0.025,
+                "step": 0.001,
+                "group": "Ornament Ink",
+                "changeCost": "live"
+              },
+              {
+                "id": "ornamentAccent",
+                "type": "number",
+                "label": "Secondary edge",
+                "default": 0.55,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Ornament Ink",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "ca5522adabfb4cf8c74bcfdd8bddf2fe86a7959b448a376a0476f0313c959f34",
+            "values": {
+              "outline": 0.005,
+              "inkWarmth": 0.15,
+              "handDrawn": 1.34,
+              "grain": 1.48,
+              "ornamentWidth": 0.008,
+              "ornamentAccent": 0.55
+            }
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0005"
+            ],
+            "definitionHash": "6bfd2bfd7746c9cff0c9776f370866c5229d9ef0883e9b0e0d1384fde2e6b6bc",
+            "schema": [
+              {
+                "id": "density",
+                "type": "number",
+                "label": "Density",
+                "default": 1,
+                "min": 0.3,
+                "max": 2,
+                "step": 0.01,
+                "group": "Contours",
+                "changeCost": "live"
+              },
+              {
+                "id": "width",
+                "type": "number",
+                "label": "Width",
+                "default": 1,
+                "min": 0.3,
+                "max": 2,
+                "step": 0.01,
+                "group": "Contours",
+                "changeCost": "live"
+              },
+              {
+                "id": "variation",
+                "type": "number",
+                "label": "Variation",
+                "default": 1,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Contours",
+                "changeCost": "live"
+              },
+              {
+                "id": "motion",
+                "type": "number",
+                "label": "Motion",
+                "default": 1,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Contours",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "0f1e29e1d3a061f160398bd628c410b9ee854c48569717835f093c07d8b0e6de",
+            "values": {
+              "density": 1,
+              "width": 1,
+              "variation": 1,
+              "motion": 1
+            }
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0006"
+            ],
+            "definitionHash": "7e1cd6daded9c7fe65f3285882d536e29661a193948bfe9b7b4a430da393e6d1",
+            "schema": [
+              {
+                "id": "acidPalette",
+                "type": "number",
+                "label": "Acid palette",
+                "default": 0.9,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Pigment",
+                "changeCost": "live"
+              },
+              {
+                "id": "contourStrength",
+                "type": "number",
+                "label": "Contour ink",
+                "default": 0.55,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Pigment",
+                "changeCost": "live"
+              },
+              {
+                "id": "scumble",
+                "type": "number",
+                "label": "Uneven pigment",
+                "default": 0.7,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Pigment",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "c4fa879c51bf6a3113958c4d5f1b65ac011b77a6ca976eb79ca8bb851fbf16d9",
+            "values": {
+              "acidPalette": 0.9,
+              "contourStrength": 0.55,
+              "scumble": 0.7
+            }
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0007"
+            ],
+            "definitionHash": "a86d69c1245a7c287c3f47810d0be4ba8010782ce7e9ac476b69b59c084acf55",
+            "schema": [
+              {
+                "id": "tooth",
+                "type": "number",
+                "label": "Paper tooth",
+                "default": 0.7,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Surface",
+                "changeCost": "live"
+              },
+              {
+                "id": "drag",
+                "type": "number",
+                "label": "Pigment drag",
+                "default": 0.6,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Surface",
+                "changeCost": "live"
+              },
+              {
+                "id": "dryBrush",
+                "type": "number",
+                "label": "Dry brush",
+                "default": 0.8,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Surface",
+                "changeCost": "live"
+              },
+              {
+                "id": "margin",
+                "type": "number",
+                "label": "Margin",
+                "default": 0.018,
+                "min": 0,
+                "max": 0.08,
+                "step": 0.001,
+                "group": "Paper edge",
+                "changeCost": "live"
+              },
+              {
+                "id": "splatter",
+                "type": "number",
+                "label": "Splatter",
+                "default": 0.6,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Paper edge",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "b5139a9119978ba63bc3b3487020c5aaa2ab0b0639c6935c34b941ffdaf08fdb",
+            "values": {
+              "tooth": 0.7,
+              "drag": 0.6,
+              "dryBrush": 0.8,
+              "margin": 0.018,
+              "splatter": 0.6
+            }
+          }
+        ]
+      },
+      "controlAnimations": [],
+      "controlAnimationIssues": [],
+      "animationSequence": 0,
+      "effectiveControls": {
+        "bandDensity": 1,
+        "folding": 1.15,
+        "flow": 0.3,
+        "arrangement": 7,
+        "pace": 1.24,
+        "phrasing": 1,
+        "warmth": 1.3,
+        "pooling": 0.74,
+        "blooms": 0.94,
+        "inkWidth": 0.008,
+        "inkCharacter": 1.34,
+        "contourDensity": 1,
+        "contourWidth": 1,
+        "acidPalette": 0.9,
+        "contourStrength": 0.55,
+        "scumble": 0.7,
+        "paperTooth": 0.7,
+        "pigmentDrag": 0.6,
+        "dryBrush": 0.8,
+        "margin": 0.018,
+        "splatter": 0.6
+      },
+      "effectiveNodeControls": {
+        "sourceHash": "7f64b537464ef980e82e93bfc16a47b775fe6e3f19c30b097c988b02c57c5efe",
+        "nodes": [
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0001"
+            ],
+            "definitionHash": "569a767759fee1ec504c7c4abfcc5df84764e8882e51a87526c17454f5b1f368",
+            "schema": [
+              {
+                "id": "scale",
+                "type": "number",
+                "label": "Band density",
+                "default": 1,
+                "min": 0.4,
+                "max": 2,
+                "step": 0.01,
+                "group": "Pigment shape",
+                "changeCost": "live"
+              },
+              {
+                "id": "fold",
+                "type": "number",
+                "label": "Folding",
+                "default": 1.15,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Pigment shape",
+                "changeCost": "live"
+              },
+              {
+                "id": "flow",
+                "type": "number",
+                "label": "Flow",
+                "default": 0.3,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Pigment shape",
+                "changeCost": "live"
+              },
+              {
+                "id": "seed",
+                "type": "number",
+                "label": "Arrangement",
+                "default": 7,
+                "min": 0,
+                "max": 999,
+                "step": 1,
+                "group": "Pigment shape",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "68b45b1940a375c2a9989e794168480dc44e4c30371c7c2ac3164f45173e526c",
+            "values": {
+              "scale": 1,
+              "fold": 1.15,
+              "flow": 0.3,
+              "seed": 7
+            }
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0002"
+            ],
+            "definitionHash": "ddf375b531bf741eeec6ba07f6d4136b5214e3148e156fda4a0dbc93b8b6cc09",
+            "schema": [
+              {
+                "id": "pace",
+                "type": "number",
+                "label": "Pace",
+                "default": 1.24,
+                "min": 0,
+                "max": 3,
+                "step": 0.01,
+                "group": "Motion",
+                "changeCost": "live"
+              },
+              {
+                "id": "phrasing",
+                "type": "number",
+                "label": "Tension and release",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Slow build, crest, release, and rest. Shapes lead; linework and color follow.",
+                "group": "Motion",
+                "changeCost": "live"
+              },
+              {
+                "id": "composition",
+                "type": "number",
+                "label": "Quiet to intricate",
+                "default": 0.44,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Composition",
+                "changeCost": "live"
+              },
+              {
+                "id": "tension",
+                "type": "number",
+                "label": "Tension",
+                "default": 0.72,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "description": "Strength of local pressure, contrasting line directions, and rhythmic compression.",
+                "group": "Composition",
+                "changeCost": "live"
+              },
+              {
+                "id": "hierarchy",
+                "type": "number",
+                "label": "Large and small rhythm",
+                "default": 0.99,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "description": "Large anchor regions alternate with smaller supporting regions.",
+                "group": "Composition",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "ab4e921d2d2dafe49ae81670559d6f697d6ceffab57af7f22f49033723eff283",
+            "values": {
+              "pace": 1.24,
+              "phrasing": 1,
+              "composition": 0.44,
+              "tension": 0.72,
+              "hierarchy": 0.99
+            }
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0003"
+            ],
+            "definitionHash": "b159577b4ab913809499efdb6a24ab41fd2fbbdeb31f55962a9ad32fb9daf69a",
+            "schema": [
+              {
+                "id": "palette",
+                "type": "number",
+                "label": "Wash lightness",
+                "default": 0.07,
+                "min": -1,
+                "max": 1,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "warmth",
+                "type": "number",
+                "label": "Warm pools",
+                "default": 1.3,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "contrast",
+                "type": "number",
+                "label": "Region contrast",
+                "default": 1.05,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "pooling",
+                "type": "number",
+                "label": "Pigment pooling",
+                "default": 0.74,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "blooms",
+                "type": "number",
+                "label": "Watercolor blooms",
+                "default": 0.94,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "ornamentSaturation",
+                "type": "number",
+                "label": "Saturation",
+                "default": 1,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Ornament Color",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "da8cfed66633190993648e19984215219790b2ddb617e76f69aaefea53553158",
+            "values": {
+              "palette": 0.07,
+              "warmth": 1.3,
+              "contrast": 1.05,
+              "pooling": 0.74,
+              "blooms": 0.94,
+              "ornamentSaturation": 1
+            }
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0004"
+            ],
+            "definitionHash": "c0f808de02081671138f31f078565b179ce928a8b2cffafb9a9859b56f6576dd",
+            "schema": [
+              {
+                "id": "outline",
+                "type": "number",
+                "label": "Boundary width",
+                "default": 0.005,
+                "min": 0.002,
+                "max": 0.03,
+                "step": 0.001,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "inkWarmth",
+                "type": "number",
+                "label": "Warmth",
+                "default": 0.15,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "handDrawn",
+                "type": "number",
+                "label": "Hand-drawn character",
+                "default": 1.34,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "grain",
+                "type": "number",
+                "label": "Grain",
+                "default": 1.48,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "ornamentWidth",
+                "type": "number",
+                "label": "Boundary width",
+                "default": 0.008,
+                "min": 0.001,
+                "max": 0.025,
+                "step": 0.001,
+                "group": "Ornament Ink",
+                "changeCost": "live"
+              },
+              {
+                "id": "ornamentAccent",
+                "type": "number",
+                "label": "Secondary edge",
+                "default": 0.55,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Ornament Ink",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "ca5522adabfb4cf8c74bcfdd8bddf2fe86a7959b448a376a0476f0313c959f34",
+            "values": {
+              "outline": 0.005,
+              "inkWarmth": 0.15,
+              "handDrawn": 1.34,
+              "grain": 1.48,
+              "ornamentWidth": 0.008,
+              "ornamentAccent": 0.55
+            }
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0005"
+            ],
+            "definitionHash": "6bfd2bfd7746c9cff0c9776f370866c5229d9ef0883e9b0e0d1384fde2e6b6bc",
+            "schema": [
+              {
+                "id": "density",
+                "type": "number",
+                "label": "Density",
+                "default": 1,
+                "min": 0.3,
+                "max": 2,
+                "step": 0.01,
+                "group": "Contours",
+                "changeCost": "live"
+              },
+              {
+                "id": "width",
+                "type": "number",
+                "label": "Width",
+                "default": 1,
+                "min": 0.3,
+                "max": 2,
+                "step": 0.01,
+                "group": "Contours",
+                "changeCost": "live"
+              },
+              {
+                "id": "variation",
+                "type": "number",
+                "label": "Variation",
+                "default": 1,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Contours",
+                "changeCost": "live"
+              },
+              {
+                "id": "motion",
+                "type": "number",
+                "label": "Motion",
+                "default": 1,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Contours",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "0f1e29e1d3a061f160398bd628c410b9ee854c48569717835f093c07d8b0e6de",
+            "values": {
+              "density": 1,
+              "width": 1,
+              "variation": 1,
+              "motion": 1
+            }
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0006"
+            ],
+            "definitionHash": "7e1cd6daded9c7fe65f3285882d536e29661a193948bfe9b7b4a430da393e6d1",
+            "schema": [
+              {
+                "id": "acidPalette",
+                "type": "number",
+                "label": "Acid palette",
+                "default": 0.9,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Pigment",
+                "changeCost": "live"
+              },
+              {
+                "id": "contourStrength",
+                "type": "number",
+                "label": "Contour ink",
+                "default": 0.55,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Pigment",
+                "changeCost": "live"
+              },
+              {
+                "id": "scumble",
+                "type": "number",
+                "label": "Uneven pigment",
+                "default": 0.7,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Pigment",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "c4fa879c51bf6a3113958c4d5f1b65ac011b77a6ca976eb79ca8bb851fbf16d9",
+            "values": {
+              "acidPalette": 0.9,
+              "contourStrength": 0.55,
+              "scumble": 0.7
+            }
+          },
+          {
+            "nodePath": [
+              "b8dc8301-67a4-47d0-9c72-18dc6abf0007"
+            ],
+            "definitionHash": "a86d69c1245a7c287c3f47810d0be4ba8010782ce7e9ac476b69b59c084acf55",
+            "schema": [
+              {
+                "id": "tooth",
+                "type": "number",
+                "label": "Paper tooth",
+                "default": 0.7,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Surface",
+                "changeCost": "live"
+              },
+              {
+                "id": "drag",
+                "type": "number",
+                "label": "Pigment drag",
+                "default": 0.6,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Surface",
+                "changeCost": "live"
+              },
+              {
+                "id": "dryBrush",
+                "type": "number",
+                "label": "Dry brush",
+                "default": 0.8,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Surface",
+                "changeCost": "live"
+              },
+              {
+                "id": "margin",
+                "type": "number",
+                "label": "Margin",
+                "default": 0.018,
+                "min": 0,
+                "max": 0.08,
+                "step": 0.001,
+                "group": "Paper edge",
+                "changeCost": "live"
+              },
+              {
+                "id": "splatter",
+                "type": "number",
+                "label": "Splatter",
+                "default": 0.6,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Paper edge",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "b5139a9119978ba63bc3b3487020c5aaa2ab0b0639c6935c34b941ffdaf08fdb",
+            "values": {
+              "tooth": 0.7,
+              "drag": 0.6,
+              "dryBrush": 0.8,
+              "margin": 0.018,
+              "splatter": 0.6
+            }
+          }
+        ]
+      },
+      "controlMigration": [],
+      "clockEpoch": 0,
+      "timeSeconds": 0.00019999999925494194,
+      "tempo": {
+        "bpm": 120,
+        "beatPosition": 1.48379999999702,
+        "beatPhase": 0.48379999999701995,
+        "tempoSequence": 0
+      },
+      "tempoSequence": 0,
+      "frameId": "1",
+      "output": {
+        "width": 1920,
+        "height": 1080,
+        "fps": 60,
+        "seed": 0
+      },
+      "fault": null
+    },
+    "host": null,
+    "jobs": [
+      {
+        "jobId": "9433fb80-84a0-4581-a4b8-09abcd2af5ad",
+        "state": "succeeded",
+        "summary": "Visual is ready in Lux."
+      }
+    ],
+    "visualFps": null,
+    "uiFps": null,
+    "performance": {
+      "owner": {
+        "instanceId": "ef867dd8-6dbc-49a3-9f01-46aac01dfb17",
+        "generation": 2,
+        "revisionId": "7f64b537464ef980e82e93bfc16a47b775fe6e3f19c30b097c988b02c57c5efe"
+      },
+      "status": "pending",
+      "observedAtMs": null,
+      "worker": null
+    },
+    "capabilities": {
+      "protocolVersion": 4,
+      "supportedSdkVersions": [
+        "0.1.0",
+        "0.2.0",
+        "0.4.0"
+      ],
+      "codeDeclaredParameters": true,
+      "parameterKinds": [
+        "number"
+      ],
+      "maxParameterMetadataBytes": 32768,
+      "imageFormats": [
+        "image/bmp",
+        "image/png",
+        "image/jpeg"
+      ],
+      "assetExport": true,
+      "sceneVersions": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "controlVariation": {
+        "stableInstanceKeys": true,
+        "distributions": [
+          "random",
+          "centered",
+          "spread"
+        ]
+      },
+      "tempo": {
+        "manual": true,
+        "tap": true,
+        "bpm": {
+          "min": 20,
+          "max": 300
+        }
+      }
+    }
+  }
+}

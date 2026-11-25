@@ -1,0 +1,10 @@
+{
+  "label": "fiber",
+  "profile": "test-764d83eb-cf09-456e-ac9a-5aabf73dceba",
+  "checks": [
+    "source admitted and GPU runtime started"
+  ],
+  "errors": [
+    "Error: Visual initialization stopped making progress\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/fiber-optic-heart/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/fiber-optic-heart/scripts/render-reference-previews.mjs:69:3"
+  ]
+}

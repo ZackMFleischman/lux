@@ -1,0 +1,700 @@
+{
+  "playback": "playing",
+  "timeSeconds": 7.8147000000011175,
+  "clockEpoch": 0,
+  "tempo": {
+    "bpm": 120,
+    "beatPosition": 16.64220000000298,
+    "beatPhase": 0.6422000000029797,
+    "tempoSequence": 0
+  },
+  "tempoSequence": 0,
+  "frameId": "399",
+  "sdkVersion": "0.4.0",
+  "controlSchemaHash": "b002d04686195be9b8a38f3775d217cbcded1b9abdac9e348a1a5d5f2d01ce86",
+  "controls": {
+    "coreBrightness": 2.3,
+    "coreRadius": 0.14,
+    "haze": 0.7,
+    "breath": 0.55,
+    "flare": 0.45,
+    "strandCount": 12,
+    "spread": 1,
+    "cableWidth": 0.018,
+    "arrangement": 7,
+    "drift": 0.35,
+    "strandBrightness": 1.3,
+    "palette": 0.5,
+    "pulseSpeed": 0.12,
+    "pulseWidth": 0.07,
+    "pulseStrength": 2,
+    "ribbons": 3,
+    "ribbonWidth": 4,
+    "cables": 4,
+    "collars": 0.7,
+    "dustCount": 44,
+    "dustSize": 0.009,
+    "dustDrift": 0.35,
+    "dustBrightness": 0.55
+  },
+  "controlSequence": 0,
+  "nodeControls": {
+    "nodes": [
+      {
+        "nodePath": [
+          "a2ca5401-1e17-4c40-8dd6-6595f78a0001"
+        ],
+        "definitionHash": "1ccf7913af7e147c7c65d80bdd0e276e3bd27260d642e15c5214c9c78d32bca2",
+        "schema": [
+          {
+            "id": "radius",
+            "type": "number",
+            "label": "Radius",
+            "default": 0.14,
+            "min": 0.02,
+            "max": 0.35,
+            "step": 0.005,
+            "group": "Core",
+            "changeCost": "live"
+          },
+          {
+            "id": "brightness",
+            "type": "number",
+            "label": "Brightness",
+            "default": 2.3,
+            "min": 0,
+            "max": 5,
+            "step": 0.01,
+            "group": "Core",
+            "changeCost": "live"
+          },
+          {
+            "id": "haze",
+            "type": "number",
+            "label": "Magenta haze",
+            "default": 0.7,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "group": "Atmosphere",
+            "changeCost": "live"
+          },
+          {
+            "id": "breath",
+            "type": "number",
+            "label": "Breathing",
+            "default": 0.55,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Core",
+            "changeCost": "live"
+          },
+          {
+            "id": "flare",
+            "type": "number",
+            "label": "Horizontal flare",
+            "default": 0.45,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "group": "Atmosphere",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "52b6d321b5a99f9b8eaf1685d7f96558f69d84fee04b6ff8c6c8c2d393580f7a",
+        "values": {
+          "radius": 0.14,
+          "brightness": 2.3,
+          "haze": 0.7,
+          "breath": 0.55,
+          "flare": 0.45
+        }
+      },
+      {
+        "nodePath": [
+          "a2ca5401-1e17-4c40-8dd6-6595f78a0002"
+        ],
+        "definitionHash": "e8f4c77173313702c88c3fef1acc3d5c2067ff25d319a6c5cfccc74a39cc7eea",
+        "schema": [
+          {
+            "id": "count",
+            "type": "number",
+            "label": "Strands",
+            "default": 12,
+            "min": 0,
+            "max": 16,
+            "step": 1,
+            "group": "Shape",
+            "changeCost": "live"
+          },
+          {
+            "id": "spread",
+            "type": "number",
+            "label": "Spread",
+            "default": 1,
+            "min": 0.3,
+            "max": 1.4,
+            "step": 0.01,
+            "group": "Shape",
+            "changeCost": "live"
+          },
+          {
+            "id": "width",
+            "type": "number",
+            "label": "Cable width",
+            "default": 0.018,
+            "min": 0.002,
+            "max": 0.05,
+            "step": 0.001,
+            "group": "Shape",
+            "changeCost": "live"
+          },
+          {
+            "id": "seed",
+            "type": "number",
+            "label": "Arrangement",
+            "default": 7,
+            "min": 0,
+            "max": 999,
+            "step": 1,
+            "group": "Shape",
+            "changeCost": "live"
+          },
+          {
+            "id": "motion",
+            "type": "number",
+            "label": "Drift",
+            "default": 0.35,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "group": "Motion",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "74fa7702c50a343f2e05a88f18c7164e675766ceb81bc4805f65b7f3e85a59d7",
+        "values": {
+          "count": 12,
+          "spread": 1,
+          "width": 0.018,
+          "seed": 7,
+          "motion": 0.35
+        }
+      },
+      {
+        "nodePath": [
+          "a2ca5401-1e17-4c40-8dd6-6595f78a0003"
+        ],
+        "definitionHash": "c77fd5d968a249f4d3d28b72e9f844278d3a37d176ca0442c88a1b25fc88c2cf",
+        "schema": [
+          {
+            "id": "brightness",
+            "type": "number",
+            "label": "Strand brightness",
+            "default": 1.3,
+            "min": 0,
+            "max": 4,
+            "step": 0.01,
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "palette",
+            "type": "number",
+            "label": "Cyan to magenta",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "pulseSpeed",
+            "type": "number",
+            "label": "Pulse speed",
+            "default": 0.12,
+            "min": -1,
+            "max": 1,
+            "step": 0.01,
+            "group": "Energy",
+            "changeCost": "live"
+          },
+          {
+            "id": "pulseWidth",
+            "type": "number",
+            "label": "Pulse length",
+            "default": 0.07,
+            "min": 0.01,
+            "max": 0.3,
+            "step": 0.005,
+            "group": "Energy",
+            "changeCost": "live"
+          },
+          {
+            "id": "pulseStrength",
+            "type": "number",
+            "label": "Pulse strength",
+            "default": 2,
+            "min": 0,
+            "max": 6,
+            "step": 0.01,
+            "group": "Energy",
+            "changeCost": "live"
+          },
+          {
+            "id": "ribbons",
+            "type": "number",
+            "label": "Broad ribbons",
+            "default": 3,
+            "min": 0,
+            "max": 6,
+            "step": 1,
+            "group": "Structure",
+            "changeCost": "live"
+          },
+          {
+            "id": "ribbonWidth",
+            "type": "number",
+            "label": "Ribbon width",
+            "default": 4,
+            "min": 1,
+            "max": 8,
+            "step": 0.05,
+            "group": "Structure",
+            "changeCost": "live"
+          },
+          {
+            "id": "cables",
+            "type": "number",
+            "label": "Glass-style cables",
+            "default": 4,
+            "min": 0,
+            "max": 8,
+            "step": 1,
+            "group": "Structure",
+            "changeCost": "live"
+          },
+          {
+            "id": "collars",
+            "type": "number",
+            "label": "Cable collars",
+            "default": 0.7,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Structure",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "8e0aef23161068157edf0d77246285a7673a68fae9106180cccce452bb1993d5",
+        "values": {
+          "brightness": 1.3,
+          "palette": 0.5,
+          "pulseSpeed": 0.12,
+          "pulseWidth": 0.07,
+          "pulseStrength": 2,
+          "ribbons": 3,
+          "ribbonWidth": 4,
+          "cables": 4,
+          "collars": 0.7
+        }
+      },
+      {
+        "nodePath": [
+          "a2ca5401-1e17-4c40-8dd6-6595f78a0004"
+        ],
+        "definitionHash": "546db09082881eef9507e2eea315aa7bc2e5b4f232386bf3f5b2eff6026289c2",
+        "schema": [
+          {
+            "id": "count",
+            "type": "number",
+            "label": "Particles",
+            "default": 44,
+            "min": 0,
+            "max": 96,
+            "step": 1,
+            "group": "Dust",
+            "changeCost": "live"
+          },
+          {
+            "id": "size",
+            "type": "number",
+            "label": "Size",
+            "default": 0.009,
+            "min": 0.002,
+            "max": 0.03,
+            "step": 0.001,
+            "group": "Dust",
+            "changeCost": "live"
+          },
+          {
+            "id": "drift",
+            "type": "number",
+            "label": "Drift",
+            "default": 0.35,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "group": "Dust",
+            "changeCost": "live"
+          },
+          {
+            "id": "brightness",
+            "type": "number",
+            "label": "Brightness",
+            "default": 0.55,
+            "min": 0,
+            "max": 3,
+            "step": 0.01,
+            "group": "Dust",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "154c4af5822a2ffa048adf66d6f5efbc4c43e42f0d094f2d816fd980c26e52f6",
+        "values": {
+          "count": 44,
+          "size": 0.009,
+          "drift": 0.35,
+          "brightness": 0.55
+        }
+      }
+    ]
+  },
+  "effectiveNodeControls": {
+    "nodes": [
+      {
+        "nodePath": [
+          "a2ca5401-1e17-4c40-8dd6-6595f78a0001"
+        ],
+        "definitionHash": "1ccf7913af7e147c7c65d80bdd0e276e3bd27260d642e15c5214c9c78d32bca2",
+        "schema": [
+          {
+            "id": "radius",
+            "type": "number",
+            "label": "Radius",
+            "default": 0.14,
+            "min": 0.02,
+            "max": 0.35,
+            "step": 0.005,
+            "group": "Core",
+            "changeCost": "live"
+          },
+          {
+            "id": "brightness",
+            "type": "number",
+            "label": "Brightness",
+            "default": 2.3,
+            "min": 0,
+            "max": 5,
+            "step": 0.01,
+            "group": "Core",
+            "changeCost": "live"
+          },
+          {
+            "id": "haze",
+            "type": "number",
+            "label": "Magenta haze",
+            "default": 0.7,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "group": "Atmosphere",
+            "changeCost": "live"
+          },
+          {
+            "id": "breath",
+            "type": "number",
+            "label": "Breathing",
+            "default": 0.55,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Core",
+            "changeCost": "live"
+          },
+          {
+            "id": "flare",
+            "type": "number",
+            "label": "Horizontal flare",
+            "default": 0.45,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "group": "Atmosphere",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "52b6d321b5a99f9b8eaf1685d7f96558f69d84fee04b6ff8c6c8c2d393580f7a",
+        "values": {
+          "radius": 0.14,
+          "brightness": 2.3,
+          "haze": 0.7,
+          "breath": 0.55,
+          "flare": 0.45
+        }
+      },
+      {
+        "nodePath": [
+          "a2ca5401-1e17-4c40-8dd6-6595f78a0002"
+        ],
+        "definitionHash": "e8f4c77173313702c88c3fef1acc3d5c2067ff25d319a6c5cfccc74a39cc7eea",
+        "schema": [
+          {
+            "id": "count",
+            "type": "number",
+            "label": "Strands",
+            "default": 12,
+            "min": 0,
+            "max": 16,
+            "step": 1,
+            "group": "Shape",
+            "changeCost": "live"
+          },
+          {
+            "id": "spread",
+            "type": "number",
+            "label": "Spread",
+            "default": 1,
+            "min": 0.3,
+            "max": 1.4,
+            "step": 0.01,
+            "group": "Shape",
+            "changeCost": "live"
+          },
+          {
+            "id": "width",
+            "type": "number",
+            "label": "Cable width",
+            "default": 0.018,
+            "min": 0.002,
+            "max": 0.05,
+            "step": 0.001,
+            "group": "Shape",
+            "changeCost": "live"
+          },
+          {
+            "id": "seed",
+            "type": "number",
+            "label": "Arrangement",
+            "default": 7,
+            "min": 0,
+            "max": 999,
+            "step": 1,
+            "group": "Shape",
+            "changeCost": "live"
+          },
+          {
+            "id": "motion",
+            "type": "number",
+            "label": "Drift",
+            "default": 0.35,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "group": "Motion",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "74fa7702c50a343f2e05a88f18c7164e675766ceb81bc4805f65b7f3e85a59d7",
+        "values": {
+          "count": 12,
+          "spread": 1,
+          "width": 0.018,
+          "seed": 7,
+          "motion": 0.35
+        }
+      },
+      {
+        "nodePath": [
+          "a2ca5401-1e17-4c40-8dd6-6595f78a0003"
+        ],
+        "definitionHash": "c77fd5d968a249f4d3d28b72e9f844278d3a37d176ca0442c88a1b25fc88c2cf",
+        "schema": [
+          {
+            "id": "brightness",
+            "type": "number",
+            "label": "Strand brightness",
+            "default": 1.3,
+            "min": 0,
+            "max": 4,
+            "step": 0.01,
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "palette",
+            "type": "number",
+            "label": "Cyan to magenta",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "pulseSpeed",
+            "type": "number",
+            "label": "Pulse speed",
+            "default": 0.12,
+            "min": -1,
+            "max": 1,
+            "step": 0.01,
+            "group": "Energy",
+            "changeCost": "live"
+          },
+          {
+            "id": "pulseWidth",
+            "type": "number",
+            "label": "Pulse length",
+            "default": 0.07,
+            "min": 0.01,
+            "max": 0.3,
+            "step": 0.005,
+            "group": "Energy",
+            "changeCost": "live"
+          },
+          {
+            "id": "pulseStrength",
+            "type": "number",
+            "label": "Pulse strength",
+            "default": 2,
+            "min": 0,
+            "max": 6,
+            "step": 0.01,
+            "group": "Energy",
+            "changeCost": "live"
+          },
+          {
+            "id": "ribbons",
+            "type": "number",
+            "label": "Broad ribbons",
+            "default": 3,
+            "min": 0,
+            "max": 6,
+            "step": 1,
+            "group": "Structure",
+            "changeCost": "live"
+          },
+          {
+            "id": "ribbonWidth",
+            "type": "number",
+            "label": "Ribbon width",
+            "default": 4,
+            "min": 1,
+            "max": 8,
+            "step": 0.05,
+            "group": "Structure",
+            "changeCost": "live"
+          },
+          {
+            "id": "cables",
+            "type": "number",
+            "label": "Glass-style cables",
+            "default": 4,
+            "min": 0,
+            "max": 8,
+            "step": 1,
+            "group": "Structure",
+            "changeCost": "live"
+          },
+          {
+            "id": "collars",
+            "type": "number",
+            "label": "Cable collars",
+            "default": 0.7,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Structure",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "8e0aef23161068157edf0d77246285a7673a68fae9106180cccce452bb1993d5",
+        "values": {
+          "brightness": 1.3,
+          "palette": 0.5,
+          "pulseSpeed": 0.12,
+          "pulseWidth": 0.07,
+          "pulseStrength": 2,
+          "ribbons": 3,
+          "ribbonWidth": 4,
+          "cables": 4,
+          "collars": 0.7
+        }
+      },
+      {
+        "nodePath": [
+          "a2ca5401-1e17-4c40-8dd6-6595f78a0004"
+        ],
+        "definitionHash": "546db09082881eef9507e2eea315aa7bc2e5b4f232386bf3f5b2eff6026289c2",
+        "schema": [
+          {
+            "id": "count",
+            "type": "number",
+            "label": "Particles",
+            "default": 44,
+            "min": 0,
+            "max": 96,
+            "step": 1,
+            "group": "Dust",
+            "changeCost": "live"
+          },
+          {
+            "id": "size",
+            "type": "number",
+            "label": "Size",
+            "default": 0.009,
+            "min": 0.002,
+            "max": 0.03,
+            "step": 0.001,
+            "group": "Dust",
+            "changeCost": "live"
+          },
+          {
+            "id": "drift",
+            "type": "number",
+            "label": "Drift",
+            "default": 0.35,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "group": "Dust",
+            "changeCost": "live"
+          },
+          {
+            "id": "brightness",
+            "type": "number",
+            "label": "Brightness",
+            "default": 0.55,
+            "min": 0,
+            "max": 3,
+            "step": 0.01,
+            "group": "Dust",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "154c4af5822a2ffa048adf66d6f5efbc4c43e42f0d094f2d816fd980c26e52f6",
+        "values": {
+          "count": 44,
+          "size": 0.009,
+          "drift": 0.35,
+          "brightness": 0.55
+        }
+      }
+    ]
+  },
+  "controlAnimations": [],
+  "controlAnimationIssues": [],
+  "animationSequence": 0,
+  "width": 1920,
+  "height": 1080,
+  "seed": 0,
+  "colorSpace": "srgb",
+  "alphaMode": "straight",
+  "instanceId": "225815b4-5e75-4e32-8e22-eb534ec16544",
+  "generation": 2,
+  "revisionId": "13a16ad56f4b637464e8da864d1141b2ac433a6e56341190a5a9a157fe91dc5d"
+}

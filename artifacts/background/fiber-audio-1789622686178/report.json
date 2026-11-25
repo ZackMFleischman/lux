@@ -1,0 +1,10 @@
+{
+  "label": "fiber-audio",
+  "profile": "test-8e068d2b-4f03-4fad-a214-8862d00879cc",
+  "checks": [
+    "saved scene opened with all audio bindings intact and no binding issues",
+    "source admitted and GPU runtime started",
+    "scene saved in isolated test folder; reopen is a separate check"
+  ],
+  "errors": []
+}

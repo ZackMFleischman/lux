@@ -1,0 +1,1 @@
+{"summary":"User corrected scene deliverable location","expected":"Save requested demo scenes in repo visuals/ and commit with the other scenes.","actual":"Demo files were saved only to the Codex visualization output directory.","correction":"Add both exact validated scenes under visuals/ and merge the reviewed branch to main as requested."}

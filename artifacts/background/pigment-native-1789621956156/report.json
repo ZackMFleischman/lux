@@ -1,0 +1,9 @@
+{
+  "label": "pigment-native",
+  "profile": "test-ef98fefb-03ae-46a7-b5af-0a0bdf1ec193",
+  "checks": [
+    "source admitted and GPU runtime started",
+    "scene saved in isolated test folder; reopen is a separate check"
+  ],
+  "errors": []
+}
