@@ -1,0 +1,328 @@
+✔ real dock panes preserve canvas, editor undo and runtime subscriptions through close, tab, reset, restore and fullscreen (3844.293ms)
+✖ group menu targets its owning group, preserves identities, cancels with focus and recovers all closed panes (331.1081ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8274.1829
+
+✖ failing tests:
+
+test at apps\studio\dist\dock-shell.test.mjs:1719:1
+✖ group menu targets its owning group, preserves identities, cancels with focus and recovers all closed panes (331.1081ms)
+  Error [TestingLibraryElementError]: Unable to find an accessible element with the role "button" and name "Add pane to Preview group"
+  
+  Here are the accessible roles:
+  
+    region:
+  
+    Name "Source":
+    [36m<div[39m
+      [33maria-label[39m=[32m"Source"[39m
+      [33mclass[39m=[32m"dv-groupview dv-groupview-header-top dv-inactive-group"[39m
+      [33mrole[39m=[32m"region"[39m
+      [33mstyle[39m=[32m"outline: none; height: 100%; width: 100%; overflow: hidden;"[39m
+      [33mtabindex[39m=[32m"-1"[39m
+    [36m/>[39m
+  
+    Name "Preview":
+    [36m<div[39m
+      [33maria-label[39m=[32m"Preview"[39m
+      [33mclass[39m=[32m"dv-groupview dv-groupview-header-top dv-active-group"[39m
+      [33mrole[39m=[32m"region"[39m
+      [33mstyle[39m=[32m"outline: none; height: 100%; width: 100%; overflow: hidden;"[39m
+      [33mtabindex[39m=[32m"-1"[39m
+    [36m/>[39m
+  
+    Name "Jobs":
+    [36m<div[39m
+      [33maria-label[39m=[32m"Jobs"[39m
+      [33mclass[39m=[32m"dv-groupview dv-groupview-header-top dv-inactive-group"[39m
+      [33mrole[39m=[32m"region"[39m
+      [33mstyle[39m=[32m"outline: none; height: 100%; width: 100%; overflow: hidden;"[39m
+      [33mtabindex[39m=[32m"-1"[39m
+    [36m/>[39m
+  
+    Name "Inspector":
+    [36m<div[39m
+      [33maria-label[39m=[32m"Inspector"[39m
+      [33mclass[39m=[32m"dv-groupview dv-groupview-header-top dv-inactive-group"[39m
+      [33mrole[39m=[32m"region"[39m
+      [33mstyle[39m=[32m"outline: none; height: 100%; width: 100%; overflow: hidden;"[39m
+      [33mtabindex[39m=[32m"-1"[39m
+    [36m/>[39m
+  
+    --------------------------------------------------
+    tablist:
+  
+    Name "":
+    [36m<div[39m
+      [33maria-orientation[39m=[32m"horizontal"[39m
+      [33mclass[39m=[32m"dv-tabs-container"[39m
+      [33mrole[39m=[32m"tablist"[39m
+    [36m/>[39m
+  
+    Name "":
+    [36m<div[39m
+      [33maria-orientation[39m=[32m"horizontal"[39m
+      [33mclass[39m=[32m"dv-tabs-container"[39m
+      [33mrole[39m=[32m"tablist"[39m
+    [36m/>[39m
+  
+    Name "":
+    [36m<div[39m
+      [33maria-orientation[39m=[32m"horizontal"[39m
+      [33mclass[39m=[32m"dv-tabs-container"[39m
+      [33mrole[39m=[32m"tablist"[39m
+    [36m/>[39m
+  
+    Name "":
+    [36m<div[39m
+      [33maria-orientation[39m=[32m"horizontal"[39m
+      [33mclass[39m=[32m"dv-tabs-container"[39m
+      [33mrole[39m=[32m"tablist"[39m
+    [36m/>[39m
+  
+    --------------------------------------------------
+    tab:
+  
+    Name "Source":
+    [36m<div[39m
+      [33maria-controls[39m=[32m"dv-tabpanel-19"[39m
+      [33maria-selected[39m=[32m"true"[39m
+      [33mclass[39m=[32m"dv-tab dv-active-tab"[39m
+      [33mdraggable[39m=[32m"false"[39m
+      [33mid[39m=[32m"dv-tab-40"[39m
+      [33mrole[39m=[32m"tab"[39m
+      [33mtabindex[39m=[32m"0"[39m
+    [36m/>[39m
+  
+    Name "Preview":
+    [36m<div[39m
+      [33maria-controls[39m=[32m"dv-tabpanel-20"[39m
+      [33maria-selected[39m=[32m"true"[39m
+      [33mclass[39m=[32m"dv-tab dv-active-tab"[39m
+      [33mdraggable[39m=[32m"false"[39m
+      [33mid[39m=[32m"dv-tab-41"[39m
+      [33mrole[39m=[32m"tab"[39m
+      [33mtabindex[39m=[32m"0"[39m
+    [36m/>[39m
+  
+    Name "Jobs":
+    [36m<div[39m
+      [33maria-controls[39m=[32m"dv-tabpanel-21"[39m
+      [33maria-selected[39m=[32m"true"[39m
+      [33mclass[39m=[32m"dv-tab dv-active-tab"[39m
+      [33mdraggable[39m=[32m"false"[39m
+      [33mid[39m=[32m"dv-tab-42"[39m
+      [33mrole[39m=[32m"tab"[39m
+      [33mtabindex[39m=[32m"0"[39m
+    [36m/>[39m
+  
+    Name "Inspector":
+    [36m<div[39m
+      [33maria-controls[39m=[32m"dv-tabpanel-22"[39m
+      [33maria-selected[39m=[32m"true"[39m
+      [33mclass[39m=[32m"dv-tab dv-active-tab"[39m
+      [33mdraggable[39m=[32m"false"[39m
+      [33mid[39m=[32m"dv-tab-43"[39m
+      [33mrole[39m=[32m"tab"[39m
+      [33mtabindex[39m=[32m"0"[39m
+    [36m/>[39m
+  
+    --------------------------------------------------
+    tabpanel:
+  
+    Name "Source":
+    [36m<div[39m
+      [33maria-labelledby[39m=[32m"dv-tab-40"[39m
+      [33mclass[39m=[32m"dv-content-container"[39m
+      [33mid[39m=[32m"dv-tabpanel-19"[39m
+      [33mrole[39m=[32m"tabpanel"[39m
+      [33mtabindex[39m=[32m"-1"[39m
+    [36m/>[39m
+  
+    Name "Preview":
+    [36m<div[39m
+      [33maria-labelledby[39m=[32m"dv-tab-41"[39m
+      [33mclass[39m=[32m"dv-content-container"[39m
+      [33mid[39m=[32m"dv-tabpanel-20"[39m
+      [33mrole[39m=[32m"tabpanel"[39m
+      [33mtabindex[39m=[32m"-1"[39m
+    [36m/>[39m
+  
+    Name "Jobs":
+    [36m<div[39m
+      [33maria-labelledby[39m=[32m"dv-tab-42"[39m
+      [33mclass[39m=[32m"dv-content-container"[39m
+      [33mid[39m=[32m"dv-tabpanel-21"[39m
+      [33mrole[39m=[32m"tabpanel"[39m
+      [33mtabindex[39m=[32m"-1"[39m
+    [36m/>[39m
+  
+    Name "Inspector":
+    [36m<div[39m
+      [33maria-labelledby[39m=[32m"dv-tab-43"[39m
+      [33mclass[39m=[32m"dv-content-container"[39m
+      [33mid[39m=[32m"dv-tabpanel-22"[39m
+      [33mrole[39m=[32m"tabpanel"[39m
+      [33mtabindex[39m=[32m"-1"[39m
+    [36m/>[39m
+  
+    --------------------------------------------------
+    status:
+  
+    Name "":
+    [36m<div[39m
+      [33maria-atomic[39m=[32m"true"[39m
+      [33maria-live[39m=[32m"polite"[39m
+      [33mclass[39m=[32m"dv-live-region"[39m
+      [33mrole[39m=[32m"status"[39m
+      [33mstyle[39m=[32m"position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0px;"[39m
+    [36m/>[39m
+  
+    --------------------------------------------------
+    alert:
+  
+    Name "":
+    [36m<div[39m
+      [33maria-atomic[39m=[32m"true"[39m
+      [33maria-live[39m=[32m"assertive"[39m
+      [33mclass[39m=[32m"dv-live-region-assertive"[39m
+      [33mrole[39m=[32m"alert"[39m
+      [33mstyle[39m=[32m"position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0px;"[39m
+    [36m/>[39m
+  
+    --------------------------------------------------
+  
+  Ignored nodes: comments, script, style
+  [36m<body>[39m
+    [36m<div />[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"height: 100%; width: 100%;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"dv-shell dockview-theme-dark"[39m
+          [33mstyle[39m=[32m"height: 100%; width: 100%; position: relative;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"dv-popover-anchor"[39m
+            [33mstyle[39m=[32m"position: relative;"[39m
+          [36m/>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"dv-split-view-container dv-horizontal dv-separator-border"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"dv-sash-container"[39m
+            [36m/>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"dv-view-container"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"dv-view visible"[39m
+                [33mstyle[39m=[32m"width: 100px; left: 0px;"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"dv-shell-middle-column"[39m
+                  [33mstyle[39m=[32m"height: 100%; width: 100%;"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"dv-split-view-container dv-vertical dv-separator-border"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"dv-sash-container"[39m
+                    [36m/>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"dv-view-container"[39m
+                    [36m>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m"dv-view visible"[39m
+                        [33mstyle[39m=[32m"height: 100px; top: 0px;"[39m
+                      [36m>[39m
+                        [36m<div[39m
+                          [33mstyle[39m=[32m"height: 100%; width: 100%;"[39m
+                        [36m>[39m
+                          [36m<div[39m
+                            [33mclass[39m=[32m"dv-grid-view dv-dockview"[39m
+                            [33mstyle[39m=[32m"height: 100px; width: 100px;"[39m
+                          [36m>[39m
+                            [36m<div[39m
+                              [33mclass[39m=[32m"dv-branch-node"[39m
+                            [36m>[39m
+                              [36m<div[39m
+                                [33mclass[39m=[32m"dv-split-view-container dv-horizontal dv-separator-border"[39m
+                              [36m>[39m
+                                [36m<div[39m
+                                  [33mclass[39m=[32m"dv-sash-container"[39m
+                                [36m>[39m
+                                  [36m<div[39m
+                                    [33mclass[39m=[32m"dv-sash dv-disabled"[39m
+                                    [33mstyle[39m=[32m"left: 198px; top: 0px;"[39m
+                                  [36m/>[39m
+                                [36m</div>[39m
+                                [36m<div[39m
+                                  [33mclass[39m=[32m"dv-view-container"[39m
+                                [36m>[39m
+                                  [36m<div[39m
+                                    [33mclass[39m=[32m"dv-view visible"[39m
+                                    [33mstyle[39m=[32m"width: 200px; left: 0px;"[39m
+                                  [36m>[39m
+                                    [36m<div[39m
+                                      [33mclass[39m=[32m"dv-branch-node"[39m
+                                    [36m>[39m
+                                      [36m<div[39m
+                                        [33mclass[39m=[32m"dv-split-view-container dv-vertical dv-separator-border"[39m
+                                      [36m>[39m
+                                        [36m<div[39m
+                                          [33mclass[39m=[32m"dv-sash-container"[39m
+                                        [36m>[39m
+                                          [36m<div[39m
+                                            [33mclass[39m=[32m"dv-sash dv-disabled"[39m
+                                            [33mstyle[39m=[32m"left: 0px; top: 98px;"[39m
+                                          [36m/>[39m
+                                        [36m</div>[39m
+                                        [36m<div[39m
+                                          [33mclass[39m=[32m"dv-view-container"[39m
+                                        [36m>[39m
+                                          [36m<div[39m
+                                            [33mclass[39m=[32m"dv-view visible"[39m
+                                            [33mstyle[39m=[32m"height: 100px; top: 0px;"[39m
+                                          [36m>[39m
+                                            [36m<div[39m
+                                              [33mclass[39m=[32m"dv-branch-node"[39m
+                                            [36m>[39m
+                                              [36m<div[39m
+                                                [33mclass[39m=[32m"dv-split-view-container dv-horizontal dv-separator-border"[39m
+                                              [36m>[39m
+                                                [36m<div[39m
+                                                  [33mclass[39m=[32m"dv-sash-container"[39m
+                                                [36m>[39m
+                                                  [36m<div[39m
+                                                    [33mclass[39m=[32m"dv-sash dv-disabled"[39m
+                                                    [33mstyle[39m=[32m"left: 98px; top: 0px;"[39m
+                                                  [36m/>[39m
+                                                [36m</div>[39m
+                                                [36m<div[39m
+                                                  [33mclass[39m=[32m"dv-view-container"[39m
+                                                [36m>[39m
+                                                  [36m<div[39m
+                                                    [33mclass[39m=[32m"dv-view visible"[39m
+                                                    [33mstyle[39m=[32m"width: 100px; left: 0px;"[39m
+                                                  [36m>[39m
+                                                    [36m<div[39m
+                                                      [33maria-label[39m=[32m"Source"[39m
+                                                      [33mclass[39m=[32m"dv-groupview dv-groupview-header-top dv-inactive-group"[39m
+                                                      [33mrole[39m=[32m"region"[39m
+                                                      [33mstyle[39m=[32m"outline: none; height: 100%; width: 100%; overflow: hidden;"[39m
+                               ...
+      at Object.getElementError (C:\Users\zFlei\repos\lux\.worktrees\tracer\node_modules\.pnpm\@testing-library+dom@10.4.1\node_modules\@testing-library\dom\dist\config.js:37:19)
+      at C:\Users\zFlei\repos\lux\.worktrees\tracer\node_modules\.pnpm\@testing-library+dom@10.4.1\node_modules\@testing-library\dom\dist\query-helpers.js:76:38
+      at C:\Users\zFlei\repos\lux\.worktrees\tracer\node_modules\.pnpm\@testing-library+dom@10.4.1\node_modules\@testing-library\dom\dist\query-helpers.js:52:17
+      at C:\Users\zFlei\repos\lux\.worktrees\tracer\node_modules\.pnpm\@testing-library+dom@10.4.1\node_modules\@testing-library\dom\dist\query-helpers.js:95:19
+      at TestContext.<anonymous> (file:///C:/Users/zFlei/repos/lux/.worktrees/checkpoint-compact-ui/apps/studio/dist/dock-shell.test.mjs:1740:26)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7)

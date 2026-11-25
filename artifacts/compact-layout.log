@@ -1,0 +1,35 @@
+TAP version 13
+# Subtest: versioned desktop split and laptop tab layouts contain only registered real panel kinds
+ok 1 - versioned desktop split and laptop tab layouts contain only registered real panel kinds
+  ---
+  duration_ms: 12.9528
+  type: 'test'
+  ...
+# Subtest: layout parser rejects unsupported schema, unknown panels, state authority and unsafe references
+ok 2 - layout parser rejects unsupported schema, unknown panels, state authority and unsafe references
+  ---
+  duration_ms: 11.7833
+  type: 'test'
+  ...
+# Subtest: inspector instances preserve independent locks and serialized title is canonicalized
+ok 3 - inspector instances preserve independent locks and serialized title is canonicalized
+  ---
+  duration_ms: 2.1704
+  type: 'test'
+  ...
+# Subtest: real Dockview CPU adapter moves, saves, restores, reopens and resets without runtime authority
+ok 4 - real Dockview CPU adapter moves, saves, restores, reopens and resets without runtime authority
+  ---
+  duration_ms: 281.0231
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1697.0194
+Dockview React adapter and local CSS bundled; no application or graphics launched.

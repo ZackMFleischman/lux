@@ -1,0 +1,140 @@
+
+  apps\studio\dist\main.cjs      150.5kb
+  apps\studio\dist\main.cjs.map  289.9kb
+
+Done in 34ms
+
+  apps\studio\dist\preload.cjs      2.4kb
+  apps\studio\dist\preload.cjs.map  3.7kb
+
+Done in 8ms
+
+  apps\studio\dist\renderer.js         3.8mb
+  apps\studio\dist\renderer.css      137.6kb
+  apps\studio\dist\renderer.js.map     7.0mb
+  apps\studio\dist\renderer.css.map  211.2kb
+
+Done in 756ms
+
+  apps\studio\dist\visual-worker.js       9.5kb
+  apps\studio\dist\visual-worker.js.map  17.6kb
+
+Done in 22ms
+
+  apps\studio\dist\view.test.cjs        3.2mb
+  apps\studio\dist\view.test.css      118.9kb
+  apps\studio\dist\view.test.cjs.map    5.4mb
+  apps\studio\dist\view.test.css.map  183.6kb
+
+Done in 667ms
+
+  apps\studio\dist\interactions.test.css      118.9kb
+  apps\studio\dist\interactions.test.mjs       62.6kb
+  apps\studio\dist\interactions.test.mjs.map  228.5kb
+  apps\studio\dist\interactions.test.css.map  183.6kb
+
+Done in 40ms
+
+  apps\studio\dist\source-editor.test.mjs      34.7kb
+  apps\studio\dist\source-editor.test.mjs.map  56.3kb
+
+Done in 26ms
+✔ RTL: disconnected buttons and MUI slider refuse input while workspace remains operable (353.3408ms)
+✔ RTL: playback and intensity invoke guarded shared operations and wait for applied state (295.6686ms)
+✔ RTL: failed runtime command shows actionable error without a successful-state claim (295.1814ms)
+✔ RTL: pending playback preserves button styling and ignores duplicate transport commands (483.9646ms)
+✔ RTL: intensity writes do not disable transport or insert a success alert (87.7317ms)
+✔ RTL: Escape exits native fullscreen even before its state notification arrives (89.5622ms)
+An update to StudioLayout inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+✔ RTL: fullscreen shows only preview, ignores stale initial state, and exits on first Escape (3767.5566ms)
+✔ RTL: unavailable popout is absent while fullscreen remains available (46.9183ms)
+✔ default view shows unavailable output and disabled runtime controls rather than a demo (34.8106ms)
+✔ connected view distinguishes actual zero measurement, stale coverage and host revision (17.3474ms)
+✔ local agent bridge requires token, rejects browser origins and deduplicates requests (41.0518ms)
+✔ local agent bridge forwards runtime controls through the application dispatcher (14.2414ms)
+✔ session reads, builds and saves a complete isolated draft (2.8272ms)
+✔ cancelled/failed saves preserve dirty and an in-flight save excludes open/build/save (0.9991ms)
+✔ stale build cannot submit and opening invalid code preserves the previous running identity (0.7716ms)
+✔ export validates a complete snapshot, excludes competing operations and preserves dirty state (0.6334ms)
+✔ failed preview validation prevents export and releases the session lock (0.3675ms)
+✔ failed open preserves document controls through save and applies them when repaired (0.6277ms)
+✔ disconnected Studio never admits a runtime command or invents status (0.4237ms)
+✔ commands use current canonical operation payloads without optimistic application (0.409ms)
+✔ host authority and nonfinite or out-of-range values never reach core (0.6855ms)
+✔ continuous intensity holds one in-flight write and coalesces to the latest guarded value (0.8802ms)
+✔ a value queued at acknowledgement is not erased by drain cleanup (0.3692ms)
+✔ export owns an isolated full document across folder selection and excludes overlapping jobs (0.6511ms)
+✔ invalid names and oversized JSON never open a dialog; failed export releases exclusion (13.5464ms)
+✔ bounded child transports JSON and rejects errors, malformed output, overflow, timeout and cancellation (528.6375ms)
+✔ export child validates and prepares the full saved document before packaging, then cleans temporary source (48.4439ms)
+✔ invalid scene never reaches preparation; failed compilation never packages and removes its temporary source (6.8435ms)
+✔ invalid code fails before runtime copying, and a copy failure removes the runtime staging directory (829.4229ms)
+✔ fullscreen events are authoritative even when the native query still reports the previous state (0.5126ms)
+✔ versioned desktop split and laptop tab layouts contain only registered real panel kinds (6.5086ms)
+✔ layout parser rejects unsupported schema, unknown panels, state authority and unsafe references (7.3542ms)
+✔ inspector instances preserve independent locks and serialized title is canonicalized (0.8049ms)
+✔ real Dockview CPU adapter moves, saves, restores, reopens and resets without runtime authority (107.7252ms)
+✔ Emotion styling is allowed only through a nonce while script and network policy stays restricted (1.5738ms)
+✔ page generation refuses remote assets and injected nonce content (0.2438ms)
+✔ moving presentation retires only consumers and preserves the runtime key (0.3853ms)
+✔ attachment completing after close is retired rather than leaked or presented (0.2051ms)
+✔ a failed detach never attaches a second consumer over uncertain ownership (0.2094ms)
+✔ standalone guarded MCP commands wait for applied state and reject invalid/stale writes (3.2276ms)
+✔ silent candidate is terminated at 1250 ms while previous preview survives (1.4228ms)
+✔ healthy candidate heartbeats permit slow initialization until the independent five-second cap (2.0054ms)
+✔ paused stalled commands fault the runtime and settle all pending waiters (1.4745ms)
+✔ capture admission allows one active and one queued; replacement rejects both (0.613ms)
+✔ restart uses cached accepted linked bytes without compiling and retains controls (0.5007ms)
+✔ postMessage failure faults and clears every pending operation (0.4145ms)
+✔ late terminal callbacks cannot revive a faulted runtime (0.3543ms)
+✔ initialization post failure clears activation and watchdog timers (0.3484ms)
+✔ paused live worker CPU silence and malformed heartbeats do not escape the liveness deadline (0.6336ms)
+✔ repeated frame IDs cannot conceal a playing worker without completed frame progress (0.7581ms)
+✔ completed captures release admission while capture deadline tears down an abandoned queue (1.108ms)
+✔ restart retains admitted controls across failure and failed recovery; rejected commands cannot replace intent (0.8447ms)
+✔ source replacement does not inherit unacknowledged control intent from the previous runtime (0.4062ms)
+✔ diagnostic targets use one-based UTF-16 coordinates and clamp CRLF helper positions (0.3876ms)
+✔ compile failures retain structured diagnostics and readable messages (0.243ms)
+✔ candidate-only diagnostics cannot navigate an unchanged draft with the same version and file path (0.1539ms)
+✔ failed changed multi-file candidate retains draft but labels its diagnostics separately (0.3892ms)
+✔ helper drafts survive navigation and dirty compares complete saved content (0.3316ms)
+✔ submit takes a synchronous exclusive lock and failure preserves all drafts (0.4045ms)
+✔ submitted inputs and published snapshots cannot mutate store; stale versions never activate (0.3709ms)
+✔ new files share compiler path and complete UTF-8 budget admission (4.9968ms)
+✔ closing detached preview restores docking without owning a runtime (0.3547ms)
+✔ failed popout retains a usable docked panel (0.2286ms)
+✔ dock during pending popout cancels presentation and prevents an orphan window (0.1772ms)
+✔ only the exact local Studio document can invoke window operations (0.2331ms)
+ℹ tests 65
+ℹ suites 0
+ℹ pass 65
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11342.7911
+✔ source panel preserves helper edits and undo across close/reopen and document replacement resets history (603.2096ms)
+✔ file creation validates paths, saving sees all files, and busy view is readonly (464.4747ms)
+✔ external replacement resets changed file history and panel remount retains unaffected file history (401.7841ms)
+✔ composition suppresses save and failed admission restores the admitted editor text (257.4364ms)
+✔ repeated rejected edits never diverge from admitted source and preserve prior undo history (286.272ms)
+✔ current diagnostics navigate helper coordinates and edited drafts label them stale (307.8097ms)
+✔ rejected candidate diagnostics explain their origin and cannot navigate the retained source (258.4875ms)
+✔ new-file Escape cancels locally, restores focus and leaves source unchanged (379.3942ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7214.5763
