@@ -1,0 +1,234 @@
+-- The CXX compiler identification is MSVC 19.50.35721.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/18/BuildTools/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (2.8s)
+-- Generating done (0.3s)
+-- Build files have been written to: C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/build
+MSBuild version 18.0.5+e22287bf1 for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  FrameReceiver.cpp
+  LuxSource.cpp
+  FFGLSDK.cpp
+  Compiling...
+  FrameReceiver.cpp
+  FFGLSDK.cpp
+  LuxSource.cpp
+C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\vendor\ffgl\source\lib\ffgl\FFGL.h(104,9): warning C4005: 'WIN32_LEAN_AND_MEAN': macro redefinition [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\LuxTracerTR02.vcxproj]
+C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\vendor\ffgl\source\lib\ffgl\FFGL.h(104,9): warning C4005: 'WIN32_LEAN_AND_MEAN': macro redefinition [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\LuxTracerTR02.vcxproj]
+  (compiling source file '../ffgl-source/src/LuxSource.cpp')
+      C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\vendor\ffgl\source\lib\ffgl\FFGL.h(104,9):
+      'WIN32_LEAN_AND_MEAN' previously declared on the command line
+  
+C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\vendor\ffgl\source\lib\ffgl\FFGL.h(131,9): warning C4005: 'NOMINMAX': macro redefinition [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\LuxTracerTR02.vcxproj]
+  (compiling source file '../ffgl-source/src/LuxSource.cpp')
+      C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\vendor\ffgl\source\lib\ffgl\FFGL.h(131,9):
+      'NOMINMAX' previously declared on the command line
+  
+  (compiling source file '../vendor/ffgl/source/lib/FFGLSDK.cpp')
+      C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\vendor\ffgl\source\lib\ffgl\FFGL.h(104,9):
+      'WIN32_LEAN_AND_MEAN' previously declared on the command line
+  
+C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\vendor\ffgl\source\lib\ffgl\FFGL.h(131,9): warning C4005: 'NOMINMAX': macro redefinition [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\LuxTracerTR02.vcxproj]
+  (compiling source file '../vendor/ffgl/source/lib/FFGLSDK.cpp')
+      C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\vendor\ffgl\source\lib\ffgl\FFGL.h(131,9):
+      'NOMINMAX' previously declared on the command line
+  
+C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\vendor\ffgl\source\lib\ffgl\FFGL.h(104,9): warning C4005: 'WIN32_LEAN_AND_MEAN': macro redefinition [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\LuxTracerTR02.vcxproj]
+  (compiling source file '../ffgl-source/src/FrameReceiver.cpp')
+      C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\vendor\ffgl\source\lib\ffgl\FFGL.h(104,9):
+      'WIN32_LEAN_AND_MEAN' previously declared on the command line
+  
+C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\vendor\ffgl\source\lib\ffgl\FFGL.h(131,9): warning C4005: 'NOMINMAX': macro redefinition [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\LuxTracerTR02.vcxproj]
+  (compiling source file '../ffgl-source/src/FrameReceiver.cpp')
+      C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\vendor\ffgl\source\lib\ffgl\FFGL.h(131,9):
+      'NOMINMAX' previously declared on the command line
+  
+     Creating library C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/build/Release/LuxTracerTR02.lib and object C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/build/Release/LuxTracerTR02.exp
+  LuxTracerTR02.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\LuxTracerTR02.dll
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+cl : command line  warning D9025: overriding '/DNDEBUG' with '/UNDEBUG' [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\lux_cadence_test.vcxproj]
+  cadence_test.cc
+  Compiling...
+cl : command line  warning D9025: overriding '/DNDEBUG' with '/UNDEBUG' [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\lux_cadence_test.vcxproj]
+  cadence_test.cc
+  lux_cadence_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_cadence_test.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  context_diagnostic_test.cc
+  Compiling...
+  context_diagnostic_test.cc
+  lux_context_diagnostic_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_context_diagnostic_test.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  context_handoff_test.cc
+  Compiling...
+  context_handoff_test.cc
+  lux_context_handoff_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_context_handoff_test.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+cl : command line  warning D9025: overriding '/DNDEBUG' with '/UNDEBUG' [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\lux_frame_telemetry_test.vcxproj]
+  frame_telemetry_test.cc
+  Compiling...
+cl : command line  warning D9025: overriding '/DNDEBUG' with '/UNDEBUG' [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\lux_frame_telemetry_test.vcxproj]
+  frame_telemetry_test.cc
+  lux_frame_telemetry_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_frame_telemetry_test.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  host_control_test.cc
+  Compiling...
+  host_control_test.cc
+  lux_host_control_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_host_control_test.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  host_control_v4_test.cc
+  Compiling...
+  host_control_v4_test.cc
+  lux_host_control_v4_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_host_control_v4_test.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+cl : command line  warning D9025: overriding '/DNDEBUG' with '/UNDEBUG' [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\lux_installed_scan_test.vcxproj]
+  installed_scan_test.cc
+  Compiling...
+cl : command line  warning D9025: overriding '/DNDEBUG' with '/UNDEBUG' [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\lux_installed_scan_test.vcxproj]
+  installed_scan_test.cc
+  lux_installed_scan_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_installed_scan_test.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+cl : command line  warning D9025: overriding '/DNDEBUG' with '/UNDEBUG' [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\lux_installed_source_test.vcxproj]
+  installed_source_test.cc
+  Compiling...
+cl : command line  warning D9025: overriding '/DNDEBUG' with '/UNDEBUG' [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\lux_installed_source_test.vcxproj]
+  installed_source_test.cc
+  lux_installed_source_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_installed_source_test.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  smoke.cc
+  Compiling...
+  smoke.cc
+  lux_native_smoke.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_native_smoke.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+cl : command line  warning D9025: overriding '/DNDEBUG' with '/UNDEBUG' [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\lux_pixel_marker_test.vcxproj]
+  pixel_marker_test.cc
+  Compiling...
+cl : command line  warning D9025: overriding '/DNDEBUG' with '/UNDEBUG' [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\lux_pixel_marker_test.vcxproj]
+  pixel_marker_test.cc
+  lux_pixel_marker_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_pixel_marker_test.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+cl : command line  warning D9025: overriding '/DNDEBUG' with '/UNDEBUG' [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\lux_pool_test.vcxproj]
+  pool_test.cc
+  Compiling...
+cl : command line  warning D9025: overriding '/DNDEBUG' with '/UNDEBUG' [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\lux_pool_test.vcxproj]
+  pool_test.cc
+  lux_pool_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_pool_test.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  receiver_lifecycle_test.cc
+  Compiling...
+  receiver_lifecycle_test.cc
+  lux_receiver_lifecycle_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_receiver_lifecycle_test.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  receiver_poll_test.cc
+  Compiling...
+  receiver_poll_test.cc
+  lux_receiver_poll_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_receiver_poll_test.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+cl : command line  warning D9025: overriding '/DNDEBUG' with '/UNDEBUG' [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\lux_shared_ring_test.vcxproj]
+  shared_ring_test.cc
+  Compiling...
+cl : command line  warning D9025: overriding '/DNDEBUG' with '/UNDEBUG' [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\lux_shared_ring_test.vcxproj]
+  shared_ring_test.cc
+  lux_shared_ring_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_shared_ring_test.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  shutdown_race_test.cc
+  Compiling...
+  shutdown_race_test.cc
+  lux_shutdown_race_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_shutdown_race_test.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+cl : command line  warning D9025: overriding '/DNDEBUG' with '/UNDEBUG' [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\lux_source_slot_retirement_test.vcxproj]
+  source_slot_retirement_test.cc
+  Compiling...
+cl : command line  warning D9025: overriding '/DNDEBUG' with '/UNDEBUG' [C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\lux_source_slot_retirement_test.vcxproj]
+  source_slot_retirement_test.cc
+  lux_source_slot_retirement_test.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_source_slot_retirement_test.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  standalone_host.cc
+  gl_load.c
+  Compiling...
+  standalone_host.cc
+  gl_load.c
+     Creating library C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/build/Release/lux_standalone_host.lib and object C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/build/Release/lux_standalone_host.exp
+  lux_standalone_host.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_standalone_host.exe
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+  Scanning sources for module dependencies...
+  delay_load.cc
+  electron_texture.cc
+  Compiling...
+  delay_load.cc
+  electron_texture.cc
+     Creating library C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/build/Release/lux_texture_bridge.lib and object C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/build/Release/lux_texture_bridge.exp
+  lux_texture_bridge.vcxproj -> C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\native\build\Release\lux_texture_bridge.node
+  Building Custom Rule C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/CMakeLists.txt
+Test project C:/Users/zFlei/repos/lux/.worktrees/source-slot-retirement/native/build
+      Start  1: native_clock_smoke
+ 1/16 Test  #1: native_clock_smoke ...............   Passed    0.04 sec
+      Start  2: pool_ownership
+ 2/16 Test  #2: pool_ownership ...................   Passed    0.04 sec
+      Start  3: shared_ring_ownership
+ 3/16 Test  #3: shared_ring_ownership ............   Passed    0.04 sec
+      Start  4: shutdown_admission
+ 4/16 Test  #4: shutdown_admission ...............   Passed    0.05 sec
+      Start  5: receiver_lifecycle_cpu
+ 5/16 Test  #5: receiver_lifecycle_cpu ...........   Passed    0.06 sec
+      Start  6: context_diagnostic_cpu
+ 6/16 Test  #6: context_diagnostic_cpu ...........   Passed    0.05 sec
+      Start  7: context_handoff_cpu
+ 7/16 Test  #7: context_handoff_cpu ..............   Passed    0.05 sec
+      Start  8: receiver_poll_cpu
+ 8/16 Test  #8: receiver_poll_cpu ................   Passed    0.05 sec
+      Start  9: host_control_cpu
+ 9/16 Test  #9: host_control_cpu .................   Passed    0.04 sec
+      Start 10: host_control_v4_cpu
+10/16 Test #10: host_control_v4_cpu ..............   Passed    0.15 sec
+      Start 11: installed_source_cpu
+11/16 Test #11: installed_source_cpu .............   Passed    0.05 sec
+      Start 12: installed_scan_cpu
+12/16 Test #12: installed_scan_cpu ...............   Passed    0.26 sec
+      Start 13: frame_telemetry_cpu
+13/16 Test #13: frame_telemetry_cpu ..............   Passed    0.05 sec
+      Start 14: pixel_marker_cpu
+14/16 Test #14: pixel_marker_cpu .................   Passed    0.06 sec
+      Start 15: cadence_cpu
+15/16 Test #15: cadence_cpu ......................   Passed    0.07 sec
+      Start 16: source_slot_retirement_cpu
+16/16 Test #16: source_slot_retirement_cpu .......Exit code 0xc0000409
+***Exception:   2.00 sec
+Assertion failed: r.slots[0].state==Free&&r.slots[1].state==Free, file C:\Users\zFlei\repos\lux\.worktrees\source-slot-retirement\tests\native\source_slot_retirement_test.cc, line 21
+
+
+94% tests passed, 1 tests failed out of 16
+
+Total Test time (real) =   3.52 sec
+
+The following tests FAILED:
+	 16 - source_slot_retirement_cpu (Exit code 0xc0000409
+)
+Errors while running CTest
+Exception: 
+Line |
+   2 |  & scripts/native-build.ps1 *> artifacts/native-red.txt; Get-Content a …
+     |  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | TR-01 native clock smoke failed
