@@ -1,0 +1,123 @@
+{
+  "ok": true,
+  "profile": "test-4b39e498-f73d-45d8-b1b6-8c316b3b32cb",
+  "source": "85ec7c6019b8097b1c154d936337499a06a6ecfb",
+  "checks": [
+    "Real preview resized through Scale Home and rendered at 640x360",
+    "Kick and normal band bindings share one portable analyzer configuration",
+    "Explicit permission connected an enumerated Windows audio input",
+    "Actual microphone input drives one kick envelope and preserves the normal audio-band response",
+    "Save/reopen preserves 640x360, manual base, both bindings, kick settings, and excludes the local device",
+    "Disconnect releases kick and audio contributions to their manual bases"
+  ],
+  "errors": [],
+  "pid": 23808,
+  "audioInput": "Audio input 1",
+  "connectedRanges": {
+    "spike": [
+      0.85,
+      0.9118360497754657
+    ],
+    "noise": [
+      3.4005181565953664,
+      3.4866084710189704
+    ],
+    "samples": 21
+  },
+  "release": {
+    "samples": [
+      {
+        "spikeHeight": 1.0009273468767406,
+        "noiseScale": 3.4948538917411396,
+        "sharpness": 3.2,
+        "motionSpeed": 0.28,
+        "roughness": 0.38
+      },
+      {
+        "spikeHeight": 1.0003604411123532,
+        "noiseScale": 3.476810221673594,
+        "sharpness": 3.2,
+        "motionSpeed": 0.28,
+        "roughness": 0.38
+      },
+      {
+        "spikeHeight": 1.000122178181197,
+        "noiseScale": 3.459002966718477,
+        "sharpness": 3.2,
+        "motionSpeed": 0.28,
+        "roughness": 0.38
+      },
+      {
+        "spikeHeight": 1.0000466987961845,
+        "noiseScale": 3.4471266060587302,
+        "sharpness": 3.2,
+        "motionSpeed": 0.28,
+        "roughness": 0.38
+      },
+      {
+        "spikeHeight": 1.0000110567264726,
+        "noiseScale": 3.4352190710122423,
+        "sharpness": 3.2,
+        "motionSpeed": 0.28,
+        "roughness": 0.38
+      },
+      {
+        "spikeHeight": 1.0000008313994866,
+        "noiseScale": 3.427414929191655,
+        "sharpness": 3.2,
+        "motionSpeed": 0.28,
+        "roughness": 0.38
+      },
+      {
+        "spikeHeight": 1,
+        "noiseScale": 3.420436810805227,
+        "sharpness": 3.2,
+        "motionSpeed": 0.28,
+        "roughness": 0.38
+      },
+      {
+        "spikeHeight": 1,
+        "noiseScale": 3.415884403661096,
+        "sharpness": 3.2,
+        "motionSpeed": 0.28,
+        "roughness": 0.38
+      },
+      {
+        "spikeHeight": 1,
+        "noiseScale": 3.4119214312533237,
+        "sharpness": 3.2,
+        "motionSpeed": 0.28,
+        "roughness": 0.38
+      },
+      {
+        "spikeHeight": 1,
+        "noiseScale": 3.4078251094693406,
+        "sharpness": 3.2,
+        "motionSpeed": 0.28,
+        "roughness": 0.38
+      },
+      {
+        "spikeHeight": 1,
+        "noiseScale": 3.406121687084966,
+        "sharpness": 3.2,
+        "motionSpeed": 0.28,
+        "roughness": 0.38
+      },
+      {
+        "spikeHeight": 1,
+        "noiseScale": 3.4049509908388633,
+        "sharpness": 3.2,
+        "motionSpeed": 0.28,
+        "roughness": 0.38
+      }
+    ],
+    "after": {
+      "spikeHeight": 1,
+      "noiseScale": 3.4049509908388633,
+      "sharpness": 3.2,
+      "motionSpeed": 0.28,
+      "roughness": 0.38
+    }
+  },
+  "exitCode": 0
+}

@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "profile": "test-08765049-a22c-4c03-bd22-6fd8f04690f0",
+  "source": "c19af9350ef9f6b3ae47b71671f72a2a61489230",
+  "checks": [
+    "Real preview resized through Scale Home and rendered at 640x360",
+    "Kick and normal band bindings share one portable analyzer configuration"
+  ],
+  "errors": [],
+  "pid": 27776,
+  "failure": "AssertionError [ERR_ASSERTION]: an operating-system audio input is available after explicit first capture\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/studio-kick/scripts/test-studio-kick.mjs:96:10",
+  "exitCode": 0
+}

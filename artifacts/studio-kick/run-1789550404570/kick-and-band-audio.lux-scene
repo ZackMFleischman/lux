@@ -1,0 +1,131 @@
+{
+  "format": "lux-scene",
+  "version": 3,
+  "source": {
+    "sdkVersion": "0.2.0",
+    "entry": "visual.ts",
+    "files": {
+      "visual.ts": "import { defineVisual } from '@lux/visual-sdk';\nimport {\n  Scene, Color, Mesh, SphereGeometry, MeshStandardNodeMaterial,\n  PerspectiveCamera, AmbientLight, DirectionalLight,\n} from 'three/webgpu';\nimport { uniform, positionLocal, normalLocal, vec3, mx_noise_float } from 'three/tsl';\n\n// SDK 0.2: numeric controls are declared below; color remains a source setting.\nexport default defineVisual({\n  controls: {\n    spikeHeight: {\n      type: 'number', label: 'Spike height', group: 'Shape', default: 0.85, min: 0, max: 2, step: 0.01,\n    },\n    noiseScale: {\n      type: 'number', label: 'Noise scale', group: 'Shape', default: 3.4, min: 0.5, max: 12, step: 0.1,\n    },\n    sharpness: {\n      type: 'number', label: 'Sharpness', group: 'Shape', default: 3.2, min: 0.25, max: 8, step: 0.05,\n    },\n    motionSpeed: {\n      type: 'number', label: 'Motion speed', default: 0.28, min: 0, max: 2, step: 0.01,\n    },\n    roughness: {\n      type: 'number', label: 'Roughness', default: 0.38, min: 0, max: 1, step: 0.01,\n    },\n  },\n  async create(context) {\n    const time = uniform(0);\n    const spikeHeight = uniform(0.85);\n    const noiseScale = uniform(3.4);\n    const sharpness = uniform(3.2);\n    const drift = vec3(time.mul(0.31), time.mul(0.17), time.mul(0.23));\n    const noise = mx_noise_float(positionLocal.mul(noiseScale).add(drift));\n    const peaks = noise.mul(0.5).add(0.5).clamp(0, 1).pow(sharpness);\n    const material = new MeshStandardNodeMaterial({\n      color: '#8b5cff',\n      roughness: 0.38,\n      metalness: 0.15,\n      flatShading: true,\n    });\n    material.positionNode = positionLocal.add(\n      normalLocal.mul(peaks.mul(spikeHeight)),\n    );\n    const geometry = new SphereGeometry(1, 128, 64);\n    const sphere = new Mesh(geometry, material);\n    // Bound includes maximum GPU displacement, which CPU culling cannot see.\n    geometry.computeBoundingSphere();\n    geometry.boundingSphere!.radius = 3;\n    const scene = new Scene();\n    scene.background = new Color('#070b16');\n    scene.add(sphere, new AmbientLight('#b7c6ff', 1.4));\n    const key = new DirectionalLight('#e4d4ff', 4);\n    key.position.set(3, 4, 5);\n    const rim = new DirectionalLight('#35e6cf', 2.5);\n    rim.position.set(-3, 1, -2);\n    scene.add(key, rim);\n    const camera = new PerspectiveCamera(42, context.settings.width / context.settings.height, 0.1, 30);\n    camera.position.z = 5.6;\n    return {\n      update(frame) {\n        time.value += frame.deltaSeconds * frame.controls.motionSpeed;\n        spikeHeight.value = frame.controls.spikeHeight;\n        noiseScale.value = frame.controls.noiseScale;\n        sharpness.value = frame.controls.sharpness;\n        material.roughness = frame.controls.roughness;\n        sphere.rotation.y = frame.timeSeconds * 0.12;\n        sphere.rotation.x = Math.sin(frame.timeSeconds * 0.17) * 0.18;\n      },\n      render(target) {\n        return context.renderer.render(scene, camera, target);\n      },\n      reset(_seed) {\n        time.value = 0;\n      },\n      dispose() {\n        geometry.dispose();\n        material.dispose();\n      },\n    };\n  },\n});\n"
+    }
+  },
+  "settings": {
+    "width": 640,
+    "height": 360,
+    "fps": 60,
+    "seed": 0
+  },
+  "controls": {
+    "sourceHash": "caff2a766aa612267c9e8bb8e7134bb9711508eb2a6a5546787a1636700ff72e",
+    "schema": [
+      {
+        "id": "spikeHeight",
+        "type": "number",
+        "label": "Spike height",
+        "default": 0.85,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "group": "Shape",
+        "changeCost": "live"
+      },
+      {
+        "id": "noiseScale",
+        "type": "number",
+        "label": "Noise scale",
+        "default": 3.4,
+        "min": 0.5,
+        "max": 12,
+        "step": 0.1,
+        "group": "Shape",
+        "changeCost": "live"
+      },
+      {
+        "id": "sharpness",
+        "type": "number",
+        "label": "Sharpness",
+        "default": 3.2,
+        "min": 0.25,
+        "max": 8,
+        "step": 0.05,
+        "group": "Shape",
+        "changeCost": "live"
+      },
+      {
+        "id": "motionSpeed",
+        "type": "number",
+        "label": "Motion speed",
+        "default": 0.28,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "changeCost": "live"
+      },
+      {
+        "id": "roughness",
+        "type": "number",
+        "label": "Roughness",
+        "default": 0.38,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "changeCost": "live"
+      }
+    ],
+    "schemaHash": "01cb518440758b4cca0d9b2e963fc77c6f8db968788b1f95ac1014bbfeed4484",
+    "values": {
+      "spikeHeight": 1,
+      "noiseScale": 3.4,
+      "sharpness": 3.2,
+      "motionSpeed": 0.28,
+      "roughness": 0.38
+    }
+  },
+  "controlAnimations": [
+    {
+      "kind": "kick",
+      "nodePath": [],
+      "definitionHash": "01cb518440758b4cca0d9b2e963fc77c6f8db968788b1f95ac1014bbfeed4484",
+      "schemaHash": "01cb518440758b4cca0d9b2e963fc77c6f8db968788b1f95ac1014bbfeed4484",
+      "controlId": "spikeHeight",
+      "source": {
+        "kind": "audio-kick",
+        "logicalInputId": "primary-audio",
+        "analyzer": {
+          "version": 1,
+          "fftSize": 2048,
+          "minDecibels": -100,
+          "maxDecibels": -30
+        }
+      },
+      "amount": 0.9,
+      "attackMs": 0,
+      "releaseMs": 500,
+      "sensitivity": 1,
+      "retriggerMs": 0,
+      "envelope": "exponential",
+      "enabled": true
+    },
+    {
+      "kind": "audio",
+      "nodePath": [],
+      "definitionHash": "01cb518440758b4cca0d9b2e963fc77c6f8db968788b1f95ac1014bbfeed4484",
+      "schemaHash": "01cb518440758b4cca0d9b2e963fc77c6f8db968788b1f95ac1014bbfeed4484",
+      "controlId": "noiseScale",
+      "source": {
+        "kind": "audio-band",
+        "logicalInputId": "primary-audio",
+        "band": "highs",
+        "analyzer": {
+          "version": 1,
+          "fftSize": 2048,
+          "minDecibels": -100,
+          "maxDecibels": -30
+        }
+      },
+      "amount": 3,
+      "attackMs": 0,
+      "releaseMs": 400,
+      "enabled": true
+    }
+  ]
+}

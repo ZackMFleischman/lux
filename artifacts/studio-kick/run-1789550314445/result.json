@@ -1,0 +1,28 @@
+{
+  "ok": false,
+  "profile": "test-2e262ac7-c723-4985-a892-792a1b4a1d8b",
+  "source": "ee663ddb02e07c16a4740b5224ae919fa0728a95",
+  "checks": [
+    "Real preview resized through Scale Home and rendered at 640x360",
+    "Kick and normal band bindings share one portable analyzer configuration",
+    "Explicit permission connected the Windows default audio input; Chromium exposed no friendly hardware label",
+    "Actual microphone input drives one kick envelope and preserves the normal audio-band response",
+    "Save/reopen preserves 640x360, manual base, both bindings, kick settings, and excludes the local device"
+  ],
+  "errors": [],
+  "pid": 10928,
+  "audioInput": "Default input",
+  "connectedRanges": {
+    "spike": [
+      0.85,
+      1.0517737022652802
+    ],
+    "noise": [
+      3.4,
+      3.4831523140575573
+    ],
+    "samples": 21
+  },
+  "failure": "AssertionError [ERR_ASSERTION]: Kicks sampled during pause must not replay on resume\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/studio-kick/scripts/test-studio-kick.mjs:146:10\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)",
+  "exitCode": 0
+}
