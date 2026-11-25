@@ -1,0 +1,8 @@
+{
+  "ok": false,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\inspector-group-style",
+  "profile": "test-224f4238-73d0-4682-b9b3-46e362438170",
+  "checks": [],
+  "errors": [],
+  "error": "AssertionError [ERR_ASSERTION]: {\"content\":[{\"type\":\"text\",\"text\":\"ENOENT: no such file or directory, realpath 'C:\\\\Users\\\\zFlei\\\\repos\\\\lux\\\\.worktrees\\\\inspector-group-style\\\\node_modules'; retained evidence: C:\\\\Users\\\\zFlei\\\\AppData\\\\Local\\\\Temp\\\\lux-compile-821TM0\"}],\"isError\":true}\n+ actual - expected\n\n+ true\n- undefined\n\n    at call (file:///C:/Users/zFlei/repos/lux/.worktrees/inspector-group-style/artifacts/inspector-group-style-qa.mjs:35:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/inspector-group-style/artifacts/inspector-group-style-qa.mjs:45:3"
+}

@@ -1,0 +1,46 @@
+{
+  "ok": true,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\inspector-group-style",
+  "profile": "test-5d6c0b9c-e0af-4d37-982d-8e1242c01ba1",
+  "checks": [
+    "Three populated Bird groups use 13px headings and continuous one-pixel outlines",
+    "Open group header has a divider and controls have a lighter grouped surface",
+    "Collapse and re-expand preserve native details interaction without a runtime fault",
+    "Normal and narrow actual Studio screenshots fit the Inspector without horizontal overflow"
+  ],
+  "errors": [],
+  "groups": [
+    {
+      "label": "Bird Personality",
+      "fontSize": "13px",
+      "border": "1px solid rgb(58, 61, 75)",
+      "groupBackground": "rgb(34, 36, 45)",
+      "controlsBackground": "rgb(34, 36, 45)",
+      "divider": "1px"
+    },
+    {
+      "label": "Bird Appearance",
+      "fontSize": "13px",
+      "border": "1px solid rgb(58, 61, 75)",
+      "groupBackground": "rgb(34, 36, 45)",
+      "controlsBackground": "rgb(34, 36, 45)",
+      "divider": "1px"
+    },
+    {
+      "label": "Bird Flight",
+      "fontSize": "13px",
+      "border": "1px solid rgb(58, 61, 75)",
+      "groupBackground": "rgb(34, 36, 45)",
+      "controlsBackground": "rgb(34, 36, 45)",
+      "divider": "1px"
+    }
+  ],
+  "normalPreview": {
+    "width": 667,
+    "height": 372
+  },
+  "inspector": {
+    "width": 122,
+    "scrollWidth": 122
+  }
+}

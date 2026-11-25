@@ -1,0 +1,8 @@
+{
+  "ok": false,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\inspector-group-style",
+  "profile": "test-0cf62a7e-6a18-4a3d-8ddd-ac5129e5d721",
+  "checks": [],
+  "errors": [],
+  "error": "AssertionError [ERR_ASSERTION]: {\"content\":[{\"type\":\"text\",\"text\":\"Studio is busy or command is unsupported\"}],\"isError\":true}\n+ actual - expected\n\n+ true\n- undefined\n\n    at call (file:///C:/Users/zFlei/repos/lux/.worktrees/inspector-group-style/artifacts/inspector-group-style-qa.mjs:35:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/inspector-group-style/artifacts/inspector-group-style-qa.mjs:45:3"
+}

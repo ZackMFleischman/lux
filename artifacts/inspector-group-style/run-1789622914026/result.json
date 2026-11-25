@@ -1,0 +1,8 @@
+{
+  "ok": false,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\inspector-group-style",
+  "profile": "test-b11409bb-8cf9-4d29-ad29-12ac894e0ad4",
+  "checks": [],
+  "errors": [],
+  "error": "Error: Editor changed; read its source again before building\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/inspector-group-style/artifacts/inspector-group-style-qa.mjs:52:71\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"
+}
