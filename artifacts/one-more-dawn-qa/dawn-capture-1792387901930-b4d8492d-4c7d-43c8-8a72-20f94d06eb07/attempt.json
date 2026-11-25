@@ -1,0 +1,32 @@
+{
+  "ok": false,
+  "label": "dawn-capture",
+  "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\dawn-show",
+  "profile": "test-8da77643-3697-4139-9f8e-a9070698deae",
+  "sessionDirectory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-8da77643-3697-4139-9f8e-a9070698deae",
+  "source": {
+    "commit": "eab013d79aee28da3f1083429cfc92831692de27",
+    "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "worktreeStatusSha256": "2ba36b429e4b1bf50896366ce89e8247c3b8a56a1b040ea086d79e58c544acfd"
+  },
+  "resolution": {
+    "executablePath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\dawn-show\\node_modules\\.pnpm\\electron@44.3.0\\node_modules\\electron\\dist\\electron.exe",
+    "entryPath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\dawn-show\\apps\\studio\\dist\\main.cjs"
+  },
+  "viewport": {
+    "requested": {
+      "width": 1280,
+      "height": 800
+    },
+    "actual": {
+      "width": 1280,
+      "height": 800
+    }
+  },
+  "cleanup": {
+    "ownedPid": 25596,
+    "attempted": true,
+    "completed": true
+  },
+  "error": null
+}

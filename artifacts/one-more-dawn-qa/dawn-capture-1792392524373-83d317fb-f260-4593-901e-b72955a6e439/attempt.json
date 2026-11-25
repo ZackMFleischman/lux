@@ -1,0 +1,33 @@
+{
+  "ok": false,
+  "label": "dawn-capture",
+  "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\dawn-show",
+  "profile": "test-b02622b7-a4aa-4df4-85f5-6f2b7cadfd35",
+  "sessionDirectory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-b02622b7-a4aa-4df4-85f5-6f2b7cadfd35",
+  "source": {
+    "commit": "170ce0febc973f8e188d458cc72b313f20a44f4e",
+    "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "worktreeStatusSha256": "ed49e9fef88165094216e2aa0988f3fd6fb411e2212c2ae753624846f7009451"
+  },
+  "resolution": {
+    "executablePath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\dawn-show\\node_modules\\.pnpm\\electron@44.3.0\\node_modules\\electron\\dist\\electron.exe",
+    "entryPath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\dawn-show\\apps\\studio\\dist\\main.cjs"
+  },
+  "viewport": {
+    "requested": {
+      "width": 1280,
+      "height": 800
+    },
+    "actual": {
+      "width": 1280,
+      "height": 800
+    }
+  },
+  "cleanup": {
+    "ownedPid": 29036,
+    "attempted": true,
+    "completed": true,
+    "error": "Error: electronApplication.evaluate: Target page, context or browser has been closed\nBrowser logs:\n\n<launching> \"C:\\Users\\zFlei\\repos\\lux\\.worktrees\\dawn-show\\node_modules\\.pnpm\\electron@44.3.0\\node_modules\\electron\\dist\\electron.exe\" \"--inspect=0\" \"--remote-debugging-port=0\" \"c:\\users\\zflei\\repos\\lux\\.worktrees\\dawn-show\\apps\\studio\\dist\\main.cjs\" \n<launched> pid=10128\n[pid=10128][out] \n[pid=10128][err] Debugger listening on ws://127.0.0.1:53379/29f06e6e-58cb-4ab9-872b-dc616cc5070a\n[pid=10128][err] For help, see: https://nodejs.org/learn/getting-started/debugging\n[pid=10128][err] Debugger attached.\n[pid=10128][err] \n[pid=10128][err] DevTools listening on ws://127.0.0.1:53381/devtools/browser/fe487865-f159-46cd-a41c-d7d481c32e42\n[pid=10128][out] Studio: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools\n[pid=10128][out] You might need to use a local HTTP server (instead of file://): https://react.dev/link/react-devtools-faq font-weight:bold\n[pid=10128][out] Studio: The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127\n[pid=10128][err] Studio MCP test timeout\n[pid=10128][err] Waiting for the debugger to disconnect..."
+  },
+  "error": null
+}

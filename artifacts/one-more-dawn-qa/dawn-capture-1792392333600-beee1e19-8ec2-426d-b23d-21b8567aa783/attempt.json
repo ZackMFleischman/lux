@@ -1,0 +1,33 @@
+{
+  "ok": false,
+  "label": "dawn-capture",
+  "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\dawn-show",
+  "profile": "test-9091137c-b897-4a51-b47a-bcf5042da540",
+  "sessionDirectory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-9091137c-b897-4a51-b47a-bcf5042da540",
+  "source": {
+    "commit": "170ce0febc973f8e188d458cc72b313f20a44f4e",
+    "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "worktreeStatusSha256": "721b62a0d76483ed581d6c21664270d2b638fbd256aa057b4fc1189d658fe500"
+  },
+  "resolution": {
+    "executablePath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\dawn-show\\node_modules\\.pnpm\\electron@44.3.0\\node_modules\\electron\\dist\\electron.exe",
+    "entryPath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\dawn-show\\apps\\studio\\dist\\main.cjs"
+  },
+  "viewport": {
+    "requested": {
+      "width": 1280,
+      "height": 800
+    },
+    "actual": {
+      "width": 1280,
+      "height": 800
+    }
+  },
+  "cleanup": {
+    "ownedPid": 18392,
+    "attempted": true,
+    "completed": true,
+    "error": "Error: electronApplication.evaluate: Target page, context or browser has been closed\nBrowser logs:\n\n<launching> \"C:\\Users\\zFlei\\repos\\lux\\.worktrees\\dawn-show\\node_modules\\.pnpm\\electron@44.3.0\\node_modules\\electron\\dist\\electron.exe\" \"--inspect=0\" \"--remote-debugging-port=0\" \"c:\\users\\zflei\\repos\\lux\\.worktrees\\dawn-show\\apps\\studio\\dist\\main.cjs\" \n<launched> pid=10596\n[pid=10596][out] \n[pid=10596][err] Debugger listening on ws://127.0.0.1:50123/3300f094-48b3-42c1-aa2e-92b1ca6e05f3\n[pid=10596][err] For help, see: https://nodejs.org/learn/getting-started/debugging\n[pid=10596][err] Debugger attached.\n[pid=10596][err] \n[pid=10596][err] DevTools listening on ws://127.0.0.1:50125/devtools/browser/b56f6ef7-bf1b-488f-b8ff-3db4be770a67\n[pid=10596][out] Studio: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools\n[pid=10596][out] You might need to use a local HTTP server (instead of file://): https://react.dev/link/react-devtools-faq font-weight:bold\n[pid=10596][out] Studio: The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127\n[pid=10596][out] Studio: The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127\n[pid=10596][out] Studio: THREE.TSL: \"transformedNormalView\" is deprecated. Use \"normalView\" instead. Stack trace not available. Enable \"THREE.Node.captureStackTrace\" to capture stack traces.\n[pid=10596][err] Studio MCP test timeout\n[pid=10596][err] Waiting for the debugger to disconnect..."
+  },
+  "error": null
+}

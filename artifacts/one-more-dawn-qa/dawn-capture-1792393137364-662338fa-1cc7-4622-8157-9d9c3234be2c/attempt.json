@@ -1,0 +1,33 @@
+{
+  "ok": false,
+  "label": "dawn-capture",
+  "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\dawn-show",
+  "profile": "test-0804518a-75ab-4e2a-a83c-b4e0d2d06f5a",
+  "sessionDirectory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-0804518a-75ab-4e2a-a83c-b4e0d2d06f5a",
+  "source": {
+    "commit": "170ce0febc973f8e188d458cc72b313f20a44f4e",
+    "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "worktreeStatusSha256": "9125d3975ae1dd169ce36df5e79a579bfacdd533f9818b54fe1c91c721050474"
+  },
+  "resolution": {
+    "executablePath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\dawn-show\\node_modules\\.pnpm\\electron@44.3.0\\node_modules\\electron\\dist\\electron.exe",
+    "entryPath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\dawn-show\\apps\\studio\\dist\\main.cjs"
+  },
+  "viewport": {
+    "requested": {
+      "width": 1280,
+      "height": 800
+    },
+    "actual": {
+      "width": 1280,
+      "height": 800
+    }
+  },
+  "cleanup": {
+    "ownedPid": 11676,
+    "attempted": true,
+    "completed": true,
+    "error": "Error: electronApplication.evaluate: Target page, context or browser has been closed\nBrowser logs:\n\n<launching> \"C:\\Users\\zFlei\\repos\\lux\\.worktrees\\dawn-show\\node_modules\\.pnpm\\electron@44.3.0\\node_modules\\electron\\dist\\electron.exe\" \"--inspect=0\" \"--remote-debugging-port=0\" \"c:\\users\\zflei\\repos\\lux\\.worktrees\\dawn-show\\apps\\studio\\dist\\main.cjs\" \n<launched> pid=24816\n[pid=24816][out] \n[pid=24816][err] Debugger listening on ws://127.0.0.1:61729/8158b915-6ad6-4c54-ab64-45d68a641620\n[pid=24816][err] For help, see: https://nodejs.org/learn/getting-started/debugging\n[pid=24816][err] Debugger attached.\n[pid=24816][err] \n[pid=24816][err] DevTools listening on ws://127.0.0.1:61731/devtools/browser/ca700ae0-9143-41e8-8035-68387c4b89eb\n[pid=24816][out] Studio: Electron sandboxed_renderer.bundle.js script failed to run\n[pid=24816][out] Studio: TypeError: Cannot destructure property 'preloadScripts' of 'binding.startupData' as it is null.\n[pid=24816][out] Studio: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools\n[pid=24816][out] You might need to use a local HTTP server (instead of file://): https://react.dev/link/react-devtools-faq font-weight:bold\n[pid=24816][out] Studio: The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127\n[pid=24816][err] Studio MCP test timeout\n[pid=24816][err] Waiting for the debugger to disconnect..."
+  },
+  "error": null
+}
