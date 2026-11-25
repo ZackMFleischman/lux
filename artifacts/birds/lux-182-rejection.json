@@ -1,0 +1,10 @@
+{
+  "commit": "53b4c4a21743bcff3be53241936c54dbb49fd9d7",
+  "criteria": "Stable instance keys must preserve the caller-visible distinction between supported string and numeric key types.",
+  "evidence": "Independent source review found that controlVariationValue serialized numeric key 1 and string key '1' to the same sampling identity. The corrected implementation and regression exist after the submitted commit, so revision 3 cannot be accepted as submitted.",
+  "context_id": "/root/final_review:bird-iteration:2026-09-16",
+  "checks": {
+    "source_review": "fail",
+    "native_runtime": "pass"
+  }
+}

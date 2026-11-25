@@ -1,0 +1,11 @@
+{
+  "commit": "82ef071e32db0df19875d7cff9d1dfce89b5c09d",
+  "criteria": "Expressive small companion birds with wider useful controls, independent flight and excursion motion, mixed species and colors, stable flock spacing, shape visits, social idle interactions, occasional emotion bubbles, and preserved scene/runtime behavior.",
+  "evidence": "Independent source and canvas review is recorded in artifacts/birds/lux-181-independent-review.md. Findings for zero-radius overlap, left-facing mirroring, visit disabling and range, live zero-speed recovery, perch range, and gesture lifetime were fixed through commit 82ef071e. artifacts/birds/social-final.png is an actual isolated Studio canvas from that source. artifacts/birds/combined-qa.json records 59.763851 completed-frame FPS at 1920x1080, fault null, and save/reopen preservation of the social scene and three per-instance bindings. The installed user window remained protected.",
+  "context_id": "/root/final_review:bird-iteration:2026-09-16",
+  "checks": {
+    "source_review": "pass",
+    "actual_canvas_review": "pass",
+    "native_runtime_save_reopen": "pass"
+  }
+}

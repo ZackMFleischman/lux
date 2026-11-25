@@ -1,0 +1,11 @@
+{
+  "commit": "2f600684a0f3a70c6c0d59b1191b9b5e7fbd8001",
+  "criteria": "Stable clamped per-instance sampling for all three distributions, scene persistence, matching Inspector/MCP binding behavior, and focused CPU/type/skill validation.",
+  "evidence": "Independent review in artifacts/birds/lux-182-independent-review.md found no remaining source blocker. Corrected commit 2f600684 has the same reviewed implementation tree as combined commit 570bf219 for the changed sampler and regression. artifacts/birds/combined-qa.json records an actual isolated Studio run with three distribution bindings, fault null, and save/reopen persistence. The implementation submission records focused CPU tests, typechecks, MCP checks, and skill install/check. Native Inspector pixels were not captured; RTL interaction evidence covers its binding flow.",
+  "context_id": "/root/final_review:bird-iteration:2026-09-16",
+  "checks": {
+    "source_review": "pass",
+    "native_runtime_persistence": "pass",
+    "focused_cpu_and_types": "pass"
+  }
+}

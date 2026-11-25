@@ -1,0 +1,49 @@
+{
+  "fps": 59.76385104450497,
+  "fault": null,
+  "animations": [
+    {
+      "kind": "variation",
+      "nodePath": [
+        "d1710000-63ac-49c7-8ad7-8cf6458b5105"
+      ],
+      "definitionHash": "daa0dac4729831e3683a9f6dea075dbcee0afa7e8cb9d295c2e1a041402c14ec",
+      "schemaHash": "36a64f2e5ad36a207cc256ebab479045eab37a98f3e04a11d60dd553719ab394",
+      "controlId": "birdSize",
+      "distribution": "spread",
+      "amount": 0.5,
+      "enabled": true
+    },
+    {
+      "kind": "variation",
+      "nodePath": [
+        "d1710000-63ac-49c7-8ad7-8cf6458b5105"
+      ],
+      "definitionHash": "daa0dac4729831e3683a9f6dea075dbcee0afa7e8cb9d295c2e1a041402c14ec",
+      "schemaHash": "36a64f2e5ad36a207cc256ebab479045eab37a98f3e04a11d60dd553719ab394",
+      "controlId": "birdSpeed",
+      "distribution": "centered",
+      "amount": 0.3,
+      "enabled": true
+    },
+    {
+      "kind": "variation",
+      "nodePath": [
+        "d1710000-63ac-49c7-8ad7-8cf6458b5105"
+      ],
+      "definitionHash": "daa0dac4729831e3683a9f6dea075dbcee0afa7e8cb9d295c2e1a041402c14ec",
+      "schemaHash": "36a64f2e5ad36a207cc256ebab479045eab37a98f3e04a11d60dd553719ab394",
+      "controlId": "birdExcursionSpeed",
+      "distribution": "random",
+      "amount": 0.4,
+      "enabled": true
+    }
+  ],
+  "scene": "C:/Users/zFlei/.codex/visualizations/2026/09/15/01a0a5cb-03be-7ee2-a6cf-daf659f7ebac/Living Ornament - Social Birds.lux-scene",
+  "session": {
+    "profile": "test-1210b052-de86-44f8-b463-c4391e637556",
+    "sessionId": "da68ab7f2fe26482abb5f8d0da0346a21d88",
+    "pid": 33824,
+    "workspace": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\bird-iteration"
+  }
+}

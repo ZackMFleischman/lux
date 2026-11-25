@@ -1,0 +1,7 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import {Client} from '@modelcontextprotocol/sdk/client/index.js';
+import {StdioClientTransport} from '@modelcontextprotocol/sdk/client/stdio.js';
+const i=JSON.parse(await readFile(process.env.LOCALAPPDATA+'/Programs/Lux/installation.json','utf8'));
+const c=new Client({name:'open-birds',version:'1'});const j=r=>JSON.parse(r.content.find(x=>x.type==='text').text);const call=async(name,args={})=>{const r=await c.callTool({name:'lux.studio.'+name,arguments:args},undefined,{timeout:75000});if(r.isError)throw Error(JSON.stringify(r.content));return j(r)};
+try{await c.connect(new StdioClientTransport({command:i.node,args:[i.adapter],cwd:i.workspace,env:{...process.env,LUX_STUDIO_PROFILE:'desktop',LUX_STUDIO_DESKTOP:'1',LUX_STUDIO_SESSION_ID:'30fcdf44f4bc3f80a34a425d5e600bf9a47e'}}));await call('discover');const r=await call('read');await writeFile('artifacts/birds/desktop-before-open.json',JSON.stringify(r));await call('save',{path:'C:/Users/zFlei/.codex/visualizations/2026/09/15/01a0a5cb-03be-7ee2-a6cf-daf659f7ebac/Desktop before birds - 20260917.lux-scene',expectedDraftVersion:r.draftVersion});const opened=await call('open',{path:'C:/Users/zFlei/.codex/visualizations/2026/09/15/01a0a5cb-03be-7ee2-a6cf-daf659f7ebac/Living Ornament - Opalescent Birds.lux-scene',expectedDraftVersion:r.draftVersion});const a=(await call('status')).authoring;console.log(JSON.stringify({scene:a.sceneName,playback:a.playback,fault:a.fault,frame:a.frameId}));}finally{await c.close()}
+

@@ -1,0 +1,7 @@
+{
+  "correction": "Restored actual velocity-facing flight and prior flap waveform; restricted orientation settling to perch transitions. Added social behavior in the same prototype pass. Avoid replacing movement character when fixing local rotation jitter.",
+  "summary": "Bird iteration changed flight character more than requested",
+  "evidence": "LUX-181; source82ef071e32db0df19875d7cff9d1dfce89b5c09d; artifacts/birds/social-final.png and combined-qa.json. Final measured59.76385FPS at1920x1080, nofault.",
+  "expected": "Preserve the earlier realistic motion and address rotation jitter narrowly.",
+  "actual": "User reported the first new motion felt worse and excessively smoothed after tangent-based orientation replaced velocity-facing flight."
+}
