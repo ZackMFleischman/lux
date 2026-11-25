@@ -1,0 +1,13 @@
+{
+  "commit": "920fc9d4e6421917c5aab6bc063b110f65b8ed61",
+  "criteria": "Independent review verified all LUX-209 Source sidebar layout and behavior criteria.",
+  "evidence": "Source review found the final CSS override keeps source columns in a row at every width and has sufficient specificity to remove the former file-list max-height. Files is the flexible vertical region, Assets is a bottom disclosure with an accessible import icon, and rail mode contains only the labeled expand icon. Existing source workspace calls continue to own open, undo, import, replace, and remove behavior. The isolated actual Dockview run artifacts/source-sidebar/native/result.json passed with a 1360x900 wide case and 840x700 narrow case. It measured Files at 402.5px and 234.8px, Assets flush to the bottom, a 36px collapsed rail, and a 640x360 Preview output. I visually reviewed all four expanded/collapsed empty/asset screenshots: the sidebar remains left of the editor, status/empty/asset information is compact, and source/asset content remains present across collapse.",
+  "context_id": "lux-inspector-group-validator-01a09baf",
+  "checks": {
+    "source_behavior": "pass",
+    "focused_source_tests": "pass",
+    "typescript": "pass",
+    "isolated_wide_narrow_ui": "pass",
+    "collapsed_rail_and_data_preservation": "pass"
+  }
+}

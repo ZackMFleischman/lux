@@ -1,0 +1,5 @@
+{"request":"source-sidebar-agent-20260917","agent_id":"00732b9b-9f08-4c85-92d2-a3da2ce6f853","ok":true}
+{"request":"source-sidebar-session-20260917","session_id":"ad1fe9ea-377e-42bd-bb21-9d7a37587d4e","ok":true}
+{"request":"source-sidebar-ticket-20260917","ticket":"LUX-209","ticket_id":"411bf6d3-8861-4dae-8618-f5e629145129","revision":1,"ok":true}
+{"request":"source-sidebar-claim-20260917","claim_id":"d86e9855-f2a0-4a6b-aac7-8d11b9516e8f","revision":2,"ok":true}
+{"request":"source-sidebar-submit-20260917","ticket":"LUX-209","revision":3,"state":"review","submitted_commit":"920fc9d4e6421917c5aab6bc063b110f65b8ed61","ok":true}

@@ -1,0 +1,71 @@
+{
+  "ok": true,
+  "checks": [
+    "Actual Dockview keeps Source navigation left of the editor at wide and narrow window sizes",
+    "Files consumes remaining sidebar height and Assets stays anchored at the bottom",
+    "Empty and imported-asset states remain usable; collapse preserves the active editor and asset data",
+    "Preview output was resized through Studio controls to 640 × 360"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\source-sidebar\\artifacts\\source-sidebar\\native\\wide-expanded-empty.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\source-sidebar\\artifacts\\source-sidebar\\native\\wide-collapsed-empty.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\source-sidebar\\artifacts\\source-sidebar\\native\\narrow-expanded-asset.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\source-sidebar\\artifacts\\source-sidebar\\native\\narrow-collapsed-asset.png"
+  ],
+  "errors": [],
+  "geometry": {
+    "wide": {
+      "sidebar": {
+        "x": 6,
+        "y": 81,
+        "width": 156,
+        "height": 484
+      },
+      "editor": {
+        "x": 168,
+        "y": 81,
+        "width": 199,
+        "height": 484
+      },
+      "assets": {
+        "x": 6,
+        "y": 511.5,
+        "width": 149,
+        "height": 53.5
+      },
+      "files": {
+        "x": 6,
+        "y": 109,
+        "width": 149,
+        "height": 402.5
+      }
+    },
+    "narrow": {
+      "sidebar": {
+        "x": 6,
+        "y": 81,
+        "width": 104,
+        "height": 351
+      },
+      "editor": {
+        "x": 116,
+        "y": 81,
+        "width": 107,
+        "height": 351
+      },
+      "assets": {
+        "x": 6,
+        "y": 343.828125,
+        "width": 97,
+        "height": 88.171875
+      },
+      "files": {
+        "x": 6,
+        "y": 109,
+        "width": 97,
+        "height": 234.828125
+      }
+    },
+    "collapsedWidth": 36
+  }
+}

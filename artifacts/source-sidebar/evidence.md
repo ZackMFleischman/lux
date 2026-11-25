@@ -1,0 +1,5 @@
+- `node --test --test-isolation=none apps/studio/dist/source-editor.test.mjs`: 19 passed, 0 failed.
+- `npx tsc -p apps/studio/tsconfig.json --noEmit`: passed.
+- `node artifacts/source-sidebar/native-layout.mjs`: passed in an isolated `studioTestEnvironment` profile. The actual Dockview Source pane stayed horizontal at 1360×900 and 840×700. Files heights were 402.5px and 234.8px. Assets ended flush with the sidebar bottom. Collapsed width was 36px. Preview output was set through Studio controls to 640×360.
+- Screenshots: `artifacts/source-sidebar/native/wide-expanded-empty.png`, `wide-collapsed-empty.png`, `narrow-expanded-asset.png`, and `narrow-collapsed-asset.png`.
+- Only the Playwright-owned Studio process was closed. No user profile, installed app, or saved scene was changed.
