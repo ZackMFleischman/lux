@@ -1,0 +1,14 @@
+{
+  "parent": "2e044cb814ac1156c42d36aedfc501c993b6096b",
+  "files": [
+    {
+      "path": "apps/studio/src/visual-worker.mjs",
+      "sha256": "1E33FAE6610C7FD9C1638D5FCFC14629811F2E6506E97B300D0ECF586A30ED6A"
+    },
+    {
+      "path": "tests/studio/visual-worker.test.mjs",
+      "sha256": "B9D854D4939DB96BDCB23D13E98C53181941DDC1B84E0DEF914FF5E69793241D"
+    }
+  ],
+  "commit": "e28a5a8142074463a7aec0309cc81cd6a2977707"
+}

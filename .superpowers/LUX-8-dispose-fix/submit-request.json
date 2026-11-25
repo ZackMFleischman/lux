@@ -1,0 +1,22 @@
+[
+  "ticket",
+  "submit",
+  "LUX-8",
+  "--session",
+  "53f3b31b-e5d1-445a-87c8-8a92054e0430",
+  "--claim",
+  "548d789e-d4f2-4a39-b0ea-bdc2533ddc5d",
+  "--expect-revision",
+  "11",
+  "--commit",
+  "e28a5a8142074463a7aec0309cc81cd6a2977707",
+  "--summary-file",
+  ".superpowers/LUX-8-dispose-fix/summary.md",
+  "--evidence-file",
+  ".superpowers/LUX-8-dispose-fix/evidence.md",
+  "--qa-file",
+  ".superpowers/LUX-8-dispose-fix/qa.md",
+  "--request",
+  "lux8-dispose-fix-submit-20260913",
+  "--json"
+]

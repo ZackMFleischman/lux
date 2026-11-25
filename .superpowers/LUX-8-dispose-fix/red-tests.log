@@ -1,0 +1,62 @@
+(node:33096) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✖ legacy class prototype dispose retains its receiver and runs once across repeated disposal (54.7386ms)
+✖ throwing legacy prototype dispose reports diagnostics and still releases owned resources once (45.5727ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 314.3027
+
+✖ failing tests:
+
+test at tests\studio\visual-worker.test.mjs:46:1
+✖ legacy class prototype dispose retains its receiver and runs once across repeated disposal (54.7386ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   [
+  -     'authored-dispose',
+  -     true
+  -   ]
+  - ]
+  
+      at TestContext.<anonymous> (file:///C:/Users/zFlei/repos/lux/.worktrees/component-projects/tests/studio/visual-worker.test.mjs:51:10)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ [ 'authored-dispose', true ] ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\studio\visual-worker.test.mjs:56:1
+✖ throwing legacy prototype dispose reports diagnostics and still releases owned resources once (45.5727ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   [
+  -     'authored-dispose',
+  -     true
+  -   ]
+  - ]
+  
+      at TestContext.<anonymous> (file:///C:/Users/zFlei/repos/lux/.worktrees/component-projects/tests/studio/visual-worker.test.mjs:60:9)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ [ 'authored-dispose', true ] ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

@@ -1,0 +1,7 @@
+{
+  "summary": "Test-edit helper assumed unavailable python; subsequent filtered pre-edit test selected no regression tests",
+  "expected": "Use available editing tools and verify newly authored failing tests before production change",
+  "evidence": "LUX-8 exact component-projects; .superpowers/LUX-8-dispose-fix/red.log, red-tests.log and green-worker.log; fresh session 53f3b31b-e5d1-445a-87c8-8a92054e0430",
+  "correction": "Used apply_patch, observed both actual added tests fail in red-tests.log, then changed production and ran full focused worker suite. Preserve initial red.log separately as non-evidence.",
+  "actual": "python was not on PATH, so no test edits occurred. Following filtered command exited 0 with no matching regression tests; this was not counted as red evidence."
+}

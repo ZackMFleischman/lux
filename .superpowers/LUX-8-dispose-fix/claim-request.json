@@ -1,0 +1,12 @@
+[
+  "ticket",
+  "claim",
+  "LUX-8",
+  "--session",
+  "53f3b31b-e5d1-445a-87c8-8a92054e0430",
+  "--expect-revision",
+  "10",
+  "--request",
+  "lux8-dispose-fix-claim-20260913",
+  "--json"
+]

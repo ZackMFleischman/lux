@@ -1,0 +1,9 @@
+[
+  "session",
+  "stop",
+  "--session",
+  "53f3b31b-e5d1-445a-87c8-8a92054e0430",
+  "--request",
+  "lux8-dispose-fix-stop-20260913",
+  "--json"
+]

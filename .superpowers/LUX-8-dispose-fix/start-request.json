@@ -1,0 +1,12 @@
+{
+  "request": "lux8-dispose-fix-session-start-20260913",
+  "arguments": [
+    "session",
+    "start",
+    "--agent",
+    "efa0671d-ccda-4f65-ac80-7c699bd88a25",
+    "--request",
+    "lux8-dispose-fix-session-start-20260913",
+    "--json"
+  ]
+}

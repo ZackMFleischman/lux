@@ -1,0 +1,12 @@
+[
+  "team",
+  "ack",
+  "345554f0-0896-4ea2-8fb4-942317f65fda",
+  "--session",
+  "53f3b31b-e5d1-445a-87c8-8a92054e0430",
+  "--body-file",
+  ".superpowers/LUX-8-dispose-fix/ack.json",
+  "--request",
+  "lux8-dispose-fix-ack-20260913",
+  "--json"
+]
