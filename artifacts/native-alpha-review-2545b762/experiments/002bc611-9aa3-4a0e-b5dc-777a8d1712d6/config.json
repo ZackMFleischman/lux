@@ -1,0 +1,7 @@
+{
+  "executable": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\native\\build\\Release\\lux_standalone_host.exe",
+  "commandLine": "\"C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\native\\build\\Release\\lux_standalone_host.exe\" \"C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-native-review-2545b762\\plugins\\Lux_2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2.dll\" \"C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\artifacts\\native-alpha-review-2545b762\\final.rgba\"",
+  "cwd": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration",
+  "directory": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\artifacts\\native-alpha-review-2545b762\\experiments\\002bc611-9aa3-4a0e-b5dc-777a8d1712d6",
+  "timeoutMs": 30000
+}

@@ -1,0 +1,78 @@
+{
+  "ok": true,
+  "releaseId": "2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2",
+  "runtimeId": "8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539",
+  "actualResolumeTested": false,
+  "performanceAcceptance": false,
+  "samples": [
+    [
+      0,
+      0,
+      128,
+      128
+    ],
+    [
+      0,
+      255,
+      0,
+      255
+    ],
+    [
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      64,
+      64,
+      64,
+      64
+    ]
+  ],
+  "probe": {
+    "runId": "002bc611-9aa3-4a0e-b5dc-777a8d1712d6",
+    "ok": true,
+    "deinstantiated": true,
+    "deinitialized": true,
+    "parameterIndex": 0,
+    "normalizedValue": 0,
+    "elapsedMs": 4286,
+    "white": [
+      [
+        187,
+        187,
+        255,
+        255
+      ],
+      [
+        0,
+        255,
+        0,
+        255
+      ],
+      [
+        255,
+        255,
+        255,
+        255
+      ],
+      [
+        255,
+        255,
+        255,
+        255
+      ]
+    ]
+  },
+  "counters": {
+    "kind": "counters",
+    "callbacks": 133,
+    "consumed": 2
+  },
+  "experiment": {
+    "id": "002bc611-9aa3-4a0e-b5dc-777a8d1712d6",
+    "outcome": "success",
+    "cleanupComplete": true
+  }
+}

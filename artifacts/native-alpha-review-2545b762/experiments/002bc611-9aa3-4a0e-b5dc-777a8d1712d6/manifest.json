@@ -1,0 +1,2856 @@
+{
+  "schema": 1,
+  "id": "002bc611-9aa3-4a0e-b5dc-777a8d1712d6",
+  "directory": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\artifacts\\native-alpha-review-2545b762\\experiments\\002bc611-9aa3-4a0e-b5dc-777a8d1712d6",
+  "mode": "hardware",
+  "supervisorPid": 28968,
+  "start": {
+    "utc": "2026-09-13T02:02:47.785Z",
+    "monotonicNs": "64964765375600"
+  },
+  "timeoutMs": 30000,
+  "executable": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\native\\build\\Release\\lux_standalone_host.exe",
+  "args": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-native-review-2545b762\\plugins\\Lux_2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2.dll",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\artifacts\\native-alpha-review-2545b762\\final.rgba"
+  ],
+  "outcome": "success",
+  "cleanupComplete": true,
+  "activity": [],
+  "binary": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\native\\build\\Release\\lux_standalone_host.exe",
+    "sha256": "b1d7d8fac23b8d63f3a63ef39ed8143b364de7a4f2b6c44f068d8cdc1ce05b96"
+  },
+  "sources": [
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\scripts\\experiment-runner.mjs",
+      "sha256": "365abf167a70f13ad340d025dde089431aa9e5995c4d47a18083fb33879b32c8"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\scripts\\experiment-job.cs",
+      "sha256": "4ab4d7cd2b19de771b8cafb62c8f22b71faca4d8543c9032bdb5fba5f7d57a4a"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\scripts\\experiment-job.ps1",
+      "sha256": "b62dd34e8b7baf86a149d764f5df908ad4d7819465bd5014bc50f5511a006cf1"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\scripts\\experiment-cpu-fixture.mjs",
+      "sha256": "4ab3409e7e8b11e90fa9ff7b4cbed667e72eb9c8fce5caa7432e55c0b500f6e9"
+    }
+  ],
+  "review": {
+    "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\artifacts\\native-alpha-review-2545b762\\review-authorized.json",
+    "sha256": "e5e15e0f97b7c67727356ff0154f93e65a68e16bfba59a8f0f5f5b1aaa674f85"
+  },
+  "reviewedSources": [
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\apps\\render-host\\src\\main.ts",
+      "sha256": "d380ea765fdb5957a3150c7a891570b2b5f68546105197d37cc9a1a24ef83443",
+      "bytes": 12276,
+      "modifiedUtc": "2026-09-13T01:49:07.708Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\apps\\studio\\src\\visual-worker.mjs",
+      "sha256": "1d721eadf6aeb07705b15ccb918868b9261036de270167e740329d8c66667142",
+      "bytes": 9693,
+      "modifiedUtc": "2026-09-13T01:49:07.8Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\install.cmd",
+      "sha256": "70716d32e66b2deb48cee3175e9dc50d856ffe25831a97b63c1472355a52400d",
+      "bytes": 137,
+      "modifiedUtc": "2026-09-13T00:59:36.752Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\release\\a737b8c9e02d8d6600169cc9f417a7e7068a8502434bfd41927794d3242d96c6.json",
+      "sha256": "a737b8c9e02d8d6600169cc9f417a7e7068a8502434bfd41927794d3242d96c6",
+      "bytes": 8249007,
+      "modifiedUtc": "2026-09-13T00:59:33.262Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\release\\release.json",
+      "sha256": "1b6702fd811c73ab8a828af6d2a99c2de4c43c29e225c05c1e1faab94de297cd",
+      "bytes": 1150,
+      "modifiedUtc": "2026-09-13T00:59:36.752Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\apps\\installed-runtime\\src\\instance.cjs",
+      "sha256": "f026fbf727e6a68d281a5cc4baa169e6168be052d85acc75f6a249db7f7c0967",
+      "bytes": 2554,
+      "modifiedUtc": "2026-09-13T00:43:04.199Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\apps\\installed-runtime\\src\\registry.cjs",
+      "sha256": "fb02c9def882b3c8152984e6b8d14c69194dfdfcc8279bd904905d4ee42206a3",
+      "bytes": 6734,
+      "modifiedUtc": "2026-09-13T00:53:30.426Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\apps\\installed-runtime\\src\\supervisor.cjs",
+      "sha256": "79bcb930ca64c65a87936ff56e277c77294f20234d73a12521146260ffda7595",
+      "bytes": 7129,
+      "modifiedUtc": "2026-09-13T00:58:18.749Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\apps\\render-host\\src\\compiled-output.html",
+      "sha256": "36ee46fe43498c31640a0d40d5505cbaae98202127484c4dad41559ea98b0463",
+      "bytes": 3201,
+      "modifiedUtc": "2026-09-13T00:53:30.429Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\apps\\render-host\\src\\compiled-worker.js",
+      "sha256": "f7ad9e64e3a31347703239c1ad93ef93aa0208e1f482203754c255a48e354902",
+      "bytes": 255653,
+      "modifiedUtc": "2026-09-13T00:57:05.288Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\apps\\render-host\\src\\main.cjs",
+      "sha256": "d72734f989fc53c3fd796e2a03d592eb788fa59b6968b7727643f76d564b8010",
+      "bytes": 11703,
+      "modifiedUtc": "2026-09-13T00:57:05.079Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\LICENSE",
+      "sha256": "5154e165bd6c2cc0cfbcd8916498c7abab0497923bafcd5cb07673fe8480087d",
+      "bytes": 1096,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\LICENSES.chromium.html",
+      "sha256": "7b328b8c7463ac9bfc7dc648c751533517c8441a0b5b21047d6c0b2620e60d70",
+      "bytes": 20472830,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\version",
+      "sha256": "a1d640d380c386200a420b590105d25da627723ee42ee1061108f3acde9f25fd",
+      "bytes": 6,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\vk_swiftshader_icd.json",
+      "sha256": "32d83ff113fef532a9f97e0d2831f8656628ab1c99e9060f0332b1532839afd9",
+      "bytes": 106,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\install-flow.cjs",
+      "sha256": "bcf8270698eb109aa7f25f45d7a65f594b62613be2208bf4b15e4e870ab252cd",
+      "bytes": 2472,
+      "modifiedUtc": "2026-09-12T23:41:12.993Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\install-gui.cjs",
+      "sha256": "4ac44797ae04cd756e7abf6ba0e764e2d9cd4e5c8dbe74fdaa021ff713170301",
+      "bytes": 2699,
+      "modifiedUtc": "2026-09-12T23:41:12.994Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\install.cjs",
+      "sha256": "15d55b1e3899ffcea201925f8b0265a1157cc2359370f5f2a2c6c8f21f4f32d2",
+      "bytes": 1166,
+      "modifiedUtc": "2026-09-12T23:41:12.994Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\package.cjs",
+      "sha256": "3d1330addbb86475268560a7861fe6f7dc565a02b6c33194ee8c2fdfb5b12b43",
+      "bytes": 15120,
+      "modifiedUtc": "2026-09-13T00:53:30.442Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\parameter-mapping.cjs",
+      "sha256": "d9e7b79403316da7e60f32350074dee4657f100b665ffbe10825c2de858c06ac",
+      "bytes": 2096,
+      "modifiedUtc": "2026-09-13T00:43:04.292Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\register.cjs",
+      "sha256": "c06e2693452a12e7e8d31c8ca06df0c0d2814d4e3c05f97868eb80438b386e60",
+      "bytes": 6026,
+      "modifiedUtc": "2026-09-13T00:43:04.226Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\runtime-capability.cjs",
+      "sha256": "4617b6f40db2c9ab20040f814fefc04cbe7ec5a2b1e44d15cb99bfd015afc348",
+      "bytes": 1744,
+      "modifiedUtc": "2026-09-13T00:43:04.228Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\runtime-validation.cjs",
+      "sha256": "85529d7b57989b8181d5a632fc27757a86a4f35bf09e1cad4bd3c4cd9f8bb377",
+      "bytes": 200899,
+      "modifiedUtc": "2026-09-13T00:57:05.212Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\runtime.json",
+      "sha256": "f04632d84173801ee4b688f6690b0db4cdeb2d15e948bbe383e17336960e1d27",
+      "bytes": 17143,
+      "modifiedUtc": "2026-09-13T00:59:36.702Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\tools\\gpu-spike\\frame-gate.cjs",
+      "sha256": "81a6cd10604362f81f930d1104851ecad97c1f69d1810342ad5af2f0a43a7db4",
+      "bytes": 1523,
+      "modifiedUtc": "2026-09-13T00:53:30.451Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\tools\\gpu-spike\\frame-progress.cjs",
+      "sha256": "0545fa67500527eaffd81cde3a2f225b0ce3c7d679c493cd524fc32f20376609",
+      "bytes": 373,
+      "modifiedUtc": "2026-09-12T23:41:13.117Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\tools\\gpu-spike\\host-startup.cjs",
+      "sha256": "5bc261c65ab53f29a0fca866609b3cafca58af03a7633761b19ca4be88c99332",
+      "bytes": 1567,
+      "modifiedUtc": "2026-09-13T00:43:04.287Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\tools\\gpu-spike\\parameter-mapping.cjs",
+      "sha256": "d9e7b79403316da7e60f32350074dee4657f100b665ffbe10825c2de858c06ac",
+      "bytes": 2096,
+      "modifiedUtc": "2026-09-13T00:43:04.292Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\tools\\gpu-spike\\producer-session.cjs",
+      "sha256": "cec016be3d2487b3e94718dc6f7f231bfcefc456f6a4f4c167ebdcf591104a45",
+      "bytes": 2197,
+      "modifiedUtc": "2026-09-13T00:53:30.452Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\tools\\gpu-spike\\runtime-validation.cjs",
+      "sha256": "85529d7b57989b8181d5a632fc27757a86a4f35bf09e1cad4bd3c4cd9f8bb377",
+      "bytes": 200899,
+      "modifiedUtc": "2026-09-13T00:57:05.212Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\tools\\gpu-spike\\transport-release.cjs",
+      "sha256": "53a5fadea9bc3eb70786b3d81cdb9c3f21e6bfb26a8bea424c4b3fa73ff151cb",
+      "bytes": 1920,
+      "modifiedUtc": "2026-09-13T00:43:04.305Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\transport-release.cjs",
+      "sha256": "53a5fadea9bc3eb70786b3d81cdb9c3f21e6bfb26a8bea424c4b3fa73ff151cb",
+      "bytes": 1920,
+      "modifiedUtc": "2026-09-13T00:43:04.305Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-native-review-2545b762\\README.md",
+      "sha256": "cb37ca9c5369b55925d2e61064491f1f8efa045788702c02667e95b10f85b884",
+      "bytes": 3257,
+      "modifiedUtc": "2026-09-13T01:09:01.067Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-native-review-2545b762\\inspect-selftest.mjs",
+      "sha256": "1d940bf8d883cb803cb85819a2823da6989f55f9cf7aa3d1915ccd8d940c4aac",
+      "bytes": 2512,
+      "modifiedUtc": "2026-09-13T01:09:00.584Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-native-review-2545b762\\inspect.mjs",
+      "sha256": "da8c621623707de12ae4932428ef889ba592c89b2ca59314e36fa8f5ffe58bdd",
+      "bytes": 3694,
+      "modifiedUtc": "2026-09-13T01:06:40.875Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-native-review-2545b762\\launch.mjs",
+      "sha256": "e675d094e74eede829578d6a93e310c9648d3db2951db29b00b2d7cf04e13b77",
+      "bytes": 1811,
+      "modifiedUtc": "2026-09-13T01:06:40.389Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-native-review-2545b762\\plugins\\Lux_2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2.dll.lux-source",
+      "sha256": "8a26171748d79a388bfc182a6fcff9760096384a78c68b46fcd243006044868f",
+      "bytes": 263,
+      "modifiedUtc": "2026-09-13T01:06:54.135Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-native-review-2545b762\\prepare.mjs",
+      "sha256": "cc9eee25b9c40e1f828afebe38bcb2f9325ccdd7d577d2f383f3d1db00f4113a",
+      "bytes": 10256,
+      "modifiedUtc": "2026-09-13T01:09:48.88Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\releases\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\a737b8c9e02d8d6600169cc9f417a7e7068a8502434bfd41927794d3242d96c6.json",
+      "sha256": "a737b8c9e02d8d6600169cc9f417a7e7068a8502434bfd41927794d3242d96c6",
+      "bytes": 8249007,
+      "modifiedUtc": "2026-09-13T00:59:33.262Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\releases\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\release.json",
+      "sha256": "1b6702fd811c73ab8a828af6d2a99c2de4c43c29e225c05c1e1faab94de297cd",
+      "bytes": 1150,
+      "modifiedUtc": "2026-09-13T00:59:36.752Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\apps\\installed-runtime\\src\\instance.cjs",
+      "sha256": "f026fbf727e6a68d281a5cc4baa169e6168be052d85acc75f6a249db7f7c0967",
+      "bytes": 2554,
+      "modifiedUtc": "2026-09-13T00:43:04.199Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\apps\\installed-runtime\\src\\registry.cjs",
+      "sha256": "fb02c9def882b3c8152984e6b8d14c69194dfdfcc8279bd904905d4ee42206a3",
+      "bytes": 6734,
+      "modifiedUtc": "2026-09-13T00:53:30.426Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\apps\\installed-runtime\\src\\supervisor.cjs",
+      "sha256": "79bcb930ca64c65a87936ff56e277c77294f20234d73a12521146260ffda7595",
+      "bytes": 7129,
+      "modifiedUtc": "2026-09-13T00:58:18.749Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\apps\\render-host\\src\\compiled-output.html",
+      "sha256": "36ee46fe43498c31640a0d40d5505cbaae98202127484c4dad41559ea98b0463",
+      "bytes": 3201,
+      "modifiedUtc": "2026-09-13T00:53:30.429Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\apps\\render-host\\src\\compiled-worker.js",
+      "sha256": "f7ad9e64e3a31347703239c1ad93ef93aa0208e1f482203754c255a48e354902",
+      "bytes": 255653,
+      "modifiedUtc": "2026-09-13T00:57:05.288Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\apps\\render-host\\src\\main.cjs",
+      "sha256": "d72734f989fc53c3fd796e2a03d592eb788fa59b6968b7727643f76d564b8010",
+      "bytes": 11703,
+      "modifiedUtc": "2026-09-13T00:57:05.079Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\LICENSE",
+      "sha256": "5154e165bd6c2cc0cfbcd8916498c7abab0497923bafcd5cb07673fe8480087d",
+      "bytes": 1096,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\LICENSES.chromium.html",
+      "sha256": "7b328b8c7463ac9bfc7dc648c751533517c8441a0b5b21047d6c0b2620e60d70",
+      "bytes": 20472830,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\version",
+      "sha256": "a1d640d380c386200a420b590105d25da627723ee42ee1061108f3acde9f25fd",
+      "bytes": 6,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\vk_swiftshader_icd.json",
+      "sha256": "32d83ff113fef532a9f97e0d2831f8656628ab1c99e9060f0332b1532839afd9",
+      "bytes": 106,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\install-flow.cjs",
+      "sha256": "bcf8270698eb109aa7f25f45d7a65f594b62613be2208bf4b15e4e870ab252cd",
+      "bytes": 2472,
+      "modifiedUtc": "2026-09-12T23:41:12.993Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\install-gui.cjs",
+      "sha256": "4ac44797ae04cd756e7abf6ba0e764e2d9cd4e5c8dbe74fdaa021ff713170301",
+      "bytes": 2699,
+      "modifiedUtc": "2026-09-12T23:41:12.994Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\install.cjs",
+      "sha256": "15d55b1e3899ffcea201925f8b0265a1157cc2359370f5f2a2c6c8f21f4f32d2",
+      "bytes": 1166,
+      "modifiedUtc": "2026-09-12T23:41:12.994Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\package.cjs",
+      "sha256": "3d1330addbb86475268560a7861fe6f7dc565a02b6c33194ee8c2fdfb5b12b43",
+      "bytes": 15120,
+      "modifiedUtc": "2026-09-13T00:53:30.442Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\parameter-mapping.cjs",
+      "sha256": "d9e7b79403316da7e60f32350074dee4657f100b665ffbe10825c2de858c06ac",
+      "bytes": 2096,
+      "modifiedUtc": "2026-09-13T00:43:04.292Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\register.cjs",
+      "sha256": "c06e2693452a12e7e8d31c8ca06df0c0d2814d4e3c05f97868eb80438b386e60",
+      "bytes": 6026,
+      "modifiedUtc": "2026-09-13T00:43:04.226Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\runtime-capability.cjs",
+      "sha256": "4617b6f40db2c9ab20040f814fefc04cbe7ec5a2b1e44d15cb99bfd015afc348",
+      "bytes": 1744,
+      "modifiedUtc": "2026-09-13T00:43:04.228Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\runtime-validation.cjs",
+      "sha256": "85529d7b57989b8181d5a632fc27757a86a4f35bf09e1cad4bd3c4cd9f8bb377",
+      "bytes": 200899,
+      "modifiedUtc": "2026-09-13T00:57:05.212Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\runtime.json",
+      "sha256": "f04632d84173801ee4b688f6690b0db4cdeb2d15e948bbe383e17336960e1d27",
+      "bytes": 17143,
+      "modifiedUtc": "2026-09-13T00:59:36.702Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\tools\\gpu-spike\\frame-gate.cjs",
+      "sha256": "81a6cd10604362f81f930d1104851ecad97c1f69d1810342ad5af2f0a43a7db4",
+      "bytes": 1523,
+      "modifiedUtc": "2026-09-13T00:53:30.451Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\tools\\gpu-spike\\frame-progress.cjs",
+      "sha256": "0545fa67500527eaffd81cde3a2f225b0ce3c7d679c493cd524fc32f20376609",
+      "bytes": 373,
+      "modifiedUtc": "2026-09-12T23:41:13.117Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\tools\\gpu-spike\\host-startup.cjs",
+      "sha256": "5bc261c65ab53f29a0fca866609b3cafca58af03a7633761b19ca4be88c99332",
+      "bytes": 1567,
+      "modifiedUtc": "2026-09-13T00:43:04.287Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\tools\\gpu-spike\\parameter-mapping.cjs",
+      "sha256": "d9e7b79403316da7e60f32350074dee4657f100b665ffbe10825c2de858c06ac",
+      "bytes": 2096,
+      "modifiedUtc": "2026-09-13T00:43:04.292Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\tools\\gpu-spike\\producer-session.cjs",
+      "sha256": "cec016be3d2487b3e94718dc6f7f231bfcefc456f6a4f4c167ebdcf591104a45",
+      "bytes": 2197,
+      "modifiedUtc": "2026-09-13T00:53:30.452Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\tools\\gpu-spike\\runtime-validation.cjs",
+      "sha256": "85529d7b57989b8181d5a632fc27757a86a4f35bf09e1cad4bd3c4cd9f8bb377",
+      "bytes": 200899,
+      "modifiedUtc": "2026-09-13T00:57:05.212Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\tools\\gpu-spike\\transport-release.cjs",
+      "sha256": "53a5fadea9bc3eb70786b3d81cdb9c3f21e6bfb26a8bea424c4b3fa73ff151cb",
+      "bytes": 1920,
+      "modifiedUtc": "2026-09-13T00:43:04.305Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\transport-release.cjs",
+      "sha256": "53a5fadea9bc3eb70786b3d81cdb9c3f21e6bfb26a8bea424c4b3fa73ff151cb",
+      "bytes": 1920,
+      "modifiedUtc": "2026-09-13T00:43:04.305Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\result.json",
+      "sha256": "e465e801404f2b5503b19913ab790f9fc8956f783390a2c7ff49c65094a992d0",
+      "bytes": 496,
+      "modifiedUtc": "2026-09-13T01:01:44.059Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\studio-common-images\\reopened.png",
+      "sha256": "679975b5f26788b570923e9b73e685f77317797fb516267f59c561e47023dc39",
+      "bytes": 13931,
+      "modifiedUtc": "2026-09-13T00:56:10.504Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\studio-common-images\\result.json",
+      "sha256": "296e85fbc7c3ce524305739d8caa9039fbdba88f3b68c33c2dddef79087fcdb5",
+      "bytes": 10600,
+      "modifiedUtc": "2026-09-13T00:56:11.646Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\CMakeLists.txt",
+      "sha256": "7ee803a9835888bd2847ca7451d66c008276e66bb9846dea3c55d6e3124cf4ef",
+      "bytes": 6682,
+      "modifiedUtc": "2026-09-13T00:53:30.432Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\ffgl-source\\src\\ContextDiagnostic.h",
+      "sha256": "05f9e7543e84603f80832ede5b0bc73bb85af731b2e5aa8908df59d7dd40db98",
+      "bytes": 534,
+      "modifiedUtc": "2026-09-12T23:41:12.971Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\ffgl-source\\src\\ContextHandoff.h",
+      "sha256": "c8d5c0f92a7f033696efbedbfb4211a374849914253f36833c251d08a95c96f7",
+      "bytes": 726,
+      "modifiedUtc": "2026-09-12T23:41:12.972Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\ffgl-source\\src\\FrameReceiver.cpp",
+      "sha256": "5c8fbca235b5ad2c68ba2fc5e9f1149377721858196b6cf09482ce5a09188308",
+      "bytes": 27584,
+      "modifiedUtc": "2026-09-13T00:58:18.751Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\ffgl-source\\src\\FrameReceiver.h",
+      "sha256": "b9ce3d0ce61808718f1125a69f42d9a3ad8809bd99012c6ddc2f561a00a15ee3",
+      "bytes": 2488,
+      "modifiedUtc": "2026-09-13T00:53:30.435Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\ffgl-source\\src\\InstalledActivation.h",
+      "sha256": "078b3eb5928bd0050d4047cc9ffed4f2c0aed480810ce4ec9a9c1b97f12d1f76",
+      "bytes": 6975,
+      "modifiedUtc": "2026-09-13T00:53:30.437Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\ffgl-source\\src\\InstalledSource.h",
+      "sha256": "7c374b08e9a35574e78f009d5a04ee72cc00ab12c3a8297a8bf5641f3d36be25",
+      "bytes": 3536,
+      "modifiedUtc": "2026-09-13T00:43:04.213Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\ffgl-source\\src\\LuxSource.cpp",
+      "sha256": "14e774b4dc5695434eb180abd8f14102fcf9acdd48c99d4ea32fbee6daba2a48",
+      "bytes": 3652,
+      "modifiedUtc": "2026-09-13T00:43:04.214Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\ffgl-source\\src\\ReceiverLifecycle.h",
+      "sha256": "1de2d5b3a987ccd6e63e24d9c790c8c31cc370d126601e9c6220615cd3ed114c",
+      "bytes": 2436,
+      "modifiedUtc": "2026-09-12T23:41:12.978Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\ffgl-source\\src\\ReceiverPoll.h",
+      "sha256": "b800dec1868a2763b3a420938596f807f1bd92ff0061c44bb2356bd60ffbb5e7",
+      "bytes": 362,
+      "modifiedUtc": "2026-09-12T23:41:12.979Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\texture-bridge\\include\\frame_telemetry.h",
+      "sha256": "a26c57ba32c84ee2c9f36e98ec06cc7127fd77cfc5e71e45309f32ef53d8be5d",
+      "bytes": 2517,
+      "modifiedUtc": "2026-09-13T00:58:18.752Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\texture-bridge\\include\\host_control_snapshot_v4.h",
+      "sha256": "33fe84f38a98d45c2738cae5a5a206e1ee9f51742159eb55bcf0f63e6f777ac1",
+      "bytes": 8839,
+      "modifiedUtc": "2026-09-13T00:43:04.217Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\texture-bridge\\include\\installed_process.h",
+      "sha256": "85b0b2b8a6ce0c0bff73abcd09509ce75c6d6b21a1ff2f7f9b7cc251a70b62c8",
+      "bytes": 6659,
+      "modifiedUtc": "2026-09-13T00:53:30.439Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\texture-bridge\\include\\lux_texture_bridge.h",
+      "sha256": "336aa5d781842548c39c2f91fbcb713f7f9697eb2d33c8fb09f8927a5f4a10aa",
+      "bytes": 1001,
+      "modifiedUtc": "2026-09-12T23:41:12.983Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\texture-bridge\\include\\shared_ring.h",
+      "sha256": "a076e1a8f8840c8385087e9d7a1523618a36b2ca86df7e5b4e535704f608179b",
+      "bytes": 4061,
+      "modifiedUtc": "2026-09-13T00:53:30.44Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\texture-bridge\\src\\delay_load.cc",
+      "sha256": "9f0f79f5287491bba64ff38a28729f0ebf52b3c9b9872a8de454195f724c6324",
+      "bytes": 376,
+      "modifiedUtc": "2026-09-12T23:41:12.985Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\texture-bridge\\src\\electron_texture.cc",
+      "sha256": "02a63721f029c2992aa8684319100871b5a6a0aaec445e7b628cc4b1b4c073cf",
+      "bytes": 17332,
+      "modifiedUtc": "2026-09-13T00:53:30.441Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\FFGLSDK.cpp",
+      "sha256": "4996c8d9dff3dd9ce27a55a6f6a022d67c306dcc04130223c705d557b12afb02",
+      "bytes": 1451,
+      "modifiedUtc": "2026-09-12T04:09:25.877Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\FFGLSDK.h",
+      "sha256": "dd6cdc579d263ac7051be75d970a979a6622b016b715aab93051d62fc2c09b86",
+      "bytes": 1159,
+      "modifiedUtc": "2026-09-12T04:09:25.879Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffgl\\FFGL.cpp",
+      "sha256": "df10dfee624a2f2fefe0898e34fb88c0b4f17559caee96afe31d1643eb35cf78",
+      "bytes": 32378,
+      "modifiedUtc": "2026-09-12T04:09:25.881Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffgl\\FFGL.h",
+      "sha256": "a51814ca5f78067d7faf9ad3d48a22cb35d935b09033e1685927f4599ac85102",
+      "bytes": 22874,
+      "modifiedUtc": "2026-09-12T04:09:25.883Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffgl\\FFGLLib.h",
+      "sha256": "fb79675f993617cb6d5f03ffb820f2221cb08542797551c25f8f8a623857e5cc",
+      "bytes": 3317,
+      "modifiedUtc": "2026-09-12T04:09:25.885Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffgl\\FFGLLog.cpp",
+      "sha256": "338dd4cefa70b635580ec51287820a3155bdb13259d8450bb35091e56449b3e0",
+      "bytes": 293,
+      "modifiedUtc": "2026-09-12T04:09:25.886Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffgl\\FFGLLog.h",
+      "sha256": "6137137ee1699a83e3d8eccc5380e26ed8dfcdfdf32c06245947bf87584a05d6",
+      "bytes": 153,
+      "modifiedUtc": "2026-09-12T04:09:25.889Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffgl\\FFGLPlatform.h",
+      "sha256": "ac9665129e793bbbe2bc1f6f3b7bdc92457aa38c9d3f9fb0fd4a6df0a446c27f",
+      "bytes": 453,
+      "modifiedUtc": "2026-09-12T04:09:25.891Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffgl\\FFGLPluginInfo.cpp",
+      "sha256": "7d5628e2e8ed732da41223cd9fc3ea6f6f2d046d3d49aeb6be89ffa5127fd9e3",
+      "bytes": 3606,
+      "modifiedUtc": "2026-09-12T04:09:25.892Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffgl\\FFGLPluginInfo.h",
+      "sha256": "290c41ff120ad7fc828c4af8650022c3a9ffd800be5c1fa6147a13f378d15b9f",
+      "bytes": 8220,
+      "modifiedUtc": "2026-09-12T04:09:25.894Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffgl\\FFGLPluginInfoData.cpp",
+      "sha256": "da3346f2598a9a1a3f03825d16bab19fc9046922663f3bb5d309632635488960",
+      "bytes": 333,
+      "modifiedUtc": "2026-09-12T04:09:25.895Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffgl\\FFGLPluginManager.cpp",
+      "sha256": "d67e9ab1559933d7004048ce2156ceafed009c0b6bce61015d444e727f1e6ee0",
+      "bytes": 13774,
+      "modifiedUtc": "2026-09-12T04:09:25.897Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffgl\\FFGLPluginManager.h",
+      "sha256": "1d9185dcb927500e295b7c4f636eb6698ce7d2478d53974db8d61f0f1eae5cf0",
+      "bytes": 25938,
+      "modifiedUtc": "2026-09-12T04:09:25.899Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffgl\\FFGLPluginSDK.cpp",
+      "sha256": "6b38d08e0eb6b91bdaefbf1a4d5881c932ccc7567fcbaf588b6ad23bb19905c1",
+      "bytes": 2597,
+      "modifiedUtc": "2026-09-12T04:09:25.901Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffgl\\FFGLPluginSDK.h",
+      "sha256": "04686855af6005057eb560c04a949c07345cea5a84adae1cac64784e72af5cfe",
+      "bytes": 8497,
+      "modifiedUtc": "2026-09-12T04:09:25.902Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffgl\\FFGLThumbnailInfo.cpp",
+      "sha256": "18f4d4f40efbbe9dba436695a1241d51a5f5bd05ebba51b1def50a048f62273f",
+      "bytes": 1395,
+      "modifiedUtc": "2026-09-12T04:09:25.904Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffgl\\FFGLThumbnailInfo.h",
+      "sha256": "7e7e001e3d75aea9b47e1b48f8b022c8df2c9bb58237df58acc14bf8c7a66127",
+      "bytes": 7032,
+      "modifiedUtc": "2026-09-12T04:09:25.907Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLFBO.cpp",
+      "sha256": "241e286c9798e822247cc7244084467784d07aa2daee60be2d75c69ca4d25d7b",
+      "bytes": 3713,
+      "modifiedUtc": "2026-09-12T04:09:25.909Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLFBO.h",
+      "sha256": "d28ec34e8bcfbbcf12f6b5076396d89dd83ccf137f3411059ac8b2e73748a378",
+      "bytes": 5928,
+      "modifiedUtc": "2026-09-12T04:09:25.911Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLScopedBufferBinding.cpp",
+      "sha256": "49d7d656bd9a5708df30dad702b6c364bf1a460ae850294b7c34c32fe3d8102b",
+      "bytes": 1267,
+      "modifiedUtc": "2026-09-12T04:09:25.914Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLScopedBufferBinding.h",
+      "sha256": "09497170ba068481474ef0f863181f433bff8efc6bae6323c216ffccc80c8853",
+      "bytes": 1979,
+      "modifiedUtc": "2026-09-12T04:09:25.916Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLScopedFBOBinding.cpp",
+      "sha256": "ea4154e333b5562eb1b24f31be6f1b8228ba0fa26772a3145f2a65878ae04e2f",
+      "bytes": 950,
+      "modifiedUtc": "2026-09-12T04:09:25.918Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLScopedFBOBinding.h",
+      "sha256": "5d166a90d86bef94dd30b9eae478c700efc5920a026ace655d605efbc24a6099",
+      "bytes": 645,
+      "modifiedUtc": "2026-09-12T04:09:25.92Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLScopedRenderBufferBinding.cpp",
+      "sha256": "8866a23f0968cc7b9d635553326bebbd7bade862b54cae6867dbbf91486bff88",
+      "bytes": 449,
+      "modifiedUtc": "2026-09-12T04:09:25.922Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLScopedRenderBufferBinding.h",
+      "sha256": "016687ce5263868fd7cc089064c07a516f99389ba8831c855af627295fb36170",
+      "bytes": 268,
+      "modifiedUtc": "2026-09-12T04:09:25.923Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLScopedSamplerActivation.cpp",
+      "sha256": "18e0625a8c7f17fbc2d72593ad7b49a3508a3d4c3c3d20ea671ff91f8db36996",
+      "bytes": 421,
+      "modifiedUtc": "2026-09-12T04:09:25.924Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLScopedSamplerActivation.h",
+      "sha256": "f6ce4950cceb1409d88b0c5801c41b37958e2b01b9bbe97c7db7cefcb14c3dc5",
+      "bytes": 260,
+      "modifiedUtc": "2026-09-12T04:09:25.925Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLScopedShaderBinding.cpp",
+      "sha256": "98e3b765110a832d98771ec46a543acd2f552f91f527cbad1d95219c032a53e9",
+      "bytes": 355,
+      "modifiedUtc": "2026-09-12T04:09:25.927Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLScopedShaderBinding.h",
+      "sha256": "7c9cdce73b4bf0448c6a7dfb1c421e6eabec1a77eb0d3bf0c142c8a047bbe888",
+      "bytes": 244,
+      "modifiedUtc": "2026-09-12T04:09:25.929Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLScopedTextureBinding.cpp",
+      "sha256": "352441e4d41df644bafa64e2598dcae2ce7b4b3bf5789ad2d3cf0b801dbaaa1c",
+      "bytes": 415,
+      "modifiedUtc": "2026-09-12T04:09:25.931Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLScopedTextureBinding.h",
+      "sha256": "ab36cccc3ec93d27007d017e2c95a4664503d539132d12cd70abc5c7090d1282",
+      "bytes": 463,
+      "modifiedUtc": "2026-09-12T04:09:25.933Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLScopedVAOBinding.cpp",
+      "sha256": "4b7c627a387bdf98a331dc3cda300e99e1c65610d6dc565587430fe62f2cfaca",
+      "bytes": 341,
+      "modifiedUtc": "2026-09-12T04:09:25.935Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLScopedVAOBinding.h",
+      "sha256": "46a0c439127cf836cb88e7e2c8b2e4cde6ca75404d802257c15c8d3d0a2d2923",
+      "bytes": 232,
+      "modifiedUtc": "2026-09-12T04:09:25.936Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLScreenQuad.cpp",
+      "sha256": "4dfdddc6b82cfd49a54ca4363b027cc0c3f8bc067cf3537f8edbf91e5939fab7",
+      "bytes": 2590,
+      "modifiedUtc": "2026-09-12T04:09:25.938Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLScreenQuad.h",
+      "sha256": "2def4b7b731a7fc564167663ac1a2e2c391ffb714d6a69d312630f9dba7c9441",
+      "bytes": 1065,
+      "modifiedUtc": "2026-09-12T04:09:25.939Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLShader.cpp",
+      "sha256": "c8ce13ef52d83ad8c5fffa7c3a5140b6cebec187107fd063ca91dad455286e05",
+      "bytes": 12227,
+      "modifiedUtc": "2026-09-12T04:09:25.941Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLShader.h",
+      "sha256": "b8f9d32908a855d05563749c408098a7325b4bd7320876a2ab32536d6ddc086c",
+      "bytes": 3686,
+      "modifiedUtc": "2026-09-12T04:09:25.943Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLUtilities.cpp",
+      "sha256": "3074fa0b9742f419d37f9a64c2c9a9681dad1724e8512365a583ae7145423561",
+      "bytes": 3070,
+      "modifiedUtc": "2026-09-12T04:09:25.945Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglex\\FFGLUtilities.h",
+      "sha256": "56bea4c130e2555503b1df517a0194fb841a325e6dfd036a78417f12d0eaef63",
+      "bytes": 4977,
+      "modifiedUtc": "2026-09-12T04:09:25.947Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLAudio.cpp",
+      "sha256": "8188cefb2394d95b7e566ecab38a4254358a3b881a39bbdac1230bbb230a13d6",
+      "bytes": 2111,
+      "modifiedUtc": "2026-09-12T04:09:25.95Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLAudio.h",
+      "sha256": "f2b17314509c7db33d928fc8030658741a1c854fee8f5d8433702bb23ab9e019",
+      "bytes": 2243,
+      "modifiedUtc": "2026-09-12T04:09:25.952Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLEffect.cpp",
+      "sha256": "ee1c038d9208f606c85423c45968f7168003cda770b2aca78796984c06f4b510",
+      "bytes": 1508,
+      "modifiedUtc": "2026-09-12T04:09:25.953Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLEffect.h",
+      "sha256": "569afb6de8e673721f7e8abb75ce4d86a8eda7479f8d47b2c7abd9ceb1f91cfe",
+      "bytes": 512,
+      "modifiedUtc": "2026-09-12T04:09:25.954Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLMixer.cpp",
+      "sha256": "29d325ddc92f5a76258672916012fe9c92ec387a94719ef63fe2c6c958d7174c",
+      "bytes": 2078,
+      "modifiedUtc": "2026-09-12T04:09:25.957Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLMixer.h",
+      "sha256": "4e2d808d37561ae2940d4f133f1beaae6cebf9fb56a1535787a22194bfeb553c",
+      "bytes": 507,
+      "modifiedUtc": "2026-09-12T04:09:25.958Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLParam.cpp",
+      "sha256": "2c92c008e952829fe803769c38752eb90e092e78808660366343952ce39a41bc",
+      "bytes": 1041,
+      "modifiedUtc": "2026-09-12T04:09:25.96Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLParam.h",
+      "sha256": "ef6d628c1b046f53f2e9b1d25d7570c683d5a650511228018608d8d9f41981dc",
+      "bytes": 746,
+      "modifiedUtc": "2026-09-12T04:09:25.962Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLParamBool.cpp",
+      "sha256": "16a0f68a9a51e72300836d7e9659a756342579dc3e2ebd8797c11c745a56596a",
+      "bytes": 562,
+      "modifiedUtc": "2026-09-12T04:09:25.964Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLParamBool.h",
+      "sha256": "2a7866a0473baf937ebbba33b4eb93229bd8b6ddb6d1c4c223e18afba2d2a194",
+      "bytes": 357,
+      "modifiedUtc": "2026-09-12T04:09:25.966Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLParamEvent.cpp",
+      "sha256": "e0b9cb4ad9ddcb88993cfe69dec0f840fbc9d1bec69b56e60560d04efa7904b8",
+      "bytes": 302,
+      "modifiedUtc": "2026-09-12T04:09:25.968Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLParamEvent.h",
+      "sha256": "927cb0da23d79d86855a979d2d39a8b27cf244ba04cf5f13809ccb18229eebe8",
+      "bytes": 225,
+      "modifiedUtc": "2026-09-12T04:09:25.97Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLParamFFT.cpp",
+      "sha256": "d1e784ccf9ad86ff6a2a8a1b486093788f6fabbe7475376afde7f28137630de2",
+      "bytes": 546,
+      "modifiedUtc": "2026-09-12T04:09:25.972Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLParamFFT.h",
+      "sha256": "493bd462e6ee03c1c9730cb2d106d40efd599edef167e8bebe3ee899419e389c",
+      "bytes": 381,
+      "modifiedUtc": "2026-09-12T04:09:25.973Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLParamOption.cpp",
+      "sha256": "a65532196000034a18f6ec7cebeca36a9cdfe7f5a192a63becc7df48594aed4d",
+      "bytes": 1214,
+      "modifiedUtc": "2026-09-12T04:09:25.975Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLParamOption.h",
+      "sha256": "c2bec446020110accb29e4c1b824783982e9dd8bb4c26b41aa38a0227576cd4b",
+      "bytes": 769,
+      "modifiedUtc": "2026-09-12T04:09:25.977Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLParamRange.cpp",
+      "sha256": "2314e8d48d2c6dc1777d5100de7b1bf0b2004ceff9b45287bfee947cf2e87bcf",
+      "bytes": 909,
+      "modifiedUtc": "2026-09-12T04:09:25.979Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLParamRange.h",
+      "sha256": "4155a35d173676145e41a7d7cbea89fab5686a23238aee547f28ec52a1b574fd",
+      "bytes": 557,
+      "modifiedUtc": "2026-09-12T04:09:25.98Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLParamText.cpp",
+      "sha256": "795beb358d71062e1c358e2e423b5b726f9ca097d385b619459ef79b02313cef",
+      "bytes": 547,
+      "modifiedUtc": "2026-09-12T04:09:25.983Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLParamText.h",
+      "sha256": "42923e57da1ebb79002afd2d0f31e65c16226c0e341791f7558d473a21f21e5d",
+      "bytes": 375,
+      "modifiedUtc": "2026-09-12T04:09:25.985Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLParamTrigger.cpp",
+      "sha256": "774910448fc97a4249eb80d342c7f1be70d9936e201c6a334c158de9ca683f2b",
+      "bytes": 351,
+      "modifiedUtc": "2026-09-12T04:09:25.986Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLParamTrigger.h",
+      "sha256": "571ac01e8eeed191e3a9238e7fa3d278b7bc7dbcf1179749ea69b031b05a8cb4",
+      "bytes": 259,
+      "modifiedUtc": "2026-09-12T04:09:25.988Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLPlugin.cpp",
+      "sha256": "588ba76f7cd3ebcb379a3b72f40d22ae08122efbf8749a13c903a0e77e42ed3c",
+      "bytes": 10704,
+      "modifiedUtc": "2026-09-12T04:09:25.99Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLPlugin.h",
+      "sha256": "8e77cd9140121228efb5950a4140fb325e3cdaa0443f01f52e02d6338c3347f3",
+      "bytes": 11698,
+      "modifiedUtc": "2026-09-12T04:09:25.992Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLRandom.cpp",
+      "sha256": "76e7fd58a010259b2435e4950fb7a04177ad8538e5beea4e15513af3b97c1183",
+      "bytes": 415,
+      "modifiedUtc": "2026-09-12T04:09:25.993Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLRandom.h",
+      "sha256": "d80b01c3f5a5a127f55bbe188c95efe0410ffc2547aff92c00e5304985d58907",
+      "bytes": 256,
+      "modifiedUtc": "2026-09-12T04:09:25.994Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLSmoothValue.cpp",
+      "sha256": "872612ddaf1f06643d8c3ec5a4ab3d17b631d5713cfe91826974efa9480e25f2",
+      "bytes": 296,
+      "modifiedUtc": "2026-09-12T04:09:25.995Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLSmoothValue.h",
+      "sha256": "de6a9b2e938205da684d764ca7186f044a9d0f4c50cd423aa1327bb0883f98af",
+      "bytes": 261,
+      "modifiedUtc": "2026-09-12T04:09:25.997Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLSource.cpp",
+      "sha256": "202588bad3c31bfe23918bdc8fb15d5d7d13f6a14c7a532c43ae043e24504a8b",
+      "bytes": 505,
+      "modifiedUtc": "2026-09-12T04:09:25.999Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLSource.h",
+      "sha256": "2e71ab5d48eb8827c5b487dd7ec514a251b0752e3110c379e84a00f391687d18",
+      "bytes": 448,
+      "modifiedUtc": "2026-09-12T04:09:26.001Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\ffglquickstart\\FFGLUtils.h",
+      "sha256": "1c434a71561bdd701b2e06160d4f69ec63dccfc55b2c496064148a62d7d65e05",
+      "bytes": 2811,
+      "modifiedUtc": "2026-09-12T04:09:26.003Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_0.h",
+      "sha256": "f8f475cef6e8a4200163ea5e92be21ff3b0a750899a4ba62312309deeb8d4ff6",
+      "bytes": 9013,
+      "modifiedUtc": "2026-09-12T04:09:26.011Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_0.hpp",
+      "sha256": "b4db59d7143942b78683d3fbb341e4b2fab5684ef000b23b684774369fd4de6a",
+      "bytes": 6762,
+      "modifiedUtc": "2026-09-12T04:09:26.013Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_0_rem.h",
+      "sha256": "781d4912062ff3ccd3ac1d8a567468a383c5a115553257d2c5897d2061dc65f2",
+      "bytes": 45173,
+      "modifiedUtc": "2026-09-12T04:09:26.015Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_0_rem.hpp",
+      "sha256": "22f1a4fa0016ff5783d6e1599701601b991b4fc38dd3c83fbbd9588ab31e921a",
+      "bytes": 33730,
+      "modifiedUtc": "2026-09-12T04:09:26.017Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_1.h",
+      "sha256": "01aaf11ba1051f347d07b89e8f1887ca98ab244af1baf779d1ca129d62199ef0",
+      "bytes": 8784,
+      "modifiedUtc": "2026-09-12T04:09:26.019Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_1.hpp",
+      "sha256": "6da2a111e3c37ee549dc74dc37510acb4baba43684343bf3d03cccdf55df186a",
+      "bytes": 10705,
+      "modifiedUtc": "2026-09-12T04:09:26.022Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_1_rem.h",
+      "sha256": "69006e513d481630ed8ea8ccbda61dda7c99885e8c76ec82fba1ff88e96fd15e",
+      "bytes": 13989,
+      "modifiedUtc": "2026-09-12T04:09:26.024Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_1_rem.hpp",
+      "sha256": "f76d0264983df29333566fbb9b0ae4bf58a7567def579b2947f40b3279605937",
+      "bytes": 17210,
+      "modifiedUtc": "2026-09-12T04:09:26.026Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_2.h",
+      "sha256": "3cc5a08b17a2d4b2bfb9c4cb3279bb7aa9a965eb8b09d4aa2c9a61cd66594257",
+      "bytes": 3068,
+      "modifiedUtc": "2026-09-12T04:09:26.027Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_2.hpp",
+      "sha256": "6176779192aa03d241cb0a4fdd17842be0e0c70190c9831d24227f76abba2ff4",
+      "bytes": 2956,
+      "modifiedUtc": "2026-09-12T04:09:26.029Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_2_rem.h",
+      "sha256": "f3279c9c175df79fb8d9a9a1411e3ae42a921457643bf3d79f34f1708e6c6464",
+      "bytes": 398,
+      "modifiedUtc": "2026-09-12T04:09:26.031Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_2_rem.hpp",
+      "sha256": "27958bbfd58fabcd1505f5bb3bd90d599f40aef0fa9e8a49d1eeae796d494bc5",
+      "bytes": 425,
+      "modifiedUtc": "2026-09-12T04:09:26.033Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_3.h",
+      "sha256": "eb6b97abddc2526757fa9926bd93dd39005b2cec89ef1a3657b8fc0d970fe65a",
+      "bytes": 4751,
+      "modifiedUtc": "2026-09-12T04:09:26.034Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_3.hpp",
+      "sha256": "fc4bda5912bc43cd7b0a00b8ff7f04415f1be73d1ffcaeaadff13d417d3a8ca7",
+      "bytes": 4810,
+      "modifiedUtc": "2026-09-12T04:09:26.035Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_3_rem.h",
+      "sha256": "3e78ebc9077b3c9fdf475dad914cdcb7d7bad991fcbab31b3a8a96c2a04c117f",
+      "bytes": 9271,
+      "modifiedUtc": "2026-09-12T04:09:26.037Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_3_rem.hpp",
+      "sha256": "e9b8857f3b0975890c4f5f85bc91ebd17606528f9028e7536119543bd2e4bd99",
+      "bytes": 7540,
+      "modifiedUtc": "2026-09-12T04:09:26.04Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_4.h",
+      "sha256": "0f523c77dc341b7baace62278ca064f2e132b1ed0da1e0ef355701babe640325",
+      "bytes": 2377,
+      "modifiedUtc": "2026-09-12T04:09:26.042Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_4.hpp",
+      "sha256": "20a58857960dcd962150cbf73d77d408c4b957b6f4b426a4d0b7a23afb58058f",
+      "bytes": 2125,
+      "modifiedUtc": "2026-09-12T04:09:26.044Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_4_rem.h",
+      "sha256": "6d3fdfb9f5d1d2de76e57cf9bcf87e1c4a164450e707da189960c7e011cb4c18",
+      "bytes": 8491,
+      "modifiedUtc": "2026-09-12T04:09:26.045Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_4_rem.hpp",
+      "sha256": "59fd0ed69ea3593fc0aa202cbd183083b7fa2e143c2ea3a97b6ec5af16fd336a",
+      "bytes": 6558,
+      "modifiedUtc": "2026-09-12T04:09:26.048Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_5.h",
+      "sha256": "1fcfc3c64288d4ddcc83eafff58a9f6905f5c02e2b209ec83b8aa44d23592fe3",
+      "bytes": 4725,
+      "modifiedUtc": "2026-09-12T04:09:26.05Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_5.hpp",
+      "sha256": "53aa2af8a87097730a30ccf9e1b6004b26a0836f840a63d97985b0d661b2f128",
+      "bytes": 4051,
+      "modifiedUtc": "2026-09-12T04:09:26.053Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_5_rem.h",
+      "sha256": "263596f2f71c29771732288a1a59d0f0dcf8c02d187b6002841ce1ba8de33535",
+      "bytes": 1084,
+      "modifiedUtc": "2026-09-12T04:09:26.054Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_1_5_rem.hpp",
+      "sha256": "b736eed5b68b3b6c9144170aafb3a540f33a8057f0a27ba2409c90c80e8b405c",
+      "bytes": 1199,
+      "modifiedUtc": "2026-09-12T04:09:26.055Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_2_0.h",
+      "sha256": "7972ba91f0027955d517d52b2e853361f15e112f797419a83b94f68d0048c6f8",
+      "bytes": 22579,
+      "modifiedUtc": "2026-09-12T04:09:26.056Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_2_0.hpp",
+      "sha256": "7be7ece1c9d12c523a9ebd944438a751b139309c4605405442a4b143051845aa",
+      "bytes": 18281,
+      "modifiedUtc": "2026-09-12T04:09:26.058Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_2_0_rem.h",
+      "sha256": "bed2fa621ab7a1d911eeb0ac8bcc4f6199a636016f143aedc77928ca7ff07c55",
+      "bytes": 347,
+      "modifiedUtc": "2026-09-12T04:09:26.06Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_2_0_rem.hpp",
+      "sha256": "f8abe8d09d3e2aa9565a0655396bf2fedd4e178fa532e5885a66f545a5712ec7",
+      "bytes": 380,
+      "modifiedUtc": "2026-09-12T04:09:26.061Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_2_1.h",
+      "sha256": "434ac1aa3f77970f143cd4e60aecb422430bd371fc14991bfd842d7a779720c7",
+      "bytes": 2299,
+      "modifiedUtc": "2026-09-12T04:09:26.063Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_2_1.hpp",
+      "sha256": "31f58704c07dcfdbb4947fbe576275b6b1df510147098e146888b04aa966e490",
+      "bytes": 2111,
+      "modifiedUtc": "2026-09-12T04:09:26.065Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_2_1_rem.h",
+      "sha256": "d9f53b4e275fc72fbafc91145e1d342d89cfd503a911f566f9c9f7a39da34906",
+      "bytes": 471,
+      "modifiedUtc": "2026-09-12T04:09:26.067Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_2_1_rem.hpp",
+      "sha256": "9f52868dd73d1abbb2eee8241b5e3a3129a92f1a17ebebf40f577ba5b90ea153",
+      "bytes": 515,
+      "modifiedUtc": "2026-09-12T04:09:26.068Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_3_0.h",
+      "sha256": "6f827e61ac23796fd83aa965da40f6d0d8420386f2cb49212fd4377a6b9a01f9",
+      "bytes": 22413,
+      "modifiedUtc": "2026-09-12T04:09:26.07Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_3_0.hpp",
+      "sha256": "3e3e5a1f99570ce933a19205b026cc35147a1d99cafd178eb65b4fb5452c31be",
+      "bytes": 18239,
+      "modifiedUtc": "2026-09-12T04:09:26.072Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_3_0_rem.h",
+      "sha256": "75a34edb5e075667742374499c6d1f4334477321144de49c5b9a08932309aa6c",
+      "bytes": 313,
+      "modifiedUtc": "2026-09-12T04:09:26.074Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_3_0_rem.hpp",
+      "sha256": "ee14970578c20d9ee771c410a55128b7c2eba9d09a10b89043400accecefcd3c",
+      "bytes": 335,
+      "modifiedUtc": "2026-09-12T04:09:26.076Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_3_1.h",
+      "sha256": "dbf23a7573d989bd391c621bfe8ce3cced0e2bc5f842c0e1f48fe7464feddbf8",
+      "bytes": 4036,
+      "modifiedUtc": "2026-09-12T04:09:26.079Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_3_1.hpp",
+      "sha256": "88ed9aec7a16fbf732fb64afcfb21217c45697783a152953d0b16048555efdf4",
+      "bytes": 3315,
+      "modifiedUtc": "2026-09-12T04:09:26.081Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_3_2.h",
+      "sha256": "1289b575dbd974cc2ee083792d3683b40ba278206a541992766ac9c2236d29a4",
+      "bytes": 5789,
+      "modifiedUtc": "2026-09-12T04:09:26.082Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_3_2.hpp",
+      "sha256": "f1ddeb0d6506f7f99fcbda606a54f9bfee2f96607a80c5fa6f1bb3dd5765cda5",
+      "bytes": 4684,
+      "modifiedUtc": "2026-09-12T04:09:26.083Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_3_3.h",
+      "sha256": "11d0a0d1055a92be73c0756e57c60e49cac9a6754edafcfadd855c61f3b61126",
+      "bytes": 6772,
+      "modifiedUtc": "2026-09-12T04:09:26.084Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_3_3.hpp",
+      "sha256": "a71c976c79294a9e56594d882eed476f00a596747ac2c7f70fa3060c32e372ce",
+      "bytes": 5070,
+      "modifiedUtc": "2026-09-12T04:09:26.086Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_4_0.h",
+      "sha256": "c0367e485a73b22c419586594b01c797a28fcefa90bb8b303719564ea0052e91",
+      "bytes": 11513,
+      "modifiedUtc": "2026-09-12T04:09:26.087Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_4_0.hpp",
+      "sha256": "0c5ef8542397780621d54561571a2d20d5621b62285ccc47f5b2834b9bc82c29",
+      "bytes": 8687,
+      "modifiedUtc": "2026-09-12T04:09:26.09Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_4_3.h",
+      "sha256": "da686308effe42273867737c4066fd2c48d05be367f04f3d7023dbcf50d088e3",
+      "bytes": 11757,
+      "modifiedUtc": "2026-09-12T04:09:26.092Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_4_3.hpp",
+      "sha256": "c031351d919d14e4d208df9dc13f35e5f313877c097a1d4786a73df7c69e3c5a",
+      "bytes": 9027,
+      "modifiedUtc": "2026-09-12T04:09:26.094Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_4_4.h",
+      "sha256": "695667f535ce8d25dadb5077e6f44aca4ddaf3211cdf703320eafc9265fb2f0f",
+      "bytes": 2533,
+      "modifiedUtc": "2026-09-12T04:09:26.096Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_4_4.hpp",
+      "sha256": "c8d3a0728ffa0ab0fc9573435ce137654a93e7aec41e6b3a848f03aa2eeffd0d",
+      "bytes": 2034,
+      "modifiedUtc": "2026-09-12T04:09:26.097Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_exts.h",
+      "sha256": "1cac822c6213a3283468772bcc535677fb749043d19783c96be439b5904074b0",
+      "bytes": 667528,
+      "modifiedUtc": "2026-09-12T04:09:26.104Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_exts.hpp",
+      "sha256": "edf2f642a7f0c39fa9a64322e62f46245c92c33d375809b702452afbd2ca3ab7",
+      "bytes": 569232,
+      "modifiedUtc": "2026-09-12T04:09:26.109Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_type.h",
+      "sha256": "3daf55d09603b6ae533bd1c3e12d3207ffb5aaac597ea39d72aa4c9e548e949e",
+      "bytes": 4308,
+      "modifiedUtc": "2026-09-12T04:09:26.111Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_gl_type.hpp",
+      "sha256": "ffef3ef711b8372eadb2e82cf22fbb40861daffc33d37b0d98d24f1d367905e1",
+      "bytes": 4314,
+      "modifiedUtc": "2026-09-12T04:09:26.114Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_glx_exts.h",
+      "sha256": "53c4d6a68182377c1380b53a34239c579cda0f4cb144ed51dc6a4eb7fccc6e61",
+      "bytes": 26239,
+      "modifiedUtc": "2026-09-12T04:09:26.116Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_glx_exts.hpp",
+      "sha256": "43f48c01699fc12a3c1080145a948130777b97d160d17a9fc7dd91d5501d58e1",
+      "bytes": 24123,
+      "modifiedUtc": "2026-09-12T04:09:26.118Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_glx_type.h",
+      "sha256": "4e629aab951d501d2c8be1c9c09228e8dfc2327eef0ab3162dbc3120c6bb9a8d",
+      "bytes": 3356,
+      "modifiedUtc": "2026-09-12T04:09:26.119Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_glx_type.hpp",
+      "sha256": "13b5dfafa819b56161e4ff58a962ac64834fa73156e44dc292ec52c6afb82926",
+      "bytes": 3362,
+      "modifiedUtc": "2026-09-12T04:09:26.121Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_load_test.hpp",
+      "sha256": "bb0943895a3f602a194025bcebe4e5ef3898ab8f0d51cdf558fffbf3799e1eb4",
+      "bytes": 1437,
+      "modifiedUtc": "2026-09-12T04:09:26.122Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_wgl_exts.h",
+      "sha256": "44e23293c9e464061b217445bc446ea4da9f114213ad9bf17beeedb0b878f2f2",
+      "bytes": 41579,
+      "modifiedUtc": "2026-09-12T04:09:26.124Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_wgl_exts.hpp",
+      "sha256": "8a365f700659fd16acac91e91b09ec7c7a365f187451de9243a1678dd2a27f0c",
+      "bytes": 36051,
+      "modifiedUtc": "2026-09-12T04:09:26.126Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_wgl_type.h",
+      "sha256": "1248c6cf806e88e6424e5ed7e516b27496785b0cb778eed3b8bf812c1a418390",
+      "bytes": 1468,
+      "modifiedUtc": "2026-09-12T04:09:26.129Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\_int_wgl_type.hpp",
+      "sha256": "aa52e809769c7de7cfed9f056f25a29cbab93800d8009ed380b2e828880d1a8e",
+      "bytes": 1474,
+      "modifiedUtc": "2026-09-12T04:09:26.13Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_1_0.h",
+      "sha256": "e3c6a69e2bead4f494cd49ce1f8941636162d7836e9b45fee7df7e53d333648e",
+      "bytes": 157,
+      "modifiedUtc": "2026-09-12T04:09:26.132Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_1_0.hpp",
+      "sha256": "89639ffbd0e11a39f81854ee5d8f2a811e1705d23065bf204b10cf20d48685d8",
+      "bytes": 169,
+      "modifiedUtc": "2026-09-12T04:09:26.133Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_1_1.h",
+      "sha256": "7383fcf162d0bbbbd066afebc7f27bfb02b33c0835f00439769113ae2b7e6cdb",
+      "bytes": 182,
+      "modifiedUtc": "2026-09-12T04:09:26.135Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_1_1.hpp",
+      "sha256": "b2fc338868114486e576c0d172e7b3681f38231617a96ddd9116b8aae42fd151",
+      "bytes": 196,
+      "modifiedUtc": "2026-09-12T04:09:26.136Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_1_2.h",
+      "sha256": "7c01293fff20333a26dedcd83171bd16f8ccdfe1466406986fc1249372f3d95e",
+      "bytes": 207,
+      "modifiedUtc": "2026-09-12T04:09:26.139Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_1_2.hpp",
+      "sha256": "fc922654ee5dd5ae293f04430d678dcb9da26366ce156372e1c402388a22f4e9",
+      "bytes": 223,
+      "modifiedUtc": "2026-09-12T04:09:26.14Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_1_3.h",
+      "sha256": "25cdf731cf81ae03a9d5cf9929d58db03749e712146ae8d5ac93a4c4b34c07e3",
+      "bytes": 232,
+      "modifiedUtc": "2026-09-12T04:09:26.142Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_1_3.hpp",
+      "sha256": "f0def70ff08f9a520f08fb7740cc3f4a6d64e961b2d7f0e8d9ff266800655c27",
+      "bytes": 250,
+      "modifiedUtc": "2026-09-12T04:09:26.144Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_1_4.h",
+      "sha256": "199860c5417b6ae277aa7a6f44fc12c57606fbe7b2170f7af3379d37effebdf0",
+      "bytes": 257,
+      "modifiedUtc": "2026-09-12T04:09:26.146Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_1_4.hpp",
+      "sha256": "4e847cb8153fa740b6f28dc80092ac434202e59488d70f017352880896193cf3",
+      "bytes": 277,
+      "modifiedUtc": "2026-09-12T04:09:26.147Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_1_5.h",
+      "sha256": "61575927aedd242475d3c23b07412e4e6f5aa425aa789dc527b7d3589483b3d2",
+      "bytes": 282,
+      "modifiedUtc": "2026-09-12T04:09:26.149Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_1_5.hpp",
+      "sha256": "452b1448b35accd7c633f1d190edd85335a55fedf8b0974eebc9c14bafb465d1",
+      "bytes": 304,
+      "modifiedUtc": "2026-09-12T04:09:26.15Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_2_0.h",
+      "sha256": "f49084459d1f0737f430b8c0c0442e90198ebfe2617d5ebbe2af823243dfc4d7",
+      "bytes": 307,
+      "modifiedUtc": "2026-09-12T04:09:26.151Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_2_0.hpp",
+      "sha256": "52f00aac1e99fda1fbe5a55e0e3f1dc330e1ee213be6db0de12302193898767d",
+      "bytes": 331,
+      "modifiedUtc": "2026-09-12T04:09:26.153Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_2_1.h",
+      "sha256": "cd43074d9a3ac426e78f235c405ad8cbfe1cb5afdc15b2f12bc65cb00a745809",
+      "bytes": 332,
+      "modifiedUtc": "2026-09-12T04:09:26.155Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_2_1.hpp",
+      "sha256": "8f8084ca15c78921c2518d3d387168616cfc08cf5e75ac09b075fa6de0b92684",
+      "bytes": 358,
+      "modifiedUtc": "2026-09-12T04:09:26.156Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_3_0.h",
+      "sha256": "8a502f9ed7051ee536802b0cd9e160138658bc90acf55d0be494b2c643970819",
+      "bytes": 357,
+      "modifiedUtc": "2026-09-12T04:09:26.157Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_3_0.hpp",
+      "sha256": "f0114d070c9fc4386fbe0acf7b8c8f40f066a738b3ae1e430e8ac22303692ccf",
+      "bytes": 385,
+      "modifiedUtc": "2026-09-12T04:09:26.158Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_3_1.h",
+      "sha256": "142587733cce1af597351cabb5fd4bc13a068966344f2cd09befbfbeae5bb64d",
+      "bytes": 382,
+      "modifiedUtc": "2026-09-12T04:09:26.159Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_3_1.hpp",
+      "sha256": "abc4532210b6b4c85140faba11f18ca2374cfa048ce00b7b7582ef8fec03bc13",
+      "bytes": 412,
+      "modifiedUtc": "2026-09-12T04:09:26.16Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_3_1_comp.h",
+      "sha256": "3b119d3ee273a6f76405079a211241b470ce014bbb9f387c6fde58de1e1ad026",
+      "bytes": 655,
+      "modifiedUtc": "2026-09-12T04:09:26.162Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_3_1_comp.hpp",
+      "sha256": "6265a611c1b4aaa251bd681055c6f297c1ef5f328765d1bad1f03a7da99368a6",
+      "bytes": 703,
+      "modifiedUtc": "2026-09-12T04:09:26.164Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_3_2.h",
+      "sha256": "c79830572d8aba3945635e3eaecd21ed55661d589dae6c6e64793511c5db7405",
+      "bytes": 407,
+      "modifiedUtc": "2026-09-12T04:09:26.165Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_3_2.hpp",
+      "sha256": "2f108e19c05110b72b7037bb7857f6db769f2d944c1cc9477c07354ebdb0aa50",
+      "bytes": 439,
+      "modifiedUtc": "2026-09-12T04:09:26.167Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_3_2_comp.h",
+      "sha256": "704b491bf8fea8bbb0697ce528ef311a2fb361dd48b6e1093d59911433289f5f",
+      "bytes": 680,
+      "modifiedUtc": "2026-09-12T04:09:26.17Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_3_2_comp.hpp",
+      "sha256": "c148efbdf4147577d28c3d0d8bd16927b7157e921a1518eed7b4301c5dba0887",
+      "bytes": 730,
+      "modifiedUtc": "2026-09-12T04:09:26.173Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_3_3.h",
+      "sha256": "e717ce4aca1a336092b38aa748642ee3212f5d68073107df08e406b95485101e",
+      "bytes": 432,
+      "modifiedUtc": "2026-09-12T04:09:26.174Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_3_3.hpp",
+      "sha256": "ebf63ab3b4ae71d08ce6878d96ff9bb215cf197f0bab2d860cd515c3c397b26e",
+      "bytes": 466,
+      "modifiedUtc": "2026-09-12T04:09:26.177Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_3_3_comp.h",
+      "sha256": "76d3c83244f91d89ea04a2dac51cfe77b1d3eaf360cffa2e16baab3ac3125530",
+      "bytes": 705,
+      "modifiedUtc": "2026-09-12T04:09:26.178Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_3_3_comp.hpp",
+      "sha256": "b8a0dbeb8399f01899ab62b711a5261485cf5e9538033071dcc342a0ba05af7a",
+      "bytes": 757,
+      "modifiedUtc": "2026-09-12T04:09:26.181Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_0.h",
+      "sha256": "d1e5e4b65e16fcea26fa74b93ce1a497c3a91cfe816c1edd5b8d051c335ddb89",
+      "bytes": 457,
+      "modifiedUtc": "2026-09-12T04:09:26.183Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_0.hpp",
+      "sha256": "fa9a7a8c593064670ed22a10e63acb7b44e3c778c40c64d19cb0aa4b1f1eb7cb",
+      "bytes": 493,
+      "modifiedUtc": "2026-09-12T04:09:26.186Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_0_comp.h",
+      "sha256": "86749dce7a9a8bf1863dbbd1023cbfdf29428502816869b6fd6e45b75557bf50",
+      "bytes": 730,
+      "modifiedUtc": "2026-09-12T04:09:26.188Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_0_comp.hpp",
+      "sha256": "fdf1107adb6f4192b26a19d99aa722b64c4d88720334e9a51ef4ac70f775f917",
+      "bytes": 784,
+      "modifiedUtc": "2026-09-12T04:09:26.189Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_1.h",
+      "sha256": "7e63b1ef8116642c75f11b592fb5e6f17abb17eff98dd3398272521400532442",
+      "bytes": 457,
+      "modifiedUtc": "2026-09-12T04:09:26.192Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_1.hpp",
+      "sha256": "af2f9f7b77181423cd1364c663a7d3604edb57adb0d3c87717a01e56107e0b90",
+      "bytes": 493,
+      "modifiedUtc": "2026-09-12T04:09:26.194Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_1_comp.h",
+      "sha256": "f210023e9a07b89ffa2cf4155488338558389076319f84ea824688124ca7effa",
+      "bytes": 730,
+      "modifiedUtc": "2026-09-12T04:09:26.195Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_1_comp.hpp",
+      "sha256": "03d7983dd8a178b0dc3b348a48bc048c4e261d8b85277acd361555b7ee3be87b",
+      "bytes": 784,
+      "modifiedUtc": "2026-09-12T04:09:26.198Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_2.h",
+      "sha256": "8bedf14d71e4d7b51deeaa7d5ad265bb6bf22275afc39557397dadaa8023082c",
+      "bytes": 457,
+      "modifiedUtc": "2026-09-12T04:09:26.2Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_2.hpp",
+      "sha256": "173979b8f0e35fe1d60c81b4b239dd1187dc879ea64a0868583648345ba3dc7d",
+      "bytes": 493,
+      "modifiedUtc": "2026-09-12T04:09:26.201Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_2_comp.h",
+      "sha256": "5de36777831c36a73daf468f768093404bebd4224dbc24558363997b9a5b3896",
+      "bytes": 730,
+      "modifiedUtc": "2026-09-12T04:09:26.202Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_2_comp.hpp",
+      "sha256": "8699a3c81611ffa976f2b81fc8fec7b2adf4287c50f4710976f2a406b108172c",
+      "bytes": 784,
+      "modifiedUtc": "2026-09-12T04:09:26.205Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_3.h",
+      "sha256": "397eb8a293d5f99e96bf544dc2c1afb4b42156e483945e85fa9c596a5241bd7b",
+      "bytes": 482,
+      "modifiedUtc": "2026-09-12T04:09:26.206Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_3.hpp",
+      "sha256": "6bbc0fec8e8cd1ec30f8aa29cf4e630aa79effa17bf18aade4acb6a959e7f814",
+      "bytes": 520,
+      "modifiedUtc": "2026-09-12T04:09:26.207Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_3_comp.h",
+      "sha256": "0557446d5205b644460d95d0fc9d184f69e4d388797265797b09060dbca6a88a",
+      "bytes": 755,
+      "modifiedUtc": "2026-09-12T04:09:26.208Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_3_comp.hpp",
+      "sha256": "069dee050f3cc56493d3da207813ef0968723925b49a9bd06ce7f061fd4fa293",
+      "bytes": 811,
+      "modifiedUtc": "2026-09-12T04:09:26.21Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_4.h",
+      "sha256": "c3792b9de8bec920fce15e5ba938829413ae39cdd1d3b0b5b1edfd425a5bf8ff",
+      "bytes": 507,
+      "modifiedUtc": "2026-09-12T04:09:26.214Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_4.hpp",
+      "sha256": "0fba6b92ccfd755be43eb00db18178980a72925cb57910d766c81474d6e98948",
+      "bytes": 547,
+      "modifiedUtc": "2026-09-12T04:09:26.216Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_4_comp.h",
+      "sha256": "ac6004936b5ea197bf15bc8d5cef17fc7124a1a1c9f0fa764e38bcc293ea1b05",
+      "bytes": 780,
+      "modifiedUtc": "2026-09-12T04:09:26.217Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_4_4_comp.hpp",
+      "sha256": "a32121fe5b8d6bc4e339069e608b62e969f7a04125b98b320d6edf75f7adb5dc",
+      "bytes": 838,
+      "modifiedUtc": "2026-09-12T04:09:26.219Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_all.h",
+      "sha256": "0143e090f40ef2fb94eed380bed941c1205000af872b106db3578702c5241543",
+      "bytes": 873,
+      "modifiedUtc": "2026-09-12T04:09:26.221Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_all.hpp",
+      "sha256": "d399b6634287a4fa4c62649eb591ec2c28c9bcb7c29ed1e6af9886bf51a42b26",
+      "bytes": 919,
+      "modifiedUtc": "2026-09-12T04:09:26.222Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_core.h",
+      "sha256": "9ff57e37597b57249ea365c561bd7ab20223ecf40df4609d37e765d3c62dc570",
+      "bytes": 615,
+      "modifiedUtc": "2026-09-12T04:09:26.224Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_core.hpp",
+      "sha256": "2907283907587619a28cba48ffe828628099c75d3b8aff7943ac0aa637189cf2",
+      "bytes": 643,
+      "modifiedUtc": "2026-09-12T04:09:26.228Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_load.h",
+      "sha256": "f57f7bbc4db7804ee213760dd1476cb7f0a53360888d9f7dac5fa089ae75280b",
+      "bytes": 1671,
+      "modifiedUtc": "2026-09-12T04:09:26.23Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\gl_load.hpp",
+      "sha256": "41a3adb7771f7b15022dfe5b20130a1c622648f95d7b780d82da9ebab734a647",
+      "bytes": 1348,
+      "modifiedUtc": "2026-09-12T04:09:26.231Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\glx_all.h",
+      "sha256": "6bb31e7c3a9e936532ae813aff68f96cbe194bbe13d350cc200676609717be81",
+      "bytes": 134,
+      "modifiedUtc": "2026-09-12T04:09:26.233Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\glx_all.hpp",
+      "sha256": "789ac27bdf364d7353fb485fa0baa0235d56a5b813c22221418826a75b17e77c",
+      "bytes": 144,
+      "modifiedUtc": "2026-09-12T04:09:26.234Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\glx_load.h",
+      "sha256": "d1be0d58f1b4c9be8ed808408094f9445f709b41d3f446da9a88c8e42c11717e",
+      "bytes": 968,
+      "modifiedUtc": "2026-09-12T04:09:26.235Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\glx_load.hpp",
+      "sha256": "a37504bcf806c22733e16c3e03a2be93a116e1d45aba2c350a38161f5758ccfd",
+      "bytes": 637,
+      "modifiedUtc": "2026-09-12T04:09:26.237Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\wgl_all.h",
+      "sha256": "10ff96c04ee59cf343f33ad785316a354e2bc07332719a75a6eb6dd85070b094",
+      "bytes": 143,
+      "modifiedUtc": "2026-09-12T04:09:26.24Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\wgl_all.hpp",
+      "sha256": "1e60b21dd03c4d138b1b33855737bbd628d7914a63f91c5ff1a7fe61810df4e7",
+      "bytes": 153,
+      "modifiedUtc": "2026-09-12T04:09:26.242Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\wgl_load.h",
+      "sha256": "742fc151ba7971e16aad1bfc458f6bb58a6ef2704b84b28823cdc1fc14875bc9",
+      "bytes": 956,
+      "modifiedUtc": "2026-09-12T04:09:26.243Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\include\\wgl_load.hpp",
+      "sha256": "00ff52493044f73b24ece5c7f1337c58fdf0c603a1b2a8a18e4759415519f49c",
+      "bytes": 625,
+      "modifiedUtc": "2026-09-12T04:09:26.244Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\source\\gl_load.c",
+      "sha256": "14182a04f6369fcf1032a064d117e4b9d8d84273cc05df0866bbe383a150934e",
+      "bytes": 707047,
+      "modifiedUtc": "2026-09-12T04:09:26.251Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\source\\gl_load_cpp.cpp",
+      "sha256": "0b7dfad2655ecfb584ce84aab2e5409eb31be7ef85b5ef275a5fd5313e1b9b6a",
+      "bytes": 633958,
+      "modifiedUtc": "2026-09-12T04:09:26.257Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\source\\glx_load.c",
+      "sha256": "7e018f555bb17bf87686f50a9b30b8de7d0cba70e4f638c09ef97f6d75f3a13e",
+      "bytes": 29579,
+      "modifiedUtc": "2026-09-12T04:09:26.259Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\source\\glx_load_cpp.cpp",
+      "sha256": "4696b9b1e9be0c8d2554bd3b6719bbcbabef8beccb312577d51130b9cd65d779",
+      "bytes": 24926,
+      "modifiedUtc": "2026-09-12T04:09:26.261Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\source\\wgl_load.c",
+      "sha256": "b4a93ad1a6ab8e8d5a9345e269ca7bb64357f88e7dca0b405b376dbe8f714e86",
+      "bytes": 42830,
+      "modifiedUtc": "2026-09-12T04:09:26.264Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\native\\vendor\\ffgl\\source\\lib\\glsdk_0_5_2\\glload\\source\\wgl_load_cpp.cpp",
+      "sha256": "40785f9046d59525fd566aee50370067b856170a208de0d143ea257b46d3395d",
+      "bytes": 35963,
+      "modifiedUtc": "2026-09-12T04:09:26.266Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\package.json",
+      "sha256": "b89cb5aebfab3fbb9cbdb6376f6fbb718ac4e88de2586a3c7316e2d4e6d59520",
+      "bytes": 3367,
+      "modifiedUtc": "2026-09-13T02:01:43.667Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\pnpm-lock.yaml",
+      "sha256": "3e0a1744a297ae6f8726f5df1a7f33769ef5a9c0da22159274dcde9df1a20ae6",
+      "bytes": 97848,
+      "modifiedUtc": "2026-09-13T00:40:20.062Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\scripts\\experiment-job.cs",
+      "sha256": "4ab4d7cd2b19de771b8cafb62c8f22b71faca4d8543c9032bdb5fba5f7d57a4a",
+      "bytes": 7352,
+      "modifiedUtc": "2026-09-12T23:41:13.018Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\scripts\\experiment-job.ps1",
+      "sha256": "b62dd34e8b7baf86a149d764f5df908ad4d7819465bd5014bc50f5511a006cf1",
+      "bytes": 423,
+      "modifiedUtc": "2026-09-12T23:41:13.019Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\scripts\\experiment-runner.mjs",
+      "sha256": "365abf167a70f13ad340d025dde089431aa9e5995c4d47a18083fb33879b32c8",
+      "bytes": 11199,
+      "modifiedUtc": "2026-09-12T23:41:13.02Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\scripts\\native-build.ps1",
+      "sha256": "fd42509ff7a368f3df22a7f9bf91d41ca216c7eab871fb111e1bc1ef93de71eb",
+      "bytes": 1490,
+      "modifiedUtc": "2026-09-12T23:41:13.023Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\tools\\gpu-spike\\build.mjs",
+      "sha256": "2f4eeca46dc4dd99c6095dc61cc6e1cf6f650cd10faa14a8fcefe61d264e38ad",
+      "bytes": 1235,
+      "modifiedUtc": "2026-09-13T00:43:04.281Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-native-review-2545b762\\configuration.json",
+      "sha256": "e3258f4c2919aa3db0452ab9ee4d289f328888cbd3dec9f01782b3c782c219d6",
+      "bytes": 7118,
+      "modifiedUtc": "2026-09-13T01:10:00.781Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\tools\\gpu-spike\\standalone_host.cc",
+      "sha256": "e81b4c2c641f27b517b897fc43d05b44c2ec5e99be5f938ad29f4f708c34a8d3",
+      "bytes": 8429,
+      "modifiedUtc": "2026-09-13T01:53:49.425Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\tools\\gpu-spike\\standalone_alpha.h",
+      "sha256": "964cda26a393ce0a49ba39efd1fa84f960f7e59c841f130c6f07b2d9200f8c86",
+      "bytes": 593,
+      "modifiedUtc": "2026-09-13T01:51:54.728Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\tools\\gpu-spike\\native-alpha-inspect.mjs",
+      "sha256": "15f5403c4731efbbb3c0f6e9a86808d01776340f8a131bd6926ef1fc48999b89",
+      "bytes": 3660,
+      "modifiedUtc": "2026-09-13T01:59:30.862Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\tests\\native\\standalone_alpha_test.cc",
+      "sha256": "6bbeb2f7dd9e0cb0670df82dfa6b5ca37e1ea51d68ec030c6eec7760b933bfe3",
+      "bytes": 570,
+      "modifiedUtc": "2026-09-13T01:51:55.324Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\tests\\unit\\native-alpha-inspect.test.mjs",
+      "sha256": "79696da4ee9fc29a9cc4f145bc230a17a04de0f960e081c54f623e13cf33b911",
+      "bytes": 2264,
+      "modifiedUtc": "2026-09-13T01:59:31.31Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\artifacts\\native-alpha-review-2545b762\\prepare.mjs",
+      "sha256": "2cb9dada6b18b9e7efe37b7fdd93e0b9671d125ace18e57a790f273e2156332a",
+      "bytes": 4418,
+      "modifiedUtc": "2026-09-13T02:00:45.082Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\artifacts\\native-alpha-review-2545b762\\launch.mjs",
+      "sha256": "c12b4b6d87319cb813f8ae428574d84a64d0ea3aa28798f4465b28a1970fd271",
+      "bytes": 1831,
+      "modifiedUtc": "2026-09-13T01:57:38.593Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\artifacts\\native-alpha-review-2545b762\\inspect.mjs",
+      "sha256": "754a187438d8ffac31d626d50b926b29786a6f1f3c0b66cb54dd001af3a4c29a",
+      "bytes": 1578,
+      "modifiedUtc": "2026-09-13T01:57:39.046Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\artifacts\\native-alpha-review-2545b762\\configuration.json",
+      "sha256": "92646afa37cf44c19dc9f990c553136c8288617964c3d3ca7ebc7a2eeb731337",
+      "bytes": 6032,
+      "modifiedUtc": "2026-09-13T02:02:35.794Z"
+    }
+  ],
+  "binaries": [
+    {
+      "path": "C:\\Program Files\\nodejs\\node.exe",
+      "sha256": "2ffe3acc0458fdde999f50d11809bbe7c9b7ef204dcf17094e325d26ace101d8",
+      "bytes": 89935872,
+      "modifiedUtc": "2025-12-10T16:59:28Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\chrome_100_percent.pak",
+      "sha256": "ab7c4b7b6cb8832a31d44b95ec50ce52294f49422a3bdde4e21968eca2930cbe",
+      "bytes": 719654,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\chrome_200_percent.pak",
+      "sha256": "30fa4a6e27c9ff2fb0f939f01158477e621a67d86e9ecb84cf11b3947db8eb9d",
+      "bytes": 1269017,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\d3dcompiler_47.dll",
+      "sha256": "a05f99734f7c4822fefc12b367af21fd0976ed6608752fb1e1e80b6ece7ecbbb",
+      "bytes": 4741488,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\dxcompiler.dll",
+      "sha256": "b2b5c67bc4a9c92a0ea87000415e7970488d1ca25767518d4cc27b88f18fb6ac",
+      "bytes": 25744896,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\dxil.dll",
+      "sha256": "77e039c905030a641e53658a008b74e90635a5ea9b6b79eabd0f2003bdfca59a",
+      "bytes": 1509760,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\electron.exe",
+      "sha256": "e048632e03fabc96de5e10afbebc0aa31f4e1674155ea3d270597fe7523f9d80",
+      "bytes": 246070272,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\ffmpeg.dll",
+      "sha256": "336587847c4ed3ef1a195d1aaea3d3951c9749a035ffa7951df4c0e02971e4e0",
+      "bytes": 3113472,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\icudtl.dat",
+      "sha256": "9f48c7f9c7c94d516a14870707e910ab94d75ae640ff6842c4af53276cd26ebe",
+      "bytes": 10876560,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\af.pak",
+      "sha256": "3017b141bd16e24190d810f0748612f0fd4352ca8553002b9a63a7f77f7154f8",
+      "bytes": 636155,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\am.pak",
+      "sha256": "67b938d162bc75db067120bb8366b5bafd9a75fa99a0ca9ad4f46b47d1d37634",
+      "bytes": 1029450,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\ar.pak",
+      "sha256": "a6eb037da4ac7930a8661c8bf602deee090fc4409bf4db24db8aab65c89b1d06",
+      "bytes": 1130933,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\bg.pak",
+      "sha256": "2eb9c74c67e4b13b45a73061fa978738e335bc245da71bab0ea9b205fe91074e",
+      "bytes": 1178203,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\bn.pak",
+      "sha256": "415621a5c0b1546e6e447d43b76414425a8703cc7681d637ec1f283ad0c787e7",
+      "bytes": 1513545,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\ca.pak",
+      "sha256": "6f28297c1ccb628f534d65dade167ae559f83eace359acf47e48ff890b9409d5",
+      "bytes": 716908,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\cs.pak",
+      "sha256": "799a789ce531991cb975425730db310f9a8fe74091eee568f3e65fcc7ef0cd57",
+      "bytes": 743351,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\da.pak",
+      "sha256": "9a2cd25537a4818897481ba944981e8aee3d89c7ad37588d02f1deebff3f62d0",
+      "bytes": 666465,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\de.pak",
+      "sha256": "fcf63fd89e613a7ef69f16054b97b3493948e5c665aad180a91d3635256fb7d7",
+      "bytes": 717834,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\el.pak",
+      "sha256": "37d2e1ef69fea9bdb1e0902cbc61a458baa9009fc3761029bd1c1882a7a0c9b2",
+      "bytes": 1295538,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\en-GB.pak",
+      "sha256": "01d9200a5daee1770f7147b166d25baa6a8dd72c138c3c526421e656dec789f5",
+      "bytes": 580030,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\en-US.pak",
+      "sha256": "23b271e8009bfa14783700cd0712b4ecaa5b8f2ea28a4d81ae1d7e05bc0c96b1",
+      "bytes": 586582,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\es-419.pak",
+      "sha256": "6ff6ea0a14da50cacc4b72ab8c8c7b49c8423abb64f6a3a7f1643d8c3c74e6e9",
+      "bytes": 707635,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\es.pak",
+      "sha256": "4578e08033967a5062bfd3b1937e711df84571d444e4940b8ffe5366bce4e778",
+      "bytes": 703926,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\et.pak",
+      "sha256": "dd1205eae606f12510e24ce39f301439c98b3293d766ca5839dc292a14d7973c",
+      "bytes": 642216,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\fa.pak",
+      "sha256": "f3675255feb8b054717be9e92e93289262f35e82f25f2f8de0d3ebf3865715af",
+      "bytes": 1063054,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\fi.pak",
+      "sha256": "1f3123d7fb5c22a95b5250ea17450b665c3c6cd6a6dfd28bbdde15e1bf684a0e",
+      "bytes": 655113,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\fil.pak",
+      "sha256": "02e2c70d3d85b0deb677a9ae576ae3cf89e80774532cb3315c14f1e8ce64b310",
+      "bytes": 741385,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\fr.pak",
+      "sha256": "4db43f1cfba1ed1d7dd347d58fbab0b8d6d89dd008a3b9d2436d8744e3363453",
+      "bytes": 763453,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\gu.pak",
+      "sha256": "e86e8c240d4b6283abb03c49df9e8899607ef9def6d4933c7a541d63b5835271",
+      "bytes": 1495625,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\he.pak",
+      "sha256": "ddc1f304ab1f4489d19ae2b31e7f8e3ffb47dae439520159e8975422c65e4115",
+      "bytes": 928748,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\hi.pak",
+      "sha256": "10a6f19c1982590e33476427dee8d4293b0707e25dc536d6394b5782ecc3b642",
+      "bytes": 1586592,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\hr.pak",
+      "sha256": "d46c64ae8af3562e37eb80438aa2bee228fafda251d58ba4d0991291f1c72aab",
+      "bytes": 715279,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\hu.pak",
+      "sha256": "0a46fc8d50f74effd1cfe1979e677df3de6fc47e6b551267303d93d57bd83f50",
+      "bytes": 765640,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\id.pak",
+      "sha256": "f567569c42a25bb2dfc5c33e13aac558c0e2a1d5d4b969592bbd0841b36438db",
+      "bytes": 635080,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\it.pak",
+      "sha256": "899be10e8f46f53d9bbe7cab827fc17b7c2bd7184e31791688016e2ca4df6622",
+      "bytes": 693990,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\ja.pak",
+      "sha256": "9370c20a0612f5874dff2b015f31482e167eccf1b3c1d1a2efc1c2e38cefa88e",
+      "bytes": 842132,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\kn.pak",
+      "sha256": "af5fed2130102ecc0c878059c88faed9d6db2e8b147fb5ae9e15e3fe69706c8a",
+      "bytes": 1720240,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\ko.pak",
+      "sha256": "0f5bc49c4d35bfea1563db6eb77a074c65b39b49a916cb35a022ef96340338f2",
+      "bytes": 718709,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\lt.pak",
+      "sha256": "af969f4407c190dd01a426fa1244cb1ec7cdf2909d1c3ba5b87ff662ba567303",
+      "bytes": 777281,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\lv.pak",
+      "sha256": "27e20dfa5585161ef8b641f628aefe6c88d9f9590ffedb647e0c9da1cacf219d",
+      "bytes": 774751,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\ml.pak",
+      "sha256": "b5606265910e45098a88e989202a550531f6d00333c6b112ed4c5cbc07b2ff6a",
+      "bytes": 1767850,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\mr.pak",
+      "sha256": "8465d4077ed5414cbcb7d9bdb00d85e515a1a069703cdc1d4d67c9d6e5623fb0",
+      "bytes": 1467313,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\ms.pak",
+      "sha256": "af7021a00befa586aa067ae3ccb339079e6f13ee0cab1621836f6abb608b6f2a",
+      "bytes": 668356,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\nb.pak",
+      "sha256": "d97a2b0cbe6adc99add2ed3ce0d15d0bb124b778086c466c126634d60ea72608",
+      "bytes": 638121,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\nl.pak",
+      "sha256": "9d82c384fbb6480c7a6e721c6bcd1f2cd19665d848b056b5a2911504308ba037",
+      "bytes": 664767,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\pl.pak",
+      "sha256": "8a0969fc743d3e2f5111387d53c0d79e8c1d9f68256ad6553b87fca2bcaa7e6e",
+      "bytes": 742064,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\pt-BR.pak",
+      "sha256": "8272a84e2e6658dc4da17c6bd21995011fbaa6c328efafd24c4ebd4fe2e64916",
+      "bytes": 697044,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\pt-PT.pak",
+      "sha256": "bdfa7264dddf70f936f1785737969559a577b51d1952c820a468c611d18b17ca",
+      "bytes": 701056,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\ro.pak",
+      "sha256": "1e6b5b0dac63a9e951daf523de310f6bd9e5c53e281f37706d41bd35d2a08bb5",
+      "bytes": 728144,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\ru.pak",
+      "sha256": "52a31a7ca057b8c76208620932120927a089502ddfb66c30de4324959f9e0075",
+      "bytes": 1200996,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\sk.pak",
+      "sha256": "a53551e8d251fa01305afe1d0d187144c56bfdffd5d1aa9f96a9350b96c0a252",
+      "bytes": 755475,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\sl.pak",
+      "sha256": "e1371c8df577b979e3a515af34b0aaa3d07153c7a5c55d39a9b49a7ffe62d3d2",
+      "bytes": 722720,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\sr.pak",
+      "sha256": "be4ce17afac24dffc1eb36609cb51e766e77097d6656b1008a2a825e59609cc1",
+      "bytes": 1112919,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\sv.pak",
+      "sha256": "8bdff8855d23c739ece357f653c0a17bb36fe97577a5761912080d057ed341a5",
+      "bytes": 646537,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\sw.pak",
+      "sha256": "312b225a81cc3cc15f13f80c45dd0e0bb3655d31873d2956861207e70c33c1dc",
+      "bytes": 685130,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\ta.pak",
+      "sha256": "91fb1460711df108d8d435a378c8be1d1e80b0886c0158d8c6ae92f35812681b",
+      "bytes": 1758067,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\te.pak",
+      "sha256": "fc8c2706c5dfd36e7af8e380a240e0f697cc5fe969b512092a2185896512c4af",
+      "bytes": 1629379,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\th.pak",
+      "sha256": "c1f4235c31bc05153230b0e55b7aabc9020d7460d5b0a025c386885e1e4bda3c",
+      "bytes": 1368866,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\tr.pak",
+      "sha256": "ae87bbd88ce0adfc2dc3c460736a7d0513472af62fc856caccc638dedfec9b4a",
+      "bytes": 697368,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\uk.pak",
+      "sha256": "a6230520dac708a6235588f5d9e894fcc9b1391e18a70e3220e06ddf80f76688",
+      "bytes": 1211565,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\ur.pak",
+      "sha256": "c218e21744df2ff0669a87d497d65d76333073577360d4c662c592de146bf82a",
+      "bytes": 1047994,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\vi.pak",
+      "sha256": "42f3f0c4f645aedc66c12c74aee7256336a929798d736c56853daec91d44511a",
+      "bytes": 830059,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\zh-CN.pak",
+      "sha256": "ba8ac4bf82b50728d907215d1993948457835bf2942a4d7266a3f8af5f51de15",
+      "bytes": 592116,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\locales\\zh-TW.pak",
+      "sha256": "82739378d17ea73e57c8efae31994e0c8818ab2d0d12cb1f6b20d2f340b3229d",
+      "bytes": 583860,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\resources.pak",
+      "sha256": "3d8c36b2ec7099a27fe00763e5af28319643ba65c1b48b85eb6a7caaae034ba6",
+      "bytes": 12435445,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\resources\\default_app.asar",
+      "sha256": "06d4a28be095a80eff94dbd18edcfac5b5805e1b5538e0fb7cee7c7ae81db76a",
+      "bytes": 111073,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\snapshot_blob.bin",
+      "sha256": "1176cfa83f9ef458e7ed5b5b255c9289691dbef3ff1e4a073a5c90f9a16e8458",
+      "bytes": 368776,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\v8_context_snapshot.bin",
+      "sha256": "d9d3ec18e937ed2fddd02d92e4f0726919769e16f2ea17f962d23e40d5962b7b",
+      "bytes": 742208,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\vk_swiftshader.dll",
+      "sha256": "cfb8a533c5da1ade3fd4e66ebd0acf7186bd17fb3cc09d48809a7909c4aaf0f8",
+      "bytes": 5520384,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\electron\\vulkan-1.dll",
+      "sha256": "c1b383f18c0949f233e949ae197c2ad4c416abe7790894d7e395d73116403b4f",
+      "bytes": 939008,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\native\\build\\Release\\LuxTracerTR02.dll",
+      "sha256": "ff3937d5dc6c6e8735dd80fceb3fa551c01afdd4122cf79b8f7ab810da326449",
+      "bytes": 803328,
+      "modifiedUtc": "2026-09-13T00:58:28.039Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\native\\build\\Release\\lux_texture_bridge.node",
+      "sha256": "91acec58e0258c1fd2d4e111f14fda30b4b16e92f2edccbc849ba1703602ed93",
+      "bytes": 101888,
+      "modifiedUtc": "2026-09-13T00:58:40.955Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\native\\build\\Release\\msvcp140.dll",
+      "sha256": "7c26614e1d733892c2deac7e245ce115504b1d80592dd0a01b08e3e5a55f89ca",
+      "bytes": 643512,
+      "modifiedUtc": "2026-05-27T11:59:36Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\native\\build\\Release\\msvcp140_1.dll",
+      "sha256": "206c931bf90fdad8816de3b5e2ef80b2bcaa9406c89ecc05fe6fddffe251e982",
+      "bytes": 35768,
+      "modifiedUtc": "2026-05-27T11:59:36Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\native\\build\\Release\\msvcp140_2.dll",
+      "sha256": "d50d7883f20d1dc6191768d3746f52dd9cac89c346ffaed5be1f110c2f34a838",
+      "bytes": 274872,
+      "modifiedUtc": "2026-05-27T11:59:36Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\native\\build\\Release\\msvcp140_atomic_wait.dll",
+      "sha256": "3d0cbfaa1bf3eecf5a3f4491d2960ee803cb994f30292c6adc4a07c498f60e2b",
+      "bytes": 57792,
+      "modifiedUtc": "2026-05-27T11:59:36Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\native\\build\\Release\\msvcp140_codecvt_ids.dll",
+      "sha256": "8a65c7596ef2e6938731f5a1058e7e40145b6d97967cc649231a076b9a608d78",
+      "bytes": 31160,
+      "modifiedUtc": "2026-05-27T11:59:36Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\native\\build\\Release\\vcruntime140.dll",
+      "sha256": "d1f4225df2cd877dbf130d5668a021dce3f94118455ff5ec952061c30afc9ce7",
+      "bytes": 178616,
+      "modifiedUtc": "2026-05-27T11:59:40Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\checkpoint-exports\\2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2\\runtime\\native\\build\\Release\\vcruntime140_1.dll",
+      "sha256": "a7146c08f89fe5b04541ab507cdb59ff7b44534d4ba3c668a426c6450a03434e",
+      "bytes": 50112,
+      "modifiedUtc": "2026-05-27T11:59:40Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-native-review-2545b762\\plugins\\Lux_2545b762f774c1b046f576d7e61745765876f6ec6dc4f06410c5c998d52573c2.dll",
+      "sha256": "ff3937d5dc6c6e8735dd80fceb3fa551c01afdd4122cf79b8f7ab810da326449",
+      "bytes": 803328,
+      "modifiedUtc": "2026-09-13T01:06:54.131Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\chrome_100_percent.pak",
+      "sha256": "ab7c4b7b6cb8832a31d44b95ec50ce52294f49422a3bdde4e21968eca2930cbe",
+      "bytes": 719654,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\chrome_200_percent.pak",
+      "sha256": "30fa4a6e27c9ff2fb0f939f01158477e621a67d86e9ecb84cf11b3947db8eb9d",
+      "bytes": 1269017,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\d3dcompiler_47.dll",
+      "sha256": "a05f99734f7c4822fefc12b367af21fd0976ed6608752fb1e1e80b6ece7ecbbb",
+      "bytes": 4741488,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\dxcompiler.dll",
+      "sha256": "b2b5c67bc4a9c92a0ea87000415e7970488d1ca25767518d4cc27b88f18fb6ac",
+      "bytes": 25744896,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\dxil.dll",
+      "sha256": "77e039c905030a641e53658a008b74e90635a5ea9b6b79eabd0f2003bdfca59a",
+      "bytes": 1509760,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\electron.exe",
+      "sha256": "e048632e03fabc96de5e10afbebc0aa31f4e1674155ea3d270597fe7523f9d80",
+      "bytes": 246070272,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\ffmpeg.dll",
+      "sha256": "336587847c4ed3ef1a195d1aaea3d3951c9749a035ffa7951df4c0e02971e4e0",
+      "bytes": 3113472,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\icudtl.dat",
+      "sha256": "9f48c7f9c7c94d516a14870707e910ab94d75ae640ff6842c4af53276cd26ebe",
+      "bytes": 10876560,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\af.pak",
+      "sha256": "3017b141bd16e24190d810f0748612f0fd4352ca8553002b9a63a7f77f7154f8",
+      "bytes": 636155,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\am.pak",
+      "sha256": "67b938d162bc75db067120bb8366b5bafd9a75fa99a0ca9ad4f46b47d1d37634",
+      "bytes": 1029450,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\ar.pak",
+      "sha256": "a6eb037da4ac7930a8661c8bf602deee090fc4409bf4db24db8aab65c89b1d06",
+      "bytes": 1130933,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\bg.pak",
+      "sha256": "2eb9c74c67e4b13b45a73061fa978738e335bc245da71bab0ea9b205fe91074e",
+      "bytes": 1178203,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\bn.pak",
+      "sha256": "415621a5c0b1546e6e447d43b76414425a8703cc7681d637ec1f283ad0c787e7",
+      "bytes": 1513545,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\ca.pak",
+      "sha256": "6f28297c1ccb628f534d65dade167ae559f83eace359acf47e48ff890b9409d5",
+      "bytes": 716908,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\cs.pak",
+      "sha256": "799a789ce531991cb975425730db310f9a8fe74091eee568f3e65fcc7ef0cd57",
+      "bytes": 743351,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\da.pak",
+      "sha256": "9a2cd25537a4818897481ba944981e8aee3d89c7ad37588d02f1deebff3f62d0",
+      "bytes": 666465,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\de.pak",
+      "sha256": "fcf63fd89e613a7ef69f16054b97b3493948e5c665aad180a91d3635256fb7d7",
+      "bytes": 717834,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\el.pak",
+      "sha256": "37d2e1ef69fea9bdb1e0902cbc61a458baa9009fc3761029bd1c1882a7a0c9b2",
+      "bytes": 1295538,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\en-GB.pak",
+      "sha256": "01d9200a5daee1770f7147b166d25baa6a8dd72c138c3c526421e656dec789f5",
+      "bytes": 580030,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\en-US.pak",
+      "sha256": "23b271e8009bfa14783700cd0712b4ecaa5b8f2ea28a4d81ae1d7e05bc0c96b1",
+      "bytes": 586582,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\es-419.pak",
+      "sha256": "6ff6ea0a14da50cacc4b72ab8c8c7b49c8423abb64f6a3a7f1643d8c3c74e6e9",
+      "bytes": 707635,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\es.pak",
+      "sha256": "4578e08033967a5062bfd3b1937e711df84571d444e4940b8ffe5366bce4e778",
+      "bytes": 703926,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\et.pak",
+      "sha256": "dd1205eae606f12510e24ce39f301439c98b3293d766ca5839dc292a14d7973c",
+      "bytes": 642216,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\fa.pak",
+      "sha256": "f3675255feb8b054717be9e92e93289262f35e82f25f2f8de0d3ebf3865715af",
+      "bytes": 1063054,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\fi.pak",
+      "sha256": "1f3123d7fb5c22a95b5250ea17450b665c3c6cd6a6dfd28bbdde15e1bf684a0e",
+      "bytes": 655113,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\fil.pak",
+      "sha256": "02e2c70d3d85b0deb677a9ae576ae3cf89e80774532cb3315c14f1e8ce64b310",
+      "bytes": 741385,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\fr.pak",
+      "sha256": "4db43f1cfba1ed1d7dd347d58fbab0b8d6d89dd008a3b9d2436d8744e3363453",
+      "bytes": 763453,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\gu.pak",
+      "sha256": "e86e8c240d4b6283abb03c49df9e8899607ef9def6d4933c7a541d63b5835271",
+      "bytes": 1495625,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\he.pak",
+      "sha256": "ddc1f304ab1f4489d19ae2b31e7f8e3ffb47dae439520159e8975422c65e4115",
+      "bytes": 928748,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\hi.pak",
+      "sha256": "10a6f19c1982590e33476427dee8d4293b0707e25dc536d6394b5782ecc3b642",
+      "bytes": 1586592,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\hr.pak",
+      "sha256": "d46c64ae8af3562e37eb80438aa2bee228fafda251d58ba4d0991291f1c72aab",
+      "bytes": 715279,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\hu.pak",
+      "sha256": "0a46fc8d50f74effd1cfe1979e677df3de6fc47e6b551267303d93d57bd83f50",
+      "bytes": 765640,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\id.pak",
+      "sha256": "f567569c42a25bb2dfc5c33e13aac558c0e2a1d5d4b969592bbd0841b36438db",
+      "bytes": 635080,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\it.pak",
+      "sha256": "899be10e8f46f53d9bbe7cab827fc17b7c2bd7184e31791688016e2ca4df6622",
+      "bytes": 693990,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\ja.pak",
+      "sha256": "9370c20a0612f5874dff2b015f31482e167eccf1b3c1d1a2efc1c2e38cefa88e",
+      "bytes": 842132,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\kn.pak",
+      "sha256": "af5fed2130102ecc0c878059c88faed9d6db2e8b147fb5ae9e15e3fe69706c8a",
+      "bytes": 1720240,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\ko.pak",
+      "sha256": "0f5bc49c4d35bfea1563db6eb77a074c65b39b49a916cb35a022ef96340338f2",
+      "bytes": 718709,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\lt.pak",
+      "sha256": "af969f4407c190dd01a426fa1244cb1ec7cdf2909d1c3ba5b87ff662ba567303",
+      "bytes": 777281,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\lv.pak",
+      "sha256": "27e20dfa5585161ef8b641f628aefe6c88d9f9590ffedb647e0c9da1cacf219d",
+      "bytes": 774751,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\ml.pak",
+      "sha256": "b5606265910e45098a88e989202a550531f6d00333c6b112ed4c5cbc07b2ff6a",
+      "bytes": 1767850,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\mr.pak",
+      "sha256": "8465d4077ed5414cbcb7d9bdb00d85e515a1a069703cdc1d4d67c9d6e5623fb0",
+      "bytes": 1467313,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\ms.pak",
+      "sha256": "af7021a00befa586aa067ae3ccb339079e6f13ee0cab1621836f6abb608b6f2a",
+      "bytes": 668356,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\nb.pak",
+      "sha256": "d97a2b0cbe6adc99add2ed3ce0d15d0bb124b778086c466c126634d60ea72608",
+      "bytes": 638121,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\nl.pak",
+      "sha256": "9d82c384fbb6480c7a6e721c6bcd1f2cd19665d848b056b5a2911504308ba037",
+      "bytes": 664767,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\pl.pak",
+      "sha256": "8a0969fc743d3e2f5111387d53c0d79e8c1d9f68256ad6553b87fca2bcaa7e6e",
+      "bytes": 742064,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\pt-BR.pak",
+      "sha256": "8272a84e2e6658dc4da17c6bd21995011fbaa6c328efafd24c4ebd4fe2e64916",
+      "bytes": 697044,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\pt-PT.pak",
+      "sha256": "bdfa7264dddf70f936f1785737969559a577b51d1952c820a468c611d18b17ca",
+      "bytes": 701056,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\ro.pak",
+      "sha256": "1e6b5b0dac63a9e951daf523de310f6bd9e5c53e281f37706d41bd35d2a08bb5",
+      "bytes": 728144,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\ru.pak",
+      "sha256": "52a31a7ca057b8c76208620932120927a089502ddfb66c30de4324959f9e0075",
+      "bytes": 1200996,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\sk.pak",
+      "sha256": "a53551e8d251fa01305afe1d0d187144c56bfdffd5d1aa9f96a9350b96c0a252",
+      "bytes": 755475,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\sl.pak",
+      "sha256": "e1371c8df577b979e3a515af34b0aaa3d07153c7a5c55d39a9b49a7ffe62d3d2",
+      "bytes": 722720,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\sr.pak",
+      "sha256": "be4ce17afac24dffc1eb36609cb51e766e77097d6656b1008a2a825e59609cc1",
+      "bytes": 1112919,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\sv.pak",
+      "sha256": "8bdff8855d23c739ece357f653c0a17bb36fe97577a5761912080d057ed341a5",
+      "bytes": 646537,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\sw.pak",
+      "sha256": "312b225a81cc3cc15f13f80c45dd0e0bb3655d31873d2956861207e70c33c1dc",
+      "bytes": 685130,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\ta.pak",
+      "sha256": "91fb1460711df108d8d435a378c8be1d1e80b0886c0158d8c6ae92f35812681b",
+      "bytes": 1758067,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\te.pak",
+      "sha256": "fc8c2706c5dfd36e7af8e380a240e0f697cc5fe969b512092a2185896512c4af",
+      "bytes": 1629379,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\th.pak",
+      "sha256": "c1f4235c31bc05153230b0e55b7aabc9020d7460d5b0a025c386885e1e4bda3c",
+      "bytes": 1368866,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\tr.pak",
+      "sha256": "ae87bbd88ce0adfc2dc3c460736a7d0513472af62fc856caccc638dedfec9b4a",
+      "bytes": 697368,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\uk.pak",
+      "sha256": "a6230520dac708a6235588f5d9e894fcc9b1391e18a70e3220e06ddf80f76688",
+      "bytes": 1211565,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\ur.pak",
+      "sha256": "c218e21744df2ff0669a87d497d65d76333073577360d4c662c592de146bf82a",
+      "bytes": 1047994,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\vi.pak",
+      "sha256": "42f3f0c4f645aedc66c12c74aee7256336a929798d736c56853daec91d44511a",
+      "bytes": 830059,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\zh-CN.pak",
+      "sha256": "ba8ac4bf82b50728d907215d1993948457835bf2942a4d7266a3f8af5f51de15",
+      "bytes": 592116,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\locales\\zh-TW.pak",
+      "sha256": "82739378d17ea73e57c8efae31994e0c8818ab2d0d12cb1f6b20d2f340b3229d",
+      "bytes": 583860,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\resources.pak",
+      "sha256": "3d8c36b2ec7099a27fe00763e5af28319643ba65c1b48b85eb6a7caaae034ba6",
+      "bytes": 12435445,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\resources\\default_app.asar",
+      "sha256": "06d4a28be095a80eff94dbd18edcfac5b5805e1b5538e0fb7cee7c7ae81db76a",
+      "bytes": 111073,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\snapshot_blob.bin",
+      "sha256": "1176cfa83f9ef458e7ed5b5b255c9289691dbef3ff1e4a073a5c90f9a16e8458",
+      "bytes": 368776,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\v8_context_snapshot.bin",
+      "sha256": "d9d3ec18e937ed2fddd02d92e4f0726919769e16f2ea17f962d23e40d5962b7b",
+      "bytes": 742208,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\vk_swiftshader.dll",
+      "sha256": "cfb8a533c5da1ade3fd4e66ebd0acf7186bd17fb3cc09d48809a7909c4aaf0f8",
+      "bytes": 5520384,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\electron\\vulkan-1.dll",
+      "sha256": "c1b383f18c0949f233e949ae197c2ad4c416abe7790894d7e395d73116403b4f",
+      "bytes": 939008,
+      "modifiedUtc": "1980-01-01T00:00:00Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\native\\build\\Release\\LuxTracerTR02.dll",
+      "sha256": "ff3937d5dc6c6e8735dd80fceb3fa551c01afdd4122cf79b8f7ab810da326449",
+      "bytes": 803328,
+      "modifiedUtc": "2026-09-13T00:58:28.039Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\native\\build\\Release\\lux_texture_bridge.node",
+      "sha256": "91acec58e0258c1fd2d4e111f14fda30b4b16e92f2edccbc849ba1703602ed93",
+      "bytes": 101888,
+      "modifiedUtc": "2026-09-13T00:58:40.955Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\native\\build\\Release\\msvcp140.dll",
+      "sha256": "7c26614e1d733892c2deac7e245ce115504b1d80592dd0a01b08e3e5a55f89ca",
+      "bytes": 643512,
+      "modifiedUtc": "2026-05-27T11:59:36Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\native\\build\\Release\\msvcp140_1.dll",
+      "sha256": "206c931bf90fdad8816de3b5e2ef80b2bcaa9406c89ecc05fe6fddffe251e982",
+      "bytes": 35768,
+      "modifiedUtc": "2026-05-27T11:59:36Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\native\\build\\Release\\msvcp140_2.dll",
+      "sha256": "d50d7883f20d1dc6191768d3746f52dd9cac89c346ffaed5be1f110c2f34a838",
+      "bytes": 274872,
+      "modifiedUtc": "2026-05-27T11:59:36Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\native\\build\\Release\\msvcp140_atomic_wait.dll",
+      "sha256": "3d0cbfaa1bf3eecf5a3f4491d2960ee803cb994f30292c6adc4a07c498f60e2b",
+      "bytes": 57792,
+      "modifiedUtc": "2026-05-27T11:59:36Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\native\\build\\Release\\msvcp140_codecvt_ids.dll",
+      "sha256": "8a65c7596ef2e6938731f5a1058e7e40145b6d97967cc649231a076b9a608d78",
+      "bytes": 31160,
+      "modifiedUtc": "2026-05-27T11:59:36Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\native\\build\\Release\\vcruntime140.dll",
+      "sha256": "d1f4225df2cd877dbf130d5668a021dce3f94118455ff5ec952061c30afc9ce7",
+      "bytes": 178616,
+      "modifiedUtc": "2026-05-27T11:59:40Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\parameter-integration\\artifacts\\installed-package\\profile-RmYLyN\\local\\Lux\\Installed\\runtimes\\8205289821b2dc3185a691664749a7e7b191bb269bbbef1533a99883ae7fb539\\native\\build\\Release\\vcruntime140_1.dll",
+      "sha256": "a7146c08f89fe5b04541ab507cdb59ff7b44534d4ba3c668a426c6450a03434e",
+      "bytes": 50112,
+      "modifiedUtc": "2026-05-27T11:59:40Z"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\native-alpha-probe\\native\\build\\Release\\lux_standalone_host.exe",
+      "sha256": "b1d7d8fac23b8d63f3a63ef39ed8143b364de7a4f2b6c44f068d8cdc1ce05b96",
+      "bytes": 378880,
+      "modifiedUtc": "2026-09-13T01:54:25.588Z"
+    }
+  ],
+  "commit": null,
+  "pid": 12696,
+  "child": {
+    "pid": 12696,
+    "startUtc": "2026-09-13T02:02:51.4671461Z",
+    "startTicks": "649684456852",
+    "frequency": 10000000
+  },
+  "result": {
+    "exitCode": 0,
+    "timeout": false,
+    "cancelled": false,
+    "forcedStop": false,
+    "cleanupComplete": true,
+    "endUtc": "2026-09-13T02:02:56.4125672Z",
+    "endTicks": "649733913214"
+  },
+  "exitCode": 0,
+  "end": {
+    "utc": "2026-09-13T02:02:56.450Z",
+    "monotonicNs": "64973429607300"
+  }
+}
