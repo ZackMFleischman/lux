@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "commit": "ce11be5ccb573e2413ecae6140b5625af1000360",
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\view-menu-119",
+  "profile": "test-b6b3e745-a94a-4c09-a984-c86d6f728c1d",
+  "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-b6b3e745-a94a-4c09-a984-c86d6f728c1d\\agent-endpoint.json",
+  "checks": [
+    "Exact private endpoint/source/PID verified",
+    "Menu keyboard first focus, arrows and Escape focus return",
+    "Normal and narrow menu/dialog screenshots",
+    "Close Source using native tab and recover through View",
+    "Named layout save and restore",
+    "Preview runtime and controls retained"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\view-menu-119\\evidence\\lux119\\test-b6b3e745-a94a-4c09-a984-c86d6f728c1d\\01-view-menu-normal.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\view-menu-119\\evidence\\lux119\\test-b6b3e745-a94a-4c09-a984-c86d6f728c1d\\02-layouts-normal.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\view-menu-119\\evidence\\lux119\\test-b6b3e745-a94a-4c09-a984-c86d6f728c1d\\03-view-menu-narrow.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\view-menu-119\\evidence\\lux119\\test-b6b3e745-a94a-4c09-a984-c86d6f728c1d\\04-layouts-narrow.png"
+  ],
+  "pid": 39652,
+  "endpoint": {
+    "pid": 39652,
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\view-menu-119",
+    "profile": "test-b6b3e745-a94a-4c09-a984-c86d6f728c1d",
+    "sessionId": "c9ecc751ff189217a4b08fe5bc0ac9c3b81d"
+  },
+  "processExited": true
+}

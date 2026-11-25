@@ -1,0 +1,64 @@
+import assert from 'node:assert/strict';
+import {mkdir,readFile,writeFile} from 'node:fs/promises';
+import {join,resolve} from 'node:path';
+import {spawnSync} from 'node:child_process';
+import {_electron} from 'playwright';
+import {Client} from '@modelcontextprotocol/sdk/client/index.js';
+import {StdioClientTransport} from '@modelcontextprotocol/sdk/client/stdio.js';
+import {installedElectron} from '../scripts/studio-electron.mjs';
+import {resolveStudioSession,studioTestEnvironment} from '../scripts/studio-session.mjs';
+import {prismaticCompositionSource} from '../tests/studio/fixtures/prismatic-composition/source-bundle.mjs';
+
+const root=resolve(import.meta.dirname,'..'),expected=process.argv[2];assert.match(expected??'',/^[a-f0-9]{40}$/);
+const git=spawnSync('git',['-C',root,'-c','core.excludesFile=','-c','core.fsmonitor=false','-c',`safe.directory=${root.replaceAll('\\','/')}`,'rev-parse','HEAD'],{encoding:'utf8',windowsHide:true});assert.equal(git.status,0);assert.equal(git.stdout.trim(),expected);
+const clean=spawnSync('git',['-C',root,'-c','core.excludesFile=','-c','core.fsmonitor=false','-c',`safe.directory=${root.replaceAll('\\','/')}`,'diff','HEAD','--exit-code'],{encoding:'utf8',windowsHide:true});assert.equal(clean.status,0,'QA tracked source must match the recorded commit');
+const env={...studioTestEnvironment(),LUX_NODE_EXECUTABLE:process.execPath};delete env.ELECTRON_RUN_AS_NODE;const session=resolveStudioSession({workspace:root,env});
+const output=join(root,'evidence','lux119',session.profile);await mkdir(output,{recursive:true});
+const report={ok:false,commit:expected,root,profile:session.profile,endpointPath:session.endpointPath,checks:[],screenshots:[]};let app,client,page,lastStatus;
+try{
+ app=await _electron.launch({executablePath:installedElectron(root),args:[join(root,'apps/studio/dist/main.cjs')],cwd:root,env,timeout:30000,chromiumSandbox:true});page=await app.firstWindow();page.setDefaultTimeout(75000);report.pid=await app.evaluate(()=>process.pid);console.log(JSON.stringify({event:'started',pid:report.pid,profile:session.profile,root,output}));
+ let endpoint;for(let i=0;i<100;i++){try{endpoint=JSON.parse(await readFile(session.endpointPath,'utf8'));if(endpoint.pid===report.pid)break;}catch{}await new Promise(r=>setTimeout(r,100));}
+ assert.equal(endpoint.pid,report.pid);assert.equal(endpoint.workspace,root.toLowerCase());assert.equal(endpoint.profile,session.profile);report.endpoint={pid:endpoint.pid,workspace:endpoint.workspace,profile:endpoint.profile,sessionId:endpoint.sessionId};
+ client=new Client({name:'lux119-qa',version:'1.0.0'});await client.connect(new StdioClientTransport({command:process.execPath,args:[join(root,'scripts/studio-mcp.mjs')],cwd:root,env:{...env,LUX_STUDIO_SESSION_ID:endpoint.sessionId}}));
+ const call=async(name,args={})=>{const result=await client.callTool({name:`lux.studio.${name}`,arguments:args},undefined,{timeout:75000});assert.equal(result.isError,undefined,JSON.stringify(result));return JSON.parse(result.content.find(row=>row.type==='text').text);};
+ const status=async()=>lastStatus=await call('status');const waitFor=async(predicate,label)=>{const deadline=Date.now()+75000;while(Date.now()<deadline){const value=await status();if(predicate(value))return value;await new Promise(r=>setTimeout(r,250));}throw Error(`Timed out waiting for ${label}. Last status: ${JSON.stringify(lastStatus)}`);};
+ const initial=await call('read');await call('build',{expectedDraftVersion:initial.draftVersion,source:prismaticCompositionSource()});await page.locator('.preview-surface canvas').waitFor();
+ const capture=async name=>{const result=await client.callTool({name:'lux.studio.capture',arguments:{}},undefined,{timeout:75000});assert.equal(result.isError,undefined);const image=result.content.find(row=>row.type==='image');assert.ok(image?.data);const path=join(output,name);await writeFile(path,Buffer.from(image.data,'base64'));return {data:image.data,path};};
+ const shot=async name=>{const path=join(output,name);await page.screenshot({path});report.screenshots.push(path);return path;};
+ const noOverlap=async(a,b,label)=>{const x=await a.boundingBox(),y=await b.boundingBox();assert.ok(x&&y);assert.ok(x.x+x.width<=y.x||y.x+y.width<=x.x||x.y+x.height<=y.y||y.y+y.height<=x.y,label);};
+ const before=await status();
+ const view=page.getByRole('button',{name:'View',exact:true});
+ await view.focus(); await view.press('Enter');
+ const menu=page.getByRole('menu',{name:'View',exact:true});
+ await menu.waitFor();assert.equal(await menu.getByRole('menuitem').count(),7);
+ await shot('01-view-menu-normal.png');
+ const first=menu.getByRole('menuitem',{name:'Preview',exact:true});
+ assert.equal(await first.evaluate(node=>node===document.activeElement),true);
+ await first.press('ArrowDown');
+ assert.equal(await menu.getByRole('menuitem',{name:'Source',exact:true}).evaluate(node=>node===document.activeElement),true);
+ await menu.press('Escape'); await menu.waitFor({state:'hidden'});
+ assert.equal(await view.evaluate(node=>node===document.activeElement),true);
+ await view.click(); await menu.getByRole('menuitem',{name:'Layouts…',exact:true}).click();
+ const dialog=page.getByRole('dialog',{name:'Workspace layouts'});await dialog.waitFor();
+ await dialog.getByLabel('Layout name').fill('Menu QA');
+ await dialog.getByRole('button',{name:'Save layout',exact:true}).click();
+ await shot('02-layouts-normal.png');
+ await dialog.getByRole('button',{name:'Done',exact:true}).click();await dialog.waitFor({state:'hidden'});
+ const sourceTab=page.locator('.dv-tab').filter({hasText:/^Source$/});
+ await sourceTab.locator('.dv-default-tab-action').click();
+ await view.click();await menu.getByRole('menuitem',{name:'Source',exact:true}).click();
+ await page.locator('.cm-editor').waitFor();
+ await view.click();await menu.getByRole('menuitem',{name:'Layouts…',exact:true}).click();
+ await dialog.getByRole('button',{name:'Restore layout',exact:true}).click();
+ await dialog.getByText('Restored layout: Menu QA',{exact:true}).waitFor();
+ await dialog.getByRole('button',{name:'Done',exact:true}).click();await dialog.waitFor({state:'hidden'});
+ await page.setViewportSize({width:820,height:700});await view.click();await menu.waitFor();
+ await shot('03-view-menu-narrow.png');
+ const bounds=await menu.boundingBox();assert.ok(bounds&&bounds.x>=0&&bounds.x+bounds.width<=820);
+ await menu.getByRole('menuitem',{name:'Layouts…',exact:true}).click();await dialog.waitFor();
+ await shot('04-layouts-narrow.png');await dialog.press('Escape');await dialog.waitFor({state:'hidden'});
+ const after=await status();assert.equal(after.authoring.instanceId,before.authoring.instanceId);assert.equal(after.authoring.generation,before.authoring.generation);assert.deepEqual(after.authoring.controls,before.authoring.controls);
+ report.checks=['Exact private endpoint/source/PID verified','Menu keyboard first focus, arrows and Escape focus return','Normal and narrow menu/dialog screenshots','Close Source using native tab and recover through View','Named layout save and restore','Preview runtime and controls retained'];report.ok=true;
+}catch(error){report.error=error.stack??String(error);report.lastStatus=lastStatus;if(page)await page.screenshot({path:join(output,'failure.png')}).catch(()=>{});process.exitCode=1;}
+finally{await client?.close().catch(()=>{});if(app){await app.evaluate(({app})=>app.exit(0)).catch(()=>{});await app.close().catch(()=>{});}if(report.pid){try{process.kill(report.pid,0);report.processExited=false;report.ok=false;process.exitCode=1;}catch{report.processExited=true;}}await writeFile(join(output,'result.json'),JSON.stringify(report,null,2));}
+console.log(JSON.stringify(report));
