@@ -1,0 +1,1 @@
+Focused MCP-connected selector DOM check passes; broad Studio CPU suite running. Independent reviewer requested through coordinator. No active app/profile modified. Runtime screenshot QA pending and must not be treated as accepted.

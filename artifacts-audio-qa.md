@@ -1,0 +1,1 @@
+Install coordinator-combined source, connect CABLE Output, inspect one friendly clipped label with tooltip and hidden rawID, test Monitor and Disconnect, disconnected device selection. Capture actual toolbar before/after. No CUA authorized; do not bypass that restriction.

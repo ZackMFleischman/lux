@@ -1,0 +1,270 @@
+
+  apps\studio\dist\main.cjs      972.7kb
+  apps\studio\dist\main.cjs.map    2.1mb
+
+Done in 1908ms
+
+  apps\studio\dist\preload.cjs      5.9kb
+  apps\studio\dist\preload.cjs.map  9.2kb
+
+Done in 83ms
+
+  apps\studio\dist\renderer.js                            5.2mb
+  apps\studio\dist\assets\InterVariable-AM3KRH5U.woff2  344.0kb
+  apps\studio\dist\renderer.css                         175.3kb
+  apps\studio\dist\renderer.js.map                        9.6mb
+  apps\studio\dist\renderer.css.map                     267.2kb
+
+Done in 5103ms
+
+  apps\studio\dist\visual-worker.js      1.2mb
+  apps\studio\dist\visual-worker.js.map  2.4mb
+
+Done in 1002ms
+
+  apps\studio\dist\source-admission-worker.js      195.8kb
+  apps\studio\dist\source-admission-worker.js.map  455.0kb
+
+Done in 296ms
+
+  apps\studio\dist\image-preview-worker.js      192.9kb
+  apps\studio\dist\image-preview-worker.js.map  453.3kb
+
+Done in 963ms
+
+  apps\studio\dist\story-asset-decoder-worker.js      190.2kb
+  apps\studio\dist\story-asset-decoder-worker.js.map  437.2kb
+
+Done in 699ms
+
+  apps\studio\dist\view.test.cjs        3.7mb
+  apps\studio\dist\view.test.css      119.6kb
+  apps\studio\dist\view.test.cjs.map    6.5mb
+  apps\studio\dist\view.test.css.map  184.7kb
+
+Done in 4172ms
+
+  apps\studio\dist\interactions.test.mjs      394.3kb
+  apps\studio\dist\interactions.test.css      119.6kb
+  apps\studio\dist\interactions.test.mjs.map  894.6kb
+  apps\studio\dist\interactions.test.css.map  184.7kb
+
+Done in 230ms
+
+  apps\studio\dist\source-editor.test.mjs      830.1kb
+  apps\studio\dist\source-editor.test.css      119.6kb
+  apps\studio\dist\source-editor.test.mjs.map    1.5mb
+  apps\studio\dist\source-editor.test.css.map  184.7kb
+
+Done in 267ms
+
+  apps\studio\dist\library-panel.test.mjs      18.4kb
+  apps\studio\dist\library-panel.test.mjs.map  26.4kb
+
+Done in 186ms
+
+  apps\studio\dist\dock-shell.test.mjs      462.4kb
+  apps\studio\dist\dock-shell.test.css      119.6kb
+  apps\studio\dist\dock-shell.test.mjs.map  941.6kb
+  apps\studio\dist\dock-shell.test.css.map  184.7kb
+
+Done in 480ms
+
+  apps\studio\dist\preview-capture-menu.test.mjs      15.0kb
+  apps\studio\dist\preview-capture-menu.test.mjs.map  25.3kb
+
+Done in 97ms
+
+  apps\studio\dist\soundtrack-control.test.mjs       32.3kb
+  apps\studio\dist\soundtrack-control.test.mjs.map  115.5kb
+
+Done in 393ms
+✔ default view shows unavailable output and disabled runtime controls rather than a demo (264.7001ms)
+✔ Inspector identifies the locally selected Story visual (111.0454ms)
+✖ connected view distinguishes actual zero measurement, stale coverage and host revision (374.2846ms)
+✔ status bar exposes current build, problem and runtime health as actionable labels (598.4237ms)
+✔ source diagnostics replace only their matching compile job fault (149.6218ms)
+✔ audio commands connect only an exact currently enumerated device through the existing provider (5.1005ms)
+✔ local agent bridge requires token, rejects browser origins and deduplicates requests (178.2266ms)
+✔ local agent bridge forwards every authoring method and rejects unknown methods (122.5609ms)
+✔ local agent bridge admits a Scene v7 sized request envelope and rejects bytes above its request limit (3315.7675ms)
+✔ byte-only changes dirty the document, preserve failed candidates and undo complete assets (8.3514ms)
+✔ removal and source version changes are document changes, including empty v2 assets (1.8407ms)
+✔ session read, save, reopen and export retain v2 bytes and source changes cannot mutate snapshots (29.013ms)
+✔ an asset-only failed candidate is labeled separately and asset diagnostics never open a code tab (0.861ms)
+✔ MCP full-source schema preserves v2 and rejects omitted assets or unknown fields (4046.1236ms)
+✔ v2 source reaches preview compilation and compiler failure keeps the current preview (14.797ms)
+✔ source and linked versions must match before creating a preview worker (0.8452ms)
+✔ agent bridge round-trips complete Unicode source and rejects oversized read responses (1678.2561ms)
+✔ asset export reaches validation and invalid source never publishes a transport (6212.3175ms)
+✔ ordinary Studio rejects internal SDK before clone, compile or job mutation (3.7278ms)
+✔ MCP source-build DTO rejects SDK 0.3 before a handler can mutate draft state (1.8346ms)
+✔ all existing scene readers reject internal SDK sources before persistence (1.0035ms)
+✔ two-phase loader keeps exact verified bytes private and its importer runs once (20.3211ms)
+✔ v3 parameters retain verified private asset bytes before import and reject invalid identities (20.9983ms)
+✔ worker prepares verified isolated bytes before importing the submitted module (3.0679ms)
+✔ bad linked hashes, altered assets and ambiguous legacy messages fail before import (93.2716ms)
+✔ protected byte construction completes before submitted import can replace constructors (42.0051ms)
+✔ actual worker rejects invalid linked identity before Blob import or GPU access (120.2444ms)
+✔ actual worker exposes verified assets during create and missing keys fail before readiness (277.1503ms)
+✔ fresh arm permits one exact audio request and active capture only satisfies checks (1.9568ms)
+✔ discovery arm permits exact audio enumeration checks without permitting capture (2.0907ms)
+✔ an allowed request must activate before the original arm deadline (6.906ms)
+✔ first malformed main-window request consumes the arm and every foreign context is denied (1.4354ms)
+✔ arm expiry, navigation, renderer loss, and destruction revoke permission state (1.3478ms)
+✔ token-matched cancellation rejects stale activation (0.9195ms)
+✔ audio runtime discovers only input devices and always closes its discovery arm (2.4554ms)
+✔ audio runtime reports device changes and removes its listener (0.7863ms)
+✔ audio runtime reuses active capture permission for device refresh (3.5959ms)
+✔ audio runtime does not replace a pending capture arm during device refresh (2.4444ms)
+✔ audio runtime arms one request, activates its token, and revokes on disconnect (6.5011ms)
+✔ failed permission activation stops the acquired stream and cancels the exact arm (1.7414ms)
+✔ audio runtime fails closed when its context cannot enter running state (1.1466ms)
+✔ session reads, builds and saves a complete isolated draft (43.4737ms)
+✔ path save and reopen preserve the accepted preview resolution (6.3676ms)
+✔ cancelled/failed saves preserve dirty and an in-flight save excludes open/build/save (10.0637ms)
+✔ background builds keep runtime controls available while scene file operations protect them (2.0232ms)
+✔ stale build cannot submit and opening invalid code preserves the previous running identity (24.1132ms)
+✔ export validates a complete snapshot, excludes competing operations and preserves dirty state (1.5585ms)
+✔ failed preview validation prevents export and releases the session lock (1.0179ms)
+✔ failed open preserves prior controls and retry admits incoming controls only after success (356.7358ms)
+✔ new SDK draft saves an empty cache without inventing controls or executing source (49.1914ms)
+✔ invalid draft save retains the accepted snapshot provenance, not the draft hash (3.071ms)
+✔ opened parameters enter candidate initialization and failed open retains prior ownership (29.8301ms)
+✔ scene export refuses accepted controls belonging to unrelated source (3.5332ms)
+✔ invalid opened cache is rejected before replacing the current document or submitting (4.741ms)
+✔ a successful SDK 0.2 build cannot save a missing accepted cache as an empty visual (10.716ms)
+✔ opening a saved draft whose cache migrates marks the accepted controls dirty (6.6555ms)
+✔ linked build resolves the latest library source, persists its revision, shows updates, and fork keeps source (25.7675ms)
+✔ opening a linked scene tries the latest revision then visibly falls back to the saved working source (10.752ms)
+✔ Save Look uses accepted bytes after dirty edits and survives thumbnail failure (1.8396ms)
+✔ Load Look commits only after activation and preserves all authoring state on failure (11.6569ms)
+✔ linked composition expands pinned Library dependencies and preserves its complete saved fallback (6.9301ms)
+✔ SDK discovery advertises the Studio camera controller convention (151.1016ms)
+✔ camera field validation and pose math preserve the authored zero pose (5.9067ms)
+✔ the reusable Camera Controller source passes the real Library compile harness (19073.3525ms)
+✔ pose offsets orbit, pan, dolly and roll without mutating authored inputs (0.5397ms)
+✔ binding derives arbitrary public aliases only for one connected opted-in camera field (4.2514ms)
+✔ preview gestures coalesce writes, stop at stale runtime, and Reset cancels queued motion (5.3401ms)
+✔ an older runtime acknowledgement cannot roll back newer optimistic camera motion (1.5244ms)
+✔ a newer Inspector edit supersedes the latest acknowledged camera gesture (1.0278ms)
+✔ actual encoded PNG converts sRGB-stored linear premultiplication to straight alpha (4.7531ms)
+✔ encoded capture uses linear division, keeps opaque bytes, and canonicalizes zero alpha (0.8726ms)
+✔ low-alpha output is encoded directly without an ImageData premultiplication roundtrip (0.8156ms)
+✔ capture rejects inconsistent or oversized readback before encoding (0.3029ms)
+✔ Studio preview capture accepts a non-default render size (195.9613ms)
+✔ Studio preview capture removes Three WebGPU padding from only preceding non-aligned rows (4.9304ms)
+✔ disconnected Studio never admits a runtime command or invents status (3.5192ms)
+✔ commands use current canonical operation payloads without optimistic application (19.9709ms)
+✔ host authority and nonfinite or out-of-range values never reach core (1.361ms)
+✔ continuous intensity holds one in-flight write and coalesces to the latest guarded value (2.4111ms)
+✔ a value queued at acknowledgement is not erased by drain cleanup (1.0948ms)
+✔ generic parameter coalescing preserves different keys and original schema guards (3.2758ms)
+✔ typed parameter writes keep values typed and reject modulation on nonnumeric controls (6.6414ms)
+✔ close confirmation deduplicates pending requests, cancels cleanly and rejects stale approvals (0.8136ms)
+✔ manual/tap adapter guard requires protocol 3 and exact 20 through 300 BPM capability (0.4112ms)
+✔ 64 scene and component controls pass normalization and compiled DTOs (21.5364ms)
+✔ artifact DTOs admit strict trigger definitions without a persistent default (2.8854ms)
+✔ animation metadata remains byte-bounded without a binding-count cap (10.8314ms)
+✔ 64-value bulk writes are admitted for scene and component targets (2.8765ms)
+✔ 64 animation bindings evaluate and survive scene save/reopen with all base controls (47.9109ms)
+✔ saved control snapshots verify their own schema hash and values without requiring a match to changed draft source (2.4821ms)
+✔ creative profile is stable per checkout and distinct from development and inherited tests (13.9067ms)
+✔ creative startup uses the selected checkout as it advances, without reserving a worktree (2469.0306ms)
+✔ creative dependency check rejects parent fallback without executing package code (76.8468ms)
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+✔ fresh Studio startup loads the checked-in noise sphere source (3.4475ms)
+✔ setup installs a missing pinned runtime once; checks remain inert (197.9599ms)
+✔ setup repairs a deleted executable and wrong runtime version (594.4851ms)
+✔ setup refuses a mismatched package instead of downloading another version (34.6672ms)
+✔ failed and incomplete installs fail clearly and release their setup lock (337.2206ms)
+✔ setup refuses concurrent mutation and parent dependency fallback (49.1886ms)
+✔ installer uses official pinned sources despite inherited npm mirror/version overrides (199.2067ms)
+✔ export owns an isolated full document across folder selection and excludes overlapping jobs (0.8655ms)
+✔ invalid names and oversized JSON never open a dialog; failed export releases exclusion (911.7807ms)
+node:internal/child_process:1120
+    result.error = new ErrnoException(result.error, 'spawnSync ' + options.file);
+                   ^
+
+Error: spawnSync C:\Program Files\nodejs\node.exe ETIMEDOUT
+    at Object.spawnSync (node:internal/child_process:1120:20)
+    at spawnSync (node:child_process:911:24)
+    at file:///C:/Users/zFlei/.codex/worktrees/persistent-diagnostics/lux/apps/studio/test-cpu.mjs:31:18 {
+  errno: -4039,
+  code: 'ETIMEDOUT',
+  syscall: 'spawnSync C:\\Program Files\\nodejs\\node.exe',
+  path: 'C:\\Program Files\\nodejs\\node.exe',
+  spawnargs: [
+    '--test',
+    '--test-isolation=none',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\agent-audio.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\agent-bridge.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\asset-authoring.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\asset-boundaries.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\asset-worker.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\audio-permission-broker.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\audio-runtime.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\authoring-session.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\camera-controller.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\client.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\close-confirmation.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\control-count.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\control-state.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\default-startup.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\export-process.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\export-worker.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\fullscreen.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\layout.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\look-store.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\page.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\performance-state.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\presentation.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\preview-capture-files.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\preview-recorder.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\renderer-snapshot.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\runtime-audio-transport.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\runtime-commands.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\runtime-composition.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\runtime-flat-animation.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\runtime-lifecycle.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\runtime-parameters.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\shortcuts.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\soundtrack-files.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\soundtrack-player.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\soundtrack-session.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\source-diagnostics.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\source-workspace-admission.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\source-workspace.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\standard-library.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\story-authoring.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\story-document-agent-contract.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\story-document-authoring.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\story-document-client.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\story-receipt-validation.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\story-runtime.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\story-source-workspace.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\tempo-clock.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\trigger-capability.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\trigger-runtime.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\visual-model.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\webm-duration.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\windows.test.ts',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\source-admission.test.mjs',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\source-admission-browser.test.mjs',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\image-preview.test.mjs',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\capture-alpha.test.mjs',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\scene-control-animation.test.mjs',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\session-isolation.test.mjs',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\creative-checkout.test.mjs',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\tests\\studio\\electron-setup.test.mjs',
+    'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\apps\\studio\\dist\\view.test.cjs'
+  ]
+}
+
+Node.js v24.12.0

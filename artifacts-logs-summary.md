@@ -1,0 +1,3 @@
+Implemented local Studio failure logs at each profile’s logs/studio.jsonl (previous file studio.previous.jsonl). Each retains at most256KiB. Status/discovery/desktop status report exact paths. Records preserve compiler diagnostic explanations and source locations, startup stages, command timing, runtime faults and native causes. Arbitrary renderer console text is excluded; compiler stderr is reduced to native causes.
+Source:0e523882560919e9160016bf4df118a4b29a7c22.
+Review found and resolved unstructured payload channels and exit/native-code collision. Installed app refresh/live verification remain with main; no app or profile altered by this worker.

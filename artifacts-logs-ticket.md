@@ -1,0 +1,3 @@
+User result: After desktop startup, compile or runtime failure, an agent can read bounded local diagnostics instead of guessing from a stalled preview. Needed now because desktop launches discard console output and compiler stderr.
+
+Acceptance: profile logs record timestamps/session/operation/stage, compiler stderr bounded and sanitized, renderer/startup failures; retain at most two 256KiB files and exclude scene request bodies, endpoint credentials and audio device IDs. MCP status/discover and desktop status report log location. File write failures do not break creative work. Validate rotation/redaction/failure handling and build wiring; independent review before delivery. Main agent owns app restart/install and live verification.

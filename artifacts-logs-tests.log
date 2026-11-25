@@ -1,0 +1,15 @@
+✔ installed discovery accepts only the recorded self-contained paths (254.4982ms)
+✔ stdio adapter registers and dispatches the complete Studio build input (4776.3389ms)
+✔ MCP animation checks the running app capability before forwarding binding edits (6623.2616ms)
+✔ diagnostics persist bounded rotated records and exclude arbitrary request fields (397.3445ms)
+✔ diagnostic messages strip source frames, paths, credentials, long IDs and data payloads (13.1728ms)
+✔ diagnostic write failure stays observable and does not throw into the app (17.1933ms)
+✔ arbitrary child output cannot persist authored JSON payloads through native summaries (9.3506ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14824.2628

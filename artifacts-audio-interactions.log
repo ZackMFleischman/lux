@@ -1,0 +1,99 @@
+✔ RTL: frame bursts leave Performance responsive and applied controls publish immediately (803.4899ms)
+✔ RTL: discard confirmation is an accessible in-app dialog with safe cancel, Escape and explicit approval (1044.4607ms)
+✔ RTL: code-defined controls expose independent values, numeric entry and defaults without Intensity (1169.7222ms)
+✔ RTL: Boolean and dropdown controls expose typed values, descriptions and defaults without animation (2250.4725ms)
+✔ RTL: trigger actions use one native button, isolate pending state and never mark persistent edits (1454.0315ms)
+✔ RTL: a trigger visibly requires the selected source to be the active Story visual (186.8611ms)
+✔ RTL: an uncertain trigger failure retries manually with the same command ID (352.3423ms)
+✔ RTL: a selected component trigger targets its canonical node without a persisted value (136.5576ms)
+✔ RTL: Story v2 exposes source-specific capabilities, overlap and preparation state (157.9673ms)
+✔ RTL: Story v2 reports a failed next-source preparation while keeping the committed preview active (131.2479ms)
+✔ RTL: Story ribbon keeps selection separate from the attached occurrence and shows sustained dwell (197.9847ms)
+✔ RTL: Story ribbon shows scheduled dwell progress independently of a sustained beat (52.1519ms)
+✔ RTL: uncertain Story transport exposes an explicit exact retry (200.4932ms)
+✔ RTL: timed Story scrub admits one seek and replaces the queued target with the latest position (200ms)
+✔ RTL: an acknowledgement from an earlier Story activation cannot overwrite the current scrub (138.586ms)
+✔ RTL: a rejected seek reconciles a newer revision on the same Story activation (151.8268ms)
+An update to ForwardRef(Tooltip) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+✔ RTL: a sub-10ms timed Story beat retains a usable local-time step and readable position (61.4559ms)
+✔ RTL: segmented enum uses one roving tab stop and keyboard selection by stable option ID (844.2888ms)
+✔ RTL: radio enum exposes a radiogroup and arrow keys select the next stable option ID (747.7131ms)
+✔ RTL: an older Boolean acknowledgement cannot revert a newer local edit (381.6626ms)
+✔ RTL: an older acknowledgement preserves a newer segmented enum selection and roving tab stop (380.0622ms)
+✔ RTL: an older acknowledgement preserves a newer radio enum selection and roving tab stop (527.6447ms)
+✔ RTL: a rejected segmented enum edit restores its confirmed selection and roving tab stop (124.0469ms)
+✔ RTL: a rejected radio enum edit restores its confirmed selection and roving tab stop (251.2857ms)
+✔ RTL: a flat control can add the strict shared-audio binding (835.1683ms)
+✔ RTL: a flat control can configure stable per-instance variation (903.4147ms)
+✔ RTL: a flat control can add and tune the strict kick binding (1176.511ms)
+✔ RTL: audio configuration changes cancel an in-flight connection and ignore its stale completion (174.1585ms)
+✔ RTL: a failed default connection keeps the prelisted CABLE input available for an exact retry (666.2926ms)
+✔ RTL: a missing saved audio input blocks connection until the user chooses an available device (558.3375ms)
+✔ RTL: an audio device change refreshes inputs and unmount removes the listener (186.8562ms)
+✔ RTL: direct component selection edits flat controls and keeps empty-path animation identity (1024.3684ms)
+✔ RTL: control descriptions appear on hover and keyboard focus without creating empty help (444.9667ms)
+✔ RTL: duplicate component labels show and announce their public aliases (331.5767ms)
+✔ RTL: grouped controls use independent keyboard disclosures and preserve live values while collapsed (583.625ms)
+✔ RTL: Inspector filtering matches control and group names without changing values (635.8287ms)
+✔ RTL: Inspector group actions clear filters and apply to every group without changing values (596.6436ms)
+✔ RTL: an empty authored schema has no invented control (159.4656ms)
+✔ RTL: typing and pending control writes mark unsaved intent before acknowledgement (374.8544ms)
+✔ RTL: merely focusing numeric input cannot overwrite a later agent parameter change (332.8389ms)
+✔ RTL: disconnected controls refuse input while workspace remains operable (700.0368ms)
+✔ RTL: playback and intensity invoke guarded shared operations and wait for applied state (1687.2463ms)
+✔ RTL: failed runtime command shows actionable error without a successful-state claim (1595.676ms)
+✔ RTL: pending playback preserves button styling and ignores duplicate transport commands (2207.58ms)
+✔ RTL: intensity writes do not disable transport or insert a success alert (410.9566ms)
+✔ RTL: delayed applied values never pull a slider away from the latest input (817.0982ms)
+✔ RTL: rejected slider input restores confirmed value and replacement ignores old completion (1269.1015ms)
+✔ RTL: a replaced runtime has an independent input queue while old writes are pending (603.3958ms)
+✔ RTL: Escape exits native fullscreen even before its state notification arrives (164.5807ms)
+An update to StudioLayout inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+✔ RTL: fullscreen shows only preview, ignores stale initial state, and exits on first Escape (4093.4642ms)
+✔ RTL: unavailable popout is absent while fullscreen remains available (298.2662ms)
+✔ RTL: global authoring shortcuts dispatch one shared action and suppress repeats (203.6302ms)
+✔ RTL: question mark opens the shortcut reference without intercepting text entry or repeats (289.5009ms)
+✔ RTL: sequence timing is visible before launch and selection does not alter transport (126.3528ms)
+✖ RTL: an MCP-connected audio device replaces the previous device label (133.2408ms)
+ℹ tests 55
+ℹ suites 0
+ℹ pass 54
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 53865.4423
+
+✖ failing tests:
+
+test at apps\studio\dist\interactions.test.mjs:7093:1
+✖ RTL: an MCP-connected audio device replaces the previous device label (133.2408ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\zFlei\.codex\worktrees\persistent-diagnostics\lux\apps\apps\studio\src\studio.css'
+      at async open (node:internal/fs/promises:642:25)
+      at async Module.readFile (node:internal/fs/promises:1279:14)
+      at async TestContext.<anonymous> (file:///C:/Users/zFlei/.codex/worktrees/persistent-diagnostics/lux/apps/studio/dist/interactions.test.mjs:7125:24)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\zFlei\\.codex\\worktrees\\persistent-diagnostics\\lux\\apps\\apps\\studio\\src\\studio.css'
+  }

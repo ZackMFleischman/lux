@@ -1,0 +1,2 @@
+Audio selector implementation: preserve MUI hidden backing input opacity while disabled; full friendly device name tooltip. Root cause: global input:disabled opacity overrode MUI hidden input, exposing raw device ID.
+Implemented source and focused DOM checks. Actual changed desktop toolbar screenshots and native interaction validation remain incomplete; main owns app installation. Historical bug-only scope superseded by user’s explicit request on 2026-11-12.

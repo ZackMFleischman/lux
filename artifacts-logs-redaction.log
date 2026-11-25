@@ -1,0 +1,11 @@
+✔ diagnostics persist bounded rotated records and exclude arbitrary request fields (325.5896ms)
+✔ diagnostic messages strip source frames, paths, credentials, long IDs and data payloads (10.0077ms)
+✔ diagnostic write failure stays observable and does not throw into the app (7.0746ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 568.9772
