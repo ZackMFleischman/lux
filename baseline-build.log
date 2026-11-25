@@ -1,0 +1,22 @@
+
+  apps\studio\dist\main.cjs      150.5kb
+  apps\studio\dist\main.cjs.map  289.9kb
+
+Done in 37ms
+
+  apps\studio\dist\preload.cjs      2.4kb
+  apps\studio\dist\preload.cjs.map  3.7kb
+
+Done in 8ms
+
+  apps\studio\dist\renderer.js         3.8mb
+  apps\studio\dist\renderer.css      137.6kb
+  apps\studio\dist\renderer.js.map     7.0mb
+  apps\studio\dist\renderer.css.map  211.2kb
+
+Done in 762ms
+
+  apps\studio\dist\visual-worker.js       9.5kb
+  apps\studio\dist\visual-worker.js.map  17.6kb
+
+Done in 19ms
