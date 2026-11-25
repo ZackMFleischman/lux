@@ -1,0 +1,8 @@
+- `node --test tests/core/component-library.test.ts`: 16/16 pass.
+- `node --test tests/studio/standard-library.test.ts tests/studio/desktop-package.test.mjs tests/studio/session-isolation.test.mjs`: 17/17 pass.
+- `node --test tests/studio/prismatic-composition-fixture.test.mjs`: 3/3 pass.
+- `node --test --test-isolation=none apps/studio/dist/library-panel.test.mjs`: 8/8 pass after `node apps/studio/build.mjs --tests`.
+- `npx tsc -p apps/studio/tsconfig.json --noEmit` and `npx tsc -p tsconfig.json --noEmit`: pass.
+- Combined main full Studio CPU and all three TypeScript configurations pass; see `artifacts/feedback-01a0a7bb/all-features-cpu.log`.
+- Combined installed skill check is current with no missing, changed, or unexpected files; see `artifacts/feedback-01a0a7bb/final-skill-check.json`.
+- Tests and native/package demonstrations forced temporary library roots and did not write the user's canonical library.
