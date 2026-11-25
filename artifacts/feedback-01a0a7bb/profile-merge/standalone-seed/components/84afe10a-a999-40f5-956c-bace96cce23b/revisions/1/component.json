@@ -1,0 +1,17 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "84afe10a-a999-40f5-956c-bace96cce23b",
+  "revision": 1,
+  "name": "Prismatic Observatory",
+  "description": "Reusable nested orbital instrument: nine gyroscopic rings, satellites, a crystal heart and a star field. Controls for motion, expansion, inclination and palette.",
+  "updatedAt": "2026-09-14T04:53:12.562Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "instrument.ts",
+    "files": [
+      "instrument.ts",
+      "parts/instrument.ts"
+    ]
+  }
+}

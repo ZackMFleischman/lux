@@ -1,0 +1,11 @@
+{
+  "output": "C:\\Users\\zFlei\\repos\\lux\\artifacts\\graph-navigation\\run-1794539792656",
+  "ok": false,
+  "root": "C:\\Users\\zFlei\\repos\\lux",
+  "profile": "test-5c01209c-759b-48eb-a2e5-3c9c5c8c55d8",
+  "checks": [],
+  "errors": [],
+  "screenshots": [],
+  "stage": "checking composition navigation",
+  "error": "AssertionError [ERR_ASSERTION]: {\"content\":[{\"type\":\"text\",\"text\":\"A visual build is already running\"}],\"isError\":true}\n    at call (file:///C:/Users/zFlei/repos/lux/scripts/test-studio-graph-navigation.mjs:37:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/scripts/test-studio-graph-navigation.mjs:74:28"
+}

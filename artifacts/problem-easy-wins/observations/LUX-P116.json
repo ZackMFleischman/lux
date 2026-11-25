@@ -1,0 +1,12 @@
+{
+  "batch_id": "b03bfd76-148e-448b-8cd5-d702fcadab0a",
+  "revisit_trigger": "Reassess on a fresh recurrence after the cited fix/guidance, missing installed guidance, or an uncovered concrete acceptance gap.",
+  "observation": "User caught insufficient artistic validation of hummingbird species and material",
+  "event_seqs": [
+    3305
+  ],
+  "action": "observe",
+  "review_after": "2026-09-25T00:00:00Z",
+  "rationale": "LUX-184 is done with anatomy/material review; preserve evidence and observe later recognizability rather than duplicate.",
+  "group_key": "easywins-existing-lux-p116"
+}

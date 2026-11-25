@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "root": "C:\\Users\\zFlei\\repos\\lux",
+  "profile": "test-2b5cc190-9c42-45c3-9592-fd91f1e695c5",
+  "checks": [],
+  "errors": [],
+  "screenshots": [],
+  "stage": "checking plain Scene root",
+  "error": "Error: Before screenshot captured\n    at file:///C:/Users/zFlei/repos/lux/scripts/.scene-interior-before.mjs:57:9"
+}

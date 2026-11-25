@@ -4,10 +4,11 @@ import { createDelegationHandler } from './delegation.ts';
 import type { Delegate } from './delegation.ts';
 
 /** Browser owns audio. This trusted sideband alone owns tool execution. */
-export function attachLive({ client, sessionId, execute, state, onFailure, onEnded, log = (_s: string) => {}, debug = false, driver }: {
+export function attachLive({ client, sessionId, execute, state, onFailure, onEnded, onTranscript, log = (_s: string) => {}, debug = false, driver }: {
   client: OpenAI; sessionId: string; execute: Delegate; state: unknown;
   onFailure: (error: Error) => void; onEnded: () => void;
   log?: (message: string) => void; debug?: boolean; driver?: SidebandWS;
+  onTranscript?: (fragment: { speaker: string; delta: string; startMs: number; endMs: number }) => void;
 }) {
   const ws = driver ?? new SidebandWS(client, { session_id: sessionId }, { reconnect: null });
   let opened = false, closing = false, finalized = false, disconnected = false, failed = false;
@@ -39,7 +40,9 @@ export function attachLive({ client, sessionId, execute, state, onFailure, onEnd
     }
     if (closing || failed) return;
     if (event.type === 'session.input_transcript.delta' || event.type === 'session.output_transcript.delta') {
-      log(`${event.type === 'session.input_transcript.delta' ? 'You' : 'Copilot'}: ${event.delta}`);
+      const speaker = event.type === 'session.input_transcript.delta' ? 'You' : 'Copilot';
+      if (onTranscript) onTranscript({ speaker, delta: event.delta, startMs: event.start_ms, endMs: event.end_ms });
+      else log(`${speaker}: ${event.delta}`);
     } void backend.handle(event).catch(error => fail(error as Error));
   });
   ws.on('error', error => fail(Error(`GPT-Live: ${error.message}`)));

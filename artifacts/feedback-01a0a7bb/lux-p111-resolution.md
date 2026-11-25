@@ -1,0 +1,3 @@
+Resolved prospectively by LUX-168. The exact submitted fix `6d8d7bef7679881b49bc2217d846b9533589d974`, landed through `4514291224282ebadfdc5885cc3a7e619d75161d`, restores the old unguarded `ComponentDefinition.create` annotation and introduces `AnyComponentDefinition` for code-or-graph annotations. The unchanged legacy source compiles and links, modern graph/type regressions pass, and independent review found no blockers.
+
+Preserve the historical LUX-150 acceptance and this correction record. LUX-168 is the explicit compatibility closure for the release hold recorded here; it does not rewrite the earlier acceptance event.

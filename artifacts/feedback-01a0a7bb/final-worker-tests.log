@@ -1,0 +1,39 @@
+(node:20172) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ device loss during a post-init update retains resources until settlement and prevents evaluation (202.4575ms)
+✔ device loss during frame queue completion prevents late frame publication (152.9835ms)
+✔ device loss during reset or readback drains the command before cleanup and publishes no late result (339.3048ms)
+✔ device loss during renderer initialization prevents factory creation after settlement (136.2613ms)
+✔ real worker executes submitted v4 code: heartbeat, update, evaluate, validated presentation, queue, ready and same-target capture (572.3564ms)
+✔ message/profile mismatches reject before import; definition disagreement rejects before create (374.8444ms)
+✔ partial and terminal failures retain original errors and attempt independent cleanup once (1863.2174ms)
+✔ post-import captured descriptor and resource checks survive modified validation globals (411.4147ms)
+✔ abandoned backend and GPU work delay cleanup independently; failure never presents or permits capture (660.93ms)
+✔ explicit resets run individually, preserve controls, and reset rejection terminates once with the primary error (355.1157ms)
+✔ backend rejection restores target; forced termination remains separate from graceful cleanup (330.0789ms)
+(node:14256) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ legacy class prototype dispose retains its receiver and runs once across repeated disposal (341.1191ms)
+✔ throwing legacy prototype dispose reports diagnostics and still releases owned resources once (134.1984ms)
+✔ opt-in initialization gate waits before create and accepts only one exact owner GO outside its pending init chain (237.2806ms)
+✔ worker announces liveness before top-level/create and heartbeats continue through healthy async initialization (216.2035ms)
+✔ baseline worker retains controls, frames and heartbeat with no query allocations or optional CPU spans (353.1663ms)
+✔ worker keeps routine sampling phase through unsampled frame notifications (138.5536ms)
+✔ playing cadence subtracts full completed-frame work from its next delay (131.2908ms)
+✔ over-budget frames and late timer wakeups rebase cadence without accumulating catch-up draws (212.5964ms)
+✔ a queued old timer cannot add a draw after a control command replaces its schedule (118.1526ms)
+✔ actual worker requests timestamp support and publishes a fresh correlated GPU pass result (140.253ms)
+✔ externally driven worker advances only for explicit frames and existing control draws (271.5007ms)
+✔ actual worker reports separate CPU calls, asynchronous render wait, queue wait and honest GPU capability (183.6322ms)
+✔ actual worker applies complete initial/live controls and captures exact metadata; reset preserves values (925.654ms)
+✔ actual worker supports empty controls and rejects mismatched metadata before create (846.0851ms)
+✔ post-import verification survives mutated Object/JSON/Map intrinsics and does not invoke getters (570.5423ms)
+✔ legacy worker protocol remains scalar-compatible and invalid generic snapshots cannot draw a partial update (325.7069ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6147.8234

@@ -1,0 +1,10 @@
+{
+  "instanceId": "44ef6e13-9f2e-4c39-9d63-063ba79cb4cc",
+  "values": {
+    "cameraPitch": 0.3,
+    "cameraYaw": 0.55
+  },
+  "expectedGeneration": 3,
+  "expectedControlSchemaHash": "6f21f737c615360069fc3f2be4ce80150ec32a9f4e9c03724e1106023623600d",
+  "expectedRevisionId": "abd6aa9d356ad8045c42115b8504d76bdaa6c380e9abe7e98a23a51900f4199f"
+}

@@ -11,6 +11,17 @@ function fakeSocket() {
   ws.close = () => ws.socket.emit('close');
   return ws;
 }
+
+test('sideband sends timed transcript fragments separately from activity logs', async () => {
+  const ws = fakeSocket(), fragments: unknown[] = [], logs: string[] = [];
+  const live = attachLive({ client: {} as never, sessionId: 'id', execute: async () => 'done', state: {},
+    onFailure: e => { throw e; }, onEnded() {}, onTranscript: fragment => fragments.push(fragment), log: s => logs.push(s), driver: ws });
+  ws.socket.emit('open'); await live.ready;
+  for (const delta of ['Made', ' it faster.']) ws.emit('event', { type: 'session.output_transcript.delta', delta, start_ms: 0, end_ms: 100 });
+  assert.deepEqual(fragments, ['Made', ' it faster.'].map(delta => ({ speaker: 'Copilot', delta, startMs: 0, endMs: 100 })));
+  assert.deepEqual(logs, []);
+  const closing = live.close(); ws.emit('event', { type: 'session.closed' }); await closing;
+});
 test('sideband attaches without restarting the session and finalizes once', async () => {
   const ws = fakeSocket();
   const live = attachLive({ client: {} as never, sessionId: 'opaque-session-id', execute: async () => 'done', state: {},

@@ -1,0 +1,7 @@
+{
+  "correction": "User explicitly rejected computer-use automation for this workflow. Plan one-call MCP recording, decoded-cadence validation, direct-frame encoding and deterministic export under LUX-176; do not claim render FPS proves recording quality.",
+  "evidence": "Measured source: C:/Users/zFlei/Dropbox/VJ/Living Ornament - Companion Birds - 2026-09-16.webm. Median frame gap 0.7325s; maximum 1.256s; container duration 129.783s. Ticket receipts: artifacts/recording-roadmap.",
+  "summary": "Recording delivery was slow and temporal quality was not validated",
+  "actual": "User reported 15m30s turnaround and roughly one new frame every two seconds. WebM inspection found 113 frames over 84.639s; 30 FPS conversion duplicated frames. Prior validation of format and a still missed the defect.",
+  "expected": "Deliver a smooth clip quickly through programmatic recording and verify actual motion cadence."
+}

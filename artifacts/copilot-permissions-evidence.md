@@ -1,0 +1,3 @@
+Evidence: tools/live-copilot/README.md; artifacts/copilot-transcript-after.png; artifacts/copilot-write-smoke.txt.
+Commands: npm run test:copilot (31 pass); npm run typecheck (pass); node artifacts/start-creative-copilot.mjs --check-agent (status passed using approve + workspace-write); node artifacts/check-copilot-write.mjs (write/readback passed).
+Independent review: /root/review_copilot. Resolved canonical tool aliases, per-tool approval overrides and documentation. Custom permission profile was tested but stalled; reverted before restart. Creative protection is instructional under workspace-write, documented.

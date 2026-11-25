@@ -1,0 +1,1 @@
+Structural validation and independent scenario review complete. Future real refactors must establish effectiveness; no claim of measured time savings or permanent prevention. Automatic discovery is enabled by default; explicit invocation is $improve-ui.

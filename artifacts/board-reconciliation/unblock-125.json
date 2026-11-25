@@ -1,0 +1,3 @@
+{
+  "reason": "The historical approval and MCP-connectivity blocker is superseded by LUX-127 evidence of an actual delegated status read and scoped permissions. Return this inactive feature to the backlog; this is not acceptance. Voice-to-visual QA and review/commit of existing local work remain incomplete. Do not launch voice/API sessions as part of this board audit."
+}

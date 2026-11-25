@@ -1,0 +1,37 @@
+✔ creative checkout keeps its original commit while development advances, and detects edits (3455.6669ms)
+✔ creative dependency check rejects parent fallback without executing package code (67.1875ms)
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+✔ setup installs a missing pinned runtime once; checks remain inert (298.8947ms)
+✔ setup repairs a deleted executable and wrong runtime version (939.6003ms)
+✔ setup refuses a mismatched package instead of downloading another version (22.1462ms)
+✔ failed and incomplete installs fail clearly and release their setup lock (595.5406ms)
+✔ setup refuses concurrent mutation and parent dependency fallback (38.2615ms)
+✔ installer uses official pinned sources despite inherited npm mirror/version overrides (178.6098ms)
+✔ normal checkouts, creative, and every test run have separate profiles (58.9361ms)
+✔ connections route only to their selected profile and refuse endpoint replacement (812.4011ms)
+✔ rejects mismatched checkout and legacy or invalid endpoint before sending any request (145.9628ms)
+✔ failed startup discovery can connect after a stale endpoint is replaced (94.6319ms)
+✔ an uncertain mutation keeps the selected instance bound (94.4573ms)
+✔ actual Windows stdio adapter selects its test profile and refuses a replacement (1372.9432ms)
+✔ copies nested files and a repeated install leaves matching files untouched (1149.5709ms)
+✔ detects changed source without writing, then installs the updated bytes (976.8189ms)
+✔ reports obsolete or unrelated installed files and refuses mutation (597.5477ms)
+✔ rejects source and destination directory links without modifying their targets (44.0716ms)
+✔ rejects missing SKILL.md, overlapping paths, and links in destination ancestors (171.2956ms)
+✔ refuses obsolete installed source files until they are reviewed and moved out (385.5209ms)
+✔ rejects hard linked destination files rather than overwriting shared content (153.0367ms)
+✔ CLI check exits nonzero on drift and CODEX_HOME controls the default install root (1305.3726ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5136.5354

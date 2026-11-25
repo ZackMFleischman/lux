@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "f333e8f6-3b85-4fb9-a909-36f137954bc9",
+  "revision": 1,
+  "name": "Shockwave Ripples",
+  "description": "Use as a final image effect to make bass hits send whole-screen refracting shockwave rings outward from a chosen point, with a chromatic split and soft glow.",
+  "updatedAt": "2026-11-20T03:26:48.639Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "ripples.ts",
+    "files": [
+      "ripples.ts"
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "root": "C:\\Users\\zFlei\\repos\\lux",
+  "profile": "test-f7c787a7-2bd6-4f26-af43-da11f86abb63",
+  "checks": [
+    "Plain defineVisual opens inside Scene with one Visual card and keyboard-accessible header settings, no drill-in action, and a breadcrumb fitting an 820px window"
+  ],
+  "errors": [],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\artifacts\\graph-navigation\\run-1794539734861\\plain-scene-root.png",
+    "C:\\Users\\zFlei\\repos\\lux\\artifacts\\graph-navigation\\run-1794539734861\\plain-scene-narrow.png"
+  ],
+  "stage": "checking plain Scene root"
+}

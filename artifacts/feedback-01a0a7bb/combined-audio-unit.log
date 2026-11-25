@@ -1,0 +1,23 @@
+✔ band analysis separates bass, mids, and highs with hand-derived full-scale fixtures (12.3793ms)
+✔ band analysis rejects mismatched buffers and non-finite samples (1.216ms)
+✔ Web Audio analyzer disables built-in smoothing and disconnects only owned nodes (1.2779ms)
+✔ portable audio source normalizes one bounded primary input configuration (6.6299ms)
+✔ portable audio source rejects extra fields and unsupported identity or analyzer bounds (2.7805ms)
+✔ local device identity is validated separately from portable configuration (0.7637ms)
+✔ audio binding is a strict variant while the legacy LFO record stays exact (5.6921ms)
+✔ one scene audio configuration remains active and incompatible bindings stay disabled (1.7781ms)
+✔ audio attack and release use rendered frame time while manual base remains live (2.1826ms)
+✔ audio snapshots reject stale sequence and reset sequence on a newer generation (0.5242ms)
+✔ explicit connect owns one capture while subscriptions only control sampling (13.9542ms)
+✔ a stale connect completion cleans its resources without publishing (0.7882ms)
+✔ track end publishes unavailable zero before idempotent owned cleanup (7.8528ms)
+✔ interrupted audio context publishes unavailable zero and requires a new connect (1.7858ms)
+✔ switching analyzer configuration closes the old capture before opening the new one (1.0163ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 212.9801

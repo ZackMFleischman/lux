@@ -1,0 +1,12 @@
+{
+  "batch_id": "b03bfd76-148e-448b-8cd5-d702fcadab0a",
+  "revisit_trigger": "Reassess on a fresh recurrence after the cited fix/guidance, missing installed guidance, or an uncovered concrete acceptance gap.",
+  "observation": "The accepted connected group treatment used too much vertical padding for control-dense Inspector workflows.",
+  "event_seqs": [
+    3355
+  ],
+  "action": "observe",
+  "review_after": "2026-09-25T00:00:00Z",
+  "rationale": "LUX-201/203 and LUX-210 already address compact density and whole-panel review; do not duplicate implementation.",
+  "group_key": "easywins-existing-lux-p118"
+}

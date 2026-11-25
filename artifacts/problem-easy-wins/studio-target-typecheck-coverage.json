@@ -1,0 +1,15 @@
+{
+  "event_seqs": [
+    3034
+  ],
+  "review_after": "2026-09-25T00:00:00Z",
+  "rationale": "A small script change closes a verified coverage hole before expensive native QA.",
+  "revisit_trigger": "Review the implementation and a fresh use of the corrected path; recurrence remains actionable.",
+  "action": "now",
+  "batch_id": "b03bfd76-148e-448b-8cd5-d702fcadab0a",
+  "body": "Make the normal root typecheck include apps/studio/tsconfig.json, without launching Electron. Keep the existing checks. Prove a temporary Studio-only type error fails the normal command, then remove it and verify clean code passes. Update the documented normal check so reviewers need no special reminder. Evidence: LUX-P91 event3034; current package.json and tsconfig.json. This does not replace graphical QA. Checklist: implement; independent review; verify normal command; land.",
+  "title": "Include Studio in the standard typecheck",
+  "observation": "P91 seq3034 records an actual Studio props ReferenceError after root checks passed. Current root typecheck runs tsconfig.json and examples only; tsconfig.json excludes apps/studio.",
+  "inferred_cause": "The normal root command does not cover the renderer application.",
+  "group_key": "studio-target-typecheck-coverage"
+}

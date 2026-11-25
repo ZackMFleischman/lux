@@ -1,0 +1,12 @@
+✔ Graph enters nested components one level at a time and edits an exposed control through its canonical leaf (8195.4129ms)
+✔ Graph wheel zoom anchors at the pointer and background gestures keep selection clear (289.8785ms)
+✔ Graph opens inside Scene and keeps its settings in the header (327.3806ms)
+✔ Graph connections point from output to input with reversed node declarations (42.0793ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 27594.4974

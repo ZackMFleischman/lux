@@ -1,0 +1,1 @@
+{"request":"inputs-review-ack-01a09967-01","ok":true,"run_revision":18,"epoch":1,"launch_id":"38116d6c-c81b-4f99-84f2-9d00a2090b4a","acknowledged_generation":1,"acknowledged_epoch":1,"note":"Own launch active/acknowledged; another launch reported unreconciled. Root owns run readiness."}

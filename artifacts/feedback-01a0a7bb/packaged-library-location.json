@@ -1,0 +1,31 @@
+{
+  "ok": true,
+  "sourceCommit": "ebf3a72ac71532799310cebabaae2c6f5fb9a470",
+  "node": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\ebf3a72a-caab8a53\\resources\\app\\node.exe",
+  "workspace": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\ebf3a72a-caab8a53\\resources\\app\\runtime",
+  "canonical": {
+    "root": "C:\\Users\\zFlei\\repos\\lux\\library",
+    "kind": "repository",
+    "seedRoots": [
+      "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\ebf3a72a-caab8a53\\resources\\app\\runtime\\library",
+      "C:\\Users\\zFlei\\AppData\\Local\\Temp\\lux-packaged-location-5ryqy8\\Lux\\Studio\\library"
+    ]
+  },
+  "fallback": {
+    "root": "C:\\Users\\zFlei\\AppData\\Local\\Temp\\lux-packaged-location-5ryqy8\\Lux\\Studio\\library",
+    "kind": "fallback",
+    "seedRoots": [
+      "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\ebf3a72a-caab8a53\\resources\\app\\runtime\\library"
+    ]
+  },
+  "packagedCatalog": {
+    "format": "lux-component-library-catalog",
+    "version": 1,
+    "components": [
+      {
+        "id": "93a7215f-4df1-4e1e-9d34-3f7f0f27ad84",
+        "revision": 1
+      }
+    ]
+  }
+}

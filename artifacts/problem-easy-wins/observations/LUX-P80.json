@@ -1,0 +1,12 @@
+{
+  "batch_id": "b03bfd76-148e-448b-8cd5-d702fcadab0a",
+  "revisit_trigger": "Reassess on a fresh recurrence after the cited fix/guidance, missing installed guidance, or an uncovered concrete acceptance gap.",
+  "observation": "Coordinator sent unrelated MIDI status to the isolated-startup task",
+  "event_seqs": [
+    3128
+  ],
+  "action": "observe",
+  "review_after": "2026-09-25T00:00:00Z",
+  "rationale": "CON-50 is done and specifically addresses recipient relevance. Reassess its effectiveness on future messages rather than create another equivalent ticket.",
+  "group_key": "coordination-recipient-relevance"
+}

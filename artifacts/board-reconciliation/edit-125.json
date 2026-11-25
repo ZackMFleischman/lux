@@ -1,0 +1,8 @@
+{
+  "body": "Backlog; not currently dispatched. The old MCP connection/approval blocker was superseded by the LUX-127 delegated-read evidence. This feature is not accepted yet.\n\nThe current implementation uses browser Start/Stop audio and local Codex delegation with the saved ChatGPT login. Preserve invocation-scoped permissions, existing user files, and no paid delegation fallback.\n\nRemaining: review and commit the preserved local changes, confirm the matching Studio connection, demonstrate a spoken edit and relative follow-up, and verify stop/cleanup. Do not start billed voice sessions during board cleanup. Preserve original scope amendments and evidence in ticket history, LUX-127, and tools/live-copilot/README.md.",
+  "title": "Voice copilot: finish end-to-end validation",
+  "parent_id": null,
+  "reason": "Replace stale blocked-era specification with current backlog and unfinished acceptance; no new execution or capability claim.",
+  "kind": "feature",
+  "dependencies": []
+}

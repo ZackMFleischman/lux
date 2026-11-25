@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "f573cb7b-c14a-4051-b4f3-d11111a5c4a0",
+  "revision": 1,
+  "name": "Dancing Space Needle Dabbers",
+  "description": "Fifty dancing Space Needle characters with dab depth, dance speed and vivid palette controls; beams saved separately.",
+  "updatedAt": "2026-09-15T06:08:40.671Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "component.ts",
+    "files": [
+      "component.ts"
+    ]
+  }
+}

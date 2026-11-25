@@ -1,0 +1,31 @@
+✔ PNG save commits complete bytes and replaces only after the temporary file is ready (79.7577ms)
+✔ default PNG bound accepts a valid capture larger than the former 8 MiB ceiling (32.8395ms)
+✔ video chunks stream in order and become visible only after finish (18.1461ms)
+✔ cancel removes partial video and preserves an existing destination (9.4641ms)
+✔ capture store rejects malformed files and bounded recording writes without changing the destination (8.6667ms)
+✔ shutdown drain waits for queued chunks and removes the temporary recording (27.5581ms)
+✔ shutdown waits for an in-progress finalizer and prevents its commit (5.5975ms)
+✔ WebM selection prefers VP9 then VP8 and reports unsupported runtimes (2.4595ms)
+✔ recorder streams ordered chunks from the fixed output canvas and commits on stop (39.7158ms)
+✔ recorder rejects a panel-sized canvas instead of silently changing output dimensions (2.7054ms)
+✔ recorder allows one destination choice at a time and cancellation leaves it idle (0.6491ms)
+✔ recorder cancels the chosen destination when the preview changes during the save dialog (0.3937ms)
+✔ cancel and backpressure failures remove partial output and stop the canvas track (28.2889ms)
+✔ renderer coalesces frame observations, caches reads and publishes latest within 100 ms (5.0993ms)
+✔ renderer bounds animation time and effective-value observations to UI cadence (2.8818ms)
+✔ control, transport, owner, fault and jobs changes bypass pending frame delay (0.8614ms)
+✔ last unsubscribe cancels timer; reattachment catches up without leaking source listeners (0.6041ms)
+✔ animation operation schema admits the empty scene path (7.003ms)
+✔ flat runtime keeps base controls while accepting guarded animation state and rejecting stale or forged targets (49.4027ms)
+✔ legacy runtime state preserves scene animation fields (0.4232ms)
+✔ WebM finalizer inserts duration into Info without changing an unknown Segment size (4.342ms)
+✔ WebM finalizer replaces an existing duration without growing the file (0.5707ms)
+✔ WebM finalizer rejects missing or truncated Info instead of emitting a corrupt clip (1.1258ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 606.6149

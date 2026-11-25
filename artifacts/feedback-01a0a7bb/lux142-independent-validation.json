@@ -1,0 +1,12 @@
+{
+  "commit": "bf549de826a590b10f1b7b2963c1606c5335f0b2",
+  "criteria": "Graph shows a selectable Scene root for an accepted plain visual, keeps actual composition children beside Scene, uses a concise Scene breadcrumb, only offers View inside for a selected nested component, and preserves keyboard Enter, Back, selection, pan, zoom, and read-only connections.",
+  "evidence": "Independent review inspected the immutable GraphPanel and test diff, the 11/11 dock CPU result, and private-profile native evidence. Plain desktop and 820px Graph screenshots at artifacts/graph-navigation/run-1789535809670 show the single selectable Scene root and fitting breadcrumb. Composition screenshots at artifacts/graph-navigation/run-1789536606783 show Scene plus the source and nested components, then Scene > Double mirror 1 with Back and leaf controls. The native result records keyboard Enter navigation, Back return, no errors, and a test-owned profile/adapter session.",
+  "context_id": "codex-lux142-independent-validator-01a0a7bb",
+  "checks": {
+    "dock_cpu": "pass",
+    "typecheck": "pass",
+    "native_plain_graph": "pass",
+    "native_composition_graph": "pass"
+  }
+}

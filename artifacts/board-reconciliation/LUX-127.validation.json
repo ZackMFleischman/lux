@@ -1,0 +1,12 @@
+{
+  "commit": "",
+  "criteria": "Reconcile the submitted scope with the originating user authorization, preserve the resulting approved configuration, verify a scoped delegated read and restart, and complete the required voice-driven visual-change QA.",
+  "evidence": "The ticket submission has no commit and says its changes are uncommitted. The current candidate enables Lux approval plus workspace-write/coding behavior, while the ticket body names a narrower Lux-tool set. The originating task may contain later user authorization not preserved in this ticket; this audit cannot infer that the candidate is unauthorized. Ticket QA explicitly leaves voice-driven visual-change testing outstanding.",
+  "context_id": "/root/board_review:read-only-independent-audit",
+  "checks": {
+    "submitted_commit_present": "false",
+    "uncommitted_candidate_present": "true",
+    "ticket_scope_matches_candidate": "unresolved; reconcile against originating user instructions",
+    "required_manual_voice_qa_complete": "false"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "cancelled": false,
+  "name": "Prismatic Spikes",
+  "releaseId": "90a9b37346efdd14b2a8fefb69d7ed29f7fc0ea5a46eb856444ca4ad5feed615",
+  "installRoot": "C:\\Users\\zFlei\\AppData\\Local\\Lux\\Installed",
+  "installed": {
+    "releaseId": "90a9b37346efdd14b2a8fefb69d7ed29f7fc0ea5a46eb856444ca4ad5feed615",
+    "runtimeId": "82d548bb3d0737c927e3ae48ec3889981576f7e8c15acd6b9ec363d29e076f9f",
+    "releasePath": "C:\\Users\\zFlei\\AppData\\Local\\Lux\\Installed\\releases\\90a9b37346efdd14b2a8fefb69d7ed29f7fc0ea5a46eb856444ca4ad5feed615",
+    "runtimePath": "C:\\Users\\zFlei\\AppData\\Local\\Lux\\Installed\\runtimes\\82d548bb3d0737c927e3ae48ec3889981576f7e8c15acd6b9ec363d29e076f9f",
+    "playbackReady": false
+  },
+  "registration": {
+    "releaseId": "90a9b37346efdd14b2a8fefb69d7ed29f7fc0ea5a46eb856444ca4ad5feed615",
+    "dllPath": "C:\\Users\\zFlei\\Documents\\Resolume Avenue\\Extra Effects\\Lux_90a9b37346efdd14b2a8fefb69d7ed29f7fc0ea5a46eb856444ca4ad5feed615.dll",
+    "sidecarPath": "C:\\Users\\zFlei\\Documents\\Resolume Avenue\\Extra Effects\\Lux_90a9b37346efdd14b2a8fefb69d7ed29f7fc0ea5a46eb856444ca4ad5feed615.dll.lux-source",
+    "pluginId": "QOPT",
+    "displayName": "Prismatic Spikes",
+    "sidecar": "lux-installed-source-v1\n90a9b37346efdd14b2a8fefb69d7ed29f7fc0ea5a46eb856444ca4ad5feed615\n82d548bb3d0737c927e3ae48ec3889981576f7e8c15acd6b9ec363d29e076f9f\nQOPT\nPrismatic Spikes\n",
+    "alreadyRegistered": false
+  },
+  "verified": {
+    "releaseId": "90a9b37346efdd14b2a8fefb69d7ed29f7fc0ea5a46eb856444ca4ad5feed615",
+    "runtimeId": "82d548bb3d0737c927e3ae48ec3889981576f7e8c15acd6b9ec363d29e076f9f",
+    "savedControls": {
+      "intensity": 0.67
+    },
+    "registered": true
+  },
+  "hostPlaybackVerified": false
+}

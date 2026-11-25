@@ -1,0 +1,5 @@
+Recurrence: root sent the delivery coordinator a dense board-cleanup recap with ticket revisions, review findings, the separate Conductor state report, reporting-session cleanup and portal status. Most of this changed none of the recipient's assignments or resources. The user explicitly challenged the message.
+
+Correction: send only a necessary dispatch delta, if any (returned tickets are inactive backlog; do not start them). Keep board audit details and reporting receipts in the tracker and user report. Before sending, identify the recipient action changed by the message; if none, omit it. This is recurrence of LUX-P80 despite the existing coordination relevance rule, not a new request to build workflow tooling.
+
+Evidence: coordinator task 01a09baf-3806-7eb0-8bed-48b8b7f771cf, message to delivery task 01a0a7bb-ee60-76f1-bcd6-5d179614f551 immediately after CON-P51 reporting, and user's quoted correction. Do not send this correction back to the unrelated delivery task.

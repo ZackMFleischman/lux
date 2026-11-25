@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+const catalog=JSON.parse(execFileSync('git',['show','HEAD:library/catalog.json'],{encoding:'utf8'}));
+const current=JSON.parse(fs.readFileSync('library/catalog.json','utf8'));
+const id='7bd99b27-08ae-4483-9314-1c8e1e98cf10';
+const added=current.components.find(row=>row.id===id);
+if(!added)throw Error('Published starfield missing from catalog');
+if(!catalog.components.some(row=>row.id===id))catalog.components.push(added);
+const data=JSON.stringify(catalog,null,2)+'\n';
+const hash=execFileSync('git',['hash-object','-w','--stdin'],{input:data,encoding:'utf8'}).trim();
+execFileSync('git',['update-index','--add','--cacheinfo','100644',hash,'library/catalog.json']);
+console.log('Staged only the Cosmos Starfield catalog addition.');

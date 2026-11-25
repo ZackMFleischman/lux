@@ -1,0 +1,8 @@
+{
+  "reason": "Group the four user-approved recording proposals and encode execution dependencies.",
+  "kind": "bug",
+  "dependencies": [],
+  "parent_id": "LUX-176",
+  "title": "Diagnose and fix sparse preview recording and incorrect duration",
+  "body": "The existing WebM has 113 frames across 84.639s, median frame gap 0.7325s and maximum 1.256s. Its container duration is 129.783s. A 30-FPS MP4 conversion merely duplicates sparse frames.\n\nInstrument completed render, capture, encode and write boundaries. Identify where cadence is lost before selecting a fix. Explicit frame requests are a hypothesis, not a proven remedy. Stop duration measurement at capture end, excluding encoder shutdown and file finalization.\n\nAcceptance:\n- Document root cause and a short reproducible diagnostic.\n- On a capable host, demonstrate a 30s/30FPS clip with approximately 900 advancing frames; report decoded timestamps, drops, repeats and maximum gaps. Target >=29 actual FPS and <=100ms gaps after startup; detect and report shortfalls.\n- Compare visible, occluded and minimized operation, render FPS and recording overhead.\n- Validate playback motion and duration, not only headers or a still.\n- Checklist: independent review, focused regressions, commit and merge.\n\nReferences: preview-recorder.ts, visual-worker.mjs, preview-capture-files.ts and webm-duration.ts under apps/studio/src."
+}

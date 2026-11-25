@@ -1,0 +1,31 @@
+{
+  "batch_id": "b03bfd76-148e-448b-8cd5-d702fcadab0a",
+  "revisit_trigger": "Reassess on a fresh recurrence after the cited fix/guidance, missing installed guidance, or an uncovered concrete acceptance gap.",
+  "observation": "Known Studio QA failures were not reported to the workflow queue",
+  "event_seqs": [
+    2882,
+    2888,
+    2898,
+    2906,
+    2913,
+    2914,
+    2916,
+    2917,
+    2918,
+    2921,
+    2922,
+    2932,
+    2948,
+    2975,
+    2977,
+    2978,
+    2979,
+    2988,
+    2991,
+    3002
+  ],
+  "action": "observe",
+  "review_after": "2026-09-25T00:00:00Z",
+  "rationale": "Retain corrected harness and UI outcomes. The new QA helper addresses repeated setup/evidence mechanics; LUX-210 and CON-31 already cover UI review and claim provenance. The Studio-only typecheck failure has a separate new remedy.",
+  "group_key": "workflow-failure-reporting-receipts"
+}

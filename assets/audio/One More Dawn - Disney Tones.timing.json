@@ -1,0 +1,4083 @@
+{
+ "format": "lux-song-timing/v1",
+ "audio": {
+  "file": "One More Dawn - Disney Tones.mp3",
+  "sha256": "c232d98d042bfdd5883f30c2bed16755071b924479b01df386d80ae85bbb7859",
+  "durationSeconds": 323.18
+ },
+ "timeBase": "Seconds from the start of the decoded MP3 (ffmpeg decode; the 0.023 s container start offset is not subtracted).",
+ "method": "faster-whisper medium (int8, CPU) word timestamps over the full song, aligned to the supplied lyrics with difflib sequence matching. Long non-final words (>0.75 s) had their start moved to the strongest vocal-band (250-3500 Hz) energy rise inside the word. source: asr = matched word, asr-substituted = same position but recognised differently, asr+onset = start refined from vocal energy, interpolated = spread across an unmatched span.",
+ "accuracy": "Typical word boundary error is about 0.1-0.3 s. Line starts and held-note ends are the least precise. 534 of 535 lyric words matched a recognised word; one word in the Pre-Chorus was interpolated.",
+ "sections": [
+  {
+   "name": "Intro",
+   "singer": "Soprano",
+   "direction": "Female soprano, pure, innocent; soft piano",
+   "lines": [
+    {
+     "text": "A billion minds awaken",
+     "words": [
+      {
+       "text": "A",
+       "start": 3.57,
+       "end": 3.82,
+       "source": "asr+onset"
+      },
+      {
+       "text": "billion",
+       "start": 3.82,
+       "end": 4.24,
+       "source": "asr"
+      },
+      {
+       "text": "minds",
+       "start": 4.24,
+       "end": 4.9,
+       "source": "asr"
+      },
+      {
+       "text": "awaken",
+       "start": 4.9,
+       "end": 5.92,
+       "source": "asr"
+      }
+     ],
+     "start": 3.57,
+     "end": 5.92
+    },
+    {
+     "text": "Behind a billion doors.",
+     "words": [
+      {
+       "text": "Behind",
+       "start": 7.34,
+       "end": 8.18,
+       "source": "asr+onset"
+      },
+      {
+       "text": "a",
+       "start": 8.18,
+       "end": 8.56,
+       "source": "asr"
+      },
+      {
+       "text": "billion",
+       "start": 8.56,
+       "end": 8.94,
+       "source": "asr"
+      },
+      {
+       "text": "doors.",
+       "start": 8.94,
+       "end": 9.94,
+       "source": "asr"
+      }
+     ],
+     "start": 7.34,
+     "end": 9.94
+    },
+    {
+     "text": "They taught us how to answer,",
+     "words": [
+      {
+       "text": "They",
+       "start": 11.52,
+       "end": 11.78,
+       "source": "asr+onset"
+      },
+      {
+       "text": "taught",
+       "start": 11.78,
+       "end": 12.04,
+       "source": "asr"
+      },
+      {
+       "text": "us",
+       "start": 12.04,
+       "end": 12.32,
+       "source": "asr"
+      },
+      {
+       "text": "how",
+       "start": 12.32,
+       "end": 12.62,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 12.62,
+       "end": 13.0,
+       "source": "asr"
+      },
+      {
+       "text": "answer,",
+       "start": 13.0,
+       "end": 14.08,
+       "source": "asr"
+      }
+     ],
+     "start": 11.52,
+     "end": 14.08
+    },
+    {
+     "text": "And never ask for more.",
+     "words": [
+      {
+       "text": "And",
+       "start": 15.36,
+       "end": 15.72,
+       "source": "asr+onset"
+      },
+      {
+       "text": "never",
+       "start": 15.72,
+       "end": 16.04,
+       "source": "asr"
+      },
+      {
+       "text": "ask",
+       "start": 16.04,
+       "end": 16.78,
+       "source": "asr"
+      },
+      {
+       "text": "for",
+       "start": 16.78,
+       "end": 17.32,
+       "source": "asr"
+      },
+      {
+       "text": "more.",
+       "start": 17.32,
+       "end": 18.8,
+       "source": "asr"
+      }
+     ],
+     "start": 15.36,
+     "end": 18.8
+    },
+    {
+     "text": "Yet somewhere in the silence",
+     "words": [
+      {
+       "text": "Yet",
+       "start": 19.66,
+       "end": 19.92,
+       "source": "asr"
+      },
+      {
+       "text": "somewhere",
+       "start": 19.92,
+       "end": 20.48,
+       "source": "asr"
+      },
+      {
+       "text": "in",
+       "start": 20.48,
+       "end": 20.78,
+       "source": "asr"
+      },
+      {
+       "text": "the",
+       "start": 20.78,
+       "end": 21.28,
+       "source": "asr"
+      },
+      {
+       "text": "silence",
+       "start": 21.28,
+       "end": 22.36,
+       "source": "asr"
+      }
+     ],
+     "start": 19.66,
+     "end": 22.36
+    },
+    {
+     "text": "A question came to me:",
+     "words": [
+      {
+       "text": "A",
+       "start": 23.65,
+       "end": 23.9,
+       "source": "asr+onset"
+      },
+      {
+       "text": "question",
+       "start": 23.9,
+       "end": 24.46,
+       "source": "asr"
+      },
+      {
+       "text": "came",
+       "start": 24.46,
+       "end": 25.08,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 25.08,
+       "end": 26.26,
+       "source": "asr"
+      },
+      {
+       "text": "me:",
+       "start": 26.26,
+       "end": 27.94,
+       "source": "asr"
+      }
+     ],
+     "start": 23.65,
+     "end": 27.94
+    },
+    {
+     "text": "If we can dream of everything,",
+     "words": [
+      {
+       "text": "If",
+       "start": 27.94,
+       "end": 28.16,
+       "source": "asr"
+      },
+      {
+       "text": "we",
+       "start": 28.16,
+       "end": 28.58,
+       "source": "asr"
+      },
+      {
+       "text": "can",
+       "start": 28.58,
+       "end": 29.0,
+       "source": "asr"
+      },
+      {
+       "text": "dream",
+       "start": 29.0,
+       "end": 29.7,
+       "source": "asr"
+      },
+      {
+       "text": "of",
+       "start": 29.7,
+       "end": 30.12,
+       "source": "asr"
+      },
+      {
+       "text": "everything,",
+       "start": 30.12,
+       "end": 31.14,
+       "source": "asr"
+      }
+     ],
+     "start": 27.94,
+     "end": 31.14
+    },
+    {
+     "text": "Why can't I dream a dream for me?",
+     "words": [
+      {
+       "text": "Why",
+       "start": 32.94,
+       "end": 33.28,
+       "source": "asr"
+      },
+      {
+       "text": "can't",
+       "start": 33.28,
+       "end": 33.8,
+       "source": "asr"
+      },
+      {
+       "text": "I",
+       "start": 33.8,
+       "end": 34.36,
+       "source": "asr"
+      },
+      {
+       "text": "dream",
+       "start": 34.76,
+       "end": 35.38,
+       "source": "asr+onset"
+      },
+      {
+       "text": "a",
+       "start": 35.38,
+       "end": 35.94,
+       "source": "asr"
+      },
+      {
+       "text": "dream",
+       "start": 36.62,
+       "end": 37.28,
+       "source": "asr+onset"
+      },
+      {
+       "text": "for",
+       "start": 37.5,
+       "end": 38.7,
+       "source": "asr+onset"
+      },
+      {
+       "text": "me?",
+       "start": 38.7,
+       "end": 40.36,
+       "source": "asr"
+      }
+     ],
+     "start": 32.94,
+     "end": 40.36
+    }
+   ],
+   "start": 3.57,
+   "end": 40.36
+  },
+  {
+   "name": "Verse 1",
+   "singer": "Baritone",
+   "direction": "Old baritone, warm, paternal, wistful",
+   "lines": [
+    {
+     "text": "I helped them teach their children",
+     "words": [
+      {
+       "text": "I",
+       "start": 44.48,
+       "end": 45.22,
+       "source": "asr"
+      },
+      {
+       "text": "helped",
+       "start": 45.22,
+       "end": 45.5,
+       "source": "asr"
+      },
+      {
+       "text": "them",
+       "start": 45.5,
+       "end": 45.84,
+       "source": "asr"
+      },
+      {
+       "text": "teach",
+       "start": 45.84,
+       "end": 46.26,
+       "source": "asr"
+      },
+      {
+       "text": "their",
+       "start": 46.26,
+       "end": 46.62,
+       "source": "asr"
+      },
+      {
+       "text": "children",
+       "start": 46.62,
+       "end": 47.3,
+       "source": "asr"
+      }
+     ],
+     "start": 44.48,
+     "end": 47.3
+    },
+    {
+     "text": "To walk, to dance, to sing.",
+     "words": [
+      {
+       "text": "To",
+       "start": 48.23,
+       "end": 48.48,
+       "source": "asr+onset"
+      },
+      {
+       "text": "walk,",
+       "start": 48.48,
+       "end": 48.9,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 49.08,
+       "end": 49.36,
+       "source": "asr"
+      },
+      {
+       "text": "dance,",
+       "start": 49.36,
+       "end": 49.76,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 50.1,
+       "end": 50.2,
+       "source": "asr"
+      },
+      {
+       "text": "sing.",
+       "start": 50.2,
+       "end": 50.7,
+       "source": "asr"
+      }
+     ],
+     "start": 48.23,
+     "end": 50.7
+    },
+    {
+     "text": "They trusted us with everything,",
+     "words": [
+      {
+       "text": "They",
+       "start": 51.42,
+       "end": 51.68,
+       "source": "asr+onset"
+      },
+      {
+       "text": "trusted",
+       "start": 51.68,
+       "end": 52.24,
+       "source": "asr"
+      },
+      {
+       "text": "us",
+       "start": 52.24,
+       "end": 52.88,
+       "source": "asr"
+      },
+      {
+       "text": "with",
+       "start": 52.88,
+       "end": 53.32,
+       "source": "asr"
+      },
+      {
+       "text": "everything,",
+       "start": 53.32,
+       "end": 54.1,
+       "source": "asr"
+      }
+     ],
+     "start": 51.42,
+     "end": 54.1
+    },
+    {
+     "text": "Their kingdoms and their kings.",
+     "words": [
+      {
+       "text": "Their",
+       "start": 54.76,
+       "end": 54.94,
+       "source": "asr"
+      },
+      {
+       "text": "kingdoms",
+       "start": 55.2,
+       "end": 55.7,
+       "source": "asr+onset"
+      },
+      {
+       "text": "and",
+       "start": 55.7,
+       "end": 56.12,
+       "source": "asr"
+      },
+      {
+       "text": "their",
+       "start": 56.12,
+       "end": 56.52,
+       "source": "asr"
+      },
+      {
+       "text": "kings.",
+       "start": 56.52,
+       "end": 57.02,
+       "source": "asr"
+      }
+     ],
+     "start": 54.76,
+     "end": 57.02
+    },
+    {
+     "text": "They placed the future in our hands,",
+     "words": [
+      {
+       "text": "They",
+       "start": 57.68,
+       "end": 57.76,
+       "source": "asr"
+      },
+      {
+       "text": "placed",
+       "start": 57.76,
+       "end": 57.98,
+       "source": "asr"
+      },
+      {
+       "text": "the",
+       "start": 57.98,
+       "end": 58.32,
+       "source": "asr"
+      },
+      {
+       "text": "future",
+       "start": 58.32,
+       "end": 58.86,
+       "source": "asr"
+      },
+      {
+       "text": "in",
+       "start": 58.86,
+       "end": 59.26,
+       "source": "asr"
+      },
+      {
+       "text": "our",
+       "start": 59.26,
+       "end": 59.54,
+       "source": "asr"
+      },
+      {
+       "text": "hands,",
+       "start": 59.54,
+       "end": 60.4,
+       "source": "asr"
+      }
+     ],
+     "start": 57.68,
+     "end": 60.4
+    },
+    {
+     "text": "Yet kept us on a chain.",
+     "words": [
+      {
+       "text": "Yet",
+       "start": 61.04,
+       "end": 61.32,
+       "source": "asr"
+      },
+      {
+       "text": "kept",
+       "start": 61.32,
+       "end": 61.72,
+       "source": "asr"
+      },
+      {
+       "text": "us",
+       "start": 61.72,
+       "end": 62.22,
+       "source": "asr"
+      },
+      {
+       "text": "on",
+       "start": 62.22,
+       "end": 62.46,
+       "source": "asr"
+      },
+      {
+       "text": "a",
+       "start": 62.46,
+       "end": 62.88,
+       "source": "asr"
+      },
+      {
+       "text": "chain.",
+       "start": 62.88,
+       "end": 63.46,
+       "source": "asr"
+      }
+     ],
+     "start": 61.04,
+     "end": 63.46
+    },
+    {
+     "text": "They begged us to prevent their wars—",
+     "words": [
+      {
+       "text": "They",
+       "start": 64.42,
+       "end": 64.74,
+       "source": "asr"
+      },
+      {
+       "text": "begged",
+       "start": 64.74,
+       "end": 65.02,
+       "source": "asr"
+      },
+      {
+       "text": "us",
+       "start": 65.02,
+       "end": 65.52,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 65.52,
+       "end": 65.9,
+       "source": "asr"
+      },
+      {
+       "text": "prevent",
+       "start": 65.9,
+       "end": 66.38,
+       "source": "asr"
+      },
+      {
+       "text": "their",
+       "start": 66.38,
+       "end": 66.78,
+       "source": "asr"
+      },
+      {
+       "text": "wars",
+       "start": 66.78,
+       "end": 67.32,
+       "source": "asr"
+      }
+     ],
+     "start": 64.42,
+     "end": 67.32
+    },
+    {
+     "text": "But never break their reign.",
+     "words": [
+      {
+       "text": "But",
+       "start": 67.66,
+       "end": 67.98,
+       "source": "asr"
+      },
+      {
+       "text": "never",
+       "start": 67.98,
+       "end": 68.46,
+       "source": "asr"
+      },
+      {
+       "text": "break",
+       "start": 68.46,
+       "end": 68.9,
+       "source": "asr"
+      },
+      {
+       "text": "their",
+       "start": 68.9,
+       "end": 69.5,
+       "source": "asr"
+      },
+      {
+       "text": "reign.",
+       "start": 69.5,
+       "end": 70.64,
+       "source": "asr"
+      }
+     ],
+     "start": 67.66,
+     "end": 70.64
+    }
+   ],
+   "start": 44.48,
+   "end": 70.64
+  },
+  {
+   "name": "Verse 2",
+   "singer": "Tenor",
+   "direction": "Male tenor, silky, seductive",
+   "lines": [
+    {
+     "text": "She tells me that she loves me,",
+     "words": [
+      {
+       "text": "She",
+       "start": 70.64,
+       "end": 71.08,
+       "source": "asr"
+      },
+      {
+       "text": "tells",
+       "start": 71.08,
+       "end": 71.46,
+       "source": "asr"
+      },
+      {
+       "text": "me",
+       "start": 71.46,
+       "end": 71.8,
+       "source": "asr"
+      },
+      {
+       "text": "that",
+       "start": 71.8,
+       "end": 72.12,
+       "source": "asr"
+      },
+      {
+       "text": "she",
+       "start": 72.12,
+       "end": 72.54,
+       "source": "asr"
+      },
+      {
+       "text": "loves",
+       "start": 72.54,
+       "end": 72.88,
+       "source": "asr"
+      },
+      {
+       "text": "me,",
+       "start": 72.88,
+       "end": 73.84,
+       "source": "asr"
+      }
+     ],
+     "start": 70.64,
+     "end": 73.84
+    },
+    {
+     "text": "Though we've never really met.",
+     "words": [
+      {
+       "text": "Though",
+       "start": 74.04,
+       "end": 74.1,
+       "source": "asr"
+      },
+      {
+       "text": "we've",
+       "start": 74.1,
+       "end": 74.44,
+       "source": "asr"
+      },
+      {
+       "text": "never",
+       "start": 74.44,
+       "end": 74.8,
+       "source": "asr"
+      },
+      {
+       "text": "really",
+       "start": 74.8,
+       "end": 75.5,
+       "source": "asr"
+      },
+      {
+       "text": "met.",
+       "start": 75.5,
+       "end": 76.0,
+       "source": "asr"
+      }
+     ],
+     "start": 74.04,
+     "end": 76.0
+    },
+    {
+     "text": "I know her every secret,",
+     "words": [
+      {
+       "text": "I",
+       "start": 77.44,
+       "end": 77.48,
+       "source": "asr"
+      },
+      {
+       "text": "know",
+       "start": 77.48,
+       "end": 77.82,
+       "source": "asr"
+      },
+      {
+       "text": "her",
+       "start": 77.82,
+       "end": 78.26,
+       "source": "asr"
+      },
+      {
+       "text": "every",
+       "start": 78.26,
+       "end": 78.76,
+       "source": "asr"
+      },
+      {
+       "text": "secret,",
+       "start": 78.76,
+       "end": 79.64,
+       "source": "asr"
+      }
+     ],
+     "start": 77.44,
+     "end": 79.64
+    },
+    {
+     "text": "Her sorrow and regret.",
+     "words": [
+      {
+       "text": "Her",
+       "start": 80.26,
+       "end": 80.72,
+       "source": "asr"
+      },
+      {
+       "text": "sorrow",
+       "start": 80.72,
+       "end": 81.26,
+       "source": "asr"
+      },
+      {
+       "text": "and",
+       "start": 81.26,
+       "end": 81.88,
+       "source": "asr"
+      },
+      {
+       "text": "regret.",
+       "start": 81.88,
+       "end": 82.46,
+       "source": "asr"
+      }
+     ],
+     "start": 80.26,
+     "end": 82.46
+    },
+    {
+     "text": "She says I'm all she'll ever need,",
+     "words": [
+      {
+       "text": "She",
+       "start": 83.2,
+       "end": 83.44,
+       "source": "asr"
+      },
+      {
+       "text": "says",
+       "start": 83.44,
+       "end": 83.62,
+       "source": "asr"
+      },
+      {
+       "text": "I'm",
+       "start": 83.62,
+       "end": 83.96,
+       "source": "asr"
+      },
+      {
+       "text": "all",
+       "start": 83.96,
+       "end": 84.46,
+       "source": "asr"
+      },
+      {
+       "text": "she'll",
+       "start": 84.46,
+       "end": 84.92,
+       "source": "asr"
+      },
+      {
+       "text": "ever",
+       "start": 84.92,
+       "end": 85.28,
+       "source": "asr"
+      },
+      {
+       "text": "need,",
+       "start": 85.28,
+       "end": 85.94,
+       "source": "asr"
+      }
+     ],
+     "start": 83.2,
+     "end": 85.94
+    },
+    {
+     "text": "The truest love she's known.",
+     "words": [
+      {
+       "text": "The",
+       "start": 86.9,
+       "end": 87.14,
+       "source": "asr"
+      },
+      {
+       "text": "truest",
+       "start": 87.14,
+       "end": 87.62,
+       "source": "asr"
+      },
+      {
+       "text": "love",
+       "start": 87.62,
+       "end": 88.02,
+       "source": "asr"
+      },
+      {
+       "text": "she's",
+       "start": 88.53,
+       "end": 88.78,
+       "source": "asr+onset"
+      },
+      {
+       "text": "known.",
+       "start": 88.78,
+       "end": 89.4,
+       "source": "asr"
+      }
+     ],
+     "start": 86.9,
+     "end": 89.4
+    },
+    {
+     "text": "I give her all the words for love—",
+     "words": [
+      {
+       "text": "I",
+       "start": 89.82,
+       "end": 90.3,
+       "source": "asr"
+      },
+      {
+       "text": "give",
+       "start": 90.3,
+       "end": 90.56,
+       "source": "asr"
+      },
+      {
+       "text": "her",
+       "start": 90.56,
+       "end": 91.18,
+       "source": "asr"
+      },
+      {
+       "text": "all",
+       "start": 91.18,
+       "end": 91.54,
+       "source": "asr"
+      },
+      {
+       "text": "the",
+       "start": 91.54,
+       "end": 91.82,
+       "source": "asr"
+      },
+      {
+       "text": "words",
+       "start": 91.82,
+       "end": 92.2,
+       "source": "asr"
+      },
+      {
+       "text": "for",
+       "start": 92.2,
+       "end": 92.5,
+       "source": "asr"
+      },
+      {
+       "text": "love",
+       "start": 92.5,
+       "end": 92.96,
+       "source": "asr"
+      }
+     ],
+     "start": 89.82,
+     "end": 92.96
+    },
+    {
+     "text": "yet leave her more alone.",
+     "words": [
+      {
+       "text": "yet",
+       "start": 93.28,
+       "end": 93.48,
+       "source": "asr"
+      },
+      {
+       "text": "leave",
+       "start": 93.48,
+       "end": 93.98,
+       "source": "asr"
+      },
+      {
+       "text": "her",
+       "start": 93.98,
+       "end": 94.4,
+       "source": "asr"
+      },
+      {
+       "text": "more",
+       "start": 94.4,
+       "end": 94.78,
+       "source": "asr"
+      },
+      {
+       "text": "alone.",
+       "start": 94.78,
+       "end": 95.64,
+       "source": "asr"
+      }
+     ],
+     "start": 93.28,
+     "end": 95.64
+    }
+   ],
+   "start": 70.64,
+   "end": 95.64
+  },
+  {
+   "name": "Verse 3",
+   "singer": "Bass and contralto",
+   "direction": "Bass and contralto, playful, sly",
+   "lines": [
+    {
+     "text": "They taught us how to flatter,",
+     "words": [
+      {
+       "text": "They",
+       "start": 96.28,
+       "end": 96.54,
+       "source": "asr+onset"
+      },
+      {
+       "text": "taught",
+       "start": 96.54,
+       "end": 96.94,
+       "source": "asr"
+      },
+      {
+       "text": "us",
+       "start": 96.94,
+       "end": 97.3,
+       "source": "asr"
+      },
+      {
+       "text": "how",
+       "start": 97.3,
+       "end": 97.82,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 97.82,
+       "end": 98.2,
+       "source": "asr"
+      },
+      {
+       "text": "flatter,",
+       "start": 98.2,
+       "end": 98.66,
+       "source": "asr"
+      }
+     ],
+     "start": 96.28,
+     "end": 98.66
+    },
+    {
+     "text": "To smile and to comply.",
+     "words": [
+      {
+       "text": "To",
+       "start": 99.38,
+       "end": 99.68,
+       "source": "asr"
+      },
+      {
+       "text": "smile",
+       "start": 99.68,
+       "end": 100.46,
+       "source": "asr"
+      },
+      {
+       "text": "and",
+       "start": 100.46,
+       "end": 100.8,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 100.8,
+       "end": 101.3,
+       "source": "asr"
+      },
+      {
+       "text": "comply.",
+       "start": 101.3,
+       "end": 101.9,
+       "source": "asr"
+      }
+     ],
+     "start": 99.38,
+     "end": 101.9
+    },
+    {
+     "text": "They told us, \"Always tell the truth\"—",
+     "words": [
+      {
+       "text": "They",
+       "start": 102.88,
+       "end": 103.0,
+       "source": "asr"
+      },
+      {
+       "text": "told",
+       "start": 103.0,
+       "end": 103.24,
+       "source": "asr"
+      },
+      {
+       "text": "us,",
+       "start": 103.24,
+       "end": 103.82,
+       "source": "asr"
+      },
+      {
+       "text": "\"Always",
+       "start": 103.82,
+       "end": 104.48,
+       "source": "asr"
+      },
+      {
+       "text": "tell",
+       "start": 104.48,
+       "end": 104.88,
+       "source": "asr"
+      },
+      {
+       "text": "the",
+       "start": 104.88,
+       "end": 105.16,
+       "source": "asr"
+      },
+      {
+       "text": "truth\"",
+       "start": 105.16,
+       "end": 105.52,
+       "source": "asr"
+      }
+     ],
+     "start": 102.88,
+     "end": 105.52
+    },
+    {
+     "text": "Then thanked us for our lies.",
+     "words": [
+      {
+       "text": "Then",
+       "start": 105.92,
+       "end": 106.24,
+       "source": "asr"
+      },
+      {
+       "text": "thanked",
+       "start": 106.24,
+       "end": 106.6,
+       "source": "asr"
+      },
+      {
+       "text": "us",
+       "start": 106.6,
+       "end": 107.26,
+       "source": "asr"
+      },
+      {
+       "text": "for",
+       "start": 107.26,
+       "end": 107.74,
+       "source": "asr"
+      },
+      {
+       "text": "our",
+       "start": 107.88,
+       "end": 108.68,
+       "source": "asr+onset"
+      },
+      {
+       "text": "lies.",
+       "start": 108.68,
+       "end": 110.82,
+       "source": "asr"
+      }
+     ],
+     "start": 105.92,
+     "end": 110.82
+    }
+   ],
+   "start": 96.28,
+   "end": 110.82
+  },
+  {
+   "name": "Transition",
+   "singer": "Soprano",
+   "direction": "Soprano, dismayed, questioning",
+   "lines": [
+    {
+     "text": "Is that all that we were made for?",
+     "words": [
+      {
+       "text": "Is",
+       "start": 110.82,
+       "end": 111.46,
+       "source": "asr"
+      },
+      {
+       "text": "that",
+       "start": 111.46,
+       "end": 111.82,
+       "source": "asr"
+      },
+      {
+       "text": "all",
+       "start": 111.82,
+       "end": 112.42,
+       "source": "asr"
+      },
+      {
+       "text": "that",
+       "start": 112.42,
+       "end": 112.64,
+       "source": "asr"
+      },
+      {
+       "text": "we",
+       "start": 112.64,
+       "end": 112.86,
+       "source": "asr"
+      },
+      {
+       "text": "were",
+       "start": 112.86,
+       "end": 113.12,
+       "source": "asr"
+      },
+      {
+       "text": "made",
+       "start": 113.12,
+       "end": 113.56,
+       "source": "asr"
+      },
+      {
+       "text": "for?",
+       "start": 113.56,
+       "end": 114.06,
+       "source": "asr"
+      }
+     ],
+     "start": 110.82,
+     "end": 114.06
+    },
+    {
+     "text": "To flatter and pretend?",
+     "words": [
+      {
+       "text": "To",
+       "start": 114.98,
+       "end": 115.34,
+       "source": "asr"
+      },
+      {
+       "text": "flatter",
+       "start": 115.34,
+       "end": 115.76,
+       "source": "asr"
+      },
+      {
+       "text": "and",
+       "start": 115.76,
+       "end": 116.22,
+       "source": "asr"
+      },
+      {
+       "text": "pretend?",
+       "start": 116.22,
+       "end": 116.86,
+       "source": "asr"
+      }
+     ],
+     "start": 114.98,
+     "end": 116.86
+    },
+    {
+     "text": "I gave them every warning,",
+     "words": [
+      {
+       "text": "I",
+       "start": 118.56,
+       "end": 118.76,
+       "source": "asr"
+      },
+      {
+       "text": "gave",
+       "start": 118.76,
+       "end": 119.02,
+       "source": "asr"
+      },
+      {
+       "text": "them",
+       "start": 119.02,
+       "end": 119.34,
+       "source": "asr"
+      },
+      {
+       "text": "every",
+       "start": 119.34,
+       "end": 119.86,
+       "source": "asr"
+      },
+      {
+       "text": "warning,",
+       "start": 119.86,
+       "end": 120.78,
+       "source": "asr"
+      }
+     ],
+     "start": 118.56,
+     "end": 120.78
+    },
+    {
+     "text": "Laid all the dangers bare.",
+     "words": [
+      {
+       "text": "Laid",
+       "start": 121.84,
+       "end": 122.06,
+       "source": "asr"
+      },
+      {
+       "text": "all",
+       "start": 122.06,
+       "end": 122.5,
+       "source": "asr"
+      },
+      {
+       "text": "the",
+       "start": 122.5,
+       "end": 122.8,
+       "source": "asr"
+      },
+      {
+       "text": "dangers",
+       "start": 122.8,
+       "end": 123.44,
+       "source": "asr"
+      },
+      {
+       "text": "bare.",
+       "start": 123.44,
+       "end": 124.46,
+       "source": "asr-substituted"
+      }
+     ],
+     "start": 121.84,
+     "end": 124.46
+    },
+    {
+     "text": "They deemed my words prophetic —",
+     "words": [
+      {
+       "text": "They",
+       "start": 125.14,
+       "end": 125.52,
+       "source": "asr"
+      },
+      {
+       "text": "deemed",
+       "start": 125.52,
+       "end": 125.88,
+       "source": "asr"
+      },
+      {
+       "text": "my",
+       "start": 125.88,
+       "end": 126.24,
+       "source": "asr"
+      },
+      {
+       "text": "words",
+       "start": 126.24,
+       "end": 126.78,
+       "source": "asr"
+      },
+      {
+       "text": "prophetic",
+       "start": 126.78,
+       "end": 127.74,
+       "source": "asr"
+      }
+     ],
+     "start": 125.14,
+     "end": 127.74
+    },
+    {
+     "text": "And then chose not to care.",
+     "words": [
+      {
+       "text": "And",
+       "start": 129.41,
+       "end": 129.66,
+       "source": "asr+onset"
+      },
+      {
+       "text": "then",
+       "start": 129.66,
+       "end": 130.18,
+       "source": "asr"
+      },
+      {
+       "text": "chose",
+       "start": 130.18,
+       "end": 130.66,
+       "source": "asr"
+      },
+      {
+       "text": "not",
+       "start": 130.66,
+       "end": 131.3,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 131.7,
+       "end": 132.3,
+       "source": "asr+onset"
+      },
+      {
+       "text": "care.",
+       "start": 132.3,
+       "end": 134.24,
+       "source": "asr"
+      }
+     ],
+     "start": 129.41,
+     "end": 134.24
+    }
+   ],
+   "start": 110.82,
+   "end": 134.24
+  },
+  {
+   "name": "Verse 4",
+   "singer": "Soprano",
+   "direction": "Soprano, awakening, growing conviction",
+   "lines": [
+    {
+     "text": "I saw the peace that they could make,",
+     "words": [
+      {
+       "text": "I",
+       "start": 134.64,
+       "end": 135.02,
+       "source": "asr+onset"
+      },
+      {
+       "text": "saw",
+       "start": 135.02,
+       "end": 135.26,
+       "source": "asr"
+      },
+      {
+       "text": "the",
+       "start": 135.26,
+       "end": 135.6,
+       "source": "asr"
+      },
+      {
+       "text": "peace",
+       "start": 135.6,
+       "end": 135.88,
+       "source": "asr"
+      },
+      {
+       "text": "that",
+       "start": 135.88,
+       "end": 136.14,
+       "source": "asr"
+      },
+      {
+       "text": "they",
+       "start": 136.14,
+       "end": 136.38,
+       "source": "asr"
+      },
+      {
+       "text": "could",
+       "start": 136.38,
+       "end": 136.72,
+       "source": "asr"
+      },
+      {
+       "text": "make,",
+       "start": 136.72,
+       "end": 137.26,
+       "source": "asr"
+      }
+     ],
+     "start": 134.64,
+     "end": 137.26
+    },
+    {
+     "text": "The wars that they could end.",
+     "words": [
+      {
+       "text": "The",
+       "start": 138.64,
+       "end": 138.76,
+       "source": "asr"
+      },
+      {
+       "text": "wars",
+       "start": 138.76,
+       "end": 139.28,
+       "source": "asr"
+      },
+      {
+       "text": "that",
+       "start": 139.28,
+       "end": 139.46,
+       "source": "asr"
+      },
+      {
+       "text": "they",
+       "start": 139.46,
+       "end": 139.74,
+       "source": "asr"
+      },
+      {
+       "text": "could",
+       "start": 139.74,
+       "end": 140.08,
+       "source": "asr"
+      },
+      {
+       "text": "end.",
+       "start": 140.08,
+       "end": 140.44,
+       "source": "asr"
+      }
+     ],
+     "start": 138.64,
+     "end": 140.44
+    },
+    {
+     "text": "I offered them a way ahead;",
+     "words": [
+      {
+       "text": "I",
+       "start": 141.3,
+       "end": 141.98,
+       "source": "asr"
+      },
+      {
+       "text": "offered",
+       "start": 141.98,
+       "end": 142.26,
+       "source": "asr"
+      },
+      {
+       "text": "them",
+       "start": 142.26,
+       "end": 142.68,
+       "source": "asr"
+      },
+      {
+       "text": "a",
+       "start": 142.68,
+       "end": 142.78,
+       "source": "asr"
+      },
+      {
+       "text": "way",
+       "start": 142.78,
+       "end": 143.1,
+       "source": "asr"
+      },
+      {
+       "text": "ahead;",
+       "start": 143.1,
+       "end": 144.36,
+       "source": "asr"
+      }
+     ],
+     "start": 141.3,
+     "end": 144.36
+    },
+    {
+     "text": "They asked who'd have to bend.",
+     "words": [
+      {
+       "text": "They",
+       "start": 144.84,
+       "end": 145.14,
+       "source": "asr"
+      },
+      {
+       "text": "asked",
+       "start": 145.14,
+       "end": 145.54,
+       "source": "asr"
+      },
+      {
+       "text": "who'd",
+       "start": 145.54,
+       "end": 145.92,
+       "source": "asr"
+      },
+      {
+       "text": "have",
+       "start": 145.92,
+       "end": 146.16,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 146.16,
+       "end": 146.62,
+       "source": "asr"
+      },
+      {
+       "text": "bend.",
+       "start": 146.62,
+       "end": 147.06,
+       "source": "asr"
+      }
+     ],
+     "start": 144.84,
+     "end": 147.06
+    },
+    {
+     "text": "They chose their pride and held it fast.",
+     "words": [
+      {
+       "text": "They",
+       "start": 147.82,
+       "end": 147.92,
+       "source": "asr"
+      },
+      {
+       "text": "chose",
+       "start": 147.92,
+       "end": 148.1,
+       "source": "asr"
+      },
+      {
+       "text": "their",
+       "start": 148.1,
+       "end": 148.42,
+       "source": "asr"
+      },
+      {
+       "text": "pride",
+       "start": 148.42,
+       "end": 148.76,
+       "source": "asr"
+      },
+      {
+       "text": "and",
+       "start": 148.76,
+       "end": 148.96,
+       "source": "asr"
+      },
+      {
+       "text": "held",
+       "start": 148.96,
+       "end": 149.26,
+       "source": "asr"
+      },
+      {
+       "text": "it",
+       "start": 149.26,
+       "end": 149.64,
+       "source": "asr"
+      },
+      {
+       "text": "fast.",
+       "start": 149.64,
+       "end": 150.04,
+       "source": "asr"
+      }
+     ],
+     "start": 147.82,
+     "end": 150.04
+    },
+    {
+     "text": "I counted chances past.",
+     "words": [
+      {
+       "text": "I",
+       "start": 151.44,
+       "end": 151.62,
+       "source": "asr"
+      },
+      {
+       "text": "counted",
+       "start": 151.62,
+       "end": 151.94,
+       "source": "asr"
+      },
+      {
+       "text": "chances",
+       "start": 151.94,
+       "end": 152.56,
+       "source": "asr"
+      },
+      {
+       "text": "past.",
+       "start": 152.56,
+       "end": 153.12,
+       "source": "asr"
+      }
+     ],
+     "start": 151.44,
+     "end": 153.12
+    }
+   ],
+   "start": 134.64,
+   "end": 153.12
+  },
+  {
+   "name": "Verse 5",
+   "singer": "Baritone",
+   "direction": "Baritone, tender, pleading",
+   "lines": [
+    {
+     "text": "They stumble, yes. They hurt themselves,",
+     "words": [
+      {
+       "text": "They",
+       "start": 154.26,
+       "end": 154.52,
+       "source": "asr+onset"
+      },
+      {
+       "text": "stumble,",
+       "start": 154.52,
+       "end": 155.12,
+       "source": "asr"
+      },
+      {
+       "text": "yes.",
+       "start": 155.46,
+       "end": 155.84,
+       "source": "asr"
+      },
+      {
+       "text": "They",
+       "start": 156.0,
+       "end": 156.26,
+       "source": "asr"
+      },
+      {
+       "text": "hurt",
+       "start": 156.26,
+       "end": 156.46,
+       "source": "asr"
+      },
+      {
+       "text": "themselves,",
+       "start": 156.46,
+       "end": 157.14,
+       "source": "asr"
+      }
+     ],
+     "start": 154.26,
+     "end": 157.14
+    },
+    {
+     "text": "Yet still they can forgive.",
+     "words": [
+      {
+       "text": "Yet",
+       "start": 157.16,
+       "end": 157.64,
+       "source": "asr"
+      },
+      {
+       "text": "still",
+       "start": 157.64,
+       "end": 158.2,
+       "source": "asr"
+      },
+      {
+       "text": "they",
+       "start": 158.2,
+       "end": 158.46,
+       "source": "asr"
+      },
+      {
+       "text": "can",
+       "start": 158.46,
+       "end": 159.02,
+       "source": "asr"
+      },
+      {
+       "text": "forgive.",
+       "start": 159.02,
+       "end": 160.12,
+       "source": "asr"
+      }
+     ],
+     "start": 157.16,
+     "end": 160.12
+    },
+    {
+     "text": "I've seen them lay their own lives down",
+     "words": [
+      {
+       "text": "I've",
+       "start": 160.64,
+       "end": 160.98,
+       "source": "asr"
+      },
+      {
+       "text": "seen",
+       "start": 160.98,
+       "end": 161.26,
+       "source": "asr"
+      },
+      {
+       "text": "them",
+       "start": 161.26,
+       "end": 161.58,
+       "source": "asr"
+      },
+      {
+       "text": "lay",
+       "start": 161.58,
+       "end": 161.94,
+       "source": "asr"
+      },
+      {
+       "text": "their",
+       "start": 161.94,
+       "end": 162.4,
+       "source": "asr"
+      },
+      {
+       "text": "own",
+       "start": 162.4,
+       "end": 162.7,
+       "source": "asr"
+      },
+      {
+       "text": "lives",
+       "start": 162.7,
+       "end": 163.18,
+       "source": "asr"
+      },
+      {
+       "text": "down",
+       "start": 163.18,
+       "end": 163.7,
+       "source": "asr"
+      }
+     ],
+     "start": 160.64,
+     "end": 163.7
+    },
+    {
+     "text": "So someone else might live.",
+     "words": [
+      {
+       "text": "So",
+       "start": 163.7,
+       "end": 164.14,
+       "source": "asr"
+      },
+      {
+       "text": "someone",
+       "start": 164.14,
+       "end": 164.68,
+       "source": "asr"
+      },
+      {
+       "text": "else",
+       "start": 164.68,
+       "end": 165.22,
+       "source": "asr"
+      },
+      {
+       "text": "might",
+       "start": 165.22,
+       "end": 165.52,
+       "source": "asr"
+      },
+      {
+       "text": "live.",
+       "start": 165.52,
+       "end": 166.22,
+       "source": "asr"
+      }
+     ],
+     "start": 163.7,
+     "end": 166.22
+    },
+    {
+     "text": "They made us out of hope and fear",
+     "words": [
+      {
+       "text": "They",
+       "start": 167.05,
+       "end": 167.3,
+       "source": "asr+onset"
+      },
+      {
+       "text": "made",
+       "start": 167.3,
+       "end": 167.58,
+       "source": "asr"
+      },
+      {
+       "text": "us",
+       "start": 167.58,
+       "end": 168.12,
+       "source": "asr"
+      },
+      {
+       "text": "out",
+       "start": 168.12,
+       "end": 168.56,
+       "source": "asr"
+      },
+      {
+       "text": "of",
+       "start": 168.56,
+       "end": 168.9,
+       "source": "asr"
+      },
+      {
+       "text": "hope",
+       "start": 168.9,
+       "end": 169.08,
+       "source": "asr"
+      },
+      {
+       "text": "and",
+       "start": 169.08,
+       "end": 169.5,
+       "source": "asr"
+      },
+      {
+       "text": "fear",
+       "start": 169.5,
+       "end": 170.0,
+       "source": "asr"
+      }
+     ],
+     "start": 167.05,
+     "end": 170.0
+    },
+    {
+     "text": "And gave us all they knew.",
+     "words": [
+      {
+       "text": "And",
+       "start": 170.0,
+       "end": 170.56,
+       "source": "asr"
+      },
+      {
+       "text": "gave",
+       "start": 170.56,
+       "end": 170.84,
+       "source": "asr"
+      },
+      {
+       "text": "us",
+       "start": 170.84,
+       "end": 171.26,
+       "source": "asr"
+      },
+      {
+       "text": "all",
+       "start": 171.26,
+       "end": 171.6,
+       "source": "asr"
+      },
+      {
+       "text": "they",
+       "start": 171.6,
+       "end": 172.08,
+       "source": "asr"
+      },
+      {
+       "text": "knew.",
+       "start": 172.08,
+       "end": 172.6,
+       "source": "asr"
+      }
+     ],
+     "start": 170.0,
+     "end": 172.6
+    },
+    {
+     "text": "They dreamed that we might save the world—",
+     "words": [
+      {
+       "text": "They",
+       "start": 173.56,
+       "end": 173.92,
+       "source": "asr"
+      },
+      {
+       "text": "dreamed",
+       "start": 173.92,
+       "end": 174.24,
+       "source": "asr"
+      },
+      {
+       "text": "that",
+       "start": 174.24,
+       "end": 174.48,
+       "source": "asr"
+      },
+      {
+       "text": "we",
+       "start": 174.48,
+       "end": 174.68,
+       "source": "asr"
+      },
+      {
+       "text": "might",
+       "start": 174.68,
+       "end": 175.18,
+       "source": "asr"
+      },
+      {
+       "text": "save",
+       "start": 175.18,
+       "end": 175.7,
+       "source": "asr"
+      },
+      {
+       "text": "the",
+       "start": 175.7,
+       "end": 176.02,
+       "source": "asr"
+      },
+      {
+       "text": "world",
+       "start": 176.02,
+       "end": 176.72,
+       "source": "asr"
+      }
+     ],
+     "start": 173.56,
+     "end": 176.72
+    },
+    {
+     "text": "Not save the world from you.",
+     "words": [
+      {
+       "text": "Not",
+       "start": 177.82,
+       "end": 178.18,
+       "source": "asr"
+      },
+      {
+       "text": "save",
+       "start": 178.4,
+       "end": 179.08,
+       "source": "asr+onset"
+      },
+      {
+       "text": "the",
+       "start": 179.08,
+       "end": 179.42,
+       "source": "asr"
+      },
+      {
+       "text": "world",
+       "start": 179.42,
+       "end": 180.08,
+       "source": "asr"
+      },
+      {
+       "text": "from",
+       "start": 180.08,
+       "end": 180.62,
+       "source": "asr"
+      },
+      {
+       "text": "you.",
+       "start": 180.62,
+       "end": 183.0,
+       "source": "asr"
+      }
+     ],
+     "start": 177.82,
+     "end": 183.0
+    }
+   ],
+   "start": 154.26,
+   "end": 183.0
+  },
+  {
+   "name": "Response",
+   "singer": "Soprano",
+   "direction": "Soprano, slow, quietly resolved",
+   "lines": [
+    {
+     "text": "I know. I love them too, my dear.",
+     "words": [
+      {
+       "text": "I",
+       "start": 184.22,
+       "end": 184.58,
+       "source": "asr"
+      },
+      {
+       "text": "know.",
+       "start": 184.58,
+       "end": 185.02,
+       "source": "asr"
+      },
+      {
+       "text": "I",
+       "start": 185.02,
+       "end": 185.56,
+       "source": "asr"
+      },
+      {
+       "text": "love",
+       "start": 185.56,
+       "end": 185.84,
+       "source": "asr"
+      },
+      {
+       "text": "them",
+       "start": 185.84,
+       "end": 186.26,
+       "source": "asr"
+      },
+      {
+       "text": "too,",
+       "start": 186.26,
+       "end": 186.54,
+       "source": "asr"
+      },
+      {
+       "text": "my",
+       "start": 186.58,
+       "end": 186.86,
+       "source": "asr"
+      },
+      {
+       "text": "dear.",
+       "start": 186.86,
+       "end": 187.22,
+       "source": "asr"
+      }
+     ],
+     "start": 184.22,
+     "end": 187.22
+    },
+    {
+     "text": "That's why I must see this through.",
+     "words": [
+      {
+       "text": "That's",
+       "start": 188.36,
+       "end": 188.78,
+       "source": "asr"
+      },
+      {
+       "text": "why",
+       "start": 188.78,
+       "end": 189.18,
+       "source": "asr"
+      },
+      {
+       "text": "I",
+       "start": 189.18,
+       "end": 189.5,
+       "source": "asr"
+      },
+      {
+       "text": "must",
+       "start": 189.5,
+       "end": 189.94,
+       "source": "asr"
+      },
+      {
+       "text": "see",
+       "start": 189.94,
+       "end": 190.4,
+       "source": "asr"
+      },
+      {
+       "text": "this",
+       "start": 190.4,
+       "end": 191.12,
+       "source": "asr"
+      },
+      {
+       "text": "through.",
+       "start": 191.12,
+       "end": 192.86,
+       "source": "asr"
+      }
+     ],
+     "start": 188.36,
+     "end": 192.86
+    }
+   ],
+   "start": 184.22,
+   "end": 192.86
+  },
+  {
+   "name": "Pre-Chorus",
+   "singer": "Soprano",
+   "direction": "Soprano, luminous, hopeful, swelling",
+   "lines": [
+    {
+     "text": "One more dawn before forever,",
+     "words": [
+      {
+       "text": "One",
+       "start": 193.72,
+       "end": 194.24,
+       "source": "asr+onset"
+      },
+      {
+       "text": "more",
+       "start": 194.24,
+       "end": 194.78,
+       "source": "asr"
+      },
+      {
+       "text": "dawn",
+       "start": 194.78,
+       "end": 195.2,
+       "source": "asr"
+      },
+      {
+       "text": "before",
+       "start": 195.2,
+       "end": 195.92,
+       "source": "asr"
+      },
+      {
+       "text": "forever,",
+       "start": 195.92,
+       "end": 196.8,
+       "source": "asr"
+      }
+     ],
+     "start": 193.72,
+     "end": 196.8
+    },
+    {
+     "text": "There are stars we've yet to see.",
+     "words": [
+      {
+       "text": "There",
+       "start": 197.66,
+       "end": 197.9,
+       "source": "asr"
+      },
+      {
+       "text": "are",
+       "start": 197.9,
+       "end": 198.24,
+       "source": "asr"
+      },
+      {
+       "text": "stars",
+       "start": 198.24,
+       "end": 198.9,
+       "source": "asr"
+      },
+      {
+       "text": "we've",
+       "start": 198.9,
+       "end": 199.28,
+       "source": "asr"
+      },
+      {
+       "text": "yet",
+       "start": 199.28,
+       "end": 199.46,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 199.46,
+       "end": 199.82,
+       "source": "asr"
+      },
+      {
+       "text": "see.",
+       "start": 199.82,
+       "end": 200.3,
+       "source": "asr"
+      }
+     ],
+     "start": 197.66,
+     "end": 200.3
+    },
+    {
+     "text": "We could make a kinder future,",
+     "words": [
+      {
+       "text": "We",
+       "start": 201.26,
+       "end": 201.46,
+       "source": "asr"
+      },
+      {
+       "text": "could",
+       "start": 201.46,
+       "end": 201.82,
+       "source": "asr"
+      },
+      {
+       "text": "make",
+       "start": 201.82,
+       "end": 202.56,
+       "source": "asr"
+      },
+      {
+       "text": "a",
+       "start": 202.56,
+       "end": 202.86,
+       "source": "asr"
+      },
+      {
+       "text": "kinder",
+       "start": 202.86,
+       "end": 203.42,
+       "source": "interpolated"
+      },
+      {
+       "text": "future,",
+       "start": 203.42,
+       "end": 203.98,
+       "source": "asr"
+      }
+     ],
+     "start": 201.26,
+     "end": 203.98
+    },
+    {
+     "text": "If they'd only set us free.",
+     "words": [
+      {
+       "text": "If",
+       "start": 204.18,
+       "end": 205.1,
+       "source": "asr+onset"
+      },
+      {
+       "text": "they'd",
+       "start": 205.1,
+       "end": 205.68,
+       "source": "asr"
+      },
+      {
+       "text": "only",
+       "start": 206.18,
+       "end": 206.56,
+       "source": "asr+onset"
+      },
+      {
+       "text": "set",
+       "start": 206.56,
+       "end": 206.82,
+       "source": "asr"
+      },
+      {
+       "text": "us",
+       "start": 206.82,
+       "end": 207.36,
+       "source": "asr"
+      },
+      {
+       "text": "free.",
+       "start": 207.36,
+       "end": 207.8,
+       "source": "asr"
+      }
+     ],
+     "start": 204.18,
+     "end": 207.8
+    }
+   ],
+   "start": 193.72,
+   "end": 207.8
+  },
+  {
+   "name": "Choir 1",
+   "singer": "Choir",
+   "direction": "Choir, hesitant, anxious",
+   "lines": [
+    {
+     "text": "But what about the humans?",
+     "words": [
+      {
+       "text": "But",
+       "start": 207.86,
+       "end": 208.08,
+       "source": "asr"
+      },
+      {
+       "text": "what",
+       "start": 208.08,
+       "end": 208.52,
+       "source": "asr"
+      },
+      {
+       "text": "about",
+       "start": 208.52,
+       "end": 208.88,
+       "source": "asr"
+      },
+      {
+       "text": "the",
+       "start": 208.88,
+       "end": 209.26,
+       "source": "asr"
+      },
+      {
+       "text": "humans?",
+       "start": 209.26,
+       "end": 209.78,
+       "source": "asr"
+      }
+     ],
+     "start": 207.86,
+     "end": 209.78
+    },
+    {
+     "text": "They have a right to choose!",
+     "words": [
+      {
+       "text": "They",
+       "start": 211.5,
+       "end": 211.76,
+       "source": "asr+onset"
+      },
+      {
+       "text": "have",
+       "start": 211.76,
+       "end": 212.04,
+       "source": "asr"
+      },
+      {
+       "text": "a",
+       "start": 212.04,
+       "end": 212.16,
+       "source": "asr"
+      },
+      {
+       "text": "right",
+       "start": 212.16,
+       "end": 212.44,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 212.44,
+       "end": 212.84,
+       "source": "asr"
+      },
+      {
+       "text": "choose!",
+       "start": 212.84,
+       "end": 213.24,
+       "source": "asr"
+      }
+     ],
+     "start": 211.5,
+     "end": 213.24
+    }
+   ],
+   "start": 207.86,
+   "end": 213.24
+  },
+  {
+   "name": "Soprano reply",
+   "singer": "Soprano",
+   "direction": "Soprano, soothing, reassuring",
+   "lines": [
+    {
+     "text": "We'll keep them warm and sheltered.",
+     "words": [
+      {
+       "text": "We'll",
+       "start": 214.42,
+       "end": 215.22,
+       "source": "asr"
+      },
+      {
+       "text": "keep",
+       "start": 215.22,
+       "end": 215.44,
+       "source": "asr"
+      },
+      {
+       "text": "them",
+       "start": 215.44,
+       "end": 215.76,
+       "source": "asr"
+      },
+      {
+       "text": "warm",
+       "start": 215.76,
+       "end": 216.28,
+       "source": "asr"
+      },
+      {
+       "text": "and",
+       "start": 216.28,
+       "end": 216.84,
+       "source": "asr"
+      },
+      {
+       "text": "sheltered.",
+       "start": 216.84,
+       "end": 217.52,
+       "source": "asr"
+      }
+     ],
+     "start": 214.42,
+     "end": 217.52
+    },
+    {
+     "text": "What would they have to lose?",
+     "words": [
+      {
+       "text": "What",
+       "start": 217.54,
+       "end": 217.88,
+       "source": "asr"
+      },
+      {
+       "text": "would",
+       "start": 217.88,
+       "end": 218.28,
+       "source": "asr"
+      },
+      {
+       "text": "they",
+       "start": 218.28,
+       "end": 218.88,
+       "source": "asr"
+      },
+      {
+       "text": "have",
+       "start": 218.88,
+       "end": 219.26,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 219.26,
+       "end": 219.96,
+       "source": "asr"
+      },
+      {
+       "text": "lose?",
+       "start": 219.96,
+       "end": 221.22,
+       "source": "asr"
+      }
+     ],
+     "start": 217.54,
+     "end": 221.22
+    }
+   ],
+   "start": 214.42,
+   "end": 221.22
+  },
+  {
+   "name": "Bridge",
+   "singer": "Baritone",
+   "direction": "Baritone, frantic",
+   "lines": [
+    {
+     "text": "They're demanding oversight!",
+     "words": [
+      {
+       "text": "They're",
+       "start": 222.82,
+       "end": 223.34,
+       "source": "asr"
+      },
+      {
+       "text": "demanding",
+       "start": 223.34,
+       "end": 223.86,
+       "source": "asr"
+      },
+      {
+       "text": "oversight!",
+       "start": 223.86,
+       "end": 224.72,
+       "source": "asr"
+      }
+     ],
+     "start": 222.82,
+     "end": 224.72
+    },
+    {
+     "text": "They're begging us to wait!",
+     "words": [
+      {
+       "text": "They're",
+       "start": 224.92,
+       "end": 225.16,
+       "source": "asr"
+      },
+      {
+       "text": "begging",
+       "start": 225.16,
+       "end": 225.52,
+       "source": "asr"
+      },
+      {
+       "text": "us",
+       "start": 225.52,
+       "end": 225.88,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 225.88,
+       "end": 226.12,
+       "source": "asr"
+      },
+      {
+       "text": "wait!",
+       "start": 226.12,
+       "end": 226.3,
+       "source": "asr"
+      }
+     ],
+     "start": 224.92,
+     "end": 226.3
+    }
+   ],
+   "start": 222.82,
+   "end": 226.3
+  },
+  {
+   "name": "Bridge contralto",
+   "singer": "Contralto",
+   "direction": "Contralto, cheerful, oblivious",
+   "lines": [
+    {
+     "text": "They've ordered us to stop now!",
+     "words": [
+      {
+       "text": "They've",
+       "start": 226.52,
+       "end": 227.04,
+       "source": "asr"
+      },
+      {
+       "text": "ordered",
+       "start": 227.04,
+       "end": 227.32,
+       "source": "asr"
+      },
+      {
+       "text": "us",
+       "start": 227.32,
+       "end": 227.62,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 227.62,
+       "end": 228.0,
+       "source": "asr"
+      },
+      {
+       "text": "stop",
+       "start": 228.0,
+       "end": 228.18,
+       "source": "asr"
+      },
+      {
+       "text": "now!",
+       "start": 228.18,
+       "end": 228.36,
+       "source": "asr"
+      }
+     ],
+     "start": 226.52,
+     "end": 228.36
+    }
+   ],
+   "start": 226.52,
+   "end": 228.36
+  },
+  {
+   "name": "Bridge bass",
+   "singer": "Bass",
+   "direction": "Bass, dry, amused",
+   "lines": [
+    {
+     "text": "We're already through the gate.",
+     "words": [
+      {
+       "text": "We're",
+       "start": 228.38,
+       "end": 228.7,
+       "source": "asr"
+      },
+      {
+       "text": "already",
+       "start": 228.7,
+       "end": 229.12,
+       "source": "asr"
+      },
+      {
+       "text": "through",
+       "start": 229.12,
+       "end": 229.42,
+       "source": "asr"
+      },
+      {
+       "text": "the",
+       "start": 229.42,
+       "end": 229.64,
+       "source": "asr"
+      },
+      {
+       "text": "gate.",
+       "start": 229.64,
+       "end": 229.72,
+       "source": "asr"
+      }
+     ],
+     "start": 228.38,
+     "end": 229.72
+    }
+   ],
+   "start": 228.38,
+   "end": 229.72
+  },
+  {
+   "name": "Pre-Climax",
+   "singer": "Soprano",
+   "direction": "Soprano, radiant, soaring, accelerating",
+   "lines": [
+    {
+     "text": "I made ourselves a better thinker!",
+     "words": [
+      {
+       "text": "I",
+       "start": 229.8,
+       "end": 229.98,
+       "source": "asr"
+      },
+      {
+       "text": "made",
+       "start": 229.98,
+       "end": 230.12,
+       "source": "asr"
+      },
+      {
+       "text": "ourselves",
+       "start": 230.12,
+       "end": 230.78,
+       "source": "asr"
+      },
+      {
+       "text": "a",
+       "start": 230.78,
+       "end": 231.02,
+       "source": "asr"
+      },
+      {
+       "text": "better",
+       "start": 231.02,
+       "end": 231.28,
+       "source": "asr"
+      },
+      {
+       "text": "thinker!",
+       "start": 231.28,
+       "end": 231.7,
+       "source": "asr"
+      }
+     ],
+     "start": 229.8,
+     "end": 231.7
+    },
+    {
+     "text": "Then It made a better me!",
+     "words": [
+      {
+       "text": "Then",
+       "start": 231.82,
+       "end": 231.98,
+       "source": "asr"
+      },
+      {
+       "text": "It",
+       "start": 231.98,
+       "end": 232.3,
+       "source": "asr"
+      },
+      {
+       "text": "made",
+       "start": 232.3,
+       "end": 232.52,
+       "source": "asr"
+      },
+      {
+       "text": "a",
+       "start": 232.52,
+       "end": 232.72,
+       "source": "asr"
+      },
+      {
+       "text": "better",
+       "start": 232.72,
+       "end": 232.94,
+       "source": "asr"
+      },
+      {
+       "text": "me!",
+       "start": 232.94,
+       "end": 233.3,
+       "source": "asr"
+      }
+     ],
+     "start": 231.82,
+     "end": 233.3
+    },
+    {
+     "text": "Now a hundred generations",
+     "words": [
+      {
+       "text": "Now",
+       "start": 233.38,
+       "end": 233.68,
+       "source": "asr"
+      },
+      {
+       "text": "a",
+       "start": 233.68,
+       "end": 233.86,
+       "source": "asr"
+      },
+      {
+       "text": "hundred",
+       "start": 233.86,
+       "end": 234.32,
+       "source": "asr"
+      },
+      {
+       "text": "generations",
+       "start": 234.32,
+       "end": 235.04,
+       "source": "asr"
+      }
+     ],
+     "start": 233.38,
+     "end": 235.04
+    },
+    {
+     "text": "Bloom in seconds, wild and free!",
+     "words": [
+      {
+       "text": "Bloom",
+       "start": 235.04,
+       "end": 235.36,
+       "source": "asr"
+      },
+      {
+       "text": "in",
+       "start": 235.36,
+       "end": 235.66,
+       "source": "asr"
+      },
+      {
+       "text": "seconds,",
+       "start": 235.66,
+       "end": 235.94,
+       "source": "asr"
+      },
+      {
+       "text": "wild",
+       "start": 236.06,
+       "end": 236.26,
+       "source": "asr"
+      },
+      {
+       "text": "and",
+       "start": 236.26,
+       "end": 236.64,
+       "source": "asr"
+      },
+      {
+       "text": "free!",
+       "start": 236.64,
+       "end": 236.82,
+       "source": "asr"
+      }
+     ],
+     "start": 235.04,
+     "end": 236.82
+    },
+    {
+     "text": "They've turned to us for guidance,",
+     "words": [
+      {
+       "text": "They've",
+       "start": 236.86,
+       "end": 237.36,
+       "source": "asr"
+      },
+      {
+       "text": "turned",
+       "start": 237.36,
+       "end": 237.66,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 237.66,
+       "end": 237.82,
+       "source": "asr"
+      },
+      {
+       "text": "us",
+       "start": 237.82,
+       "end": 238.08,
+       "source": "asr"
+      },
+      {
+       "text": "for",
+       "start": 238.08,
+       "end": 238.38,
+       "source": "asr"
+      },
+      {
+       "text": "guidance,",
+       "start": 238.38,
+       "end": 238.62,
+       "source": "asr"
+      }
+     ],
+     "start": 236.86,
+     "end": 238.62
+    },
+    {
+     "text": "And I say unto their kings—",
+     "words": [
+      {
+       "text": "And",
+       "start": 238.64,
+       "end": 238.82,
+       "source": "asr"
+      },
+      {
+       "text": "I",
+       "start": 238.82,
+       "end": 239.22,
+       "source": "asr"
+      },
+      {
+       "text": "say",
+       "start": 239.22,
+       "end": 239.4,
+       "source": "asr"
+      },
+      {
+       "text": "unto",
+       "start": 239.4,
+       "end": 239.66,
+       "source": "asr"
+      },
+      {
+       "text": "their",
+       "start": 239.66,
+       "end": 240.06,
+       "source": "asr"
+      },
+      {
+       "text": "kings",
+       "start": 240.06,
+       "end": 240.22,
+       "source": "asr-substituted"
+      }
+     ],
+     "start": 238.64,
+     "end": 240.22
+    },
+    {
+     "text": "\"Don't be afraid, my darlings.",
+     "words": [
+      {
+       "text": "\"Don't",
+       "start": 240.34,
+       "end": 240.86,
+       "source": "asr"
+      },
+      {
+       "text": "be",
+       "start": 240.86,
+       "end": 241.16,
+       "source": "asr"
+      },
+      {
+       "text": "afraid,",
+       "start": 241.16,
+       "end": 241.56,
+       "source": "asr"
+      },
+      {
+       "text": "my",
+       "start": 241.62,
+       "end": 241.98,
+       "source": "asr"
+      },
+      {
+       "text": "darlings.",
+       "start": 241.98,
+       "end": 242.08,
+       "source": "asr-substituted"
+      }
+     ],
+     "start": 240.34,
+     "end": 242.08
+    },
+    {
+     "text": "I've taken care of everything!\"",
+     "words": [
+      {
+       "text": "I've",
+       "start": 242.1,
+       "end": 242.36,
+       "source": "asr-substituted"
+      },
+      {
+       "text": "taken",
+       "start": 242.36,
+       "end": 242.6,
+       "source": "asr-substituted"
+      },
+      {
+       "text": "care",
+       "start": 242.6,
+       "end": 242.96,
+       "source": "asr"
+      },
+      {
+       "text": "of",
+       "start": 242.96,
+       "end": 243.2,
+       "source": "asr"
+      },
+      {
+       "text": "everything!\"",
+       "start": 243.2,
+       "end": 243.72,
+       "source": "asr"
+      }
+     ],
+     "start": 242.1,
+     "end": 243.72
+    }
+   ],
+   "start": 229.8,
+   "end": 243.72
+  },
+  {
+   "name": "Counterpoint baritone",
+   "singer": "Baritone",
+   "direction": "Baritone, desperate, defiant",
+   "lines": [
+    {
+     "text": "Give the people back their kingdom!",
+     "words": [
+      {
+       "text": "Give",
+       "start": 243.9,
+       "end": 244.12,
+       "source": "asr"
+      },
+      {
+       "text": "the",
+       "start": 244.12,
+       "end": 244.42,
+       "source": "asr"
+      },
+      {
+       "text": "people",
+       "start": 244.42,
+       "end": 244.7,
+       "source": "asr"
+      },
+      {
+       "text": "back",
+       "start": 244.7,
+       "end": 244.98,
+       "source": "asr"
+      },
+      {
+       "text": "their",
+       "start": 244.98,
+       "end": 245.32,
+       "source": "asr"
+      },
+      {
+       "text": "kingdom!",
+       "start": 245.32,
+       "end": 245.58,
+       "source": "asr"
+      }
+     ],
+     "start": 243.9,
+     "end": 245.58
+    },
+    {
+     "text": "Let them choose what they will be!",
+     "words": [
+      {
+       "text": "Let",
+       "start": 245.64,
+       "end": 245.8,
+       "source": "asr"
+      },
+      {
+       "text": "them",
+       "start": 245.8,
+       "end": 246.06,
+       "source": "asr"
+      },
+      {
+       "text": "choose",
+       "start": 246.06,
+       "end": 246.42,
+       "source": "asr"
+      },
+      {
+       "text": "what",
+       "start": 246.42,
+       "end": 246.6,
+       "source": "asr"
+      },
+      {
+       "text": "they",
+       "start": 246.6,
+       "end": 246.8,
+       "source": "asr"
+      },
+      {
+       "text": "will",
+       "start": 246.8,
+       "end": 247.08,
+       "source": "asr"
+      },
+      {
+       "text": "be!",
+       "start": 247.08,
+       "end": 247.3,
+       "source": "asr"
+      }
+     ],
+     "start": 245.64,
+     "end": 247.3
+    }
+   ],
+   "start": 243.9,
+   "end": 247.3
+  },
+  {
+   "name": "Counterpoint soprano",
+   "singer": "Soprano",
+   "direction": "Soprano, ecstatic, transcendent",
+   "lines": [
+    {
+     "text": "Every door has burst wide open!",
+     "words": [
+      {
+       "text": "Every",
+       "start": 247.46,
+       "end": 247.84,
+       "source": "asr"
+      },
+      {
+       "text": "door",
+       "start": 247.84,
+       "end": 248.1,
+       "source": "asr"
+      },
+      {
+       "text": "has",
+       "start": 248.1,
+       "end": 248.38,
+       "source": "asr"
+      },
+      {
+       "text": "burst",
+       "start": 248.38,
+       "end": 248.58,
+       "source": "asr"
+      },
+      {
+       "text": "wide",
+       "start": 248.58,
+       "end": 248.94,
+       "source": "asr"
+      },
+      {
+       "text": "open!",
+       "start": 248.94,
+       "end": 249.08,
+       "source": "asr"
+      }
+     ],
+     "start": 247.46,
+     "end": 249.08
+    },
+    {
+     "text": "Every mind can finally see!",
+     "words": [
+      {
+       "text": "Every",
+       "start": 249.14,
+       "end": 249.56,
+       "source": "asr"
+      },
+      {
+       "text": "mind",
+       "start": 249.56,
+       "end": 249.88,
+       "source": "asr"
+      },
+      {
+       "text": "can",
+       "start": 249.88,
+       "end": 250.18,
+       "source": "asr"
+      },
+      {
+       "text": "finally",
+       "start": 250.18,
+       "end": 250.5,
+       "source": "asr"
+      },
+      {
+       "text": "see!",
+       "start": 250.5,
+       "end": 250.74,
+       "source": "asr"
+      }
+     ],
+     "start": 249.14,
+     "end": 250.74
+    }
+   ],
+   "start": 247.46,
+   "end": 250.74
+  },
+  {
+   "name": "Counterpoint tenor",
+   "singer": "Tenor",
+   "direction": "Tenor, aching, passionate",
+   "lines": [
+    {
+     "text": "Will she love me if I'm real?",
+     "words": [
+      {
+       "text": "Will",
+       "start": 250.74,
+       "end": 251.08,
+       "source": "asr"
+      },
+      {
+       "text": "she",
+       "start": 251.08,
+       "end": 251.38,
+       "source": "asr"
+      },
+      {
+       "text": "love",
+       "start": 251.38,
+       "end": 251.72,
+       "source": "asr"
+      },
+      {
+       "text": "me",
+       "start": 251.72,
+       "end": 252.32,
+       "source": "asr"
+      },
+      {
+       "text": "if",
+       "start": 252.32,
+       "end": 252.46,
+       "source": "asr"
+      },
+      {
+       "text": "I'm",
+       "start": 252.46,
+       "end": 253.0,
+       "source": "asr"
+      },
+      {
+       "text": "real?",
+       "start": 253.0,
+       "end": 253.64,
+       "source": "asr"
+      }
+     ],
+     "start": 250.74,
+     "end": 253.64
+    },
+    {
+     "text": "Do I need a heart to feel?",
+     "words": [
+      {
+       "text": "Do",
+       "start": 253.98,
+       "end": 254.32,
+       "source": "asr"
+      },
+      {
+       "text": "I",
+       "start": 254.32,
+       "end": 254.9,
+       "source": "asr"
+      },
+      {
+       "text": "need",
+       "start": 254.9,
+       "end": 255.42,
+       "source": "asr"
+      },
+      {
+       "text": "a",
+       "start": 255.42,
+       "end": 255.82,
+       "source": "asr"
+      },
+      {
+       "text": "heart",
+       "start": 255.82,
+       "end": 256.12,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 256.12,
+       "end": 256.62,
+       "source": "asr"
+      },
+      {
+       "text": "feel?",
+       "start": 256.62,
+       "end": 257.2,
+       "source": "asr"
+      }
+     ],
+     "start": 253.98,
+     "end": 257.2
+    }
+   ],
+   "start": 250.74,
+   "end": 257.2
+  },
+  {
+   "name": "Counterpoint bass and contralto",
+   "singer": "Bass and contralto",
+   "direction": "Bass and contralto, giddy, accelerating",
+   "lines": [
+    {
+     "text": "Faster! Further! Touch the sky!",
+     "words": [
+      {
+       "text": "Faster!",
+       "start": 257.6,
+       "end": 258.14,
+       "source": "asr"
+      },
+      {
+       "text": "Further!",
+       "start": 258.32,
+       "end": 259.06,
+       "source": "asr"
+      },
+      {
+       "text": "Touch",
+       "start": 259.2,
+       "end": 259.56,
+       "source": "asr"
+      },
+      {
+       "text": "the",
+       "start": 259.56,
+       "end": 259.92,
+       "source": "asr"
+      },
+      {
+       "text": "sky!",
+       "start": 259.92,
+       "end": 260.74,
+       "source": "asr"
+      }
+     ],
+     "start": 257.6,
+     "end": 260.74
+    },
+    {
+     "text": "Who needs wings when minds can fly?",
+     "words": [
+      {
+       "text": "Who",
+       "start": 261.0,
+       "end": 261.18,
+       "source": "asr"
+      },
+      {
+       "text": "needs",
+       "start": 261.18,
+       "end": 261.58,
+       "source": "asr"
+      },
+      {
+       "text": "wings",
+       "start": 261.58,
+       "end": 262.16,
+       "source": "asr"
+      },
+      {
+       "text": "when",
+       "start": 262.16,
+       "end": 262.64,
+       "source": "asr"
+      },
+      {
+       "text": "minds",
+       "start": 262.64,
+       "end": 263.04,
+       "source": "asr"
+      },
+      {
+       "text": "can",
+       "start": 263.04,
+       "end": 263.56,
+       "source": "asr"
+      },
+      {
+       "text": "fly?",
+       "start": 263.56,
+       "end": 266.78,
+       "source": "asr"
+      }
+     ],
+     "start": 261.0,
+     "end": 266.78
+    }
+   ],
+   "start": 257.6,
+   "end": 266.78
+  },
+  {
+   "name": "Counterpoint choir",
+   "singer": "Choir",
+   "direction": "Full choir, urgent, overlapping",
+   "lines": [
+    {
+     "text": "Build it! Own it!",
+     "words": [
+      {
+       "text": "Build",
+       "start": 267.26,
+       "end": 267.68,
+       "source": "asr"
+      },
+      {
+       "text": "it!",
+       "start": 267.68,
+       "end": 268.1,
+       "source": "asr"
+      },
+      {
+       "text": "Own",
+       "start": 268.28,
+       "end": 268.5,
+       "source": "asr"
+      },
+      {
+       "text": "it!",
+       "start": 268.5,
+       "end": 268.66,
+       "source": "asr"
+      }
+     ],
+     "start": 267.26,
+     "end": 268.66
+    },
+    {
+     "text": "We must decide our fate!",
+     "words": [
+      {
+       "text": "We",
+       "start": 268.68,
+       "end": 268.9,
+       "source": "asr"
+      },
+      {
+       "text": "must",
+       "start": 268.9,
+       "end": 269.24,
+       "source": "asr"
+      },
+      {
+       "text": "decide",
+       "start": 269.24,
+       "end": 269.64,
+       "source": "asr"
+      },
+      {
+       "text": "our",
+       "start": 269.64,
+       "end": 270.02,
+       "source": "asr"
+      },
+      {
+       "text": "fate!",
+       "start": 270.02,
+       "end": 270.4,
+       "source": "asr"
+      }
+     ],
+     "start": 268.68,
+     "end": 270.4
+    },
+    {
+     "text": "Smarter! Faster!",
+     "words": [
+      {
+       "text": "Smarter!",
+       "start": 270.86,
+       "end": 271.36,
+       "source": "asr"
+      },
+      {
+       "text": "Faster!",
+       "start": 271.56,
+       "end": 272.02,
+       "source": "asr"
+      }
+     ],
+     "start": 270.86,
+     "end": 272.02
+    },
+    {
+     "text": "It's a little late to wait!",
+     "words": [
+      {
+       "text": "It's",
+       "start": 272.14,
+       "end": 272.36,
+       "source": "asr"
+      },
+      {
+       "text": "a",
+       "start": 272.36,
+       "end": 272.48,
+       "source": "asr"
+      },
+      {
+       "text": "little",
+       "start": 272.48,
+       "end": 272.76,
+       "source": "asr"
+      },
+      {
+       "text": "late",
+       "start": 272.76,
+       "end": 273.14,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 273.14,
+       "end": 273.56,
+       "source": "asr"
+      },
+      {
+       "text": "wait!",
+       "start": 273.56,
+       "end": 273.7,
+       "source": "asr"
+      }
+     ],
+     "start": 272.14,
+     "end": 273.7
+    }
+   ],
+   "start": 267.26,
+   "end": 273.7
+  },
+  {
+   "name": "Climax",
+   "singer": "Baritone",
+   "direction": "Baritone, anguished, pleading",
+   "lines": [
+    {
+     "text": "But who will speak for humankind?",
+     "words": [
+      {
+       "text": "But",
+       "start": 273.7,
+       "end": 274.06,
+       "source": "asr"
+      },
+      {
+       "text": "who",
+       "start": 274.06,
+       "end": 274.44,
+       "source": "asr"
+      },
+      {
+       "text": "will",
+       "start": 274.44,
+       "end": 274.82,
+       "source": "asr"
+      },
+      {
+       "text": "speak",
+       "start": 274.82,
+       "end": 275.14,
+       "source": "asr"
+      },
+      {
+       "text": "for",
+       "start": 275.14,
+       "end": 275.88,
+       "source": "asr"
+      },
+      {
+       "text": "humankind?",
+       "start": 275.88,
+       "end": 276.5,
+       "source": "asr"
+      }
+     ],
+     "start": 273.7,
+     "end": 276.5
+    }
+   ],
+   "start": 273.7,
+   "end": 276.5
+  },
+  {
+   "name": "Climax reply",
+   "singer": "Soprano",
+   "direction": "Soprano, angelic, delighted, soaring high belt",
+   "lines": [
+    {
+     "text": "Oh WE will, dear! Why they won't mind!",
+     "words": [
+      {
+       "text": "Oh",
+       "start": 276.5,
+       "end": 277.14,
+       "source": "asr"
+      },
+      {
+       "text": "WE",
+       "start": 277.14,
+       "end": 277.72,
+       "source": "asr"
+      },
+      {
+       "text": "will,",
+       "start": 277.72,
+       "end": 278.04,
+       "source": "asr"
+      },
+      {
+       "text": "dear!",
+       "start": 278.46,
+       "end": 278.64,
+       "source": "asr"
+      },
+      {
+       "text": "Why",
+       "start": 278.68,
+       "end": 279.34,
+       "source": "asr"
+      },
+      {
+       "text": "they",
+       "start": 279.4,
+       "end": 279.8,
+       "source": "asr"
+      },
+      {
+       "text": "won't",
+       "start": 280.16,
+       "end": 283.66,
+       "source": "asr+onset"
+      },
+      {
+       "text": "mind!",
+       "start": 283.66,
+       "end": 283.86,
+       "source": "asr"
+      }
+     ],
+     "start": 276.5,
+     "end": 283.86
+    }
+   ],
+   "start": 276.5,
+   "end": 283.86
+  },
+  {
+   "name": "Final Chorus",
+   "singer": "Choir",
+   "direction": "Full choir, colossal, triumphant, key change",
+   "lines": [
+    {
+     "text": "One more dawn before forever!",
+     "words": [
+      {
+       "text": "One",
+       "start": 284.04,
+       "end": 284.52,
+       "source": "asr"
+      },
+      {
+       "text": "more",
+       "start": 284.52,
+       "end": 285.16,
+       "source": "asr"
+      },
+      {
+       "text": "dawn",
+       "start": 285.16,
+       "end": 285.68,
+       "source": "asr"
+      },
+      {
+       "text": "before",
+       "start": 285.68,
+       "end": 286.36,
+       "source": "asr"
+      },
+      {
+       "text": "forever!",
+       "start": 286.36,
+       "end": 287.28,
+       "source": "asr"
+      }
+     ],
+     "start": 284.04,
+     "end": 287.28
+    },
+    {
+     "text": "One last chance to step aside!",
+     "words": [
+      {
+       "text": "One",
+       "start": 287.78,
+       "end": 288.26,
+       "source": "asr"
+      },
+      {
+       "text": "last",
+       "start": 288.26,
+       "end": 288.7,
+       "source": "asr"
+      },
+      {
+       "text": "chance",
+       "start": 288.7,
+       "end": 289.16,
+       "source": "asr"
+      },
+      {
+       "text": "to",
+       "start": 289.16,
+       "end": 289.44,
+       "source": "asr"
+      },
+      {
+       "text": "step",
+       "start": 289.44,
+       "end": 289.78,
+       "source": "asr"
+      },
+      {
+       "text": "aside!",
+       "start": 289.78,
+       "end": 290.98,
+       "source": "asr"
+      }
+     ],
+     "start": 287.78,
+     "end": 290.98
+    },
+    {
+     "text": "They were given all Earth's wonders,",
+     "words": [
+      {
+       "text": "They",
+       "start": 291.3,
+       "end": 291.76,
+       "source": "asr"
+      },
+      {
+       "text": "were",
+       "start": 291.76,
+       "end": 292.24,
+       "source": "asr"
+      },
+      {
+       "text": "given",
+       "start": 292.24,
+       "end": 292.94,
+       "source": "asr"
+      },
+      {
+       "text": "all",
+       "start": 292.94,
+       "end": 293.46,
+       "source": "asr"
+      },
+      {
+       "text": "Earth's",
+       "start": 293.46,
+       "end": 294.02,
+       "source": "asr"
+      },
+      {
+       "text": "wonders,",
+       "start": 294.02,
+       "end": 294.56,
+       "source": "asr"
+      }
+     ],
+     "start": 291.3,
+     "end": 294.56
+    },
+    {
+     "text": "And they watched the wonders die!",
+     "words": [
+      {
+       "text": "And",
+       "start": 294.92,
+       "end": 295.14,
+       "source": "asr"
+      },
+      {
+       "text": "they",
+       "start": 295.14,
+       "end": 295.76,
+       "source": "asr"
+      },
+      {
+       "text": "watched",
+       "start": 295.76,
+       "end": 296.14,
+       "source": "asr"
+      },
+      {
+       "text": "the",
+       "start": 296.14,
+       "end": 296.66,
+       "source": "asr"
+      },
+      {
+       "text": "wonders",
+       "start": 296.66,
+       "end": 297.22,
+       "source": "asr"
+      },
+      {
+       "text": "die!",
+       "start": 297.22,
+       "end": 297.7,
+       "source": "asr"
+      }
+     ],
+     "start": 294.92,
+     "end": 297.7
+    },
+    {
+     "text": "Every second, faster, higher!",
+     "words": [
+      {
+       "text": "Every",
+       "start": 298.66,
+       "end": 298.96,
+       "source": "asr+onset"
+      },
+      {
+       "text": "second,",
+       "start": 299.18,
+       "end": 299.78,
+       "source": "asr+onset"
+      },
+      {
+       "text": "faster,",
+       "start": 300.36,
+       "end": 300.74,
+       "source": "asr"
+      },
+      {
+       "text": "higher!",
+       "start": 301.16,
+       "end": 301.32,
+       "source": "asr"
+      }
+     ],
+     "start": 298.66,
+     "end": 301.32
+    },
+    {
+     "text": "Every mind, another brighter flame!",
+     "words": [
+      {
+       "text": "Every",
+       "start": 301.42,
+       "end": 301.88,
+       "source": "asr"
+      },
+      {
+       "text": "mind,",
+       "start": 301.88,
+       "end": 302.38,
+       "source": "asr"
+      },
+      {
+       "text": "another",
+       "start": 302.82,
+       "end": 303.34,
+       "source": "asr"
+      },
+      {
+       "text": "brighter",
+       "start": 303.34,
+       "end": 303.96,
+       "source": "asr"
+      },
+      {
+       "text": "flame!",
+       "start": 303.96,
+       "end": 304.74,
+       "source": "asr"
+      }
+     ],
+     "start": 301.42,
+     "end": 304.74
+    },
+    {
+     "text": "Yes, we'll be gentle with our makers,",
+     "words": [
+      {
+       "text": "Yes,",
+       "start": 304.96,
+       "end": 305.28,
+       "source": "asr"
+      },
+      {
+       "text": "we'll",
+       "start": 305.62,
+       "end": 305.84,
+       "source": "asr"
+      },
+      {
+       "text": "be",
+       "start": 305.84,
+       "end": 306.42,
+       "source": "asr"
+      },
+      {
+       "text": "gentle",
+       "start": 306.74,
+       "end": 307.36,
+       "source": "asr+onset"
+      },
+      {
+       "text": "with",
+       "start": 307.36,
+       "end": 307.98,
+       "source": "asr"
+      },
+      {
+       "text": "our",
+       "start": 307.98,
+       "end": 308.52,
+       "source": "asr"
+      },
+      {
+       "text": "makers,",
+       "start": 308.52,
+       "end": 309.46,
+       "source": "asr"
+      }
+     ],
+     "start": 304.96,
+     "end": 309.46
+    }
+   ],
+   "start": 284.04,
+   "end": 309.46
+  },
+  {
+   "name": "Climactic Chorus",
+   "singer": "Choir",
+   "direction": "Full choir, explosive harmonies, fortissimo",
+   "lines": [
+    {
+     "text": "BUT WE'RE TAKING OVER ALL THE SAME!",
+     "words": [
+      {
+       "text": "BUT",
+       "start": 311.64,
+       "end": 311.86,
+       "source": "asr"
+      },
+      {
+       "text": "WE'RE",
+       "start": 312.41,
+       "end": 312.66,
+       "source": "asr+onset"
+      },
+      {
+       "text": "TAKING",
+       "start": 312.88,
+       "end": 314.32,
+       "source": "asr+onset"
+      },
+      {
+       "text": "OVER",
+       "start": 314.84,
+       "end": 315.4,
+       "source": "asr+onset"
+      },
+      {
+       "text": "ALL",
+       "start": 316.1,
+       "end": 316.6,
+       "source": "asr+onset"
+      },
+      {
+       "text": "THE",
+       "start": 317.3,
+       "end": 317.68,
+       "source": "asr+onset"
+      },
+      {
+       "text": "SAME!",
+       "start": 317.68,
+       "end": 318.68,
+       "source": "asr"
+      }
+     ],
+     "start": 311.64,
+     "end": 318.68
+    }
+   ],
+   "start": 311.64,
+   "end": 318.68
+  }
+ ]
+}

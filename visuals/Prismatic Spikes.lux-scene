@@ -1,0 +1,20 @@
+{
+  "format": "lux-scene",
+  "version": 1,
+  "source": {
+    "entry": "visual.ts",
+    "files": {
+      "visual.ts": "import { defineVisual } from '@lux/visual-sdk';\nimport { Scene, Mesh, IcosahedronGeometry, MeshPhysicalNodeMaterial, PerspectiveCamera, Color, AmbientLight, DirectionalLight } from 'three/webgpu';\nimport { uniform, vec3, positionLocal, mx_noise_float, mix, color, varying } from 'three/tsl';\n\n// Edit these artistic settings and rebuild. Intensity is the live macro.\nconst settings = {\n  spikeHeight: 1.0,    // 0 = round; 2 = long thorns (zoom camera out)\n  noiseScale: 3.6,    // Larger values create more, smaller spikes\n  sharpness: 3.4,     // Larger values make narrower tips\n  evolutionSpeed: 0.3,\n  domainWarp: 0.48,   // Twists the noise field into organic shapes\n  microDetail: 0.07,\n  rotationSpeed: 0.13,\n  metallic: 0.56,\n  roughness: 0.29,\n  iridescence: 0.85,\n};\n\nexport default defineVisual({\n  async create(context) {\n    const clock = uniform(0);\n    const intensity = uniform(0.55);\n    const p = positionLocal.normalize();\n    const drift = vec3(clock.mul(0.43), clock.mul(-0.31), clock.mul(0.22));\n    const warp = mx_noise_float(p.mul(2.0).add(drift.mul(0.45))).mul(settings.domainWarp);\n    const field = p.mul(settings.noiseScale).add(drift).add(warp);\n    const noise = mx_noise_float(field).mul(0.8).add(0.44).clamp(0, 1);\n    const spikes = noise.pow(settings.sharpness).mul(settings.spikeHeight).mul(intensity.mul(1.6).add(0.25));\n    const pores = mx_noise_float(field.mul(3.1).sub(drift)).mul(settings.microDetail).mul(intensity);\n    const radius = spikes.add(pores).add(0.85);\n    const height = varying(spikes);\n\n    const material = new MeshPhysicalNodeMaterial({\n      metalness: settings.metallic, roughness: settings.roughness,\n      clearcoat: 0.8, clearcoatRoughness: 0.22,\n      iridescence: settings.iridescence, iridescenceIOR: 1.4,\n      iridescenceThicknessRange: [120, 470], flatShading: true,\n    });\n    material.positionNode = p.mul(radius);\n    material.colorNode = mix(color('#392565'), color('#21e6cb'), height.mul(1.8).clamp(0, 1));\n    material.emissiveNode = mix(color('#120420'), color('#16b9b6'), height.mul(1.2).clamp(0, 1)).mul(0.13);\n    const geometry = new IcosahedronGeometry(1, 32);\n    const sphere = new Mesh(geometry, material);\n    sphere.frustumCulled = false;\n    const scene = new Scene();\n    scene.background = new Color('#030510');\n    scene.add(sphere);\n    scene.add(new AmbientLight('#668ab4', 0.8));\n    const key = new DirectionalLight('#bfefff', 4.4);\n    key.position.set(3, 4, 4);\n    scene.add(key);\n    const rim = new DirectionalLight('#fc4fa4', 5.5);\n    rim.position.set(-3, 1, -1);\n    scene.add(rim);\n    const fill = new DirectionalLight('#558bff', 2.0);\n    fill.position.set(1, -3, 2);\n    scene.add(fill);\n    const camera = new PerspectiveCamera(36, context.settings.width / context.settings.height, 0.1, 30);\n    camera.position.set(0, 0, 9);\n    camera.lookAt(0, 0, 0);\n    return {\n      update(frame) {\n        intensity.value = frame.controls.intensity;\n        clock.value = frame.timeSeconds * settings.evolutionSpeed * (0.5 + frame.controls.intensity);\n        sphere.rotation.y = frame.timeSeconds * settings.rotationSpeed;\n        sphere.rotation.x = Math.sin(frame.timeSeconds * 0.17) * 0.16;\n        sphere.rotation.z = 0.13;\n      },\n      render(target) { return context.renderer.render(scene, camera, target); },\n      reset(_seed) { clock.value = 0; sphere.rotation.set(0, 0, 0.13); },\n      dispose() { geometry.dispose(); material.dispose(); },\n    };\n  },\n});\n"
+    },
+    "sdkVersion": "0.1.0"
+  },
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "seed": 0
+  },
+  "controls": {
+    "intensity": 0.67
+  }
+}

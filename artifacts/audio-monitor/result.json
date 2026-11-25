@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\audio-monitor",
+  "pid": 26804,
+  "checks": [
+    "CABLE connected",
+    "Monitor off by default",
+    "Monitor on/off",
+    "Disconnect disables monitoring"
+  ]
+}

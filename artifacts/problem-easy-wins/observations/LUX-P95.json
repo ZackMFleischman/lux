@@ -1,0 +1,12 @@
+{
+  "batch_id": "b03bfd76-148e-448b-8cd5-d702fcadab0a",
+  "revisit_trigger": "Reassess on a fresh recurrence after the cited fix/guidance, missing installed guidance, or an uncovered concrete acceptance gap.",
+  "observation": "Workflow fixer repeatedly ended turns at a claim or method instead of a delivery checkpoint",
+  "event_seqs": [
+    2962
+  ],
+  "action": "observe",
+  "review_after": "2026-09-25T00:00:00Z",
+  "rationale": "CON-38 covers workflow-fixer continuity; host capacity failures are observed, not proof a new local scheduler can fix them.",
+  "group_key": "claimed-fixer-work-checkpoint-completion"
+}

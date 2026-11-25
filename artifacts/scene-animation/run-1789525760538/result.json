@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "profile": "test-bb5ed5d8-bab2-4a23-b265-8160c00d97f0",
+  "source": "0ae299d6671a7687e41811f95d9c673d4c3a378d",
+  "checks": [
+    "Flat SDK 0.2 scene animation changes effective output while preserving base",
+    "Keyboard group collapse closes its animation popup and preserves the binding",
+    "Save/reopen retains animation; invalid edit preserves working runtime and animation",
+    "Composition Scene alias still animates its canonical component control"
+  ],
+  "errors": [],
+  "pid": 17384,
+  "exitCode": 0
+}

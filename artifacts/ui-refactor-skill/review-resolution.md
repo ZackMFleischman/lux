@@ -1,0 +1,1 @@
+Independent scenario review completed with Terra medium, fresh context. Adopted explicit protection against live unsaved test fixtures. Clarified critique-only mutation boundaries without prohibiting authorized read-only inspection. No application was launched or changed for this skill evaluation.

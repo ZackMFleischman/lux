@@ -1,0 +1,11 @@
+{
+  "name": "Gravitational Lensing",
+  "description": "Gravity and photon-ring shader field for compatible 3D bent-ray renderers.",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "gravitational-lensing.ts",
+    "files": {
+      "gravitational-lensing.ts": "import { defineComponent } from '@lux/visual-sdk';\n\nconst shader = `fn qGravity(point:vec3f,angularMomentumSquared:f32,strength:f32) -> vec3f {\n  let radius=max(0.2,length(point));\n  return -1.5*angularMomentumSquared*point/(radius*radius*radius*radius*radius)*strength;\n}\nfn qPhotonRing(impact:f32,strength:f32,brightness:f32) -> vec3f {\n  let critical=2.60*strength;\n  let ring=exp(-pow((impact-critical)/0.075,2.0));\n  let halo=exp(-abs(impact-critical)*8.0)*0.10;\n  return vec3f(1.0,0.56,0.22)*(ring+halo)*brightness;\n}`;\n\nexport default defineComponent({\n  metadata: {\n    declarationVersion: 1, key: 'space/gravitational-lensing', label: 'Gravitational Lensing',\n    description: 'Central gravity ray bending and a controllable photon ring for compatible 3D renderers.', tags: ['space','shader-field'],\n    inputs: {},\n    outputs: { field: { type: { kind: 'shader-field', version: 1, abi: 'lux/gravitational-lensing/v1' }, label: 'Gravitational Lensing', description: 'Central gravity ray bending and a controllable photon ring for compatible 3D renderers.' } },\n    controls: {\n      lensing: { type:'number',label:'Light bending',group:'Lensing',default:0.8,min:0.4,max:1.4,step:0.01 },\n      photon: { type:'number',label:'Photon ring',group:'Lensing',default:1.24,min:0,max:3,step:0.01 },\n    },\n    controlDescriptions: {\n      lensing:'Artistic strength of the approximate gravitational bending.',\n      photon:'Brightness of the thin ring tracing the shadow.',\n    },\n    lifecycle: { state:'stateless',reset:'seed' },\n  },\n  async create() {\n    let values={\"lensing\":0.79,\"photon\":1.24};\n    return {\n      update(frame) { values={...frame.controls}; },\n      async evaluate(_inputs,context) {\n        return { field:context.shaderField('field',{version:1,abi:'lux/gravitational-lensing/v1',fragments:{shader},values}) };\n      },\n      reset() {}, dispose() {},\n    };\n  },\n});\n"
+    }
+  }
+}

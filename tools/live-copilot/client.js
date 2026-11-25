@@ -1,7 +1,10 @@
+import { createTranscript } from './transcript.js';
+const transcript = createTranscript();
 const start = document.querySelector('#start'), stop = document.querySelector('#stop');
 const status = document.querySelector('#status'), log = document.querySelector('#log'), speaker = document.querySelector('#speaker');
 let socket, peer, stream, generation = 0, stopping = false;
-const write = text => { log.textContent = (log.textContent + text + '\n').slice(-18000); log.scrollTop = log.scrollHeight; };
+const render = () => { log.textContent = transcript.text(); log.scrollTop = log.scrollHeight; };
+const write = text => { transcript.activity(text); render(); };
 function releaseMedia(closePeer = true) {
   stream?.getTracks().forEach(track => track.stop()); stream = undefined;
   if (closePeer) { peer?.close(); peer = undefined; }
@@ -17,6 +20,7 @@ stop.onclick = () => {
   else { release(); status.textContent = 'Stopped before connecting'; }
 };
 start.onclick = async () => {
+  transcript.reset();
   start.disabled = true; stop.disabled = false; status.textContent = 'Connecting…'; const attempt = ++generation;
   try {
     const mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
@@ -39,6 +43,7 @@ start.onclick = async () => {
       if (attempt !== generation) return;
       const event = JSON.parse(data);
       if (event.type === 'log') write(event.message);
+      if (event.type === 'transcript') { transcript.append(event); render(); }
       if (event.type === 'answer' && !stopping) {
         try { await rtc.setRemoteDescription({ type: 'answer', sdp: event.sdp }); }
         catch (error) { write(`✗ ${error.message}`); release(); status.textContent = 'Connection failed'; }

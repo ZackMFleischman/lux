@@ -1,0 +1,15 @@
+{
+  "commit": "1fa5e04c28f2e64940708957fc6d83a4c5e190ab",
+  "criteria": "Accept LUX-167 if a fresh isolated Studio session loads and plays the existing noise-sphere source, Graph instructional footer text is removed without removing navigation or accessible controls, saved source and controls survive save/reopen, invalid source preserves the accepted preview, and desktop packaging includes only the required skill asset.",
+  "evidence": "Independent source and UI review found no blockers. The exact submitted commit loads skills/lux-visual-creation/assets/noise-sphere.ts as SDK 0.2, keeps the draft/busy startup guard, removes only the Graph footer paragraph, and uses an exact package allowlist for noise-sphere.ts while excluding SKILL.md. The smoke applies non-default spikeHeight 1.1, verifies the runtime value, saves client.acceptedDocument(), and compares reopened controls. Independent focused CPU verification passed 8/8 default-startup and desktop-package tests. Native artifacts/studio-smoke/result.json reports ok=true, initial playing state with five controls, applied/captured spikeHeight 1.1, invalid edit rejection with accepted revision retained, and savedAndReopened=true. output.png and studio.png show the running spiky sphere, visible 1.1 control, Scene/Visual graph, and no footer; the displayed build failure is the intentional invalid-edit preservation check. Owned test processes exited.",
+  "context_id": "codex:/root/review_component_design:lux167-startup-graph-polish-20260916",
+  "checks": {
+    "source": "pass",
+    "unit": "pass",
+    "packaging-selection": "pass",
+    "native-smoke": "pass",
+    "ui": "pass",
+    "save-reopen": "pass",
+    "invalid-edit-preservation": "pass"
+  }
+}

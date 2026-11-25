@@ -1,0 +1,10 @@
+{
+  "reason": "Group the four user-approved recording proposals and encode execution dependencies.",
+  "kind": "feature",
+  "dependencies": [
+    "LUX-179"
+  ],
+  "parent_id": "LUX-176",
+  "title": "Export deterministic fixed-frame animation clips",
+  "body": "Export a saved animation at fixed scene times so complex visuals produce smooth clips even when rendering is slower than real time. This is separate from recording live interactions. Reuse the completed-frame encoder and MCP job service.\n\nAcceptance:\n- A 30s/30FPS export renders exactly 900 frames at deterministic simulation times with matching encoded timestamps. Do not skip simulation times or duplicate frames to conceal missed work.\n- Snapshot scene, seed, assets/library dependencies and supported saved control animation. Explain unsupported live inputs before starting.\n- Isolate export state; preserve the user's current scene, controls and playback.\n- Expose progress, cancellation and safe temporary-file finalization through MCP.\n- Measure export speed and memory; accept slower-than-real-time operation while reporting an honest estimate.\n- Visually inspect motion and decoded cadence; verify repeatability for supported seeded scenes.\n- Checklist: running-app demonstration, independent review, relevant regressions, skill documentation/install checks, commit and merge.\n\nDepends on direct completed-frame encoding."
+}

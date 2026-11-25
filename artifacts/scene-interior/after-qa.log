@@ -1,0 +1,11 @@
+{
+  "output": "C:\\Users\\zFlei\\repos\\lux\\artifacts\\graph-navigation\\run-1794539611993",
+  "ok": false,
+  "root": "C:\\Users\\zFlei\\repos\\lux",
+  "profile": "test-9368778d-e064-4504-8a7e-0e78ee69ba40",
+  "checks": [],
+  "errors": [],
+  "screenshots": [],
+  "stage": "checking plain Scene root",
+  "error": "AssertionError [ERR_ASSERTION]: {\"content\":[{\"type\":\"text\",\"text\":\"fetch failed\"}],\"isError\":true}\n    at call (file:///C:/Users/zFlei/repos/lux/scripts/test-studio-graph-navigation.mjs:37:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/scripts/test-studio-graph-navigation.mjs:53:22"
+}

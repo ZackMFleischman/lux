@@ -1,0 +1,38 @@
+
+  artifacts\scene-interior\dist\main.cjs      971.9kb
+  artifacts\scene-interior\dist\main.cjs.map    2.1mb
+
+Done in 1223ms
+
+  artifacts\scene-interior\dist\preload.cjs      5.9kb
+  artifacts\scene-interior\dist\preload.cjs.map  9.2kb
+
+Done in 30ms
+
+  artifacts\scene-interior\dist\renderer.js                            5.1mb
+  artifacts\scene-interior\dist\assets\InterVariable-AM3KRH5U.woff2  344.0kb
+  artifacts\scene-interior\dist\renderer.css                         175.2kb
+  artifacts\scene-interior\dist\renderer.js.map                        9.6mb
+  artifacts\scene-interior\dist\renderer.css.map                     267.1kb
+
+Done in 4681ms
+
+  artifacts\scene-interior\dist\visual-worker.js      1.2mb
+  artifacts\scene-interior\dist\visual-worker.js.map  2.4mb
+
+Done in 706ms
+
+  artifacts\scene-interior\dist\source-admission-worker.js      195.1kb
+  artifacts\scene-interior\dist\source-admission-worker.js.map  454.6kb
+
+Done in 285ms
+
+  artifacts\scene-interior\dist\image-preview-worker.js      192.3kb
+  artifacts\scene-interior\dist\image-preview-worker.js.map  452.9kb
+
+Done in 476ms
+
+  artifacts\scene-interior\dist\story-asset-decoder-worker.js      189.6kb
+  artifacts\scene-interior\dist\story-asset-decoder-worker.js.map  436.8kb
+
+Done in 509ms

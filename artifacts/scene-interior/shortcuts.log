@@ -1,0 +1,10 @@
+✔ Studio shortcut map uses the approved Windows bindings and accepts Command equivalents (1.0435ms)
+✔ shortcut hints expose the exact commands shown by menus and buttons (1.0772ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 151.5603

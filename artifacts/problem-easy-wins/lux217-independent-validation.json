@@ -1,0 +1,10 @@
+{
+  "commit": "9ee16901e01ef241d02e3b119b5fb09d4ee98d7a",
+  "criteria": "Independent review confirms checkout/profile validation, dependency and entry provenance, bounded exact viewport readiness, per-attempt failure evidence, and owned-process cleanup. The focused smoke demonstrates a 640x360 viewport, a 640x191 rendered canvas, screenshot capture, and owned PID cleanup.",
+  "evidence": "Fresh independent review: artifacts/problem-easy-wins/qa-review.md. Native smoke: artifacts/problem-easy-wins/studio-qa/smoke-1789692566305-8e5a8793-753d-4567-8ced-675779a50849/attempt.json and ready-640x360.png. Main at 99ca85ca1bf9f8427b828bd520e204aa5382bdd1: node --test tests/studio/qa-helper.test.mjs tests/studio/session-isolation.test.mjs passed 8 tests; git diff --check was clean. Limitation: historical test-studio-parameters.mjs remains unverified because its initial visual build was busy.",
+  "context_id": "qa-review-217-20260918-fresh",
+  "checks": {
+    "unit": "pass",
+    "integration": "pass"
+  }
+}

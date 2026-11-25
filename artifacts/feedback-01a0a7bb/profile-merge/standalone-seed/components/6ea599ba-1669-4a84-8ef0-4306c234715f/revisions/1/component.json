@@ -1,0 +1,17 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "6ea599ba-1669-4a84-8ef0-4306c234715f",
+  "revision": 1,
+  "name": "Metallic Cube",
+  "description": "Reusable spinning metallic cube. Includes a shared cube primitive module with the fan's six-color metallic palette.",
+  "updatedAt": "2026-09-15T05:23:57.824Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "component.ts",
+    "files": [
+      "component.ts",
+      "cube-kit.ts"
+    ]
+  }
+}

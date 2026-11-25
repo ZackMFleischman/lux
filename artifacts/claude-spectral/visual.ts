@@ -1,0 +1,51 @@
+import { defineVisual } from '@lux/visual-sdk';
+import pearl from './pearl.ts';
+import kaleidoscope from './kaleidoscope.ts';
+
+export default defineVisual({
+  label: 'Living Pearl - Spectral',
+  definitions: { pearl, kaleidoscope },
+  nodes: [
+    { id: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', definition: 'pearl' },
+    { id: '5a1c0e11-7f3b-4a8e-9d2c-000000000002', definition: 'kaleidoscope' },
+  ],
+  edges: [
+    { id: '5a1c0e11-7f3b-4a8e-9d2c-000000000011', from: { nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', portId: 'image' }, to: { nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000002', portId: 'image' }, delay: 'none' },
+  ],
+  output: { nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000002', portId: 'image' },
+  expose: [
+    { id: 'spikeHeight', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'spikeHeight' },
+    { id: 'noiseScale', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'noiseScale' },
+    { id: 'sharpness', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'sharpness' },
+    { id: 'motionSpeed', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'motionSpeed' },
+    { id: 'breath', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'breath' },
+    { id: 'roughness', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'roughness' },
+    { id: 'glow', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'glow' },
+    { id: 'nacre', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'nacre' },
+    { id: 'bass', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'bass' },
+    { id: 'mids', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'mids' },
+    { id: 'highs', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'highs' },
+    { id: 'kick', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'kick' },
+    { id: 'sensitivity', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'sensitivity' },
+    { id: 'audioDrive', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'audioDrive' },
+    { id: 'spectrumGain', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'spectrumGain' },
+    { id: 'colorShift', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'colorShift' },
+    { id: 'colorSpeed', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'colorSpeed' },
+    { id: 'screenTint', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'screenTint' },
+    { id: 'ringBloom', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'ringBloom' },
+    { id: 'ringBloomPeriod', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'ringBloomPeriod' },
+    { id: 'ringEchoes', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'ringEchoes' },
+    { id: 'echoes', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'echoes' },
+    { id: 'companions', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'companions' },
+    { id: 'companionSize', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'companionSize' },
+    { id: 'companionReach', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'companionReach' },
+    { id: 'echoInterval', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000001', controlId: 'echoInterval' },
+    { id: 'kaleidoSegments', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000002', controlId: 'segments' },
+    { id: 'kaleidoPeriod', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000002', controlId: 'period' },
+    { id: 'kaleidoOnFraction', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000002', controlId: 'onFraction' },
+    { id: 'kaleidoTransition', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000002', controlId: 'transition' },
+    { id: 'kaleidoSpin', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000002', controlId: 'spin' },
+    { id: 'kaleidoAmount', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000002', controlId: 'amount' },
+    { id: 'kaleidoForce', nodeId: '5a1c0e11-7f3b-4a8e-9d2c-000000000002', controlId: 'force' },
+  ],
+});

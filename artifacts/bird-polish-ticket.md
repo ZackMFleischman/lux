@@ -1,0 +1,1 @@
+Keep original cute bird. Lengthen bubbles with useful duration range. Fix preening head/face attachment. Reserve size-aware perch slots for arriving, resting and departing birds so partners land beside each other. Preserve scene, inspect live and save. User preference: future artistic control ranges 2-3x broader where meaningful.

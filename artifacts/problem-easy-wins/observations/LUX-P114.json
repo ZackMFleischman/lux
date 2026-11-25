@@ -1,0 +1,12 @@
+{
+  "batch_id": "b03bfd76-148e-448b-8cd5-d702fcadab0a",
+  "revisit_trigger": "Reassess on a fresh recurrence after the cited fix/guidance, missing installed guidance, or an uncovered concrete acceptance gap.",
+  "observation": "Recording delivery was slow and temporal quality was not validated",
+  "event_seqs": [
+    3284
+  ],
+  "action": "observe",
+  "review_after": "2026-09-25T00:00:00Z",
+  "rationale": "Existing LUX-176/177/178 already own recording cadence and programmatic recording; this is not a new easy-win ticket.",
+  "group_key": "easywins-existing-lux-p114"
+}

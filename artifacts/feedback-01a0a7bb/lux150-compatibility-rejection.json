@@ -1,0 +1,13 @@
+{
+  "commit": "df472683234847f426f594ccdd414889c2783c61",
+  "criteria": "Rejected the previously accepted source-compatibility criterion: existing SDK 0.4 sources that type a code definition as ComponentDefinition and access or call .create must continue to compile unchanged.",
+  "evidence": "After the revision-5 acceptance receipt, the coordinator surfaced the exact pre-change tracer/compiler source `(definition: ComponentDefinition) => definition.create`. At submitted commit df472683234847f426f594ccdd414889c2783c61 and landed merge 72bdcfa9f53c8335c59fa3435b3ff77648375602, ComponentDefinition was changed from the public code-definition type to CodeComponentDefinition | GraphComponentDefinition. The strict pinned compiler therefore requires a new kind guard for source that was valid before LUX-150. The modified regression test added that guard, so it adapted the test instead of proving the ticket's explicit no-source-rewrite criterion. Minimal remedy: retain ComponentDefinition<C,I,O> as the compatibility alias to CodeComponentDefinition<C,I,O>; add a separately named AnyComponentDefinition union for graph containers and defineComponent's implementation; restore an exact unchanged unguarded .create compile/link regression. LUX-151 behavior remains reviewed, but combined release validation is held until this fix is landed and re-reviewed. This later rejection preserves rather than overwrites the earlier acceptance history.",
+  "context_id": "codex:/root/review_component_design:component-definition-compatibility-correction-20260916",
+  "checks": {
+    "unit": "pass",
+    "integration": "fail",
+    "compatibility": "fail",
+    "ui": "pass",
+    "skill": "pass"
+  }
+}

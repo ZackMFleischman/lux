@@ -1,0 +1,17 @@
+{
+  "output": "C:\\Users\\zFlei\\repos\\lux\\artifacts\\graph-navigation\\run-1794540737335",
+  "ok": true,
+  "root": "C:\\Users\\zFlei\\repos\\lux",
+  "profile": "test-6519271a-12af-47f4-a1bb-e102afd385ab",
+  "checks": [
+    "Composition opens with its immediate children; Enter, double-click and View inside navigate down two levels; ancestor breadcrumbs and Alt+Up navigate up without duplicate Scene or Back buttons, including a narrow nested view"
+  ],
+  "errors": [],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\artifacts\\graph-navigation\\run-1794540737335\\composition-scene-children.png",
+    "C:\\Users\\zFlei\\repos\\lux\\artifacts\\graph-navigation\\run-1794540737335\\nested-view.png",
+    "C:\\Users\\zFlei\\repos\\lux\\artifacts\\graph-navigation\\run-1794540737335\\nested-second-level.png",
+    "C:\\Users\\zFlei\\repos\\lux\\artifacts\\graph-navigation\\run-1794540737335\\nested-narrow.png"
+  ],
+  "stage": "checking nested breadcrumb navigation"
+}

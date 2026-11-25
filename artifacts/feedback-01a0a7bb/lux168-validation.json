@@ -1,0 +1,13 @@
+{
+  "commit": "6d8d7bef7679881b49bc2217d846b9533589d974",
+  "criteria": "Accept LUX-168 only if the previously valid SDK 0.4 ComponentDefinition annotation again exposes create without a kind guard, while the code-or-graph union remains available under AnyComponentDefinition and modern graph authoring, typed resources, runtime identities, and author guidance remain correct.",
+  "evidence": "Independent source review found no blockers. The exact submitted commit 6d8d7bef7679881b49bc2217d846b9533589d974 is contained in landed main commit 4514291224282ebadfdc5885cc3a7e619d75161d and current main. The pre-fix fixture reproduced TS2339; the corrected unchanged annotation compiles and links. The worker's 14/14 compiler checks, root/examples and Studio typechecks, and diff check pass; an independent focused run passed 12/12 component-model and typed-composition tests. No runtime or persistence behavior changed. The shipped skill was installed from main and its current check passed. Detailed evidence is in .worktrees/component-type-compatibility/artifacts/component-type-compatibility/evidence.md.",
+  "context_id": "codex:/root/review_component_design:lux168-component-type-compatibility-20260916",
+  "checks": {
+    "unit": "pass",
+    "integration": "pass",
+    "compatibility": "pass",
+    "documentation": "pass",
+    "skill": "pass"
+  }
+}

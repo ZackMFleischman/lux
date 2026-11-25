@@ -1,0 +1,2 @@
+Completed: missing runtime repair, pinned version validation, shared cache behavior, local dependency mutation boundary, inert checks/tests, independent review, actual verified runtime installation, creative window and matching MCP readiness, repeat-launch reuse.
+Remaining: serial source landing; install/check updated start-lux and inert integrated runtime check. No graphics test needed for that final installation step. Do not alter the open creative reservation.

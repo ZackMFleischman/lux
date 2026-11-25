@@ -1,0 +1,10 @@
+import {loadEnvFile} from 'node:process';
+import OpenAI from 'openai';
+import {LiveWS} from 'openai/resources/live/ws';
+loadEnvFile('.env.local');
+const client=new OpenAI({apiKey:process.env.OPENAI_API_KEY,maxRetries:0});
+const ws=new LiveWS(client,{reconnect:null});
+const timer=setTimeout(()=>{console.log('Probe timed out');ws.close();},10000);
+ws.socket.on('open',()=>ws.send({type:'session.start',session:{model:'gpt-live-1',delegation:{type:'client'}}}));
+ws.on('event',e=>{console.log(e.type,e.type==='error'?e.error:'');if(e.type==='session.started')ws.send({type:'session.close'});if(e.type==='session.closed'||e.type==='error'){clearTimeout(timer);ws.close();}});
+ws.on('error',e=>{console.log('WebSocket probe:',e.message);clearTimeout(timer);ws.close();});

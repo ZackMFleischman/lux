@@ -15,9 +15,17 @@ Node process runs from this repository; no Electron UI or separate frontend buil
 - The child environment excludes `OPENAI_API_KEY`, `CODEX_API_KEY` (case insensitive)
   and all variables containing the voice key. Conflicting provider/auth settings,
   custom base URLs, automatic profiles and stored key injection fail closed.
-- The app retains existing Codex tool permissions, rules and sandbox settings.
-  A tool needing interactive approval cannot execute through this V1 adapter;
-  it returns failure. The app never enables bypass flags or grants approvals.
+- Per the user's authorization, all Lux MCP tools use invocation-scoped `approve`
+  mode, including saved per-tool approval overrides. Other servers retain their
+  permissions. A saved Lux enabled/disabled tool filter fails startup with an
+  actionable message; the app does not silently advertise unavailable tools.
+- Coding tasks can edit the workspace and run commands/tests. Global settings
+  remain unchanged. No unrestricted sandbox or approval-bypass flags are used.
+  The agent must obey the repository's prohibition on editing/rebuilding the
+  reserved creative checkout. In this V1 that prohibition is instructional:
+  `workspace-write` does not technically exclude nested `.worktrees` directories.
+  A tested custom subtree permission profile stalled on this installed Windows
+  runtime, so it is not shipped. Stronger subtree isolation remains a follow-up.
 
 ## Setup
 
@@ -81,10 +89,9 @@ codex mcp remove lux-studio
 codex mcp add lux-studio -- node C:\path\to\lux\scripts\studio-mcp.mjs
 ```
 
-The app also honors the entry's enabled/disabled tool list for startup status.
-If Codex reports that a tool requires approval, review your intended Lux tool
-permissions in Codex. This prototype has no interactive approval UI and will
-report the refusal accurately. Do not disable safeguards just to pass a demo.
+Remove Lux-only enabled/disabled tool filters if you want all tools available.
+Organization requirements and non-Lux approvals still apply. An operation that
+cannot run under those policies fails accurately; there is no paid fallback.
 
 ## Run
 
@@ -125,23 +132,39 @@ npm run test:copilot
 5. Interrupt speech, continue with another turn, then Stop. Confirm the browser's
    microphone indicator goes away. Start again without restarting the Node app.
 6. Press Ctrl+C. Check no copilot/Codex/MCP child processes remain.
+7. Ask for a small repository file edit and verification. Check the resulting
+   diff/file and command output. Software summaries come from the local agent,
+   backed by completed command/file events; the adapter cannot independently
+   prove the semantic correctness of arbitrary code changes.
+
+Speech fragments append to the current speaker's paragraph, including when tool
+activity arrives between fragments. A speaker change, pause, or new session starts
+a new paragraph. Activity remains on separate lines.
 
 ## Verification performed and limits
 
-**Real checks:** installed CLI version and `codex login status` confirmed ChatGPT
-login. A real local Codex invocation attempted `lux.studio.status` and accurately
-returned an approval refusal (non-interactive approval policy). The user's saved
-MCP entry points to `.worktrees/tracer`; direct startup status also failed with
-`fetch failed`. Voice was therefore **not opened**. No paid fallback was attempted.
-No live visual change or spoken multi-turn acceptance is claimed.
+**Real checks:** Codex 0.154.0 confirmed ChatGPT login. The complete delegation
+adapter successfully invoked `lux.studio.status` against the running creative
+Studio and returned a verified inspection summary. A separate coding invocation
+wrote `artifacts/copilot-write-smoke.txt` and read back its exact contents. No paid
+model fallback was used. The user confirmed live voice conversation works; a
+post-fix voice-driven visual change still requires the manual smoke test.
+
+The running creative session was paired using invocation-scoped MCP command,
+working directory, profile and session overrides in the local launch helper
+`artifacts/start-creative-copilot.mjs`. The saved global entry still points to the
+old tracer checkout; normal `npm run copilot` requires correcting that entry as
+described above. Global configuration was not changed.
 
 The final MCP startup wrapper also passed against an isolated test-owned Studio (12 tools, successful status read); that test process was closed. This does not prove delegated model execution or a visual change.
 
-**Mocked checks (24 passing tests):** authentication classification, missing/API-key login rejection,
+**Mocked checks:** authentication classification, missing/API-key login rejection,
 key sanitization, enforced invocation flags, limits, completion/error handling,
 MCP-backed JSONL output, client delegation transcript/context and result routing,
 cancellation, cross-origin control rejection, and preflight-before-voice ordering.
-The actual browser page was visually reviewed with external services disabled.
+The actual browser client was also checked with simulated audio/network transport:
+streamed fragments rendered as paragraphs with one speaker label and separate
+activity lines. This UI check did not use the microphone or a paid voice session.
 
 V1 uses one browser session, no persisted conversational memory and no `--last`.
 Each task gets a fresh Codex run plus recent transcripts, the preceding verified

@@ -1,0 +1,36 @@
+Extracting the checksum-verified official Electron archive...
+Copying independent package dependencies...
+Building the installed Studio...
+
+  apps\studio\dist\main.cjs      929.5kb
+  apps\studio\dist\main.cjs.map    2.0mb
+
+Done in 504ms
+
+  apps\studio\dist\preload.cjs      5.4kb
+  apps\studio\dist\preload.cjs.map  8.4kb
+
+Done in 35ms
+
+  apps\studio\dist\renderer.js         4.3mb
+  apps\studio\dist\renderer.css      157.6kb
+  apps\studio\dist\renderer.js.map     8.0mb
+  apps\studio\dist\renderer.css.map  241.4kb
+
+Done in 3166ms
+
+  apps\studio\dist\visual-worker.js      534.6kb
+  apps\studio\dist\visual-worker.js.map    1.1mb
+
+Done in 168ms
+
+  apps\studio\dist\source-admission-worker.js      191.7kb
+  apps\studio\dist\source-admission-worker.js.map  436.0kb
+
+Done in 157ms
+
+  apps\studio\dist\image-preview-worker.js      189.0kb
+  apps\studio\dist\image-preview-worker.js.map  434.4kb
+
+Done in 121ms
+{"sourceCommit":"4311980789fe5eb89368f0075b1951dafd7ffed6","directory":"C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\43119807-c5bad848","sourceDigest":"0a223199df5afa006472789d4beabd5402c3bb3772c7947cf81943634bd22ccb"}

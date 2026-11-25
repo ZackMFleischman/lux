@@ -1,0 +1,1 @@
+Created and installed global improve-ui skill using skill-creator. It covers actual UI inspection, use-case analysis, compact layout, shared components, implementation, screenshot/interaction review, and delivery verification. Post-mortem and independent scenario review are saved in artifacts/ui-refactor-skill. No Lux application changes.

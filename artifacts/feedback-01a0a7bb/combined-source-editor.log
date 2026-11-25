@@ -1,0 +1,25 @@
+✔ native selected-text insertion preserves admission, undo, readonly and composition paths (577.3655ms)
+✔ source panel preserves helper edits and undo across close/reopen and document replacement resets history (477.1712ms)
+✔ file creation validates paths, saving sees all files, and busy view is readonly (545.5179ms)
+✔ external replacement resets changed file history and panel remount retains unaffected file history (462.3216ms)
+✔ composition suppresses save and failed admission restores the admitted editor text (277.3663ms)
+✔ repeated rejected edits never diverge from admitted source and preserve prior undo history (275.6751ms)
+✔ current diagnostics expose helper coordinates and external navigation selects the editor target (317.1048ms)
+✔ rejected candidate diagnostics explain their origin and cannot navigate the retained source (214.3309ms)
+✔ new-file Escape cancels locally, restores focus and leaves source unchanged (402.8822ms)
+✔ asset selection displays decoded pixels and preserves code drafts and undo (476.9527ms)
+✔ selected asset refreshes on replacement, reports dirty bytes and cannot survive removal or a new document (675.4934ms)
+✔ legacy files remain editable with an empty asset list (247.1427ms)
+✔ malformed image presentation stays local and code remains accessible (382.3247ms)
+✔ keyboard asset activation and source tabs keep navigation accessible (711.9569ms)
+✔ collapsing source navigation preserves the active asset and code draft (412.8319ms)
+✔ source shortcuts apply all drafts with Ctrl/Cmd+S and save the scene only with Shift (368.1658ms)
+✔ authoring source shortcut compiles the complete edited bundle, exposes errors, and keeps explicit scene save (9076.0901ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 23050.2772

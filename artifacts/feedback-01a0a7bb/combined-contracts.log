@@ -1,0 +1,29 @@
+✔ flat scene saves animation separately from its base value and reopens it (18.1414ms)
+✔ legacy intensity scenes retain their original controls and optional animation (2.2075ms)
+✔ renderer coalesces frame observations, caches reads and publishes latest within 100 ms (2.7802ms)
+✔ renderer bounds animation time and effective-value observations to UI cadence (0.7455ms)
+✔ control, transport, owner, fault and jobs changes bypass pending frame delay (1.4761ms)
+✔ last unsubscribe cancels timer; reattachment catches up without leaking source listeners (0.3652ms)
+✔ animation operation schema admits the empty scene path (4.2574ms)
+✔ flat runtime keeps base controls while accepting guarded animation state and rejecting stale or forged targets (21.8178ms)
+✔ legacy runtime state preserves scene animation fields (0.4092ms)
+✔ declarations preserve semantic IDs/order, normalize metadata, and freeze independent snapshots (5.7852ms)
+✔ empty declarations produce no implicit control and support an empty full snapshot (1.0645ms)
+✔ schema canonicalization ignores input field order, preserves control order, and normalizes negative zero (1.1627ms)
+✔ optional groups preserve declared order while legacy schemas keep their canonical shape (0.6261ms)
+✔ invalid IDs, duplicate normalized IDs and unsupported descriptor fields are rejected (1.3408ms)
+✔ descriptor finite range/default/step invariants reject invalid values without clamping (1.4783ms)
+✔ metadata enforces Unicode validity, code-point lengths, controls, and UTF-8/count budgets (4.4159ms)
+✔ untrusted records and schema arrays never invoke accessors or accept inherited/hidden/symbol data (1.3491ms)
+✔ patches permit finite values between UI steps and full snapshots require exactly all keys (2.2162ms)
+✔ invalid multi-key patch is atomic and rejects own-record attacks without evaluating values (0.9165ms)
+✔ reconciliation preserves compatible values and reports added, removed, narrowed-range and unit changes (1.0342ms)
+✔ reconciliation validates saved snapshots and handles first build, empty schema and removed units (0.6979ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 441.009

@@ -1,0 +1,3 @@
+Make Graph understandable for every accepted visual. Plain defineVisual scenes currently show a blank graph. Show a selectable Scene/root node that opens scene controls; compositions also show their actual children. Use a concise Scene breadcrumb, clarify nested navigation as View inside, and hide irrelevant drill-in actions. Preserve existing selection, controls, viewport and nested navigation. Do not add graph wiring editing.
+
+Demonstrate a plain scene and nested composition in actual private-profile Studio. Verify root/node selection and meaningful keyboard navigation. Include independent source/design/UI review and screenshots before serial integration.

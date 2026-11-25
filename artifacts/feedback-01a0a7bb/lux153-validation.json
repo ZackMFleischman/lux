@@ -1,0 +1,20 @@
+{
+  "commit": "2eaee8b78b4fe499419cf2e748c0bb2ad75285a4",
+  "criteria": "Accepted manual tap tempo as a deterministic Studio control and exact tempo-binding source: BPM is bounded to 20-300, tap derives BPM from the approved bounded interval window, BPM edits preserve beat phase, paused tap rephases beat zero while visual time remains frozen, reset and reopen start at fresh phase/history, and only BPM persists and contributes to scene dirtiness. Runtime, worker, bridge and MCP paths use the guarded protocol-3 capability; build candidates receive the latest acknowledged BPM with fresh phase/history; failed builds retain the incumbent BPM, bindings, bases and pixels. Existing LFO, audio and kick binding shapes remain compatible. Studio controls are compact, readable and keyboard accessible, and the authoring skill is installed and current.",
+  "evidence": "Independent design, pure-clock, full-source and correction reviews bound the submitted source through 2eaee8b78b4fe499419cf2e748c0bb2ad75285a4 with no remaining findings. Independent focused checks passed the pure clock 14/14, correction contracts 7/7, rebuilt dock-shell 11/11 and renderer cadence 4/4. Source-pinned native result .worktrees/lux153-tempo/artifacts/studio-tempo/run-1789553518556/result.json records ok:true, no page errors and owned PID 27788 exit 0 while proving manual BPM, tap derivation, tempo modulation, pause/tap rephase, save/reopen with fresh history and invalid-build incumbent retention; its three screenshots were independently reviewed for hierarchy, spacing, readability and accessible controls. Integration lineage 12150d3d4f872b82c19bb82ff6dda83d65e3f832 -> ab8258eae270baa4a6391abb82faf7eb784021d0 -> 4311980789fe5eb89368f0075b1951dafd7ffed6 preserves the exact submitted commit; the shared live-copilot file was intentionally left to the user-owned working tree, where the two exact tempo mutation names are present. All three TypeScript configurations pass. The exact full Studio CPU runner passes every shard after independently reviewed test-only Emotion cache correction 4273db4a352c167915b8af967d997a85f299a9a4. artifacts/feedback-01a0a7bb/tempo-limit-lifecycle-retry.log records protocolVersion 3, exact tempo capability, 640x360 interaction output and owned PID 27376 exit 0. artifacts/feedback-01a0a7bb/tempo-limit-qa/context.json records ok:true, the default 18-entry catalog and matching source closure. An independent node scripts/install-visual-skill.mjs --check returned current:true with empty missing, changed and unexpected lists. Automatic audio beat estimation and Resolume host/export tempo-phase behavior remain explicitly outside this ticket.",
+  "context_id": "codex-thread-01a0a7bb-ee60-76f1-bcd6-5d179614f551-lux153-independent-review",
+  "checks": {
+    "source_review": "pass",
+    "deterministic_tests": "pass",
+    "runtime_contracts": "pass",
+    "native_runtime": "pass",
+    "ui_ux_accessibility": "pass",
+    "persistence_build_retention": "pass",
+    "integration": "pass",
+    "typecheck": "pass",
+    "full_studio_cpu": "pass",
+    "packaged_lifecycle": "pass",
+    "package_closure": "pass",
+    "skill_install": "pass"
+  }
+}

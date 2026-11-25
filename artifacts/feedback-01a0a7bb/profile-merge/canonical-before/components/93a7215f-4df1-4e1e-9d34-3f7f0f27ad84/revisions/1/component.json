@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "93a7215f-4df1-4e1e-9d34-3f7f0f27ad84",
+  "revision": 1,
+  "name": "Prismatic Ball",
+  "description": "Animated iridescent spike image source.",
+  "updatedAt": "2026-09-16T00:00:00.000Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "component.ts",
+    "files": [
+      "component.ts"
+    ]
+  }
+}

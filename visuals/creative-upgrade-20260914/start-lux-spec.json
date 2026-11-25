@@ -1,0 +1,8 @@
+{
+  "dependencies": [],
+  "title": "Start creative Lux sessions on latest main automatically",
+  "body": "Every normal start-lux request selects verified latest main automatically under the user's standing authorization, without another upgrade approval. Preserve user work and the isolated creative profile.\n\nAcceptance:\n- Resolve latest main for first and later starts. Reuse a matching reservation without restart.\n- Use existing launcher commands; do not invent an upgrade flag.\n- Preserve source, assets, links, controls, playback, profile and library data. Check restore support before stopping a live session.\n- Require a clean reserved checkout; stop only the verified creative PID. Retain rollback, align dependencies, update reservation, rebuild and verify live connection.\n- Preserve development/test isolation. Install/check the shipped start-lux skill after review and integration.",
+  "reason": "Correct the originally misrecorded user requirement; the reviewed source already implements automatic normal starts.",
+  "kind": "implementation",
+  "parent_id": null
+}

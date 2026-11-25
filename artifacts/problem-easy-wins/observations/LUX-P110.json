@@ -1,0 +1,12 @@
+{
+  "batch_id": "b03bfd76-148e-448b-8cd5-d702fcadab0a",
+  "revisit_trigger": "Reassess on a fresh recurrence after the cited fix/guidance, missing installed guidance, or an uncovered concrete acceptance gap.",
+  "observation": "Preserve established visual appearance when extracting reusable components",
+  "event_seqs": [
+    3101
+  ],
+  "action": "observe",
+  "review_after": "2026-09-25T00:00:00Z",
+  "rationale": "Existing extraction tickets LUX-158 through LUX-163 and appearance-preservation guidance cover this outcome; judge their actual visual evidence.",
+  "group_key": "easywins-existing-lux-p110"
+}

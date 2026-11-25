@@ -1,0 +1,57 @@
+{
+  "candidate": "36727700ae12ecc3f017a495953e1f79f5804a71",
+  "defaultInstructions": true,
+  "libraryListCalls": 0,
+  "sourceLoaded": false,
+  "entries": [
+    {
+      "id": "93a7215f-4df1-4e1e-9d34-3f7f0f27ad84",
+      "revision": 1,
+      "name": "Prismatic Ball",
+      "description": "Animated iridescent spike image source."
+    },
+    {
+      "id": "84afe10a-a999-40f5-956c-bace96cce23b",
+      "revision": 1,
+      "name": "Prismatic Observatory",
+      "description": "Reusable nested orbital instrument: nine gyroscopic rings, satellites, a crystal heart and a star field. Controls for motion, expansion, inclination and palette."
+    },
+    {
+      "id": "489bada1-64e6-40c6-bae6-9b31077bf0d4",
+      "revision": 2,
+      "name": "Particle Tornado",
+      "description": "Blue particles and amber sparks with adjustable count, height, width, spin, turbulence, size and glow."
+    },
+    {
+      "id": "6ea599ba-1669-4a84-8ef0-4306c234715f",
+      "revision": 1,
+      "name": "Metallic Cube",
+      "description": "Reusable spinning metallic cube. Includes a shared cube primitive module with the fan's six-color metallic palette."
+    },
+    {
+      "id": "78a8f505-dde8-4ec4-9e25-934a14ccd31a",
+      "revision": 1,
+      "name": "Metallic Cube Fan",
+      "description": "The complete six-arm, 168-cube metallic cascade as a reusable image-source component. Uses the shared cube primitive, with spin, spread, cascade speed and size controls."
+    },
+    {
+      "id": "80b280b0-c2a7-4f38-a34c-0a18bbb0947d",
+      "revision": 1,
+      "name": "Prismatic Cube Fan",
+      "description": "Reusable metallic cube spiral with 1–20 rainbow arms, palette shift, reversible lightness gradient and cube size taper. Preserves the original Metallic Cube Fan separately."
+    },
+    {
+      "id": "e84c1b88-e3b7-447a-85dd-38ebeddbfe28",
+      "revision": 1,
+      "name": "Colorful Sweeping Beams",
+      "description": "Layered colorful beams with width, length, sweep speed, angle, pulse, brightness and palette controls."
+    },
+    {
+      "id": "f573cb7b-c14a-4051-b4f3-d11111a5c4a0",
+      "revision": 1,
+      "name": "Dancing Space Needle Dabbers",
+      "description": "Fifty dancing Space Needle characters with dab depth, dance speed and vivid palette controls; beams saved separately."
+    }
+  ],
+  "studioOpened": false
+}

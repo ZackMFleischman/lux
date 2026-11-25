@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "489bada1-64e6-40c6-bae6-9b31077bf0d4",
+  "revision": 2,
+  "name": "Particle Tornado",
+  "description": "Blue particles and amber sparks with adjustable count, height, width, spin, turbulence, size and glow.",
+  "updatedAt": "2026-09-15T04:12:52.901Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "particle-tornado-component.ts",
+    "files": [
+      "particle-tornado-component.ts"
+    ]
+  }
+}

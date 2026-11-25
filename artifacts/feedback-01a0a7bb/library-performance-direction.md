@@ -1,0 +1,1 @@
+Further user direction: bias toward quickly writing code that reuses existing components; update latency matters. Prefer compact context, likely-match source reads, small useful edits and existing components. Avoid repeated discovery, unnecessary rebuilds and new abstraction unless required for the requested result. Apply this to LUX149 guidance and implementation.

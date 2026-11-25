@@ -1,0 +1,2 @@
+import {readFileSync,writeFileSync} from 'node:fs';
+for(const path of ['apps/studio/src/audio/audio-analysis.mjs','apps/studio/src/audio/studio-audio-provider.mjs','docs/superpowers/specs/2026-09-15-studio-audio-provider-design.md','packages/runtime-contracts/src/audio-input.d.mts','packages/runtime-contracts/src/audio-input.mjs'])writeFileSync(path,readFileSync(path,'utf8').replace(/[ \t]+$/gm,'').trimEnd()+'\n');

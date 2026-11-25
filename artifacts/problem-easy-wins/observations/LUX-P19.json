@@ -1,0 +1,13 @@
+{
+  "batch_id": "b03bfd76-148e-448b-8cd5-d702fcadab0a",
+  "revisit_trigger": "Reassess on a fresh recurrence after the cited fix/guidance, missing installed guidance, or an uncovered concrete acceptance gap.",
+  "observation": "Compacted LUX-18 claim identifier omitted a UUID segment and caused rejected submission",
+  "event_seqs": [
+    2905,
+    2950
+  ],
+  "action": "observe",
+  "review_after": "2026-09-25T00:00:00Z",
+  "rationale": "Retain complete receipts under existing CON-30/31 startup and provenance guidance; no need for a second identity system.",
+  "group_key": "compacted-mutation-identity-drift"
+}

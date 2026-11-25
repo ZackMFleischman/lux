@@ -1,0 +1,3 @@
+Put top menus in File, View, Preview order. Add screenshot camera and record/stop-video actions in the Preview panel header, wired to the existing fixed-output-resolution capture/recorder. Keep one recorder shared with the Preview menu. Provide accessible labels/tooltips and clear recording/stopping state. Preserve capture cleanup and file-protection behavior.
+
+Demonstrate actual PNG/video capture using the panel actions in isolated native Studio. Verify menu ordering, keyboard access and compact layout. Include independent source/design/UI review and screenshots before serial integration. Do not change capture formats or the user's running app.

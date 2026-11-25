@@ -1,0 +1,13 @@
+{
+  "commit": "ab9af012dc6ad669946de53781c9d0555ebf0696",
+  "criteria": "Performance, Runtime, and Host output move from Inspector to a recoverable Diagnostics dock panel. Inspector remains focused on controls, View can open, close, and restore Diagnostics, and layouts saved before Diagnostics remain valid.",
+  "evidence": "Independent review inspected the immutable renderer, registry, dock-layout, CSS, and test diff; the Diagnostics CSS class has the same intended dock sizing/overflow treatment as Inspector. Native isolated Studio evidence at artifacts/studio-ui/diagnostics/result.json and desktop/narrow screenshots shows the separate Diagnostics tab with the three sections, an Inspector containing only Controls, View recovery, saved-layout restore, and keyboard dismissal. CPU/view/layout checks and TypeScript check passed as submitted. The captured panels are collapsed and the native run has no runtime, so the evidence proves placement/recovery rather than live metric values; the unchanged widgets remain in Diagnostics source and expanded live-value QA is reserved for combined validation.",
+  "context_id": "codex-lux146-independent-validator-01a0a7bb",
+  "checks": {
+    "dock_cpu": "pass",
+    "view_suite": "pass",
+    "layout_suite": "pass",
+    "typecheck": "pass",
+    "native_diagnostics_layout": "pass"
+  }
+}

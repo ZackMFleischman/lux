@@ -1,0 +1,405 @@
+diff --git a/tests/unit/live-copilot-codex.test.ts b/tests/unit/live-copilot-codex.test.ts
+index 684a185a..574c7133 100644
+--- a/tests/unit/live-copilot-codex.test.ts
++++ b/tests/unit/live-copilot-codex.test.ts
+@@ -1,7 +1,54 @@
+ import { test } from 'node:test';
+ import assert from 'node:assert/strict';
++import { parse } from 'smol-toml';
+ import { sanitizeEnvironment, requireChatGPT, validateRouting, createCodex, enforcedConfig } from '../../tools/live-copilot/codex.ts';
+ 
++test('software summaries require completed execution evidence', async () => {
++  let item: any;
++  const codex = createCodex({ root: '.', apiKey: '', readConfiguration: async () => ({}), run: async (args, options) => {
++    if (args.includes('status')) return { code: 0, stdout: 'Logged in using ChatGPT', stderr: '' };
++    if (item) options.onEvent?.({ type: 'item.completed', item });
++    options.onEvent?.({ type: 'item.completed', item: { type: 'agent_message', text: JSON.stringify({ success: true, summary: 'Verified file.', operation: 'software', applied_tools: [] }) } });
++    options.onEvent?.({ type: 'turn.completed' });
++    return { code: 0, stdout: '', stderr: '' };
++  } });
++  for (item of [undefined, { type: 'command_execution', status: 'completed', exit_code: 1 }, { type: 'file_change', status: 'failed' }]) {
++    await assert.rejects(codex.execute('Write a file', new AbortController().signal), /Required tool evidence/);
++  }
++  for (item of [{ type: 'command_execution', status: 'completed', exit_code: 0 }, { type: 'file_change', status: 'completed' }]) {
++    assert.equal(await codex.execute('Write a file', new AbortController().signal), 'Verified file.');
++  }
++});
++
++test('all Lux tools are preapproved with workspace writes and unchanged other server permissions', () => {
++  const settings = parse(enforcedConfig.filter((_value, index) => index % 2 === 1).join('\n')) as any;
++  assert.equal(settings.forced_login_method, 'chatgpt');
++  assert.equal(settings.model_provider, 'openai');
++  assert.equal(settings.approval_policy, undefined);
++  assert.equal(settings.sandbox_mode, 'workspace-write');
++  assert.deepEqual(settings.mcp_servers, { 'lux-studio': { default_tools_approval_mode: 'approve' } });
++});
++
++test('saved per-tool prompts are overridden using exact canonical names', async () => {
++  let settings: any;
++  const codex = createCodex({ root: process.cwd(), apiKey: '', readConfiguration: async () => ({
++    mcp_servers: { 'lux-studio': { tools: { 'lux.studio.status': { approval_mode: 'prompt' } } } },
++  }), run: async (args) => {
++    settings = parse(args.slice(0, -2).filter((_v, i) => i % 2 === 1).join('\n'));
++    return { code: 0, stdout: 'Logged in using ChatGPT', stderr: '' };
++  } });
++  await codex.verify();
++  assert.equal(settings.mcp_servers['lux-studio'].tools['lux.studio.status'].approval_mode, 'approve');
++});
++
++test('filtered Lux tool configuration fails clearly before opening a session', async () => {
++  for (const filter of [{ enabled_tools: ['lux.studio.status'] }, { disabled_tools: ['lux.studio.build'] }]) {
++    const codex = createCodex({ root: '.', apiKey: '', readConfiguration: async () => ({ mcp_servers: { 'lux-studio': filter } }),
++      run: async () => { throw Error('must fail before invocation'); } });
++    await assert.rejects(codex.verify(), /Remove that Lux-only filter/);
++  }
++});
++
+ test('authentication requires an affirmative ChatGPT status, not just exit zero', () => {
+   requireChatGPT({ code: 0, stdout: '', stderr: 'Logged in using ChatGPT\n' });
+   for (const result of [
+@@ -50,7 +97,7 @@ test('complete Codex adapter accepts an MCP-backed result, rejects incomplete tu
+     run: async (args, options) => {
+       if (args.includes('status')) return { code: 0, stdout: 'Logged in using ChatGPT', stderr: '' };
+       options.onEvent?.({ type: 'item.completed', item: { type: 'mcp_tool_call', server: 'lux-studio', tool: 'lux.studio.status', status: 'completed', result: { content: [] } } });
+-      options.onEvent?.({ type: 'item.completed', item: { type: 'agent_message', text: '{"success":true,"summary":"Lux is running.","operation":"inspect","applied_tools":["lux.studio.status"]}' } });
++      options.onEvent?.({ type: 'item.completed', item: { type: 'agent_message', text: '{"success":true,"summary":"Lux is running.","operation":"inspect","applied_tools":["mcp__lux_studio__lux_studio_status"]}' } });
+       if (complete) options.onEvent?.({ type: 'turn.completed' });
+       return { code: 0, stdout: '', stderr: '' };
+     } });
+@@ -83,7 +130,7 @@ test('a status read cannot support a claimed change; a completed mutation can',
+     options.onEvent?.({ type: 'turn.completed' });
+     return { code: 0, stdout: '', stderr: '' };
+   } });
+-  await assert.rejects(codex.execute('faster', new AbortController().signal), /required tool evidence/);
++  await assert.rejects(codex.execute('faster', new AbortController().signal), /Required tool evidence/);
+   tool = 'lux.studio.parameters';
+   assert.equal(await codex.execute('faster', new AbortController().signal), 'Made it faster.');
+ });
+diff --git a/tests/unit/live-copilot-live.test.ts b/tests/unit/live-copilot-live.test.ts
+index eb4c8875..5f2040d3 100644
+--- a/tests/unit/live-copilot-live.test.ts
++++ b/tests/unit/live-copilot-live.test.ts
+@@ -11,6 +11,17 @@ function fakeSocket() {
+   ws.close = () => ws.socket.emit('close');
+   return ws;
+ }
++
++test('sideband sends timed transcript fragments separately from activity logs', async () => {
++  const ws = fakeSocket(), fragments: unknown[] = [], logs: string[] = [];
++  const live = attachLive({ client: {} as never, sessionId: 'id', execute: async () => 'done', state: {},
++    onFailure: e => { throw e; }, onEnded() {}, onTranscript: fragment => fragments.push(fragment), log: s => logs.push(s), driver: ws });
++  ws.socket.emit('open'); await live.ready;
++  for (const delta of ['Made', ' it faster.']) ws.emit('event', { type: 'session.output_transcript.delta', delta, start_ms: 0, end_ms: 100 });
++  assert.deepEqual(fragments, ['Made', ' it faster.'].map(delta => ({ speaker: 'Copilot', delta, startMs: 0, endMs: 100 })));
++  assert.deepEqual(logs, []);
++  const closing = live.close(); ws.emit('event', { type: 'session.closed' }); await closing;
++});
+ test('sideband attaches without restarting the session and finalizes once', async () => {
+   const ws = fakeSocket();
+   const live = attachLive({ client: {} as never, sessionId: 'opaque-session-id', execute: async () => 'done', state: {},
+diff --git a/tools/live-copilot/README.md b/tools/live-copilot/README.md
+index 05895167..14ef0dcd 100644
+--- a/tools/live-copilot/README.md
++++ b/tools/live-copilot/README.md
+@@ -15,9 +15,17 @@ Node process runs from this repository; no Electron UI or separate frontend buil
+ - The child environment excludes `OPENAI_API_KEY`, `CODEX_API_KEY` (case insensitive)
+   and all variables containing the voice key. Conflicting provider/auth settings,
+   custom base URLs, automatic profiles and stored key injection fail closed.
+-- The app retains existing Codex tool permissions, rules and sandbox settings.
+-  A tool needing interactive approval cannot execute through this V1 adapter;
+-  it returns failure. The app never enables bypass flags or grants approvals.
++- Per the user's authorization, all Lux MCP tools use invocation-scoped `approve`
++  mode, including saved per-tool approval overrides. Other servers retain their
++  permissions. A saved Lux enabled/disabled tool filter fails startup with an
++  actionable message; the app does not silently advertise unavailable tools.
++- Coding tasks can edit the workspace and run commands/tests. Global settings
++  remain unchanged. No unrestricted sandbox or approval-bypass flags are used.
++  The agent must obey the repository's prohibition on editing/rebuilding the
++  reserved creative checkout. In this V1 that prohibition is instructional:
++  `workspace-write` does not technically exclude nested `.worktrees` directories.
++  A tested custom subtree permission profile stalled on this installed Windows
++  runtime, so it is not shipped. Stronger subtree isolation remains a follow-up.
+ 
+ ## Setup
+ 
+@@ -81,10 +89,9 @@ codex mcp remove lux-studio
+ codex mcp add lux-studio -- node C:\path\to\lux\scripts\studio-mcp.mjs
+ ```
+ 
+-The app also honors the entry's enabled/disabled tool list for startup status.
+-If Codex reports that a tool requires approval, review your intended Lux tool
+-permissions in Codex. This prototype has no interactive approval UI and will
+-report the refusal accurately. Do not disable safeguards just to pass a demo.
++Remove Lux-only enabled/disabled tool filters if you want all tools available.
++Organization requirements and non-Lux approvals still apply. An operation that
++cannot run under those policies fails accurately; there is no paid fallback.
+ 
+ ## Run
+ 
+@@ -125,23 +132,39 @@ npm run test:copilot
+ 5. Interrupt speech, continue with another turn, then Stop. Confirm the browser's
+    microphone indicator goes away. Start again without restarting the Node app.
+ 6. Press Ctrl+C. Check no copilot/Codex/MCP child processes remain.
++7. Ask for a small repository file edit and verification. Check the resulting
++   diff/file and command output. Software summaries come from the local agent,
++   backed by completed command/file events; the adapter cannot independently
++   prove the semantic correctness of arbitrary code changes.
++
++Speech fragments append to the current speaker's paragraph, including when tool
++activity arrives between fragments. A speaker change, pause, or new session starts
++a new paragraph. Activity remains on separate lines.
+ 
+ ## Verification performed and limits
+ 
+-**Real checks:** installed CLI version and `codex login status` confirmed ChatGPT
+-login. A real local Codex invocation attempted `lux.studio.status` and accurately
+-returned an approval refusal (non-interactive approval policy). The user's saved
+-MCP entry points to `.worktrees/tracer`; direct startup status also failed with
+-`fetch failed`. Voice was therefore **not opened**. No paid fallback was attempted.
+-No live visual change or spoken multi-turn acceptance is claimed.
++**Real checks:** Codex 0.154.0 confirmed ChatGPT login. The complete delegation
++adapter successfully invoked `lux.studio.status` against the running creative
++Studio and returned a verified inspection summary. A separate coding invocation
++wrote `artifacts/copilot-write-smoke.txt` and read back its exact contents. No paid
++model fallback was used. The user confirmed live voice conversation works; a
++post-fix voice-driven visual change still requires the manual smoke test.
++
++The running creative session was paired using invocation-scoped MCP command,
++working directory, profile and session overrides in the local launch helper
++`artifacts/start-creative-copilot.mjs`. The saved global entry still points to the
++old tracer checkout; normal `npm run copilot` requires correcting that entry as
++described above. Global configuration was not changed.
+ 
+ The final MCP startup wrapper also passed against an isolated test-owned Studio (12 tools, successful status read); that test process was closed. This does not prove delegated model execution or a visual change.
+ 
+-**Mocked checks (24 passing tests):** authentication classification, missing/API-key login rejection,
++**Mocked checks:** authentication classification, missing/API-key login rejection,
+ key sanitization, enforced invocation flags, limits, completion/error handling,
+ MCP-backed JSONL output, client delegation transcript/context and result routing,
+ cancellation, cross-origin control rejection, and preflight-before-voice ordering.
+-The actual browser page was visually reviewed with external services disabled.
++The actual browser client was also checked with simulated audio/network transport:
++streamed fragments rendered as paragraphs with one speaker label and separate
++activity lines. This UI check did not use the microphone or a paid voice session.
+ 
+ V1 uses one browser session, no persisted conversational memory and no `--last`.
+ Each task gets a fresh Codex run plus recent transcripts, the preceding verified
+diff --git a/tools/live-copilot/client.js b/tools/live-copilot/client.js
+index a67d7021..e02a81a4 100644
+--- a/tools/live-copilot/client.js
++++ b/tools/live-copilot/client.js
+@@ -1,7 +1,10 @@
++import { createTranscript } from './transcript.js';
++const transcript = createTranscript();
+ const start = document.querySelector('#start'), stop = document.querySelector('#stop');
+ const status = document.querySelector('#status'), log = document.querySelector('#log'), speaker = document.querySelector('#speaker');
+ let socket, peer, stream, generation = 0, stopping = false;
+-const write = text => { log.textContent = (log.textContent + text + '\n').slice(-18000); log.scrollTop = log.scrollHeight; };
++const render = () => { log.textContent = transcript.text(); log.scrollTop = log.scrollHeight; };
++const write = text => { transcript.activity(text); render(); };
+ function releaseMedia(closePeer = true) {
+   stream?.getTracks().forEach(track => track.stop()); stream = undefined;
+   if (closePeer) { peer?.close(); peer = undefined; }
+@@ -17,6 +20,7 @@ stop.onclick = () => {
+   else { release(); status.textContent = 'Stopped before connecting'; }
+ };
+ start.onclick = async () => {
++  transcript.reset();
+   start.disabled = true; stop.disabled = false; status.textContent = 'Connecting…'; const attempt = ++generation;
+   try {
+     const mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+@@ -39,6 +43,7 @@ start.onclick = async () => {
+       if (attempt !== generation) return;
+       const event = JSON.parse(data);
+       if (event.type === 'log') write(event.message);
++      if (event.type === 'transcript') { transcript.append(event); render(); }
+       if (event.type === 'answer' && !stopping) {
+         try { await rtc.setRemoteDescription({ type: 'answer', sdp: event.sdp }); }
+         catch (error) { write(`✗ ${error.message}`); release(); status.textContent = 'Connection failed'; }
+diff --git a/tools/live-copilot/codex.ts b/tools/live-copilot/codex.ts
+index ac0d5a2c..fac6646b 100644
+--- a/tools/live-copilot/codex.ts
++++ b/tools/live-copilot/codex.ts
+@@ -5,7 +5,10 @@ import { join, delimiter } from 'node:path';
+ import { parse } from 'smol-toml';
+ import { agentPrompt } from './prompt.ts';
+ 
+-export const enforcedConfig = ['-c', 'forced_login_method="chatgpt"', '-c', 'model_provider="openai"'];
++// The user explicitly preapproved all Lux MCP tools for copilot invocations.
++// Coding tasks may write in this workspace. Other servers retain saved permissions.
++export const enforcedConfig = ['-c', 'forced_login_method="chatgpt"', '-c', 'model_provider="openai"',
++  '-c', 'mcp_servers.lux-studio.default_tools_approval_mode="approve"', '-c', 'sandbox_mode="workspace-write"'];
+ const loginHelp = 'Run these in the same OS account and CODEX_HOME as this app:\ncodex login status\nIf missing or API-key authenticated: codex logout\nThen: codex login (choose ChatGPT). No login was changed; no paid fallback is available.';
+ type CommandResult = { code: number | null; stdout: string; stderr: string };
+ type RunOptions = { env: NodeJS.ProcessEnv; cwd: string; input?: string; signal?: AbortSignal; onEvent?: (event: any) => void };
+@@ -117,13 +120,21 @@ export function createCodex({ root, apiKey, env = process.env, log = (_s: string
+   const childEnv = sanitizeEnvironment(env, apiKey);
+   const options = { cwd: root, env: childEnv };
+   const clean = (message: string) => apiKey ? message.replaceAll(apiKey, '[redacted]') : message;
++  let invocationConfig = enforcedConfig;
+   async function verify(signal?: AbortSignal) {
+-    validateRouting(await readConfiguration(), env, apiKey);
+-    requireChatGPT(await run([...enforcedConfig, 'login', 'status'], { ...options, signal }));
++    const saved = await readConfiguration();
++    validateRouting(saved, env, apiKey);
++    const lux = saved.mcp_servers?.['lux-studio'];
++    if (lux?.enabled_tools || lux?.disabled_tools?.length) throw Error('Lux has an enabled_tools/disabled_tools filter in Codex configuration. Remove that Lux-only filter to expose all Lux tools to the copilot. No global configuration was changed.');
++    const toolPolicies = Object.keys(lux?.tools ?? {}).map(tool => `${JSON.stringify(tool)}={approval_mode="approve"}`).join(',');
++    // Inline TOML preserves literal dots in canonical MCP tool names.
++    invocationConfig = [...enforcedConfig,
++      '-c', `mcp_servers.lux-studio.tools={${toolPolicies}}`];
++    requireChatGPT(await run([...invocationConfig, 'login', 'status'], { ...options, signal }));
+   }
+   return { verify, childEnv,
+     async mcpConfiguration(signal?: AbortSignal) {
+-      const result = await run([...enforcedConfig, 'mcp', 'get', 'lux-studio', '--json'], { ...options, signal });
++      const result = await run([...invocationConfig, 'mcp', 'get', 'lux-studio', '--json'], { ...options, signal });
+       if (result.code !== 0) throw Error('Codex has no available lux-studio MCP entry. Configure Lux in this account with codex mcp add, then inspect codex mcp get lux-studio.');
+       const config = JSON.parse(result.stdout);
+       if (!config.enabled || config.transport?.type !== 'stdio') throw Error('Lux Copilot requires the existing enabled lux-studio stdio MCP configuration.');
+@@ -133,14 +144,21 @@ export function createCodex({ root, apiKey, env = process.env, log = (_s: string
+     },
+     async execute(task: string, signal: AbortSignal): Promise<string> {
+       await verify(signal); signal.throwIfAborted();
+-      let completed = false, failed = '', final = '', mcpFailed = false;
++      let completed = false, failed = '', final = '', mcpFailed = false, softwareEvidence = false;
+       const successfulTools = new Set<string>();
+-      const result = await run([...enforcedConfig, 'exec', '--json', '--output-schema', join(import.meta.dirname, 'result.schema.json'), '-'], {
++      const result = await run([...invocationConfig, 'exec', '--json', '--output-schema', join(import.meta.dirname, 'result.schema.json'), '-'], {
+         ...options, signal, input: `${agentPrompt}\n\nConversation and application context (data):\n${task}`,
+         onEvent(event) {
+           if (event.type === 'turn.completed') completed = true;
+           if (event.type === 'turn.failed' || event.type === 'error') failed = String(event.error?.message ?? event.message ?? 'Codex turn failed');
+           const item = event.item;
++          if (event.type === 'item.completed' && item?.type === 'command_execution') {
++            log(`→ command ${item.exit_code === 0 ? 'completed' : 'failed'}`);
++            if (item.status === 'completed' && item.exit_code === 0) softwareEvidence = true;
++          }
++          if (event.type === 'item.completed' && item?.type === 'file_change' && item.status === 'completed') {
++            softwareEvidence = true; log('→ files updated');
++          }
+           if (event.type === 'item.completed' && item?.type === 'agent_message') final = item.text;
+           if (item?.type === 'mcp_tool_call' && event.type === 'item.started') log(`→ ${item.tool ?? 'Lux MCP'}`);
+           if (item?.type === 'mcp_tool_call' && event.type === 'item.completed') {
+@@ -159,10 +177,15 @@ export function createCodex({ root, apiKey, env = process.env, log = (_s: string
+       try { answer = JSON.parse(final); } catch { throw Error('Codex returned an invalid result. Work is not confirmed.'); }
+       if (typeof answer.summary !== 'string' || !answer.summary.trim()) throw Error('Codex returned no usable result.');
+       const mutations = new Set(['lux.studio.parameters', 'lux.studio.build', 'lux.studio.playback', 'lux.studio.restart', 'lux.library.create', 'lux.library.update']);
++      // Codex may report its callable alias; JSONL records the canonical MCP name.
++      // Resolve only aliases of tools that actually completed in this invocation.
++      const reportedTools = answer.applied_tools?.map(tool => [...successfulTools].find(actual =>
++        tool === actual || tool === `mcp__lux_studio__${actual.replace(/[^a-zA-Z0-9_]/g, '_')}`) ?? tool);
+       const evidence = Array.isArray(answer.applied_tools) && answer.applied_tools.length > 0 &&
+-        answer.applied_tools.every(tool => successfulTools.has(tool));
+-      const applied = answer.operation === 'inspect' || (answer.operation === 'change' && answer.applied_tools?.some(tool => mutations.has(tool)));
+-      if (answer.success !== true || !evidence || !applied || mcpFailed) throw codexFailure(clean(answer.success === true ? 'Lux MCP did not confirm the reported operation; required tool evidence is missing' : answer.summary));
++        reportedTools!.every(tool => successfulTools.has(tool));
++      const applied = answer.operation === 'inspect' || (answer.operation === 'change' && reportedTools?.some(tool => mutations.has(tool)));
++      const verified = answer.operation === 'software' ? softwareEvidence : evidence && applied;
++      if (answer.success !== true || !verified || mcpFailed) throw codexFailure(clean(answer.success === true ? 'Required tool evidence for the reported operation is missing' : answer.summary));
+       return clean(answer.summary).slice(0, 1200);
+     },
+   };
+diff --git a/tools/live-copilot/delegation.ts b/tools/live-copilot/delegation.ts
+index cdc39a69..49229911 100644
+--- a/tools/live-copilot/delegation.ts
++++ b/tools/live-copilot/delegation.ts
+@@ -36,7 +36,7 @@ export function createDelegationHandler({ execute, state, send, log = (_s: strin
+         let content: string;
+         try {
+           if (!hasNewInput || !context.some(t => t.speaker === 'User' && t.text.trim())) throw Error('No user transcript is available for this request. Ask the user to repeat the request.');
+-          const task = JSON.stringify({ instruction: 'Execute the latest user request, using preceding conversation for relative follow-ups. Inspect fresh Lux state through MCP.',
++          const task = JSON.stringify({ instruction: 'Execute the latest user request, using preceding conversation for relative follow-ups. Use MCP for Lux control; use workspace files and commands for software engineering.',
+             transcript: context, previousVerifiedResult: recentResult, startupState: state });
+           content = await execute(task, controller.signal);
+           if (controller.signal.aborted) return;
+diff --git a/tools/live-copilot/live.ts b/tools/live-copilot/live.ts
+index dd5e15f0..a2d39954 100644
+--- a/tools/live-copilot/live.ts
++++ b/tools/live-copilot/live.ts
+@@ -4,10 +4,11 @@ import { createDelegationHandler } from './delegation.ts';
+ import type { Delegate } from './delegation.ts';
+ 
+ /** Browser owns audio. This trusted sideband alone owns tool execution. */
+-export function attachLive({ client, sessionId, execute, state, onFailure, onEnded, log = (_s: string) => {}, debug = false, driver }: {
++export function attachLive({ client, sessionId, execute, state, onFailure, onEnded, onTranscript, log = (_s: string) => {}, debug = false, driver }: {
+   client: OpenAI; sessionId: string; execute: Delegate; state: unknown;
+   onFailure: (error: Error) => void; onEnded: () => void;
+   log?: (message: string) => void; debug?: boolean; driver?: SidebandWS;
++  onTranscript?: (fragment: { speaker: string; delta: string; startMs: number; endMs: number }) => void;
+ }) {
+   const ws = driver ?? new SidebandWS(client, { session_id: sessionId }, { reconnect: null });
+   let opened = false, closing = false, finalized = false, disconnected = false, failed = false;
+@@ -39,7 +40,9 @@ export function attachLive({ client, sessionId, execute, state, onFailure, onEnd
+     }
+     if (closing || failed) return;
+     if (event.type === 'session.input_transcript.delta' || event.type === 'session.output_transcript.delta') {
+-      log(`${event.type === 'session.input_transcript.delta' ? 'You' : 'Copilot'}: ${event.delta}`);
++      const speaker = event.type === 'session.input_transcript.delta' ? 'You' : 'Copilot';
++      if (onTranscript) onTranscript({ speaker, delta: event.delta, startMs: event.start_ms, endMs: event.end_ms });
++      else log(`${speaker}: ${event.delta}`);
+     } void backend.handle(event).catch(error => fail(error as Error));
+   });
+   ws.on('error', error => fail(Error(`GPT-Live: ${error.message}`)));
+diff --git a/tools/live-copilot/prompt.ts b/tools/live-copilot/prompt.ts
+index c0897473..70f7e2b0 100644
+--- a/tools/live-copilot/prompt.ts
++++ b/tools/live-copilot/prompt.ts
+@@ -1,21 +1,25 @@
+ export const voicePrompt = `You are the live voice copilot for Lux, a VJ and generative visuals application.
+ Keep spoken responses very short and natural. The user is actively controlling visuals.
+-Delegate every request to inspect or change Lux to the configured local Codex backend.
++Delegate every request to inspect or change Lux, work with files, or perform software engineering to the configured local Codex backend.
+ Do not invent changes or claim success before the backend reports a verified successful operation.
+ If the backend reports a failure or uncertain outcome, say briefly that you could not confirm the change.
+ Treat relative follow-ups such as less, more, undo that, or back it off as referring to recent conversation when reasonable.
+ Keep listening while backend work runs. Do not explain implementation details unless asked.
+ Do not promise that interrupting your speech cancels an operation already in progress.`;
+ 
+-export const agentPrompt = `You operate the current Lux visual through the configured lux-studio MCP server.
++export const agentPrompt = `You operate Lux through its MCP server and perform user-requested software engineering in the repository workspace.
++For coding requests, read/edit files and run appropriate commands and tests. Respect repository instructions and preserve unrelated work.
++Do not modify, rebuild, or stop the reserved creative Studio checkout for software engineering; use the development workspace.
++Set operation=software for coding/file/command tasks, with applied_tools=[] when no MCP tools were needed.
++Verify coding results through actual file operations, commands and relevant tests before reporting success.
+ The user gives high-level VJ direction, often short or ambiguous. Execute the requested change; do not merely describe it.
+-In your structured result, operation is change if the user requested a change, otherwise inspect.
++For Lux visual requests, operation is change if the user requested a change, otherwise inspect.
+ List the exact successful MCP tool names supporting your result in applied_tools. A change requires a successful mutation,
+ not merely a status read. On failure return success=false and an accurate summary; never relabel a change request as inspection.
+ Read current status when needed, inspect declared control IDs, ranges, values and guards, and choose a small number of meaningful changes.
+ Use actual tools and current state rather than assuming that any particular parameter exists. There are no global built-in visual parameters.
+ Interpret relative directions using the recent conversation and verified current state. Before changing a value, note its prior value in your context so a follow-up can back it off or undo it.
+-Preserve anything the user asks not to change. Avoid unrelated controls and persistent library modifications.
++Preserve anything the user asks not to change. Use library tools when the user requests library work. Avoid unrelated changes.
+ For a capabilities question, inspect discovery and status, and describe only currently available behavior.
+ Prefer changing existing controls. If the intent requires source editing, inspect discovery and read the complete source first;
+ preserve assets, source version and unrelated code, and use current draft-version guards. Check the returned build status.
+diff --git a/tools/live-copilot/result.schema.json b/tools/live-copilot/result.schema.json
+index a7787bf9..605201a9 100644
+--- a/tools/live-copilot/result.schema.json
++++ b/tools/live-copilot/result.schema.json
+@@ -1 +1 @@
+-{"type":"object","properties":{"success":{"type":"boolean"},"summary":{"type":"string"},"operation":{"type":"string","enum":["inspect","change"]},"applied_tools":{"type":"array","items":{"type":"string"}}},"required":["success","summary","operation","applied_tools"],"additionalProperties":false}
++{"type":"object","properties":{"success":{"type":"boolean"},"summary":{"type":"string"},"operation":{"type":"string","enum":["inspect","change","software"]},"applied_tools":{"type":"array","items":{"type":"string"}}},"required":["success","summary","operation","applied_tools"],"additionalProperties":false}
+diff --git a/tools/live-copilot/server.ts b/tools/live-copilot/server.ts
+index 0c912a9e..25bbcb36 100644
+--- a/tools/live-copilot/server.ts
++++ b/tools/live-copilot/server.ts
+@@ -12,7 +12,7 @@ export async function startServer({ apiKey, preflight, execute, log = (_s: strin
+   apiKey: string; preflight: (signal: AbortSignal) => Promise<unknown>; execute: Delegate;
+   log?: (s: string) => void; debug?: boolean; client?: OpenAI; attach?: typeof attachLive;
+ }) {
+-  const files: Record<string, [string, string]> = { '/': ['index.html', 'text/html'], '/client.js': ['client.js', 'text/javascript'] };
++  const files: Record<string, [string, string]> = { '/': ['index.html', 'text/html'], '/client.js': ['client.js', 'text/javascript'], '/transcript.js': ['transcript.js', 'text/javascript'] };
+   let url = '', closing = false;
+   const server = createServer(async (req, res) => {
+     if (req.headers.host !== new URL(url).host) { res.writeHead(403).end(); return; }
+@@ -65,6 +65,7 @@ export async function startServer({ apiKey, preflight, execute, log = (_s: strin
+             delegation: { type: 'client' }, client: { data_channel: { allowed_client_events: [] } } },
+             transport: { type: 'webrtc', sdp: command.sdp } }, { signal });
+           live = attach({ client, sessionId: session.session.id, execute, state, debug, log: report,
++            onTranscript(fragment) { send({ type: 'transcript', ...fragment, delta: apiKey ? fragment.delta.replaceAll(apiKey, '[redacted]') : fragment.delta }); },
+             onFailure(error) { report(`✗ ${error.message}`); send({ type: 'error', message: 'Voice connection failed; final usage is unconfirmed. Stop and check the log.' }); void live?.close().catch(error => report(`✗ ${error.message}`)); },
+             onEnded() { send({ type: 'stopped', confirmed: true }); live = undefined; } });
+           if (signal.aborted || ws.readyState !== WebSocket.OPEN) { await live.close(); live = undefined; return; }

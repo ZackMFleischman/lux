@@ -1,0 +1,5 @@
+Restore compilation of existing SDK0.4 source annotated with ComponentDefinition and using its create method without a kind guard. LUX150 changed the exported type to a code/graph union, which breaks valid saved source; changing the regression test hid that incompatibility.
+
+Keep ComponentDefinition<C,I,O> as a compatibility alias for CodeComponentDefinition. Introduce AnyComponentDefinition for internal/public code-or-graph use without changing defineComponent/defineVisual authoring behavior or runtime representation. Restore the exact older unguarded create fixture and compile/link it alongside modern graph and typed fan-out fixtures. Preserve typed paths2d/shader-field inference and runtime identities. Independent review and shipped skill install/check are required before packaged release.
+
+Linked correction: LUX150 and LUX-P111 f4432601-29cb-4701-95ad-e3fd5e913037. Conductor cannot reject a done ticket, so retain its historical acceptance and close this explicit bug before treating the release as validated. No GPU or source migration is needed for a type-only correction.

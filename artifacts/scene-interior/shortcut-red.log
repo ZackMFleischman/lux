@@ -1,0 +1,31 @@
+✔ Graph enters nested components one level at a time and edits an exposed control through its canonical leaf (6718.4756ms)
+✔ Graph wheel zoom anchors at the pointer and background gestures keep selection clear (259.5736ms)
+✖ Graph opens inside Scene with one breadcrumb and no redundant settings buttons (452.9163ms)
+✔ Graph connections point from output to input with reversed node declarations (85.9365ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 3
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17714.8453
+
+✖ failing tests:
+
+test at apps\studio\dist\scene-interior.test.mjs:8317:1
+✖ Graph opens inside Scene with one breadcrumb and no redundant settings buttons (452.9163ms)
+  AssertionError [ERR_ASSERTION]: Alt+Up returns to the parent contents
+  
+  2 !== 3
+  
+      at TestContext.<anonymous> (file:///C:/Users/zFlei/repos/lux/apps/studio/dist/scene-interior.test.mjs:8365:10)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 2,
+    expected: 3,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

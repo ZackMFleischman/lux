@@ -1,0 +1,76 @@
+
+  apps\studio\dist\main.cjs      957.3kb
+  apps\studio\dist\main.cjs.map    2.0mb
+
+Done in 130ms
+
+  apps\studio\dist\preload.cjs      5.6kb
+  apps\studio\dist\preload.cjs.map  8.7kb
+
+Done in 10ms
+
+  apps\studio\dist\renderer.js                            5.1mb
+  apps\studio\dist\assets\InterVariable-AM3KRH5U.woff2  344.0kb
+  apps\studio\dist\renderer.css                         172.3kb
+  apps\studio\dist\renderer.js.map                        9.5mb
+  apps\studio\dist\renderer.css.map                     262.8kb
+
+Done in 802ms
+
+  apps\studio\dist\visual-worker.js      1.2mb
+  apps\studio\dist\visual-worker.js.map  2.4mb
+
+Done in 217ms
+
+  apps\studio\dist\source-admission-worker.js      191.7kb
+  apps\studio\dist\source-admission-worker.js.map  436.0kb
+
+Done in 85ms
+
+  apps\studio\dist\image-preview-worker.js      189.0kb
+  apps\studio\dist\image-preview-worker.js.map  434.4kb
+
+Done in 64ms
+
+  apps\studio\dist\story-asset-decoder-worker.js      188.6kb
+  apps\studio\dist\story-asset-decoder-worker.js.map  433.4kb
+
+Done in 57ms
+
+  apps\studio\dist\view.test.cjs        3.7mb
+  apps\studio\dist\view.test.css      118.9kb
+  apps\studio\dist\view.test.cjs.map    6.5mb
+  apps\studio\dist\view.test.css.map  183.6kb
+
+Done in 735ms
+
+  apps\studio\dist\interactions.test.mjs      372.8kb
+  apps\studio\dist\interactions.test.css      118.9kb
+  apps\studio\dist\interactions.test.mjs.map  849.9kb
+  apps\studio\dist\interactions.test.css.map  183.6kb
+
+Done in 86ms
+
+  apps\studio\dist\source-editor.test.mjs      778.7kb
+  apps\studio\dist\source-editor.test.css      118.9kb
+  apps\studio\dist\source-editor.test.mjs.map    1.4mb
+  apps\studio\dist\source-editor.test.css.map  183.6kb
+
+Done in 73ms
+
+  apps\studio\dist\library-panel.test.mjs      18.4kb
+  apps\studio\dist\library-panel.test.mjs.map  26.4kb
+
+Done in 16ms
+
+  apps\studio\dist\dock-shell.test.mjs      441.3kb
+  apps\studio\dist\dock-shell.test.css      118.9kb
+  apps\studio\dist\dock-shell.test.mjs.map  898.1kb
+  apps\studio\dist\dock-shell.test.css.map  183.6kb
+
+Done in 55ms
+
+  apps\studio\dist\preview-capture-menu.test.mjs      15.0kb
+  apps\studio\dist\preview-capture-menu.test.mjs.map  25.3kb
+
+Done in 26ms

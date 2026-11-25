@@ -1,0 +1,10 @@
+{
+  "commit": "ebf3a72ac71532799310cebabaae2c6f5fb9a470",
+  "criteria": "Repository-owned immutable component source is shared across checkout profiles; explicit create/update alone mutates it; legacy migration, revision/fallback/fork behavior, conflict retention, and concurrent additions are preserved; the desktop package contains the seed and selects its recorded marked repository or isolated app-data fallback; two distinct source and packaged profiles discovered and used one shared library; the shipped visual-authoring skill is installed and current.",
+  "evidence": "Independent review covered candidate add6587b21410ea42699c6985553ff8a0708ba92 and integrated main ebf3a72ac71532799310cebabaae2c6f5fb9a470. Reviewer ran 36 focused store/location/package/session/seed tests, 8 built Library UI tests, root and Studio TypeScript checks, a CPU Studio test build, diff checks, and a 64-contender lock probe with maxActive=1. Staged conflict resolution preserved concurrent Preview Capture, control grouping, and scene-animation changes. Exact-source and packaged screenshots passed UI/UX review. Packaged evidence in artifacts/feedback-01a0a7bb/installed-qa/result.json records real Lux.exe plus bundled Node/adapter, two private profiles, built-in/create/link/build/save/open, both exits 0, and no errors. packaged-library-location.json records the actual marked canonical path and absent-repository fallback using the packaged runtime. installation.json binds the package to integrated main. all-features-cpu.log has zero failures across all groups and final-skill-check.json reports current with no missing, changed, or unexpected files. The retained first harness failure rewrote an embedded scene import in test setup; the corrected harness passed without a production change.",
+  "context_id": "01a0a7bb-ee60-76f1-bcd6-5d179614f551:/root/review_standard_library",
+  "checks": {
+    "unit": "pass",
+    "integration": "pass"
+  }
+}

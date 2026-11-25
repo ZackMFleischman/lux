@@ -1,0 +1,31 @@
+✔ library writes are atomic, revision guarded, validated before activation, and persist across store restart (223.4856ms)
+✔ linked source applies a newer revision while a fork keeps the mounted source and removes its link (2.2212ms)
+✔ missing library data retains the saved mounted fallback and reports it explicitly (0.5592ms)
+✔ checking an empty library link set does not require an SDK 0.4 scene (0.2525ms)
+✔ library reads reject an oversized profile file through the bounded file path (17.7289ms)
+✔ two profile stores share explicit additions as real source files without losing concurrent creates (106.8216ms)
+✔ separate stores serialize updates so a stale revision cannot overwrite the winner (96.0549ms)
+✔ legacy profile entries migrate once into the shared directory without changing IDs or revisions (29.6075ms)
+✔ a conflicting legacy migration keeps both complete sources and reports the collision (120.4876ms)
+✔ an installed writable library imports packaged seed components without writing back to the seed (278.4627ms)
+✔ a fallback update fast-forwards the canonical library only through matching immutable history (273.8444ms)
+✔ a new fallback component imports its complete immutable revision history (156.2898ms)
+✔ legacy revision suffix seeds a standalone library without inventing earlier history (135.6035ms)
+✔ seeding rejects gaps within available history without activating a partial component (144.6175ms)
+✔ a higher fallback revision without matching history is preserved as a conflict (111.0017ms)
+✔ a persistent lock is never stolen from a live or uncertain owner (36.5624ms)
+✔ parallel contenders never evict a persistent lock or enter the critical section (57.0711ms)
+✔ the repository seed exposes a useful Prismatic Ball component from an isolated copy (216.7444ms)
+✔ checkout profiles resolve one library from the Git common directory (1.9356ms)
+✔ independent installed Studio uses one writable fallback and the immutable package library as its seed (0.2534ms)
+✔ an explicit test root isolates writes while retaining the checkout seed (0.212ms)
+✔ installed Studio uses the marked canonical repository and merges its fallback when available (10.3399ms)
+✔ installed Studio falls back only when the marked canonical repository is unavailable (6.285ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2299.9464

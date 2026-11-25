@@ -1,0 +1,13 @@
+{
+  "commit": "d9d97c158c7f77b089a35b9a7042849306662a73",
+  "criteria": "Feature is implemented/usable. Formal closure requires a fresh QA receipt pinned to the cited or landed commit, both shipped skill install --check outputs, and the independent-review result.",
+  "evidence": "git merge-base --is-ancestor d9d97c158c7f77b089a35b9a7042849306662a73 main succeeded; main was dc5b1735b3a95d077e37f9684d8230e977c69f4d at audit. _coordination/start-simple/qa.mjs is an owned isolated harness and qa.json records a test profile, private build, live status, same-instance reuse, and MCP discover/status/read. The receipt does not record a git SHA or skill/review outputs and predates the cited commit by about 31 seconds.",
+  "context_id": "/root/board_review:read-only-independent-audit",
+  "checks": {
+    "commit_reachable_from_main": "true",
+    "native_isolation_and_mcp_provenance_saved": "true",
+    "qa_source_commit_pinned": "false",
+    "skills_check_output_saved": "false",
+    "independent_review_evidence_saved": "false"
+  }
+}

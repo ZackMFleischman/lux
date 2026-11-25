@@ -1,0 +1,9 @@
+{
+  "ok": false,
+  "checks": [],
+  "runs": [],
+  "errors": [],
+  "physicalStopVerified": false,
+  "gpuCleanupVerified": false,
+  "error": "AssertionError [ERR_ASSERTION]: {\"content\":[{\"type\":\"text\",\"text\":\"Studio is busy or command is unsupported\"}],\"isError\":true}\n+ actual - expected\n\n+ true\n- undefined\n\n    at call (file:///C:/Users/zFlei/repos/lux/scripts/test-studio-recovery.mjs:33:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/scripts/test-studio-recovery.mjs:41:19"
+}

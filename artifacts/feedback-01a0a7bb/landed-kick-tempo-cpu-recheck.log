@@ -1,0 +1,382 @@
+
+  apps\studio\dist\main.cjs      929.5kb
+  apps\studio\dist\main.cjs.map    2.0mb
+
+Done in 135ms
+
+  apps\studio\dist\preload.cjs      5.4kb
+  apps\studio\dist\preload.cjs.map  8.4kb
+
+Done in 9ms
+
+  apps\studio\dist\renderer.js         4.3mb
+  apps\studio\dist\renderer.css      157.6kb
+  apps\studio\dist\renderer.js.map     8.0mb
+  apps\studio\dist\renderer.css.map  241.4kb
+
+Done in 865ms
+
+  apps\studio\dist\visual-worker.js      534.6kb
+  apps\studio\dist\visual-worker.js.map    1.1mb
+
+Done in 100ms
+
+  apps\studio\dist\source-admission-worker.js      191.7kb
+  apps\studio\dist\source-admission-worker.js.map  436.0kb
+
+Done in 57ms
+
+  apps\studio\dist\image-preview-worker.js      189.0kb
+  apps\studio\dist\image-preview-worker.js.map  434.4kb
+
+Done in 55ms
+
+  apps\studio\dist\view.test.cjs        3.5mb
+  apps\studio\dist\view.test.css      118.9kb
+  apps\studio\dist\view.test.cjs.map    6.2mb
+  apps\studio\dist\view.test.css.map  183.6kb
+
+Done in 647ms
+
+  apps\studio\dist\interactions.test.mjs      206.1kb
+  apps\studio\dist\interactions.test.css      118.9kb
+  apps\studio\dist\interactions.test.mjs.map  537.5kb
+  apps\studio\dist\interactions.test.css.map  183.6kb
+
+Done in 51ms
+
+  apps\studio\dist\source-editor.test.mjs      514.4kb
+  apps\studio\dist\source-editor.test.css      118.9kb
+  apps\studio\dist\source-editor.test.mjs.map  984.0kb
+  apps\studio\dist\source-editor.test.css.map  183.6kb
+
+Done in 58ms
+
+  apps\studio\dist\library-panel.test.mjs      18.4kb
+  apps\studio\dist\library-panel.test.mjs.map  26.4kb
+
+Done in 17ms
+
+  apps\studio\dist\dock-shell.test.mjs      365.2kb
+  apps\studio\dist\dock-shell.test.css      118.9kb
+  apps\studio\dist\dock-shell.test.mjs.map  761.7kb
+  apps\studio\dist\dock-shell.test.css.map  183.6kb
+
+Done in 47ms
+
+  apps\studio\dist\preview-capture-menu.test.mjs      15.0kb
+  apps\studio\dist\preview-capture-menu.test.mjs.map  25.3kb
+
+Done in 15ms
+✔ default view shows unavailable output and disabled runtime controls rather than a demo (57.5351ms)
+✔ connected view distinguishes actual zero measurement, stale coverage and host revision (47.4801ms)
+✔ status bar exposes current build, problem and runtime health as actionable labels (189.7205ms)
+✔ source diagnostics replace only their matching compile job fault (50.1457ms)
+✔ local agent bridge requires token, rejects browser origins and deduplicates requests (71.8065ms)
+✔ local agent bridge forwards runtime controls through the application dispatcher (33.2845ms)
+✔ byte-only changes dirty the document, preserve failed candidates and undo complete assets (5.9393ms)
+✔ removal and source version changes are document changes, including empty v2 assets (1.0367ms)
+✔ session read, save, reopen and export retain v2 bytes and source changes cannot mutate snapshots (10.7694ms)
+✔ an asset-only failed candidate is labeled separately and asset diagnostics never open a code tab (0.5987ms)
+✔ MCP full-source schema preserves v2 and rejects omitted assets or unknown fields (230.1725ms)
+✔ v2 source reaches preview compilation and compiler failure keeps the current preview (1.4825ms)
+✔ source and linked versions must match before creating a preview worker (0.3304ms)
+✔ agent bridge round-trips complete Unicode source and rejects oversized read responses (40.0221ms)
+✔ asset export reaches validation and invalid source never publishes a transport (2408.9495ms)
+✔ ordinary Studio rejects internal SDK before clone, compile or job mutation (0.3529ms)
+✔ MCP source-build DTO rejects SDK 0.3 before a handler can mutate draft state (0.6682ms)
+✔ all existing scene readers reject internal SDK sources before persistence (0.4577ms)
+✔ two-phase loader keeps exact verified bytes private and its importer runs once (2.2737ms)
+✔ v3 parameters retain verified private asset bytes before import and reject invalid identities (2.6018ms)
+✔ worker prepares verified isolated bytes before importing the submitted module (0.9744ms)
+✔ bad linked hashes, altered assets and ambiguous legacy messages fail before import (30.9657ms)
+✔ protected byte construction completes before submitted import can replace constructors (1.0533ms)
+✔ actual worker rejects invalid linked identity before Blob import or GPU access (22.9728ms)
+✔ actual worker exposes verified assets during create and missing keys fail before readiness (31.6634ms)
+✔ fresh arm permits one exact audio request and active capture only satisfies checks (0.7103ms)
+✔ an allowed request must activate before the original arm deadline (0.154ms)
+✔ first malformed main-window request consumes the arm and every foreign context is denied (0.1635ms)
+✔ arm expiry, navigation, renderer loss, and destruction revoke permission state (0.2147ms)
+✔ token-matched cancellation rejects stale activation (0.1352ms)
+✔ audio runtime arms one request, activates its token, and revokes on disconnect (1.1808ms)
+✔ failed permission activation stops the acquired stream and cancels the exact arm (0.2951ms)
+✔ audio runtime fails closed when its context cannot enter running state (0.3052ms)
+✔ session reads, builds and saves a complete isolated draft (11.8867ms)
+✔ path save and reopen preserve the accepted preview resolution (1.4841ms)
+✔ cancelled/failed saves preserve dirty and an in-flight save excludes open/build/save (7.4593ms)
+✔ background builds keep runtime controls available while scene file operations protect them (0.7678ms)
+✔ stale build cannot submit and opening invalid code preserves the previous running identity (1.1104ms)
+✔ export validates a complete snapshot, excludes competing operations and preserves dirty state (0.6254ms)
+✔ failed preview validation prevents export and releases the session lock (0.3042ms)
+✔ failed open preserves document controls through save and applies them when repaired (1.5203ms)
+✔ new SDK draft saves an empty cache without inventing controls or executing source (0.768ms)
+✔ invalid draft save retains the accepted snapshot provenance, not the draft hash (0.8791ms)
+✔ opened parameters enter first candidate initialization and failed open retains document ownership (2.5422ms)
+✔ scene export refuses accepted controls belonging to unrelated source (0.7699ms)
+✔ invalid opened cache is rejected before replacing the current document or submitting (0.5919ms)
+✔ a successful SDK 0.2 build cannot save a missing accepted cache as an empty visual (0.3524ms)
+✔ opening a saved draft whose cache migrates marks the accepted controls dirty (1.2548ms)
+✔ linked build resolves the latest library source, persists its revision, shows updates, and fork keeps source (4.5304ms)
+✔ opening a linked scene tries the latest revision then visibly falls back to the saved working source (2.1947ms)
+✔ Save Look uses accepted bytes after dirty edits and survives thumbnail failure (0.5385ms)
+✔ Load Look commits only after activation and preserves all authoring state on failure (1.3699ms)
+✔ linked composition expands pinned Library dependencies and preserves its complete saved fallback (2.3962ms)
+✔ actual encoded PNG converts sRGB-stored linear premultiplication to straight alpha (3.6115ms)
+✔ encoded capture uses linear division, keeps opaque bytes, and canonicalizes zero alpha (0.6068ms)
+✔ low-alpha output is encoded directly without an ImageData premultiplication roundtrip (0.5002ms)
+✔ capture rejects inconsistent or oversized readback before encoding (0.1649ms)
+✔ Studio preview capture accepts a non-default render size (102.9833ms)
+✔ Studio preview capture removes Three WebGPU padding from only preceding non-aligned rows (2.1731ms)
+✔ disconnected Studio never admits a runtime command or invents status (0.638ms)
+✔ commands use current canonical operation payloads without optimistic application (0.6731ms)
+✔ host authority and nonfinite or out-of-range values never reach core (0.4557ms)
+✔ continuous intensity holds one in-flight write and coalesces to the latest guarded value (0.5693ms)
+✔ a value queued at acknowledgement is not erased by drain cleanup (0.4635ms)
+✔ generic parameter coalescing preserves different keys and original schema guards (1.0361ms)
+✔ close confirmation deduplicates pending requests, cancels cleanly and rejects stale approvals (0.2508ms)
+✔ manual/tap adapter guard requires protocol 3 and exact 20 through 300 BPM capability (0.1817ms)
+✔ 64 scene and component controls pass normalization and compiled DTOs (4.3886ms)
+✔ animation metadata remains byte-bounded without a binding-count cap (4.289ms)
+✔ 64-value bulk writes are admitted for scene and component targets (1.0644ms)
+✔ 64 animation bindings evaluate and survive scene save/reopen with all base controls (12.4545ms)
+✔ saved control snapshots verify their own schema hash and values without requiring a match to changed draft source (1.3117ms)
+✔ creative profile is stable per checkout and distinct from development and inherited tests (5.9557ms)
+✔ creative startup uses the selected checkout as it advances, without reserving a worktree (972.1567ms)
+✔ creative dependency check rejects parent fallback without executing package code (38.4534ms)
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+Preparing Electron 44.3.0 for win32-x64 (shared download cache)...
+✔ fresh Studio startup loads the checked-in noise sphere source (1.0808ms)
+✔ setup installs a missing pinned runtime once; checks remain inert (110.7445ms)
+✔ setup repairs a deleted executable and wrong runtime version (202.1869ms)
+✔ setup refuses a mismatched package instead of downloading another version (7.8444ms)
+✔ failed and incomplete installs fail clearly and release their setup lock (125.6081ms)
+✔ setup refuses concurrent mutation and parent dependency fallback (15.1913ms)
+✔ installer uses official pinned sources despite inherited npm mirror/version overrides (70.4598ms)
+✔ export owns an isolated full document across folder selection and excludes overlapping jobs (0.635ms)
+✔ invalid names and oversized JSON never open a dialog; failed export releases exclusion (16.9364ms)
+✔ bounded child transports JSON and rejects errors, malformed output, overflow, timeout and cancellation (616.89ms)
+✔ export child validates and prepares the full saved document before packaging, then cleans temporary source (43.2415ms)
+✔ invalid scene never reaches preparation; failed compilation never packages and removes its temporary source (7.3914ms)
+✔ invalid code fails before runtime copying, and a copy failure removes the runtime staging directory (909.9762ms)
+✔ fullscreen events are authoritative even when the native query still reports the previous state (0.4326ms)
+✔ source worker admits a real transparent PNG and rejects truncated originals (5.9623ms)
+✔ preview worker returns decoded straight-alpha pixels and rejects bad media (1.4739ms)
+✔ versioned desktop split and laptop tab layouts contain Diagnostics beside editing panels (4.3074ms)
+✔ layout parser rejects unsupported schema, unknown panels, state authority and unsafe references (9.3547ms)
+✔ inspector instances preserve independent locks and serialized title is canonicalized (1.1658ms)
+✔ real Dockview CPU adapter moves, saves, restores, reopens and resets without runtime authority (265.528ms)
+✔ Looks persist separately, reject collisions and stale updates, and keep prior bytes on failed write (92.0503ms)
+✔ Emotion styling is allowed only through a nonce while script and network policy stays restricted (0.6335ms)
+✔ page generation refuses remote assets and injected nonce content (0.2617ms)
+✔ routine receiver rejects populations impossible under one-in-thirty sampling (1.7379ms)
+✔ receiver accepts explicit baseline and sampled routine summaries without accepting false full coverage (0.5491ms)
+✔ telemetry uses parent arrival age and monotonic worker sequences, with detached bounded data (0.7693ms)
+✔ invalid, misleading, oversized and regressing telemetry cannot replace the last good summary (1.2622ms)
+✔ moving presentation retires only consumers and preserves the runtime key (0.6685ms)
+✔ attachment completing after close is retired rather than leaked or presented (0.3363ms)
+✔ a failed detach never attaches a second consumer over uncertain ownership (0.3043ms)
+✔ PNG save commits complete bytes and replaces only after the temporary file is ready (6.1484ms)
+✔ default PNG bound accepts a valid capture larger than the former 8 MiB ceiling (30.8433ms)
+✔ video chunks stream in order and become visible only after finish (10.7498ms)
+✔ cancel removes partial video and preserves an existing destination (4.6098ms)
+✔ capture store rejects malformed files and bounded recording writes without changing the destination (5.2293ms)
+✔ shutdown drain waits for queued chunks and removes the temporary recording (18.4719ms)
+✔ shutdown waits for an in-progress finalizer and prevents its commit (3.8801ms)
+✔ WebM selection prefers VP9 then VP8 and reports unsupported runtimes (0.2582ms)
+✔ recorder streams ordered chunks from the fixed output canvas and commits on stop (11.1397ms)
+✔ recorder rejects a panel-sized canvas instead of silently changing output dimensions (1.489ms)
+✔ recorder allows one destination choice at a time and cancellation leaves it idle (0.3701ms)
+✔ recorder cancels the chosen destination when the preview changes during the save dialog (0.3205ms)
+✔ cancel and backpressure failures remove partial output and stop the canvas track (28.2059ms)
+✔ renderer coalesces frame observations, caches reads and publishes latest within 100 ms (1.6527ms)
+✔ renderer bounds animation time and effective-value observations to UI cadence (0.7951ms)
+✔ control, transport, owner, fault and jobs changes bypass pending frame delay (0.4993ms)
+✔ last unsubscribe cancels timer; reattachment catches up without leaking source listeners (0.2385ms)
+✔ runtime audio transport keeps one in-flight sample and one latest overwrite without publishing sampled state (3.2952ms)
+✔ standalone guarded MCP commands wait for applied state and reject invalid/stale writes (4.1002ms)
+✔ saved edit signature tracks output and base controls but ignores playback and animation samples (0.8373ms)
+✔ Studio saves, reopens, edits and restarts nested composition instances while a failed rebuild retains them (5062.4431ms)
+✔ animation operation schema admits the empty scene path (0.4511ms)
+✔ animation operation schema accepts exact audio and kick bindings without widening legacy LFOs (1.3685ms)
+✔ manual and tap tempo acknowledge guarded writes and persist only BPM (3.4145ms)
+✔ background build synchronizes the latest acknowledged BPM before promotion with fresh beat zero (23.8566ms)
+✔ flat runtime keeps base controls while accepting guarded animation state and rejecting stale or forged targets (5.6879ms)
+✔ background build promotes only after the latest compatible controls and animation reach its candidate (28.1179ms)
+✔ edits acknowledged during compilation initialize the eventual candidate with the latest state (27.0575ms)
+✔ legacy runtime state preserves scene animation fields (0.4042ms)
+✔ successful initial Build and a later Build from Pause both start playback (2.7216ms)
+✔ Pause during compilation wins over Build autoplay (1.4217ms)
+✔ Pause during candidate startup synchronizes before the candidate is promoted (1.9516ms)
+✔ a rejected Pause during candidate startup restores autoplay before promotion (2.1852ms)
+✔ failed autoplay candidate preserves the explicitly paused preview (1.2133ms)
+✔ scene Open autoplays accepted source and a failed later Open retains the preview and incoming draft (2.9374ms)
+✔ explicit saved scene controls win over the previous preview during promotion (1.7482ms)
+✔ Build still waits for a playback command that was already pending (1.4057ms)
+✔ a rejected Pause from worker failure does not leave Build blocked (1.2218ms)
+✔ a rejected Pause from timeout does not leave Build blocked (1.855ms)
+✔ baseline selection reaches initial and restarted workers without changing watchdog termination (0.8194ms)
+✔ silent candidate is terminated at 1250 ms while previous preview survives (1.0433ms)
+✔ healthy candidate heartbeats permit slow initialization until the independent five-second cap (2.363ms)
+✔ paused stalled commands fault the runtime and settle all pending waiters (1.7496ms)
+✔ capture admission allows one active and one queued; replacement rejects both (1.0742ms)
+✔ restart uses cached accepted linked bytes without compiling and retains controls (0.8765ms)
+✔ preview resolution restarts at the requested dimensions and retains the working preview when its candidate fails (0.7867ms)
+✔ invalid preview resolution reports a concise limit without replacing the working runtime (0.9197ms)
+✔ v2 restart retains the whole accepted envelope after compile-result mutation and failed replacement (1.9398ms)
+✔ postMessage failure faults and clears every pending operation (0.7687ms)
+✔ late terminal callbacks cannot revive a faulted runtime (0.6794ms)
+✔ initialization post failure clears activation and watchdog timers (0.7925ms)
+✔ paused live worker CPU silence and malformed heartbeats do not escape the liveness deadline (0.8532ms)
+✔ repeated frame IDs cannot conceal a playing worker without completed frame progress (1.3563ms)
+✔ completed captures release admission while capture deadline tears down an abandoned queue (2.4612ms)
+✔ restart retains admitted controls across failure and failed recovery; rejected commands cannot replace intent (2.219ms)
+✔ source replacement waits for a pre-existing control command and does not inherit its rejected intent (1.0955ms)
+✔ performance belongs to promoted runtime and failed candidates or late old workers cannot replace it (1.4383ms)
+✔ telemetry silence becomes stale despite healthy heartbeats, and faults preserve labeled last measurements (0.9799ms)
+✔ first accepted-runtime fault retries cached source once with admitted values; a second fault suppresses automatic restart (1.2642ms)
+✔ failed automatic startup is terminal without a retry storm and explicit restart can still recover (0.9864ms)
+✔ a healthy 30-second interval permits one new retry and source replacement cancels a queued old retry (13.7766ms)
+✔ a fault during source compilation defers recovery; rejected replacement retries only the accepted artifact (1.1488ms)
+✔ retiring an already faulted owner cancels its queued automatic retry (0.4876ms)
+✔ automatic recovery preserves acknowledged playing state without replaying pending transport (1.0728ms)
+✔ automatic recovery preserves acknowledged paused state without replaying pending transport (1.0514ms)
+✔ Look activation uses saved resolution only after success and snapshots accepted source (2.0115ms)
+✔ saving a look above the scene format resolution limit gives a short actionable error (0.7893ms)
+✔ SDK 0.2 activation is explicitly gated while legacy UI integration is incomplete (0.6438ms)
+✔ saved values enter the first candidate frame and generic patches preserve admitted keys atomically (4.8464ms)
+✔ failed candidates retain schema/values and restart restores admitted intent without recompiling (3.4903ms)
+✔ scene animation bindings use the empty path as a distinct validated target (0.3574ms)
+✔ SDK 0.2 worker animates effective scene controls while retaining authored base controls (1.9834ms)
+✔ tempo bindings use injected beat position and preserve the exact target identity (1.2279ms)
+✔ legacy intensity uses the same scene animation evaluator (0.698ms)
+✔ changed scene schema disables a retained binding without retargeting it (0.7462ms)
+✔ scene animation evaluation retains captured intrinsics after authored code mutates prototypes (0.731ms)
+✔ normal checkouts, creative, and every test run have separate profiles (13.7071ms)
+✔ connections route only to their selected profile and refuse endpoint replacement (76.4265ms)
+✔ rejects mismatched checkout and legacy or invalid endpoint before sending any request (21.7662ms)
+✔ failed startup discovery can connect after a stale endpoint is replaced (29.8299ms)
+✔ an uncertain mutation keeps the selected instance bound (31.7317ms)
+✔ actual Windows stdio adapter selects its test profile and refuses a replacement (824.4948ms)
+✔ Studio shortcut map uses the approved Windows bindings and accepts Command equivalents (0.3892ms)
+✔ shortcut hints expose the exact commands shown by menus and buttons (0.1349ms)
+✔ dedicated browser admission worker independently validates source bytes (86.8504ms)
+✔ owned text edits reuse frozen assets without reinterpreting image headers (0.8473ms)
+✔ real asynchronous worker fully admits bytes and isolates caller mutations (216.0855ms)
+✔ timeouts, worker failures and forged responses terminate without creating trusted sources (554.8372ms)
+✔ diagnostic targets use one-based UTF-16 coordinates and clamp CRLF helper positions (0.4917ms)
+✔ compile failures retain structured diagnostics and readable messages (0.2092ms)
+✔ candidate-only diagnostics cannot navigate an unchanged draft with the same version and file path (0.139ms)
+✔ failed changed multi-file candidate retains draft but labels its diagnostics separately (0.3989ms)
+✔ workspace typing and new files never decode unchanged assets (0.5749ms)
+✔ asynchronous replacement commits only after full worker admission and preserves last good on failure (319.3269ms)
+✔ asset import is a worker-validated draft edit preserving text, saved state and undo (214.8128ms)
+✔ helper drafts survive navigation and dirty compares complete saved content (0.4983ms)
+✔ submit takes a synchronous exclusive lock and failure preserves all drafts (0.5571ms)
+✔ submitted inputs and published snapshots cannot mutate store; stale versions never activate (0.6614ms)
+✔ new files share compiler path and complete UTF-8 budget admission (5.391ms)
+✔ checkout profiles resolve one library from the Git common directory (0.3884ms)
+✔ independent installed Studio uses one writable fallback and the immutable package library as its seed (0.1392ms)
+✔ an explicit test root isolates writes while retaining the checkout seed (0.1363ms)
+✔ installed Studio uses the marked canonical repository and merges its fallback when available (3.7565ms)
+✔ installed Studio falls back only when the marked canonical repository is unavailable (5.1146ms)
+✔ tempo clock derives beat position and phase from visual time (0.3223ms)
+✔ manual BPM changes preserve phase and acknowledge same-BPM writes (0.5424ms)
+✔ reset keeps BPM and sequence while establishing beat zero at supplied visual time (0.2986ms)
+✔ tempo clock rejects invalid settings and visual times before mutation (0.8978ms)
+✔ tempo clock accepts the RuntimeClock upper time boundary without overflowing (0.1626ms)
+✔ tempo sequence exhaustion rejects an admitted set before mutation (0.1794ms)
+✔ first and paused taps rephase beat zero before an accepted interval sets BPM (0.2765ms)
+✔ tap window retains only the newest four accepted intervals (0.1777ms)
+✔ ignored short tap does not advance accepted timestamp, history or phase (0.1757ms)
+✔ long tap gap restarts history and keeps BPM until a new accepted interval (0.1583ms)
+✔ manual BPM set and reset clear prior tap history (0.11ms)
+✔ tap rejects invalid monotonic samples and sequence exhaustion before mutation (0.3268ms)
+✔ tap accepts the RuntimeClock safe millisecond boundary (0.1012ms)
+✔ replacement initialization accepts acknowledged BPM and sequence with fresh phase (0.1244ms)
+✔ candidate synchronization adopts the acknowledged sequence with fresh beat and tap history (0.1517ms)
+✔ legacy visual has a view-only code occurrence at its existing empty control path (0.7965ms)
+✔ direct parameter visuals retain schema identity and missing graph state is never invented (0.326ms)
+✔ direct-only selection returns to Scene when a graph visual replaces it (0.1861ms)
+✔ WebM finalizer inserts duration into Info without changing an unknown Segment size (0.3499ms)
+✔ WebM finalizer replaces an existing duration without growing the file (0.1632ms)
+✔ WebM finalizer rejects missing or truncated Info instead of emitting a corrupt clip (0.2074ms)
+✔ closing detached preview restores docking without owning a runtime (0.351ms)
+✔ failed popout retains a usable docked panel (0.1672ms)
+✔ dock during pending popout cancels presentation and prevents an orphan window (0.1953ms)
+✔ only the exact local Studio document can invoke window operations (0.2466ms)
+ℹ tests 234
+ℹ suites 0
+ℹ pass 234
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17517.0538
+✔ RTL: frame bursts leave Performance responsive and applied controls publish immediately (350.3728ms)
+✔ RTL: discard confirmation is an accessible in-app dialog with safe cancel, Escape and explicit approval (998.4732ms)
+✔ RTL: code-defined controls expose independent values, numeric entry and defaults without Intensity (219.6074ms)
+✔ RTL: a flat control can add the strict shared-audio binding (490.8642ms)
+✔ RTL: a flat control can add and tune the strict kick binding (368.9698ms)
+✔ RTL: audio configuration changes cancel an in-flight connection and ignore its stale completion (62.5281ms)
+✔ RTL: direct component selection edits flat controls and keeps empty-path animation identity (365.7139ms)
+✖ RTL: control descriptions appear on hover and keyboard focus without creating empty help (224.4889ms)
+✔ RTL: duplicate component labels show and announce their public aliases (122.6124ms)
+✔ RTL: grouped controls use independent keyboard disclosures and preserve live values while collapsed (315.5221ms)
+✔ RTL: an empty authored schema has no invented control (93.2542ms)
+✔ RTL: typing and pending control writes mark unsaved intent before acknowledgement (204.7803ms)
+✔ RTL: merely focusing numeric input cannot overwrite a later agent parameter change (192.7056ms)
+✔ RTL: disconnected controls refuse input while workspace remains operable (223.3016ms)
+✔ RTL: playback and intensity invoke guarded shared operations and wait for applied state (390.9543ms)
+✔ RTL: failed runtime command shows actionable error without a successful-state claim (387.4736ms)
+✔ RTL: pending playback preserves button styling and ignores duplicate transport commands (595.9676ms)
+✔ RTL: intensity writes do not disable transport or insert a success alert (115.0322ms)
+✔ RTL: delayed applied values never pull a slider away from the latest input (205.7308ms)
+✔ RTL: rejected slider input restores confirmed value and replacement ignores old completion (157.7428ms)
+✔ RTL: a replaced runtime has an independent input queue while old writes are pending (136.944ms)
+✔ RTL: Escape exits native fullscreen even before its state notification arrives (97.7764ms)
+An update to StudioLayout inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+✔ RTL: fullscreen shows only preview, ignores stale initial state, and exits on first Escape (3793.3625ms)
+✔ RTL: unavailable popout is absent while fullscreen remains available (77.4587ms)
+✔ RTL: global authoring shortcuts dispatch one shared action and suppress repeats (48.8202ms)
+✔ RTL: question mark opens the shortcut reference without intercepting text entry or repeats (106.2613ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 25
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15168.153
+
+✖ failing tests:
+
+test at apps\studio\dist\interactions.test.mjs:3528:1
+✖ RTL: control descriptions appear on hover and keyboard focus without creating empty help (224.4889ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  '' !== '12px'
+  
+      at TestContext.<anonymous> (file:///C:/Users/zFlei/repos/lux/apps/studio/dist/interactions.test.mjs:3539:10)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '',
+    expected: '12px',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

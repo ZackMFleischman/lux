@@ -1,0 +1,367 @@
+[
+  {
+    "file": "locales/en-GB.pak",
+    "sha256": "01D9200A5DAEE1770F7147B166D25BAA6A8DD72C138C3C526421E656DEC789F5",
+    "matches": true
+  },
+  {
+    "file": "dxil.dll",
+    "sha256": "77E039C905030A641E53658A008B74E90635A5EA9B6B79EABD0F2003BDFCA59A",
+    "matches": true
+  },
+  {
+    "file": "locales/lt.pak",
+    "sha256": "AF969F4407C190DD01A426FA1244CB1EC7CDF2909D1C3BA5B87FF662BA567303",
+    "matches": true
+  },
+  {
+    "file": "locales/nl.pak",
+    "sha256": "9D82C384FBB6480C7A6E721C6BCD1F2CD19665D848B056B5A2911504308BA037",
+    "matches": true
+  },
+  {
+    "file": "locales/uk.pak",
+    "sha256": "A6230520DAC708A6235588F5D9E894FCC9B1391E18A70E3220E06DDF80F76688",
+    "matches": true
+  },
+  {
+    "file": "locales/ar.pak",
+    "sha256": "A6EB037DA4AC7930A8661C8BF602DEEE090FC4409BF4DB24DB8AAB65C89B1D06",
+    "matches": true
+  },
+  {
+    "file": "locales/el.pak",
+    "sha256": "37D2E1EF69FEA9BDB1E0902CBC61A458BAA9009FC3761029BD1C1882A7A0C9B2",
+    "matches": true
+  },
+  {
+    "file": "locales/fi.pak",
+    "sha256": "1F3123D7FB5C22A95B5250EA17450B665C3C6CD6A6DFD28BBDDE15E1BF684A0E",
+    "matches": true
+  },
+  {
+    "file": "chrome_100_percent.pak",
+    "sha256": "AB7C4B7B6CB8832A31D44B95EC50CE52294F49422A3BDDE4E21968ECA2930CBE",
+    "matches": true
+  },
+  {
+    "file": "locales/en-US.pak",
+    "sha256": "23B271E8009BFA14783700CD0712B4ECAA5B8F2EA28A4D81AE1D7E05BC0C96B1",
+    "matches": true
+  },
+  {
+    "file": "locales/af.pak",
+    "sha256": "3017B141BD16E24190D810F0748612F0FD4352CA8553002B9A63A7F77F7154F8",
+    "matches": true
+  },
+  {
+    "file": "resources/default_app.asar",
+    "sha256": "06D4A28BE095A80EFF94DBD18EDCFAC5B5805E1B5538E0FB7CEE7C7AE81DB76A",
+    "matches": true
+  },
+  {
+    "file": "locales/it.pak",
+    "sha256": "899BE10E8F46F53D9BBE7CAB827FC17B7C2BD7184E31791688016E2CA4DF6622",
+    "matches": true
+  },
+  {
+    "file": "locales/th.pak",
+    "sha256": "C1F4235C31BC05153230B0E55B7AABC9020D7460D5B0A025C386885E1E4BDA3C",
+    "matches": true
+  },
+  {
+    "file": "locales/te.pak",
+    "sha256": "FC8C2706C5DFD36E7AF8E380A240E0F697CC5FE969B512092A2185896512C4AF",
+    "matches": true
+  },
+  {
+    "file": "ffmpeg.dll",
+    "sha256": "336587847C4ED3EF1A195D1AAEA3D3951C9749A035FFA7951DF4C0E02971E4E0",
+    "matches": true
+  },
+  {
+    "file": "locales/bg.pak",
+    "sha256": "2EB9C74C67E4B13B45A73061FA978738E335BC245DA71BAB0EA9B205FE91074E",
+    "matches": true
+  },
+  {
+    "file": "locales/am.pak",
+    "sha256": "67B938D162BC75DB067120BB8366B5BAFD9A75FA99A0CA9AD4F46B47D1D37634",
+    "matches": true
+  },
+  {
+    "file": "locales/hr.pak",
+    "sha256": "D46C64AE8AF3562E37EB80438AA2BEE228FAFDA251D58BA4D0991291F1C72AAB",
+    "matches": true
+  },
+  {
+    "file": "locales/sk.pak",
+    "sha256": "A53551E8D251FA01305AFE1D0D187144C56BFDFFD5D1AA9F96A9350B96C0A252",
+    "matches": true
+  },
+  {
+    "file": "locales/de.pak",
+    "sha256": "FCF63FD89E613A7EF69F16054B97B3493948E5C665AAD180A91D3635256FB7D7",
+    "matches": true
+  },
+  {
+    "file": "locales/gu.pak",
+    "sha256": "E86E8C240D4B6283ABB03C49DF9E8899607EF9DEF6D4933C7A541D63B5835271",
+    "matches": true
+  },
+  {
+    "file": "vk_swiftshader.dll",
+    "sha256": "CFB8A533C5DA1ADE3FD4E66EBD0ACF7186BD17FB3CC09D48809A7909C4AAF0F8",
+    "matches": true
+  },
+  {
+    "file": "electron.exe",
+    "sha256": "E048632E03FABC96DE5E10AFBEBC0AA31F4E1674155EA3D270597FE7523F9D80",
+    "matches": true
+  },
+  {
+    "file": "locales/mr.pak",
+    "sha256": "8465D4077ED5414CBCB7D9BDB00D85E515A1A069703CDC1D4D67C9D6E5623FB0",
+    "matches": true
+  },
+  {
+    "file": "chrome_200_percent.pak",
+    "sha256": "30FA4A6E27C9FF2FB0F939F01158477E621A67D86E9ECB84CF11B3947DB8EB9D",
+    "matches": true
+  },
+  {
+    "file": "locales/nb.pak",
+    "sha256": "D97A2B0CBE6ADC99ADD2ED3CE0D15D0BB124B778086C466C126634D60EA72608",
+    "matches": true
+  },
+  {
+    "file": "locales/bn.pak",
+    "sha256": "415621A5C0B1546E6E447D43B76414425A8703CC7681D637EC1F283AD0C787E7",
+    "matches": true
+  },
+  {
+    "file": "v8_context_snapshot.bin",
+    "sha256": "D9D3EC18E937ED2FDDD02D92E4F0726919769E16F2EA17F962D23E40D5962B7B",
+    "matches": true
+  },
+  {
+    "file": "locales/id.pak",
+    "sha256": "F567569C42A25BB2DFC5C33E13AAC558C0E2A1D5D4B969592BBD0841B36438DB",
+    "matches": true
+  },
+  {
+    "file": "LICENSE",
+    "sha256": "5154E165BD6C2CC0CFBCD8916498C7ABAB0497923BAFCD5CB07673FE8480087D",
+    "matches": true
+  },
+  {
+    "file": "locales/lv.pak",
+    "sha256": "27E20DFA5585161EF8B641F628AEFE6C88D9F9590FFEDB647E0C9DA1CACF219D",
+    "matches": true
+  },
+  {
+    "file": "locales/da.pak",
+    "sha256": "9A2CD25537A4818897481BA944981E8AEE3D89C7AD37588D02F1DEEBFF3F62D0",
+    "matches": true
+  },
+  {
+    "file": "locales/hu.pak",
+    "sha256": "0A46FC8D50F74EFFD1CFE1979E677DF3DE6FC47E6B551267303D93D57BD83F50",
+    "matches": true
+  },
+  {
+    "file": "locales/ml.pak",
+    "sha256": "B5606265910E45098A88E989202A550531F6D00333C6B112ED4C5CBC07B2FF6A",
+    "matches": true
+  },
+  {
+    "file": "locales/ja.pak",
+    "sha256": "9370C20A0612F5874DFF2B015F31482E167ECCF1B3C1D1A2EFC1C2E38CEFA88E",
+    "matches": true
+  },
+  {
+    "file": "locales/ta.pak",
+    "sha256": "91FB1460711DF108D8D435A378C8BE1D1E80B0886C0158D8C6AE92F35812681B",
+    "matches": true
+  },
+  {
+    "file": "version",
+    "sha256": "A1D640D380C386200A420B590105D25DA627723EE42EE1061108F3ACDE9F25FD",
+    "matches": true
+  },
+  {
+    "file": "locales/fil.pak",
+    "sha256": "02E2C70D3D85B0DEB677A9AE576AE3CF89E80774532CB3315C14F1E8CE64B310",
+    "matches": true
+  },
+  {
+    "file": "locales/fr.pak",
+    "sha256": "4DB43F1CFBA1ED1D7DD347D58FBAB0B8D6D89DD008A3B9D2436D8744E3363453",
+    "matches": true
+  },
+  {
+    "file": "locales/pl.pak",
+    "sha256": "8A0969FC743D3E2F5111387D53C0D79E8C1D9F68256AD6553B87FCA2BCAA7E6E",
+    "matches": true
+  },
+  {
+    "file": "locales/pt-BR.pak",
+    "sha256": "8272A84E2E6658DC4DA17C6BD21995011FBAA6C328EFAFD24C4EBD4FE2E64916",
+    "matches": true
+  },
+  {
+    "file": "locales/he.pak",
+    "sha256": "DDC1F304AB1F4489D19AE2B31E7F8E3FFB47DAE439520159E8975422C65E4115",
+    "matches": true
+  },
+  {
+    "file": "locales/pt-PT.pak",
+    "sha256": "BDFA7264DDDF70F936F1785737969559A577B51D1952C820A468C611D18B17CA",
+    "matches": true
+  },
+  {
+    "file": "locales/ru.pak",
+    "sha256": "52A31A7CA057B8C76208620932120927A089502DDFB66C30DE4324959F9E0075",
+    "matches": true
+  },
+  {
+    "file": "locales/tr.pak",
+    "sha256": "AE87BBD88CE0ADFC2DC3C460736A7D0513472AF62FC856CACCC638DEDFEC9B4A",
+    "matches": true
+  },
+  {
+    "file": "locales/ur.pak",
+    "sha256": "C218E21744DF2FF0669A87D497D65D76333073577360D4C662C592DE146BF82A",
+    "matches": true
+  },
+  {
+    "file": "vulkan-1.dll",
+    "sha256": "C1B383F18C0949F233E949AE197C2AD4C416ABE7790894D7E395D73116403B4F",
+    "matches": true
+  },
+  {
+    "file": "d3dcompiler_47.dll",
+    "sha256": "A05F99734F7C4822FEFC12B367AF21FD0976ED6608752FB1E1E80B6ECE7ECBBB",
+    "matches": true
+  },
+  {
+    "file": "dxcompiler.dll",
+    "sha256": "B2B5C67BC4A9C92A0EA87000415E7970488D1CA25767518D4CC27B88F18FB6AC",
+    "matches": true
+  },
+  {
+    "file": "locales/ro.pak",
+    "sha256": "1E6B5B0DAC63A9E951DAF523DE310F6BD9E5C53E281F37706D41BD35D2A08BB5",
+    "matches": true
+  },
+  {
+    "file": "locales/et.pak",
+    "sha256": "DD1205EAE606F12510E24CE39F301439C98B3293D766CA5839DC292A14D7973C",
+    "matches": true
+  },
+  {
+    "file": "locales/sv.pak",
+    "sha256": "8BDFF8855D23C739ECE357F653C0A17BB36FE97577A5761912080D057ED341A5",
+    "matches": true
+  },
+  {
+    "file": "locales/ca.pak",
+    "sha256": "6F28297C1CCB628F534D65DADE167AE559F83EACE359ACF47E48FF890B9409D5",
+    "matches": true
+  },
+  {
+    "file": "locales/sl.pak",
+    "sha256": "E1371C8DF577B979E3A515AF34B0AAA3D07153C7A5C55D39A9B49A7FFE62D3D2",
+    "matches": true
+  },
+  {
+    "file": "locales/hi.pak",
+    "sha256": "10A6F19C1982590E33476427DEE8D4293B0707E25DC536D6394B5782ECC3B642",
+    "matches": true
+  },
+  {
+    "file": "locales/vi.pak",
+    "sha256": "42F3F0C4F645AEDC66C12C74AEE7256336A929798D736C56853DAEC91D44511A",
+    "matches": true
+  },
+  {
+    "file": "locales/es.pak",
+    "sha256": "4578E08033967A5062BFD3B1937E711DF84571D444E4940B8FFE5366BCE4E778",
+    "matches": true
+  },
+  {
+    "file": "locales/sw.pak",
+    "sha256": "312B225A81CC3CC15F13F80C45DD0E0BB3655D31873D2956861207E70C33C1DC",
+    "matches": true
+  },
+  {
+    "file": "snapshot_blob.bin",
+    "sha256": "1176CFA83F9EF458E7ED5B5B255C9289691DBEF3FF1E4A073A5C90F9A16E8458",
+    "matches": true
+  },
+  {
+    "file": "resources.pak",
+    "sha256": "3D8C36B2EC7099A27FE00763E5AF28319643BA65C1B48B85EB6A7CAAAE034BA6",
+    "matches": true
+  },
+  {
+    "file": "vk_swiftshader_icd.json",
+    "sha256": "32D83FF113FEF532A9F97E0D2831F8656628AB1C99E9060F0332B1532839AFD9",
+    "matches": true
+  },
+  {
+    "file": "locales/ko.pak",
+    "sha256": "0F5BC49C4D35BFEA1563DB6EB77A074C65B39B49A916CB35A022EF96340338F2",
+    "matches": true
+  },
+  {
+    "file": "locales/kn.pak",
+    "sha256": "AF5FED2130102ECC0C878059C88FAED9D6DB2E8B147FB5AE9E15E3FE69706C8A",
+    "matches": true
+  },
+  {
+    "file": "LICENSES.chromium.html",
+    "sha256": "7B328B8C7463AC9BFC7DC648C751533517C8441A0B5B21047D6C0B2620E60D70",
+    "matches": true
+  },
+  {
+    "file": "icudtl.dat",
+    "sha256": "9F48C7F9C7C94D516A14870707E910AB94D75AE640FF6842C4AF53276CD26EBE",
+    "matches": true
+  },
+  {
+    "file": "locales/ms.pak",
+    "sha256": "AF7021A00BEFA586AA067AE3CCB339079E6F13EE0CAB1621836F6ABB608B6F2A",
+    "matches": true
+  },
+  {
+    "file": "locales/cs.pak",
+    "sha256": "799A789CE531991CB975425730DB310F9A8FE74091EEE568F3E65FCC7EF0CD57",
+    "matches": true
+  },
+  {
+    "file": "locales/zh-TW.pak",
+    "sha256": "82739378D17EA73E57C8EFAE31994E0C8818AB2D0D12CB1F6B20D2F340B3229D",
+    "matches": true
+  },
+  {
+    "file": "locales/es-419.pak",
+    "sha256": "6FF6EA0A14DA50CACC4B72AB8C8C7B49C8423ABB64F6A3A7F1643D8C3C74E6E9",
+    "matches": true
+  },
+  {
+    "file": "locales/zh-CN.pak",
+    "sha256": "BA8AC4BF82B50728D907215D1993948457835BF2942A4D7266A3F8AF5F51DE15",
+    "matches": true
+  },
+  {
+    "file": "locales/sr.pak",
+    "sha256": "BE4CE17AFAC24DFFC1EB36609CB51E766E77097D6656B1008A2A825E59609CC1",
+    "matches": true
+  },
+  {
+    "file": "locales/fa.pak",
+    "sha256": "F3675255FEB8B054717BE9E92E93289262F35E82F25F2F8DE0D3EBF3865715AF",
+    "matches": true
+  }
+]

@@ -1,0 +1,1 @@
+Normal Lux startup now prepares a missing pinned Electron runtime and uses the standard shared cache. Independent source review passed. Reviewed source is on main, the combined build and setup regressions passed, actual Studio readiness succeeded, and both installed skills match main. The user's creative Studio remains open and its pinned source is unchanged.

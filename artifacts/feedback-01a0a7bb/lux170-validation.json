@@ -1,0 +1,13 @@
+{
+  "commit": "cb086ec2c025f88fde86f67d09382954d0becc8f",
+  "criteria": "Accepted the submitted LUX-170 source: fixed composition-count ceilings are removed consistently from compiler extraction, runtime admission/planning, Studio authoring DTOs, Library dependency/link resolution, and saved node-control snapshots; cycle, node-path depth, byte, raw-value, compilation, planning-work, resource, provenance, and device protections remain; the separate 32-entry Library inventory cap remains. A real 17-node scene preserves the approved eight-node painting at unity scale, exposes a working ninth-relay control, fits all nodes in Graph, survives save/reopen, and retains the incumbent scene after an invalid edit. The authoring skill is installed and current.",
+  "evidence": "Independent source review bound to cb086ec2c025f88fde86f67d09382954d0becc8f found no actionable issues. Independent changed-area CPU run passed 60/60. Native result artifacts/living-ornament/limit-qa/run-1789554133805/result.json is source-pinned and records ok:true, original and 17-node unity comparisons with changedChannels:0, relay control change across 533286 channels, reopen and invalid-build comparisons with changedChannels:0, retained saved-scene SHA-256, no page errors, and owned PID 5428 exit 0; screenshots show all 17 nodes fit and the selected relay remains editable. Integration commit 7d29f49a3268086b1948c4a40f641025019bc1f3 contains the submitted commit and its landed focused compiler/nested/scene log artifacts/feedback-01a0a7bb/landed-limit-tests.log passes 41/41. node scripts/install-visual-skill.mjs --check on main reported current:true with empty missing, changed, and unexpected lists. The QA harness changed the BrowserWindow to 640x360 while retaining 1920x1080 render output; this wording correction is nonblocking because the source-pinned candidate passed the full-HD workload.",
+  "context_id": "codex-thread-01a0a7bb-ee60-76f1-bcd6-5d179614f551-lux170-independent-review",
+  "checks": {
+    "unit": "pass",
+    "integration": "pass",
+    "source_review": "pass",
+    "native_ui": "pass",
+    "skill_install": "pass"
+  }
+}

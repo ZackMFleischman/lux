@@ -1,0 +1,16 @@
+{
+  "commit": "ca1bedb489e9f2531b0e0f63f7c2c96a4ba7ccd7",
+  "criteria": "Feature is implemented/usable. Formal closure requires a raw existing-build receipt for Desktop and Start-menu shortcut target/icon verification, both shipped skill install --check outputs, and the independent-review result.",
+  "evidence": "git merge-base --is-ancestor ca1bedb489e9f2531b0e0f63f7c2c96a4ba7ccd7 main succeeded; main was dc5b1735b3a95d077e37f9684d8230e977c69f4d at audit. final-package.json pins the source commit, package paths, bundled node/adapter, source digest, and Electron archive SHA-256. app-qa.json records owned installed-app launch, bundled MCP discover/read, compiler/linker preview, capture, invalid-edit preservation, favicon, and actual screenshot. installed-window.png and installed-menu.png were visually inspected. The retained harness does not record shortcut verification, skill checks, or independent-review output.",
+  "context_id": "/root/board_review:read-only-independent-audit",
+  "checks": {
+    "commit_reachable_from_main": "true",
+    "package_source_commit_pinned": "true",
+    "native_installed_app_provenance_saved": "true",
+    "branded_ui_screenshot_saved_and_inspected": "true",
+    "invalid_edit_preserves_preview": "true",
+    "shortcut_receipt_saved": "false",
+    "skills_check_output_saved": "false",
+    "independent_review_evidence_saved": "false"
+  }
+}

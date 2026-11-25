@@ -1,0 +1,17 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "44760b0b-c42c-48d5-937b-964d2464c3a8",
+  "revision": 1,
+  "name": "Gaussian Blur",
+  "description": "Reusable Gaussian-weighted image blur with pixel radius and premultiplied-alpha edges. Includes a texture helper for scene-local logo focus reveals.",
+  "updatedAt": "2026-09-17T06:06:39.025Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "blur.ts",
+    "files": [
+      "blur.ts",
+      "gaussian-blur.ts"
+    ]
+  }
+}

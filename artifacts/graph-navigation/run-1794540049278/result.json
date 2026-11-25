@@ -1,0 +1,18 @@
+{
+  "ok": true,
+  "root": "C:\\Users\\zFlei\\repos\\lux",
+  "profile": "test-7550e088-3085-49c8-8276-fd6e303daf02",
+  "checks": [
+    "Plain defineVisual opens inside Scene with one Visual card, a plain location label, no redundant settings buttons, and a breadcrumb fitting an 820px window",
+    "Composition opens with its immediate children; Enter, double-click and View inside navigate down two levels; keyboard-accessible ancestor breadcrumbs navigate up without duplicate Scene or Back buttons"
+  ],
+  "errors": [],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\artifacts\\graph-navigation\\run-1794540049278\\plain-scene-root.png",
+    "C:\\Users\\zFlei\\repos\\lux\\artifacts\\graph-navigation\\run-1794540049278\\plain-scene-narrow.png",
+    "C:\\Users\\zFlei\\repos\\lux\\artifacts\\graph-navigation\\run-1794540049278\\composition-scene-children.png",
+    "C:\\Users\\zFlei\\repos\\lux\\artifacts\\graph-navigation\\run-1794540049278\\nested-view.png",
+    "C:\\Users\\zFlei\\repos\\lux\\artifacts\\graph-navigation\\run-1794540049278\\nested-second-level.png"
+  ],
+  "stage": "checking nested breadcrumb navigation"
+}

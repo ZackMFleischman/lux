@@ -1,0 +1,10 @@
+{
+  "provenance": "Transcribed from the retained original root tool output before the packaging fix. The generic observation filename was reused by a later successful verification; per-source observation filenames now prevent overwriting. This is the original observed diagnostic, not a new test run.",
+  "sourceCommit": "76990add2d219d77d1aa4e09e4154a572d069c2d",
+  "package": "76990add-75d5e280",
+  "catalog": {
+    "storage": "test",
+    "entries": [],
+    "error": "ENOENT: no such file or directory, realpath 'c:\\users\\zflei\\appdata\\local\\programs\\lux\\builds\\76990add-75d5e280\\resources\\app\\runtime\\library\\components\\0f5e1c0f-c53f-4808-b1c8-98fe75eb13a3\\revisions\\1'"
+  }
+}

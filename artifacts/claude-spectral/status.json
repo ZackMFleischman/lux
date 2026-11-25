@@ -1,0 +1,4555 @@
+{
+ "connection": "connected",
+ "message": null,
+ "receivedAtMs": 1794545181372,
+ "authoring": {
+  "instanceId": "5505e19c-27e4-4f7c-bb30-9e534c6c0bae",
+  "generation": 3,
+  "revisionId": "8cecc00ea1ec6f07034ceafb68a5931ef1ff1f5faadb704b21cc931d7eaa3863",
+  "composition": {
+   "version": 1,
+   "declaration": {
+    "definitions": {
+     "pearl": "pearl.ts",
+     "kaleidoscope": "kaleidoscope.ts"
+    },
+    "nodes": [
+     {
+      "id": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "definition": "pearl"
+     },
+     {
+      "id": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+      "definition": "kaleidoscope"
+     }
+    ],
+    "edges": [
+     {
+      "id": "5a1c0e11-7f3b-4a8e-9d2c-000000000011",
+      "from": {
+       "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+       "portId": "image"
+      },
+      "to": {
+       "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+       "portId": "image"
+      },
+      "delay": "none"
+     }
+    ],
+    "output": {
+     "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+     "portId": "image"
+    },
+    "expose": [
+     {
+      "id": "spikeHeight",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "spikeHeight"
+     },
+     {
+      "id": "noiseScale",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "noiseScale"
+     },
+     {
+      "id": "sharpness",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "sharpness"
+     },
+     {
+      "id": "motionSpeed",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "motionSpeed"
+     },
+     {
+      "id": "breath",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "breath"
+     },
+     {
+      "id": "roughness",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "roughness"
+     },
+     {
+      "id": "glow",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "glow"
+     },
+     {
+      "id": "nacre",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "nacre"
+     },
+     {
+      "id": "bass",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "bass"
+     },
+     {
+      "id": "mids",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "mids"
+     },
+     {
+      "id": "highs",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "highs"
+     },
+     {
+      "id": "kick",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "kick"
+     },
+     {
+      "id": "sensitivity",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "sensitivity"
+     },
+     {
+      "id": "audioDrive",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "audioDrive"
+     },
+     {
+      "id": "spectrumGain",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "spectrumGain"
+     },
+     {
+      "id": "colorShift",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "colorShift"
+     },
+     {
+      "id": "colorSpeed",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "colorSpeed"
+     },
+     {
+      "id": "screenTint",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "screenTint"
+     },
+     {
+      "id": "ringBloom",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "ringBloom"
+     },
+     {
+      "id": "ringBloomPeriod",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "ringBloomPeriod"
+     },
+     {
+      "id": "ringEchoes",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "ringEchoes"
+     },
+     {
+      "id": "echoes",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "echoes"
+     },
+     {
+      "id": "companions",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "companions"
+     },
+     {
+      "id": "companionSize",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "companionSize"
+     },
+     {
+      "id": "companionReach",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "companionReach"
+     },
+     {
+      "id": "echoInterval",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+      "controlId": "echoInterval"
+     },
+     {
+      "id": "kaleidoSegments",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+      "controlId": "segments"
+     },
+     {
+      "id": "kaleidoPeriod",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+      "controlId": "period"
+     },
+     {
+      "id": "kaleidoOnFraction",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+      "controlId": "onFraction"
+     },
+     {
+      "id": "kaleidoTransition",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+      "controlId": "transition"
+     },
+     {
+      "id": "kaleidoSpin",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+      "controlId": "spin"
+     },
+     {
+      "id": "kaleidoAmount",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+      "controlId": "amount"
+     },
+     {
+      "id": "kaleidoForce",
+      "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+      "controlId": "force"
+     }
+    ],
+    "label": "Living Pearl - Spectral"
+   },
+   "definitionNames": {
+    "pearl": "e3b663454348e23f95379b99df62ec9b227de708dca417b7db3ba6bd35235117",
+    "kaleidoscope": "d360da07ca88e488b8bec7f0932fcffed83e64759fe848c55998d5a45d7ffcf7"
+   },
+   "moduleDeclarations": {
+    "738e7c93a6e9e18d018e40ef734a4381ea176a33cebf26c6e7bdb7a2ce57d440": {
+     "modulePath": "visual.ts",
+     "definitionNames": {
+      "pearl": "e3b663454348e23f95379b99df62ec9b227de708dca417b7db3ba6bd35235117",
+      "kaleidoscope": "d360da07ca88e488b8bec7f0932fcffed83e64759fe848c55998d5a45d7ffcf7"
+     },
+     "declaration": {
+      "definitions": {
+       "pearl": "pearl.ts",
+       "kaleidoscope": "kaleidoscope.ts"
+      },
+      "nodes": [
+       {
+        "id": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "definition": "pearl"
+       },
+       {
+        "id": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+        "definition": "kaleidoscope"
+       }
+      ],
+      "edges": [
+       {
+        "id": "5a1c0e11-7f3b-4a8e-9d2c-000000000011",
+        "from": {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "portId": "image"
+        },
+        "to": {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+         "portId": "image"
+        },
+        "delay": "none"
+       }
+      ],
+      "output": {
+       "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+       "portId": "image"
+      },
+      "expose": [
+       {
+        "id": "spikeHeight",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "spikeHeight"
+       },
+       {
+        "id": "noiseScale",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "noiseScale"
+       },
+       {
+        "id": "sharpness",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "sharpness"
+       },
+       {
+        "id": "motionSpeed",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "motionSpeed"
+       },
+       {
+        "id": "breath",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "breath"
+       },
+       {
+        "id": "roughness",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "roughness"
+       },
+       {
+        "id": "glow",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "glow"
+       },
+       {
+        "id": "nacre",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "nacre"
+       },
+       {
+        "id": "bass",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "bass"
+       },
+       {
+        "id": "mids",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "mids"
+       },
+       {
+        "id": "highs",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "highs"
+       },
+       {
+        "id": "kick",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "kick"
+       },
+       {
+        "id": "sensitivity",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "sensitivity"
+       },
+       {
+        "id": "audioDrive",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "audioDrive"
+       },
+       {
+        "id": "spectrumGain",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "spectrumGain"
+       },
+       {
+        "id": "colorShift",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "colorShift"
+       },
+       {
+        "id": "colorSpeed",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "colorSpeed"
+       },
+       {
+        "id": "screenTint",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "screenTint"
+       },
+       {
+        "id": "ringBloom",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "ringBloom"
+       },
+       {
+        "id": "ringBloomPeriod",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "ringBloomPeriod"
+       },
+       {
+        "id": "ringEchoes",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "ringEchoes"
+       },
+       {
+        "id": "echoes",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "echoes"
+       },
+       {
+        "id": "companions",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "companions"
+       },
+       {
+        "id": "companionSize",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "companionSize"
+       },
+       {
+        "id": "companionReach",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "companionReach"
+       },
+       {
+        "id": "echoInterval",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "controlId": "echoInterval"
+       },
+       {
+        "id": "kaleidoSegments",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+        "controlId": "segments"
+       },
+       {
+        "id": "kaleidoPeriod",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+        "controlId": "period"
+       },
+       {
+        "id": "kaleidoOnFraction",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+        "controlId": "onFraction"
+       },
+       {
+        "id": "kaleidoTransition",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+        "controlId": "transition"
+       },
+       {
+        "id": "kaleidoSpin",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+        "controlId": "spin"
+       },
+       {
+        "id": "kaleidoAmount",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+        "controlId": "amount"
+       },
+       {
+        "id": "kaleidoForce",
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+        "controlId": "force"
+       }
+      ],
+      "label": "Living Pearl - Spectral"
+     }
+    }
+   },
+   "graph": {
+    "version": 2,
+    "rootDefinitionHash": "738e7c93a6e9e18d018e40ef734a4381ea176a33cebf26c6e7bdb7a2ce57d440",
+    "outputPort": "image"
+   },
+   "definitions": {
+    "738e7c93a6e9e18d018e40ef734a4381ea176a33cebf26c6e7bdb7a2ce57d440": {
+     "kind": "graph",
+     "metadata": {
+      "declarationVersion": 1,
+      "key": "lux/image-composition",
+      "label": "Living Pearl - Spectral",
+      "description": "Authored image component chain",
+      "tags": [],
+      "inputs": {},
+      "outputs": {
+       "image": {
+        "type": {
+         "kind": "image",
+         "colorSpace": "linear-srgb",
+         "alphaMode": "premultiplied"
+        },
+        "label": "Image",
+        "description": "Image"
+       }
+      },
+      "controls": [
+       {
+        "id": "spikeHeight",
+        "type": "number",
+        "label": "Fold depth",
+        "default": 0.85,
+        "min": 0,
+        "max": 1.4,
+        "step": 0.01,
+        "description": "Fold depth.",
+        "group": "Body",
+        "changeCost": "live"
+       },
+       {
+        "id": "noiseScale",
+        "type": "number",
+        "label": "Fold scale",
+        "default": 3.4,
+        "min": 1,
+        "max": 7,
+        "step": 0.1,
+        "description": "Fold scale.",
+        "group": "Body",
+        "changeCost": "live"
+       },
+       {
+        "id": "sharpness",
+        "type": "number",
+        "label": "Fold definition",
+        "default": 3.2,
+        "min": 0.5,
+        "max": 5,
+        "step": 0.05,
+        "description": "Fold definition.",
+        "group": "Body",
+        "changeCost": "live"
+       },
+       {
+        "id": "motionSpeed",
+        "type": "number",
+        "label": "Life speed",
+        "default": 0.28,
+        "min": 0,
+        "max": 1.5,
+        "step": 0.01,
+        "description": "Life speed.",
+        "group": "Life",
+        "changeCost": "live"
+       },
+       {
+        "id": "breath",
+        "type": "number",
+        "label": "Breathing",
+        "default": 0.65,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "description": "Breathing.",
+        "group": "Life",
+        "changeCost": "live"
+       },
+       {
+        "id": "roughness",
+        "type": "number",
+        "label": "Skin roughness",
+        "default": 0.38,
+        "min": 0.12,
+        "max": 0.8,
+        "step": 0.01,
+        "description": "Skin roughness.",
+        "group": "Skin",
+        "changeCost": "live"
+       },
+       {
+        "id": "glow",
+        "type": "number",
+        "label": "Inner glow",
+        "default": 0.65,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "description": "Inner glow.",
+        "group": "Skin",
+        "changeCost": "live"
+       },
+       {
+        "id": "nacre",
+        "type": "number",
+        "label": "Nacre shimmer",
+        "default": 0.8,
+        "min": 0,
+        "max": 1.5,
+        "step": 0.01,
+        "description": "Nacre shimmer.",
+        "group": "Skin",
+        "changeCost": "live"
+       },
+       {
+        "id": "bass",
+        "type": "number",
+        "label": "Bass",
+        "default": 0,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "description": "Bass.",
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "mids",
+        "type": "number",
+        "label": "Mids",
+        "default": 0,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "description": "Mids.",
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "highs",
+        "type": "number",
+        "label": "Highs",
+        "default": 0,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "description": "Highs.",
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "kick",
+        "type": "number",
+        "label": "Kick",
+        "default": 0,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "description": "Kick.",
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "sensitivity",
+        "type": "number",
+        "label": "Audio sensitivity",
+        "default": 2.2,
+        "min": 0.5,
+        "max": 6,
+        "step": 0.05,
+        "description": "Audio sensitivity.",
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "audioDrive",
+        "type": "number",
+        "label": "Body response",
+        "default": 1.6,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "description": "Body response.",
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "spectrumGain",
+        "type": "number",
+        "label": "Spectrum",
+        "default": 1,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "description": "Spectrum.",
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "colorShift",
+        "type": "number",
+        "label": "Colour shift",
+        "default": 0.65,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "description": "Colour shift.",
+        "group": "Skin",
+        "changeCost": "live"
+       },
+       {
+        "id": "colorSpeed",
+        "type": "number",
+        "label": "Colour speed",
+        "default": 0.035,
+        "min": 0,
+        "max": 0.3,
+        "step": 0.001,
+        "description": "Colour speed.",
+        "group": "Skin",
+        "changeCost": "live"
+       },
+       {
+        "id": "screenTint",
+        "type": "number",
+        "label": "Screen tint",
+        "default": 0.7,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "description": "Screen tint.",
+        "group": "Skin",
+        "changeCost": "live"
+       },
+       {
+        "id": "ringBloom",
+        "type": "number",
+        "label": "Ring bloom",
+        "default": 1,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "description": "How far the occasional ring bloom spreads (0 off, 1 fills the screen).",
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "ringBloomPeriod",
+        "type": "number",
+        "label": "Ring bloom period (s)",
+        "default": 24,
+        "min": 6,
+        "max": 120,
+        "step": 0.5,
+        "description": "Seconds per bloom cycle.",
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "ringEchoes",
+        "type": "number",
+        "label": "Ring echoes",
+        "default": 2,
+        "min": 0,
+        "max": 2,
+        "step": 1,
+        "description": "Out-of-phase echo copies per spectrum ring (0-2).",
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "echoes",
+        "type": "number",
+        "label": "Echo trail",
+        "default": 1,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "description": "Echo trail.",
+        "group": "Echo",
+        "changeCost": "live"
+       },
+       {
+        "id": "companions",
+        "type": "number",
+        "label": "Companions",
+        "default": 42,
+        "min": 0,
+        "max": 96,
+        "step": 1,
+        "description": "Companions.",
+        "group": "Companions",
+        "changeCost": "live"
+       },
+       {
+        "id": "companionSize",
+        "type": "number",
+        "label": "Companion size",
+        "default": 1,
+        "min": 0.2,
+        "max": 3,
+        "step": 0.01,
+        "description": "Companion size.",
+        "group": "Companions",
+        "changeCost": "live"
+       },
+       {
+        "id": "companionReach",
+        "type": "number",
+        "label": "Streamer reach",
+        "default": 1,
+        "min": 0.3,
+        "max": 2,
+        "step": 0.01,
+        "description": "Streamer reach.",
+        "group": "Companions",
+        "changeCost": "live"
+       },
+       {
+        "id": "echoInterval",
+        "type": "number",
+        "label": "Echo spacing (s)",
+        "default": 0.6,
+        "min": 0.15,
+        "max": 3,
+        "step": 0.01,
+        "description": "Echo spacing (s).",
+        "group": "Echo",
+        "changeCost": "live"
+       },
+       {
+        "id": "kaleidoSegments",
+        "type": "number",
+        "label": "Segments",
+        "default": 6,
+        "min": 2,
+        "max": 16,
+        "step": 1,
+        "description": "Number of mirrored wedges around the centre.",
+        "group": "Kaleidoscope",
+        "changeCost": "live"
+       },
+       {
+        "id": "kaleidoPeriod",
+        "type": "number",
+        "label": "Cycle length",
+        "default": 16,
+        "min": 4,
+        "max": 120,
+        "step": 0.5,
+        "unit": "s",
+        "description": "Seconds for one full off-and-on cycle.",
+        "group": "Kaleidoscope",
+        "changeCost": "live"
+       },
+       {
+        "id": "kaleidoOnFraction",
+        "type": "number",
+        "label": "On fraction",
+        "default": 0.4,
+        "min": 0.05,
+        "max": 0.95,
+        "step": 0.01,
+        "description": "Share of each cycle in which the kaleidoscope is on, including its fades.",
+        "group": "Kaleidoscope",
+        "changeCost": "live"
+       },
+       {
+        "id": "kaleidoTransition",
+        "type": "number",
+        "label": "Transition",
+        "default": 2.5,
+        "min": 0.2,
+        "max": 10,
+        "step": 0.1,
+        "unit": "s",
+        "description": "Seconds to ease in and again to ease out. Limited to half the on time.",
+        "group": "Kaleidoscope",
+        "changeCost": "live"
+       },
+       {
+        "id": "kaleidoSpin",
+        "type": "number",
+        "label": "Spin",
+        "default": 0.08,
+        "min": -1,
+        "max": 1,
+        "step": 0.01,
+        "unit": "rad/s",
+        "description": "Rotation speed of the wedge pattern in radians per second.",
+        "group": "Kaleidoscope",
+        "changeCost": "live"
+       },
+       {
+        "id": "kaleidoAmount",
+        "type": "number",
+        "label": "Amount",
+        "default": 1,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "description": "Maximum blend toward the kaleidoscope. Zero keeps the original image.",
+        "group": "Kaleidoscope",
+        "changeCost": "live"
+       },
+       {
+        "id": "kaleidoForce",
+        "type": "number",
+        "label": "Force",
+        "default": 0,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "description": "Added to the cycle blend, so an audio or LFO binding can push the effect in at any time.",
+        "group": "Kaleidoscope",
+        "changeCost": "live"
+       }
+      ],
+      "controlDescriptions": {
+       "audioDrive": "Body response.",
+       "bass": "Bass.",
+       "breath": "Breathing.",
+       "colorShift": "Colour shift.",
+       "colorSpeed": "Colour speed.",
+       "companionReach": "Streamer reach.",
+       "companionSize": "Companion size.",
+       "companions": "Companions.",
+       "echoInterval": "Echo spacing (s).",
+       "echoes": "Echo trail.",
+       "glow": "Inner glow.",
+       "highs": "Highs.",
+       "kaleidoAmount": "Maximum blend toward the kaleidoscope. Zero keeps the original image.",
+       "kaleidoForce": "Added to the cycle blend, so an audio or LFO binding can push the effect in at any time.",
+       "kaleidoOnFraction": "Share of each cycle in which the kaleidoscope is on, including its fades.",
+       "kaleidoPeriod": "Seconds for one full off-and-on cycle.",
+       "kaleidoSegments": "Number of mirrored wedges around the centre.",
+       "kaleidoSpin": "Rotation speed of the wedge pattern in radians per second.",
+       "kaleidoTransition": "Seconds to ease in and again to ease out. Limited to half the on time.",
+       "kick": "Kick.",
+       "mids": "Mids.",
+       "motionSpeed": "Life speed.",
+       "nacre": "Nacre shimmer.",
+       "noiseScale": "Fold scale.",
+       "ringBloom": "How far the occasional ring bloom spreads (0 off, 1 fills the screen).",
+       "ringBloomPeriod": "Seconds per bloom cycle.",
+       "ringEchoes": "Out-of-phase echo copies per spectrum ring (0-2).",
+       "roughness": "Skin roughness.",
+       "screenTint": "Screen tint.",
+       "sensitivity": "Audio sensitivity.",
+       "sharpness": "Fold definition.",
+       "spectrumGain": "Spectrum.",
+       "spikeHeight": "Fold depth."
+      },
+      "lifecycle": {
+       "state": "stateful",
+       "reset": "seed"
+      }
+     },
+     "body": {
+      "nodes": [
+       {
+        "id": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+        "definitionHash": "e3b663454348e23f95379b99df62ec9b227de708dca417b7db3ba6bd35235117",
+        "controlDefaults": {}
+       },
+       {
+        "id": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+        "definitionHash": "d360da07ca88e488b8bec7f0932fcffed83e64759fe848c55998d5a45d7ffcf7",
+        "controlDefaults": {}
+       }
+      ],
+      "edges": [
+       {
+        "id": "5a1c0e11-7f3b-4a8e-9d2c-000000000011",
+        "from": {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "portId": "image"
+        },
+        "to": {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+         "portId": "image"
+        },
+        "delay": "none"
+       }
+      ],
+      "inputBindings": {},
+      "outputBindings": {
+       "image": {
+        "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+        "portId": "image"
+       }
+      },
+      "controlBindings": {
+       "audioDrive": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "audioDrive"
+        }
+       ],
+       "bass": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "bass"
+        }
+       ],
+       "breath": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "breath"
+        }
+       ],
+       "colorShift": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "colorShift"
+        }
+       ],
+       "colorSpeed": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "colorSpeed"
+        }
+       ],
+       "companionReach": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "companionReach"
+        }
+       ],
+       "companionSize": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "companionSize"
+        }
+       ],
+       "companions": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "companions"
+        }
+       ],
+       "echoInterval": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "echoInterval"
+        }
+       ],
+       "echoes": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "echoes"
+        }
+       ],
+       "glow": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "glow"
+        }
+       ],
+       "highs": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "highs"
+        }
+       ],
+       "kaleidoAmount": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+         "controlId": "amount"
+        }
+       ],
+       "kaleidoForce": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+         "controlId": "force"
+        }
+       ],
+       "kaleidoOnFraction": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+         "controlId": "onFraction"
+        }
+       ],
+       "kaleidoPeriod": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+         "controlId": "period"
+        }
+       ],
+       "kaleidoSegments": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+         "controlId": "segments"
+        }
+       ],
+       "kaleidoSpin": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+         "controlId": "spin"
+        }
+       ],
+       "kaleidoTransition": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000002",
+         "controlId": "transition"
+        }
+       ],
+       "kick": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "kick"
+        }
+       ],
+       "mids": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "mids"
+        }
+       ],
+       "motionSpeed": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "motionSpeed"
+        }
+       ],
+       "nacre": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "nacre"
+        }
+       ],
+       "noiseScale": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "noiseScale"
+        }
+       ],
+       "ringBloom": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "ringBloom"
+        }
+       ],
+       "ringBloomPeriod": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "ringBloomPeriod"
+        }
+       ],
+       "ringEchoes": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "ringEchoes"
+        }
+       ],
+       "roughness": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "roughness"
+        }
+       ],
+       "screenTint": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "screenTint"
+        }
+       ],
+       "sensitivity": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "sensitivity"
+        }
+       ],
+       "sharpness": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "sharpness"
+        }
+       ],
+       "spectrumGain": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "spectrumGain"
+        }
+       ],
+       "spikeHeight": [
+        {
+         "nodeId": "5a1c0e11-7f3b-4a8e-9d2c-000000000001",
+         "controlId": "spikeHeight"
+        }
+       ]
+      }
+     }
+    },
+    "d360da07ca88e488b8bec7f0932fcffed83e64759fe848c55998d5a45d7ffcf7": {
+     "kind": "code",
+     "metadata": {
+      "declarationVersion": 1,
+      "key": "effects/kaleidoscope-cycle",
+      "label": "Kaleidoscope Cycle",
+      "description": "Mirrored-wedge kaleidoscope that slowly rotates and fades in and out on a regular cycle.",
+      "tags": [
+       "effect",
+       "kaleidoscope",
+       "mirror"
+      ],
+      "inputs": {
+       "image": {
+        "type": {
+         "kind": "image",
+         "colorSpace": "linear-srgb",
+         "alphaMode": "premultiplied"
+        },
+        "label": "Image",
+        "description": "Image to fold into mirrored wedges."
+       }
+      },
+      "outputs": {
+       "image": {
+        "type": {
+         "kind": "image",
+         "colorSpace": "linear-srgb",
+         "alphaMode": "premultiplied"
+        },
+        "label": "Image",
+        "description": "Image with the cycling kaleidoscope applied."
+       }
+      },
+      "controls": [
+       {
+        "id": "segments",
+        "type": "number",
+        "label": "Segments",
+        "default": 6,
+        "min": 2,
+        "max": 16,
+        "step": 1,
+        "group": "Kaleidoscope",
+        "changeCost": "live"
+       },
+       {
+        "id": "period",
+        "type": "number",
+        "label": "Cycle length",
+        "default": 16,
+        "min": 4,
+        "max": 120,
+        "step": 0.5,
+        "unit": "s",
+        "group": "Kaleidoscope",
+        "changeCost": "live"
+       },
+       {
+        "id": "onFraction",
+        "type": "number",
+        "label": "On fraction",
+        "default": 0.4,
+        "min": 0.05,
+        "max": 0.95,
+        "step": 0.01,
+        "group": "Kaleidoscope",
+        "changeCost": "live"
+       },
+       {
+        "id": "transition",
+        "type": "number",
+        "label": "Transition",
+        "default": 2.5,
+        "min": 0.2,
+        "max": 10,
+        "step": 0.1,
+        "unit": "s",
+        "group": "Kaleidoscope",
+        "changeCost": "live"
+       },
+       {
+        "id": "spin",
+        "type": "number",
+        "label": "Spin",
+        "default": 0.08,
+        "min": -1,
+        "max": 1,
+        "step": 0.01,
+        "unit": "rad/s",
+        "group": "Kaleidoscope",
+        "changeCost": "live"
+       },
+       {
+        "id": "amount",
+        "type": "number",
+        "label": "Amount",
+        "default": 1,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "group": "Kaleidoscope",
+        "changeCost": "live"
+       },
+       {
+        "id": "force",
+        "type": "number",
+        "label": "Force",
+        "default": 0,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "group": "Kaleidoscope",
+        "changeCost": "live"
+       }
+      ],
+      "controlDescriptions": {
+       "amount": "Maximum blend toward the kaleidoscope. Zero keeps the original image.",
+       "force": "Added to the cycle blend, so an audio or LFO binding can push the effect in at any time.",
+       "onFraction": "Share of each cycle in which the kaleidoscope is on, including its fades.",
+       "period": "Seconds for one full off-and-on cycle.",
+       "segments": "Number of mirrored wedges around the centre.",
+       "spin": "Rotation speed of the wedge pattern in radians per second.",
+       "transition": "Seconds to ease in and again to ease out. Limited to half the on time."
+      },
+      "lifecycle": {
+       "state": "stateful",
+       "reset": "seed"
+      }
+     }
+    },
+    "e3b663454348e23f95379b99df62ec9b227de708dca417b7db3ba6bd35235117": {
+     "kind": "code",
+     "metadata": {
+      "declarationVersion": 1,
+      "key": "living-pearl/scene",
+      "label": "Living Pearl",
+      "description": "Audio-reactive nacre pearl with spectral halo, companions and echoes.",
+      "tags": [
+       "audio",
+       "pearl"
+      ],
+      "inputs": {},
+      "outputs": {
+       "image": {
+        "type": {
+         "kind": "image",
+         "colorSpace": "linear-srgb",
+         "alphaMode": "premultiplied"
+        },
+        "label": "Image",
+        "description": "Rendered pearl scene."
+       }
+      },
+      "controls": [
+       {
+        "id": "spikeHeight",
+        "type": "number",
+        "label": "Fold depth",
+        "default": 0.85,
+        "min": 0,
+        "max": 1.4,
+        "step": 0.01,
+        "group": "Body",
+        "changeCost": "live"
+       },
+       {
+        "id": "noiseScale",
+        "type": "number",
+        "label": "Fold scale",
+        "default": 3.4,
+        "min": 1,
+        "max": 7,
+        "step": 0.1,
+        "group": "Body",
+        "changeCost": "live"
+       },
+       {
+        "id": "sharpness",
+        "type": "number",
+        "label": "Fold definition",
+        "default": 3.2,
+        "min": 0.5,
+        "max": 5,
+        "step": 0.05,
+        "group": "Body",
+        "changeCost": "live"
+       },
+       {
+        "id": "motionSpeed",
+        "type": "number",
+        "label": "Life speed",
+        "default": 0.28,
+        "min": 0,
+        "max": 1.5,
+        "step": 0.01,
+        "group": "Life",
+        "changeCost": "live"
+       },
+       {
+        "id": "breath",
+        "type": "number",
+        "label": "Breathing",
+        "default": 0.65,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "group": "Life",
+        "changeCost": "live"
+       },
+       {
+        "id": "roughness",
+        "type": "number",
+        "label": "Skin roughness",
+        "default": 0.38,
+        "min": 0.12,
+        "max": 0.8,
+        "step": 0.01,
+        "group": "Skin",
+        "changeCost": "live"
+       },
+       {
+        "id": "glow",
+        "type": "number",
+        "label": "Inner glow",
+        "default": 0.65,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "group": "Skin",
+        "changeCost": "live"
+       },
+       {
+        "id": "nacre",
+        "type": "number",
+        "label": "Nacre shimmer",
+        "default": 0.8,
+        "min": 0,
+        "max": 1.5,
+        "step": 0.01,
+        "group": "Skin",
+        "changeCost": "live"
+       },
+       {
+        "id": "bass",
+        "type": "number",
+        "label": "Bass",
+        "default": 0,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "mids",
+        "type": "number",
+        "label": "Mids",
+        "default": 0,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "highs",
+        "type": "number",
+        "label": "Highs",
+        "default": 0,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "kick",
+        "type": "number",
+        "label": "Kick",
+        "default": 0,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "sensitivity",
+        "type": "number",
+        "label": "Audio sensitivity",
+        "default": 2.2,
+        "min": 0.5,
+        "max": 6,
+        "step": 0.05,
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "audioDrive",
+        "type": "number",
+        "label": "Body response",
+        "default": 1.6,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "spectrumGain",
+        "type": "number",
+        "label": "Spectrum",
+        "default": 1,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "colorShift",
+        "type": "number",
+        "label": "Colour shift",
+        "default": 0.65,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "group": "Skin",
+        "changeCost": "live"
+       },
+       {
+        "id": "colorSpeed",
+        "type": "number",
+        "label": "Colour speed",
+        "default": 0.035,
+        "min": 0,
+        "max": 0.3,
+        "step": 0.001,
+        "group": "Skin",
+        "changeCost": "live"
+       },
+       {
+        "id": "screenTint",
+        "type": "number",
+        "label": "Screen tint",
+        "default": 0.7,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "group": "Skin",
+        "changeCost": "live"
+       },
+       {
+        "id": "ringBloom",
+        "type": "number",
+        "label": "Ring bloom",
+        "default": 1,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "ringBloomPeriod",
+        "type": "number",
+        "label": "Ring bloom period (s)",
+        "default": 24,
+        "min": 6,
+        "max": 120,
+        "step": 0.5,
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "ringEchoes",
+        "type": "number",
+        "label": "Ring echoes",
+        "default": 2,
+        "min": 0,
+        "max": 2,
+        "step": 1,
+        "group": "Audio",
+        "changeCost": "live"
+       },
+       {
+        "id": "echoes",
+        "type": "number",
+        "label": "Echo trail",
+        "default": 1,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "group": "Echo",
+        "changeCost": "live"
+       },
+       {
+        "id": "companions",
+        "type": "number",
+        "label": "Companions",
+        "default": 42,
+        "min": 0,
+        "max": 96,
+        "step": 1,
+        "group": "Companions",
+        "changeCost": "live"
+       },
+       {
+        "id": "companionSize",
+        "type": "number",
+        "label": "Companion size",
+        "default": 1,
+        "min": 0.2,
+        "max": 3,
+        "step": 0.01,
+        "group": "Companions",
+        "changeCost": "live"
+       },
+       {
+        "id": "companionReach",
+        "type": "number",
+        "label": "Streamer reach",
+        "default": 1,
+        "min": 0.3,
+        "max": 2,
+        "step": 0.01,
+        "group": "Companions",
+        "changeCost": "live"
+       },
+       {
+        "id": "echoInterval",
+        "type": "number",
+        "label": "Echo spacing (s)",
+        "default": 0.6,
+        "min": 0.15,
+        "max": 3,
+        "step": 0.01,
+        "group": "Echo",
+        "changeCost": "live"
+       }
+      ],
+      "controlDescriptions": {
+       "audioDrive": "Body response.",
+       "bass": "Bass.",
+       "breath": "Breathing.",
+       "colorShift": "Colour shift.",
+       "colorSpeed": "Colour speed.",
+       "companionReach": "Streamer reach.",
+       "companionSize": "Companion size.",
+       "companions": "Companions.",
+       "echoInterval": "Echo spacing (s).",
+       "echoes": "Echo trail.",
+       "glow": "Inner glow.",
+       "highs": "Highs.",
+       "kick": "Kick.",
+       "mids": "Mids.",
+       "motionSpeed": "Life speed.",
+       "nacre": "Nacre shimmer.",
+       "noiseScale": "Fold scale.",
+       "ringBloom": "How far the occasional ring bloom spreads (0 off, 1 fills the screen).",
+       "ringBloomPeriod": "Seconds per bloom cycle.",
+       "ringEchoes": "Out-of-phase echo copies per spectrum ring (0-2).",
+       "roughness": "Skin roughness.",
+       "screenTint": "Screen tint.",
+       "sensitivity": "Audio sensitivity.",
+       "sharpness": "Fold definition.",
+       "spectrumGain": "Spectrum.",
+       "spikeHeight": "Fold depth."
+      },
+      "lifecycle": {
+       "state": "stateful",
+       "reset": "seed"
+      }
+     }
+    }
+   },
+   "publicControls": [
+    {
+     "id": "spikeHeight",
+     "type": "number",
+     "label": "Fold depth",
+     "default": 0.85,
+     "min": 0,
+     "max": 1.4,
+     "step": 0.01,
+     "description": "Fold depth.",
+     "group": "Body",
+     "changeCost": "live"
+    },
+    {
+     "id": "noiseScale",
+     "type": "number",
+     "label": "Fold scale",
+     "default": 3.4,
+     "min": 1,
+     "max": 7,
+     "step": 0.1,
+     "description": "Fold scale.",
+     "group": "Body",
+     "changeCost": "live"
+    },
+    {
+     "id": "sharpness",
+     "type": "number",
+     "label": "Fold definition",
+     "default": 3.2,
+     "min": 0.5,
+     "max": 5,
+     "step": 0.05,
+     "description": "Fold definition.",
+     "group": "Body",
+     "changeCost": "live"
+    },
+    {
+     "id": "motionSpeed",
+     "type": "number",
+     "label": "Life speed",
+     "default": 0.28,
+     "min": 0,
+     "max": 1.5,
+     "step": 0.01,
+     "description": "Life speed.",
+     "group": "Life",
+     "changeCost": "live"
+    },
+    {
+     "id": "breath",
+     "type": "number",
+     "label": "Breathing",
+     "default": 0.65,
+     "min": 0,
+     "max": 1,
+     "step": 0.01,
+     "description": "Breathing.",
+     "group": "Life",
+     "changeCost": "live"
+    },
+    {
+     "id": "roughness",
+     "type": "number",
+     "label": "Skin roughness",
+     "default": 0.38,
+     "min": 0.12,
+     "max": 0.8,
+     "step": 0.01,
+     "description": "Skin roughness.",
+     "group": "Skin",
+     "changeCost": "live"
+    },
+    {
+     "id": "glow",
+     "type": "number",
+     "label": "Inner glow",
+     "default": 0.65,
+     "min": 0,
+     "max": 2,
+     "step": 0.01,
+     "description": "Inner glow.",
+     "group": "Skin",
+     "changeCost": "live"
+    },
+    {
+     "id": "nacre",
+     "type": "number",
+     "label": "Nacre shimmer",
+     "default": 0.8,
+     "min": 0,
+     "max": 1.5,
+     "step": 0.01,
+     "description": "Nacre shimmer.",
+     "group": "Skin",
+     "changeCost": "live"
+    },
+    {
+     "id": "bass",
+     "type": "number",
+     "label": "Bass",
+     "default": 0,
+     "min": 0,
+     "max": 1,
+     "step": 0.01,
+     "description": "Bass.",
+     "group": "Audio",
+     "changeCost": "live"
+    },
+    {
+     "id": "mids",
+     "type": "number",
+     "label": "Mids",
+     "default": 0,
+     "min": 0,
+     "max": 1,
+     "step": 0.01,
+     "description": "Mids.",
+     "group": "Audio",
+     "changeCost": "live"
+    },
+    {
+     "id": "highs",
+     "type": "number",
+     "label": "Highs",
+     "default": 0,
+     "min": 0,
+     "max": 1,
+     "step": 0.01,
+     "description": "Highs.",
+     "group": "Audio",
+     "changeCost": "live"
+    },
+    {
+     "id": "kick",
+     "type": "number",
+     "label": "Kick",
+     "default": 0,
+     "min": 0,
+     "max": 1,
+     "step": 0.01,
+     "description": "Kick.",
+     "group": "Audio",
+     "changeCost": "live"
+    },
+    {
+     "id": "sensitivity",
+     "type": "number",
+     "label": "Audio sensitivity",
+     "default": 2.2,
+     "min": 0.5,
+     "max": 6,
+     "step": 0.05,
+     "description": "Audio sensitivity.",
+     "group": "Audio",
+     "changeCost": "live"
+    },
+    {
+     "id": "audioDrive",
+     "type": "number",
+     "label": "Body response",
+     "default": 1.6,
+     "min": 0,
+     "max": 2,
+     "step": 0.01,
+     "description": "Body response.",
+     "group": "Audio",
+     "changeCost": "live"
+    },
+    {
+     "id": "spectrumGain",
+     "type": "number",
+     "label": "Spectrum",
+     "default": 1,
+     "min": 0,
+     "max": 2,
+     "step": 0.01,
+     "description": "Spectrum.",
+     "group": "Audio",
+     "changeCost": "live"
+    },
+    {
+     "id": "colorShift",
+     "type": "number",
+     "label": "Colour shift",
+     "default": 0.65,
+     "min": 0,
+     "max": 1,
+     "step": 0.01,
+     "description": "Colour shift.",
+     "group": "Skin",
+     "changeCost": "live"
+    },
+    {
+     "id": "colorSpeed",
+     "type": "number",
+     "label": "Colour speed",
+     "default": 0.035,
+     "min": 0,
+     "max": 0.3,
+     "step": 0.001,
+     "description": "Colour speed.",
+     "group": "Skin",
+     "changeCost": "live"
+    },
+    {
+     "id": "screenTint",
+     "type": "number",
+     "label": "Screen tint",
+     "default": 0.7,
+     "min": 0,
+     "max": 2,
+     "step": 0.01,
+     "description": "Screen tint.",
+     "group": "Skin",
+     "changeCost": "live"
+    },
+    {
+     "id": "ringBloom",
+     "type": "number",
+     "label": "Ring bloom",
+     "default": 1,
+     "min": 0,
+     "max": 1,
+     "step": 0.01,
+     "description": "How far the occasional ring bloom spreads (0 off, 1 fills the screen).",
+     "group": "Audio",
+     "changeCost": "live"
+    },
+    {
+     "id": "ringBloomPeriod",
+     "type": "number",
+     "label": "Ring bloom period (s)",
+     "default": 24,
+     "min": 6,
+     "max": 120,
+     "step": 0.5,
+     "description": "Seconds per bloom cycle.",
+     "group": "Audio",
+     "changeCost": "live"
+    },
+    {
+     "id": "ringEchoes",
+     "type": "number",
+     "label": "Ring echoes",
+     "default": 2,
+     "min": 0,
+     "max": 2,
+     "step": 1,
+     "description": "Out-of-phase echo copies per spectrum ring (0-2).",
+     "group": "Audio",
+     "changeCost": "live"
+    },
+    {
+     "id": "echoes",
+     "type": "number",
+     "label": "Echo trail",
+     "default": 1,
+     "min": 0,
+     "max": 2,
+     "step": 0.01,
+     "description": "Echo trail.",
+     "group": "Echo",
+     "changeCost": "live"
+    },
+    {
+     "id": "companions",
+     "type": "number",
+     "label": "Companions",
+     "default": 42,
+     "min": 0,
+     "max": 96,
+     "step": 1,
+     "description": "Companions.",
+     "group": "Companions",
+     "changeCost": "live"
+    },
+    {
+     "id": "companionSize",
+     "type": "number",
+     "label": "Companion size",
+     "default": 1,
+     "min": 0.2,
+     "max": 3,
+     "step": 0.01,
+     "description": "Companion size.",
+     "group": "Companions",
+     "changeCost": "live"
+    },
+    {
+     "id": "companionReach",
+     "type": "number",
+     "label": "Streamer reach",
+     "default": 1,
+     "min": 0.3,
+     "max": 2,
+     "step": 0.01,
+     "description": "Streamer reach.",
+     "group": "Companions",
+     "changeCost": "live"
+    },
+    {
+     "id": "echoInterval",
+     "type": "number",
+     "label": "Echo spacing (s)",
+     "default": 0.6,
+     "min": 0.15,
+     "max": 3,
+     "step": 0.01,
+     "description": "Echo spacing (s).",
+     "group": "Echo",
+     "changeCost": "live"
+    },
+    {
+     "id": "kaleidoSegments",
+     "type": "number",
+     "label": "Segments",
+     "default": 6,
+     "min": 2,
+     "max": 16,
+     "step": 1,
+     "description": "Number of mirrored wedges around the centre.",
+     "group": "Kaleidoscope",
+     "changeCost": "live"
+    },
+    {
+     "id": "kaleidoPeriod",
+     "type": "number",
+     "label": "Cycle length",
+     "default": 16,
+     "min": 4,
+     "max": 120,
+     "step": 0.5,
+     "unit": "s",
+     "description": "Seconds for one full off-and-on cycle.",
+     "group": "Kaleidoscope",
+     "changeCost": "live"
+    },
+    {
+     "id": "kaleidoOnFraction",
+     "type": "number",
+     "label": "On fraction",
+     "default": 0.4,
+     "min": 0.05,
+     "max": 0.95,
+     "step": 0.01,
+     "description": "Share of each cycle in which the kaleidoscope is on, including its fades.",
+     "group": "Kaleidoscope",
+     "changeCost": "live"
+    },
+    {
+     "id": "kaleidoTransition",
+     "type": "number",
+     "label": "Transition",
+     "default": 2.5,
+     "min": 0.2,
+     "max": 10,
+     "step": 0.1,
+     "unit": "s",
+     "description": "Seconds to ease in and again to ease out. Limited to half the on time.",
+     "group": "Kaleidoscope",
+     "changeCost": "live"
+    },
+    {
+     "id": "kaleidoSpin",
+     "type": "number",
+     "label": "Spin",
+     "default": 0.08,
+     "min": -1,
+     "max": 1,
+     "step": 0.01,
+     "unit": "rad/s",
+     "description": "Rotation speed of the wedge pattern in radians per second.",
+     "group": "Kaleidoscope",
+     "changeCost": "live"
+    },
+    {
+     "id": "kaleidoAmount",
+     "type": "number",
+     "label": "Amount",
+     "default": 1,
+     "min": 0,
+     "max": 1,
+     "step": 0.01,
+     "description": "Maximum blend toward the kaleidoscope. Zero keeps the original image.",
+     "group": "Kaleidoscope",
+     "changeCost": "live"
+    },
+    {
+     "id": "kaleidoForce",
+     "type": "number",
+     "label": "Force",
+     "default": 0,
+     "min": 0,
+     "max": 1,
+     "step": 0.01,
+     "description": "Added to the cycle blend, so an audio or LFO binding can push the effect in at any time.",
+     "group": "Kaleidoscope",
+     "changeCost": "live"
+    }
+   ],
+   "publicControlBindings": {
+    "spikeHeight": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "spikeHeight",
+      "active": true
+     }
+    ],
+    "noiseScale": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "noiseScale",
+      "active": true
+     }
+    ],
+    "sharpness": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "sharpness",
+      "active": true
+     }
+    ],
+    "motionSpeed": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "motionSpeed",
+      "active": true
+     }
+    ],
+    "breath": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "breath",
+      "active": true
+     }
+    ],
+    "roughness": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "roughness",
+      "active": true
+     }
+    ],
+    "glow": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "glow",
+      "active": true
+     }
+    ],
+    "nacre": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "nacre",
+      "active": true
+     }
+    ],
+    "bass": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "bass",
+      "active": true
+     }
+    ],
+    "mids": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "mids",
+      "active": true
+     }
+    ],
+    "highs": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "highs",
+      "active": true
+     }
+    ],
+    "kick": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "kick",
+      "active": true
+     }
+    ],
+    "sensitivity": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "sensitivity",
+      "active": true
+     }
+    ],
+    "audioDrive": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "audioDrive",
+      "active": true
+     }
+    ],
+    "spectrumGain": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "spectrumGain",
+      "active": true
+     }
+    ],
+    "colorShift": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "colorShift",
+      "active": true
+     }
+    ],
+    "colorSpeed": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "colorSpeed",
+      "active": true
+     }
+    ],
+    "screenTint": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "screenTint",
+      "active": true
+     }
+    ],
+    "ringBloom": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "ringBloom",
+      "active": true
+     }
+    ],
+    "ringBloomPeriod": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "ringBloomPeriod",
+      "active": true
+     }
+    ],
+    "ringEchoes": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "ringEchoes",
+      "active": true
+     }
+    ],
+    "echoes": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "echoes",
+      "active": true
+     }
+    ],
+    "companions": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "companions",
+      "active": true
+     }
+    ],
+    "companionSize": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "companionSize",
+      "active": true
+     }
+    ],
+    "companionReach": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "companionReach",
+      "active": true
+     }
+    ],
+    "echoInterval": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+      ],
+      "controlId": "echoInterval",
+      "active": true
+     }
+    ],
+    "kaleidoSegments": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000002"
+      ],
+      "controlId": "segments",
+      "active": true
+     }
+    ],
+    "kaleidoPeriod": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000002"
+      ],
+      "controlId": "period",
+      "active": true
+     }
+    ],
+    "kaleidoOnFraction": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000002"
+      ],
+      "controlId": "onFraction",
+      "active": true
+     }
+    ],
+    "kaleidoTransition": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000002"
+      ],
+      "controlId": "transition",
+      "active": true
+     }
+    ],
+    "kaleidoSpin": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000002"
+      ],
+      "controlId": "spin",
+      "active": true
+     }
+    ],
+    "kaleidoAmount": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000002"
+      ],
+      "controlId": "amount",
+      "active": true
+     }
+    ],
+    "kaleidoForce": [
+     {
+      "nodePath": [
+       "5a1c0e11-7f3b-4a8e-9d2c-000000000002"
+      ],
+      "controlId": "force",
+      "active": true
+     }
+    ]
+   },
+   "nodes": [
+    {
+     "nodePath": [
+      "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+     ],
+     "definitionHash": "e3b663454348e23f95379b99df62ec9b227de708dca417b7db3ba6bd35235117",
+     "schema": [
+      {
+       "id": "spikeHeight",
+       "type": "number",
+       "label": "Fold depth",
+       "default": 0.85,
+       "min": 0,
+       "max": 1.4,
+       "step": 0.01,
+       "group": "Body",
+       "changeCost": "live"
+      },
+      {
+       "id": "noiseScale",
+       "type": "number",
+       "label": "Fold scale",
+       "default": 3.4,
+       "min": 1,
+       "max": 7,
+       "step": 0.1,
+       "group": "Body",
+       "changeCost": "live"
+      },
+      {
+       "id": "sharpness",
+       "type": "number",
+       "label": "Fold definition",
+       "default": 3.2,
+       "min": 0.5,
+       "max": 5,
+       "step": 0.05,
+       "group": "Body",
+       "changeCost": "live"
+      },
+      {
+       "id": "motionSpeed",
+       "type": "number",
+       "label": "Life speed",
+       "default": 0.28,
+       "min": 0,
+       "max": 1.5,
+       "step": 0.01,
+       "group": "Life",
+       "changeCost": "live"
+      },
+      {
+       "id": "breath",
+       "type": "number",
+       "label": "Breathing",
+       "default": 0.65,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Life",
+       "changeCost": "live"
+      },
+      {
+       "id": "roughness",
+       "type": "number",
+       "label": "Skin roughness",
+       "default": 0.38,
+       "min": 0.12,
+       "max": 0.8,
+       "step": 0.01,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "glow",
+       "type": "number",
+       "label": "Inner glow",
+       "default": 0.65,
+       "min": 0,
+       "max": 2,
+       "step": 0.01,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "nacre",
+       "type": "number",
+       "label": "Nacre shimmer",
+       "default": 0.8,
+       "min": 0,
+       "max": 1.5,
+       "step": 0.01,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "bass",
+       "type": "number",
+       "label": "Bass",
+       "default": 0,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "mids",
+       "type": "number",
+       "label": "Mids",
+       "default": 0,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "highs",
+       "type": "number",
+       "label": "Highs",
+       "default": 0,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "kick",
+       "type": "number",
+       "label": "Kick",
+       "default": 0,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "sensitivity",
+       "type": "number",
+       "label": "Audio sensitivity",
+       "default": 2.2,
+       "min": 0.5,
+       "max": 6,
+       "step": 0.05,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "audioDrive",
+       "type": "number",
+       "label": "Body response",
+       "default": 1.6,
+       "min": 0,
+       "max": 2,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "spectrumGain",
+       "type": "number",
+       "label": "Spectrum",
+       "default": 1,
+       "min": 0,
+       "max": 2,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "colorShift",
+       "type": "number",
+       "label": "Colour shift",
+       "default": 0.65,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "colorSpeed",
+       "type": "number",
+       "label": "Colour speed",
+       "default": 0.035,
+       "min": 0,
+       "max": 0.3,
+       "step": 0.001,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "screenTint",
+       "type": "number",
+       "label": "Screen tint",
+       "default": 0.7,
+       "min": 0,
+       "max": 2,
+       "step": 0.01,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "ringBloom",
+       "type": "number",
+       "label": "Ring bloom",
+       "default": 1,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "ringBloomPeriod",
+       "type": "number",
+       "label": "Ring bloom period (s)",
+       "default": 24,
+       "min": 6,
+       "max": 120,
+       "step": 0.5,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "ringEchoes",
+       "type": "number",
+       "label": "Ring echoes",
+       "default": 2,
+       "min": 0,
+       "max": 2,
+       "step": 1,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "echoes",
+       "type": "number",
+       "label": "Echo trail",
+       "default": 1,
+       "min": 0,
+       "max": 2,
+       "step": 0.01,
+       "group": "Echo",
+       "changeCost": "live"
+      },
+      {
+       "id": "companions",
+       "type": "number",
+       "label": "Companions",
+       "default": 42,
+       "min": 0,
+       "max": 96,
+       "step": 1,
+       "group": "Companions",
+       "changeCost": "live"
+      },
+      {
+       "id": "companionSize",
+       "type": "number",
+       "label": "Companion size",
+       "default": 1,
+       "min": 0.2,
+       "max": 3,
+       "step": 0.01,
+       "group": "Companions",
+       "changeCost": "live"
+      },
+      {
+       "id": "companionReach",
+       "type": "number",
+       "label": "Streamer reach",
+       "default": 1,
+       "min": 0.3,
+       "max": 2,
+       "step": 0.01,
+       "group": "Companions",
+       "changeCost": "live"
+      },
+      {
+       "id": "echoInterval",
+       "type": "number",
+       "label": "Echo spacing (s)",
+       "default": 0.6,
+       "min": 0.15,
+       "max": 3,
+       "step": 0.01,
+       "group": "Echo",
+       "changeCost": "live"
+      }
+     ],
+     "schemaHash": "53726a19a765353dda8c1974aecb04d6ed0fb369615025b8b328193685120e06"
+    },
+    {
+     "nodePath": [
+      "5a1c0e11-7f3b-4a8e-9d2c-000000000002"
+     ],
+     "definitionHash": "d360da07ca88e488b8bec7f0932fcffed83e64759fe848c55998d5a45d7ffcf7",
+     "schema": [
+      {
+       "id": "segments",
+       "type": "number",
+       "label": "Segments",
+       "default": 6,
+       "min": 2,
+       "max": 16,
+       "step": 1,
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "period",
+       "type": "number",
+       "label": "Cycle length",
+       "default": 16,
+       "min": 4,
+       "max": 120,
+       "step": 0.5,
+       "unit": "s",
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "onFraction",
+       "type": "number",
+       "label": "On fraction",
+       "default": 0.4,
+       "min": 0.05,
+       "max": 0.95,
+       "step": 0.01,
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "transition",
+       "type": "number",
+       "label": "Transition",
+       "default": 2.5,
+       "min": 0.2,
+       "max": 10,
+       "step": 0.1,
+       "unit": "s",
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "spin",
+       "type": "number",
+       "label": "Spin",
+       "default": 0.08,
+       "min": -1,
+       "max": 1,
+       "step": 0.01,
+       "unit": "rad/s",
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "amount",
+       "type": "number",
+       "label": "Amount",
+       "default": 1,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "force",
+       "type": "number",
+       "label": "Force",
+       "default": 0,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      }
+     ],
+     "schemaHash": "6762605c8d0aa96170da9bb0e7141cde450cd848549e62c00e5a4ce9f3fcd3ac"
+    }
+   ]
+  },
+  "sceneName": "Untitled visual",
+  "authority": "studio",
+  "playback": "playing",
+  "sdkVersion": "0.4.0",
+  "controlSchema": [
+   {
+    "id": "spikeHeight",
+    "type": "number",
+    "label": "Fold depth",
+    "default": 0.85,
+    "min": 0,
+    "max": 1.4,
+    "step": 0.01,
+    "description": "Fold depth.",
+    "group": "Body",
+    "changeCost": "live"
+   },
+   {
+    "id": "noiseScale",
+    "type": "number",
+    "label": "Fold scale",
+    "default": 3.4,
+    "min": 1,
+    "max": 7,
+    "step": 0.1,
+    "description": "Fold scale.",
+    "group": "Body",
+    "changeCost": "live"
+   },
+   {
+    "id": "sharpness",
+    "type": "number",
+    "label": "Fold definition",
+    "default": 3.2,
+    "min": 0.5,
+    "max": 5,
+    "step": 0.05,
+    "description": "Fold definition.",
+    "group": "Body",
+    "changeCost": "live"
+   },
+   {
+    "id": "motionSpeed",
+    "type": "number",
+    "label": "Life speed",
+    "default": 0.28,
+    "min": 0,
+    "max": 1.5,
+    "step": 0.01,
+    "description": "Life speed.",
+    "group": "Life",
+    "changeCost": "live"
+   },
+   {
+    "id": "breath",
+    "type": "number",
+    "label": "Breathing",
+    "default": 0.65,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "description": "Breathing.",
+    "group": "Life",
+    "changeCost": "live"
+   },
+   {
+    "id": "roughness",
+    "type": "number",
+    "label": "Skin roughness",
+    "default": 0.38,
+    "min": 0.12,
+    "max": 0.8,
+    "step": 0.01,
+    "description": "Skin roughness.",
+    "group": "Skin",
+    "changeCost": "live"
+   },
+   {
+    "id": "glow",
+    "type": "number",
+    "label": "Inner glow",
+    "default": 0.65,
+    "min": 0,
+    "max": 2,
+    "step": 0.01,
+    "description": "Inner glow.",
+    "group": "Skin",
+    "changeCost": "live"
+   },
+   {
+    "id": "nacre",
+    "type": "number",
+    "label": "Nacre shimmer",
+    "default": 0.8,
+    "min": 0,
+    "max": 1.5,
+    "step": 0.01,
+    "description": "Nacre shimmer.",
+    "group": "Skin",
+    "changeCost": "live"
+   },
+   {
+    "id": "bass",
+    "type": "number",
+    "label": "Bass",
+    "default": 0,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "description": "Bass.",
+    "group": "Audio",
+    "changeCost": "live"
+   },
+   {
+    "id": "mids",
+    "type": "number",
+    "label": "Mids",
+    "default": 0,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "description": "Mids.",
+    "group": "Audio",
+    "changeCost": "live"
+   },
+   {
+    "id": "highs",
+    "type": "number",
+    "label": "Highs",
+    "default": 0,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "description": "Highs.",
+    "group": "Audio",
+    "changeCost": "live"
+   },
+   {
+    "id": "kick",
+    "type": "number",
+    "label": "Kick",
+    "default": 0,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "description": "Kick.",
+    "group": "Audio",
+    "changeCost": "live"
+   },
+   {
+    "id": "sensitivity",
+    "type": "number",
+    "label": "Audio sensitivity",
+    "default": 2.2,
+    "min": 0.5,
+    "max": 6,
+    "step": 0.05,
+    "description": "Audio sensitivity.",
+    "group": "Audio",
+    "changeCost": "live"
+   },
+   {
+    "id": "audioDrive",
+    "type": "number",
+    "label": "Body response",
+    "default": 1.6,
+    "min": 0,
+    "max": 2,
+    "step": 0.01,
+    "description": "Body response.",
+    "group": "Audio",
+    "changeCost": "live"
+   },
+   {
+    "id": "spectrumGain",
+    "type": "number",
+    "label": "Spectrum",
+    "default": 1,
+    "min": 0,
+    "max": 2,
+    "step": 0.01,
+    "description": "Spectrum.",
+    "group": "Audio",
+    "changeCost": "live"
+   },
+   {
+    "id": "colorShift",
+    "type": "number",
+    "label": "Colour shift",
+    "default": 0.65,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "description": "Colour shift.",
+    "group": "Skin",
+    "changeCost": "live"
+   },
+   {
+    "id": "colorSpeed",
+    "type": "number",
+    "label": "Colour speed",
+    "default": 0.035,
+    "min": 0,
+    "max": 0.3,
+    "step": 0.001,
+    "description": "Colour speed.",
+    "group": "Skin",
+    "changeCost": "live"
+   },
+   {
+    "id": "screenTint",
+    "type": "number",
+    "label": "Screen tint",
+    "default": 0.7,
+    "min": 0,
+    "max": 2,
+    "step": 0.01,
+    "description": "Screen tint.",
+    "group": "Skin",
+    "changeCost": "live"
+   },
+   {
+    "id": "ringBloom",
+    "type": "number",
+    "label": "Ring bloom",
+    "default": 1,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "description": "How far the occasional ring bloom spreads (0 off, 1 fills the screen).",
+    "group": "Audio",
+    "changeCost": "live"
+   },
+   {
+    "id": "ringBloomPeriod",
+    "type": "number",
+    "label": "Ring bloom period (s)",
+    "default": 24,
+    "min": 6,
+    "max": 120,
+    "step": 0.5,
+    "description": "Seconds per bloom cycle.",
+    "group": "Audio",
+    "changeCost": "live"
+   },
+   {
+    "id": "ringEchoes",
+    "type": "number",
+    "label": "Ring echoes",
+    "default": 2,
+    "min": 0,
+    "max": 2,
+    "step": 1,
+    "description": "Out-of-phase echo copies per spectrum ring (0-2).",
+    "group": "Audio",
+    "changeCost": "live"
+   },
+   {
+    "id": "echoes",
+    "type": "number",
+    "label": "Echo trail",
+    "default": 1,
+    "min": 0,
+    "max": 2,
+    "step": 0.01,
+    "description": "Echo trail.",
+    "group": "Echo",
+    "changeCost": "live"
+   },
+   {
+    "id": "companions",
+    "type": "number",
+    "label": "Companions",
+    "default": 42,
+    "min": 0,
+    "max": 96,
+    "step": 1,
+    "description": "Companions.",
+    "group": "Companions",
+    "changeCost": "live"
+   },
+   {
+    "id": "companionSize",
+    "type": "number",
+    "label": "Companion size",
+    "default": 1,
+    "min": 0.2,
+    "max": 3,
+    "step": 0.01,
+    "description": "Companion size.",
+    "group": "Companions",
+    "changeCost": "live"
+   },
+   {
+    "id": "companionReach",
+    "type": "number",
+    "label": "Streamer reach",
+    "default": 1,
+    "min": 0.3,
+    "max": 2,
+    "step": 0.01,
+    "description": "Streamer reach.",
+    "group": "Companions",
+    "changeCost": "live"
+   },
+   {
+    "id": "echoInterval",
+    "type": "number",
+    "label": "Echo spacing (s)",
+    "default": 0.6,
+    "min": 0.15,
+    "max": 3,
+    "step": 0.01,
+    "description": "Echo spacing (s).",
+    "group": "Echo",
+    "changeCost": "live"
+   },
+   {
+    "id": "kaleidoSegments",
+    "type": "number",
+    "label": "Segments",
+    "default": 6,
+    "min": 2,
+    "max": 16,
+    "step": 1,
+    "description": "Number of mirrored wedges around the centre.",
+    "group": "Kaleidoscope",
+    "changeCost": "live"
+   },
+   {
+    "id": "kaleidoPeriod",
+    "type": "number",
+    "label": "Cycle length",
+    "default": 16,
+    "min": 4,
+    "max": 120,
+    "step": 0.5,
+    "unit": "s",
+    "description": "Seconds for one full off-and-on cycle.",
+    "group": "Kaleidoscope",
+    "changeCost": "live"
+   },
+   {
+    "id": "kaleidoOnFraction",
+    "type": "number",
+    "label": "On fraction",
+    "default": 0.4,
+    "min": 0.05,
+    "max": 0.95,
+    "step": 0.01,
+    "description": "Share of each cycle in which the kaleidoscope is on, including its fades.",
+    "group": "Kaleidoscope",
+    "changeCost": "live"
+   },
+   {
+    "id": "kaleidoTransition",
+    "type": "number",
+    "label": "Transition",
+    "default": 2.5,
+    "min": 0.2,
+    "max": 10,
+    "step": 0.1,
+    "unit": "s",
+    "description": "Seconds to ease in and again to ease out. Limited to half the on time.",
+    "group": "Kaleidoscope",
+    "changeCost": "live"
+   },
+   {
+    "id": "kaleidoSpin",
+    "type": "number",
+    "label": "Spin",
+    "default": 0.08,
+    "min": -1,
+    "max": 1,
+    "step": 0.01,
+    "unit": "rad/s",
+    "description": "Rotation speed of the wedge pattern in radians per second.",
+    "group": "Kaleidoscope",
+    "changeCost": "live"
+   },
+   {
+    "id": "kaleidoAmount",
+    "type": "number",
+    "label": "Amount",
+    "default": 1,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "description": "Maximum blend toward the kaleidoscope. Zero keeps the original image.",
+    "group": "Kaleidoscope",
+    "changeCost": "live"
+   },
+   {
+    "id": "kaleidoForce",
+    "type": "number",
+    "label": "Force",
+    "default": 0,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "description": "Added to the cycle blend, so an audio or LFO binding can push the effect in at any time.",
+    "group": "Kaleidoscope",
+    "changeCost": "live"
+   }
+  ],
+  "controlSchemaHash": "a6b2cf15a7d3a109e761c97c48f4e983ca3175cd917e86af528d1affd11cde60",
+  "controls": {
+   "spikeHeight": 0.85,
+   "noiseScale": 3.4,
+   "sharpness": 3.2,
+   "motionSpeed": 0.28,
+   "breath": 0.65,
+   "roughness": 0.38,
+   "glow": 0.65,
+   "nacre": 0.8,
+   "bass": 0,
+   "mids": 0,
+   "highs": 0,
+   "kick": 0,
+   "sensitivity": 2.2,
+   "audioDrive": 1.6,
+   "spectrumGain": 1,
+   "colorShift": 0.65,
+   "colorSpeed": 0.035,
+   "screenTint": 0.7,
+   "ringBloom": 1,
+   "ringBloomPeriod": 24,
+   "ringEchoes": 2,
+   "echoes": 1,
+   "companions": 42,
+   "companionSize": 1,
+   "companionReach": 1,
+   "echoInterval": 0.6,
+   "kaleidoSegments": 5,
+   "kaleidoPeriod": 37,
+   "kaleidoOnFraction": 0.11,
+   "kaleidoTransition": 2.5,
+   "kaleidoSpin": 0.15,
+   "kaleidoAmount": 0.1,
+   "kaleidoForce": 0
+  },
+  "controlSequence": 1,
+  "nodeControls": {
+   "sourceHash": "8cecc00ea1ec6f07034ceafb68a5931ef1ff1f5faadb704b21cc931d7eaa3863",
+   "nodes": [
+    {
+     "nodePath": [
+      "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+     ],
+     "definitionHash": "e3b663454348e23f95379b99df62ec9b227de708dca417b7db3ba6bd35235117",
+     "schema": [
+      {
+       "id": "spikeHeight",
+       "type": "number",
+       "label": "Fold depth",
+       "default": 0.85,
+       "min": 0,
+       "max": 1.4,
+       "step": 0.01,
+       "group": "Body",
+       "changeCost": "live"
+      },
+      {
+       "id": "noiseScale",
+       "type": "number",
+       "label": "Fold scale",
+       "default": 3.4,
+       "min": 1,
+       "max": 7,
+       "step": 0.1,
+       "group": "Body",
+       "changeCost": "live"
+      },
+      {
+       "id": "sharpness",
+       "type": "number",
+       "label": "Fold definition",
+       "default": 3.2,
+       "min": 0.5,
+       "max": 5,
+       "step": 0.05,
+       "group": "Body",
+       "changeCost": "live"
+      },
+      {
+       "id": "motionSpeed",
+       "type": "number",
+       "label": "Life speed",
+       "default": 0.28,
+       "min": 0,
+       "max": 1.5,
+       "step": 0.01,
+       "group": "Life",
+       "changeCost": "live"
+      },
+      {
+       "id": "breath",
+       "type": "number",
+       "label": "Breathing",
+       "default": 0.65,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Life",
+       "changeCost": "live"
+      },
+      {
+       "id": "roughness",
+       "type": "number",
+       "label": "Skin roughness",
+       "default": 0.38,
+       "min": 0.12,
+       "max": 0.8,
+       "step": 0.01,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "glow",
+       "type": "number",
+       "label": "Inner glow",
+       "default": 0.65,
+       "min": 0,
+       "max": 2,
+       "step": 0.01,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "nacre",
+       "type": "number",
+       "label": "Nacre shimmer",
+       "default": 0.8,
+       "min": 0,
+       "max": 1.5,
+       "step": 0.01,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "bass",
+       "type": "number",
+       "label": "Bass",
+       "default": 0,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "mids",
+       "type": "number",
+       "label": "Mids",
+       "default": 0,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "highs",
+       "type": "number",
+       "label": "Highs",
+       "default": 0,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "kick",
+       "type": "number",
+       "label": "Kick",
+       "default": 0,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "sensitivity",
+       "type": "number",
+       "label": "Audio sensitivity",
+       "default": 2.2,
+       "min": 0.5,
+       "max": 6,
+       "step": 0.05,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "audioDrive",
+       "type": "number",
+       "label": "Body response",
+       "default": 1.6,
+       "min": 0,
+       "max": 2,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "spectrumGain",
+       "type": "number",
+       "label": "Spectrum",
+       "default": 1,
+       "min": 0,
+       "max": 2,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "colorShift",
+       "type": "number",
+       "label": "Colour shift",
+       "default": 0.65,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "colorSpeed",
+       "type": "number",
+       "label": "Colour speed",
+       "default": 0.035,
+       "min": 0,
+       "max": 0.3,
+       "step": 0.001,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "screenTint",
+       "type": "number",
+       "label": "Screen tint",
+       "default": 0.7,
+       "min": 0,
+       "max": 2,
+       "step": 0.01,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "ringBloom",
+       "type": "number",
+       "label": "Ring bloom",
+       "default": 1,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "ringBloomPeriod",
+       "type": "number",
+       "label": "Ring bloom period (s)",
+       "default": 24,
+       "min": 6,
+       "max": 120,
+       "step": 0.5,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "ringEchoes",
+       "type": "number",
+       "label": "Ring echoes",
+       "default": 2,
+       "min": 0,
+       "max": 2,
+       "step": 1,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "echoes",
+       "type": "number",
+       "label": "Echo trail",
+       "default": 1,
+       "min": 0,
+       "max": 2,
+       "step": 0.01,
+       "group": "Echo",
+       "changeCost": "live"
+      },
+      {
+       "id": "companions",
+       "type": "number",
+       "label": "Companions",
+       "default": 42,
+       "min": 0,
+       "max": 96,
+       "step": 1,
+       "group": "Companions",
+       "changeCost": "live"
+      },
+      {
+       "id": "companionSize",
+       "type": "number",
+       "label": "Companion size",
+       "default": 1,
+       "min": 0.2,
+       "max": 3,
+       "step": 0.01,
+       "group": "Companions",
+       "changeCost": "live"
+      },
+      {
+       "id": "companionReach",
+       "type": "number",
+       "label": "Streamer reach",
+       "default": 1,
+       "min": 0.3,
+       "max": 2,
+       "step": 0.01,
+       "group": "Companions",
+       "changeCost": "live"
+      },
+      {
+       "id": "echoInterval",
+       "type": "number",
+       "label": "Echo spacing (s)",
+       "default": 0.6,
+       "min": 0.15,
+       "max": 3,
+       "step": 0.01,
+       "group": "Echo",
+       "changeCost": "live"
+      }
+     ],
+     "schemaHash": "53726a19a765353dda8c1974aecb04d6ed0fb369615025b8b328193685120e06",
+     "values": {
+      "spikeHeight": 0.85,
+      "noiseScale": 3.4,
+      "sharpness": 3.2,
+      "motionSpeed": 0.28,
+      "breath": 0.65,
+      "roughness": 0.38,
+      "glow": 0.65,
+      "nacre": 0.8,
+      "bass": 0,
+      "mids": 0,
+      "highs": 0,
+      "kick": 0,
+      "sensitivity": 2.2,
+      "audioDrive": 1.6,
+      "spectrumGain": 1,
+      "colorShift": 0.65,
+      "colorSpeed": 0.035,
+      "screenTint": 0.7,
+      "ringBloom": 1,
+      "ringBloomPeriod": 24,
+      "ringEchoes": 2,
+      "echoes": 1,
+      "companions": 42,
+      "companionSize": 1,
+      "companionReach": 1,
+      "echoInterval": 0.6
+     }
+    },
+    {
+     "nodePath": [
+      "5a1c0e11-7f3b-4a8e-9d2c-000000000002"
+     ],
+     "definitionHash": "d360da07ca88e488b8bec7f0932fcffed83e64759fe848c55998d5a45d7ffcf7",
+     "schema": [
+      {
+       "id": "segments",
+       "type": "number",
+       "label": "Segments",
+       "default": 6,
+       "min": 2,
+       "max": 16,
+       "step": 1,
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "period",
+       "type": "number",
+       "label": "Cycle length",
+       "default": 16,
+       "min": 4,
+       "max": 120,
+       "step": 0.5,
+       "unit": "s",
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "onFraction",
+       "type": "number",
+       "label": "On fraction",
+       "default": 0.4,
+       "min": 0.05,
+       "max": 0.95,
+       "step": 0.01,
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "transition",
+       "type": "number",
+       "label": "Transition",
+       "default": 2.5,
+       "min": 0.2,
+       "max": 10,
+       "step": 0.1,
+       "unit": "s",
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "spin",
+       "type": "number",
+       "label": "Spin",
+       "default": 0.08,
+       "min": -1,
+       "max": 1,
+       "step": 0.01,
+       "unit": "rad/s",
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "amount",
+       "type": "number",
+       "label": "Amount",
+       "default": 1,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "force",
+       "type": "number",
+       "label": "Force",
+       "default": 0,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      }
+     ],
+     "schemaHash": "6762605c8d0aa96170da9bb0e7141cde450cd848549e62c00e5a4ce9f3fcd3ac",
+     "values": {
+      "segments": 5,
+      "period": 37,
+      "onFraction": 0.11,
+      "transition": 2.5,
+      "spin": 0.15,
+      "amount": 0.1,
+      "force": 0
+     }
+    }
+   ]
+  },
+  "controlAnimations": [
+   {
+    "nodePath": [],
+    "definitionHash": "a6b2cf15a7d3a109e761c97c48f4e983ca3175cd917e86af528d1affd11cde60",
+    "schemaHash": "a6b2cf15a7d3a109e761c97c48f4e983ca3175cd917e86af528d1affd11cde60",
+    "controlId": "noiseScale",
+    "shape": "sine",
+    "periodSeconds": 4,
+    "amount": 1.6,
+    "phase": 0,
+    "enabled": true
+   },
+   {
+    "kind": "audio",
+    "nodePath": [],
+    "definitionHash": "a6b2cf15a7d3a109e761c97c48f4e983ca3175cd917e86af528d1affd11cde60",
+    "schemaHash": "a6b2cf15a7d3a109e761c97c48f4e983ca3175cd917e86af528d1affd11cde60",
+    "controlId": "bass",
+    "source": {
+     "kind": "audio-band",
+     "logicalInputId": "primary-audio",
+     "band": "bass",
+     "analyzer": {
+      "version": 1,
+      "fftSize": 2048,
+      "minDecibels": -100,
+      "maxDecibels": -30
+     }
+    },
+    "amount": 1,
+    "attackMs": 30,
+    "releaseMs": 280,
+    "enabled": true
+   },
+   {
+    "kind": "audio",
+    "nodePath": [],
+    "definitionHash": "a6b2cf15a7d3a109e761c97c48f4e983ca3175cd917e86af528d1affd11cde60",
+    "schemaHash": "a6b2cf15a7d3a109e761c97c48f4e983ca3175cd917e86af528d1affd11cde60",
+    "controlId": "mids",
+    "source": {
+     "kind": "audio-band",
+     "logicalInputId": "primary-audio",
+     "band": "mids",
+     "analyzer": {
+      "version": 1,
+      "fftSize": 2048,
+      "minDecibels": -100,
+      "maxDecibels": -30
+     }
+    },
+    "amount": 1,
+    "attackMs": 60,
+    "releaseMs": 400,
+    "enabled": true
+   },
+   {
+    "kind": "audio",
+    "nodePath": [],
+    "definitionHash": "a6b2cf15a7d3a109e761c97c48f4e983ca3175cd917e86af528d1affd11cde60",
+    "schemaHash": "a6b2cf15a7d3a109e761c97c48f4e983ca3175cd917e86af528d1affd11cde60",
+    "controlId": "highs",
+    "source": {
+     "kind": "audio-band",
+     "logicalInputId": "primary-audio",
+     "band": "highs",
+     "analyzer": {
+      "version": 1,
+      "fftSize": 2048,
+      "minDecibels": -100,
+      "maxDecibels": -30
+     }
+    },
+    "amount": 1,
+    "attackMs": 15,
+    "releaseMs": 180,
+    "enabled": true
+   },
+   {
+    "kind": "kick",
+    "nodePath": [],
+    "definitionHash": "a6b2cf15a7d3a109e761c97c48f4e983ca3175cd917e86af528d1affd11cde60",
+    "schemaHash": "a6b2cf15a7d3a109e761c97c48f4e983ca3175cd917e86af528d1affd11cde60",
+    "controlId": "kick",
+    "source": {
+     "kind": "audio-kick",
+     "logicalInputId": "primary-audio",
+     "analyzer": {
+      "version": 1,
+      "fftSize": 2048,
+      "minDecibels": -100,
+      "maxDecibels": -30
+     }
+    },
+    "amount": 1,
+    "attackMs": 5,
+    "releaseMs": 260,
+    "sensitivity": 0.6,
+    "retriggerMs": 180,
+    "envelope": "exponential",
+    "enabled": true
+   }
+  ],
+  "controlAnimationIssues": [
+   {
+    "index": 0,
+    "nodePath": [],
+    "controlId": "noiseScale",
+    "message": "Animation target is no longer available."
+   },
+   {
+    "index": 1,
+    "nodePath": [],
+    "controlId": "bass",
+    "message": "Animation target is no longer available."
+   },
+   {
+    "index": 2,
+    "nodePath": [],
+    "controlId": "mids",
+    "message": "Animation target is no longer available."
+   },
+   {
+    "index": 3,
+    "nodePath": [],
+    "controlId": "highs",
+    "message": "Animation target is no longer available."
+   },
+   {
+    "index": 4,
+    "nodePath": [],
+    "controlId": "kick",
+    "message": "Animation target is no longer available."
+   }
+  ],
+  "animationSequence": 0,
+  "effectiveControls": {
+   "spikeHeight": 0.85,
+   "noiseScale": 3.4,
+   "sharpness": 3.2,
+   "motionSpeed": 0.28,
+   "breath": 0.65,
+   "roughness": 0.38,
+   "glow": 0.65,
+   "nacre": 0.8,
+   "bass": 0,
+   "mids": 0,
+   "highs": 0,
+   "kick": 0,
+   "sensitivity": 2.2,
+   "audioDrive": 1.6,
+   "spectrumGain": 1,
+   "colorShift": 0.65,
+   "colorSpeed": 0.035,
+   "screenTint": 0.7,
+   "ringBloom": 1,
+   "ringBloomPeriod": 24,
+   "ringEchoes": 2,
+   "echoes": 1,
+   "companions": 42,
+   "companionSize": 1,
+   "companionReach": 1,
+   "echoInterval": 0.6,
+   "kaleidoSegments": 5,
+   "kaleidoPeriod": 37,
+   "kaleidoOnFraction": 0.11,
+   "kaleidoTransition": 2.5,
+   "kaleidoSpin": 0.15,
+   "kaleidoAmount": 0.1,
+   "kaleidoForce": 0
+  },
+  "effectiveNodeControls": {
+   "sourceHash": "8cecc00ea1ec6f07034ceafb68a5931ef1ff1f5faadb704b21cc931d7eaa3863",
+   "nodes": [
+    {
+     "nodePath": [
+      "5a1c0e11-7f3b-4a8e-9d2c-000000000001"
+     ],
+     "definitionHash": "e3b663454348e23f95379b99df62ec9b227de708dca417b7db3ba6bd35235117",
+     "schema": [
+      {
+       "id": "spikeHeight",
+       "type": "number",
+       "label": "Fold depth",
+       "default": 0.85,
+       "min": 0,
+       "max": 1.4,
+       "step": 0.01,
+       "group": "Body",
+       "changeCost": "live"
+      },
+      {
+       "id": "noiseScale",
+       "type": "number",
+       "label": "Fold scale",
+       "default": 3.4,
+       "min": 1,
+       "max": 7,
+       "step": 0.1,
+       "group": "Body",
+       "changeCost": "live"
+      },
+      {
+       "id": "sharpness",
+       "type": "number",
+       "label": "Fold definition",
+       "default": 3.2,
+       "min": 0.5,
+       "max": 5,
+       "step": 0.05,
+       "group": "Body",
+       "changeCost": "live"
+      },
+      {
+       "id": "motionSpeed",
+       "type": "number",
+       "label": "Life speed",
+       "default": 0.28,
+       "min": 0,
+       "max": 1.5,
+       "step": 0.01,
+       "group": "Life",
+       "changeCost": "live"
+      },
+      {
+       "id": "breath",
+       "type": "number",
+       "label": "Breathing",
+       "default": 0.65,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Life",
+       "changeCost": "live"
+      },
+      {
+       "id": "roughness",
+       "type": "number",
+       "label": "Skin roughness",
+       "default": 0.38,
+       "min": 0.12,
+       "max": 0.8,
+       "step": 0.01,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "glow",
+       "type": "number",
+       "label": "Inner glow",
+       "default": 0.65,
+       "min": 0,
+       "max": 2,
+       "step": 0.01,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "nacre",
+       "type": "number",
+       "label": "Nacre shimmer",
+       "default": 0.8,
+       "min": 0,
+       "max": 1.5,
+       "step": 0.01,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "bass",
+       "type": "number",
+       "label": "Bass",
+       "default": 0,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "mids",
+       "type": "number",
+       "label": "Mids",
+       "default": 0,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "highs",
+       "type": "number",
+       "label": "Highs",
+       "default": 0,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "kick",
+       "type": "number",
+       "label": "Kick",
+       "default": 0,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "sensitivity",
+       "type": "number",
+       "label": "Audio sensitivity",
+       "default": 2.2,
+       "min": 0.5,
+       "max": 6,
+       "step": 0.05,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "audioDrive",
+       "type": "number",
+       "label": "Body response",
+       "default": 1.6,
+       "min": 0,
+       "max": 2,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "spectrumGain",
+       "type": "number",
+       "label": "Spectrum",
+       "default": 1,
+       "min": 0,
+       "max": 2,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "colorShift",
+       "type": "number",
+       "label": "Colour shift",
+       "default": 0.65,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "colorSpeed",
+       "type": "number",
+       "label": "Colour speed",
+       "default": 0.035,
+       "min": 0,
+       "max": 0.3,
+       "step": 0.001,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "screenTint",
+       "type": "number",
+       "label": "Screen tint",
+       "default": 0.7,
+       "min": 0,
+       "max": 2,
+       "step": 0.01,
+       "group": "Skin",
+       "changeCost": "live"
+      },
+      {
+       "id": "ringBloom",
+       "type": "number",
+       "label": "Ring bloom",
+       "default": 1,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "ringBloomPeriod",
+       "type": "number",
+       "label": "Ring bloom period (s)",
+       "default": 24,
+       "min": 6,
+       "max": 120,
+       "step": 0.5,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "ringEchoes",
+       "type": "number",
+       "label": "Ring echoes",
+       "default": 2,
+       "min": 0,
+       "max": 2,
+       "step": 1,
+       "group": "Audio",
+       "changeCost": "live"
+      },
+      {
+       "id": "echoes",
+       "type": "number",
+       "label": "Echo trail",
+       "default": 1,
+       "min": 0,
+       "max": 2,
+       "step": 0.01,
+       "group": "Echo",
+       "changeCost": "live"
+      },
+      {
+       "id": "companions",
+       "type": "number",
+       "label": "Companions",
+       "default": 42,
+       "min": 0,
+       "max": 96,
+       "step": 1,
+       "group": "Companions",
+       "changeCost": "live"
+      },
+      {
+       "id": "companionSize",
+       "type": "number",
+       "label": "Companion size",
+       "default": 1,
+       "min": 0.2,
+       "max": 3,
+       "step": 0.01,
+       "group": "Companions",
+       "changeCost": "live"
+      },
+      {
+       "id": "companionReach",
+       "type": "number",
+       "label": "Streamer reach",
+       "default": 1,
+       "min": 0.3,
+       "max": 2,
+       "step": 0.01,
+       "group": "Companions",
+       "changeCost": "live"
+      },
+      {
+       "id": "echoInterval",
+       "type": "number",
+       "label": "Echo spacing (s)",
+       "default": 0.6,
+       "min": 0.15,
+       "max": 3,
+       "step": 0.01,
+       "group": "Echo",
+       "changeCost": "live"
+      }
+     ],
+     "schemaHash": "53726a19a765353dda8c1974aecb04d6ed0fb369615025b8b328193685120e06",
+     "values": {
+      "spikeHeight": 0.85,
+      "noiseScale": 3.4,
+      "sharpness": 3.2,
+      "motionSpeed": 0.28,
+      "breath": 0.65,
+      "roughness": 0.38,
+      "glow": 0.65,
+      "nacre": 0.8,
+      "bass": 0,
+      "mids": 0,
+      "highs": 0,
+      "kick": 0,
+      "sensitivity": 2.2,
+      "audioDrive": 1.6,
+      "spectrumGain": 1,
+      "colorShift": 0.65,
+      "colorSpeed": 0.035,
+      "screenTint": 0.7,
+      "ringBloom": 1,
+      "ringBloomPeriod": 24,
+      "ringEchoes": 2,
+      "echoes": 1,
+      "companions": 42,
+      "companionSize": 1,
+      "companionReach": 1,
+      "echoInterval": 0.6
+     }
+    },
+    {
+     "nodePath": [
+      "5a1c0e11-7f3b-4a8e-9d2c-000000000002"
+     ],
+     "definitionHash": "d360da07ca88e488b8bec7f0932fcffed83e64759fe848c55998d5a45d7ffcf7",
+     "schema": [
+      {
+       "id": "segments",
+       "type": "number",
+       "label": "Segments",
+       "default": 6,
+       "min": 2,
+       "max": 16,
+       "step": 1,
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "period",
+       "type": "number",
+       "label": "Cycle length",
+       "default": 16,
+       "min": 4,
+       "max": 120,
+       "step": 0.5,
+       "unit": "s",
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "onFraction",
+       "type": "number",
+       "label": "On fraction",
+       "default": 0.4,
+       "min": 0.05,
+       "max": 0.95,
+       "step": 0.01,
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "transition",
+       "type": "number",
+       "label": "Transition",
+       "default": 2.5,
+       "min": 0.2,
+       "max": 10,
+       "step": 0.1,
+       "unit": "s",
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "spin",
+       "type": "number",
+       "label": "Spin",
+       "default": 0.08,
+       "min": -1,
+       "max": 1,
+       "step": 0.01,
+       "unit": "rad/s",
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "amount",
+       "type": "number",
+       "label": "Amount",
+       "default": 1,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      },
+      {
+       "id": "force",
+       "type": "number",
+       "label": "Force",
+       "default": 0,
+       "min": 0,
+       "max": 1,
+       "step": 0.01,
+       "group": "Kaleidoscope",
+       "changeCost": "live"
+      }
+     ],
+     "schemaHash": "6762605c8d0aa96170da9bb0e7141cde450cd848549e62c00e5a4ce9f3fcd3ac",
+     "values": {
+      "segments": 5,
+      "period": 37,
+      "onFraction": 0.11,
+      "transition": 2.5,
+      "spin": 0.15,
+      "amount": 0.1,
+      "force": 0
+     }
+    }
+   ]
+  },
+  "controlMigration": [],
+  "clockEpoch": 0,
+  "timeSeconds": 3.901100000023842,
+  "tempo": {
+   "bpm": 108.1763274125218,
+   "beatPosition": 7.033444514526132,
+   "beatPhase": 0.033444514526132174,
+   "tempoSequence": 0
+  },
+  "tempoSequence": 0,
+  "frameId": "148",
+  "triggerSequence": 0,
+  "output": {
+   "width": 1920,
+   "height": 1080,
+   "fps": 60,
+   "seed": 0
+  },
+  "fault": null
+ },
+ "host": null,
+ "jobs": [
+  {
+   "jobId": "8940e84a-0695-44f4-8a74-ddd2d65eab14",
+   "state": "succeeded",
+   "summary": "Visual is ready in Lux."
+  }
+ ],
+ "visualFps": null,
+ "uiFps": null,
+ "performance": {
+  "owner": {
+   "instanceId": "5505e19c-27e4-4f7c-bb30-9e534c6c0bae",
+   "generation": 3,
+   "revisionId": "8cecc00ea1ec6f07034ceafb68a5931ef1ff1f5faadb704b21cc931d7eaa3863"
+  },
+  "status": "live",
+  "observedAtMs": 130437.89999997616,
+  "worker": {
+   "schemaVersion": 1,
+   "mode": "routine",
+   "clockDomain": "dedicated-worker-monotonic-ms",
+   "sequence": 7,
+   "windowStartMs": 5894.300000071526,
+   "windowEndMs": 6393.100000023842,
+   "lostRecords": 0,
+   "invalidRecords": 0,
+   "intervalLostRecords": 0,
+   "intervalInvalidRecords": 0,
+   "retainedRecords": 25,
+   "produced": {
+    "unit": "Hz",
+    "availability": "available",
+    "validity": "complete",
+    "gate": "not_evaluated",
+    "sampleCount": 25,
+    "expectedCount": 25,
+    "missingCount": 0,
+    "samplingPolicy": "completed frames over independent summary interval",
+    "value": 50.12028869765421
+   },
+   "update": {
+    "unit": "ms",
+    "availability": "available",
+    "validity": "complete",
+    "gate": "not_evaluated",
+    "sampleCount": 25,
+    "expectedCount": 25,
+    "missingCount": 0,
+    "samplingPolicy": "all completed frames in this summary interval",
+    "p50": 0.5,
+    "p95": 0.8000000715255737,
+    "p99": 0.8999999761581421,
+    "max": 0.8999999761581421
+   },
+   "renderCall": {
+    "unit": "ms",
+    "availability": "available",
+    "validity": "complete",
+    "gate": "not_evaluated",
+    "sampleCount": 25,
+    "expectedCount": 25,
+    "missingCount": 0,
+    "samplingPolicy": "all completed frames in this summary interval",
+    "p50": 6.700000047683716,
+    "p95": 8.5,
+    "p99": 9.699999928474426,
+    "max": 9.699999928474426
+   },
+   "cpuCall": {
+    "unit": "ms",
+    "availability": "available",
+    "validity": "incomplete",
+    "gate": "not_evaluated",
+    "sampleCount": 25,
+    "expectedCount": 25,
+    "missingCount": 0,
+    "samplingPolicy": "all completed frames in this summary interval",
+    "reason": "Asynchronous render continuation CPU work is not fully measured",
+    "p50": 7.399999976158142,
+    "p95": 9.200000047683716,
+    "p99": 10,
+    "max": 10
+   },
+   "renderAwait": {
+    "unit": "ms",
+    "availability": "available",
+    "validity": "complete",
+    "gate": "not_evaluated",
+    "sampleCount": 25,
+    "expectedCount": 25,
+    "missingCount": 0,
+    "samplingPolicy": "all completed frames in this summary interval",
+    "p50": 1.899999976158142,
+    "p95": 2.700000047683716,
+    "p99": 2.9000000953674316,
+    "max": 2.9000000953674316
+   },
+   "queueWait": {
+    "unit": "ms",
+    "availability": "available",
+    "validity": "complete",
+    "gate": "not_evaluated",
+    "sampleCount": 25,
+    "expectedCount": 25,
+    "missingCount": 0,
+    "samplingPolicy": "all completed frames in this summary interval",
+    "p50": 9.600000023841858,
+    "p95": 12.400000095367432,
+    "p99": 13.200000047683716,
+    "max": 13.200000047683716
+   },
+   "gpu": {
+    "unit": "ms",
+    "availability": "available",
+    "validity": "incomplete",
+    "gate": "not_evaluated",
+    "sampleCount": 1,
+    "expectedCount": 1,
+    "missingCount": 0,
+    "samplingPolicy": "one in 30 frames (frame IDs 1,31,61,...)",
+    "reason": "GPU copies, uploads or clears outside passes are excluded",
+    "p50": 0.786432,
+    "p95": 0.786432,
+    "p99": 0.786432,
+    "max": 0.786432,
+    "timestampQuerySupported": true,
+    "timestampQueryEnabled": true,
+    "failedSamples": 0,
+    "droppedSamples": 0,
+    "pendingSamples": 0
+   }
+  }
+ },
+ "capabilities": {
+  "protocolVersion": 4,
+  "supportedSdkVersions": [
+   "0.1.0",
+   "0.2.0",
+   "0.4.0"
+  ],
+  "codeDeclaredParameters": true,
+  "parameterKinds": [
+   "number",
+   "boolean",
+   "enum"
+  ],
+  "maxParameterMetadataBytes": 32768,
+  "audioSpectrum": {
+   "frameField": "audioSpectrum",
+   "bins": 128,
+   "scale": "log",
+   "fftSize": 2048,
+   "readOnly": true
+  },
+  "audioInputControl": {
+   "enumerate": true,
+   "connect": true,
+   "disconnect": true
+  },
+  "controlAnimation": {
+   "guardedBindings": true,
+   "kinds": [
+    "lfo",
+    "audio",
+    "kick",
+    "tempo",
+    "variation"
+   ]
+  },
+  "controlTriggers": {
+   "commandReceipts": true,
+   "pausedFrame": true,
+   "maxCommandIds": 16384
+  },
+  "story": {
+   "version": 1,
+   "rootSdkVersion": "0.2.0",
+   "sustained": true,
+   "timedDirectSeek": true,
+   "commandReceipts": true
+  },
+  "imageFormats": [
+   "image/bmp",
+   "image/png",
+   "image/jpeg"
+  ],
+  "assetExport": true,
+  "sceneVersions": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "controlVariation": {
+   "stableInstanceKeys": true,
+   "distributions": [
+    "random",
+    "centered",
+    "spread"
+   ]
+  },
+  "tempo": {
+   "manual": true,
+   "tap": true,
+   "bpm": {
+    "min": 20,
+    "max": 300
+   }
+  }
+ },
+ "audioInput": {
+  "generation": 1,
+  "sequence": 375,
+  "available": true,
+  "level": 0.26114163342870944,
+  "bass": 0.7770532544128322,
+  "mids": 0.11905137164910688,
+  "highs": 0.014951999998106128,
+  "kickSequence": 72,
+  "kickStrength": 0.2580568133523267,
+  "spectrum": {
+   "sampleRate": 48000,
+   "fftSize": 2048,
+   "scale": "log",
+   "minFrequency": 20,
+   "maxFrequency": 24000,
+   "magnitudes": [
+    0.3793325863557009,
+    0.3793325863557009,
+    0.3793325863557009,
+    0.3793325863557009,
+    0.3793325863557009,
+    0.3793325863557009,
+    0.3793325863557009,
+    0.3793325863557009,
+    0.3793325863557009,
+    0.3793325863557009,
+    0.3793325863557009,
+    0.3793325863557009,
+    0.3793325863557009,
+    0.3793325863557009,
+    0.3793325863557009,
+    0.4001617649268223,
+    0.4001617649268223,
+    0.4001617649268223,
+    0.4001617649268223,
+    0.4001617649268223,
+    0.4001617649268223,
+    0.4001617649268223,
+    0.4388348094354653,
+    0.4388348094354653,
+    0.4388348094354653,
+    0.4388348094354653,
+    0.4388348094354653,
+    0.4388348094354653,
+    0.4211100801483216,
+    0.4211100801483216,
+    0.4211100801483216,
+    0.769226822529664,
+    0.769226822529664,
+    0.769226822529664,
+    0.769226822529664,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0.878905773494072,
+    0.878905773494072,
+    0.6203341438377981,
+    0.44530430596909787,
+    0.44530430596909787,
+    0.3324000319694113,
+    0.23322163973174007,
+    0.15536001620372572,
+    0.15536001620372572,
+    0.29379128725764525,
+    0.29379128725764525,
+    0.2863848869091701,
+    0.09906878802333058,
+    0.08881205989297779,
+    0.08798451358743178,
+    0.07933224663439335,
+    0.05509768056923136,
+    0.049239975872745215,
+    0.04051838099255643,
+    0.04099388427722476,
+    0.0411042486663652,
+    0.04292959393506776,
+    0.04292959393506776,
+    0.032175424822929746,
+    0.01257389488010175,
+    0.020188003828253115,
+    0.028697710185355465,
+    0.02885313727713722,
+    0.03683774255673185,
+    0.03278462232146544,
+    0.03280941784176758,
+    0.029819325463254245,
+    0.02617716509279748,
+    0.021073772078037345,
+    0.023033520499488293,
+    0.023033520499488293,
+    0.02706504422357334,
+    0.02730235455827051,
+    0.018669695920200104,
+    0.01176043140441546,
+    0.018540857375027427,
+    0.017375201620514518,
+    0.021186941396950817,
+    0.018458600665691022,
+    0.016700270822337656,
+    0.01927593203476969,
+    0.044632994705716855,
+    0.041265956037780396,
+    0.012827844518169717,
+    0.02178067119096265,
+    0.025035878513815724,
+    0.013542226871097306,
+    0.012201398012360776,
+    0.020602778514525452,
+    0.026515385518228754,
+    0.02511131381919979,
+    0.040352114289299613,
+    0.021143345500435146,
+    0.027658588081382482,
+    0.02924462393910107,
+    0.023329022707417563,
+    0.024205213153745457,
+    0.026716808186935146,
+    0.0203254942497598,
+    0.019812626362561335,
+    0.022055473653443618,
+    0.01597199342905964,
+    0.024642932069258227,
+    0.018223436151435037,
+    0.024940293351478095,
+    0.025658719148382886,
+    0.03227233279389884,
+    0.03227233279389884,
+    0.024119466289701342,
+    0.020284006747641418,
+    0.019737518209578614,
+    0.019737518209578614,
+    0.02875218438971518,
+    0.03435074811849166,
+    0.029083495285807615,
+    0.020302951498227955,
+    0.023348221315586427,
+    0.029585697029897773
+   ]
+  }
+ },
+ "soundtrack": null,
+ "studioSession": {
+  "profile": "creative-c8e73bbdb600a59b83b225c2",
+  "workspace": "c:\\users\\zflei\\repos\\lux",
+  "sessionId": "d36bd95d9dd5451fbcc7c4c7eceea2785c81",
+  "pid": 40028
+ },
+ "diagnostics": {
+  "path": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\creative-c8e73bbdb600a59b83b225c2\\logs\\studio.jsonl",
+  "previousPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\creative-c8e73bbdb600a59b83b225c2\\logs\\studio.previous.jsonl",
+  "maxFileBytes": 262144,
+  "retainedFiles": 2,
+  "writable": true
+ }
+}

@@ -1,0 +1,1 @@
+Scope clarification recorded after the LUX-168 acceptance: future component migration is authorized when it preserves saved values, stable instance and Library links, and source history, with external limits disclosed. This does not undo or narrow the accepted LUX-168 compatibility fix, and it does not require a migration in LUX-168.

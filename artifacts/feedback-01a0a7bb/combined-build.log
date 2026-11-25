@@ -1,0 +1,32 @@
+
+  apps\studio\dist\main.cjs      382.8kb
+  apps\studio\dist\main.cjs.map  807.1kb
+
+Done in 98ms
+
+  apps\studio\dist\preload.cjs      4.1kb
+  apps\studio\dist\preload.cjs.map  6.4kb
+
+Done in 18ms
+
+  apps\studio\dist\renderer.js         4.2mb
+  apps\studio\dist\renderer.css      155.2kb
+  apps\studio\dist\renderer.js.map     7.8mb
+  apps\studio\dist\renderer.css.map  237.7kb
+
+Done in 1163ms
+
+  apps\studio\dist\visual-worker.js      501.6kb
+  apps\studio\dist\visual-worker.js.map    1.0mb
+
+Done in 113ms
+
+  apps\studio\dist\source-admission-worker.js      191.7kb
+  apps\studio\dist\source-admission-worker.js.map  436.0kb
+
+Done in 88ms
+
+  apps\studio\dist\image-preview-worker.js      189.0kb
+  apps\studio\dist\image-preview-worker.js.map  434.4kb
+
+Done in 102ms

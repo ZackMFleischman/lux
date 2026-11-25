@@ -1,0 +1,19 @@
+✔ RTL: a trigger visibly requires the selected source to be the active Story visual (154.864ms)
+✔ RTL: Story v2 exposes source-specific capabilities, overlap and preparation state (79.8486ms)
+✔ RTL: Story v2 reports a failed next-source preparation while keeping the committed preview active (56.3357ms)
+✔ RTL: Story ribbon keeps selection separate from the attached occurrence and shows sustained dwell (73.8217ms)
+✔ RTL: Story ribbon shows scheduled dwell progress independently of a sustained beat (25.8067ms)
+✔ RTL: uncertain Story transport exposes an explicit exact retry (105.1279ms)
+✔ RTL: timed Story scrub admits one seek and replaces the queued target with the latest position (83.5573ms)
+✔ RTL: an acknowledgement from an earlier Story activation cannot overwrite the current scrub (68.7599ms)
+✔ RTL: a rejected seek reconciles a newer revision on the same Story activation (62.2418ms)
+✔ RTL: a sub-10ms timed Story beat retains a usable local-time step and readable position (30.4123ms)
+✔ RTL: sequence timing is visible before launch and selection does not alter transport (51.7987ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5153.0124

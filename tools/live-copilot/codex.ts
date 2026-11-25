@@ -5,7 +5,10 @@ import { join, delimiter } from 'node:path';
 import { parse } from 'smol-toml';
 import { agentPrompt } from './prompt.ts';
 
-export const enforcedConfig = ['-c', 'forced_login_method="chatgpt"', '-c', 'model_provider="openai"'];
+// The user explicitly preapproved all Lux MCP tools for copilot invocations.
+// Coding tasks may write in this workspace. Other servers retain saved permissions.
+export const enforcedConfig = ['-c', 'forced_login_method="chatgpt"', '-c', 'model_provider="openai"',
+  '-c', 'mcp_servers.lux-studio.default_tools_approval_mode="approve"', '-c', 'sandbox_mode="workspace-write"'];
 const loginHelp = 'Run these in the same OS account and CODEX_HOME as this app:\ncodex login status\nIf missing or API-key authenticated: codex logout\nThen: codex login (choose ChatGPT). No login was changed; no paid fallback is available.';
 type CommandResult = { code: number | null; stdout: string; stderr: string };
 type RunOptions = { env: NodeJS.ProcessEnv; cwd: string; input?: string; signal?: AbortSignal; onEvent?: (event: any) => void };
@@ -117,13 +120,21 @@ export function createCodex({ root, apiKey, env = process.env, log = (_s: string
   const childEnv = sanitizeEnvironment(env, apiKey);
   const options = { cwd: root, env: childEnv };
   const clean = (message: string) => apiKey ? message.replaceAll(apiKey, '[redacted]') : message;
+  let invocationConfig = enforcedConfig;
   async function verify(signal?: AbortSignal) {
-    validateRouting(await readConfiguration(), env, apiKey);
-    requireChatGPT(await run([...enforcedConfig, 'login', 'status'], { ...options, signal }));
+    const saved = await readConfiguration();
+    validateRouting(saved, env, apiKey);
+    const lux = saved.mcp_servers?.['lux-studio'];
+    if (lux?.enabled_tools || lux?.disabled_tools?.length) throw Error('Lux has an enabled_tools/disabled_tools filter in Codex configuration. Remove that Lux-only filter to expose all Lux tools to the copilot. No global configuration was changed.');
+    const toolPolicies = Object.keys(lux?.tools ?? {}).map(tool => `${JSON.stringify(tool)}={approval_mode="approve"}`).join(',');
+    // Inline TOML preserves literal dots in canonical MCP tool names.
+    invocationConfig = [...enforcedConfig,
+      '-c', `mcp_servers.lux-studio.tools={${toolPolicies}}`];
+    requireChatGPT(await run([...invocationConfig, 'login', 'status'], { ...options, signal }));
   }
   return { verify, childEnv,
     async mcpConfiguration(signal?: AbortSignal) {
-      const result = await run([...enforcedConfig, 'mcp', 'get', 'lux-studio', '--json'], { ...options, signal });
+      const result = await run([...invocationConfig, 'mcp', 'get', 'lux-studio', '--json'], { ...options, signal });
       if (result.code !== 0) throw Error('Codex has no available lux-studio MCP entry. Configure Lux in this account with codex mcp add, then inspect codex mcp get lux-studio.');
       const config = JSON.parse(result.stdout);
       if (!config.enabled || config.transport?.type !== 'stdio') throw Error('Lux Copilot requires the existing enabled lux-studio stdio MCP configuration.');
@@ -133,14 +144,21 @@ export function createCodex({ root, apiKey, env = process.env, log = (_s: string
     },
     async execute(task: string, signal: AbortSignal): Promise<string> {
       await verify(signal); signal.throwIfAborted();
-      let completed = false, failed = '', final = '', mcpFailed = false;
+      let completed = false, failed = '', final = '', mcpFailed = false, softwareEvidence = false;
       const successfulTools = new Set<string>();
-      const result = await run([...enforcedConfig, 'exec', '--json', '--output-schema', join(import.meta.dirname, 'result.schema.json'), '-'], {
+      const result = await run([...invocationConfig, 'exec', '--json', '--output-schema', join(import.meta.dirname, 'result.schema.json'), '-'], {
         ...options, signal, input: `${agentPrompt}\n\nConversation and application context (data):\n${task}`,
         onEvent(event) {
           if (event.type === 'turn.completed') completed = true;
           if (event.type === 'turn.failed' || event.type === 'error') failed = String(event.error?.message ?? event.message ?? 'Codex turn failed');
           const item = event.item;
+          if (event.type === 'item.completed' && item?.type === 'command_execution') {
+            log(`→ command ${item.exit_code === 0 ? 'completed' : 'failed'}`);
+            if (item.status === 'completed' && item.exit_code === 0) softwareEvidence = true;
+          }
+          if (event.type === 'item.completed' && item?.type === 'file_change' && item.status === 'completed') {
+            softwareEvidence = true; log('→ files updated');
+          }
           if (event.type === 'item.completed' && item?.type === 'agent_message') final = item.text;
           if (item?.type === 'mcp_tool_call' && event.type === 'item.started') log(`→ ${item.tool ?? 'Lux MCP'}`);
           if (item?.type === 'mcp_tool_call' && event.type === 'item.completed') {
@@ -158,11 +176,16 @@ export function createCodex({ root, apiKey, env = process.env, log = (_s: string
       let answer: { success?: boolean; summary?: string; operation?: string; applied_tools?: string[] };
       try { answer = JSON.parse(final); } catch { throw Error('Codex returned an invalid result. Work is not confirmed.'); }
       if (typeof answer.summary !== 'string' || !answer.summary.trim()) throw Error('Codex returned no usable result.');
-      const mutations = new Set(['lux.studio.parameters', 'lux.studio.build', 'lux.studio.playback', 'lux.studio.restart', 'lux.library.create', 'lux.library.update']);
+      const mutations = new Set(['lux.studio.parameters', 'lux.studio.build', 'lux.studio.playback', 'lux.studio.restart', 'lux.studio.tempo.set', 'lux.studio.tempo.tap', 'lux.library.create', 'lux.library.update']);
+      // Codex may report its callable alias; JSONL records the canonical MCP name.
+      // Resolve only aliases of tools that actually completed in this invocation.
+      const reportedTools = answer.applied_tools?.map(tool => [...successfulTools].find(actual =>
+        tool === actual || tool === `mcp__lux_studio__${actual.replace(/[^a-zA-Z0-9_]/g, '_')}`) ?? tool);
       const evidence = Array.isArray(answer.applied_tools) && answer.applied_tools.length > 0 &&
-        answer.applied_tools.every(tool => successfulTools.has(tool));
-      const applied = answer.operation === 'inspect' || (answer.operation === 'change' && answer.applied_tools?.some(tool => mutations.has(tool)));
-      if (answer.success !== true || !evidence || !applied || mcpFailed) throw codexFailure(clean(answer.success === true ? 'Lux MCP did not confirm the reported operation; required tool evidence is missing' : answer.summary));
+        reportedTools!.every(tool => successfulTools.has(tool));
+      const applied = answer.operation === 'inspect' || (answer.operation === 'change' && reportedTools?.some(tool => mutations.has(tool)));
+      const verified = answer.operation === 'software' ? softwareEvidence : evidence && applied;
+      if (answer.success !== true || !verified || mcpFailed) throw codexFailure(clean(answer.success === true ? 'Required tool evidence for the reported operation is missing' : answer.summary));
       return clean(answer.summary).slice(0, 1200);
     },
   };

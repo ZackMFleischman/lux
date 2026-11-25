@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "commit": "ebf3a72ac71532799310cebabaae2c6f5fb9a470",
+  "installation": {
+    "version": 1,
+    "name": "Lux",
+    "sourceCommit": "ebf3a72ac71532799310cebabaae2c6f5fb9a470",
+    "sourceTree": "working tree snapshot",
+    "canonicalLibraryRoot": "C:\\Users\\zFlei\\repos\\lux\\library",
+    "electron": {
+      "version": "44.3.0",
+      "archiveName": "electron-v44.3.0-win32-x64.zip",
+      "sha256": "26bf9a617d58d81772b3d68305d59ee48272969c15083c06db634a77358a8d9d",
+      "source": "https://github.com/electron/electron/releases/download/v44.3.0/electron-v44.3.0-win32-x64.zip"
+    },
+    "installedAt": "2026-09-16T02:45:47.276Z",
+    "directory": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\ebf3a72a-caab8a53",
+    "executable": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\ebf3a72a-caab8a53\\Lux.exe",
+    "workspace": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\ebf3a72a-caab8a53\\resources\\app\\runtime",
+    "node": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\ebf3a72a-caab8a53\\resources\\app\\node.exe",
+    "adapter": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\ebf3a72a-caab8a53\\resources\\app\\runtime\\scripts\\studio-installed-mcp.mjs",
+    "profile": "desktop",
+    "sourceDigest": "46a2d575943921c96fcc20c9d835b8a98b4a050aca7a2f83423996bfbec87f99"
+  },
+  "sharedRoot": "C:\\Users\\zFlei\\AppData\\Local\\Temp\\lux-standard-library-native\\a37dcef2-fa25-46a6-96ba-4fc39b1103d4\\shared-library-with-a-deliberately-long-path-for-layout-verification\\library",
+  "profiles": [
+    "test-df9bc538-f8ba-4167-8e57-c385e20be54e",
+    "test-59273756-1af6-4de6-b77d-bfc5ce7cf866"
+  ],
+  "checks": [
+    "Built-in Prismatic Ball is present and explicit library create succeeds",
+    "A distinct Studio profile sees both the built-in and explicit save through one isolated root",
+    "Linked composition builds, saves, and reopens with its resolved revision and mounted fallback source",
+    "Actual Library panel identifies the isolated storage path without overflowing its pane"
+  ],
+  "exits": [
+    {
+      "label": "profile-a",
+      "code": 0
+    },
+    {
+      "label": "profile-b",
+      "code": 0
+    }
+  ],
+  "errors": [],
+  "builtIn": {
+    "id": "93a7215f-4df1-4e1e-9d34-3f7f0f27ad84",
+    "revision": 1
+  },
+  "created": {
+    "id": "021b54fc-5c3d-461a-a197-8c0ba92cf71f",
+    "revision": 1
+  }
+}

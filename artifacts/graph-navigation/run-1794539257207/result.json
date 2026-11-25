@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "root": "C:\\Users\\zFlei\\repos\\lux",
+  "profile": "test-e2f449f4-9056-40c6-bf17-1f8c1fb6b223",
+  "checks": [],
+  "errors": [],
+  "screenshots": [],
+  "stage": "checking plain Scene root",
+  "error": "AssertionError [ERR_ASSERTION]: {\"content\":[{\"type\":\"text\",\"text\":\"Studio is busy or command is unsupported\"}],\"isError\":true}\n    at call (file:///C:/Users/zFlei/repos/lux/scripts/.scene-interior-before.mjs:37:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/scripts/.scene-interior-before.mjs:49:22"
+}

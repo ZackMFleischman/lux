@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "root": "C:\\Users\\zFlei\\repos\\lux",
+  "profile": "test-5f76c73b-51e2-43b6-8748-7919ea0d23ef",
+  "checks": [],
+  "errors": [],
+  "screenshots": [],
+  "stage": "launching isolated Studio",
+  "error": "AssertionError [ERR_ASSERTION]: wait for the small preview replacement to finish\n    at file:///C:/Users/zFlei/repos/lux/scripts/test-studio-graph-navigation.mjs:53:10"
+}

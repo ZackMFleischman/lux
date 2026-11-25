@@ -1,0 +1,10 @@
+{
+  "body": "Backlog only. Live input recording is not part of the current creative-workflow or audio-analysis milestone. Do not dispatch the old plan automatically.\n\nPreserve the submitted adapter plan, control-ordering defect evidence, and worktree. Before resuming, recheck the current runtime and user need; prepare a concrete recording feature and obtain independent review. No recording implementation or native acquisition is approved by this ticket's prior plan submission.\n\nHistorical scope and evidence: artifacts/board-review.json and .worktrees/_coordination/LUX-85. Existing policy/native gates remain.",
+  "title": "Deferred: live input recording",
+  "parent_id": "7187f877-b10d-484b-b905-6204291ec2fb",
+  "kind": "planning",
+  "reason": "User requested board reconciliation. Remove obsolete active-review presentation; preserve historical work as explicitly deferred backlog.",
+  "dependencies": [
+    "5347ea54-473c-4d77-afb2-9a4bc708c469"
+  ]
+}

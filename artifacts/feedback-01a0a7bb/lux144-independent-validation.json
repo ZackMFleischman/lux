@@ -1,0 +1,14 @@
+{
+  "commit": "9e099d0707078b7709bb627d216860a75c61982a",
+  "criteria": "Top menus are File, View, Preview. Preview has accessible camera and record/stop controls connected to the fixed-resolution shared recorder, with one authoritative live recording announcement, a compact narrow layout, successful PNG/WebM output, and no successful-run capture leftovers.",
+  "evidence": "Independent review inspected commits 668191dced47eec20560319514d5d61c204e64ae and 9e099d0707078b7709bb627d216860a75c61982a, including the combined DOM regression that asserts one role=status across menu and header. Fresh isolated native evidence is artifacts/preview-actions-native/run-1789537154549/result.json, desktop-header.png, and narrow-header.png: File/View/Preview order, panel camera/record controls, 1920x1080 PNG, a 24,686-byte 1920x1080 WebM, 2.520899-second playback completion in a separate owned permissive BrowserWindow, compact header geometry, no error alerts, and no .lux-* temporary file in the fresh directory. The earlier zero-byte temp/error belongs to the prior immediate-stop harness run outside this fresh output and is not used for acceptance. The Studio-page blob decoder emits code 4 because its intentional default-src-none CSP rejects the URL; no production CSP change was made, and the separate owned decoder establishes file playback.",
+  "context_id": "codex-lux144-independent-validator-01a0a7bb",
+  "checks": {
+    "studio_cpu": "pass",
+    "typecheck": "pass",
+    "combined_live_status_dom": "pass",
+    "native_header_capture": "pass",
+    "fresh_output_cleanup": "pass",
+    "webm_decode_playback": "pass"
+  }
+}

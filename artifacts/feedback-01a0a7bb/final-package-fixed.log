@@ -1,0 +1,35 @@
+Extracting the checksum-verified official Electron archive...
+Copying independent package dependencies...
+Building the installed Studio...
+
+  apps\studio\dist\main.cjs      419.4kb
+  apps\studio\dist\main.cjs.map  873.0kb
+
+Done in 879ms
+
+  apps\studio\dist\preload.cjs      4.8kb
+  apps\studio\dist\preload.cjs.map  7.5kb
+
+Done in 36ms
+
+  apps\studio\dist\renderer.js         4.3mb
+  apps\studio\dist\renderer.css      156.9kb
+  apps\studio\dist\renderer.js.map     7.9mb
+  apps\studio\dist\renderer.css.map  240.4kb
+
+Done in 5861ms
+
+  apps\studio\dist\visual-worker.js      502.1kb
+  apps\studio\dist\visual-worker.js.map    1.0mb
+
+Done in 560ms
+
+  apps\studio\dist\source-admission-worker.js      191.7kb
+  apps\studio\dist\source-admission-worker.js.map  436.0kb
+
+Done in 289ms
+
+  apps\studio\dist\image-preview-worker.js      189.0kb
+  apps\studio\dist\image-preview-worker.js.map  434.4kb
+
+Done in 222ms

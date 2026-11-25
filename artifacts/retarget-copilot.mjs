@@ -1,0 +1,14 @@
+import {readFile,writeFile} from 'node:fs/promises';
+const path='artifacts/start-creative-copilot.mjs';
+let s=await readFile(path,'utf8');
+s=s.replace("import { readFile, writeFile }","import { readFile }");
+const start=s.indexOf('const record =');
+const end=s.indexOf('const overrides =',start);
+s=s.slice(0,start)+`const record = {checkout:root};
+const profile = 'creative-c8e73bbdb600a59b83b225c2';
+const endpoint = JSON.parse(await readFile(join(process.env.APPDATA, 'Lux/Studio/profiles', profile, 'agent-endpoint.json'), 'utf8'));
+if (endpoint.workspace.toLowerCase() !== root.toLowerCase() || endpoint.profile !== profile || endpoint.sessionId !== 'c5a6db070d8e1b55735dd87de0466185a89b') throw Error('Lux endpoint does not match selected main session');
+`+s.slice(end);
+s=s.replace("'-c', 'mcp_servers.lux-studio.env.LUX_STUDIO_PROFILE=\"creative\"'","'-c', 'mcp_servers.lux-studio.env.LUX_STUDIO_PROFILE=\"creative-c8e73bbdb600a59b83b225c2\"'");
+s=s.replace("await writeFile(join(root,'artifacts/live-start-request.json'),JSON.stringify(args[0])); ","");
+await writeFile(path,s);

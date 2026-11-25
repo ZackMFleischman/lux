@@ -1,0 +1,7 @@
+import {readFile,writeFile} from 'node:fs/promises';
+const a='48a7d856-2cb2-4779-b756-0ba156718321',b='c61a5b8f-d522-4f50-b7fb-c6c64976a638',c='831d46b4-3f11-4f9d-a89b-9f4fbe535621';
+const source=`import {defineComposition} from '@lux/visual-sdk';
+import instrument from './shared/observatory/instrument.ts';
+import prism from './effects/prism.ts';
+export default defineComposition({definitions:{instrument,prism},nodes:[{id:'${a}',definition:'instrument'},{id:'${b}',definition:'prism'},{id:'${c}',definition:'prism'}],edges:[{id:'1aa3d8c0-a9ca-47ef-ab77-c3e49f5e240a',from:{nodeId:'${a}',portId:'image'},to:{nodeId:'${b}',portId:'image'},delay:'none'},{id:'3aa3d8c0-a9ca-47ef-ab77-c3e49f5e240a',from:{nodeId:'${b}',portId:'image'},to:{nodeId:'${c}',portId:'image'},delay:'none'}],output:{nodeId:'${c}',portId:'image'},expose:[${[['orbitSpeed',a,'speed'],['ringExpansion',a,'spread'],['gimbalTilt',a,'twist'],['spectrum',a,'hue'],['innerSplit',b,'split'],['innerGlow',b,'glow'],['innerRadius',b,'radius'],['outerSplit',c,'split'],['outerGlow',c,'glow'],['outerRadius',c,'radius']].map(([id,nodeId,controlId])=>`{id:'${id}',nodeId:'${nodeId}',controlId:'${controlId}'}`).join(',')}]});`;
+await writeFile(new URL('./build.json',import.meta.url),JSON.stringify({expectedDraftVersion:1,source:{sdkVersion:'0.4.0',entry:'observatory.ts',files:{'observatory.ts':source,'effects/prism.ts':await readFile(new URL('./prism.ts',import.meta.url),'utf8')}},libraryLinks:[{componentId:'84afe10a-a999-40f5-956c-bace96cce23b',mountPath:'shared/observatory'}]},null,2));

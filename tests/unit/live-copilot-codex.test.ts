@@ -1,6 +1,53 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { parse } from 'smol-toml';
 import { sanitizeEnvironment, requireChatGPT, validateRouting, createCodex, enforcedConfig } from '../../tools/live-copilot/codex.ts';
+
+test('software summaries require completed execution evidence', async () => {
+  let item: any;
+  const codex = createCodex({ root: '.', apiKey: '', readConfiguration: async () => ({}), run: async (args, options) => {
+    if (args.includes('status')) return { code: 0, stdout: 'Logged in using ChatGPT', stderr: '' };
+    if (item) options.onEvent?.({ type: 'item.completed', item });
+    options.onEvent?.({ type: 'item.completed', item: { type: 'agent_message', text: JSON.stringify({ success: true, summary: 'Verified file.', operation: 'software', applied_tools: [] }) } });
+    options.onEvent?.({ type: 'turn.completed' });
+    return { code: 0, stdout: '', stderr: '' };
+  } });
+  for (item of [undefined, { type: 'command_execution', status: 'completed', exit_code: 1 }, { type: 'file_change', status: 'failed' }]) {
+    await assert.rejects(codex.execute('Write a file', new AbortController().signal), /Required tool evidence/);
+  }
+  for (item of [{ type: 'command_execution', status: 'completed', exit_code: 0 }, { type: 'file_change', status: 'completed' }]) {
+    assert.equal(await codex.execute('Write a file', new AbortController().signal), 'Verified file.');
+  }
+});
+
+test('all Lux tools are preapproved with workspace writes and unchanged other server permissions', () => {
+  const settings = parse(enforcedConfig.filter((_value, index) => index % 2 === 1).join('\n')) as any;
+  assert.equal(settings.forced_login_method, 'chatgpt');
+  assert.equal(settings.model_provider, 'openai');
+  assert.equal(settings.approval_policy, undefined);
+  assert.equal(settings.sandbox_mode, 'workspace-write');
+  assert.deepEqual(settings.mcp_servers, { 'lux-studio': { default_tools_approval_mode: 'approve' } });
+});
+
+test('saved per-tool prompts are overridden using exact canonical names', async () => {
+  let settings: any;
+  const codex = createCodex({ root: process.cwd(), apiKey: '', readConfiguration: async () => ({
+    mcp_servers: { 'lux-studio': { tools: { 'lux.studio.status': { approval_mode: 'prompt' } } } },
+  }), run: async (args) => {
+    settings = parse(args.slice(0, -2).filter((_v, i) => i % 2 === 1).join('\n'));
+    return { code: 0, stdout: 'Logged in using ChatGPT', stderr: '' };
+  } });
+  await codex.verify();
+  assert.equal(settings.mcp_servers['lux-studio'].tools['lux.studio.status'].approval_mode, 'approve');
+});
+
+test('filtered Lux tool configuration fails clearly before opening a session', async () => {
+  for (const filter of [{ enabled_tools: ['lux.studio.status'] }, { disabled_tools: ['lux.studio.build'] }]) {
+    const codex = createCodex({ root: '.', apiKey: '', readConfiguration: async () => ({ mcp_servers: { 'lux-studio': filter } }),
+      run: async () => { throw Error('must fail before invocation'); } });
+    await assert.rejects(codex.verify(), /Remove that Lux-only filter/);
+  }
+});
 
 test('authentication requires an affirmative ChatGPT status, not just exit zero', () => {
   requireChatGPT({ code: 0, stdout: '', stderr: 'Logged in using ChatGPT\n' });
@@ -50,7 +97,7 @@ test('complete Codex adapter accepts an MCP-backed result, rejects incomplete tu
     run: async (args, options) => {
       if (args.includes('status')) return { code: 0, stdout: 'Logged in using ChatGPT', stderr: '' };
       options.onEvent?.({ type: 'item.completed', item: { type: 'mcp_tool_call', server: 'lux-studio', tool: 'lux.studio.status', status: 'completed', result: { content: [] } } });
-      options.onEvent?.({ type: 'item.completed', item: { type: 'agent_message', text: '{"success":true,"summary":"Lux is running.","operation":"inspect","applied_tools":["lux.studio.status"]}' } });
+      options.onEvent?.({ type: 'item.completed', item: { type: 'agent_message', text: '{"success":true,"summary":"Lux is running.","operation":"inspect","applied_tools":["mcp__lux_studio__lux_studio_status"]}' } });
       if (complete) options.onEvent?.({ type: 'turn.completed' });
       return { code: 0, stdout: '', stderr: '' };
     } });
@@ -83,7 +130,7 @@ test('a status read cannot support a claimed change; a completed mutation can', 
     options.onEvent?.({ type: 'turn.completed' });
     return { code: 0, stdout: '', stderr: '' };
   } });
-  await assert.rejects(codex.execute('faster', new AbortController().signal), /required tool evidence/);
+  await assert.rejects(codex.execute('faster', new AbortController().signal), /Required tool evidence/);
   tool = 'lux.studio.parameters';
   assert.equal(await codex.execute('faster', new AbortController().signal), 'Made it faster.');
 });

@@ -1,0 +1,2 @@
+# bash ship.sh <tag> <chain...>
+cd /c/Users/zFlei/repos/lux/artifacts/jelly; tag=$1; shift; node gen.mjs "$@" && cd ../.. && node artifacts/luxc.mjs read '{}' artifacts/jelly/read >/dev/null && node artifacts/jelly/build.mjs artifacts/jelly/src && node artifacts/luxc.mjs build @artifacts/jelly/build-args.json artifacts/jelly/b-$tag | head -c 600; echo; node artifacts/luxc.mjs capture '{}' artifacts/jelly/c-$tag | head -1

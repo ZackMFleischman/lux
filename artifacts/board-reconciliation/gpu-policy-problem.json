@@ -1,0 +1,7 @@
+{
+  "actual": "Coordinator applied one-test-at-a-time holds to all native graphics work and repeatedly mediated reservations, delaying delivery. User explicitly corrected this as overly restrictive.",
+  "expected": "Use measured contention to coordinate tests. CPU work proceeds independently. Concurrent low-resolution functional previews are allowed when resources permit; exclusive windows are reserved for performance measurements or heavy full-resolution runs.",
+  "correction": "User supersedes the historical blanket serialization rule. Default routine QA to640x360 with normal UI viewport; allow concurrent functional tests subject to resource checks. Preserve uncontended performance evidence and exact required capture resolutions. Never hold CPU implementation for a GPU slot or terminate user apps.",
+  "summary": "Blanket GPU-test serialization delays unrelated delivery",
+  "evidence": "User correction in task01a09baf-3806-7eb0-8bed-48b8b7f771cf on2026-09-16; delivery coordinator01a0a7bb acknowledged updated policy. Earlier snapshot50GB RAM free,845MiB/8192MiB VRAM used is historical, not proof of future capacity."
+}

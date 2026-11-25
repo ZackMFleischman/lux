@@ -1,0 +1,9 @@
+{
+  "criteria": "Board relevance review: live-input recording plan is outside current creative-workflow priority and has not received required independent plan acceptance.",
+  "checks": {
+    "relevance": "fail"
+  },
+  "commit": "caa937adbf8b2f6426ac8abae01612639c51ee7c",
+  "evidence": "User paused MIDI/recording delivery and requested feature-sized tickets. Preserve submitted plan and discovered ordering-defect evidence; return to deferred backlog without approving plan or authorizing recording implementation.",
+  "context_id": "01a09baf-3806-7eb0-8bed-48b8b7f771cf/board-reconciliation"
+}

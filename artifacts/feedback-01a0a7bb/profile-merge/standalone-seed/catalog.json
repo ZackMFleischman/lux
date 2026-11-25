@@ -1,0 +1,38 @@
+{
+  "format": "lux-component-library-catalog",
+  "version": 1,
+  "components": [
+    {
+      "id": "93a7215f-4df1-4e1e-9d34-3f7f0f27ad84",
+      "revision": 1
+    },
+    {
+      "id": "84afe10a-a999-40f5-956c-bace96cce23b",
+      "revision": 1
+    },
+    {
+      "id": "489bada1-64e6-40c6-bae6-9b31077bf0d4",
+      "revision": 2
+    },
+    {
+      "id": "6ea599ba-1669-4a84-8ef0-4306c234715f",
+      "revision": 1
+    },
+    {
+      "id": "78a8f505-dde8-4ec4-9e25-934a14ccd31a",
+      "revision": 1
+    },
+    {
+      "id": "80b280b0-c2a7-4f38-a34c-0a18bbb0947d",
+      "revision": 1
+    },
+    {
+      "id": "e84c1b88-e3b7-447a-85dd-38ebeddbfe28",
+      "revision": 1
+    },
+    {
+      "id": "f573cb7b-c14a-4051-b4f3-d11111a5c4a0",
+      "revision": 1
+    }
+  ]
+}

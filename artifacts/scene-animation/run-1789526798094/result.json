@@ -1,0 +1,19 @@
+{
+  "installation": {
+    "sourceCommit": "ebf3a72ac71532799310cebabaae2c6f5fb9a470",
+    "executable": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\ebf3a72a-caab8a53\\Lux.exe",
+    "workspace": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\ebf3a72a-caab8a53\\resources\\app\\runtime"
+  },
+  "ok": true,
+  "profile": "test-e6f00a66-9e2e-420d-bd0b-ad4c2ad187a3",
+  "source": "ebf3a72ac71532799310cebabaae2c6f5fb9a470",
+  "checks": [
+    "Flat SDK 0.2 scene animation changes effective output while preserving base",
+    "Keyboard group collapse closes its animation popup and preserves the binding",
+    "Save/reopen retains animation; invalid edit preserves working runtime and animation",
+    "Composition Scene alias still animates its canonical component control"
+  ],
+  "errors": [],
+  "pid": 24892,
+  "exitCode": 0
+}

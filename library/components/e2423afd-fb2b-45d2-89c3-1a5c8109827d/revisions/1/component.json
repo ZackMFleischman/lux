@@ -1,0 +1,17 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "e2423afd-fb2b-45d2-89c3-1a5c8109827d",
+  "revision": 1,
+  "name": "Sonic Veil",
+  "description": "Transparent glowing sine ribbons for bass, mids and highs. Bind its three numeric energy controls to the shared audio input; layer the image behind a subject. Uses the same ribbon implementation as Living Pearl.",
+  "updatedAt": "2026-11-13T03:44:40.864Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "sonic-veil-component.ts",
+    "files": [
+      "sonic-veil-component.ts",
+      "spectral-waves.ts"
+    ]
+  }
+}

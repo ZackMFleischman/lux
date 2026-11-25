@@ -1,0 +1,43 @@
+✔ nested readable node paths execute through resource capture and backend dispatch (16.0432ms)
+✔ H1 authentic attachment is once; own non-enumerable captures reject accessors without calls (4.7128ms)
+✔ H6 final hold survives cache release; old caches survive replacement (2.4741ms)
+✔ H11 authentic 257 reachable leaves reserve exactly 4096 destination ports (130.9134ms)
+ℹ {"criterion":"H11-inputs","reachable":257,"inputs":4096,"pruned":0,"drained":{"state":"drained","clockEpoch":3,"counts":{"allocations":0,"backend":0,"inputs":0,"frames":0,"captures":0},"openCallbacks":0,"cleanupPending":0,"releaseFailed":0}}
+✔ H11 8192 retained outputs reject next issue without dispatch or eviction (831.8984ms)
+ℹ {"criterion":"H11-allocations","frames":512,"outputsPerFrame":16,"produced":8192,"released":8192}
+✔ H11 reader and capture cap plus one leave prior holders intact (7.1768ms)
+ℹ {"criterion":"H11-holders","readers":16,"captures":16,"final":{"state":"drained","clockEpoch":3,"counts":{"allocations":0,"backend":0,"inputs":0,"frames":0,"captures":0},"openCallbacks":0,"cleanupPending":0,"releaseFailed":0}}
+✔ H13 8192 failed releases retain bounded evidence and never retry (2618.904ms)
+ℹ {"criterion":"H13","releases":8192,"getters":0,"status":{"state":"terminal","clockEpoch":3,"counts":{"allocations":8192,"backend":0,"inputs":0,"frames":0,"captures":0},"openCallbacks":0,"cleanupPending":0,"releaseFailed":8192}}
+✔ H14 detached immutable backend identity and type-only authority (3.4452ms)
+✔ H1 H14 all capability kinds reject clones and foreign ownership without reflection (2.3795ms)
+✔ H14 profile descriptor and methods are captured once with original backend receiver (1.212ms)
+✔ H1 bounded shapes reject getters extra fields exotic and sparse input arrays (1.6326ms)
+✔ literal FNV/Mulberry vector 0/00000000-0000-4000-8000-000000000001 (4.9021ms)
+✔ literal FNV/Mulberry vector 1/00000000-0000-4000-8000-000000000001 (0.5818ms)
+✔ literal FNV/Mulberry vector 0/00000000-0000-4000-8000-000000000002 (0.4079ms)
+✔ literal FNV/Mulberry vector 4294967295/00000000-0000-4000-8000-000000000001/00000000-0000-4000-8000-000000000002 (0.402ms)
+✔ literal FNV/Mulberry vector 0/ABCDEFAB-1234-4ABC-8DEF-ABCDEFABCDEF (0.3461ms)
+✔ literal FNV/Mulberry vector 0/abcdefab-1234-4abc-8def-abcdefabcdef (0.3232ms)
+✔ literal 57-byte zero/A encoding independently hashes to the published seed (0.4426ms)
+✔ accepts frozen depth-eight paths, repeated UUID segments and canonical seed zero (0.7501ms)
+✔ readable nested node paths use an unambiguous deterministic encoding (0.8702ms)
+✔ rejects invalid seeds before path reads or unsigned truncation (1.2966ms)
+✔ rejects malformed path containers and identities without invoking getters (2.9565ms)
+✔ streams own private state and reset the original seed without external changes (0.4549ms)
+✔ SDK discovery advertises the Studio camera controller convention (11.7199ms)
+✔ camera field validation and pose math preserve the authored zero pose (1.5255ms)
+✔ the reusable Camera Controller source passes the real Library compile harness (5654.9349ms)
+✔ pose offsets orbit, pan, dolly and roll without mutating authored inputs (0.6217ms)
+✔ binding derives arbitrary public aliases only for one connected opted-in camera field (3.0822ms)
+✔ preview gestures coalesce writes, stop at stale runtime, and Reset cancels queued motion (2.5608ms)
+✔ an older runtime acknowledgement cannot roll back newer optimistic camera motion (0.5685ms)
+✔ a newer Inspector edit supersedes the latest acknowledged camera gesture (0.8443ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 31
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6055.7323

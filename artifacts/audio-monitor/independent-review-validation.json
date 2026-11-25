@@ -1,0 +1,11 @@
+{
+  "commit": "fa6dd785779ede559667e29afe7aa47915bc7697",
+  "criteria": "Reviewed the Monitor toggle implementation and its landed follow-up label. It reuses the active capture stream, creates a route only while monitoring is enabled, starts disabled, disconnects on toggle-off/disconnect/dispose/capture loss, and does not request another media stream.",
+  "evidence": "Independent source review of apps/studio/src/audio/studio-audio-runtime.ts and AudioInputControl.tsx; current landed label shows 'Monitor on' while aria-pressed. Actual isolated Studio smoke evidence at artifacts/audio-monitor/result.json records CABLE connected, off by default, on/off transitions, and disconnect reset; monitor-on.png shows the connected Studio control. Smoke owned PID 26804 and exited 0. Worker-recorded focused Studio build passed for submitted source.",
+  "context_id": "codex-monitor-review-20260916",
+  "checks": {
+    "source-review": "pass",
+    "native-smoke": "pass",
+    "focused-build": "pass"
+  }
+}

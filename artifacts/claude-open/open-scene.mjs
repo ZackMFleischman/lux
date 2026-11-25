@@ -1,0 +1,14 @@
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+const [scenePath] = process.argv.slice(2);
+const client = new Client({ name: 'lux-open-scene', version: '1.0.0' });
+const call = async (name, args = {}) => { const r = await client.callTool({ name: `lux.studio.${name}`, arguments: args });
+  const t = r.content?.find(c => c.type === 'text')?.text; const v = t ? JSON.parse(t) : r; if (r.isError) throw Error(t); return v; };
+await client.connect(new StdioClientTransport({ command: process.execPath, args: ['scripts/studio-mcp.mjs'], cwd: process.cwd(), env: { ...process.env } }));
+const before = await call('read');
+console.log('before:', JSON.stringify({ scene: before.scene?.name ?? before.sceneName, draftVersion: before.draftVersion, dirty: before.dirty }));
+const opened = await call('open', { path: scenePath, expectedDraftVersion: before.draftVersion });
+console.log('opened:', JSON.stringify(opened).slice(0, 600));
+const status = await call('status');
+console.log('status:', JSON.stringify(status).slice(0, 1500));
+await client.close();

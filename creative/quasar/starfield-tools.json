@@ -1,0 +1,1049 @@
+[
+  {
+    "name": "lux.studio.discover",
+    "description": "Read the exact visual SDK, example and standalone Lux capabilities. Start Lux Studio separately.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.studio.read",
+    "description": "Read the current draft and version. For single-visual scenes source is authoritative. For Scene v7 document is the complete authoritative scene and source is the selected editor view. Preserve every document field. The JSON response is limited to 52 MiB and the escaped tool result to 104 MiB.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.studio.status",
+    "description": "Read actual standalone preview status.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.studio.build",
+    "description": "Compile and preview one complete replacement. Read first; expectedDraftVersion prevents overwriting intervening edits. Pass source (plus optional libraryLinks/Story v1) for single-visual scenes, or pass the complete Scene v7 document with no source/libraryLinks/story siblings. For Scene v7, preserve all visuals, sources, caches, animations, settings, tempo and Story v2. Successful builds return Story to Normal. Failed builds retain the working preview.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "expectedDraftVersion": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "entry": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "files": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "sdkVersion": {
+                  "type": "string",
+                  "enum": [
+                    "0.1.0",
+                    "0.2.0",
+                    "0.4.0"
+                  ]
+                }
+              },
+              "required": [
+                "entry",
+                "files",
+                "sdkVersion"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "entry": {
+                  "$ref": "#/properties/source/anyOf/0/properties/entry"
+                },
+                "files": {
+                  "$ref": "#/properties/source/anyOf/0/properties/files"
+                },
+                "sdkVersion": {
+                  "$ref": "#/properties/source/anyOf/0/properties/sdkVersion"
+                },
+                "sourceVersion": {
+                  "type": "number",
+                  "const": 2
+                },
+                "assets": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "mediaType": {
+                        "type": "string",
+                        "enum": [
+                          "image/bmp",
+                          "image/png",
+                          "image/jpeg"
+                        ]
+                      },
+                      "encoding": {
+                        "type": "string",
+                        "const": "base64"
+                      },
+                      "data": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "mediaType",
+                      "encoding",
+                      "data"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "entry",
+                "files",
+                "sdkVersion",
+                "sourceVersion",
+                "assets"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "document": {},
+        "libraryLinks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "componentId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "mountPath": {
+                "type": "string",
+                "maxLength": 180,
+                "pattern": "^(?:[A-Za-z0-9_-]+\\/)*[A-Za-z0-9_-]+$"
+              }
+            },
+            "required": [
+              "componentId",
+              "mountPath"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "story": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "version": {
+                  "type": "number",
+                  "const": 1
+                },
+                "beats": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+                      },
+                      "label": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "timing": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "kind": {
+                                "type": "string",
+                                "const": "sustained"
+                              }
+                            },
+                            "required": [
+                              "kind"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "kind": {
+                                "type": "string",
+                                "const": "timed"
+                              },
+                              "durationSeconds": {
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                              }
+                            },
+                            "required": [
+                              "kind",
+                              "durationSeconds"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "label",
+                      "timing"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "maxItems": 128
+                },
+                "sequence": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "$ref": "#/properties/story/anyOf/0/properties/beats/items/properties/id"
+                      },
+                      "beatId": {
+                        "$ref": "#/properties/story/anyOf/0/properties/beats/items/properties/id"
+                      },
+                      "follow": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "kind": {
+                                "type": "string",
+                                "const": "manual"
+                              }
+                            },
+                            "required": [
+                              "kind"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "kind": {
+                                "type": "string",
+                                "const": "after"
+                              },
+                              "seconds": {
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                              }
+                            },
+                            "required": [
+                              "kind",
+                              "seconds"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "beatId",
+                      "follow"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "maxItems": 1024
+                }
+              },
+              "required": [
+                "version",
+                "beats",
+                "sequence"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "expectedDraftVersion"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.studio.save",
+    "description": "Save the current scene to an explicit .lux-scene path. Read first and pass expectedDraftVersion. Existing paths require overwrite:true; external file changes remain protected.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "expectedDraftVersion": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "overwrite": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "path",
+        "expectedDraftVersion"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.studio.open",
+    "description": "Open an explicit .lux-scene path. Read first and pass expectedDraftVersion. Dirty source, controls, or library links require discardDirty:true; invalid scenes retain the current draft and preview.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "expectedDraftVersion": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "discardDirty": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "path",
+        "expectedDraftVersion"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.library.list",
+    "description": "Explicitly refresh shared component metadata; the compact catalog is already supplied in server instructions and discovery.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.library.read",
+    "description": "Read one shared component, its own source and pinned Library dependencies. Omit revision for latest, or read an exact immutable revision.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revision": {
+          "type": "integer",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.library.create",
+    "description": "Validate an image/paths2d/shader-field component or SDK 0.4 composition, then publish its own source and optional pinned dependencies to the shared Library at revision 1.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "source": {
+          "type": "object",
+          "properties": {
+            "entry": {
+              "type": "string",
+              "minLength": 1
+            },
+            "files": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "sdkVersion": {
+              "type": "string",
+              "const": "0.4.0"
+            }
+          },
+          "required": [
+            "entry",
+            "files",
+            "sdkVersion"
+          ],
+          "additionalProperties": false
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "componentId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "mountPath": {
+                "type": "string",
+                "maxLength": 180,
+                "pattern": "^(?:[A-Za-z0-9_-]+\\/)*[A-Za-z0-9_-]+$"
+              },
+              "revision": {
+                "type": "integer",
+                "exclusiveMinimum": 0
+              }
+            },
+            "required": [
+              "componentId",
+              "mountPath",
+              "revision"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "source"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.library.update",
+    "description": "Validate and build a complete replacement, then update one standard shared entry only when expectedRevision matches.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "source": {
+          "type": "object",
+          "properties": {
+            "entry": {
+              "type": "string",
+              "minLength": 1
+            },
+            "files": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "sdkVersion": {
+              "type": "string",
+              "const": "0.4.0"
+            }
+          },
+          "required": [
+            "entry",
+            "files",
+            "sdkVersion"
+          ],
+          "additionalProperties": false
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "componentId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "mountPath": {
+                "type": "string",
+                "maxLength": 180,
+                "pattern": "^(?:[A-Za-z0-9_-]+\\/)*[A-Za-z0-9_-]+$"
+              },
+              "revision": {
+                "type": "integer",
+                "exclusiveMinimum": 0
+              }
+            },
+            "required": [
+              "componentId",
+              "mountPath",
+              "revision"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "id": {
+          "$ref": "#/properties/dependencies/items/properties/componentId"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "source",
+        "id",
+        "expectedRevision"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.studio.capture",
+    "description": "Return an actual PNG at the current Preview render size, with frame, controls and revision metadata. MCP does not change Preview resolution.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.studio.parameters",
+    "description": "Set a partial map of code-defined parameters: numbers, booleans, or stable enum option IDs. Read status for controlSchema types/options/ranges, instance, generation, revision and expectedControlSchemaHash guards. Returns actual applied frame state; live mode only.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "instanceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedGeneration": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "expectedRevisionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedControlSchemaHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "visualId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "values": {
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              }
+            ]
+          }
+        },
+        "mode": {
+          "type": "string",
+          "const": "live",
+          "default": "live"
+        }
+      },
+      "required": [
+        "instanceId",
+        "expectedGeneration",
+        "expectedRevisionId",
+        "values"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.studio.playback",
+    "description": "Play, pause or reset the Studio runtime using current instance and generation guards. Reset preserves playing/paused state. Returns applied state.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "instanceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedGeneration": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "play",
+            "pause",
+            "reset"
+          ]
+        }
+      },
+      "required": [
+        "instanceId",
+        "expectedGeneration",
+        "action"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.studio.restart",
+    "description": "Restart the Studio runtime using current instance and generation guards. Retains source and controls; returns replacement runtime state.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "instanceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedGeneration": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "instanceId",
+        "expectedGeneration"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.studio.variation",
+    "description": "Configure or remove stable per-instance variation for one numeric control. Read status first for nodePath, controlId and runtime guards. Amount is a symmetric range around the current base; distribution is random, centered, or spread. Pass variation:null to remove it.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "instanceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedGeneration": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "expectedRevisionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedControlSchemaHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "visualId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "nodePath": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "maxItems": 8
+        },
+        "controlId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "variation": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "distribution": {
+                  "type": "string",
+                  "enum": [
+                    "random",
+                    "centered",
+                    "spread"
+                  ]
+                },
+                "amount": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "enabled": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "distribution",
+                "amount",
+                "enabled"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "instanceId",
+        "expectedGeneration",
+        "expectedRevisionId",
+        "expectedControlSchemaHash",
+        "nodePath",
+        "controlId",
+        "variation"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.studio.trigger",
+    "description": "Invoke one discovered trigger control with current instance, generation, revision and schema guards, a controlId and caller-supplied commandId. Optional nodePath addresses a component instance. Returns the completed-frame receipt. Retry an uncertain action with the same commandId and guards; never automatically retry across generations. Trigger actions are not saved values. A paused preview draws once with zero delta and remains paused.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "instanceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedGeneration": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "commandId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "expectedRevisionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedControlSchemaHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "visualId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "activationId": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "controlId": {
+          "type": "string",
+          "pattern": "^[a-z][A-Za-z0-9_]{0,63}$"
+        },
+        "nodePath": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "minItems": 1,
+          "maxItems": 16
+        }
+      },
+      "required": [
+        "instanceId",
+        "expectedGeneration",
+        "commandId",
+        "expectedRevisionId",
+        "expectedControlSchemaHash",
+        "controlId"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.story.read",
+    "description": "Read accepted Story status, definition, or source capabilities. Status supplies current runtime guards and transport revision. Sustained beats have no local timeline; occurrence dwell is separate from timed beat phase.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "view": {
+          "type": "string",
+          "enum": [
+            "status",
+            "definition",
+            "capabilities"
+          ]
+        }
+      },
+      "required": [
+        "view"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.story.transport",
+    "description": "Control Story with one guarded action. launch stays on a beat indefinitely; start runs occurrences; resume requires an explicit occurrence and fresh dwell. Auto-advance controls dwell independently from timed phase. seek/replay/loop require a timed/direct beat. Return-normal resumes normal visual behavior without resetting ambient time. Reuse commandId only for an exact uncertain retry; read current guards and expectedStoryRevision first. Success is a completed-frame receipt, not merely admission.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "instanceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedGeneration": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "commandId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "expectedRevisionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedStoryHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "expectedStoryRevision": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "launch",
+            "start",
+            "pause",
+            "play",
+            "set-auto-advance",
+            "resume",
+            "advance",
+            "seek",
+            "replay",
+            "loop",
+            "return-normal"
+          ]
+        },
+        "beatId": {
+          "type": "string"
+        },
+        "occurrenceId": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "localTimeSeconds": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "instanceId",
+        "expectedGeneration",
+        "commandId",
+        "expectedRevisionId",
+        "expectedStoryHash",
+        "expectedStoryRevision",
+        "action"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.studio.tempo.set",
+    "description": "Set manual scene tempo from 20 through 300 BPM using current runtime identity and revision guards. Preserves beat phase and returns the acknowledged tempo result.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "instanceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedGeneration": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "expectedRevisionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bpm": {
+          "type": "number",
+          "minimum": 20,
+          "maximum": 300
+        }
+      },
+      "required": [
+        "instanceId",
+        "expectedGeneration",
+        "expectedRevisionId",
+        "bpm"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "lux.studio.tempo.tap",
+    "description": "Tap scene tempo using the running Studio monotonic clock and current runtime identity and revision guards. Returns accepted, restarted, or ignored-short.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "instanceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedGeneration": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "expectedRevisionId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "instanceId",
+        "expectedGeneration",
+        "expectedRevisionId"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  }
+]

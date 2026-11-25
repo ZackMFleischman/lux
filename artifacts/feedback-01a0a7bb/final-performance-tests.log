@@ -1,0 +1,29 @@
+✔ offset reference probing preserves the unchanged real routine query schedule (13.2501ms)
+✔ baseline leaves GPU APIs untouched and allocates no query resources (0.4757ms)
+✔ routine samples frames 1 and 31 without treating intervening draws as failures (2.927ms)
+✔ an uninstrumented encoder from an unsampled frame cannot certify a sampled submission (0.9088ms)
+✔ GPU timer captures every render/compute pass, subtracts uint64 before converting, and never reuses cached results (1.2978ms)
+✔ readback pool stays bounded and overflow/failure/late completion are explicit (1.4361ms)
+✔ unsupported features allocate nothing and conflicting query writes cannot claim complete coverage (0.8226ms)
+✔ copies retain useful pass timing with incomplete coverage and old command buffers cannot impersonate a reused query slot (0.8845ms)
+✔ pass overflow and non-extensible WebGPU objects invalidate instrumentation without breaking rendering (1.6636ms)
+✔ asynchronous GPU validation failure rejects otherwise plausible cached timestamp contents (0.8414ms)
+✔ baseline disables duration collection while preserving completed-frame health counts (5.2229ms)
+✔ routine GPU populations include only eligible frames, including across summary boundaries (1.2254ms)
+✔ GPU readbacks correlate once to retained frames; missing or late samples never reuse earlier values (0.5956ms)
+✔ collector measures completed-frame throughput and per-frame CPU sums with nearest-rank quantiles (0.3359ms)
+✔ overflow is bounded and cannot improve completeness; drained samples are not retained indefinitely (0.314ms)
+✔ invalid timestamps, durations and frame order invalidate coverage without inventing zero values (0.7857ms)
+✔ async renders remain explicit wall-time observations and cannot claim a complete CPU-work measurement (0.8429ms)
+✔ snapshot data is detached and invalid allocation options fail before creating buffers (2.432ms)
+✔ recovery requires independent stop and exact consumed generation/reference/current values (1.9017ms)
+✔ termination requests and worker-ready proxies cannot pass host recovery (0.3369ms)
+✔ late observations fail budgets and incomplete/invalid records cannot pass (1.3136ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 195.0614

@@ -1,0 +1,19 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "498d051c-b6eb-4faa-a707-55de4ab81949",
+  "revision": 4,
+  "name": "Alien Hippo Saucer",
+  "description": "Alien hippo bubble saucer with three retractable landing legs, four configurable stops, eased flight, banking, hover beam and planted waving flags. Transparent overlay; manual position, independent sizes and audio-ready engine. Scene supplies planet positions.",
+  "updatedAt": "2026-09-17T04:59:33.706Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "alien-saucer.ts",
+    "files": [
+      "alien-saucer.ts",
+      "flag.ts",
+      "pilot-pixels.ts",
+      "saucer.ts"
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "sourceCommit": "17f1f3b951c4325c3df7fea4fe3e4ddb187494ce",
+  "pid": 22400,
+  "webSecurity": true,
+  "video": {
+    "width": 1920,
+    "height": 1080,
+    "duration": 1.833199,
+    "playedAt": 0.201608,
+    "seekTarget": 1.0999193999999999,
+    "seekedAt": 1.099919
+  }
+}

@@ -1,0 +1,28 @@
+✖ Graph opens inside Scene and keeps its settings in the header (572.1467ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 27711.1758
+
+✖ failing tests:
+
+test at apps\studio\dist\dock-shell.test.mjs:8322:1
+✖ Graph opens inside Scene and keeps its settings in the header (572.1467ms)
+  AssertionError [ERR_ASSERTION]: Scene contains the visual instead of appearing beside it
+  
+  2 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/Users/zFlei/repos/lux/apps/studio/dist/dock-shell.test.mjs:8327:10)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 2,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

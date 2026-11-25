@@ -12,7 +12,7 @@ export async function startServer({ apiKey, preflight, execute, log = (_s: strin
   apiKey: string; preflight: (signal: AbortSignal) => Promise<unknown>; execute: Delegate;
   log?: (s: string) => void; debug?: boolean; client?: OpenAI; attach?: typeof attachLive;
 }) {
-  const files: Record<string, [string, string]> = { '/': ['index.html', 'text/html'], '/client.js': ['client.js', 'text/javascript'] };
+  const files: Record<string, [string, string]> = { '/': ['index.html', 'text/html'], '/client.js': ['client.js', 'text/javascript'], '/transcript.js': ['transcript.js', 'text/javascript'] };
   let url = '', closing = false;
   const server = createServer(async (req, res) => {
     if (req.headers.host !== new URL(url).host) { res.writeHead(403).end(); return; }
@@ -65,6 +65,7 @@ export async function startServer({ apiKey, preflight, execute, log = (_s: strin
             delegation: { type: 'client' }, client: { data_channel: { allowed_client_events: [] } } },
             transport: { type: 'webrtc', sdp: command.sdp } }, { signal });
           live = attach({ client, sessionId: session.session.id, execute, state, debug, log: report,
+            onTranscript(fragment) { send({ type: 'transcript', ...fragment, delta: apiKey ? fragment.delta.replaceAll(apiKey, '[redacted]') : fragment.delta }); },
             onFailure(error) { report(`✗ ${error.message}`); send({ type: 'error', message: 'Voice connection failed; final usage is unconfirmed. Stop and check the log.' }); void live?.close().catch(error => report(`✗ ${error.message}`)); },
             onEnded() { send({ type: 'stopped', confirmed: true }); live = undefined; } });
           if (signal.aborted || ws.readyState !== WebSocket.OPEN) { await live.close(); live = undefined; return; }

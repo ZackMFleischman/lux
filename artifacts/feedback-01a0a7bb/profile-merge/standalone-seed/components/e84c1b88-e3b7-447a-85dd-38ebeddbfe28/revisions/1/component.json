@@ -1,0 +1,16 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "e84c1b88-e3b7-447a-85dd-38ebeddbfe28",
+  "revision": 1,
+  "name": "Colorful Sweeping Beams",
+  "description": "Layered colorful beams with width, length, sweep speed, angle, pulse, brightness and palette controls.",
+  "updatedAt": "2026-09-15T06:08:12.475Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "component.ts",
+    "files": [
+      "component.ts"
+    ]
+  }
+}

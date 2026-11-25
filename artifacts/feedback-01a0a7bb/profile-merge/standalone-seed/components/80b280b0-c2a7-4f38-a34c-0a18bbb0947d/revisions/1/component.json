@@ -1,0 +1,17 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "80b280b0-c2a7-4f38-a34c-0a18bbb0947d",
+  "revision": 1,
+  "name": "Prismatic Cube Fan",
+  "description": "Reusable metallic cube spiral with 1–20 rainbow arms, palette shift, reversible lightness gradient and cube size taper. Preserves the original Metallic Cube Fan separately.",
+  "updatedAt": "2026-09-15T05:26:27.829Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "component.ts",
+    "files": [
+      "component.ts",
+      "cube-kit.ts"
+    ]
+  }
+}

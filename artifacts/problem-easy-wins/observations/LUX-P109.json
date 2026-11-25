@@ -1,0 +1,13 @@
+{
+  "batch_id": "b03bfd76-148e-448b-8cd5-d702fcadab0a",
+  "revisit_trigger": "Reassess on a fresh recurrence after the cited fix/guidance, missing installed guidance, or an uncovered concrete acceptance gap.",
+  "observation": "User correction: avoid repeated library discovery",
+  "event_seqs": [
+    3091,
+    3093
+  ],
+  "action": "observe",
+  "review_after": "2026-09-25T00:00:00Z",
+  "rationale": "LUX-149 is done and supplies compact startup Library context. Keep later effectiveness distinct from delivery.",
+  "group_key": "easywins-existing-lux-p109"
+}

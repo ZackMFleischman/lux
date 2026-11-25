@@ -1,0 +1,14 @@
+import {readFile} from 'node:fs/promises';
+import {parseEnv} from 'node:util';
+import WebSocket from 'ws';
+const key=parseEnv(await readFile('.env.local','utf8')).OPENAI_API_KEY?.trim();
+if(!key)throw Error('Missing voice key');
+console.log('Raw test UTC:',new Date().toISOString());
+const ws=new WebSocket('wss://api.openai.com/v1/live/sessions',{headers:{Authorization:'Bearer '+key},followRedirects:false});
+const timer=setTimeout(()=>{console.log('Timeout; closing');ws.terminate();},15000);
+ws.on('upgrade',r=>console.log('HTTP',r.statusCode,'request ID:',r.headers['x-request-id']??'not supplied'));
+ws.on('open',()=>ws.send(JSON.stringify({type:'session.start',session:{model:'gpt-live-1',delegation:{type:'client'}}})));
+ws.on('message',raw=>{const e=JSON.parse(raw.toString());console.log(e.type==='error'?JSON.stringify(e):e.type);if(e.type==='session.started')ws.send(JSON.stringify({type:'session.close'}));if(['session.closed','error'].includes(e.type)){clearTimeout(timer);ws.close();}});
+ws.on('unexpected-response',(_req,res)=>{console.log('HTTP',res.statusCode);res.on('data',b=>console.log(b.toString().replaceAll(key,'[redacted]')));res.on('end',()=>{clearTimeout(timer);ws.terminate();});});
+ws.on('error',e=>{console.log(e.message.replaceAll(key,'[redacted]'));clearTimeout(timer);});
+ws.on('close',()=>clearTimeout(timer));

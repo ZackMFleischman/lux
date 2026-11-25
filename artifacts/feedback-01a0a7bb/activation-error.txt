@@ -1,0 +1,1 @@
+Close the previous desktop Lux before activating this build. Its scene has been preserved.

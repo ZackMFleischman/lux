@@ -1,0 +1,3 @@
+interface:
+  display_name: "Improve UI"
+  short_description: "Refactor real UI for compact, usable workflows"

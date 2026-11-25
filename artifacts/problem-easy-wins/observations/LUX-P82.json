@@ -1,0 +1,13 @@
+{
+  "batch_id": "b03bfd76-148e-448b-8cd5-d702fcadab0a",
+  "revisit_trigger": "Reassess on a fresh recurrence after the cited fix/guidance, missing installed guidance, or an uncovered concrete acceptance gap.",
+  "observation": "Coordinator used incorrect inspection syntax after context restoration",
+  "event_seqs": [
+    2885,
+    2931
+  ],
+  "action": "observe",
+  "review_after": "2026-09-25T00:00:00Z",
+  "rationale": "Existing installed command references and CON-30 cover startup syntax; a new generic CLI wrapper would exceed this bounded easy-win pass.",
+  "group_key": "restored-context-command-and-evidence-syntax"
+}

@@ -1,0 +1,19 @@
+{
+  "format": "lux-library-component",
+  "version": 1,
+  "id": "498d051c-b6eb-4faa-a707-55de4ab81949",
+  "revision": 3,
+  "name": "Alien Hippo Saucer",
+  "description": "Transparent bubble saucer with alien hippo pilot, four configurable destinations, eased flights, banking, hover beam and planted waving hippo flags. Independent craft, pilot and flag sizes; audio-ready engine glow. Scene supplies planet positions.",
+  "updatedAt": "2026-09-17T04:55:01.128Z",
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "alien-saucer.ts",
+    "files": [
+      "alien-saucer.ts",
+      "flag.ts",
+      "pilot-pixels.ts",
+      "saucer.ts"
+    ]
+  }
+}

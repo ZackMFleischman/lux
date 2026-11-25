@@ -1,0 +1,39 @@
+{
+  "connection": "connected",
+  "message": "Open an example or write a visual, then Build & preview.",
+  "receivedAtMs": 1789321842429,
+  "authoring": null,
+  "host": null,
+  "jobs": [],
+  "visualFps": null,
+  "uiFps": null,
+  "capabilities": {
+    "protocolVersion": 2,
+    "supportedSdkVersions": [
+      "0.1.0",
+      "0.2.0"
+    ],
+    "codeDeclaredParameters": true,
+    "parameterKinds": [
+      "number"
+    ],
+    "maxParameters": 32,
+    "imageFormats": [
+      "image/bmp",
+      "image/png",
+      "image/jpeg"
+    ],
+    "assetExport": true,
+    "sceneVersions": [
+      1,
+      2,
+      3
+    ]
+  },
+  "studioSession": {
+    "profile": "creative",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\lux-creative",
+    "sessionId": "805887c760f0a1371f3a8103f100195e6c96",
+    "pid": 23204
+  }
+}

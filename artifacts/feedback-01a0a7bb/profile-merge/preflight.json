@@ -1,0 +1,122 @@
+{
+  "sources": [
+    {
+      "path": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\creative\\component-library.json",
+      "snapshot": "C:\\Users\\zFlei\\repos\\lux\\artifacts\\feedback-01a0a7bb\\profile-merge\\creative-component-library.json",
+      "sha256": "6b054f5f65244931706496dac4a14b71596c1dfff6067dd73c49d382cbff894a",
+      "count": 5
+    },
+    {
+      "path": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\creative-c8e73bbdb600a59b83b225c2\\component-library.json",
+      "snapshot": "C:\\Users\\zFlei\\repos\\lux\\artifacts\\feedback-01a0a7bb\\profile-merge\\creative-c8e73bbdb600a59b83b225c2-component-library.json",
+      "sha256": "4a5f9ded0c4995952d3d067beb7ca4903969f8d6fb00766965aee6a2c0982a9b",
+      "count": 2
+    }
+  ],
+  "excluded": [
+    {
+      "path": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-1231bc8e-89bc-44e7-99df-b9d5d0c4bc2c\\component-library.json",
+      "reason": "automated test profile"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-996d3f85-d9ef-406c-a3be-e8f7549af324\\component-library.json",
+      "reason": "automated test profile"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-b0033a17-fbd6-43f5-82a0-3fadb1cb17fb\\component-library.json",
+      "reason": "automated test profile"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-d7b9ecca-c657-4659-babf-4c4781210c02\\component-library.json",
+      "reason": "automated test profile"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-de8204b4-d419-4a06-8d1d-70416f729811\\component-library.json",
+      "reason": "automated test profile"
+    },
+    {
+      "path": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-dfe3328f-c038-470e-8689-98619a1bac0b\\component-library.json",
+      "reason": "automated test profile"
+    }
+  ],
+  "components": [
+    {
+      "id": "84afe10a-a999-40f5-956c-bace96cce23b",
+      "name": "Prismatic Observatory",
+      "revision": 1,
+      "sourceHash": "d6fed69bd7780e43ee79018ef9049e61cb49f94a0aa38e4504cc346593cb993e",
+      "compiled": true,
+      "linkedVersion": 4,
+      "alreadyPresent": false
+    },
+    {
+      "id": "489bada1-64e6-40c6-bae6-9b31077bf0d4",
+      "name": "Particle Tornado",
+      "revision": 2,
+      "sourceHash": "044c4be88b2234cfb8dd0f6f819b83162d924d97ad76a38fdf251180e58a4d7b",
+      "compiled": true,
+      "linkedVersion": 4,
+      "alreadyPresent": false
+    },
+    {
+      "id": "6ea599ba-1669-4a84-8ef0-4306c234715f",
+      "name": "Metallic Cube",
+      "revision": 1,
+      "sourceHash": "fe75b30b14af47fd865205b3fd52bc37671428fc85ca5f57140d61544fee3a7a",
+      "compiled": true,
+      "linkedVersion": 4,
+      "alreadyPresent": false
+    },
+    {
+      "id": "78a8f505-dde8-4ec4-9e25-934a14ccd31a",
+      "name": "Metallic Cube Fan",
+      "revision": 1,
+      "sourceHash": "9fef839f1b59e5aa0a33965620f24f86cd94bdfaca059bc505a0d6df207dd41b",
+      "compiled": true,
+      "linkedVersion": 4,
+      "alreadyPresent": false
+    },
+    {
+      "id": "80b280b0-c2a7-4f38-a34c-0a18bbb0947d",
+      "name": "Prismatic Cube Fan",
+      "revision": 1,
+      "sourceHash": "51ed506643bcd6729b089d5a838ddd07269350d08c590c546eb643c412164470",
+      "compiled": true,
+      "linkedVersion": 4,
+      "alreadyPresent": false
+    },
+    {
+      "id": "e84c1b88-e3b7-447a-85dd-38ebeddbfe28",
+      "name": "Colorful Sweeping Beams",
+      "revision": 1,
+      "sourceHash": "75c5d7b7e76680e5d731a3aa6322e7cc6274c444cee58ced4e4859bd51762f3c",
+      "compiled": true,
+      "linkedVersion": 4,
+      "alreadyPresent": false
+    },
+    {
+      "id": "f573cb7b-c14a-4051-b4f3-d11111a5c4a0",
+      "name": "Dancing Space Needle Dabbers",
+      "revision": 1,
+      "sourceHash": "c211e3604ad3c54047b168800641306111183c0cd81e06885e61121b49764845",
+      "compiled": true,
+      "linkedVersion": 4,
+      "alreadyPresent": false
+    }
+  ],
+  "before": [
+    {
+      "id": "93a7215f-4df1-4e1e-9d34-3f7f0f27ad84",
+      "revision": 1,
+      "name": "Prismatic Ball",
+      "description": "Animated iridescent spike image source.",
+      "updatedAt": "2026-09-16T00:00:00.000Z"
+    }
+  ],
+  "after": [],
+  "applied": false,
+  "fallback": {
+    "path": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\library",
+    "present": false
+  }
+}

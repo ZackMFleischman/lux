@@ -1,0 +1,10 @@
+{
+  "sourceCommit": "416d4640f7db7dd01034f37102b33455eb760fe8",
+  "libraryTools": [
+    "lux.library.list",
+    "lux.library.read",
+    "lux.library.create",
+    "lux.library.update"
+  ],
+  "canonicalLibraryRoot": "C:\\Users\\zFlei\\repos\\lux\\library"
+}

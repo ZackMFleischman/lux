@@ -1,0 +1,9 @@
+import {defineComponent} from '@lux/visual-sdk';
+import {Scene,PerspectiveCamera,Color} from 'three/webgpu';
+import {makeInstrument} from './parts/instrument.ts';
+export default defineComponent({metadata:{declarationVersion:1,key:'observatory/orbital-instrument',label:'Orbital instrument',description:'Nested armillary rings, orbiting satellites and a luminous crystalline heart.',tags:['space','generative'],inputs:{},outputs:{image:{type:{kind:'image',colorSpace:'linear-srgb',alphaMode:'premultiplied'},label:'Image',description:'Linear light image'}},controls:{speed:{type:'number',label:'Orbit speed',default:0.35,min:0,max:2,step:0.01},spread:{type:'number',label:'Ring expansion',default:1,min:0.6,max:1.5,step:0.01},twist:{type:'number',label:'Gimbal tilt',default:0.65,min:0,max:1.5,step:0.01},hue:{type:'number',label:'Spectrum',default:0.53,min:0,max:1,step:0.01}},controlDescriptions:{speed:'Speed of the nested orbital assemblies. Zero freezes orbital rotation.',spread:'Radius of the orbital rings around the crystalline core.',twist:'Inclination of each nested gimbal assembly.',hue:'Base hue of the instrument, offset around each orbital assembly.'},lifecycle:{state:'stateful',reset:'seed'}},async create(context){
+ const scene=new Scene();scene.background=new Color(0.001,0.002,0.009);
+ const camera=new PerspectiveCamera(38,context.settings.width/context.settings.height,0.1,100);camera.position.set(0,0,8);
+ const instrument=makeInstrument();scene.add(instrument.root);
+ return {update(frame){instrument.update(frame.timeSeconds,frame.controls.speed,frame.controls.spread,frame.controls.twist,frame.controls.hue);},async evaluate(_inputs,evaluation){return {image:await evaluation.render(scene,camera)}},reset(){},dispose(){instrument.dispose()}};
+}});

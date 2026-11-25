@@ -1,0 +1,70 @@
+
+  apps\studio\dist\main.cjs      419.4kb
+  apps\studio\dist\main.cjs.map  873.0kb
+
+Done in 141ms
+
+  apps\studio\dist\preload.cjs      4.8kb
+  apps\studio\dist\preload.cjs.map  7.5kb
+
+Done in 20ms
+
+  apps\studio\dist\renderer.js         4.3mb
+  apps\studio\dist\renderer.css      156.9kb
+  apps\studio\dist\renderer.js.map     7.9mb
+  apps\studio\dist\renderer.css.map  240.4kb
+
+Done in 1413ms
+
+  apps\studio\dist\visual-worker.js      502.1kb
+  apps\studio\dist\visual-worker.js.map    1.0mb
+
+Done in 124ms
+
+  apps\studio\dist\source-admission-worker.js      191.7kb
+  apps\studio\dist\source-admission-worker.js.map  436.0kb
+
+Done in 95ms
+
+  apps\studio\dist\image-preview-worker.js      189.0kb
+  apps\studio\dist\image-preview-worker.js.map  434.4kb
+
+Done in 126ms
+
+  apps\studio\dist\view.test.cjs        3.5mb
+  apps\studio\dist\view.test.css      118.9kb
+  apps\studio\dist\view.test.cjs.map    6.2mb
+  apps\studio\dist\view.test.css.map  183.6kb
+
+Done in 1585ms
+
+  apps\studio\dist\interactions.test.mjs      174.3kb
+  apps\studio\dist\interactions.test.css      118.9kb
+  apps\studio\dist\interactions.test.mjs.map  478.2kb
+  apps\studio\dist\interactions.test.css.map  183.6kb
+
+Done in 106ms
+
+  apps\studio\dist\source-editor.test.mjs      456.0kb
+  apps\studio\dist\source-editor.test.css      118.9kb
+  apps\studio\dist\source-editor.test.mjs.map  890.0kb
+  apps\studio\dist\source-editor.test.css.map  183.6kb
+
+Done in 137ms
+
+  apps\studio\dist\library-panel.test.mjs      18.4kb
+  apps\studio\dist\library-panel.test.mjs.map  26.4kb
+
+Done in 32ms
+
+  apps\studio\dist\dock-shell.test.mjs      344.6kb
+  apps\studio\dist\dock-shell.test.css      118.9kb
+  apps\studio\dist\dock-shell.test.mjs.map  718.1kb
+  apps\studio\dist\dock-shell.test.css.map  183.6kb
+
+Done in 97ms
+
+  apps\studio\dist\preview-capture-menu.test.mjs      15.0kb
+  apps\studio\dist\preview-capture-menu.test.mjs.map  25.3kb
+
+Done in 37ms

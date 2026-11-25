@@ -1,0 +1,10 @@
+{
+  "commit": "b6ee21fd9434c604aa7eb095b0ebe0ec3ebb8ea8",
+  "criteria": "The repository author skill now requires Library-first discovery, directs authors to choose meaningful reusable SDK 0.4 components only when warranted, keeps controls on their owning components with task-based groups, and makes publication explicit and selective. The wording preserves SDK 0.2 scene-local work, image-chain limits, zero-input Library publication, UI-only Fork behavior, and per-scene update adoption.",
+  "evidence": "Independent fresh-context review inspected the immutable commit diff and compared its new paragraphs with scripts/studio-mcp.mjs, apps/studio/src/source/authoring-session.ts, packages/core/src/component-library.ts, packages/core/src/component-library-store.ts, apps/studio/src/main.ts, and the SDK/runtime composition contracts. Earlier review findings on SDK 0.4 library-link eligibility, the absence of an MCP fork command, and non-immediate linked-scene update adoption were present in the submitted diff and match those implementations. The delivery handoff at artifacts/feedback-01a0a7bb/author-guidance-handoff.md records successful installer/check current:true; no Studio runtime or GPU work is part of this documentation-only criterion.",
+  "context_id": "codex-lux145-independent-validator-01a0a7bb",
+  "checks": {
+    "immutable_diff_contract_review": "pass",
+    "skill_install_check": "pass"
+  }
+}

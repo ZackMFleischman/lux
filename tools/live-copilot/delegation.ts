@@ -36,7 +36,7 @@ export function createDelegationHandler({ execute, state, send, log = (_s: strin
         let content: string;
         try {
           if (!hasNewInput || !context.some(t => t.speaker === 'User' && t.text.trim())) throw Error('No user transcript is available for this request. Ask the user to repeat the request.');
-          const task = JSON.stringify({ instruction: 'Execute the latest user request, using preceding conversation for relative follow-ups. Inspect fresh Lux state through MCP.',
+          const task = JSON.stringify({ instruction: 'Execute the latest user request, using preceding conversation for relative follow-ups. Use MCP for Lux control; use workspace files and commands for software engineering.',
             transcript: context, previousVerifiedResult: recentResult, startupState: state });
           content = await execute(task, controller.signal);
           if (controller.signal.aborted) return;

@@ -1,0 +1,39 @@
+✔ real dock panes preserve canvas, editor undo and runtime subscriptions through close, tab, reset, restore and fullscreen (34587.1002ms)
+✔ Story status opens the singleton Story panel and distinguishes normal from awaiting cue (1894.0157ms)
+✔ group menu targets its owning group, cancels with focus and rejects a vanished target (2170.8933ms)
+✔ Scene and component controls expose real animation plus independent reset while descriptions stay in tooltips (32043.7373ms)
+✔ Graph enters nested components one level at a time and edits an exposed control through its canonical leaf (11082.7988ms)
+✔ View is a compact keyboard menu with recoverable panes and a separate layout dialog (3164.1313ms)
+✔ Graph wheel zoom anchors at the pointer and background gestures keep selection clear (743.2757ms)
+✖ Graph opens inside Scene and keeps its settings in the header (73.7652ms)
+✔ Graph connections point from output to input with reversed node declarations (119.145ms)
+✔ workspace chrome omits redundant connection and playback labels (2062.1983ms)
+✔ File and View share one menu and restore keyboard focus (544.4435ms)
+✔ disabled application menu still closes with Escape while building (161.5829ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 11
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 123837.9021
+
+✖ failing tests:
+
+test at apps\studio\dist\dock-shell.test.mjs:8322:1
+✖ Graph opens inside Scene and keeps its settings in the header (73.7652ms)
+  AssertionError [ERR_ASSERTION]: Scene contains the visual instead of appearing beside it
+  
+  2 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/Users/zFlei/repos/lux/apps/studio/dist/dock-shell.test.mjs:8327:10)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 2,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

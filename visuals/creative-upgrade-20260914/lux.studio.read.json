@@ -1,0 +1,8 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"source\":{\"sdkVersion\":\"0.1.0\",\"entry\":\"visual.ts\",\"files\":{\"visual.ts\":\"import { defineVisual } from '@lux/visual-sdk';\\nimport { Scene, Mesh, PlaneGeometry, MeshBasicNodeMaterial, OrthographicCamera } from 'three/webgpu';\\nimport { uniform, vec4 } from 'three/tsl';\\n\\nexport default defineVisual({\\n  async create(context) {\\n    const level = uniform(0.5);\\n    const material = new MeshBasicNodeMaterial();\\n    material.fragmentNode = vec4(level, 0.2, 0.4, 1);\\n    const geometry = new PlaneGeometry(1.4, 1.4);\\n    const scene = new Scene();\\n    const shape = new Mesh(geometry, material);\\n    scene.add(shape);\\n    const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);\\n    return {\\n      update(frame) { level.value = frame.controls.intensity; shape.rotation.z = frame.timeSeconds * 0.35; },\\n      render(target) { return context.renderer.render(scene, camera, target); },\\n      reset(_seed) {},\\n      dispose() { geometry.dispose(); material.dispose(); },\\n    };\\n  },\\n});\\n\"}},\"draftVersion\":1,\"libraryLinks\":[],\"status\":{\"connection\":\"connected\",\"message\":\"Open an example or write a visual, then Build & preview.\",\"receivedAtMs\":1789361419679,\"authoring\":null,\"host\":null,\"jobs\":[],\"visualFps\":null,\"uiFps\":null,\"capabilities\":{\"protocolVersion\":2,\"supportedSdkVersions\":[\"0.1.0\",\"0.2.0\",\"0.4.0\"],\"codeDeclaredParameters\":true,\"parameterKinds\":[\"number\"],\"maxParameters\":32,\"imageFormats\":[\"image/bmp\",\"image/png\",\"image/jpeg\"],\"assetExport\":true,\"sceneVersions\":[1,2,3,4]}}}"
+    }
+  ]
+}

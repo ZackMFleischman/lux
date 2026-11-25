@@ -1,0 +1,12 @@
+✔ Preview menu exposes frame and recording actions and announces fixed recording dimensions (602.2305ms)
+✔ Preview menu disables capture when no working visual exists (89.2852ms)
+✔ Preview header actions use the shared recorder state and expose concise labels (398.0146ms)
+✔ Preview header keeps recording text local while the menu provides one live announcement (20.2989ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7004.8984

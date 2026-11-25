@@ -1,0 +1,350 @@
+{
+  "format": "lux-scene",
+  "version": 5,
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "visual.ts",
+    "files": {
+      "bloom.ts": "import { defineComponent } from '@lux/visual-sdk';\nimport { DataTexture, FloatType, Mesh, MeshBasicNodeMaterial, OrthographicCamera, PlaneGeometry, RGBAFormat, Scene, Vector4, type Texture } from 'three/webgpu';\nimport { texture, uniform, uv, wgslFn } from 'three/tsl';\n\nconst glow = wgslFn(`\nfn quasarBloom(st:vec2f, settings:vec4f, source:texture_2d<f32>) -> vec4f {\n  let dims = vec2i(textureDimensions(source));\n  let pixel = vec2i(vec2f(st.x,1.0-st.y)*vec2f(dims));\n  let base = textureLoad(source,clamp(pixel,vec2i(0),dims-1),0).rgb;\n  var bloom=vec3f(0.0);\n  for(var i=0;i<12;i++) {\n    let a=f32(i)*2.399963;\n    let r=sqrt((f32(i)+0.5)/12.0)*settings.y;\n    let offset=vec2i(vec2f(cos(a)*r,sin(a)*r));\n    let sample=textureLoad(source,clamp(pixel+offset,vec2i(0),dims-1),0).rgb;\n    bloom += max(sample-0.55,vec3f(0.0))/12.0;\n  }\n  let exposed=vec3f(1.0)-pow(max(vec3f(0.0),vec3f(1.0)-base),vec3f(settings.z));\n  let color=exposed + bloom*settings.x*0.55;\n  return vec4f(color,1.0);\n}`);\n\nexport default defineComponent({\n  metadata: {\n    declarationVersion:1,key:'creative/quasar-bloom',label:'Quasar Bloom',\n    description:'Restrained highlight bloom with photographic exposure.',tags:['bloom'],\n    inputs:{image:{type:{kind:'image',colorSpace:'linear-srgb',alphaMode:'premultiplied'},label:'Radiance',description:'Quasar radiance before bloom and exposure.'}},\n    outputs:{image:{type:{kind:'image',colorSpace:'linear-srgb',alphaMode:'premultiplied'},label:'Image',description:'Finished quasar image.'}},\n    controls:{\n      bloom:{type:'number',label:'Bloom strength',group:'Light',default:0.65,min:0,max:2,step:0.01},\n      softness:{type:'number',label:'Bloom radius',group:'Light',default:18,min:2,max:50,step:1},\n      exposure:{type:'number',label:'Exposure',group:'Light',default:1.15,min:0.3,max:2.5,step:0.01},\n    },\n    controlDescriptions:{\n      bloom:'Amount of soft light spread from the hottest highlights.',\n      softness:'Spread of highlight bloom in output pixels.',\n      exposure:'Photographic exposure applied after bloom.',\n    },\n    lifecycle:{state:'stateless',reset:'seed'},\n  },\n  async create() {\n    const scene=new Scene();\n    const camera=new OrthographicCamera(-1,1,1,-1,0,1);\n    const geometry=new PlaneGeometry(2,2);\n    const fallback=new DataTexture(new Float32Array([0,0,0,1]),1,1,RGBAFormat,FloatType);\n    fallback.needsUpdate=true;\n    const source=texture(fallback);\n    const settings=uniform(new Vector4(0.65,18,1.15,0));\n    const material=new MeshBasicNodeMaterial({depthTest:false,depthWrite:false,toneMapped:false});\n    material.fragmentNode=glow(uv(),settings,source);\n    const mesh=new Mesh(geometry,material);mesh.frustumCulled=false;scene.add(mesh);\n    return {\n      update(frame) { settings.value.set(frame.controls.bloom,frame.controls.softness,frame.controls.exposure,0); },\n      async evaluate(inputs,evaluation) { source.value=inputs.image.texture as Texture;return {image:await evaluation.render(scene,camera)}; },\n      reset() {},\n      dispose() {geometry.dispose();material.dispose();fallback.dispose();},\n    };\n  },\n});\n\r\n",
+      "quasar.ts": "import { defineComponent } from '@lux/visual-sdk';\nimport {\n  DataTexture, FloatType, Mesh, MeshBasicNodeMaterial, OrthographicCamera,\n  PlaneGeometry, RGBAFormat, Scene, Vector4, type Texture,\n} from 'three/webgpu';\nimport { texture, uniform, uv, wgslFn } from 'three/tsl';\n\n// Bounded bent-ray integration: detailed disk shading only at surface crossings.\n// This is a cinematic lensing approximation, not a relativistic simulation.\nconst quasar = wgslFn(`\nfn feedingQuasar(st: vec2f, view: vec4f, disk: vec4f, jets: vec4f,\n  optics: vec4f, stars: texture_2d<f32>) -> vec4f {\n  let time = view.y;\n  let roll = optics.w;\n  let raw = (st - 0.5) * vec2f(view.x, 1.0) * 2.0;\n  let p = vec2f(cos(roll)*raw.x - sin(roll)*raw.y, sin(roll)*raw.x + cos(roll)*raw.y);\n  let inclination = view.w;\n  let ro = vec3f(0.0, sin(inclination), cos(inclination)) * 18.0;\n  let forward = -normalize(ro);\n  let right = vec3f(1.0, 0.0, 0.0);\n  let up = cross(right, forward);\n  let focal = 2.15 * view.z;\n  var rd = normalize(forward*focal + right*p.x + up*p.y);\n  let initial = rd;\n  var pos = ro;\n  var emission = vec3f(0.0);\n  var transmit = 1.0;\n  var swallowed = false;\n  var closest = 30.0;\n  let h2 = dot(cross(ro,rd),cross(ro,rd));\n  let entryB = dot(ro, rd);\n  let discriminant = entryB*entryB - dot(ro,ro) + 121.0;\n  if (discriminant > 0.0) {\n    pos += rd * max(0.0, -entryB - sqrt(discriminant));\n    for (var i = 0; i < 88; i++) {\n      let r = length(pos);\n      closest = min(closest, r);\n      if (r < 1.02 * optics.x) { swallowed = true; break; }\n      if (r > 11.2 && dot(pos,rd) > 0.0) { break; }\n      let stepLength = clamp(r * 0.115, 0.075, 1.0);\n      let force = -1.5 * h2 * pos / max(0.01, r*r*r*r*r) * optics.x;\n      // Velocity Verlet preserves the critical orbit without normalization drift.\n      let nextPosition = pos + rd * stepLength + force * (0.5*stepLength*stepLength);\n      let nextRadius = max(0.2,length(nextPosition));\n      let nextRadius2 = nextRadius*nextRadius;\n      let nextForce = -1.5*h2*nextPosition / (nextRadius2*nextRadius2*nextRadius) * optics.x;\n      let nextDirection = rd + (force+nextForce) * (0.5*stepLength);\n      if (pos.y * nextPosition.y <= 0.0) {\n        let crossing = clamp(pos.y / (pos.y - nextPosition.y + 0.000001), 0.0, 1.0);\n        let hit = mix(pos, nextPosition, crossing);\n        let radius = length(hit.xz);\n        if (radius > 1.72 && radius < disk.w) {\n          let angle = atan2(hit.z, hit.x);\n          let flow = angle + time*disk.x*2.8 / pow(radius,1.35);\n          // Periodic angular coordinates avoid an atan2 seam through the disk.\n          let coord = vec2f(log(radius)*20.0, sin(flow*8.0)*3.0 + cos(flow*5.0)*2.0);\n          let broad = qNoise(coord*0.43);\n          let grain = qNoise(coord*vec2f(2.8,1.2) + broad*2.4);\n          let fine = qNoise(coord*vec2f(8.0,2.0));\n          let filaments = pow(0.5+0.5*sin(radius*31.0 + broad*7.0 + grain*3.0), 4.0);\n          let lanes = 0.18 + pow(0.24 + 0.48*broad + 0.40*grain,2.2) + 0.12*filaments + 0.10*fine;\n          let textureDetail = mix(0.82, lanes, disk.y);\n          let innerEdge = smoothstep(1.72,2.04,radius);\n          let outerEdge = 1.0-smoothstep(disk.w*0.65,disk.w,radius);\n          let heat = pow(2.05 / max(radius,2.05), 1.55);\n          let approaching = clamp(0.5 + 0.5*hit.x/radius,0.0,1.0);\n          let beaming = mix(0.44,2.15,pow(approaching,1.7));\n          let hot = vec3f(1.0,0.80,0.49);\n          let cool = vec3f(0.58,0.105,0.027);\n          var color = mix(cool,hot,pow(heat,0.6));\n          color = mix(color,vec3f(0.73,0.87,1.0),pow(heat,4.0)*0.22);\n          let power = innerEdge*outerEdge*heat*textureDetail*beaming*disk.z;\n          emission += color * power * transmit * 2.8;\n          transmit *= 1.0 - innerEdge*outerEdge*0.88;\n        }\n      }\n      pos = nextPosition;\n      rd = nextDirection;\n    }\n    if (length(pos) < 3.0) { swallowed = true; }\n  }\n\n  // Lensing samples the *input* sky: the shared stars bend with the same ray.\n  let bend = normalize(rd) - initial;\n  let warp = vec2f(dot(bend,right),dot(bend,up)) * 0.18 * optics.x;\n  let unrolled = vec2f(cos(roll)*warp.x + sin(roll)*warp.y,-sin(roll)*warp.x+cos(roll)*warp.y);\n  let skyUv = fract(st + unrolled / vec2f(view.x,1.0));\n  let dims = vec2i(textureDimensions(stars));\n  let skyPixel = vec2i(clamp(vec2f(skyUv.x,1.0-skyUv.y),vec2f(0.0),vec2f(0.99999))*vec2f(dims));\n  let sky = textureLoad(stars,skyPixel,0).rgb;\n  var color = emission + select(sky*transmit,vec3f(0.0),swallowed);\n\n  // A narrow, softly bloomed critical curve strengthens the readable silhouette.\n  let impact = sqrt(h2);\n  let critical = 2.60 * optics.x;\n  let ring = exp(-pow((impact-critical)/0.075,2.0));\n  let ringHalo = exp(-abs(impact-critical)*8.0)*0.10;\n  color += vec3f(1.0,0.56,0.22)*(ring+ringHalo)*optics.y*(0.70+0.3*p.x);\n\n  // Polar plasma: a translucent envelope and three intertwined filaments.\n  // Screen-space projection keeps this detail independent of ray step count.\n  let axisDistance = abs(p.y);\n  let start = critical*focal/18.0*1.08;\n  let h = max(0.0,axisDistance-start);\n  let jetFade = smoothstep(start,start+0.15,axisDistance) * exp(-h*1.1);\n  let jetWidth = jets.y*(0.018 + h*0.075);\n  let spiral = h*jets.z*17.0 - time*jets.w*2.2;\n  let envelope = exp(-pow(p.x/(jetWidth*1.4+0.001),2.0))*0.19;\n  var plasma = envelope;\n  for(var strand=0; strand<3; strand++) {\n    let phase = spiral + f32(strand)*2.094395;\n    let center = sin(phase)*jetWidth*(0.76+0.15*sin(h*14.0-time));\n    let width = max(0.0018,jetWidth*0.11);\n    let filament = exp(-pow((p.x-center)/width,2.0));\n    let glow = exp(-abs(p.x-center)/(width*4.0))*0.16;\n    plasma += (filament*0.45+glow)*(0.55+0.45*cos(phase));\n  }\n  let shocks = pow(0.5+0.5*sin(h*31.0-time*jets.w*3.0),8.0);\n  let jetColor = mix(vec3f(0.19,0.62,1.0),vec3f(0.58,0.20,1.0),clamp(h*0.65,0.0,1.0));\n  let nearJet = select(0.63,1.0,p.y>0.0);\n  let vapor = qNoise(vec2f(p.x*130.0,h*35.0-time*jets.w*2.0));\n  plasma += envelope*vapor*2.0;\n  color += jetColor*plasma*jetFade*jets.x*nearJet*(0.8+shocks*0.45);\n  // Tiny near-pole launch glow, outside the dark shadow.\n  color += vec3f(0.23,0.52,1.0)*exp(-pow(p.x/0.055,2.0)-pow((axisDistance-start-0.10)/0.12,2.0))*jets.x*0.25;\n  let vignette = 1.0 - 0.20*smoothstep(0.8,2.2,length(raw));\n  // Component image targets are rgba8; compress radiance before that boundary.\n  let mapped = vec3f(1.0)-exp(-max(color,vec3f(0.0))*0.82);\n  return vec4f(mapped*vignette,1.0);\n}\n\nfn qHash(p: vec2f) -> f32 {\n  return fract(sin(dot(p,vec2f(127.1,311.7)))*43758.5453);\n}\nfn qNoise(p: vec2f) -> f32 {\n  let i=floor(p); let f=fract(p); let u=f*f*(3.0-2.0*f);\n  return mix(mix(qHash(i),qHash(i+vec2f(1.0,0.0)),u.x),\n    mix(qHash(i+vec2f(0.0,1.0)),qHash(i+vec2f(1.0,1.0)),u.x),u.y);\n}\n`);\n\nexport default defineComponent({\n  metadata: {\n    declarationVersion: 1,\n    key: 'creative/feeding-quasar',\n    label: 'Feeding Quasar',\n    description: 'Bent-light accretion disk, dark shadow, photon ring and intertwined polar plasma jets.',\n    tags: ['space','black-hole','quasar'],\n    inputs: { image: { type: { kind: 'image', colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }, label: 'Starfield', description: 'Background stars to gravitationally distort.' } },\n    outputs: { image: { type: { kind: 'image', colorSpace: 'linear-srgb', alphaMode: 'premultiplied' }, label: 'Quasar', description: 'Linear quasar radiance over the lensed sky.' } },\n    controls: {\n      zoom: { type:'number',label:'Framing',group:'Camera',default:1,min:0.6,max:1.5,step:0.01 },\n      inclination: { type:'number',label:'Disk viewing angle',group:'Camera',default:12,min:3,max:65,step:0.1 },\n      roll: { type:'number',label:'Composition tilt',group:'Camera',default:-10,min:-45,max:45,step:0.1 },\n      drift: { type:'number',label:'Slow camera drift',group:'Camera',default:0.3,min:0,max:1,step:0.01 },\n      spin: { type:'number',label:'Disk spin',group:'Accretion disk',default:1,min:0,max:4,step:0.01 },\n      turbulence: { type:'number',label:'Turbulence detail',group:'Accretion disk',default:1,min:0,max:1.5,step:0.01 },\n      heat: { type:'number',label:'Disk radiance',group:'Accretion disk',default:1.5,min:0.1,max:4,step:0.01 },\n      radius: { type:'number',label:'Outer disk radius',group:'Accretion disk',default:8,min:4,max:10,step:0.1 },\n      jetPower: { type:'number',label:'Jet radiance',group:'Polar jets',default:1.4,min:0,max:4,step:0.01 },\n      jetWidth: { type:'number',label:'Jet width',group:'Polar jets',default:1,min:0.3,max:2.5,step:0.01 },\n      jetTwist: { type:'number',label:'Helix turns',group:'Polar jets',default:1,min:0.2,max:2,step:0.01 },\n      jetSpeed: { type:'number',label:'Outflow speed',group:'Polar jets',default:1,min:0,max:4,step:0.01 },\n      lensing: { type:'number',label:'Light bending',group:'Lensing',default:1,min:0.4,max:1.4,step:0.01 },\n      photon: { type:'number',label:'Photon ring',group:'Lensing',default:0.8,min:0,max:3,step:0.01 },\n    },\n    controlDescriptions: {\n      zoom:'Overall framing; higher values bring the quasar closer.',\n      inclination:'Degrees above the disk plane. Low angles reveal the lensed arch.',\n      roll:'Tilts the entire composition, including both polar jets.',\n      drift:'Slow breathing of the viewing angle, with no camera cuts.',\n      spin:'Differential disk rotation: the inner material revolves faster.',\n      turbulence:'Strength of fine turbulent filaments in the disk.',\n      heat:'Emission before exposure and highlight bloom.',\n      radius:'Outer reach of the feeding disk.',\n      jetPower:'Emission of the cool polar plasma.',\n      jetWidth:'Width of the expanding jet envelope and its filaments.',\n      jetTwist:'Number of turns in the intertwined polar helices.',\n      jetSpeed:'Outward travel speed of jet filaments and knots.',\n      lensing:'Artistic strength of the approximate gravitational bending.',\n      photon:'Brightness of the thin ring tracing the shadow.',\n    },\n    lifecycle: { state:'stateless',reset:'seed' },\n  },\n  async create(context) {\n    const scene = new Scene();\n    const camera = new OrthographicCamera(-1,1,1,-1,0,1);\n    const geometry = new PlaneGeometry(2,2);\n    const fallback = new DataTexture(new Float32Array([0,0,0,1]),1,1,RGBAFormat,FloatType);\n    fallback.needsUpdate = true;\n    const background = texture(fallback);\n    const view = uniform(new Vector4(context.settings.width/context.settings.height,0,1,0.2));\n    const disk = uniform(new Vector4(1,1,1.5,8));\n    const jets = uniform(new Vector4(1.4,1,1,1));\n    const optics = uniform(new Vector4(1,0.8,0,0));\n    const material = new MeshBasicNodeMaterial({ depthTest:false,depthWrite:false,toneMapped:false });\n    material.fragmentNode = quasar(uv(),view,disk,jets,optics,background);\n    const mesh = new Mesh(geometry,material);\n    mesh.frustumCulled = false;\n    scene.add(mesh);\n    return {\n      update(frame) {\n        const c=frame.controls;\n        view.value.set(context.settings.width/context.settings.height,frame.timeSeconds,c.zoom,\n          (c.inclination+Math.sin(frame.timeSeconds*0.065)*c.drift*5)*Math.PI/180);\n        disk.value.set(c.spin,c.turbulence,c.heat,c.radius);\n        jets.value.set(c.jetPower,c.jetWidth,c.jetTwist,c.jetSpeed);\n        optics.value.set(c.lensing,c.photon,0,(c.roll+Math.sin(frame.timeSeconds*0.041)*c.drift*6)*Math.PI/180);\n      },\n      async evaluate(inputs,evaluation) {\n        background.value = inputs.image.texture as Texture;\n        return { image: await evaluation.render(scene,camera) };\n      },\n      reset() {},\n      dispose() { geometry.dispose(); material.dispose(); fallback.dispose(); },\n    };\n  },\n});\n\r\n",
+      "starfield/starfield-flare-rig.ts": "import {\n  AdditiveBlending,\n  Color,\n  Group,\n  Mesh,\n  MeshBasicNodeMaterial,\n  OrthographicCamera,\n  PerspectiveCamera,\n  PlaneGeometry,\n  Vector3,\n  Vector4,\n} from 'three/webgpu';\nimport { uniform, uv, wgslFn } from 'three/tsl';\n\nconst diffraction = wgslFn(`\nfn diffraction(st: vec2f, shape: vec4f, tint: vec3f) -> vec4f {\n  let p = (st - 0.5) * 2.0;\n  let cs = cos(shape.z);\n  let sn = sin(shape.z);\n  let q = vec2f(cs * p.x - sn * p.y, sn * p.x + cs * p.y);\n  let r = length(q);\n  var rays = 0.0;\n  for (var i = 0; i < 3; i = i + 1) {\n    let a = 1.5707963 + f32(i) * 1.04719755;\n    let along = abs(dot(q, vec2f(cos(a), sin(a))));\n    let across = abs(dot(q, vec2f(-sin(a), cos(a))));\n    let width = max(0.0018 + 0.0035 * exp(-along * 7.0), fwidth(across) * 0.7);\n    rays += exp(-across / width) * pow(max(0.0, 1.0 - along), 2.4) * 0.72;\n    rays += exp(-across / (width * 4.0)) * exp(-along * 9.0) * 0.075;\n  }\n  let horizontal = exp(-abs(q.y) / 0.0025) * pow(max(0.0, 1.0 - abs(q.x) * 2.4), 2.0);\n  rays += horizontal * shape.y;\n  let coreWidth = max(0.0067, fwidth(r) * 0.65);\n  let core = exp(-r * r / (coreWidth * coreWidth)) * 2.6;\n  let halo = exp(-r * 36.0) * 0.15;\n  let ring = exp(-pow((r - 0.038) / 0.004, 2.0)) * 0.024;\n  let edge = 1.0 - smoothstep(0.85, 0.99, r);\n  let energy = (rays + core + halo + ring) * shape.x * edge;\n  let rgb = mix(tint, vec3f(1.0), exp(-r * 90.0) * 0.88) * energy;\n  return vec4f(rgb, clamp(energy, 0.0, 1.0));\n}`);\n\nexport type FlareOptions = {\n  brightness?: number;\n  visibility?: number;\n  scale?: number;\n  tint?: Color;\n  rotation?: number;\n  secondarySpikes?: number;\n};\n\nexport function createFlareRig() {\n  const root = new Group();\n  const geometry = new PlaneGeometry(2, 2);\n  const defaultTint = new Color('#c7ddff');\n  const shape = uniform(new Vector4());\n  const tint = uniform(defaultTint.clone());\n  const material = new MeshBasicNodeMaterial({\n    transparent: true,\n    blending: AdditiveBlending,\n    depthTest: false,\n    depthWrite: false,\n    toneMapped: false,\n    premultipliedAlpha: true,\n  });\n  material.fragmentNode = diffraction(uv(), shape, tint);\n  const mesh = new Mesh(geometry, material);\n  mesh.frustumCulled = false;\n  mesh.renderOrder = 1000;\n  root.add(mesh);\n\n  const point = new Vector3();\n  const cameraPosition = new Vector3();\n  const right = new Vector3();\n  const up = new Vector3();\n  const forward = new Vector3();\n  const direction = new Vector3();\n\n  return {\n    root,\n    update(\n      camera: PerspectiveCamera | OrthographicCamera,\n      worldLight: Vector3,\n      options: FlareOptions = {},\n    ) {\n      camera.updateMatrixWorld();\n      point.copy(worldLight).project(camera);\n      camera.getWorldPosition(cameraPosition);\n      camera.getWorldDirection(forward);\n      const inFront = direction.copy(worldLight).sub(cameraPosition).dot(forward) > 0;\n      const edge = Math.max(\n        0,\n        Math.min(1, (1.22 - Math.max(Math.abs(point.x), Math.abs(point.y))) / 0.20),\n      );\n      const energy = (options.brightness ?? 1) * (options.visibility ?? 1) * edge;\n      root.visible = inFront && energy > 0.00001;\n      if (!root.visible) return;\n\n      tint.value.copy(options.tint ?? defaultTint);\n      right.set(1, 0, 0).applyQuaternion(camera.quaternion);\n      up.set(0, 1, 0).applyQuaternion(camera.quaternion);\n      const distance = Math.max(camera.near * 4, 1);\n      const halfHeight = camera instanceof PerspectiveCamera\n        ? Math.tan(camera.fov * Math.PI / 360) * distance\n        : (camera.top - camera.bottom) / (2 * camera.zoom);\n      const aspect = camera instanceof PerspectiveCamera\n        ? camera.aspect\n        : (camera.right - camera.left) / (camera.top - camera.bottom);\n\n      mesh.position.copy(cameraPosition)\n        .addScaledVector(forward, distance)\n        .addScaledVector(right, point.x * halfHeight * aspect)\n        .addScaledVector(up, point.y * halfHeight);\n      mesh.quaternion.copy(camera.quaternion);\n      mesh.scale.setScalar(halfHeight * (options.scale ?? 0.28));\n      shape.value.set(\n        energy,\n        options.secondarySpikes ?? 0.035,\n        options.rotation ?? 0,\n        0,\n      );\n    },\n    dispose() {\n      geometry.dispose();\n      material.dispose();\n      root.removeFromParent();\n      root.clear();\n    },\n  };\n}\n",
+      "starfield/starfield.ts": "import { defineComponent } from '@lux/visual-sdk';\nimport {\n  AdditiveBlending,\n  Color,\n  InstancedMesh,\n  MeshBasicNodeMaterial,\n  Object3D,\n  PerspectiveCamera,\n  PlaneGeometry,\n  Scene,\n  Vector3,\n} from 'three/webgpu';\nimport { float, smoothstep, uniform, uv } from 'three/tsl';\nimport { createFlareRig } from './starfield-flare-rig.ts';\n\nconst ease = (value: number) => {\n  const clamped = Math.max(0, Math.min(1, value));\n  return clamped * clamped * (3 - 2 * clamped);\n};\n\nconst featureStarData = [\n  [-0.23, 0.22, -1, 0.055, 0.62, '#d9eaff'],\n  [0.35, 0.12, -1, 0.043, 0.42, '#fff0d7'],\n  [-0.42, -0.18, -1, 0.035, 0.34, '#e4edff'],\n  [0.08, 0.33, -1, 0.046, 0.48, '#eff5ff'],\n  [0.28, -0.27, -1, 0.033, 0.36, '#ffe6ca'],\n  [-0.07, -0.36, -1, 0.04, 0.40, '#d4eaff'],\n  [0.48, 0.30, -1, 0.05, 0.42, '#e7efff'],\n  [-0.55, 0.07, -1, 0.032, 0.38, '#ffedda'],\n  [0.51, -0.12, -1, 0.047, 0.40, '#dceaff'],\n  [-0.32, -0.30, -1, 0.037, 0.35, '#fff1de'],\n  [0.02, 0.12, -1, 0.053, 0.42, '#e9f0ff'],\n  [-0.13, 0.46, -1, 0.034, 0.36, '#ffe8d5'],\n] as const;\n\nexport default defineComponent({\n  metadata: {\n    declarationVersion: 1,\n    key: 'lux/cosmos-starfield',\n    label: 'Cosmos Starfield',\n    description: 'Layered fine stars and fixed six-ray feature stars on deep black.',\n    tags: ['space', 'background', 'stars', 'jwst'],\n    inputs: {},\n    outputs: {\n      image: {\n        type: {\n          kind: 'image',\n          colorSpace: 'linear-srgb',\n          alphaMode: 'premultiplied',\n        },\n        label: 'Image',\n        description: 'Rendered starfield image.',\n      },\n    },\n    controls: {\n      starlight: {\n        type: 'number',\n        label: 'Fine star brightness',\n        default: 0.8,\n        min: 0,\n        max: 2,\n        step: 0.01,\n        group: 'Cosmos',\n      },\n      featureStarDensity: {\n        type: 'number',\n        label: 'Feature star density',\n        default: 6,\n        min: 0,\n        max: 12,\n        step: 0.1,\n        group: 'Cosmos',\n      },\n      featureStarScale: {\n        type: 'number',\n        label: 'Feature star scale',\n        default: 0.65,\n        min: 0.1,\n        max: 2,\n        step: 0.01,\n        group: 'Cosmos',\n      },\n      featureStarVariance: {\n        type: 'number',\n        label: 'Feature star size variance',\n        default: 0.5,\n        min: 0,\n        max: 2,\n        step: 0.01,\n        group: 'Cosmos',\n      },\n      featureStarOpacity: {\n        type: 'number',\n        label: 'Feature star opacity',\n        default: 0.65,\n        min: 0,\n        max: 1,\n        step: 0.01,\n        group: 'Cosmos',\n      },\n      twinkle: {\n        type: 'number',\n        label: 'Twinkle',\n        default: 0.18,\n        min: 0,\n        max: 1,\n        step: 0.01,\n        group: 'Cosmos',\n      },\n    },\n    controlDescriptions: {\n      starlight: 'Sets the opacity of the three fine-star depth layers.',\n      featureStarDensity: 'Reveals the twelve stable feature stars in sequence, including fractional fades.',\n      featureStarScale: 'Scales all six-ray feature stars while preserving their size distribution.',\n      featureStarVariance: 'Controls how strongly the stable feature-star sizes differ.',\n      featureStarOpacity: 'Fades the feature-star layer independently of the fine stars.',\n      twinkle: 'Adds a slow, subtle brightness drift without moving the fixed sky.',\n    },\n    lifecycle: {\n      state: 'stateful',\n      reset: 'seed',\n    },\n  },\n  async create(context) {\n    const scene = new Scene();\n    scene.background = new Color('#000006');\n    const camera = new PerspectiveCamera(\n      42,\n      context.settings.width / context.settings.height,\n      0.1,\n      100,\n    );\n    camera.position.set(0, 0, 17.12);\n    camera.lookAt(0, 0, 0);\n    scene.add(camera);\n\n    const fineStarGain = uniform(0.8 * 0.48);\n    const fineStarGeometry = new PlaneGeometry(1, 1);\n    const fineStarMaterial = new MeshBasicNodeMaterial();\n    const fineStarRadius = uv().sub(0.5).length().mul(2);\n    fineStarMaterial.opacityNode = float(1)\n      .sub(smoothstep(0.05, 1, fineStarRadius))\n      .pow(3)\n      .mul(fineStarGain);\n    fineStarMaterial.transparent = true;\n    fineStarMaterial.blending = AdditiveBlending;\n    fineStarMaterial.depthWrite = false;\n    fineStarMaterial.toneMapped = false;\n\n    const fineStarBatches: InstancedMesh[] = [];\n    const dummy = new Object3D();\n    const color = new Color();\n    for (let layer = 0; layer < 3; layer += 1) {\n      const stars = new InstancedMesh(fineStarGeometry, fineStarMaterial, 480);\n      for (let index = 0; index < 480; index += 1) {\n        dummy.position.set(\n          (context.random() - 0.5) * 74,\n          (context.random() - 0.5) * 44,\n          -9 - layer * 12 - context.random() * 7,\n        );\n        const size = (0.13 + Math.pow(context.random(), 5) * 0.15) * (1 + layer * 0.4);\n        dummy.scale.setScalar(size);\n        dummy.updateMatrix();\n        stars.setMatrixAt(index, dummy.matrix);\n        const tint = context.random();\n        stars.setColorAt(\n          index,\n          color.setRGB(0.55 + tint * 0.45, 0.64 + tint * 0.24, 1),\n        );\n      }\n      stars.instanceMatrix.needsUpdate = true;\n      if (stars.instanceColor) stars.instanceColor.needsUpdate = true;\n      stars.frustumCulled = false;\n      scene.add(stars);\n      fineStarBatches.push(stars);\n    }\n\n    const featureStars = featureStarData.map(([x, y, z, size, brightness, tint]) => {\n      const rig = createFlareRig();\n      scene.add(rig.root);\n      return {\n        rig,\n        direction: new Vector3(x, y, z).normalize(),\n        size,\n        brightness,\n        tint: new Color(tint),\n        light: new Vector3(),\n      };\n    });\n\n    return {\n      update(frame) {\n        const controls = frame.controls;\n        const fineTwinkle = 1 + controls.twinkle * (\n          Math.sin(frame.timeSeconds * 0.41) * 0.045\n          + Math.sin(frame.timeSeconds * 0.79 + 1.7) * 0.025\n        );\n        fineStarGain.value = controls.starlight * 0.48 * fineTwinkle;\n\n        for (let index = 0; index < featureStars.length; index += 1) {\n          const star = featureStars[index];\n          const starSize = 0.1032\n            * controls.featureStarScale\n            * Math.exp(Math.log(star.size / 0.043) * controls.featureStarVariance * 2);\n          const densityFade = ease(controls.featureStarDensity - index);\n          const twinkle = 1 + controls.twinkle * 0.09\n            * Math.sin(frame.timeSeconds * (0.23 + index * 0.017) + index * 1.93);\n          star.light.copy(camera.position).addScaledVector(star.direction, 60);\n          star.rig.update(camera, star.light, {\n            scale: starSize,\n            brightness: star.brightness * 1.8 * Math.min(1.4, controls.starlight) * twinkle,\n            visibility: controls.featureStarOpacity * densityFade,\n            tint: star.tint,\n            secondarySpikes: 0.035,\n          });\n        }\n      },\n      async evaluate(_inputs, evaluation) {\n        return {\n          image: await evaluation.render(scene, camera),\n        };\n      },\n      reset() {\n        fineStarGain.value = 0.8 * 0.48;\n      },\n      dispose() {\n        for (const star of featureStars) star.rig.dispose();\n        for (const stars of fineStarBatches) {\n          stars.removeFromParent();\n          stars.dispose();\n        }\n        fineStarGeometry.dispose();\n        fineStarMaterial.dispose();\n      },\n    };\n  },\n});\n",
+      "visual.ts": "import { defineVisual } from '@lux/visual-sdk';\nimport starfield from './starfield/starfield.ts';\nimport quasar from './quasar.ts';\nimport bloom from './bloom.ts';\n\nexport default defineVisual({\n  label: 'Feeding Quasar',\n  definitions: { starfield, quasar, bloom },\n  nodes: [\n    { id: '6d0bd349-bbeb-4988-b49b-443315397b16', definition: 'starfield' },\n    { id: 'fa981b60-a121-45e0-9a97-ccedfa2e05cc', definition: 'quasar' },\n    { id: 'd831c483-9f01-4a63-80e2-a43d0a373aee', definition: 'bloom' },\n  ],\n  edges: [\n    { id: '1e4b6cde-eaea-4aa7-9178-aa676053fbae', from: { nodeId: '6d0bd349-bbeb-4988-b49b-443315397b16', portId: 'image' }, to: { nodeId: 'fa981b60-a121-45e0-9a97-ccedfa2e05cc', portId: 'image' }, delay: 'none' },\n    { id: 'b53bf4e4-bd7e-43f3-a993-051746df89ac', from: { nodeId: 'fa981b60-a121-45e0-9a97-ccedfa2e05cc', portId: 'image' }, to: { nodeId: 'd831c483-9f01-4a63-80e2-a43d0a373aee', portId: 'image' }, delay: 'none' },\n  ],\n  output: { nodeId: 'd831c483-9f01-4a63-80e2-a43d0a373aee', portId: 'image' },\n  expose: [\n    { id: 'starlight', nodeId: '6d0bd349-bbeb-4988-b49b-443315397b16', controlId: 'starlight' },\n    { id: 'featureStarDensity', nodeId: '6d0bd349-bbeb-4988-b49b-443315397b16', controlId: 'featureStarDensity' },\n    { id: 'featureStarScale', nodeId: '6d0bd349-bbeb-4988-b49b-443315397b16', controlId: 'featureStarScale' },\n    { id: 'featureStarVariance', nodeId: '6d0bd349-bbeb-4988-b49b-443315397b16', controlId: 'featureStarVariance' },\n    { id: 'featureStarOpacity', nodeId: '6d0bd349-bbeb-4988-b49b-443315397b16', controlId: 'featureStarOpacity' },\n    { id: 'twinkle', nodeId: '6d0bd349-bbeb-4988-b49b-443315397b16', controlId: 'twinkle' },\n    { id: 'zoom', nodeId: 'fa981b60-a121-45e0-9a97-ccedfa2e05cc', controlId: 'zoom' },\n    { id: 'inclination', nodeId: 'fa981b60-a121-45e0-9a97-ccedfa2e05cc', controlId: 'inclination' },\n    { id: 'roll', nodeId: 'fa981b60-a121-45e0-9a97-ccedfa2e05cc', controlId: 'roll' },\n    { id: 'drift', nodeId: 'fa981b60-a121-45e0-9a97-ccedfa2e05cc', controlId: 'drift' },\n    { id: 'spin', nodeId: 'fa981b60-a121-45e0-9a97-ccedfa2e05cc', controlId: 'spin' },\n    { id: 'turbulence', nodeId: 'fa981b60-a121-45e0-9a97-ccedfa2e05cc', controlId: 'turbulence' },\n    { id: 'heat', nodeId: 'fa981b60-a121-45e0-9a97-ccedfa2e05cc', controlId: 'heat' },\n    { id: 'radius', nodeId: 'fa981b60-a121-45e0-9a97-ccedfa2e05cc', controlId: 'radius' },\n    { id: 'jetPower', nodeId: 'fa981b60-a121-45e0-9a97-ccedfa2e05cc', controlId: 'jetPower' },\n    { id: 'jetWidth', nodeId: 'fa981b60-a121-45e0-9a97-ccedfa2e05cc', controlId: 'jetWidth' },\n    { id: 'jetTwist', nodeId: 'fa981b60-a121-45e0-9a97-ccedfa2e05cc', controlId: 'jetTwist' },\n    { id: 'jetSpeed', nodeId: 'fa981b60-a121-45e0-9a97-ccedfa2e05cc', controlId: 'jetSpeed' },\n    { id: 'lensing', nodeId: 'fa981b60-a121-45e0-9a97-ccedfa2e05cc', controlId: 'lensing' },\n    { id: 'photon', nodeId: 'fa981b60-a121-45e0-9a97-ccedfa2e05cc', controlId: 'photon' },\n    { id: 'bloom', nodeId: 'd831c483-9f01-4a63-80e2-a43d0a373aee', controlId: 'bloom' },\n    { id: 'softness', nodeId: 'd831c483-9f01-4a63-80e2-a43d0a373aee', controlId: 'softness' },\n    { id: 'exposure', nodeId: 'd831c483-9f01-4a63-80e2-a43d0a373aee', controlId: 'exposure' },\n  ],\n});\n"
+    }
+  },
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "seed": 0
+  },
+  "controls": {
+    "sourceHash": "2ab0ced951512e91f7bd4adf84b0cea3a5b251c42ae8d872108cd0be7a97855e",
+    "nodes": [
+      {
+        "nodePath": [
+          "6d0bd349-bbeb-4988-b49b-443315397b16"
+        ],
+        "definitionHash": "34b2c45bec4c55537cd92bd3f395f805a2834d9d08cee34b8896b1417966aee3",
+        "schema": [
+          {
+            "id": "starlight",
+            "type": "number",
+            "label": "Fine star brightness",
+            "default": 0.8,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "group": "Cosmos",
+            "changeCost": "live"
+          },
+          {
+            "id": "featureStarDensity",
+            "type": "number",
+            "label": "Feature star density",
+            "default": 6,
+            "min": 0,
+            "max": 12,
+            "step": 0.1,
+            "group": "Cosmos",
+            "changeCost": "live"
+          },
+          {
+            "id": "featureStarScale",
+            "type": "number",
+            "label": "Feature star scale",
+            "default": 0.65,
+            "min": 0.1,
+            "max": 2,
+            "step": 0.01,
+            "group": "Cosmos",
+            "changeCost": "live"
+          },
+          {
+            "id": "featureStarVariance",
+            "type": "number",
+            "label": "Feature star size variance",
+            "default": 0.5,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "group": "Cosmos",
+            "changeCost": "live"
+          },
+          {
+            "id": "featureStarOpacity",
+            "type": "number",
+            "label": "Feature star opacity",
+            "default": 0.65,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Cosmos",
+            "changeCost": "live"
+          },
+          {
+            "id": "twinkle",
+            "type": "number",
+            "label": "Twinkle",
+            "default": 0.18,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Cosmos",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "9060dd26378975ec105c9506dd74ece88bad44b579a6fa45cca496b7914621a2",
+        "values": {
+          "starlight": 0.8,
+          "featureStarDensity": 12,
+          "featureStarScale": 0.65,
+          "featureStarVariance": 0.86,
+          "featureStarOpacity": 0.6,
+          "twinkle": 0.81
+        }
+      },
+      {
+        "nodePath": [
+          "fa981b60-a121-45e0-9a97-ccedfa2e05cc"
+        ],
+        "definitionHash": "c1b36c33e0e2b433b50e557c62186f4a6b639a86b8a21a07afdf746617f2a9b7",
+        "schema": [
+          {
+            "id": "zoom",
+            "type": "number",
+            "label": "Framing",
+            "default": 1,
+            "min": 0.6,
+            "max": 1.5,
+            "step": 0.01,
+            "group": "Camera",
+            "changeCost": "live"
+          },
+          {
+            "id": "inclination",
+            "type": "number",
+            "label": "Disk viewing angle",
+            "default": 12,
+            "min": 3,
+            "max": 65,
+            "step": 0.1,
+            "group": "Camera",
+            "changeCost": "live"
+          },
+          {
+            "id": "roll",
+            "type": "number",
+            "label": "Composition tilt",
+            "default": -10,
+            "min": -45,
+            "max": 45,
+            "step": 0.1,
+            "group": "Camera",
+            "changeCost": "live"
+          },
+          {
+            "id": "drift",
+            "type": "number",
+            "label": "Slow camera drift",
+            "default": 0.3,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Camera",
+            "changeCost": "live"
+          },
+          {
+            "id": "spin",
+            "type": "number",
+            "label": "Disk spin",
+            "default": 1,
+            "min": 0,
+            "max": 4,
+            "step": 0.01,
+            "group": "Accretion disk",
+            "changeCost": "live"
+          },
+          {
+            "id": "turbulence",
+            "type": "number",
+            "label": "Turbulence detail",
+            "default": 1,
+            "min": 0,
+            "max": 1.5,
+            "step": 0.01,
+            "group": "Accretion disk",
+            "changeCost": "live"
+          },
+          {
+            "id": "heat",
+            "type": "number",
+            "label": "Disk radiance",
+            "default": 1.5,
+            "min": 0.1,
+            "max": 4,
+            "step": 0.01,
+            "group": "Accretion disk",
+            "changeCost": "live"
+          },
+          {
+            "id": "radius",
+            "type": "number",
+            "label": "Outer disk radius",
+            "default": 8,
+            "min": 4,
+            "max": 10,
+            "step": 0.1,
+            "group": "Accretion disk",
+            "changeCost": "live"
+          },
+          {
+            "id": "jetPower",
+            "type": "number",
+            "label": "Jet radiance",
+            "default": 1.4,
+            "min": 0,
+            "max": 4,
+            "step": 0.01,
+            "group": "Polar jets",
+            "changeCost": "live"
+          },
+          {
+            "id": "jetWidth",
+            "type": "number",
+            "label": "Jet width",
+            "default": 1,
+            "min": 0.3,
+            "max": 2.5,
+            "step": 0.01,
+            "group": "Polar jets",
+            "changeCost": "live"
+          },
+          {
+            "id": "jetTwist",
+            "type": "number",
+            "label": "Helix turns",
+            "default": 1,
+            "min": 0.2,
+            "max": 2,
+            "step": 0.01,
+            "group": "Polar jets",
+            "changeCost": "live"
+          },
+          {
+            "id": "jetSpeed",
+            "type": "number",
+            "label": "Outflow speed",
+            "default": 1,
+            "min": 0,
+            "max": 4,
+            "step": 0.01,
+            "group": "Polar jets",
+            "changeCost": "live"
+          },
+          {
+            "id": "lensing",
+            "type": "number",
+            "label": "Light bending",
+            "default": 1,
+            "min": 0.4,
+            "max": 1.4,
+            "step": 0.01,
+            "group": "Lensing",
+            "changeCost": "live"
+          },
+          {
+            "id": "photon",
+            "type": "number",
+            "label": "Photon ring",
+            "default": 0.8,
+            "min": 0,
+            "max": 3,
+            "step": 0.01,
+            "group": "Lensing",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "9544325ae5463731e8477280b357cf2732b4b2d608c6887f4afc42799d0179d8",
+        "values": {
+          "zoom": 1,
+          "inclination": 7.6,
+          "roll": -7.5,
+          "drift": 0.2,
+          "spin": 0.4,
+          "turbulence": 1,
+          "heat": 2.09,
+          "radius": 6.1,
+          "jetPower": 3.25,
+          "jetWidth": 0.58,
+          "jetTwist": 1.11,
+          "jetSpeed": 0.44,
+          "lensing": 0.79,
+          "photon": 1.24
+        }
+      },
+      {
+        "nodePath": [
+          "d831c483-9f01-4a63-80e2-a43d0a373aee"
+        ],
+        "definitionHash": "65717279392b5c4d035c42cd1097507f10df032820235c61e690a671a3fc6c98",
+        "schema": [
+          {
+            "id": "bloom",
+            "type": "number",
+            "label": "Bloom strength",
+            "default": 0.65,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "softness",
+            "type": "number",
+            "label": "Bloom radius",
+            "default": 18,
+            "min": 2,
+            "max": 50,
+            "step": 1,
+            "group": "Light",
+            "changeCost": "live"
+          },
+          {
+            "id": "exposure",
+            "type": "number",
+            "label": "Exposure",
+            "default": 1.15,
+            "min": 0.3,
+            "max": 2.5,
+            "step": 0.01,
+            "group": "Light",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "6b42894fa02f14a90a9b4f347de3f5444fc1ca133e4849ad3689882832d1fbba",
+        "values": {
+          "bloom": 0.83,
+          "softness": 17,
+          "exposure": 1.27
+        }
+      }
+    ]
+  },
+  "libraryLinks": [
+    {
+      "componentId": "7bd99b27-08ae-4483-9314-1c8e1e98cf10",
+      "mountPath": "starfield",
+      "resolvedRevision": 1,
+      "files": [
+        "starfield/starfield-flare-rig.ts",
+        "starfield/starfield.ts"
+      ]
+    }
+  ],
+  "tempo": {
+    "bpm": 120
+  },
+  "controlAnimations": []
+}

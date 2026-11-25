@@ -1,0 +1,56 @@
+{
+  "format": "lux-scene",
+  "version": 5,
+  "source": {
+    "sdkVersion": "0.4.0",
+    "entry": "composition.ts",
+    "files": {
+      "composition.ts": "import { defineComposition } from '@lux/visual-sdk';\nimport ball from './library/qa-saved-ball/component.ts';\nexport default defineComposition({\n  definitions: { ball },\n  nodes: [{ id: '11111111-1111-4111-8111-111111111111', definition: 'ball' }],\n  edges: [],\n  output: { nodeId: '11111111-1111-4111-8111-111111111111', portId: 'image' },\n  expose: [{ id: 'intensity', nodeId: '11111111-1111-4111-8111-111111111111', controlId: 'intensity' }],\n});\n",
+      "library/qa-saved-ball/component.ts": "import { defineComponent } from '@lux/visual-sdk';\nimport {\n  AmbientLight,\n  Color,\n  DirectionalLight,\n  IcosahedronGeometry,\n  Mesh,\n  MeshPhysicalNodeMaterial,\n  PerspectiveCamera,\n  Scene,\n} from 'three/webgpu';\nimport {\n  color,\n  mix,\n  mx_noise_float,\n  positionLocal,\n  uniform,\n  varying,\n  vec3,\n} from 'three/tsl';\n\nexport default defineComponent({\n  metadata: {\n    declarationVersion: 1,\n    key: 'demo/prismatic-ball',\n    label: 'Prismatic Ball',\n    description: 'Animated iridescent spike source',\n    tags: ['demo'],\n    inputs: {},\n    outputs: {\n      image: {\n        type: {\n          kind: 'image',\n          colorSpace: 'linear-srgb',\n          alphaMode: 'premultiplied',\n        },\n        label: 'Image',\n        description: 'Rendered ball',\n      },\n    },\n    controls: {\n      intensity: {\n        type: 'number',\n        label: 'Spike amount',\n        default: 0.67,\n        min: 0,\n        max: 1,\n        step: 0.01,\n      },\n    },\n    controlDescriptions: {\n      intensity: 'Controls the height of the animated spikes.',\n    },\n    lifecycle: {\n      state: 'stateful',\n      reset: 'seed',\n    },\n  },\n  async create(context) {\n    const clock = uniform(0);\n    const intensity = uniform(0.67);\n    const position = positionLocal.normalize();\n    const drift = vec3(clock.mul(0.43), clock.mul(-0.31), clock.mul(0.22));\n    const warp = mx_noise_float(position.mul(2).add(drift.mul(0.45))).mul(0.48);\n    const field = position.mul(3.6).add(drift).add(warp);\n    const noise = mx_noise_float(field).mul(0.8).add(0.44).clamp(0, 1);\n    const spikes = noise.pow(3.4).mul(intensity.mul(1.6).add(0.25));\n    const height = varying(spikes);\n    const material = new MeshPhysicalNodeMaterial({\n      metalness: 0.56,\n      roughness: 0.29,\n      clearcoat: 0.8,\n      clearcoatRoughness: 0.22,\n      iridescence: 0.85,\n      flatShading: true,\n    });\n    const detail = mx_noise_float(field.mul(3.1).sub(drift)).mul(0.07).mul(intensity);\n    material.positionNode = position.mul(spikes.add(detail).add(0.85));\n    material.colorNode = mix(\n      color('#392565'),\n      color('#21e6cb'),\n      height.mul(1.8).clamp(0, 1),\n    );\n    material.emissiveNode = mix(\n      color('#120420'),\n      color('#16b9b6'),\n      height.mul(1.2).clamp(0, 1),\n    ).mul(0.13);\n    const geometry = new IcosahedronGeometry(1, 24);\n    const sphere = new Mesh(geometry, material);\n    const scene = new Scene();\n    scene.background = new Color('#030510');\n    scene.add(sphere, new AmbientLight('#668ab4', 0.8));\n    const key = new DirectionalLight('#bfefff', 4.4);\n    key.position.set(3, 4, 4);\n    scene.add(key);\n    const rim = new DirectionalLight('#fc4fa4', 5.5);\n    rim.position.set(-3, 1, -1);\n    scene.add(rim);\n    const camera = new PerspectiveCamera(\n      36,\n      context.settings.width / context.settings.height,\n      0.1,\n      30,\n    );\n    camera.position.set(0, 0, 9);\n    return {\n      update(frame) {\n        intensity.value = frame.controls.intensity;\n        clock.value = frame.timeSeconds * 0.3 * (0.5 + frame.controls.intensity);\n        sphere.rotation.set(\n          Math.sin(frame.timeSeconds * 0.17) * 0.16,\n          frame.timeSeconds * 0.13,\n          0.13,\n        );\n      },\n      async evaluate(_inputs, evaluation) {\n        return { image: await evaluation.render(scene, camera) };\n      },\n      reset() {\n        clock.value = 0;\n        sphere.rotation.set(0, 0, 0.13);\n      },\n      dispose() {\n        geometry.dispose();\n        material.dispose();\n      },\n    };\n  },\n});\n"
+    }
+  },
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "seed": 0
+  },
+  "controls": {
+    "sourceHash": "19dc5de25ea3e47f21a33bb64579bc792539a3f8e9dbcc53c37ab5eaf42a9cc7",
+    "nodes": [
+      {
+        "nodePath": [
+          "11111111-1111-4111-8111-111111111111"
+        ],
+        "definitionHash": "d6a79f51cf3d906230db3d1a3c56c8e4bde935f713c76509d55335e7d075e8e0",
+        "schema": [
+          {
+            "id": "intensity",
+            "type": "number",
+            "label": "Spike amount",
+            "default": 0.67,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "8229c8eca7f52b563e1adf1eb8c801db6ffd4438d611f332ff491facb6c823bd",
+        "values": {
+          "intensity": 0.67
+        }
+      }
+    ]
+  },
+  "libraryLinks": [
+    {
+      "componentId": "021b54fc-5c3d-461a-a197-8c0ba92cf71f",
+      "mountPath": "library/qa-saved-ball",
+      "resolvedRevision": 1,
+      "files": [
+        "library/qa-saved-ball/component.ts"
+      ]
+    }
+  ],
+  "controlAnimations": []
+}

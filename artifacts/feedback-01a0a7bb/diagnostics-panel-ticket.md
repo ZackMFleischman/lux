@@ -1,0 +1,3 @@
+Move Performance, Runtime and Host Output from Inspector into a separate Diagnostics dock panel. Inspector should focus on editing controls. Reuse existing dock, panel and disclosure components; retain all existing information and interactions. Expose Diagnostics through View and preserve saved-layout compatibility.
+
+Acceptance: all three sections appear in Diagnostics and remain functional; Inspector no longer includes them; Diagnostics can be opened, closed and restored through View; old saved layouts still load safely. Verify the actual running app with screenshots and independent UX/design review. Coordinate renderer/layout changes with LUX142 and LUX144 and serialize native GPU QA.

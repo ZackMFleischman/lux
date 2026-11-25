@@ -1,0 +1,36 @@
+✔ library writes are atomic, revision guarded, validated before activation, and persist across store restart (188.6661ms)
+✔ linked source applies a newer revision while a fork keeps the mounted source and removes its link (1.8412ms)
+✔ missing library data retains the saved mounted fallback and reports it explicitly (0.7794ms)
+✔ checking an empty library link set does not require an SDK 0.4 scene (0.2538ms)
+✔ library reads reject an oversized profile file through the bounded file path (14.0028ms)
+✔ two profile stores share explicit additions as real source files without losing concurrent creates (117.1759ms)
+✔ separate stores serialize updates so a stale revision cannot overwrite the winner (93.4852ms)
+✔ legacy profile entries migrate once into the shared directory without changing IDs or revisions (27.0622ms)
+✔ a conflicting legacy migration keeps both complete sources and reports the collision (115.8065ms)
+✔ an installed writable library imports packaged seed components without writing back to the seed (232.4326ms)
+✔ a fallback update fast-forwards the canonical library only through matching immutable history (221.3515ms)
+✔ a new fallback component imports its complete immutable revision history (132.1082ms)
+✖ legacy revision suffix seeds a standalone library without inventing earlier history (85.5878ms)
+✔ seeding rejects gaps within available history without activating a partial component (140.0499ms)
+✔ a higher fallback revision without matching history is preserved as a conflict (93.1158ms)
+✔ a persistent lock is never stolen from a live or uncertain owner (44.0937ms)
+✔ parallel contenders never evict a persistent lock or enter the critical section (41.3127ms)
+✔ the repository seed exposes a useful Prismatic Ball component from an isolated copy (45.9578ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 17
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1851.7306
+
+✖ failing tests:
+
+test at tests\core\component-library.test.ts:241:1
+✖ legacy revision suffix seeds a standalone library without inventing earlier history (85.5878ms)
+  Error: Component library seed history is incomplete for 11111111-1111-4111-8111-111111111111; the current source was preserved
+      at add (file:///C:/Users/zFlei/repos/lux/packages/core/src/component-library-store.ts:307:19)
+      at async ComponentLibraryStore.prepareLocked (file:///C:/Users/zFlei/repos/lux/packages/core/src/component-library-store.ts:348:48)
+      at async file:///C:/Users/zFlei/repos/lux/packages/core/src/component-library-store.ts:377:23
+      at async ComponentLibraryStore.locked (file:///C:/Users/zFlei/repos/lux/packages/core/src/component-library-store.ts:281:18)

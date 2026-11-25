@@ -1,0 +1,12 @@
+{
+  "batch_id": "b03bfd76-148e-448b-8cd5-d702fcadab0a",
+  "revisit_trigger": "Reassess on a fresh recurrence after the cited fix/guidance, missing installed guidance, or an uncovered concrete acceptance gap.",
+  "observation": "Bird iteration changed flight character more than requested",
+  "event_seqs": [
+    3299
+  ],
+  "action": "observe",
+  "review_after": "2026-09-25T00:00:00Z",
+  "rationale": "LUX-181 records restoration of motion character. Preserve that fix and check subsequent changes; no new reusable mechanism justified.",
+  "group_key": "easywins-existing-lux-p115"
+}

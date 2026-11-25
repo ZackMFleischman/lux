@@ -1,0 +1,1 @@
+User voice-driven visual change and follow-up remain to be tested. Semantic correctness of arbitrary coding tasks depends on agent verification. Global saved MCP entry remains obsolete; running app uses verified creative-session invocation overrides. No paid reasoning fallback.

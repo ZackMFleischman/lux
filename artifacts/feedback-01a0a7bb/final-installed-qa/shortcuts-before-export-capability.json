@@ -1,0 +1,42 @@
+{
+  "installation": {
+    "version": 1,
+    "name": "Lux",
+    "sourceCommit": "4fae14f783d7a05ac958bef1ceb3724ee690471e",
+    "sourceTree": "working tree snapshot",
+    "canonicalLibraryRoot": "C:\\Users\\zFlei\\repos\\lux\\library",
+    "electron": {
+      "version": "44.3.0",
+      "archiveName": "electron-v44.3.0-win32-x64.zip",
+      "sha256": "26bf9a617d58d81772b3d68305d59ee48272969c15083c06db634a77358a8d9d",
+      "source": "https://github.com/electron/electron/releases/download/v44.3.0/electron-v44.3.0-win32-x64.zip"
+    },
+    "installedAt": "2026-09-16T07:05:34.977Z",
+    "directory": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\4fae14f7-19e933a3",
+    "executable": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\4fae14f7-19e933a3\\Lux.exe",
+    "workspace": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\4fae14f7-19e933a3\\resources\\app\\runtime",
+    "node": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\4fae14f7-19e933a3\\resources\\app\\node.exe",
+    "adapter": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\4fae14f7-19e933a3\\resources\\app\\runtime\\scripts\\studio-installed-mcp.mjs",
+    "profile": "desktop",
+    "sourceDigest": "fadf664751593820e983c339dbaa1ac065f8d2ace45b61dbae6e97372e871b0f"
+  },
+  "ok": false,
+  "checks": [
+    "Electron accelerator menu is disabled while native minimize, maximize, and close controls remain enabled",
+    "File, Preview, View, Build, panel, and fullscreen controls expose their assigned shortcut hints",
+    "? types in Source without opening the shortcut reference or suppressing text input",
+    "Ctrl+Enter builds from Source; Ctrl+S and Ctrl+Shift+S save through the same scene actions while Source has focus"
+  ],
+  "errors": [],
+  "nativeWindow": {
+    "applicationMenu": false,
+    "minimizable": true,
+    "maximizable": true,
+    "closable": true
+  },
+  "savedScenes": {
+    "saveBytes": 1216,
+    "saveAsBytes": 1216
+  },
+  "failure": "locator.waitFor: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('dialog', { name: 'Export for Resolume' }) to be visible\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\artifacts\\feedback-01a0a7bb\\final-installed-qa\\test-studio-shortcuts.mjs:96:67"
+}

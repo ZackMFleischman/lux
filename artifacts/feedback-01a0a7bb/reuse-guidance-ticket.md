@@ -1,0 +1,3 @@
+Teach Lux agents a clear reuse-first authoring workflow: inspect the shared Library before inventing components; prefer meaningful reusable component compositions; place controls on their owning nodes and group related controls into meaningful subgroups. When useful reusable work emerges, explicitly create/update a Library entry when appropriate to the user request. Ordinary scene edits remain scene-local; do not publish every experiment.
+
+Preserve the supported SDK/image-chain limits and explicit library update semantics. Coordinate with LUX141's current matching-adapter skill correction rather than duplicating it. Update the repository skill, reinstall/check it, and independently review against the actual SDK/MCP contracts.

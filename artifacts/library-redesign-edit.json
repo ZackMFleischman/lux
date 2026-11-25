@@ -1,0 +1,8 @@
+{
+  "parent_id": null,
+  "title": "Redesign Library for visual discovery, organization and AI reuse",
+  "body": "Make Library a compact visual browser for large component collections: find useful components, understand their appearance and purpose, then direct the AI to use them.\n\nAcceptance:\n- Dense thumbnail list plus optional grid; search names/descriptions/tags/use cases; type/compatibility/favorite/in-scene filters.\n- Shallow folders, tags and favorites; later saved collections.\n- Details lead with previews, purpose, use cases, inputs/output and examples. Code/history stay secondary. Narrow details use Back; wide layout shows results beside details.\n- Single/multiple component selection attaches stable references to an AI request, or honestly offers Copy request until attachment exists.\n- Explicit isolated demos for sources, effects and non-image components; one active demo; preserve current scene and release resources.\n- Preserve catalogs, IDs, revisions, source/history and linked scenes; independent actual-app UX review.\n\nDelivery: browser/discovery/details/AI reuse first, then demos and saved collections. Reuse LUX-164 clipping work.\nFull approved design and safety/acceptance detail: artifacts/library-organization-brief.md, Approved redesign detail — 17 September 2026.\nPlanning only; no dispatch.",
+  "reason": "Expand existing Library feature with user-approved compact visual browser, AI selection and isolated demo design; preserve existing work and assignment.",
+  "dependencies": [],
+  "kind": "implementation"
+}

@@ -1,0 +1,38 @@
+✔ RTL: frame bursts leave Performance responsive and applied controls publish immediately (643.5662ms)
+✔ RTL: discard confirmation is an accessible in-app dialog with safe cancel, Escape and explicit approval (1079.7483ms)
+✔ RTL: code-defined controls expose independent values, numeric entry and defaults without Intensity (386.0664ms)
+✔ RTL: control descriptions appear on hover and keyboard focus without creating empty help (364.6842ms)
+✔ RTL: duplicate component labels show and announce their public aliases (152.5925ms)
+✔ RTL: grouped controls use independent keyboard disclosures and preserve live values while collapsed (353.0019ms)
+✔ RTL: an empty authored schema has no invented control (74.2751ms)
+✔ RTL: typing and pending control writes mark unsaved intent before acknowledgement (166.9596ms)
+✔ RTL: merely focusing numeric input cannot overwrite a later agent parameter change (186.2347ms)
+✔ RTL: disconnected controls refuse input while workspace remains operable (267.0779ms)
+✔ RTL: playback and intensity invoke guarded shared operations and wait for applied state (556.4559ms)
+✔ RTL: failed runtime command shows actionable error without a successful-state claim (654.1031ms)
+✔ RTL: pending playback preserves button styling and ignores duplicate transport commands (1006.8669ms)
+✔ RTL: intensity writes do not disable transport or insert a success alert (226.6434ms)
+✔ RTL: delayed applied values never pull a slider away from the latest input (326.3344ms)
+✔ RTL: rejected slider input restores confirmed value and replacement ignores old completion (306.5686ms)
+✔ RTL: a replaced runtime has an independent input queue while old writes are pending (272.3345ms)
+✔ RTL: Escape exits native fullscreen even before its state notification arrives (114.2005ms)
+An update to StudioLayout inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+✔ RTL: fullscreen shows only preview, ignores stale initial state, and exits on first Escape (3908.2726ms)
+✔ RTL: unavailable popout is absent while fullscreen remains available (127.6849ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 19144.3903
