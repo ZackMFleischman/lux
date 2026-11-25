@@ -1,0 +1,7 @@
+{
+  "ok": false,
+  "profile": "test-de726b1c-3cb3-4b24-92ea-2d1677af9645",
+  "checks": [],
+  "errors": [],
+  "error": "Error: visual.ts:32:117 Duplicate literal property: min\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/inspector-group-density/artifacts/inspector-density-qa.mjs:19:427\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"
+}

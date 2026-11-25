@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "profile": "test-08037138-cda0-4ede-9c39-e0d1a16588a4",
+  "checks": [
+    "260px dense controls",
+    "group filter",
+    "no match",
+    "clear"
+  ],
+  "hostWidth": 260,
+  "inspector": {
+    "width": 245,
+    "scroll": 245,
+    "controls": 17
+  }
+}

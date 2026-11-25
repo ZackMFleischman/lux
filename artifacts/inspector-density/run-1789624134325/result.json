@@ -1,0 +1,11 @@
+{
+  "ok": false,
+  "profile": "test-66721753-a9b2-4e1c-a342-2ab97290632c",
+  "checks": [],
+  "inspector": {
+    "width": 245,
+    "scroll": 245,
+    "controls": 17
+  },
+  "error": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(report.inspector.width>=250&&report.inspector.scroll<=report.inspector.width&&report.inspector.controls>=17)\n\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/inspector-group-density/artifacts/inspector-density-qa.mjs:6:441"
+}

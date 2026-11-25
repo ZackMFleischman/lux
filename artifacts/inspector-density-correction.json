@@ -1,0 +1,7 @@
+{
+  "summary": "The accepted connected group treatment used too much vertical padding for control-dense Inspector workflows.",
+  "expected": "Compact groups should preserve 13px headings, contrast, borders, and usable controls while showing many controls in a normal 260px Inspector.",
+  "actual": "The 8px group gap, 5px summary padding, 2/5px control padding, and 5px rows accumulated too much empty height.",
+  "correction": "The user authorized a bounded density follow-up: tighten group, header, controls, and repeated row spacing; verify a realistic many-control Inspector.",
+  "evidence": "User correction relayed by root on 2026-09-16 after review of LUX-186 screenshots."
+}

@@ -1,0 +1,7 @@
+{
+  "ok": false,
+  "profile": "test-f2b3f1fc-c276-4d5f-bc56-63d1160b5df5",
+  "checks": [],
+  "errors": [],
+  "error": "locator.waitFor: Error: strict mode violation: getByRole('button', { name: 'Build' }) resolved to 2 elements:\n    1) <button tabindex=\"0\" type=\"button\" aria-busy=\"false\" aria-label=\"Build\" title=\"Build preview (Ctrl+Enter)\" class=\"MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-sizeSmall MuiButton-colorInherit MuiButton-disableElevation studio-build-button lux-vfqrh3-MuiButtonBase-root-MuiButton-root\">Build</button> aka getByRole('button', { name: 'Build', exact: true })\n    2) <button type=\"button\" aria-busy=\"false\" class=\"status-item status-build \" aria-label=\"Build status: Build idle. Open Jobs and diagnostics\">…</button> aka getByRole('button', { name: 'Build status: Build idle.' })\n\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Build' }) to be visible\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\inspector-group-density\\artifacts\\inspector-density-qa.mjs:3:298"
+}

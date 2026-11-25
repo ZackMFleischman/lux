@@ -1,0 +1,1 @@
+Focused interaction test added for label, id, group, no-match, clear, retained values, and restored collapse. Studio build passed. The isolated dense run built 17 controls and measured a 245px inner Inspector within the 260px host before the evidence assertion stopped screenshots; root should capture final 260px outer-host screenshots during review.

@@ -1,0 +1,1 @@
+Independent review: verify actual 260px host screenshots for dense controls, group filter, no-match, clear, and restored collapse state. Existing unrelated audio fixture failures remain outside this source change.

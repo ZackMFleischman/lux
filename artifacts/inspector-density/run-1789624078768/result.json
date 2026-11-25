@@ -1,0 +1,6 @@
+{
+  "ok": false,
+  "profile": "test-a7efec09-af1a-48c3-ab34-97324f6d03de",
+  "checks": [],
+  "error": "Error: visual.ts:27:5 Unsupported visual literal property: extra0\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/inspector-group-density/artifacts/inspector-density-qa.mjs:5:1393\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"
+}
