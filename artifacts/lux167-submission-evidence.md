@@ -1,0 +1,3 @@
+CPU: default-startup test passed after a red/green cycle; focused Graph navigation test passed; desktop package selection passed 7/7 and includes skills/lux-visual-creation/assets/noise-sphere.ts while excluding SKILL.md.
+
+Native: pnpm studio --smoke exited 0 using an isolated test profile. artifacts/studio-smoke/result.json records SDK 0.2 fresh noise-sphere startup playing, spikeHeight changed to 1.1, invalid replacement retained the preview, and savedAndReopened true. artifacts/studio-smoke/output.png and studio.png capture the running application. The test Electron process exited; no Electron process remained in the post-run check.

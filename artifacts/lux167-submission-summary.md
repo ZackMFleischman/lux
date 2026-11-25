@@ -1,0 +1,1 @@
+LUX-167 sets the existing noise sphere as the fresh Studio source, removes Graph instructional footer copy, and packages only the needed source asset. Tested commit: 1fa5e04c28f2e64940708957fc6d83a4c5e190ab.

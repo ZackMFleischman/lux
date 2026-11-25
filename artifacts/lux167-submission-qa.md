@@ -1,0 +1,1 @@
+Independent review remains with /root/review_component_design. Coordinator owns serial merge and installed-package QA. The worktree node_modules junction points to the existing main checkout dependencies and remains in place; it made no dependency changes.
