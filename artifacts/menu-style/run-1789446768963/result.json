@@ -1,0 +1,36 @@
+{
+  "ok": false,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\menu-style",
+  "commit": "fe6f4760f84d00ce8cadbe414d50ffb2b5da51b9",
+  "session": {
+    "profile": "test-2b094f0c-1565-464d-a830-a28248ffece8",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\menu-style",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-2b094f0c-1565-464d-a830-a28248ffece8",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-2b094f0c-1565-464d-a830-a28248ffece8\\agent-endpoint.json"
+  },
+  "checks": [],
+  "errors": [],
+  "pid": 11232,
+  "fileTrigger": {
+    "font": "500 12px / 16.8px Inter, \"Segoe UI\", sans-serif",
+    "color": "rgb(210, 212, 223)",
+    "height": 28
+  },
+  "viewTrigger": {
+    "font": "500 12px / 16.8px Inter, \"Segoe UI\", sans-serif",
+    "color": "rgb(210, 212, 223)",
+    "height": 28
+  },
+  "fileItem": {
+    "font": "12px / 18px Inter, \"Segoe UI\", sans-serif",
+    "color": "rgb(210, 212, 223)",
+    "height": 30
+  },
+  "viewItem": {
+    "font": "12px / 18px Inter, \"Segoe UI\", sans-serif",
+    "color": "rgb(210, 212, 223)",
+    "height": 30
+  },
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/menu-style/scripts/test-studio-menu-style.mjs:41:45",
+  "processExited": true
+}

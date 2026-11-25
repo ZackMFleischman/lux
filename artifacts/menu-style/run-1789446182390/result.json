@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\menu-style",
+  "commit": "eabbb20caab6390e0db0fc4e406b454e3bea2e28",
+  "session": {
+    "profile": "test-9549793a-f911-4e91-a40a-313637bf9063",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\menu-style",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-9549793a-f911-4e91-a40a-313637bf9063",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-9549793a-f911-4e91-a40a-313637bf9063\\agent-endpoint.json"
+  },
+  "checks": [
+    "Matching menu trigger and item fonts/colors/sizes",
+    "File/View pointer switch and keyboard switch show one menu",
+    "Escape focus, outside dismissal, Looks/Export/Layouts dialogs",
+    "Inactive tab close visible away from pointer and closes",
+    "Redundant labels absent; Play/Pause functional",
+    "Normal and 820px screenshots; Build remains in bounds"
+  ],
+  "errors": [],
+  "pid": 39508,
+  "fileTrigger": {
+    "font": "500 12px / 16.8px Inter, \"Segoe UI\", sans-serif",
+    "color": "rgb(210, 212, 223)",
+    "height": 28
+  },
+  "viewTrigger": {
+    "font": "500 12px / 16.8px Inter, \"Segoe UI\", sans-serif",
+    "color": "rgb(210, 212, 223)",
+    "height": 28
+  },
+  "fileItem": {
+    "font": "12px / 18px Inter, \"Segoe UI\", sans-serif",
+    "color": "rgb(210, 212, 223)",
+    "height": 30
+  },
+  "viewItem": {
+    "font": "12px / 18px Inter, \"Segoe UI\", sans-serif",
+    "color": "rgb(210, 212, 223)",
+    "height": 30
+  },
+  "closedTab": "Preview",
+  "processExited": true
+}

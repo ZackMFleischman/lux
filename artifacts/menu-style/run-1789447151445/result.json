@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\menu-style",
+  "commit": "19f33da5f682c5b3271a90ffd36f6d2aaa25a059",
+  "session": {
+    "profile": "test-79e834cc-a6ff-4ac3-ab38-712a37feed7d",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\menu-style",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-79e834cc-a6ff-4ac3-ab38-712a37feed7d",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-79e834cc-a6ff-4ac3-ab38-712a37feed7d\\agent-endpoint.json"
+  },
+  "checks": [
+    "Graph visible by default on desktop beside live Preview; Graph tab in reset laptop layout",
+    "Matching menu trigger and item fonts/colors/sizes",
+    "File/View pointer switch and keyboard switch show one menu",
+    "Escape focus, outside dismissal, Looks/Export/Layouts dialogs",
+    "Inactive tab close visible away from pointer and closes",
+    "Redundant labels absent; Play/Pause functional",
+    "Normal and 820px screenshots; Build remains in bounds"
+  ],
+  "errors": [],
+  "pid": 11536,
+  "fileTrigger": {
+    "font": "500 12px / 16.8px Inter, \"Segoe UI\", sans-serif",
+    "color": "rgb(210, 212, 223)",
+    "height": 28
+  },
+  "viewTrigger": {
+    "font": "500 12px / 16.8px Inter, \"Segoe UI\", sans-serif",
+    "color": "rgb(210, 212, 223)",
+    "height": 28
+  },
+  "fileItem": {
+    "font": "12px / 18px Inter, \"Segoe UI\", sans-serif",
+    "color": "rgb(210, 212, 223)",
+    "height": 30
+  },
+  "viewItem": {
+    "font": "12px / 18px Inter, \"Segoe UI\", sans-serif",
+    "color": "rgb(210, 212, 223)",
+    "height": 30
+  },
+  "closedTab": "Preview",
+  "processExited": true
+}

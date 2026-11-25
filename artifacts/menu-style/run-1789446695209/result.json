@@ -1,0 +1,16 @@
+{
+  "ok": false,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\menu-style",
+  "commit": "6ab197f92fefac28cf1df2f5f9a2f86ad716bbe1",
+  "session": {
+    "profile": "test-31f41843-a709-4cd0-aa48-5560b8bfea04",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\menu-style",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-31f41843-a709-4cd0-aa48-5560b8bfea04",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-31f41843-a709-4cd0-aa48-5560b8bfea04\\agent-endpoint.json"
+  },
+  "checks": [],
+  "errors": [],
+  "pid": 43324,
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n42068 !== 43324\n\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/menu-style/scripts/test-studio-menu-style.mjs:21:9",
+  "processExited": true
+}

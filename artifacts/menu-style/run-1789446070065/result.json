@@ -1,0 +1,16 @@
+{
+  "ok": false,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\menu-style",
+  "commit": "2a2e17e35891e7eeeca39e64efbaf816bf391d37",
+  "session": {
+    "profile": "test-24c8fae5-c6c3-44e3-89cc-2fc89e2b0689",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\menu-style",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-24c8fae5-c6c3-44e3-89cc-2fc89e2b0689",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-24c8fae5-c6c3-44e3-89cc-2fc89e2b0689\\agent-endpoint.json"
+  },
+  "checks": [],
+  "errors": [],
+  "pid": 30188,
+  "error": "locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Pause', exact: true }) to be visible\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\menu-style\\scripts\\test-studio-menu-style.mjs:17:59",
+  "processExited": true
+}

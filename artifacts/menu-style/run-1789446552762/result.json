@@ -1,0 +1,14 @@
+{
+  "ok": false,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\menu-style",
+  "commit": "e2865d16b3c9a15acdffb1273b8cb75f5478762c",
+  "session": {
+    "profile": "test-6c593ef6-4341-4fbc-a36f-ea7c98ca5edf",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\menu-style",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-6c593ef6-4341-4fbc-a36f-ea7c98ca5edf",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-6c593ef6-4341-4fbc-a36f-ea7c98ca5edf\\agent-endpoint.json"
+  },
+  "checks": [],
+  "errors": [],
+  "error": "Error: Pinned Electron binary is not installed. Run pnpm studio:setup in this checkout.\n    at missing (file:///C:/Users/zFlei/repos/lux/.worktrees/menu-style/scripts/studio-electron.mjs:22:24)\n    at executablePath (file:///C:/Users/zFlei/repos/lux/.worktrees/menu-style/scripts/studio-electron.mjs:31:40)\n    at installedElectron (file:///C:/Users/zFlei/repos/lux/.worktrees/menu-style/scripts/studio-electron.mjs:44:10)\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/menu-style/scripts/test-studio-menu-style.mjs:17:45"
+}

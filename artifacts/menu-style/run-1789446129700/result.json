@@ -1,0 +1,37 @@
+{
+  "ok": false,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\menu-style",
+  "commit": "2a2e17e35891e7eeeca39e64efbaf816bf391d37",
+  "session": {
+    "profile": "test-4ccc0818-82eb-4dd1-9fff-220ad7c47cbb",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\menu-style",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-4ccc0818-82eb-4dd1-9fff-220ad7c47cbb",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-4ccc0818-82eb-4dd1-9fff-220ad7c47cbb\\agent-endpoint.json"
+  },
+  "checks": [],
+  "errors": [],
+  "pid": 31060,
+  "fileTrigger": {
+    "font": "500 12px / 16.8px Inter, \"Segoe UI\", sans-serif",
+    "color": "rgb(210, 212, 223)",
+    "height": 28
+  },
+  "viewTrigger": {
+    "font": "500 12px / 16.8px Inter, \"Segoe UI\", sans-serif",
+    "color": "rgb(210, 212, 223)",
+    "height": 28
+  },
+  "fileItem": {
+    "font": "12px / 18px Inter, \"Segoe UI\", sans-serif",
+    "color": "rgb(210, 212, 223)",
+    "height": 30
+  },
+  "viewItem": {
+    "font": "12px / 18px Inter, \"Segoe UI\", sans-serif",
+    "color": "rgb(210, 212, 223)",
+    "height": 30
+  },
+  "closedTab": "Preview",
+  "error": "locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Pause', exact: true })\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\menu-style\\scripts\\test-studio-menu-style.mjs:41:59",
+  "processExited": true
+}
