@@ -1,0 +1,42 @@
+{
+  "ok": true,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\compact-breadcrumb",
+  "commit": "9fd837461e7a74d1dcbbd00728091171f35ec415",
+  "session": {
+    "profile": "test-7de8fa79-a17f-4ffd-a712-94a4c47ff512",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\compact-breadcrumb",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-7de8fa79-a17f-4ffd-a712-94a4c47ff512",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-7de8fa79-a17f-4ffd-a712-94a4c47ff512\\agent-endpoint.json"
+  },
+  "checks": [
+    "Nested leaf to both parents and Scene with Graph closed",
+    "Keyboard activation and focus retained",
+    "Control values and runtime unchanged by navigation",
+    "Quiet single20px breadcrumb; full parent menu and normal/narrow layouts"
+  ],
+  "errors": [],
+  "pid": 38640,
+  "headings": [
+    {
+      "text": "Files and assets",
+      "fontSize": "14px"
+    },
+    {
+      "text": "ControlsLIVE",
+      "fontSize": "14px"
+    },
+    {
+      "text": "Performance",
+      "fontSize": "14px"
+    },
+    {
+      "text": "Runtime",
+      "fontSize": "14px"
+    },
+    {
+      "text": "Host output",
+      "fontSize": "14px"
+    }
+  ],
+  "processExited": true
+}
