@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "candidate": "a028f05796d23a85c2a77c8ebfeb82e89a8381ac",
+  "testSession": {
+    "profile": "test-e156b2cf-3949-4872-b67a-31f4326b6c33",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\statusbar-105-delivery",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-e156b2cf-3949-4872-b67a-31f4326b6c33",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-e156b2cf-3949-4872-b67a-31f4326b6c33\\agent-endpoint.json"
+  },
+  "checks": [
+    "Actual pending build shows footer spinner",
+    "Successful build reports Build ready with a stable footer",
+    "Keyboard and pointer status actions restore maximized workspace and visibly focus Jobs without replacing Preview"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789369812935\\build-progress.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789369812935\\successful-build.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789369812935\\maximized-status.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789369812935\\maximized-keyboard-details.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789369812935\\maximized-pointer-details.png"
+  ],
+  "errors": [],
+  "launcherPid": 31616,
+  "ownedPid": 28664,
+  "endpoint": {
+    "pid": 28664,
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\statusbar-105-delivery",
+    "profile": "test-e156b2cf-3949-4872-b67a-31f4326b6c33",
+    "sessionId": "7cf9c57aaba6ba82fb359d7bca4dd8e2c4a1"
+  },
+  "ownedProcessExited": true
+}

@@ -1,0 +1,115 @@
+{
+  "ok": true,
+  "candidate": "6e60e7405f46f7b583809b3ec05bd8542acddbfb",
+  "testSession": {
+    "profile": "test-f5ce20d6-375e-4400-b800-544fda71e86b",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\statusbar-105-delivery",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-f5ce20d6-375e-4400-b800-544fda71e86b",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-f5ce20d6-375e-4400-b800-544fda71e86b\\agent-endpoint.json"
+  },
+  "checks": [
+    "Actual pending build shows footer spinner",
+    "Successful build reports Build ready with a stable footer",
+    "Keyboard Enter on a footer item reopens the closed Jobs pane",
+    "Failed build stays visible with Jobs closed, preserves preview, and opens details from the keyboard",
+    "Runtime failure stays visible with Jobs closed and keyboard navigation reveals its exact detail",
+    "Combined standard View opens nested Graph; selected composite control is visible in shared Disclosure; child breadcrumb opens"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789368177289\\build-progress.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789368177289\\successful-build.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789368177289\\failed-build-closed-details.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789368177289\\runtime-failure-closed-details.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789368177289\\runtime-failure-details.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789368177289\\combined-nested-controls.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789368177289\\narrow-status.png"
+  ],
+  "errors": [],
+  "launcherPid": 40728,
+  "ownedPid": 37204,
+  "endpoint": {
+    "pid": 37204,
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\statusbar-105-delivery",
+    "profile": "test-f5ce20d6-375e-4400-b800-544fda71e86b",
+    "sessionId": "a1ce27067970980a2a913d6e21079525f7e8"
+  },
+  "narrowGeometry": {
+    "innerWidth": 820,
+    "innerHeight": 700,
+    "scrollX": 0,
+    "scrollY": 0,
+    "document": {
+      "w": 820,
+      "h": 700
+    },
+    "elements": [
+      {
+        "class": "studio  ",
+        "box": {
+          "x": 0,
+          "y": 0,
+          "width": 820,
+          "height": 700,
+          "top": 0,
+          "right": 820,
+          "bottom": 700,
+          "left": 0
+        },
+        "scrollWidth": 820,
+        "scrollHeight": 700
+      },
+      {
+        "class": "studio-dock-shell ",
+        "box": {
+          "x": 0,
+          "y": 40,
+          "width": 820,
+          "height": 636,
+          "top": 40,
+          "right": 820,
+          "bottom": 676,
+          "left": 0
+        },
+        "scrollWidth": 820,
+        "scrollHeight": 636
+      },
+      {
+        "class": "studio-dock-grid",
+        "box": {
+          "x": 0,
+          "y": 88,
+          "width": 820,
+          "height": 588,
+          "top": 88,
+          "right": 820,
+          "bottom": 676,
+          "left": 0
+        },
+        "scrollWidth": 1424,
+        "scrollHeight": 749
+      },
+      {
+        "class": "status-bar",
+        "box": {
+          "x": 0,
+          "y": 676,
+          "width": 820,
+          "height": 24,
+          "top": 676,
+          "right": 820,
+          "bottom": 700,
+          "left": 0
+        },
+        "scrollWidth": 820,
+        "scrollHeight": 23
+      }
+    ]
+  },
+  "footer": {
+    "x": 0,
+    "y": 837,
+    "width": 1424,
+    "height": 24
+  },
+  "ownedProcessExited": true
+}

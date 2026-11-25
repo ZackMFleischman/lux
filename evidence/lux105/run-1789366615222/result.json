@@ -1,0 +1,39 @@
+{
+  "ok": false,
+  "candidate": "54427019fb7cccf2bbb235d86410f593e9ffc6a8",
+  "testSession": {
+    "profile": "test-fa6bcf06-454b-4fb6-a0b2-d83a6ff3dcb5",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\statusbar-105-delivery",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-fa6bcf06-454b-4fb6-a0b2-d83a6ff3dcb5",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-fa6bcf06-454b-4fb6-a0b2-d83a6ff3dcb5\\agent-endpoint.json"
+  },
+  "checks": [
+    "Actual pending build shows footer spinner",
+    "Successful build reports Build ready with a stable footer",
+    "Keyboard Enter on a footer item reopens the closed Jobs pane",
+    "Failed build stays visible with Jobs closed, preserves preview, and opens details from the keyboard",
+    "Runtime failure stays visible with Jobs closed and keyboard navigation reveals its exact detail"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789366615222\\build-progress.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789366615222\\successful-build.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789366615222\\failed-build-closed-details.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789366615222\\runtime-failure-closed-details.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789366615222\\runtime-failure-details.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789366615222\\failure.png"
+  ],
+  "errors": [],
+  "launcherPid": 13428,
+  "ownedPid": 28312,
+  "endpoint": {
+    "version": 1,
+    "profile": "test-fa6bcf06-454b-4fb6-a0b2-d83a6ff3dcb5",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\statusbar-105-delivery",
+    "sessionId": "d718574fb545adcccf0cba26ab04b072f36b",
+    "pid": 28312,
+    "url": "http://127.0.0.1:61219/",
+    "token": "3ac84b4b221e75b268ec9e5e7657fdf2530cbf509d279bdd6ab1046273552513"
+  },
+  "failure": "page.waitForFunction: Timeout 90000ms exceeded.\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105-demo.mjs:96:178",
+  "ownedProcessExited": true
+}

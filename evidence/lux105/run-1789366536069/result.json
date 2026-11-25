@@ -1,0 +1,18 @@
+{
+  "ok": false,
+  "candidate": "54427019fb7cccf2bbb235d86410f593e9ffc6a8",
+  "testSession": {
+    "profile": "test-f8924b3a-d9c0-4c76-85ca-d162b9fb25be",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\statusbar-105-delivery",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-f8924b3a-d9c0-4c76-85ca-d162b9fb25be",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-f8924b3a-d9c0-4c76-85ca-d162b9fb25be\\agent-endpoint.json"
+  },
+  "checks": [],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789366536069\\failure.png"
+  ],
+  "errors": [],
+  "ownedPid": 34376,
+  "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n32060 !== 34376\n\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/statusbar-105-delivery/evidence/lux105-demo.mjs:23:202",
+  "ownedProcessExited": true
+}

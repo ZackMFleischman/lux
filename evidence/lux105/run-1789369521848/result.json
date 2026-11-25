@@ -1,0 +1,31 @@
+{
+  "ok": false,
+  "candidate": "90f5890e2c65302f2a4d6c57bf170086519d5a03",
+  "testSession": {
+    "profile": "test-89072ff9-2ac7-48dd-ab57-627a94f17a94",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\statusbar-105-delivery",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-89072ff9-2ac7-48dd-ab57-627a94f17a94",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-89072ff9-2ac7-48dd-ab57-627a94f17a94\\agent-endpoint.json"
+  },
+  "checks": [
+    "Actual pending build shows footer spinner",
+    "Successful build reports Build ready with a stable footer"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789369521848\\build-progress.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789369521848\\successful-build.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789369521848\\maximized-status.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789369521848\\failure.png"
+  ],
+  "errors": [],
+  "launcherPid": 33956,
+  "ownedPid": 42300,
+  "endpoint": {
+    "pid": 42300,
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\statusbar-105-delivery",
+    "profile": "test-89072ff9-2ac7-48dd-ab57-627a94f17a94",
+    "sessionId": "e39c86254af278d4e7ce087713ced2068edb"
+  },
+  "failure": "locator.waitFor: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Maximize', exact: true }) to be visible\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105-max-demo.mjs:57:63",
+  "ownedProcessExited": true
+}

@@ -1,0 +1,25 @@
+{
+  "ok": false,
+  "candidate": "b70ee7afa7411885af13418b4778bcde14178d77",
+  "testSession": {
+    "profile": "test-5bb4fa90-96ce-4dc8-b4fe-c9173ce88bba",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\statusbar-105-delivery",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-5bb4fa90-96ce-4dc8-b4fe-c9173ce88bba",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-5bb4fa90-96ce-4dc8-b4fe-c9173ce88bba\\agent-endpoint.json"
+  },
+  "checks": [],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789367379892\\failure.png"
+  ],
+  "errors": [],
+  "launcherPid": 41396,
+  "ownedPid": 29708,
+  "endpoint": {
+    "pid": 29708,
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\statusbar-105-delivery",
+    "profile": "test-5bb4fa90-96ce-4dc8-b4fe-c9173ce88bba",
+    "sessionId": "8d4b29b2231548351b024bcf93fba6fe5405"
+  },
+  "failure": "locator.click: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Reset desktop layout', exact: true })\u001b[22m\n\u001b[2m    - locator resolved to <button tabindex=\"0\" type=\"button\" class=\"MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-sizeSmall MuiButton-colorPrimary MuiButton-disableElevation lux-14ocnae-MuiButtonBase-root-MuiButton-root\">Reset desktop layout</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"dv-sash dv-enabled\"></div> from <div class=\"workspace\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"dv-sash dv-enabled\"></div> from <div class=\"workspace\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    169 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m        - element is visible, enabled and stable\u001b[22m\n\u001b[2m        - scrolling into view if needed\u001b[22m\n\u001b[2m        - done scrolling\u001b[22m\n\u001b[2m        - <div class=\"dv-sash dv-enabled\"></div> from <div class=\"workspace\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m      - retrying click action\u001b[22m\n\u001b[2m        - waiting 500ms\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105-demo.mjs:38:81",
+  "ownedProcessExited": true
+}

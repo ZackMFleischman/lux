@@ -1,0 +1,108 @@
+{
+  "ok": false,
+  "candidate": "cc4b943e623b179472871d861c200dec3b9c7fe4",
+  "testSession": {
+    "profile": "test-6f40b5a3-8d01-4e17-aef8-e1d786520216",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\statusbar-105-delivery",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-6f40b5a3-8d01-4e17-aef8-e1d786520216",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-6f40b5a3-8d01-4e17-aef8-e1d786520216\\agent-endpoint.json"
+  },
+  "checks": [
+    "Actual pending build shows footer spinner",
+    "Successful build reports Build ready with a stable footer",
+    "Keyboard Enter on a footer item reopens the closed Jobs pane",
+    "Failed build stays visible with Jobs closed, preserves preview, and opens details from the keyboard",
+    "Runtime failure stays visible with Jobs closed and keyboard navigation reveals its exact detail"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789367135615\\build-progress.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789367135615\\successful-build.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789367135615\\failed-build-closed-details.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789367135615\\runtime-failure-closed-details.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789367135615\\runtime-failure-details.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789367135615\\failure.png"
+  ],
+  "errors": [],
+  "launcherPid": 40668,
+  "ownedPid": 39944,
+  "endpoint": {
+    "pid": 39944,
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\statusbar-105-delivery",
+    "profile": "test-6f40b5a3-8d01-4e17-aef8-e1d786520216",
+    "sessionId": "d446f2d51220b0d1384c8cbfd1b0dc8c8cc9"
+  },
+  "narrowGeometry": {
+    "innerWidth": 820,
+    "innerHeight": 700,
+    "scrollX": 0,
+    "scrollY": 0,
+    "document": {
+      "w": 1424,
+      "h": 837
+    },
+    "elements": [
+      {
+        "class": "studio  ",
+        "box": {
+          "x": 0,
+          "y": 0,
+          "width": 805,
+          "height": 700,
+          "top": 0,
+          "right": 805,
+          "bottom": 700,
+          "left": 0
+        },
+        "scrollWidth": 1424,
+        "scrollHeight": 837
+      },
+      {
+        "class": "studio-dock-shell ",
+        "box": {
+          "x": 0,
+          "y": 40,
+          "width": 805,
+          "height": 636,
+          "top": 40,
+          "right": 805,
+          "bottom": 676,
+          "left": 0
+        },
+        "scrollWidth": 1424,
+        "scrollHeight": 797
+      },
+      {
+        "class": "studio-dock-grid",
+        "box": {
+          "x": 0,
+          "y": 40,
+          "width": 805,
+          "height": 636,
+          "top": 40,
+          "right": 805,
+          "bottom": 676,
+          "left": 0
+        },
+        "scrollWidth": 1424,
+        "scrollHeight": 797
+      },
+      {
+        "class": "status-bar",
+        "box": {
+          "x": 0,
+          "y": 676,
+          "width": 805,
+          "height": 24,
+          "top": 676,
+          "right": 805,
+          "bottom": 700,
+          "left": 0
+        },
+        "scrollWidth": 805,
+        "scrollHeight": 23
+      }
+    ]
+  },
+  "failure": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(report.narrowGeometry.document.w<=report.narrowGeometry.innerWidth)\n\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/statusbar-105-delivery/evidence/lux105-demo.mjs:96:741",
+  "ownedProcessExited": true
+}

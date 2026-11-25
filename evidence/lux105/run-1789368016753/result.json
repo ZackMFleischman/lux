@@ -1,0 +1,36 @@
+{
+  "ok": false,
+  "candidate": "8e1170997fd09a7c909c72d63557c9e6c78f9a42",
+  "testSession": {
+    "profile": "test-03408638-c0f3-4fcd-8fff-5f30809e83e1",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\statusbar-105-delivery",
+    "directory": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-03408638-c0f3-4fcd-8fff-5f30809e83e1",
+    "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-03408638-c0f3-4fcd-8fff-5f30809e83e1\\agent-endpoint.json"
+  },
+  "checks": [
+    "Actual pending build shows footer spinner",
+    "Successful build reports Build ready with a stable footer",
+    "Keyboard Enter on a footer item reopens the closed Jobs pane",
+    "Failed build stays visible with Jobs closed, preserves preview, and opens details from the keyboard",
+    "Runtime failure stays visible with Jobs closed and keyboard navigation reveals its exact detail"
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789368016753\\build-progress.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789368016753\\successful-build.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789368016753\\failed-build-closed-details.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789368016753\\runtime-failure-closed-details.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789368016753\\runtime-failure-details.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\statusbar-105-delivery\\evidence\\lux105\\run-1789368016753\\failure.png"
+  ],
+  "errors": [],
+  "launcherPid": 35204,
+  "ownedPid": 34508,
+  "endpoint": {
+    "pid": 34508,
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\statusbar-105-delivery",
+    "profile": "test-03408638-c0f3-4fcd-8fff-5f30809e83e1",
+    "sessionId": "bb5727913414bfdb0577f9c91f7aff3b2467"
+  },
+  "failure": "AssertionError [ERR_ASSERTION]: {\"content\":[{\"type\":\"text\",\"text\":\"camera.updateProjectionMatrix is not a function\"}],\"isError\":true}\n+ actual - expected\n\n+ true\n- undefined\n\n    at call (file:///C:/Users/zFlei/repos/lux/.worktrees/statusbar-105-delivery/evidence/lux105-demo.mjs:97:146)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/statusbar-105-delivery/evidence/lux105-demo.mjs:98:34",
+  "ownedProcessExited": true
+}
