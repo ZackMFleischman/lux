@@ -1,0 +1,15 @@
+{
+  "ok": false,
+  "prepared": true,
+  "sourceCommit": "025d41758f8af026e16a741257dd7b55a9b73362",
+  "output": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\lux170-component-limit-delivery\\artifacts\\living-ornament\\limit-qa\\run-1789553791309",
+  "approvedPath": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\lux170-component-limit-delivery\\artifacts\\painting-extractions\\tracer-before-18\\frame.png",
+  "seconds": 18,
+  "originalNodes": 8,
+  "candidateNodes": 17,
+  "relayCount": 9,
+  "checks": [],
+  "captures": {},
+  "errors": [],
+  "provenance": "Scripted Playwright and Studio adapter QA. No native-input provenance claim. Test-only frozen scene time and deterministic 60Hz tracer replay; production source files unchanged."
+}
