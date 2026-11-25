@@ -1,0 +1,18 @@
+{
+  "ok": false,
+  "commit": "a6621eb914bb1b2f2c87c44ad3f9145bf349fa70",
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-animation",
+  "profile": "test-252309bd-1130-485f-b4c5-c2c164127722",
+  "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-252309bd-1130-485f-b4c5-c2c164127722\\agent-endpoint.json",
+  "checks": [],
+  "screenshots": [],
+  "pid": 31364,
+  "endpoint": {
+    "pid": 31364,
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\control-animation",
+    "profile": "test-252309bd-1130-485f-b4c5-c2c164127722",
+    "sessionId": "963db58cf60b669ea521393f677d088fc0eb"
+  },
+  "error": "locator.click: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Animate Intensity', exact: true })\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-animation\\evidence\\lux115-demo.mjs:30:144",
+  "processExited": true
+}

@@ -1,0 +1,11 @@
+Completed criteria:
+- One compact anchored editor for eligible selected-node numeric controls; normal and narrow screenshots show the edited base row remains accessible.
+- Base/effective separation, declared-range clamp, formatted extrema/current marker, and visible clipping status.
+- Sine, triangle, saw, square; bounded period, amount, phase; invalid/blank/no-op drafts do not mutate.
+- Live playing edits stay stable, apply period/amount, and undo one setting gesture.
+- Pause freezes; scene reset and Restart reset phase; Off returns base and freezes phase; re-enable resumes; remove deletes.
+- Stable node/definition/schema/control identity prevents positional retargeting. Incompatible and missing targets remain retained, inactive, and visibly explained.
+- A/B component isolation, manual base change, actual preview differences, keyboard open/Escape focus return, and guarded failure behavior.
+- Scene v4 actual save/reopen restored base 0.35 and the exact binding. Linked v5 and fallback persistence are covered by focused source tests and independent review, not attributed to the v4 screenshot run.
+- Existing public/source reset, selected-node reset access, control descriptions, failed-candidate preview protection, and file safety remain covered.
+- Shipped visual-creation skill documents connected behavior and limits. Root owns post-acceptance main integration and install/check.

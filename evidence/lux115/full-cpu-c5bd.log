@@ -1,0 +1,27 @@
+X [ERROR] Cannot read directory "../../../..": Access is denied.
+
+X [ERROR] Could not resolve "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-animation\\apps\\studio\\src\\main.ts"
+
+2 errors
+C:\Users\zFlei\repos\lux\node_modules\.pnpm\esbuild@0.28.2\node_modules\esbuild\lib\main.js:1752
+  let error = new Error(text);
+              ^
+
+Error: Build failed with 2 errors:
+error: Cannot read directory "../../../..": Access is denied.
+error: Could not resolve "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-animation\\apps\\studio\\src\\main.ts"
+    at failureErrorWithLog (C:\Users\zFlei\repos\lux\node_modules\.pnpm\esbuild@0.28.2\node_modules\esbuild\lib\main.js:1752:15)
+    at C:\Users\zFlei\repos\lux\node_modules\.pnpm\esbuild@0.28.2\node_modules\esbuild\lib\main.js:1211:25
+    at C:\Users\zFlei\repos\lux\node_modules\.pnpm\esbuild@0.28.2\node_modules\esbuild\lib\main.js:1163:52
+    at buildResponseToResult (C:\Users\zFlei\repos\lux\node_modules\.pnpm\esbuild@0.28.2\node_modules\esbuild\lib\main.js:1209:7)
+    at C:\Users\zFlei\repos\lux\node_modules\.pnpm\esbuild@0.28.2\node_modules\esbuild\lib\main.js:1236:16
+    at responseCallbacks.<computed> (C:\Users\zFlei\repos\lux\node_modules\.pnpm\esbuild@0.28.2\node_modules\esbuild\lib\main.js:886:9)
+    at handleIncomingPacket (C:\Users\zFlei\repos\lux\node_modules\.pnpm\esbuild@0.28.2\node_modules\esbuild\lib\main.js:941:12)
+    at Socket.readFromStdout (C:\Users\zFlei\repos\lux\node_modules\.pnpm\esbuild@0.28.2\node_modules\esbuild\lib\main.js:864:7)
+    at Socket.emit (node:events:508:28)
+    at addChunk (node:internal/streams/readable:559:12) {
+  errors: [Getter/Setter],
+  warnings: [Getter/Setter]
+}
+
+Node.js v24.12.0

@@ -1,0 +1,21 @@
+{
+  "ok": false,
+  "commit": "a6621eb914bb1b2f2c87c44ad3f9145bf349fa70",
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-animation",
+  "profile": "test-43e5eb62-88b7-4ff6-93ac-ab477462b74d",
+  "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-43e5eb62-88b7-4ff6-93ac-ab477462b74d\\agent-endpoint.json",
+  "checks": [],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-animation\\evidence\\lux115\\test-43e5eb62-88b7-4ff6-93ac-ab477462b74d\\02-add-lfo.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-animation\\evidence\\lux115\\test-43e5eb62-88b7-4ff6-93ac-ab477462b74d\\03-lfo-paused.png"
+  ],
+  "pid": 35428,
+  "endpoint": {
+    "pid": 35428,
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\control-animation",
+    "profile": "test-43e5eb62-88b7-4ff6-93ac-ab477462b74d",
+    "sessionId": "a23a988ca96895528e7d24b5fb3aecc53ac3"
+  },
+  "error": "locator.click: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Play', exact: true })\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-animation\\evidence\\lux115-demo.mjs:32:58",
+  "processExited": true
+}

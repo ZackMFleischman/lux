@@ -1,0 +1,22 @@
+{
+  "ok": false,
+  "commit": "a6621eb914bb1b2f2c87c44ad3f9145bf349fa70",
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-animation",
+  "profile": "test-0a494d5d-7324-4da9-bb0b-2cee2368dc4b",
+  "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-0a494d5d-7324-4da9-bb0b-2cee2368dc4b\\agent-endpoint.json",
+  "checks": [],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-animation\\evidence\\lux115\\test-0a494d5d-7324-4da9-bb0b-2cee2368dc4b\\02-add-lfo.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-animation\\evidence\\lux115\\test-0a494d5d-7324-4da9-bb0b-2cee2368dc4b\\03-lfo-paused.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-animation\\evidence\\lux115\\test-0a494d5d-7324-4da9-bb0b-2cee2368dc4b\\09-manual-base.png"
+  ],
+  "pid": 9316,
+  "endpoint": {
+    "pid": 9316,
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\control-animation",
+    "profile": "test-0a494d5d-7324-4da9-bb0b-2cee2368dc4b",
+    "sessionId": "1a4ebbfd2d4570b34b7da29a1842a1b2098c"
+  },
+  "error": "page.waitForFunction: Timeout 20000ms exceeded.\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-animation\\evidence\\lux115-demo.mjs:36:227",
+  "processExited": true
+}

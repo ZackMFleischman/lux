@@ -1,0 +1,18 @@
+{
+  "ok": false,
+  "commit": "a6621eb914bb1b2f2c87c44ad3f9145bf349fa70",
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\control-animation",
+  "profile": "test-dc75f505-72d7-4e7e-98bc-d2aa33066e7f",
+  "endpointPath": "C:\\Users\\zFlei\\AppData\\Roaming\\Lux\\Studio\\profiles\\test-dc75f505-72d7-4e7e-98bc-d2aa33066e7f\\agent-endpoint.json",
+  "checks": [],
+  "screenshots": [],
+  "pid": 35040,
+  "endpoint": {
+    "pid": 35040,
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\control-animation",
+    "profile": "test-dc75f505-72d7-4e7e-98bc-d2aa33066e7f",
+    "sessionId": "964c51aa0366a6be5245e64e27a199940363"
+  },
+  "error": "AssertionError [ERR_ASSERTION]: {\"content\":[{\"type\":\"text\",\"text\":\"Visual initialization stopped making progress\"}],\"isError\":true}\n+ actual - expected\n\n+ true\n- undefined\n\n    at call (file:///C:/Users/zFlei/repos/lux/.worktrees/control-animation/evidence/lux115-demo.mjs:23:147)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/control-animation/evidence/lux115-demo.mjs:24:35",
+  "processExited": true
+}
