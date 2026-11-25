@@ -1,0 +1,110 @@
+{
+  "ok": true,
+  "profile": "test-82ba366c-147e-4f8c-b9a5-97b448271a76",
+  "source": "de0226d5973740f2703ebf54479529e0df950875",
+  "checks": [
+    "Real preview resized through Scale Home and rendered at 640×360",
+    "Bass and Highs bindings share one portable analyzer configuration",
+    "CABLE Output was listed and connected before any successful default capture",
+    "Default input also connected after the Electron permission-check correction",
+    "Explicit permission connected the enumerated eMeet hardware microphone",
+    "Actual microphone samples drive both bound effective controls while bases remain unchanged",
+    "Save/reopen preserves 640×360, manual base, both bindings, and excludes the local device",
+    "Invalid replacement retains the connected accepted preview and two audio bindings",
+    "Disconnect releases both contributions smoothly to their manual bases"
+  ],
+  "errors": [],
+  "pid": 23304,
+  "cableInput": "CABLE Output (VB-Audio Virtual Cable)",
+  "audioInput": "Microphone (HD Webcam eMeet C960) (328f:006d)",
+  "connectedRanges": {
+    "spike": [
+      0.85,
+      0.8641207267963497
+    ],
+    "noise": [
+      3.4,
+      3.4009717014772183
+    ]
+  },
+  "release": {
+    "before": {
+      "spikeHeight": 1.0030801211212061,
+      "noiseScale": 3.4003901729848254,
+      "sharpness": 3.2,
+      "motionSpeed": 0.28,
+      "roughness": 0.38
+    },
+    "samples": [
+      {
+        "spike": 1.0019600594569409,
+        "noise": 3.400278059212721
+      },
+      {
+        "spike": 1.0015577224834247,
+        "noise": 3.400220982626749
+      },
+      {
+        "spike": 1.0012351900044285,
+        "noise": 3.4001752273172
+      },
+      {
+        "spike": 1.000854255292926,
+        "noise": 3.4001211869126586
+      },
+      {
+        "spike": 1.000670806075471,
+        "noise": 3.4000951623220272
+      },
+      {
+        "spike": 1.00054103289819,
+        "noise": 3.4000767523562585
+      },
+      {
+        "spike": 1.00037287009453,
+        "noise": 3.4000528963366725
+      },
+      {
+        "spike": 1.0003020160274378,
+        "noise": 3.4000428447915296
+      },
+      {
+        "spike": 1.0002077800538827,
+        "noise": 3.400029476227365
+      },
+      {
+        "spike": 1.000168212840782,
+        "noise": 3.400023863117984
+      },
+      {
+        "spike": 1.000119968605409,
+        "noise": 3.400017019063301
+      },
+      {
+        "spike": 1.0000928959534707,
+        "noise": 3.4000131784653753
+      },
+      {
+        "spike": 1.000070473030249,
+        "noise": 3.4000099974902493
+      },
+      {
+        "spike": 1.0000542026655415,
+        "noise": 3.400007689333328
+      },
+      {
+        "spike": 1.0000432492584228,
+        "noise": 3.400006135454057
+      },
+      {
+        "spike": 1.0000303176510847,
+        "noise": 3.400004300942077
+      }
+    ],
+    "after": {
+      "spike": 1.0000303176510847,
+      "noise": 3.400004300942077
+    }
+  },
+  "exitCode": 0
+}

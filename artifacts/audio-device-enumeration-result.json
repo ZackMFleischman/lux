@@ -1,0 +1,214 @@
+{
+  "url": "file:///C:/Users/zFlei/repos/lux/.worktrees/audio-device-fix/artifacts/audio-device-enumeration.html",
+  "observations": [
+    {
+      "kind": "check",
+      "trusted": true,
+      "permission": "media",
+      "requestingOrigin": "",
+      "details": {
+        "embeddingOrigin": "file:///",
+        "isMainFrame": true,
+        "mediaType": "video",
+        "requestingUrl": ""
+      }
+    },
+    {
+      "kind": "check",
+      "trusted": true,
+      "permission": "media",
+      "requestingOrigin": "",
+      "details": {
+        "embeddingOrigin": "file:///",
+        "isMainFrame": true,
+        "mediaType": "audio",
+        "requestingUrl": ""
+      }
+    },
+    {
+      "kind": "check",
+      "trusted": true,
+      "permission": "web-app-installation",
+      "requestingOrigin": "",
+      "details": {
+        "embeddingOrigin": "file:///",
+        "isMainFrame": true,
+        "requestingUrl": ""
+      }
+    },
+    {
+      "kind": "check",
+      "trusted": true,
+      "permission": "geolocation",
+      "requestingOrigin": "",
+      "details": {
+        "embeddingOrigin": "file:///",
+        "isMainFrame": true,
+        "requestingUrl": ""
+      }
+    },
+    {
+      "kind": "check",
+      "trusted": true,
+      "permission": "media",
+      "requestingOrigin": "file:///",
+      "details": {
+        "isMainFrame": true,
+        "mediaType": "audio",
+        "requestingUrl": "file:///C:/Users/zFlei/repos/lux/.worktrees/audio-device-fix/artifacts/audio-device-enumeration.html",
+        "securityOrigin": "file:///"
+      }
+    },
+    {
+      "kind": "check",
+      "trusted": true,
+      "permission": "speaker-selection",
+      "requestingOrigin": "file:///",
+      "details": {
+        "embeddingOrigin": "file:///",
+        "isMainFrame": true,
+        "requestingUrl": "file:///C:/Users/zFlei/repos/lux/.worktrees/audio-device-fix/artifacts/audio-device-enumeration.html"
+      }
+    },
+    {
+      "kind": "check",
+      "trusted": true,
+      "permission": "media",
+      "requestingOrigin": "file:///",
+      "details": {
+        "isMainFrame": true,
+        "mediaType": "video",
+        "requestingUrl": "file:///C:/Users/zFlei/repos/lux/.worktrees/audio-device-fix/artifacts/audio-device-enumeration.html",
+        "securityOrigin": "file:///"
+      }
+    },
+    {
+      "kind": "request",
+      "trusted": true,
+      "permission": "media",
+      "details": {
+        "isMainFrame": true,
+        "mediaTypes": [
+          "audio"
+        ],
+        "requestingUrl": "file:///C:/Users/zFlei/repos/lux/.worktrees/audio-device-fix/artifacts/audio-device-enumeration.html",
+        "securityOrigin": "file:///"
+      }
+    },
+    {
+      "kind": "check",
+      "trusted": true,
+      "permission": "media",
+      "requestingOrigin": "file:///",
+      "details": {
+        "embeddingOrigin": "file:///",
+        "isMainFrame": true,
+        "requestingUrl": "file:///C:/Users/zFlei/repos/lux/.worktrees/audio-device-fix/artifacts/audio-device-enumeration.html"
+      }
+    },
+    {
+      "kind": "check",
+      "trusted": true,
+      "permission": "media",
+      "requestingOrigin": "file:///",
+      "details": {
+        "isMainFrame": true,
+        "mediaType": "audio",
+        "requestingUrl": "file:///C:/Users/zFlei/repos/lux/.worktrees/audio-device-fix/artifacts/audio-device-enumeration.html",
+        "securityOrigin": "file:///"
+      }
+    },
+    {
+      "kind": "check",
+      "trusted": true,
+      "permission": "speaker-selection",
+      "requestingOrigin": "file:///",
+      "details": {
+        "embeddingOrigin": "file:///",
+        "isMainFrame": true,
+        "requestingUrl": "file:///C:/Users/zFlei/repos/lux/.worktrees/audio-device-fix/artifacts/audio-device-enumeration.html"
+      }
+    }
+  ],
+  "devices": [
+    {
+      "kind": "audioinput",
+      "deviceId": "default",
+      "label": "Default - Microphone (HD Webcam eMeet C960) (328f:006d)",
+      "groupId": "c5d378770a311a80dbab0ddf90182dc35c00cd91f5ef504b1033fdf974a35599"
+    },
+    {
+      "kind": "audioinput",
+      "deviceId": "communications",
+      "label": "Communications - Microphone (HD Webcam eMeet C960) (328f:006d)",
+      "groupId": "c5d378770a311a80dbab0ddf90182dc35c00cd91f5ef504b1033fdf974a35599"
+    },
+    {
+      "kind": "audioinput",
+      "deviceId": "ec9a0138e04712334013aa11f1eb42d9f450ef1776b6b2f578e511e6cad47b5a",
+      "label": "CABLE Output (VB-Audio Virtual Cable)",
+      "groupId": "82cce8b17c7c52943d3c8fd3258ec0244fea3423b08728cd88fd729d3fef6fa2"
+    },
+    {
+      "kind": "audioinput",
+      "deviceId": "95e945405211929dfb81ab16f96a724844c7e5e9ef4f89b9d50ecbf05b229a83",
+      "label": "Microphone (HD Webcam eMeet C960) (328f:006d)",
+      "groupId": "c5d378770a311a80dbab0ddf90182dc35c00cd91f5ef504b1033fdf974a35599"
+    },
+    {
+      "kind": "audioinput",
+      "deviceId": "2cf7545fc7fc372890bcb3155ad4a648496d8fb387fec3f1a4fe35699667269b",
+      "label": "Microphone (Realtek(R) Audio)",
+      "groupId": "82cce8b17c7c52943d3c8fd3258ec0244fea3423b08728cd88fd729d3fef6fa2"
+    },
+    {
+      "kind": "videoinput",
+      "deviceId": "",
+      "label": "",
+      "groupId": ""
+    },
+    {
+      "kind": "audiooutput",
+      "deviceId": "default",
+      "label": "Default - Speakers (Pebble V3) (041e:3272)",
+      "groupId": "3b7fd47532a85031f6c39d8de3879a2fb699564916a0070dc166e7a254d4f204"
+    },
+    {
+      "kind": "audiooutput",
+      "deviceId": "communications",
+      "label": "Communications - Speakers (Pebble V3) (041e:3272)",
+      "groupId": "3b7fd47532a85031f6c39d8de3879a2fb699564916a0070dc166e7a254d4f204"
+    },
+    {
+      "kind": "audiooutput",
+      "deviceId": "57f970346a165262c8ecd688a13e610fa5842e7e86a7227e54978d496ee3118a",
+      "label": "Speakers (Pebble V3) (041e:3272)",
+      "groupId": "3b7fd47532a85031f6c39d8de3879a2fb699564916a0070dc166e7a254d4f204"
+    },
+    {
+      "kind": "audiooutput",
+      "deviceId": "cf5b57bce51b760ad55c43f887a23588f502174acb0301d0080557bcb1122fe7",
+      "label": "G34WQC A (NVIDIA High Definition Audio)",
+      "groupId": "68d5ecbccd0df214c699d9e682b672fa420bcf665373ffad4c5d085257fad9a6"
+    },
+    {
+      "kind": "audiooutput",
+      "deviceId": "7ce1320fae4d5b4aae42176090b1873b899b9949fe7f7d1fdd946efe5d723a30",
+      "label": "Speakers (Realtek(R) Audio)",
+      "groupId": "82cce8b17c7c52943d3c8fd3258ec0244fea3423b08728cd88fd729d3fef6fa2"
+    },
+    {
+      "kind": "audiooutput",
+      "deviceId": "25c865dd7003f96aeedf4968d15cdc55be5014aee0880c4c9e14d06ea01f070a",
+      "label": "CABLE Input (VB-Audio Virtual Cable)",
+      "groupId": "de9123dc372d7f48d5d3a030148eeb497dd297c9db1ed102cc6b06a5b3f37292"
+    }
+  ],
+  "capture": [
+    {
+      "kind": "audio",
+      "label": "CABLE Output (VB-Audio Virtual Cable)",
+      "readyState": "live"
+    }
+  ]
+}
