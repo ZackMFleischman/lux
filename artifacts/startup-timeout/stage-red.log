@@ -1,0 +1,31 @@
+✖ startup failure identifies the last validated stage without treating stage messages as liveness (33.1076ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1710.6824
+
+✖ failing tests:
+
+test at tests\studio\runtime-lifecycle.test.ts:419:1
+✖ startup failure identifies the last validated stage without treating stage messages as liveness (33.1076ms)
+  [AssertionError [ERR_ASSERTION]: The input did not match the regular expression /initialization stopped making progress.*shader-compile/. Input:
+  
+  'Error: Visual initialization stopped making progress'
+  ] {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: Visual initialization stopped making progress
+        at fail (file:///C:/Users/zFlei/.codex/worktrees/startup-timeout/lux/apps/studio/src/standalone-client.ts:313:63)
+        at Object.callback (file:///C:/Users/zFlei/.codex/worktrees/startup-timeout/lux/apps/studio/src/standalone-client.ts:379:54)
+        at Object.advance (file:///C:/Users/zFlei/.codex/worktrees/startup-timeout/lux/tests/studio/runtime-lifecycle.test.ts:36:323)
+        at TestContext.<anonymous> (file:///C:/Users/zFlei/.codex/worktrees/startup-timeout/lux/tests/studio/runtime-lifecycle.test.ts:422:10)
+        at async Test.run (node:internal/test_runner/test:1113:7)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3),
+    expected: /initialization stopped making progress.*shader-compile/,
+    operator: 'rejects',
+    diff: 'simple'
+  }

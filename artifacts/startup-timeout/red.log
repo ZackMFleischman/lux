@@ -1,0 +1,51 @@
+(node:22924) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ legacy class prototype dispose retains its receiver and runs once across repeated disposal (400.9786ms)
+✔ throwing legacy prototype dispose reports diagnostics and still releases owned resources once (181.0671ms)
+✔ opt-in initialization gate waits before create and accepts only one exact owner GO outside its pending init chain (404.1777ms)
+✔ worker announces liveness before top-level/create and heartbeats continue through healthy async initialization (465.0246ms)
+✔ baseline worker retains controls, frames and heartbeat with no query allocations or optional CPU spans (677.5628ms)
+✔ paused trigger draws once after hostile intrinsic mutation and duplicate IDs return the original receipt without regressing latest status (866.2493ms)
+✔ paused Story commands survive authored intrinsic mutation, draw with zero delta, and dedupe after reset (12000.388ms)
+✔ worker keeps routine sampling phase through unsampled frame notifications (255.9562ms)
+✔ playing cadence subtracts full completed-frame work from its next delay (218.9704ms)
+✔ over-budget frames and late timer wakeups rebase cadence without accumulating catch-up draws (583.0733ms)
+✔ a queued old timer cannot add a draw after a control command replaces its schedule (334.9445ms)
+✔ actual worker requests timestamp support and publishes a fresh correlated GPU pass result (287.7649ms)
+✔ externally driven worker advances only for explicit frames and existing control draws (671.8456ms)
+✔ actual worker reports separate CPU calls, asynchronous render wait, queue wait and honest GPU capability (243.0463ms)
+✔ actual worker applies complete initial/live controls and captures exact metadata; reset preserves values (1286.2542ms)
+✔ actual worker applies typed controls and acknowledges their exact values after a completed frame (1185.2268ms)
+✔ actual worker exposes stable per-instance samples without changing the base control (415.9833ms)
+✔ audio snapshots update the evaluator cache and acknowledge without drawing (379.9357ms)
+✔ actual worker supports empty controls and rejects mismatched metadata before create (776.7891ms)
+✔ post-import verification survives mutated Object/JSON/Map intrinsics and does not invoke getters (923.0752ms)
+✔ legacy worker protocol remains scalar-compatible and invalid generic snapshots cannot draw a partial update (372.6081ms)
+✖ ordinary visuals await asynchronous shader preparation while heartbeats remain live (160.6869ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 21
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 24017.5452
+
+✖ failing tests:
+
+test at tests\studio\visual-worker.test.mjs:269:1
+✖ ordinary visuals await asynchronous shader preparation while heartbeats remain live (160.6869ms)
+  AssertionError [ERR_ASSERTION]: [{"type":"heartbeat","instanceId":"instance","generation":1,"revisionId":"revision","frameId":"0","workerHeartbeat":1},{"type":"failure","instanceId":"instance","generation":1,"revisionId":"revision","requestId":"init","code":"RUNTIME_FAILED","message":"synchronous GPU pipeline compilation"}]
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///C:/Users/zFlei/.codex/worktrees/startup-timeout/lux/tests/studio/visual-worker.test.mjs:272:9)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

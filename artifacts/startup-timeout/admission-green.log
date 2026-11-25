@@ -1,0 +1,48 @@
+✔ successful initial Build and a later Build from Pause both start playback (23.3141ms)
+✔ Pause during compilation wins over Build autoplay (3.705ms)
+✔ Pause during candidate startup synchronizes before the candidate is promoted (4.6106ms)
+✔ a rejected Pause during candidate startup restores autoplay before promotion (5.3018ms)
+✔ failed autoplay candidate preserves the explicitly paused preview (6.413ms)
+✔ scene Open autoplays accepted source and a failed later Open retains the preview and incoming draft (41.6168ms)
+✔ explicit saved scene controls win over the previous preview during promotion (6.521ms)
+✔ Build still waits for a playback command that was already pending (4.0945ms)
+✔ a rejected Pause from worker failure does not leave Build blocked (6.129ms)
+✔ a rejected Pause from timeout does not leave Build blocked (5.8895ms)
+✔ baseline selection reaches initial and restarted workers without changing watchdog termination (3.3497ms)
+✔ silent authored candidate is terminated at 1250 ms after admission while previous preview survives (1.9338ms)
+✔ healthy candidate heartbeats permit slow initialization until the independent five-second cap (5.0696ms)
+✔ paused stalled commands fault the runtime and settle all pending waiters (2.4784ms)
+✔ capture admission allows one active and one queued; replacement rejects both (1.8816ms)
+✔ restart uses cached accepted linked bytes without compiling and retains controls (1.2753ms)
+✔ preview resolution restarts at the requested dimensions and retains the working preview when its candidate fails (1.4661ms)
+✔ invalid preview resolution reports a concise limit without replacing the working runtime (2.1153ms)
+✔ v2 restart retains the whole accepted envelope after compile-result mutation and failed replacement (1.9131ms)
+✔ postMessage failure faults and clears every pending operation (3.4022ms)
+✔ late terminal callbacks cannot revive a faulted runtime (1.3808ms)
+✔ initialization post failure clears activation and watchdog timers (0.9559ms)
+✔ paused live worker CPU silence and malformed heartbeats do not escape the liveness deadline (0.9323ms)
+✔ repeated frame IDs cannot conceal a playing worker without completed frame progress (1.5729ms)
+✔ completed captures release admission while capture deadline tears down an abandoned queue (5.0018ms)
+✔ restart retains admitted controls across failure and failed recovery; rejected commands cannot replace intent (5.8981ms)
+✔ source replacement waits for a pre-existing control command and does not inherit its rejected intent (4.7774ms)
+✔ performance belongs to promoted runtime and failed candidates or late old workers cannot replace it (6.4204ms)
+✔ telemetry silence becomes stale despite healthy heartbeats, and faults preserve labeled last measurements (2.5674ms)
+✔ first accepted-runtime fault retries cached source once with admitted values; a second fault suppresses automatic restart (5.7925ms)
+✔ failed automatic startup is terminal without a retry storm and explicit restart can still recover (2.8411ms)
+✔ a healthy 30-second interval permits one new retry and source replacement cancels a queued old retry (24.8738ms)
+✔ a fault during source compilation defers recovery; rejected replacement retries only the accepted artifact (3.6906ms)
+✔ retiring an already faulted owner cancels its queued automatic retry (2.1804ms)
+✔ automatic recovery preserves acknowledged playing state without replaying pending transport (2.1627ms)
+✔ automatic recovery preserves acknowledged paused state without replaying pending transport (2.1382ms)
+✔ Look activation uses saved resolution only after success and snapshots accepted source (9.7193ms)
+✔ saving a look above the scene format resolution limit gives a short actionable error (2.5169ms)
+✔ startup failure identifies the last validated stage without treating stage messages as liveness (1.2188ms)
+✔ trusted admission can finish after the authored silence budget but remains bounded by the startup cap (3.3438ms)
+ℹ tests 40
+ℹ suites 0
+ℹ pass 40
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 976.9184

@@ -1,0 +1,4 @@
+
+> lux@0.0.0 typecheck C:\Users\zFlei\.codex\worktrees\startup-timeout\lux
+> tsc --noEmit && tsc -p tsconfig.examples-v2.json --noEmit && tsc -p apps/studio/tsconfig.json --noEmit
+

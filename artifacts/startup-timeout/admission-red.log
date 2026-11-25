@@ -1,0 +1,29 @@
+✖ trusted admission can finish after the authored silence budget but remains bounded by the startup cap (125.1021ms)
+ℹ Error: Test "trusted admission can finish after the authored silence budget but remains bounded by the startup cap" at tests\studio\runtime-lifecycle.test.ts:425:1 generated asynchronous activity after the test ended. This activity created the error "Error: Visual initialization stopped making progress (stage: admission)" and would have caused the test to fail, but instead triggered an unhandledRejection event.
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3335.1043
+
+✖ failing tests:
+
+test at tests\studio\runtime-lifecycle.test.ts:425:1
+✖ trusted admission can finish after the authored silence budget but remains bounded by the startup cap (125.1021ms)
+  AssertionError [ERR_ASSERTION]: trusted image decode has not entered authored execution
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///C:/Users/zFlei/.codex/worktrees/startup-timeout/lux/tests/studio/runtime-lifecycle.test.ts:427:31)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

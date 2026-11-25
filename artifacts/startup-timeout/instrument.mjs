@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+const p='apps/studio/src/visual-worker.mjs';let s=fs.readFileSync(p,'utf8');
+s=s.replace("const prepared=await prepareAuthoredModule(message);", "send('trace',{stage:'admission',at:now()});const prepared=await prepareAuthoredModule(message);send('trace',{stage:'admitted',at:now()});");
+s=s.replace('const {module,assets,images} = await prepared.import', "send('trace',{stage:'import',at:now()});const {module,assets,images} = await prepared.import");
+s=s.replace('const create=controlState.checkDefinition(module);',"send('trace',{stage:'imported',at:now()});const create=controlState.checkDefinition(module);");
+s=s.replace('visual=await create(freeze({...context',"send('trace',{stage:'create',at:now()});visual=await create(freeze({...context");
+s=s.replace("if(stopped)throw new RuntimeError('Worker stopped during initialization');", "send('trace',{stage:'created',at:now()});if(stopped)throw new RuntimeError('Worker stopped during initialization');");
+s=s.replace('const renderResult=visual.render',"send('trace',{stage:'render',at:now()});const renderResult=visual.render");
+s=s.replace('const renderCallEnd=profiling?',"send('trace',{stage:'render-called',at:now()});const renderCallEnd=profiling?");
+fs.writeFileSync(p,s);
+const q='apps/studio/src/standalone-client.ts';s=fs.readFileSync(q,'utf8');s=s.replace('const message = event.data;',"const message = event.data;if(message.type==='trace'||message.type==='heartbeat')console.info('STARTUP-TRACE '+JSON.stringify({now:performance.now(),...message}));");fs.writeFileSync(q,s);
+const m='apps/studio/src/main.ts';s=fs.readFileSync(m,'utf8').replace('mainWindow.show();','/* isolated diagnostic remains hidden */');fs.writeFileSync(m,s);

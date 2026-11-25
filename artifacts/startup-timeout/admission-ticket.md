@@ -1,0 +1,3 @@
+Valid image-backed visuals are stopped before authored code runs. Installed stage telemetry identifies admission; CPU timing of the actual637494-byte JPEG shows1284ms trusted admission before the first heartbeat, beyond the1250ms authored liveness threshold.
+
+Separate bounded trusted bootstrap/admission from authored-loop liveness. Keep the5000ms absolute startup cap and1250ms heartbeat deadline after the worker announces authored execution readiness. Test delayed admission, hung authored import, and the unchanged hard cap. Demonstrate the full textured source through installed MCP. Review and delivery remain checklist items on this bug.

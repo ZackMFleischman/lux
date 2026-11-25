@@ -1,0 +1,21 @@
+(node:25380) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ device loss during a post-init update retains resources until settlement and prevents evaluation (147.2077ms)
+✔ device loss during frame queue completion prevents late frame publication (124.7398ms)
+✔ device loss during reset or readback drains the command before cleanup and publishes no late result (305.3297ms)
+✔ device loss during renderer initialization prevents factory creation after settlement (109.6209ms)
+✔ real worker executes submitted v4 code: heartbeat, update, evaluate, validated presentation, queue, ready and same-target capture (391.66ms)
+✔ message/profile mismatches reject before import; definition disagreement rejects before create (278.0054ms)
+✔ partial and terminal failures retain original errors and attempt independent cleanup once (955.3399ms)
+✔ post-import captured descriptor and resource checks survive modified validation globals (176.2499ms)
+✔ abandoned backend and GPU work delay cleanup independently; failure never presents or permits capture (372.4377ms)
+✔ explicit resets run individually, preserve controls, and reset rejection terminates once with the primary error (218.2052ms)
+✔ backend rejection restores target; forced termination remains separate from graceful cleanup (213.107ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3831.4413

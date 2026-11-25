@@ -1,0 +1,46 @@
+✖ candidate loading has no heartbeat or activation deadline and retains the previous preview (77.4359ms)
+✖ startup stage progress is visible while slow loading remains active (8.8501ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1510.5125
+
+✖ failing tests:
+
+test at tests\studio\runtime-lifecycle.test.ts:189:1
+✖ candidate loading has no heartbeat or activation deadline and retains the previous preview (77.4359ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///C:/Users/zFlei/.codex/worktrees/startup-timeout/lux/tests/studio/runtime-lifecycle.test.ts:194:9)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\studio\runtime-lifecycle.test.ts:421:1
+✖ startup stage progress is visible while slow loading remains active (8.8501ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///C:/Users/zFlei/.codex/worktrees/startup-timeout/lux/tests/studio/runtime-lifecycle.test.ts:424:9)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

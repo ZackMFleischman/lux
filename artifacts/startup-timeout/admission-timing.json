@@ -1,0 +1,16 @@
+[
+  {
+    "file": "organic-skin.jpg",
+    "bytes": 112826,
+    "deriveMs": 202.17849999999999,
+    "verifyMs": 138.21029999999996,
+    "admissionMs": 161.8507000000002
+  },
+  {
+    "file": "organic-skin-full.jpg",
+    "bytes": 637494,
+    "deriveMs": 687.5209,
+    "verifyMs": 630.9225999999999,
+    "admissionMs": 1283.9793
+  }
+]

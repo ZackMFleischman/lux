@@ -1,0 +1,47 @@
+✔ successful initial Build and a later Build from Pause both start playback (84.6439ms)
+✔ Pause during compilation wins over Build autoplay (4.8108ms)
+✔ Pause during candidate startup synchronizes before the candidate is promoted (5.7456ms)
+✔ a rejected Pause during candidate startup restores autoplay before promotion (24.3233ms)
+✔ failed autoplay candidate preserves the explicitly paused preview (39.9754ms)
+✔ scene Open autoplays accepted source and a failed later Open retains the preview and incoming draft (273.7176ms)
+✔ explicit saved scene controls win over the previous preview during promotion (105.1057ms)
+✔ Build still waits for a playback command that was already pending (35.0897ms)
+✔ a rejected Pause from worker failure does not leave Build blocked (10.4334ms)
+✔ a rejected Pause from timeout does not leave Build blocked (47.8206ms)
+✔ baseline selection reaches initial and restarted workers without changing watchdog termination (2.1764ms)
+✔ silent candidate is terminated at 1250 ms while previous preview survives (2.2778ms)
+✔ healthy candidate heartbeats permit slow initialization until the independent five-second cap (5.9485ms)
+✔ paused stalled commands fault the runtime and settle all pending waiters (14.0813ms)
+✔ capture admission allows one active and one queued; replacement rejects both (56.404ms)
+✔ restart uses cached accepted linked bytes without compiling and retains controls (3.0005ms)
+✔ preview resolution restarts at the requested dimensions and retains the working preview when its candidate fails (2.548ms)
+✔ invalid preview resolution reports a concise limit without replacing the working runtime (6.5907ms)
+✔ v2 restart retains the whole accepted envelope after compile-result mutation and failed replacement (18.1264ms)
+✔ postMessage failure faults and clears every pending operation (2.2313ms)
+✔ late terminal callbacks cannot revive a faulted runtime (1.1849ms)
+✔ initialization post failure clears activation and watchdog timers (0.9835ms)
+✔ paused live worker CPU silence and malformed heartbeats do not escape the liveness deadline (1.534ms)
+✔ repeated frame IDs cannot conceal a playing worker without completed frame progress (2.4707ms)
+✔ completed captures release admission while capture deadline tears down an abandoned queue (63.1904ms)
+✔ restart retains admitted controls across failure and failed recovery; rejected commands cannot replace intent (81.7067ms)
+✔ source replacement waits for a pre-existing control command and does not inherit its rejected intent (6.0397ms)
+✔ performance belongs to promoted runtime and failed candidates or late old workers cannot replace it (13.5872ms)
+✔ telemetry silence becomes stale despite healthy heartbeats, and faults preserve labeled last measurements (72.2613ms)
+✔ first accepted-runtime fault retries cached source once with admitted values; a second fault suppresses automatic restart (11.0871ms)
+✔ failed automatic startup is terminal without a retry storm and explicit restart can still recover (18.8466ms)
+✔ a healthy 30-second interval permits one new retry and source replacement cancels a queued old retry (242.6737ms)
+✔ a fault during source compilation defers recovery; rejected replacement retries only the accepted artifact (19.7719ms)
+✔ retiring an already faulted owner cancels its queued automatic retry (3.009ms)
+✔ automatic recovery preserves acknowledged playing state without replaying pending transport (2.6095ms)
+✔ automatic recovery preserves acknowledged paused state without replaying pending transport (2.9242ms)
+✔ Look activation uses saved resolution only after success and snapshots accepted source (5.7565ms)
+✔ saving a look above the scene format resolution limit gives a short actionable error (2.9163ms)
+✔ startup failure identifies the last validated stage without treating stage messages as liveness (1.6222ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4092.6892
