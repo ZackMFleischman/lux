@@ -1,0 +1,12 @@
+{
+  "commit": "a969cf38c61d65a08b2e34c4cc0790542aa63ed4",
+  "criteria": "A recognizable hummingbird with proper body and wing anatomy, opalescent feather material, coherent integration with the Living Ornament flock, preserved controls and saved scene, and actual runtime evidence.",
+  "evidence": "Independent source and artistic review is recorded in artifacts/hummingbirds/lux-184-independent-review.md. Actual enlarged and normal-size captures show the corrected overlapping wing envelope, emerald body, localized jewel gorget, needle bill, short legs, and readable normal-scale silhouette. Root reports 59.214 measured FPS at 1920x1080, fault null, and the Opalescent Birds scene saved with controls and bindings preserved. Submitted commit a969cf38c61d65a08b2e34c4cc0790542aa63ed4 was fast-forwarded unchanged to main at the same SHA; workflow correction receipt LUX-P116 records the prior insufficient art review.",
+  "context_id": "/root/final_review:hummingbird-art:2026-09-16",
+  "checks": {
+    "source_review": "pass",
+    "actual_art_review": "pass",
+    "native_runtime_and_save": "pass",
+    "main_landing": "pass"
+  }
+}

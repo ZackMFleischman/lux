@@ -1,0 +1,2 @@
+Hummingbirds now have a distinct compact body, fine bill, short tail and overlapping feathered wings. A dedicated angle-dependent thin-film-inspired shader adds emerald body plumage, ruby gorget and blue-green opalescent wings. Shortened perch legs. Live draft5 built without fault; normal and enlarged actual preview captures reviewed and refined twice.
+Commit: a969cf38c61d65a08b2e34c4cc0790542aa63ed4
