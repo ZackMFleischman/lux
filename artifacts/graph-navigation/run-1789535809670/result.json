@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-navigation",
+  "profile": "test-bb9fe01a-a3c2-4e9f-a116-6ffc0d45cfdd",
+  "checks": [
+    "Plain defineVisual shows one selectable Scene root, opens Scene controls, has no drill-in action, and keeps its breadcrumb within an 820px window"
+  ],
+  "errors": [],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-navigation\\artifacts\\graph-navigation\\run-1789535809670\\plain-scene-root.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-navigation\\artifacts\\graph-navigation\\run-1789535809670\\plain-scene-narrow.png"
+  ],
+  "stage": "checking plain Scene root"
+}

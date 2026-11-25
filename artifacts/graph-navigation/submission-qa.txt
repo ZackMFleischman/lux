@@ -1,0 +1,3 @@
+Completed criteria: Scene/root for plain accepted visuals; composition children; concise Scene breadcrumb; View inside only for selected nested components; keyboard Enter and Back navigation; existing pan, zoom, selection, and connection rendering retained.
+
+Remaining review: independent reviewer will complete its final actual-image pass before serial integration. This submission does not claim main integration.

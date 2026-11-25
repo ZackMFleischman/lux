@@ -1,0 +1,19 @@
+✔ real dock panes preserve canvas, editor undo and runtime subscriptions through close, tab, reset, restore and fullscreen (19513.7871ms)
+✔ group menu targets its owning group, cancels with focus and rejects a vanished target (461.4825ms)
+✔ Scene and component controls expose real animation plus independent reset while descriptions stay in tooltips (7849.9298ms)
+✔ Graph enters nested components one level at a time and edits an exposed control through its canonical leaf (3892.4329ms)
+✔ View is a compact keyboard menu with recoverable panes and a separate layout dialog (562.4318ms)
+✔ Graph wheel zoom anchors at the pointer and background gestures keep selection clear (228.6645ms)
+✔ Graph keeps Scene available for plain visuals and compositions (158.8584ms)
+✔ Graph connections point from output to input with reversed node declarations (31.5039ms)
+✔ workspace chrome omits redundant connection and playback labels (106.1807ms)
+✔ File and View share one menu and restore keyboard focus (173.1014ms)
+✔ disabled application menu still closes with Escape while building (36.7724ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 42219.0217

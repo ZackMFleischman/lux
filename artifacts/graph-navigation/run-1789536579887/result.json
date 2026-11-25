@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-navigation",
+  "profile": "test-3b599d17-cf28-4c9d-acca-efffa8b11f94",
+  "checks": [],
+  "errors": [],
+  "screenshots": [],
+  "stage": "checking composition navigation",
+  "error": "ReferenceError: draft is not defined\n    at file:///C:/Users/zFlei/repos/lux/.worktrees/graph-navigation/scripts/test-studio-graph-navigation.mjs:69:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"
+}

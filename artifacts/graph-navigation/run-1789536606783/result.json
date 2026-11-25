@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-navigation",
+  "profile": "test-eafd6678-e2f2-4634-8435-e7dc31628bc1",
+  "checks": [
+    "Composition retains its real children beside Scene; keyboard Enter selects and enters a nested composition; View inside and Back return through the concise Scene breadcrumb"
+  ],
+  "errors": [],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-navigation\\artifacts\\graph-navigation\\run-1789536606783\\composition-scene-children.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-navigation\\artifacts\\graph-navigation\\run-1789536606783\\nested-view.png"
+  ],
+  "stage": "checking nested Back navigation"
+}

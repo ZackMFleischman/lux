@@ -1,0 +1,9 @@
+CPU validation against the candidate worktree:
+- node apps/studio/test-dock-cpu.mjs: 11/11 pass.
+- pnpm typecheck: pass.
+- node scripts/install-visual-skill.mjs and --check: pass before the shared installed-skill serialization notice; repository skill source remains updated.
+
+Native private-profile Studio evidence:
+- Plain Scene root: artifacts/graph-navigation/run-1789535809670/result.json, plain-scene-root.png, plain-scene-narrow.png. The test profile was test-bb9fe01a-a3c2-4e9f-a116-6ffc0d45cfdd; Fit frames the 820x720 Graph view.
+- Composition navigation: artifacts/graph-navigation/run-1789536606783/result.json, composition-scene-children.png, nested-view.png. The test profile was test-eafd6678-e2f2-4634-8435-e7dc31628bc1. The script verifies Scene with real children, keyboard Enter into a nested composition, and Back return.
+- Each launch used studioTestEnvironment() and an adapter pinned to the owned endpoint session. All owned Electron and Node processes were explicitly stopped before the GPU lane was released.

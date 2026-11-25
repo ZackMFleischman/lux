@@ -1,0 +1,16 @@
+{
+  "ok": false,
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-navigation",
+  "profile": "test-21bce2ec-4d85-41ca-9ec4-1f9df7b6ec8f",
+  "checks": [
+    "Plain defineVisual shows one selectable Scene root, opens Scene controls, has no drill-in action, and keeps its breadcrumb within an 820px window"
+  ],
+  "errors": [],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-navigation\\artifacts\\graph-navigation\\run-1789535627805\\plain-scene-root.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-navigation\\artifacts\\graph-navigation\\run-1789535627805\\plain-scene-narrow.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-navigation\\artifacts\\graph-navigation\\run-1789535627805\\composition-scene-children.png"
+  ],
+  "stage": "checking composition navigation",
+  "error": "locator.waitFor: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'View inside', exact: true }) to be visible\u001b[22m\n\n    at C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-navigation\\scripts\\test-studio-graph-navigation.mjs:71:72"
+}

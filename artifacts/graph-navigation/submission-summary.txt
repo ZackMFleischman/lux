@@ -1,0 +1,4 @@
+LUX-142 implements Graph navigation for every accepted visual. Plain defineVisual scenes show a selectable Scene root that opens scene controls. Compositions retain their real children beside Scene. The concise Scene breadcrumb, nested-only View inside action, keyboard Enter navigation, Back navigation, pan, zoom, selection, and non-editable wiring behavior are covered.
+
+Source commit: bf549de826a590b10f1b7b2963c1606c5335f0b2
+Delivery: source candidate only; no main integration or remote push.
