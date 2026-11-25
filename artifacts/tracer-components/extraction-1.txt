@@ -1,0 +1,1 @@
+Extract per-region hatch angle, spacing, width, curvature, irregularity and crosshatching, including no-hatch regions, as a reusable Library part. Preserve region-specific styling and support compositional reuse. Capture matching before/after frames and inspect animation; resolve visual regressions. Publish, commit, review, and merge before next extraction.

@@ -1,0 +1,2205 @@
+{
+  "connection": "connected",
+  "message": null,
+  "receivedAtMs": 1789537611450,
+  "authoring": {
+    "instanceId": "19746851-5643-4c0e-a4e8-f3c2e988af36",
+    "generation": 1,
+    "revisionId": "d5ef621de5ba42fa925d702c183a2850606726c9018090456f9917c22ecf520f",
+    "composition": {
+      "version": 2,
+      "declaration": {
+        "definitions": {
+          "background": "background.ts",
+          "overlay": "overlay.ts"
+        },
+        "nodes": [
+          {
+            "id": "c28d1010-63ac-49c7-8ad7-8cf6458b5101",
+            "definition": "background"
+          },
+          {
+            "id": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+            "definition": "overlay"
+          }
+        ],
+        "edges": [
+          {
+            "id": "c28d3030-63ac-49c7-8ad7-8cf6458b5103",
+            "from": {
+              "nodeId": "c28d1010-63ac-49c7-8ad7-8cf6458b5101",
+              "portId": "image"
+            },
+            "to": {
+              "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "portId": "image"
+            },
+            "delay": "none"
+          }
+        ],
+        "output": {
+          "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+          "portId": "image"
+        },
+        "expose": [
+          {
+            "id": "backgroundMotion",
+            "nodeId": "c28d1010-63ac-49c7-8ad7-8cf6458b5101",
+            "controlId": "motion"
+          },
+          {
+            "id": "count",
+            "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+            "controlId": "count"
+          },
+          {
+            "id": "speed",
+            "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+            "controlId": "speed"
+          },
+          {
+            "id": "curl",
+            "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+            "controlId": "curl"
+          },
+          {
+            "id": "sway",
+            "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+            "controlId": "sway"
+          },
+          {
+            "id": "seed",
+            "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+            "controlId": "seed"
+          },
+          {
+            "id": "width",
+            "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+            "controlId": "width"
+          },
+          {
+            "id": "pace",
+            "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+            "controlId": "pace"
+          },
+          {
+            "id": "contrast",
+            "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+            "controlId": "contrast"
+          },
+          {
+            "id": "hatch",
+            "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+            "controlId": "hatch"
+          },
+          {
+            "id": "bleed",
+            "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+            "controlId": "bleed"
+          }
+        ],
+        "label": "Wandering Tracers"
+      },
+      "definitionNames": {
+        "background": "c54910e1c3f6ad7b5735b0775cd3407d151e759d80229a3081525fb12cf76050",
+        "overlay": "8402f95b7dcc3cc4bad22fdc4d68aed132e1e38c972f26bd1c16f5c4728ee486"
+      },
+      "moduleDeclarations": {
+        "8402f95b7dcc3cc4bad22fdc4d68aed132e1e38c972f26bd1c16f5c4728ee486": {
+          "modulePath": "overlay.ts",
+          "definitionNames": {
+            "paths": "7e1e618eb8215fd6de3c8335dc603367c003f9c15ec41406dc740c6056fbc699",
+            "renderer": "b20cb4fb1d3f17641aa96ed61de8a37088855e54796db463caad068e55e93d3b"
+          },
+          "declaration": {
+            "definitions": {
+              "paths": "paths.ts",
+              "renderer": "renderer.ts"
+            },
+            "nodes": [
+              {
+                "id": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                "definition": "paths"
+              },
+              {
+                "id": "b17c2020-5f6a-4f88-9db5-e8b4e5534202",
+                "definition": "renderer"
+              }
+            ],
+            "edges": [
+              {
+                "id": "b17c3030-5f6a-4f88-9db5-e8b4e5534203",
+                "from": {
+                  "nodeId": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                  "portId": "paths"
+                },
+                "to": {
+                  "nodeId": "b17c2020-5f6a-4f88-9db5-e8b4e5534202",
+                  "portId": "paths"
+                },
+                "delay": "none"
+              }
+            ],
+            "input": {
+              "nodeId": "b17c2020-5f6a-4f88-9db5-e8b4e5534202",
+              "portId": "image"
+            },
+            "output": {
+              "nodeId": "b17c2020-5f6a-4f88-9db5-e8b4e5534202",
+              "portId": "image"
+            },
+            "expose": [
+              {
+                "id": "count",
+                "nodeId": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                "controlId": "count"
+              },
+              {
+                "id": "speed",
+                "nodeId": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                "controlId": "speed"
+              },
+              {
+                "id": "curl",
+                "nodeId": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                "controlId": "curl"
+              },
+              {
+                "id": "sway",
+                "nodeId": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                "controlId": "sway"
+              },
+              {
+                "id": "seed",
+                "nodeId": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                "controlId": "seed"
+              },
+              {
+                "id": "width",
+                "nodeId": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                "controlId": "width"
+              },
+              {
+                "id": "pace",
+                "nodeId": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                "controlId": "pace"
+              },
+              {
+                "id": "contrast",
+                "nodeId": "b17c2020-5f6a-4f88-9db5-e8b4e5534202",
+                "controlId": "contrast"
+              },
+              {
+                "id": "hatch",
+                "nodeId": "b17c2020-5f6a-4f88-9db5-e8b4e5534202",
+                "controlId": "hatch"
+              },
+              {
+                "id": "bleed",
+                "nodeId": "b17c2020-5f6a-4f88-9db5-e8b4e5534202",
+                "controlId": "bleed"
+              }
+            ],
+            "label": "Wandering Tracer Overlay"
+          }
+        },
+        "def72902dd5b0fb1bd92591b0d5c26c11186a6881c31ec90fee0e016fe258259": {
+          "modulePath": "composition.ts",
+          "definitionNames": {
+            "background": "c54910e1c3f6ad7b5735b0775cd3407d151e759d80229a3081525fb12cf76050",
+            "overlay": "8402f95b7dcc3cc4bad22fdc4d68aed132e1e38c972f26bd1c16f5c4728ee486"
+          },
+          "declaration": {
+            "definitions": {
+              "background": "background.ts",
+              "overlay": "overlay.ts"
+            },
+            "nodes": [
+              {
+                "id": "c28d1010-63ac-49c7-8ad7-8cf6458b5101",
+                "definition": "background"
+              },
+              {
+                "id": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                "definition": "overlay"
+              }
+            ],
+            "edges": [
+              {
+                "id": "c28d3030-63ac-49c7-8ad7-8cf6458b5103",
+                "from": {
+                  "nodeId": "c28d1010-63ac-49c7-8ad7-8cf6458b5101",
+                  "portId": "image"
+                },
+                "to": {
+                  "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "portId": "image"
+                },
+                "delay": "none"
+              }
+            ],
+            "output": {
+              "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "portId": "image"
+            },
+            "expose": [
+              {
+                "id": "backgroundMotion",
+                "nodeId": "c28d1010-63ac-49c7-8ad7-8cf6458b5101",
+                "controlId": "motion"
+              },
+              {
+                "id": "count",
+                "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                "controlId": "count"
+              },
+              {
+                "id": "speed",
+                "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                "controlId": "speed"
+              },
+              {
+                "id": "curl",
+                "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                "controlId": "curl"
+              },
+              {
+                "id": "sway",
+                "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                "controlId": "sway"
+              },
+              {
+                "id": "seed",
+                "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                "controlId": "seed"
+              },
+              {
+                "id": "width",
+                "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                "controlId": "width"
+              },
+              {
+                "id": "pace",
+                "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                "controlId": "pace"
+              },
+              {
+                "id": "contrast",
+                "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                "controlId": "contrast"
+              },
+              {
+                "id": "hatch",
+                "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                "controlId": "hatch"
+              },
+              {
+                "id": "bleed",
+                "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                "controlId": "bleed"
+              }
+            ],
+            "label": "Wandering Tracers"
+          }
+        }
+      },
+      "graph": {
+        "version": 2,
+        "rootDefinitionHash": "def72902dd5b0fb1bd92591b0d5c26c11186a6881c31ec90fee0e016fe258259",
+        "outputPort": "image"
+      },
+      "definitions": {
+        "7e1e618eb8215fd6de3c8335dc603367c003f9c15ec41406dc740c6056fbc699": {
+          "kind": "code",
+          "metadata": {
+            "declarationVersion": 1,
+            "key": "examples/wandering-tracer-paths",
+            "label": "Wandering Tracer Paths",
+            "description": "Generates reusable paths that enter from the canvas perimeter and grow across the frame.",
+            "tags": [
+              "generator",
+              "tracers"
+            ],
+            "inputs": {},
+            "outputs": {
+              "paths": {
+                "type": {
+                  "kind": "paths2d",
+                  "version": 1,
+                  "coordinateSpace": "canvas-height"
+                },
+                "label": "Paths",
+                "description": "Grown tracer paths in centered canvas-height coordinates."
+              }
+            },
+            "controls": [
+              {
+                "id": "count",
+                "type": "number",
+                "label": "Count",
+                "default": 3,
+                "min": 0,
+                "max": 4,
+                "step": 1,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "speed",
+                "type": "number",
+                "label": "Speed",
+                "default": 0.75,
+                "min": 0.1,
+                "max": 2,
+                "step": 0.01,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "curl",
+                "type": "number",
+                "label": "Curl",
+                "default": 1,
+                "min": 0,
+                "max": 2.5,
+                "step": 0.01,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "sway",
+                "type": "number",
+                "label": "Sway",
+                "default": 0.65,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "seed",
+                "type": "number",
+                "label": "Seed",
+                "default": 17,
+                "min": 0,
+                "max": 999,
+                "step": 1,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "width",
+                "type": "number",
+                "label": "Width",
+                "default": 0.052,
+                "min": 0.012,
+                "max": 0.12,
+                "step": 0.001,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "pace",
+                "type": "number",
+                "label": "Pace",
+                "default": 1,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              }
+            ],
+            "controlDescriptions": {
+              "count": "Sets the number of independent tracer lifetimes, up to four.",
+              "curl": "Sets the stable curvature chosen for each lifetime.",
+              "pace": "Scales artistic time while deposition timestamps remain scene seconds.",
+              "seed": "Chooses perimeter entries, headings, pigments, and hatch families.",
+              "speed": "Sets how quickly each tracer head advances through canvas-height space.",
+              "sway": "Sets a subtle shared-body movement without changing the deposited route.",
+              "width": "Sets the full ribbon width in canvas-height units."
+            },
+            "lifecycle": {
+              "state": "stateful",
+              "reset": "seed"
+            }
+          }
+        },
+        "8402f95b7dcc3cc4bad22fdc4d68aed132e1e38c972f26bd1c16f5c4728ee486": {
+          "kind": "graph",
+          "metadata": {
+            "declarationVersion": 1,
+            "key": "lux/image-composition",
+            "label": "Wandering Tracer Overlay",
+            "description": "Authored image component chain",
+            "tags": [],
+            "inputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Image"
+              }
+            },
+            "outputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Image"
+              }
+            },
+            "controls": [
+              {
+                "id": "count",
+                "type": "number",
+                "label": "Count",
+                "default": 3,
+                "min": 0,
+                "max": 4,
+                "step": 1,
+                "description": "Sets the number of independent tracer lifetimes, up to four.",
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "speed",
+                "type": "number",
+                "label": "Speed",
+                "default": 0.75,
+                "min": 0.1,
+                "max": 2,
+                "step": 0.01,
+                "description": "Sets how quickly each tracer head advances through canvas-height space.",
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "curl",
+                "type": "number",
+                "label": "Curl",
+                "default": 1,
+                "min": 0,
+                "max": 2.5,
+                "step": 0.01,
+                "description": "Sets the stable curvature chosen for each lifetime.",
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "sway",
+                "type": "number",
+                "label": "Sway",
+                "default": 0.65,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "description": "Sets a subtle shared-body movement without changing the deposited route.",
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "seed",
+                "type": "number",
+                "label": "Seed",
+                "default": 17,
+                "min": 0,
+                "max": 999,
+                "step": 1,
+                "description": "Chooses perimeter entries, headings, pigments, and hatch families.",
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "width",
+                "type": "number",
+                "label": "Width",
+                "default": 0.052,
+                "min": 0.012,
+                "max": 0.12,
+                "step": 0.001,
+                "description": "Sets the full ribbon width in canvas-height units.",
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "pace",
+                "type": "number",
+                "label": "Pace",
+                "default": 1,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "description": "Scales artistic time while deposition timestamps remain scene seconds.",
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "contrast",
+                "type": "number",
+                "label": "Contrast",
+                "default": 0.55,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Moves each lifetime pigment from quiet watercolor toward a clearer accent.",
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              },
+              {
+                "id": "hatch",
+                "type": "number",
+                "label": "Hatching",
+                "default": 0.8,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Sets the opacity and weight of the lifetime-seeded hatch family.",
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              },
+              {
+                "id": "bleed",
+                "type": "number",
+                "label": "Bleed",
+                "default": 0.65,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Adds a broad translucent pigment spread around the ribbon.",
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              }
+            ],
+            "controlDescriptions": {
+              "bleed": "Adds a broad translucent pigment spread around the ribbon.",
+              "contrast": "Moves each lifetime pigment from quiet watercolor toward a clearer accent.",
+              "count": "Sets the number of independent tracer lifetimes, up to four.",
+              "curl": "Sets the stable curvature chosen for each lifetime.",
+              "hatch": "Sets the opacity and weight of the lifetime-seeded hatch family.",
+              "pace": "Scales artistic time while deposition timestamps remain scene seconds.",
+              "seed": "Chooses perimeter entries, headings, pigments, and hatch families.",
+              "speed": "Sets how quickly each tracer head advances through canvas-height space.",
+              "sway": "Sets a subtle shared-body movement without changing the deposited route.",
+              "width": "Sets the full ribbon width in canvas-height units."
+            },
+            "lifecycle": {
+              "state": "stateful",
+              "reset": "seed"
+            }
+          },
+          "body": {
+            "nodes": [
+              {
+                "id": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                "definitionHash": "7e1e618eb8215fd6de3c8335dc603367c003f9c15ec41406dc740c6056fbc699",
+                "controlDefaults": {}
+              },
+              {
+                "id": "b17c2020-5f6a-4f88-9db5-e8b4e5534202",
+                "definitionHash": "b20cb4fb1d3f17641aa96ed61de8a37088855e54796db463caad068e55e93d3b",
+                "controlDefaults": {}
+              }
+            ],
+            "edges": [
+              {
+                "id": "b17c3030-5f6a-4f88-9db5-e8b4e5534203",
+                "from": {
+                  "nodeId": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                  "portId": "paths"
+                },
+                "to": {
+                  "nodeId": "b17c2020-5f6a-4f88-9db5-e8b4e5534202",
+                  "portId": "paths"
+                },
+                "delay": "none"
+              }
+            ],
+            "inputBindings": {
+              "image": [
+                {
+                  "nodeId": "b17c2020-5f6a-4f88-9db5-e8b4e5534202",
+                  "portId": "image"
+                }
+              ]
+            },
+            "outputBindings": {
+              "image": {
+                "nodeId": "b17c2020-5f6a-4f88-9db5-e8b4e5534202",
+                "portId": "image"
+              }
+            },
+            "controlBindings": {
+              "bleed": [
+                {
+                  "nodeId": "b17c2020-5f6a-4f88-9db5-e8b4e5534202",
+                  "controlId": "bleed"
+                }
+              ],
+              "contrast": [
+                {
+                  "nodeId": "b17c2020-5f6a-4f88-9db5-e8b4e5534202",
+                  "controlId": "contrast"
+                }
+              ],
+              "count": [
+                {
+                  "nodeId": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                  "controlId": "count"
+                }
+              ],
+              "curl": [
+                {
+                  "nodeId": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                  "controlId": "curl"
+                }
+              ],
+              "hatch": [
+                {
+                  "nodeId": "b17c2020-5f6a-4f88-9db5-e8b4e5534202",
+                  "controlId": "hatch"
+                }
+              ],
+              "pace": [
+                {
+                  "nodeId": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                  "controlId": "pace"
+                }
+              ],
+              "seed": [
+                {
+                  "nodeId": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                  "controlId": "seed"
+                }
+              ],
+              "speed": [
+                {
+                  "nodeId": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                  "controlId": "speed"
+                }
+              ],
+              "sway": [
+                {
+                  "nodeId": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                  "controlId": "sway"
+                }
+              ],
+              "width": [
+                {
+                  "nodeId": "b17c1010-5f6a-4f88-9db5-e8b4e5534201",
+                  "controlId": "width"
+                }
+              ]
+            }
+          }
+        },
+        "b20cb4fb1d3f17641aa96ed61de8a37088855e54796db463caad068e55e93d3b": {
+          "kind": "code",
+          "metadata": {
+            "declarationVersion": 1,
+            "key": "examples/wandering-tracer-renderer",
+            "label": "Wandering Tracer Renderer",
+            "description": "Draws reusable tracer paths over an image with muted pigment, stable hatching, and optional bleed.",
+            "tags": [
+              "effect",
+              "tracers"
+            ],
+            "inputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Background image under the tracer ribbons."
+              },
+              "paths": {
+                "type": {
+                  "kind": "paths2d",
+                  "version": 1,
+                  "coordinateSpace": "canvas-height"
+                },
+                "label": "Paths",
+                "description": "Tracer path snapshot to draw."
+              }
+            },
+            "outputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Background image with tracer ribbons composited over it."
+              },
+              "overlay": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Overlay",
+                "description": "Transparent tracer-only image for another compositor."
+              }
+            },
+            "controls": [
+              {
+                "id": "contrast",
+                "type": "number",
+                "label": "Contrast",
+                "default": 0.55,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              },
+              {
+                "id": "hatch",
+                "type": "number",
+                "label": "Hatching",
+                "default": 0.8,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              },
+              {
+                "id": "bleed",
+                "type": "number",
+                "label": "Bleed",
+                "default": 0.65,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              }
+            ],
+            "controlDescriptions": {
+              "bleed": "Adds a broad translucent pigment spread around the ribbon.",
+              "contrast": "Moves each lifetime pigment from quiet watercolor toward a clearer accent.",
+              "hatch": "Sets the opacity and weight of the lifetime-seeded hatch family."
+            },
+            "lifecycle": {
+              "state": "stateful",
+              "reset": "seed"
+            }
+          }
+        },
+        "c54910e1c3f6ad7b5735b0775cd3407d151e759d80229a3081525fb12cf76050": {
+          "kind": "code",
+          "metadata": {
+            "declarationVersion": 1,
+            "key": "examples/wandering-tracer-background",
+            "label": "Slow Paper Wash",
+            "description": "An independent moving paper wash used to demonstrate tracer overlay reuse.",
+            "tags": [
+              "background",
+              "demo"
+            ],
+            "inputs": {},
+            "outputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Slow paper wash image."
+              }
+            },
+            "controls": [
+              {
+                "id": "motion",
+                "type": "number",
+                "label": "Motion",
+                "default": 0.55,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Background",
+                "changeCost": "live"
+              }
+            ],
+            "controlDescriptions": {
+              "motion": "Sets the speed of the independent background wash."
+            },
+            "lifecycle": {
+              "state": "stateful",
+              "reset": "seed"
+            }
+          }
+        },
+        "def72902dd5b0fb1bd92591b0d5c26c11186a6881c31ec90fee0e016fe258259": {
+          "kind": "graph",
+          "metadata": {
+            "declarationVersion": 1,
+            "key": "lux/image-composition",
+            "label": "Wandering Tracers",
+            "description": "Authored image component chain",
+            "tags": [],
+            "inputs": {},
+            "outputs": {
+              "image": {
+                "type": {
+                  "kind": "image",
+                  "colorSpace": "linear-srgb",
+                  "alphaMode": "premultiplied"
+                },
+                "label": "Image",
+                "description": "Image"
+              }
+            },
+            "controls": [
+              {
+                "id": "backgroundMotion",
+                "type": "number",
+                "label": "Motion",
+                "default": 0.55,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "description": "Sets the speed of the independent background wash.",
+                "group": "Background",
+                "changeCost": "live"
+              },
+              {
+                "id": "count",
+                "type": "number",
+                "label": "Count",
+                "default": 3,
+                "min": 0,
+                "max": 4,
+                "step": 1,
+                "description": "Sets the number of independent tracer lifetimes, up to four.",
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "speed",
+                "type": "number",
+                "label": "Speed",
+                "default": 0.75,
+                "min": 0.1,
+                "max": 2,
+                "step": 0.01,
+                "description": "Sets how quickly each tracer head advances through canvas-height space.",
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "curl",
+                "type": "number",
+                "label": "Curl",
+                "default": 1,
+                "min": 0,
+                "max": 2.5,
+                "step": 0.01,
+                "description": "Sets the stable curvature chosen for each lifetime.",
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "sway",
+                "type": "number",
+                "label": "Sway",
+                "default": 0.65,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "description": "Sets a subtle shared-body movement without changing the deposited route.",
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "seed",
+                "type": "number",
+                "label": "Seed",
+                "default": 17,
+                "min": 0,
+                "max": 999,
+                "step": 1,
+                "description": "Chooses perimeter entries, headings, pigments, and hatch families.",
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "width",
+                "type": "number",
+                "label": "Width",
+                "default": 0.052,
+                "min": 0.012,
+                "max": 0.12,
+                "step": 0.001,
+                "description": "Sets the full ribbon width in canvas-height units.",
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "pace",
+                "type": "number",
+                "label": "Pace",
+                "default": 1,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "description": "Scales artistic time while deposition timestamps remain scene seconds.",
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "contrast",
+                "type": "number",
+                "label": "Contrast",
+                "default": 0.55,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Moves each lifetime pigment from quiet watercolor toward a clearer accent.",
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              },
+              {
+                "id": "hatch",
+                "type": "number",
+                "label": "Hatching",
+                "default": 0.8,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Sets the opacity and weight of the lifetime-seeded hatch family.",
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              },
+              {
+                "id": "bleed",
+                "type": "number",
+                "label": "Bleed",
+                "default": 0.65,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Adds a broad translucent pigment spread around the ribbon.",
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              }
+            ],
+            "controlDescriptions": {
+              "backgroundMotion": "Sets the speed of the independent background wash.",
+              "bleed": "Adds a broad translucent pigment spread around the ribbon.",
+              "contrast": "Moves each lifetime pigment from quiet watercolor toward a clearer accent.",
+              "count": "Sets the number of independent tracer lifetimes, up to four.",
+              "curl": "Sets the stable curvature chosen for each lifetime.",
+              "hatch": "Sets the opacity and weight of the lifetime-seeded hatch family.",
+              "pace": "Scales artistic time while deposition timestamps remain scene seconds.",
+              "seed": "Chooses perimeter entries, headings, pigments, and hatch families.",
+              "speed": "Sets how quickly each tracer head advances through canvas-height space.",
+              "sway": "Sets a subtle shared-body movement without changing the deposited route.",
+              "width": "Sets the full ribbon width in canvas-height units."
+            },
+            "lifecycle": {
+              "state": "stateful",
+              "reset": "seed"
+            }
+          },
+          "body": {
+            "nodes": [
+              {
+                "id": "c28d1010-63ac-49c7-8ad7-8cf6458b5101",
+                "definitionHash": "c54910e1c3f6ad7b5735b0775cd3407d151e759d80229a3081525fb12cf76050",
+                "controlDefaults": {}
+              },
+              {
+                "id": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                "definitionHash": "8402f95b7dcc3cc4bad22fdc4d68aed132e1e38c972f26bd1c16f5c4728ee486",
+                "controlDefaults": {}
+              }
+            ],
+            "edges": [
+              {
+                "id": "c28d3030-63ac-49c7-8ad7-8cf6458b5103",
+                "from": {
+                  "nodeId": "c28d1010-63ac-49c7-8ad7-8cf6458b5101",
+                  "portId": "image"
+                },
+                "to": {
+                  "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "portId": "image"
+                },
+                "delay": "none"
+              }
+            ],
+            "inputBindings": {},
+            "outputBindings": {
+              "image": {
+                "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                "portId": "image"
+              }
+            },
+            "controlBindings": {
+              "backgroundMotion": [
+                {
+                  "nodeId": "c28d1010-63ac-49c7-8ad7-8cf6458b5101",
+                  "controlId": "motion"
+                }
+              ],
+              "bleed": [
+                {
+                  "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "bleed"
+                }
+              ],
+              "contrast": [
+                {
+                  "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "contrast"
+                }
+              ],
+              "count": [
+                {
+                  "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "count"
+                }
+              ],
+              "curl": [
+                {
+                  "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "curl"
+                }
+              ],
+              "hatch": [
+                {
+                  "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "hatch"
+                }
+              ],
+              "pace": [
+                {
+                  "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "pace"
+                }
+              ],
+              "seed": [
+                {
+                  "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "seed"
+                }
+              ],
+              "speed": [
+                {
+                  "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "speed"
+                }
+              ],
+              "sway": [
+                {
+                  "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "sway"
+                }
+              ],
+              "width": [
+                {
+                  "nodeId": "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "width"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "publicControls": [
+        {
+          "id": "backgroundMotion",
+          "type": "number",
+          "label": "Motion",
+          "default": 0.55,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "Sets the speed of the independent background wash.",
+          "group": "Background",
+          "changeCost": "live"
+        },
+        {
+          "id": "count",
+          "type": "number",
+          "label": "Count",
+          "default": 3,
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "description": "Sets the number of independent tracer lifetimes, up to four.",
+          "group": "Tracer paths",
+          "changeCost": "live"
+        },
+        {
+          "id": "speed",
+          "type": "number",
+          "label": "Speed",
+          "default": 0.75,
+          "min": 0.1,
+          "max": 2,
+          "step": 0.01,
+          "description": "Sets how quickly each tracer head advances through canvas-height space.",
+          "group": "Tracer paths",
+          "changeCost": "live"
+        },
+        {
+          "id": "curl",
+          "type": "number",
+          "label": "Curl",
+          "default": 1,
+          "min": 0,
+          "max": 2.5,
+          "step": 0.01,
+          "description": "Sets the stable curvature chosen for each lifetime.",
+          "group": "Tracer paths",
+          "changeCost": "live"
+        },
+        {
+          "id": "sway",
+          "type": "number",
+          "label": "Sway",
+          "default": 0.65,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "Sets a subtle shared-body movement without changing the deposited route.",
+          "group": "Tracer paths",
+          "changeCost": "live"
+        },
+        {
+          "id": "seed",
+          "type": "number",
+          "label": "Seed",
+          "default": 17,
+          "min": 0,
+          "max": 999,
+          "step": 1,
+          "description": "Chooses perimeter entries, headings, pigments, and hatch families.",
+          "group": "Tracer paths",
+          "changeCost": "live"
+        },
+        {
+          "id": "width",
+          "type": "number",
+          "label": "Width",
+          "default": 0.052,
+          "min": 0.012,
+          "max": 0.12,
+          "step": 0.001,
+          "description": "Sets the full ribbon width in canvas-height units.",
+          "group": "Tracer paths",
+          "changeCost": "live"
+        },
+        {
+          "id": "pace",
+          "type": "number",
+          "label": "Pace",
+          "default": 1,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "Scales artistic time while deposition timestamps remain scene seconds.",
+          "group": "Tracer paths",
+          "changeCost": "live"
+        },
+        {
+          "id": "contrast",
+          "type": "number",
+          "label": "Contrast",
+          "default": 0.55,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Moves each lifetime pigment from quiet watercolor toward a clearer accent.",
+          "group": "Tracer appearance",
+          "changeCost": "live"
+        },
+        {
+          "id": "hatch",
+          "type": "number",
+          "label": "Hatching",
+          "default": 0.8,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Sets the opacity and weight of the lifetime-seeded hatch family.",
+          "group": "Tracer appearance",
+          "changeCost": "live"
+        },
+        {
+          "id": "bleed",
+          "type": "number",
+          "label": "Bleed",
+          "default": 0.65,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Adds a broad translucent pigment spread around the ribbon.",
+          "group": "Tracer appearance",
+          "changeCost": "live"
+        }
+      ],
+      "publicControlBindings": {
+        "backgroundMotion": [
+          {
+            "nodePath": [
+              "c28d1010-63ac-49c7-8ad7-8cf6458b5101"
+            ],
+            "controlId": "motion",
+            "active": true
+          }
+        ],
+        "count": [
+          {
+            "nodePath": [
+              "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "b17c1010-5f6a-4f88-9db5-e8b4e5534201"
+            ],
+            "controlId": "count",
+            "active": true
+          }
+        ],
+        "speed": [
+          {
+            "nodePath": [
+              "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "b17c1010-5f6a-4f88-9db5-e8b4e5534201"
+            ],
+            "controlId": "speed",
+            "active": true
+          }
+        ],
+        "curl": [
+          {
+            "nodePath": [
+              "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "b17c1010-5f6a-4f88-9db5-e8b4e5534201"
+            ],
+            "controlId": "curl",
+            "active": true
+          }
+        ],
+        "sway": [
+          {
+            "nodePath": [
+              "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "b17c1010-5f6a-4f88-9db5-e8b4e5534201"
+            ],
+            "controlId": "sway",
+            "active": true
+          }
+        ],
+        "seed": [
+          {
+            "nodePath": [
+              "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "b17c1010-5f6a-4f88-9db5-e8b4e5534201"
+            ],
+            "controlId": "seed",
+            "active": true
+          }
+        ],
+        "width": [
+          {
+            "nodePath": [
+              "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "b17c1010-5f6a-4f88-9db5-e8b4e5534201"
+            ],
+            "controlId": "width",
+            "active": true
+          }
+        ],
+        "pace": [
+          {
+            "nodePath": [
+              "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "b17c1010-5f6a-4f88-9db5-e8b4e5534201"
+            ],
+            "controlId": "pace",
+            "active": true
+          }
+        ],
+        "contrast": [
+          {
+            "nodePath": [
+              "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "b17c2020-5f6a-4f88-9db5-e8b4e5534202"
+            ],
+            "controlId": "contrast",
+            "active": true
+          }
+        ],
+        "hatch": [
+          {
+            "nodePath": [
+              "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "b17c2020-5f6a-4f88-9db5-e8b4e5534202"
+            ],
+            "controlId": "hatch",
+            "active": true
+          }
+        ],
+        "bleed": [
+          {
+            "nodePath": [
+              "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "b17c2020-5f6a-4f88-9db5-e8b4e5534202"
+            ],
+            "controlId": "bleed",
+            "active": true
+          }
+        ]
+      },
+      "nodes": [
+        {
+          "nodePath": [
+            "c28d1010-63ac-49c7-8ad7-8cf6458b5101"
+          ],
+          "definitionHash": "c54910e1c3f6ad7b5735b0775cd3407d151e759d80229a3081525fb12cf76050",
+          "schema": [
+            {
+              "id": "motion",
+              "type": "number",
+              "label": "Motion",
+              "default": 0.55,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Background",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "cd72dfdad2936c2419738385eba532c401a102908e1d53a8817b48dd29eae168"
+        },
+        {
+          "nodePath": [
+            "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+            "b17c1010-5f6a-4f88-9db5-e8b4e5534201"
+          ],
+          "definitionHash": "7e1e618eb8215fd6de3c8335dc603367c003f9c15ec41406dc740c6056fbc699",
+          "schema": [
+            {
+              "id": "count",
+              "type": "number",
+              "label": "Count",
+              "default": 3,
+              "min": 0,
+              "max": 4,
+              "step": 1,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "speed",
+              "type": "number",
+              "label": "Speed",
+              "default": 0.75,
+              "min": 0.1,
+              "max": 2,
+              "step": 0.01,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "curl",
+              "type": "number",
+              "label": "Curl",
+              "default": 1,
+              "min": 0,
+              "max": 2.5,
+              "step": 0.01,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "sway",
+              "type": "number",
+              "label": "Sway",
+              "default": 0.65,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "seed",
+              "type": "number",
+              "label": "Seed",
+              "default": 17,
+              "min": 0,
+              "max": 999,
+              "step": 1,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "width",
+              "type": "number",
+              "label": "Width",
+              "default": 0.052,
+              "min": 0.012,
+              "max": 0.12,
+              "step": 0.001,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "pace",
+              "type": "number",
+              "label": "Pace",
+              "default": 1,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "d64444047e8ac6a258b7071c3c7cb47a34b3f9c5d5a377bfdf8799646c13b05e"
+        },
+        {
+          "nodePath": [
+            "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+            "b17c2020-5f6a-4f88-9db5-e8b4e5534202"
+          ],
+          "definitionHash": "b20cb4fb1d3f17641aa96ed61de8a37088855e54796db463caad068e55e93d3b",
+          "schema": [
+            {
+              "id": "contrast",
+              "type": "number",
+              "label": "Contrast",
+              "default": 0.55,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Tracer appearance",
+              "changeCost": "live"
+            },
+            {
+              "id": "hatch",
+              "type": "number",
+              "label": "Hatching",
+              "default": 0.8,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Tracer appearance",
+              "changeCost": "live"
+            },
+            {
+              "id": "bleed",
+              "type": "number",
+              "label": "Bleed",
+              "default": 0.65,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Tracer appearance",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "0d3770aace7e17c8577ac953428d7d6862b6d29b000fcba8b145bd56ae654263"
+        }
+      ]
+    },
+    "sceneName": "Untitled visual",
+    "authority": "studio",
+    "playback": "playing",
+    "sdkVersion": "0.4.0",
+    "controlSchema": [
+      {
+        "id": "backgroundMotion",
+        "type": "number",
+        "label": "Motion",
+        "default": 0.55,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "description": "Sets the speed of the independent background wash.",
+        "group": "Background",
+        "changeCost": "live"
+      },
+      {
+        "id": "count",
+        "type": "number",
+        "label": "Count",
+        "default": 3,
+        "min": 0,
+        "max": 4,
+        "step": 1,
+        "description": "Sets the number of independent tracer lifetimes, up to four.",
+        "group": "Tracer paths",
+        "changeCost": "live"
+      },
+      {
+        "id": "speed",
+        "type": "number",
+        "label": "Speed",
+        "default": 0.75,
+        "min": 0.1,
+        "max": 2,
+        "step": 0.01,
+        "description": "Sets how quickly each tracer head advances through canvas-height space.",
+        "group": "Tracer paths",
+        "changeCost": "live"
+      },
+      {
+        "id": "curl",
+        "type": "number",
+        "label": "Curl",
+        "default": 1,
+        "min": 0,
+        "max": 2.5,
+        "step": 0.01,
+        "description": "Sets the stable curvature chosen for each lifetime.",
+        "group": "Tracer paths",
+        "changeCost": "live"
+      },
+      {
+        "id": "sway",
+        "type": "number",
+        "label": "Sway",
+        "default": 0.65,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "description": "Sets a subtle shared-body movement without changing the deposited route.",
+        "group": "Tracer paths",
+        "changeCost": "live"
+      },
+      {
+        "id": "seed",
+        "type": "number",
+        "label": "Seed",
+        "default": 17,
+        "min": 0,
+        "max": 999,
+        "step": 1,
+        "description": "Chooses perimeter entries, headings, pigments, and hatch families.",
+        "group": "Tracer paths",
+        "changeCost": "live"
+      },
+      {
+        "id": "width",
+        "type": "number",
+        "label": "Width",
+        "default": 0.052,
+        "min": 0.012,
+        "max": 0.12,
+        "step": 0.001,
+        "description": "Sets the full ribbon width in canvas-height units.",
+        "group": "Tracer paths",
+        "changeCost": "live"
+      },
+      {
+        "id": "pace",
+        "type": "number",
+        "label": "Pace",
+        "default": 1,
+        "min": 0,
+        "max": 2,
+        "step": 0.01,
+        "description": "Scales artistic time while deposition timestamps remain scene seconds.",
+        "group": "Tracer paths",
+        "changeCost": "live"
+      },
+      {
+        "id": "contrast",
+        "type": "number",
+        "label": "Contrast",
+        "default": 0.55,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "description": "Moves each lifetime pigment from quiet watercolor toward a clearer accent.",
+        "group": "Tracer appearance",
+        "changeCost": "live"
+      },
+      {
+        "id": "hatch",
+        "type": "number",
+        "label": "Hatching",
+        "default": 0.8,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "description": "Sets the opacity and weight of the lifetime-seeded hatch family.",
+        "group": "Tracer appearance",
+        "changeCost": "live"
+      },
+      {
+        "id": "bleed",
+        "type": "number",
+        "label": "Bleed",
+        "default": 0.65,
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "description": "Adds a broad translucent pigment spread around the ribbon.",
+        "group": "Tracer appearance",
+        "changeCost": "live"
+      }
+    ],
+    "controlSchemaHash": "1ffd1d85b3bd5d45d68f3bd5107cae5f92dd61f2276cb9522a2fca5a42bd8c35",
+    "controls": {
+      "backgroundMotion": 0.55,
+      "count": 3,
+      "speed": 0.75,
+      "curl": 1,
+      "sway": 0.65,
+      "seed": 17,
+      "width": 0.052,
+      "pace": 1,
+      "contrast": 0.55,
+      "hatch": 0.8,
+      "bleed": 0.65
+    },
+    "controlSequence": 0,
+    "nodeControls": {
+      "sourceHash": "d5ef621de5ba42fa925d702c183a2850606726c9018090456f9917c22ecf520f",
+      "nodes": [
+        {
+          "nodePath": [
+            "c28d1010-63ac-49c7-8ad7-8cf6458b5101"
+          ],
+          "definitionHash": "c54910e1c3f6ad7b5735b0775cd3407d151e759d80229a3081525fb12cf76050",
+          "schema": [
+            {
+              "id": "motion",
+              "type": "number",
+              "label": "Motion",
+              "default": 0.55,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Background",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "cd72dfdad2936c2419738385eba532c401a102908e1d53a8817b48dd29eae168",
+          "values": {
+            "motion": 0.55
+          }
+        },
+        {
+          "nodePath": [
+            "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+            "b17c1010-5f6a-4f88-9db5-e8b4e5534201"
+          ],
+          "definitionHash": "7e1e618eb8215fd6de3c8335dc603367c003f9c15ec41406dc740c6056fbc699",
+          "schema": [
+            {
+              "id": "count",
+              "type": "number",
+              "label": "Count",
+              "default": 3,
+              "min": 0,
+              "max": 4,
+              "step": 1,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "speed",
+              "type": "number",
+              "label": "Speed",
+              "default": 0.75,
+              "min": 0.1,
+              "max": 2,
+              "step": 0.01,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "curl",
+              "type": "number",
+              "label": "Curl",
+              "default": 1,
+              "min": 0,
+              "max": 2.5,
+              "step": 0.01,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "sway",
+              "type": "number",
+              "label": "Sway",
+              "default": 0.65,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "seed",
+              "type": "number",
+              "label": "Seed",
+              "default": 17,
+              "min": 0,
+              "max": 999,
+              "step": 1,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "width",
+              "type": "number",
+              "label": "Width",
+              "default": 0.052,
+              "min": 0.012,
+              "max": 0.12,
+              "step": 0.001,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "pace",
+              "type": "number",
+              "label": "Pace",
+              "default": 1,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "d64444047e8ac6a258b7071c3c7cb47a34b3f9c5d5a377bfdf8799646c13b05e",
+          "values": {
+            "count": 3,
+            "speed": 0.75,
+            "curl": 1,
+            "sway": 0.65,
+            "seed": 17,
+            "width": 0.052,
+            "pace": 1
+          }
+        },
+        {
+          "nodePath": [
+            "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+            "b17c2020-5f6a-4f88-9db5-e8b4e5534202"
+          ],
+          "definitionHash": "b20cb4fb1d3f17641aa96ed61de8a37088855e54796db463caad068e55e93d3b",
+          "schema": [
+            {
+              "id": "contrast",
+              "type": "number",
+              "label": "Contrast",
+              "default": 0.55,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Tracer appearance",
+              "changeCost": "live"
+            },
+            {
+              "id": "hatch",
+              "type": "number",
+              "label": "Hatching",
+              "default": 0.8,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Tracer appearance",
+              "changeCost": "live"
+            },
+            {
+              "id": "bleed",
+              "type": "number",
+              "label": "Bleed",
+              "default": 0.65,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Tracer appearance",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "0d3770aace7e17c8577ac953428d7d6862b6d29b000fcba8b145bd56ae654263",
+          "values": {
+            "contrast": 0.55,
+            "hatch": 0.8,
+            "bleed": 0.65
+          }
+        }
+      ]
+    },
+    "controlAnimations": [],
+    "controlAnimationIssues": [],
+    "animationSequence": 0,
+    "effectiveControls": {
+      "backgroundMotion": 0.55,
+      "count": 3,
+      "speed": 0.75,
+      "curl": 1,
+      "sway": 0.65,
+      "seed": 17,
+      "width": 0.052,
+      "pace": 1,
+      "contrast": 0.55,
+      "hatch": 0.8,
+      "bleed": 0.65
+    },
+    "effectiveNodeControls": {
+      "sourceHash": "d5ef621de5ba42fa925d702c183a2850606726c9018090456f9917c22ecf520f",
+      "nodes": [
+        {
+          "nodePath": [
+            "c28d1010-63ac-49c7-8ad7-8cf6458b5101"
+          ],
+          "definitionHash": "c54910e1c3f6ad7b5735b0775cd3407d151e759d80229a3081525fb12cf76050",
+          "schema": [
+            {
+              "id": "motion",
+              "type": "number",
+              "label": "Motion",
+              "default": 0.55,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Background",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "cd72dfdad2936c2419738385eba532c401a102908e1d53a8817b48dd29eae168",
+          "values": {
+            "motion": 0.55
+          }
+        },
+        {
+          "nodePath": [
+            "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+            "b17c1010-5f6a-4f88-9db5-e8b4e5534201"
+          ],
+          "definitionHash": "7e1e618eb8215fd6de3c8335dc603367c003f9c15ec41406dc740c6056fbc699",
+          "schema": [
+            {
+              "id": "count",
+              "type": "number",
+              "label": "Count",
+              "default": 3,
+              "min": 0,
+              "max": 4,
+              "step": 1,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "speed",
+              "type": "number",
+              "label": "Speed",
+              "default": 0.75,
+              "min": 0.1,
+              "max": 2,
+              "step": 0.01,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "curl",
+              "type": "number",
+              "label": "Curl",
+              "default": 1,
+              "min": 0,
+              "max": 2.5,
+              "step": 0.01,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "sway",
+              "type": "number",
+              "label": "Sway",
+              "default": 0.65,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "seed",
+              "type": "number",
+              "label": "Seed",
+              "default": 17,
+              "min": 0,
+              "max": 999,
+              "step": 1,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "width",
+              "type": "number",
+              "label": "Width",
+              "default": 0.052,
+              "min": 0.012,
+              "max": 0.12,
+              "step": 0.001,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            },
+            {
+              "id": "pace",
+              "type": "number",
+              "label": "Pace",
+              "default": 1,
+              "min": 0,
+              "max": 2,
+              "step": 0.01,
+              "group": "Tracer paths",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "d64444047e8ac6a258b7071c3c7cb47a34b3f9c5d5a377bfdf8799646c13b05e",
+          "values": {
+            "count": 3,
+            "speed": 0.75,
+            "curl": 1,
+            "sway": 0.65,
+            "seed": 17,
+            "width": 0.052,
+            "pace": 1
+          }
+        },
+        {
+          "nodePath": [
+            "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+            "b17c2020-5f6a-4f88-9db5-e8b4e5534202"
+          ],
+          "definitionHash": "b20cb4fb1d3f17641aa96ed61de8a37088855e54796db463caad068e55e93d3b",
+          "schema": [
+            {
+              "id": "contrast",
+              "type": "number",
+              "label": "Contrast",
+              "default": 0.55,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Tracer appearance",
+              "changeCost": "live"
+            },
+            {
+              "id": "hatch",
+              "type": "number",
+              "label": "Hatching",
+              "default": 0.8,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Tracer appearance",
+              "changeCost": "live"
+            },
+            {
+              "id": "bleed",
+              "type": "number",
+              "label": "Bleed",
+              "default": 0.65,
+              "min": 0,
+              "max": 1,
+              "step": 0.01,
+              "group": "Tracer appearance",
+              "changeCost": "live"
+            }
+          ],
+          "schemaHash": "0d3770aace7e17c8577ac953428d7d6862b6d29b000fcba8b145bd56ae654263",
+          "values": {
+            "contrast": 0.55,
+            "hatch": 0.8,
+            "bleed": 0.65
+          }
+        }
+      ]
+    },
+    "controlMigration": [],
+    "clockEpoch": 0,
+    "timeSeconds": 7.97810000000149,
+    "frameId": "172",
+    "output": {
+      "width": 1920,
+      "height": 1080,
+      "fps": 60,
+      "seed": 0
+    },
+    "fault": null
+  },
+  "host": null,
+  "jobs": [
+    {
+      "jobId": "c712afe1-cff9-4590-baf7-ef29dae82e37",
+      "state": "succeeded",
+      "summary": "Visual is ready in Lux."
+    }
+  ],
+  "visualFps": null,
+  "uiFps": null,
+  "performance": {
+    "owner": {
+      "instanceId": "19746851-5643-4c0e-a4e8-f3c2e988af36",
+      "generation": 1,
+      "revisionId": "d5ef621de5ba42fa925d702c183a2850606726c9018090456f9917c22ecf520f"
+    },
+    "status": "live",
+    "observedAtMs": 43123.39999999851,
+    "worker": {
+      "schemaVersion": 1,
+      "mode": "routine",
+      "clockDomain": "dedicated-worker-monotonic-ms",
+      "sequence": 16,
+      "windowStartMs": 8824.60000000149,
+      "windowEndMs": 9321.39999999851,
+      "lostRecords": 0,
+      "invalidRecords": 0,
+      "intervalLostRecords": 0,
+      "intervalInvalidRecords": 0,
+      "retainedRecords": 12,
+      "produced": {
+        "unit": "Hz",
+        "availability": "available",
+        "validity": "complete",
+        "gate": "not_evaluated",
+        "sampleCount": 12,
+        "expectedCount": 12,
+        "missingCount": 0,
+        "samplingPolicy": "completed frames over independent summary interval",
+        "value": 24.154589372125578
+      },
+      "update": {
+        "unit": "ms",
+        "availability": "available",
+        "validity": "complete",
+        "gate": "not_evaluated",
+        "sampleCount": 12,
+        "expectedCount": 12,
+        "missingCount": 0,
+        "samplingPolicy": "all completed frames in this summary interval",
+        "p50": 0.19999999552965164,
+        "p95": 0.20000000298023224,
+        "p99": 0.20000000298023224,
+        "max": 0.20000000298023224
+      },
+      "renderCall": {
+        "unit": "ms",
+        "availability": "available",
+        "validity": "complete",
+        "gate": "not_evaluated",
+        "sampleCount": 12,
+        "expectedCount": 12,
+        "missingCount": 0,
+        "samplingPolicy": "all completed frames in this summary interval",
+        "p50": 0.6000000014901161,
+        "p95": 0.7999999970197678,
+        "p99": 0.7999999970197678,
+        "max": 0.7999999970197678
+      },
+      "cpuCall": {
+        "unit": "ms",
+        "availability": "available",
+        "validity": "incomplete",
+        "gate": "not_evaluated",
+        "sampleCount": 12,
+        "expectedCount": 12,
+        "missingCount": 0,
+        "samplingPolicy": "all completed frames in this summary interval",
+        "reason": "Asynchronous render continuation CPU work is not fully measured",
+        "p50": 0.7999999970197678,
+        "p95": 1,
+        "p99": 1,
+        "max": 1
+      },
+      "renderAwait": {
+        "unit": "ms",
+        "availability": "available",
+        "validity": "complete",
+        "gate": "not_evaluated",
+        "sampleCount": 12,
+        "expectedCount": 12,
+        "missingCount": 0,
+        "samplingPolicy": "all completed frames in this summary interval",
+        "p50": 16.399999998509884,
+        "p95": 17.799999997019768,
+        "p99": 17.799999997019768,
+        "max": 17.799999997019768
+      },
+      "queueWait": {
+        "unit": "ms",
+        "availability": "available",
+        "validity": "complete",
+        "gate": "not_evaluated",
+        "sampleCount": 12,
+        "expectedCount": 12,
+        "missingCount": 0,
+        "samplingPolicy": "all completed frames in this summary interval",
+        "p50": 28.299999997019768,
+        "p95": 31.69999999552965,
+        "p99": 31.69999999552965,
+        "max": 31.69999999552965
+      },
+      "gpu": {
+        "unit": "ms",
+        "availability": "pending",
+        "validity": "sampled",
+        "gate": "not_evaluated",
+        "sampleCount": 0,
+        "expectedCount": 0,
+        "missingCount": 0,
+        "samplingPolicy": "one in 30 frames (frame IDs 1,31,61,...)",
+        "timestampQuerySupported": true,
+        "timestampQueryEnabled": true,
+        "failedSamples": 0,
+        "droppedSamples": 1,
+        "pendingSamples": 0
+      }
+    }
+  },
+  "capabilities": {
+    "protocolVersion": 2,
+    "supportedSdkVersions": [
+      "0.1.0",
+      "0.2.0",
+      "0.4.0"
+    ],
+    "codeDeclaredParameters": true,
+    "parameterKinds": [
+      "number"
+    ],
+    "maxParameterMetadataBytes": 32768,
+    "imageFormats": [
+      "image/bmp",
+      "image/png",
+      "image/jpeg"
+    ],
+    "assetExport": true,
+    "sceneVersions": [
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "studioSession": {
+    "profile": "test-07712f13-5607-4899-af30-7c4886c40b35",
+    "workspace": "c:\\users\\zflei\\repos\\lux\\.worktrees\\tracer-components",
+    "sessionId": "4b470badfd84922884ebcc6253e2dc48ef62",
+    "pid": 23596
+  }
+}

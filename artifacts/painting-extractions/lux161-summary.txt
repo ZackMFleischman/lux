@@ -1,0 +1,1 @@
+Animated Watercolor is now a separate Library component with five existing color controls. The original moving washes, warm pools, pooling and blooms are preserved. Published, reviewed, committed and merged.

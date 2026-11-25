@@ -1,0 +1,1 @@
+Organic Regions is an independent Library node with scale, flow, growth, variation and drift controls. The painting consumes its bounded shader field without another image pass. Published, independently reviewed, committed and merged.

@@ -1,0 +1,52 @@
+{
+  "libraryRoot": "C:/Users/zFlei/repos/lux/library",
+  "parts": [
+    {
+      "name": "Wandering Tracer Paths",
+      "entry": "paths.ts",
+      "files": [
+        "paths.ts",
+        "tracer-state.ts"
+      ],
+      "mountPath": "generator"
+    },
+    {
+      "name": "Wandering Tracer Renderer",
+      "entry": "renderer.ts",
+      "files": [
+        "renderer.ts",
+        "tracer-texture.ts",
+        "tracer-spline.ts"
+      ],
+      "mountPath": "renderer"
+    },
+    {
+      "name": "Organic Regions",
+      "description": "Slowly flowing weighted regions with varied size and density. Supplies shader fragments and controls to a compatible painting renderer without an extra image pass.",
+      "entry": "regions.ts",
+      "files": [
+        "regions.ts"
+      ],
+      "mountPath": "regions"
+    },
+    {
+      "name": "Region Hatching",
+      "description": "Region-specific curved, directional and perpendicular hatch patterns, with controlled irregularity and optional unhatched areas. Shader-field for compatible single-pass painting renderers.",
+      "entry": "hatching.ts",
+      "files": [
+        "hatching.ts"
+      ],
+      "mountPath": "hatching"
+    },
+    {
+      "name": "Animated Watercolor",
+      "description": "Slowly shifting blue-green washes and moving warm pools, with regional color contrast, pigment pooling and watercolor blooms. Shader-field for compatible painting renderers.",
+      "entry": "watercolor.ts",
+      "files": [
+        "watercolor.ts"
+      ],
+      "mountPath": "watercolor"
+    }
+  ],
+  "inspectLabel": "Animated Watercolor"
+}

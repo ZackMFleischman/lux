@@ -1,0 +1,1 @@
+Organic Boundary Ink now owns the original boundary pressure, warm ink and paper finish as a Library component. Four existing controls remain connected to shared drawing behavior. Published, independently reviewed and merged.

@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "profile": "test-eedd8011-876f-41f0-bfe1-5fce4103e2eb",
+  "checks": [
+    "overlay rendered",
+    "overlay saved and reopened",
+    "painting rendered",
+    "painting saved and reopened"
+  ],
+  "errors": []
+}

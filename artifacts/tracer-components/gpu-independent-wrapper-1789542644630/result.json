@@ -1,0 +1,9 @@
+{
+  "ok": true,
+  "profile": "test-6756ac62-237d-4e0c-8b8e-8e1125c2354b",
+  "checks": [
+    "Independent typed entries published; wrapper stores references only; independent-wrapper rendered, saved and reopened",
+    "Invalid edit preserved accepted preview"
+  ],
+  "errors": []
+}

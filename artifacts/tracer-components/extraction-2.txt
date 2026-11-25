@@ -1,0 +1,1 @@
+Extract region identity-driven color/hatch variation and smooth split transitions into a reusable Library part. Preserve tracer-driven cuts and the approved uneven patches. Compare identical-time before/after frames and animation, then publish, commit, review and merge.

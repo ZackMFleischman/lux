@@ -1,0 +1,16 @@
+{
+  "id": "0f5e1c0f-c53f-4808-b1c8-98fe75eb13a3",
+  "revision": 1,
+  "name": "Wandering Tracers",
+  "files": [
+    "overlay.ts",
+    "paths.ts",
+    "renderer.ts",
+    "tracer-spline.ts",
+    "tracer-state.ts",
+    "tracer-texture.ts"
+  ],
+  "exactSourceMatch": true,
+  "paintingRevision": "b08359f01622b5261bb263c5fd5d59f1c2a6f0ab0861ed0bd3f462a34a555515",
+  "fault": null
+}

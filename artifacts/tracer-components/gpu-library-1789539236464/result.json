@@ -1,0 +1,9 @@
+{
+  "ok": true,
+  "profile": "test-7b2f413a-c9bd-4b73-add1-dea8cda695f3",
+  "checks": [
+    "Library wrapper created, linked, saved and reopened",
+    "Invalid edit preserved accepted preview"
+  ],
+  "errors": []
+}

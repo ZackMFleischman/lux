@@ -1,0 +1,1 @@
+Open Living Painting - Independent Library Tracers.lux-scene with the current checkout Studio. Installed open app predates pinned dependencies; packaged update exists but was not activated while user process remains open. Existing accepted scene and backups preserved. Review animation and library graph as desired; remaining six extraction tickets continue next.

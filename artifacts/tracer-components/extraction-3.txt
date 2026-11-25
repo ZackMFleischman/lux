@@ -1,0 +1,1 @@
+Extract animated palette fields, moving warm spots, pigment bleeding and watercolor blending into reusable Library parts with compositional inputs/outputs. Preserve approved palette and tracer interaction. Compare before/after at matching settings/times and animation. Publish, commit, review and merge before next extraction.

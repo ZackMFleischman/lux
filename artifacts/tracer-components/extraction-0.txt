@@ -1,0 +1,1 @@
+Extract the painting region geometry and coordinated slow motion into an independently published component. Preserve varied region size, density, and flow. Compare baseline and extracted frames at identical settings/times and inspect animation before publishing. Keep original saved scenes. Publish, commit, independently review, and merge before beginning the next extraction.

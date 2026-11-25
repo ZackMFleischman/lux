@@ -1,0 +1,7 @@
+{
+  "ok": false,
+  "profile": "test-fa3d15ae-2d34-4adf-a8a8-38f04f2f36d6",
+  "checks": [],
+  "errors": [],
+  "failure": "Error: Visual initialization exceeded five seconds\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/tracer-components/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/tracer-components/scripts/test-wandering-tracers.mjs:36:15"
+}

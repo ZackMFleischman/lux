@@ -1,0 +1,1 @@
+Published independent Wandering Tracer Paths and Wandering Tracer Renderer. The convenience effect stores pinned references only. Saved a scene with both direct Library links and merged implementation and Library content into main.

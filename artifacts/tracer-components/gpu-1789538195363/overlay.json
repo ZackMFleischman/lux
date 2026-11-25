@@ -1,0 +1,375 @@
+{
+  "playback": "playing",
+  "timeSeconds": 19.6245,
+  "clockEpoch": 0,
+  "frameId": "1109",
+  "sdkVersion": "0.4.0",
+  "controlSchemaHash": "7cb613750323e83f236455d76d5c1a569cb0a44bcd280b63d5fe036689d3e746",
+  "controls": {
+    "backgroundMotion": 0.55,
+    "count": 3,
+    "speed": 0.96,
+    "curl": 2.5,
+    "sway": 0.65,
+    "seed": 7,
+    "width": 0.021,
+    "pace": 1.24,
+    "contrast": 1,
+    "hatch": 1,
+    "bleed": 1
+  },
+  "controlSequence": 0,
+  "nodeControls": {
+    "nodes": [
+      {
+        "nodePath": [
+          "c28d1010-63ac-49c7-8ad7-8cf6458b5101"
+        ],
+        "definitionHash": "c54910e1c3f6ad7b5735b0775cd3407d151e759d80229a3081525fb12cf76050",
+        "schema": [
+          {
+            "id": "motion",
+            "type": "number",
+            "label": "Motion",
+            "default": 0.55,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "group": "Background",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "cd72dfdad2936c2419738385eba532c401a102908e1d53a8817b48dd29eae168",
+        "values": {
+          "motion": 0.55
+        }
+      },
+      {
+        "nodePath": [
+          "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+          "b17c1010-5f6a-4f88-9db5-e8b4e5534201"
+        ],
+        "definitionHash": "db30e71cf6f55af0b92d41c4282b34ccb6e72509ca67a0f9ff6e0932dd16c8c8",
+        "schema": [
+          {
+            "id": "count",
+            "type": "number",
+            "label": "Count",
+            "default": 3,
+            "min": 0,
+            "max": 4,
+            "step": 1,
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "speed",
+            "type": "number",
+            "label": "Speed",
+            "default": 0.96,
+            "min": 0.1,
+            "max": 2,
+            "step": 0.01,
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "curl",
+            "type": "number",
+            "label": "Curl",
+            "default": 2.5,
+            "min": 0,
+            "max": 2.5,
+            "step": 0.01,
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "sway",
+            "type": "number",
+            "label": "Sway",
+            "default": 0.65,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "seed",
+            "type": "number",
+            "label": "Seed",
+            "default": 7,
+            "min": 0,
+            "max": 999,
+            "step": 1,
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "width",
+            "type": "number",
+            "label": "Width",
+            "default": 0.021,
+            "min": 0.005,
+            "max": 0.12,
+            "step": 0.001,
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "pace",
+            "type": "number",
+            "label": "Pace",
+            "default": 1.24,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "group": "Tracer paths",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "013f95fd3d496ea3ae5b52247ceff2e2b53640ca200f890d94932164e49b5192",
+        "values": {
+          "count": 3,
+          "speed": 0.96,
+          "curl": 2.5,
+          "sway": 0.65,
+          "seed": 7,
+          "width": 0.021,
+          "pace": 1.24
+        }
+      },
+      {
+        "nodePath": [
+          "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+          "b17c2020-5f6a-4f88-9db5-e8b4e5534202"
+        ],
+        "definitionHash": "dd3db1791662852eba91ec5a9b4fcf795ec2c5a6afa7b5d2875239429aca4f52",
+        "schema": [
+          {
+            "id": "contrast",
+            "type": "number",
+            "label": "Contrast",
+            "default": 1,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Tracer appearance",
+            "changeCost": "live"
+          },
+          {
+            "id": "hatch",
+            "type": "number",
+            "label": "Hatching",
+            "default": 1,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Tracer appearance",
+            "changeCost": "live"
+          },
+          {
+            "id": "bleed",
+            "type": "number",
+            "label": "Bleed",
+            "default": 1,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Tracer appearance",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "3dd6cb33c65c8976e5a6a1801876d8b1f7d56b98d385f757f96d52036883e502",
+        "values": {
+          "contrast": 1,
+          "hatch": 1,
+          "bleed": 1
+        }
+      }
+    ]
+  },
+  "effectiveNodeControls": {
+    "nodes": [
+      {
+        "nodePath": [
+          "c28d1010-63ac-49c7-8ad7-8cf6458b5101"
+        ],
+        "definitionHash": "c54910e1c3f6ad7b5735b0775cd3407d151e759d80229a3081525fb12cf76050",
+        "schema": [
+          {
+            "id": "motion",
+            "type": "number",
+            "label": "Motion",
+            "default": 0.55,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "group": "Background",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "cd72dfdad2936c2419738385eba532c401a102908e1d53a8817b48dd29eae168",
+        "values": {
+          "motion": 0.55
+        }
+      },
+      {
+        "nodePath": [
+          "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+          "b17c1010-5f6a-4f88-9db5-e8b4e5534201"
+        ],
+        "definitionHash": "db30e71cf6f55af0b92d41c4282b34ccb6e72509ca67a0f9ff6e0932dd16c8c8",
+        "schema": [
+          {
+            "id": "count",
+            "type": "number",
+            "label": "Count",
+            "default": 3,
+            "min": 0,
+            "max": 4,
+            "step": 1,
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "speed",
+            "type": "number",
+            "label": "Speed",
+            "default": 0.96,
+            "min": 0.1,
+            "max": 2,
+            "step": 0.01,
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "curl",
+            "type": "number",
+            "label": "Curl",
+            "default": 2.5,
+            "min": 0,
+            "max": 2.5,
+            "step": 0.01,
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "sway",
+            "type": "number",
+            "label": "Sway",
+            "default": 0.65,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "seed",
+            "type": "number",
+            "label": "Seed",
+            "default": 7,
+            "min": 0,
+            "max": 999,
+            "step": 1,
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "width",
+            "type": "number",
+            "label": "Width",
+            "default": 0.021,
+            "min": 0.005,
+            "max": 0.12,
+            "step": 0.001,
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "pace",
+            "type": "number",
+            "label": "Pace",
+            "default": 1.24,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "group": "Tracer paths",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "013f95fd3d496ea3ae5b52247ceff2e2b53640ca200f890d94932164e49b5192",
+        "values": {
+          "count": 3,
+          "speed": 0.96,
+          "curl": 2.5,
+          "sway": 0.65,
+          "seed": 7,
+          "width": 0.021,
+          "pace": 1.24
+        }
+      },
+      {
+        "nodePath": [
+          "c28d2020-63ac-49c7-8ad7-8cf6458b5102",
+          "b17c2020-5f6a-4f88-9db5-e8b4e5534202"
+        ],
+        "definitionHash": "dd3db1791662852eba91ec5a9b4fcf795ec2c5a6afa7b5d2875239429aca4f52",
+        "schema": [
+          {
+            "id": "contrast",
+            "type": "number",
+            "label": "Contrast",
+            "default": 1,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Tracer appearance",
+            "changeCost": "live"
+          },
+          {
+            "id": "hatch",
+            "type": "number",
+            "label": "Hatching",
+            "default": 1,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Tracer appearance",
+            "changeCost": "live"
+          },
+          {
+            "id": "bleed",
+            "type": "number",
+            "label": "Bleed",
+            "default": 1,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "group": "Tracer appearance",
+            "changeCost": "live"
+          }
+        ],
+        "schemaHash": "3dd6cb33c65c8976e5a6a1801876d8b1f7d56b98d385f757f96d52036883e502",
+        "values": {
+          "contrast": 1,
+          "hatch": 1,
+          "bleed": 1
+        }
+      }
+    ]
+  },
+  "controlAnimations": [],
+  "controlAnimationIssues": [],
+  "animationSequence": 0,
+  "width": 1920,
+  "height": 1080,
+  "seed": 0,
+  "colorSpace": "srgb",
+  "alphaMode": "straight",
+  "instanceId": "e7379278-04f4-469b-bbee-2f6f98ff299c",
+  "generation": 1,
+  "revisionId": "c3a160daa62861d57a2e31d9acfddff5abdff46241910cc6a58427675d6a41ab"
+}

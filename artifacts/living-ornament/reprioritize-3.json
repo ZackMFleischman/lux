@@ -1,0 +1,11 @@
+{
+  "reason": "User prioritizes visualization now; first visual fits current limit. Count fix is required only for larger pattern integration.",
+  "title": "Living Ornament batch 2: complete pattern vocabulary",
+  "kind": "feature",
+  "dependencies": [
+    "LUX-170",
+    "LUX-171"
+  ],
+  "parent_id": "LUX-169",
+  "body": "F07-F12. New Spiral Fill, Packed Circles & Rings, Membrane/Petal Divisions, Nested Contours and Decorated Ribbons; expand Region Hatching. Parallel lanes: spirals/circles; membranes/contours; hatching/ribbons. Stable per-region variation, fitted spacing, light/dark reversals and per-family controls. Demonstrate narrow/concave/large regions at multiple scales in one scene. Spirals pack varied sizes; circles retain gaps; membrane hubs form unequal curved petals; contours respect necks; ribbons support beads/stripes/ladder cells. Review actual composition and detail together, fix artistic/clipping issues, publish independent Library parts as one batch, save, commit and merge."
+}

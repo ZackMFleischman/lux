@@ -1,0 +1,1 @@
+Extract controls for large versus fine detail, spatial rhythm, tension/release and quiet areas into a reusable component usable by the painting parts. Preserve current coherent movement without extra stylistic changes. Compare matching frames and animation before publishing, committing, reviewing and merging.

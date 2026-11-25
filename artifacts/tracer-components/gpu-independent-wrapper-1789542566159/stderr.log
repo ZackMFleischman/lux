@@ -1,0 +1,5 @@
+Error occurred in handler for 'studio:library': Error: Import must resolve to a submitted .ts module: ./tracer-state.ts
+    at validateLibraryCandidate (C:\Users\zFlei\repos\lux\.worktrees\tracer-components\apps\studio\dist\main.cjs:25666:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\zFlei\repos\lux\.worktrees\tracer-components\apps\studio\dist\main.cjs:11042:7
+Waiting for the debugger to disconnect...

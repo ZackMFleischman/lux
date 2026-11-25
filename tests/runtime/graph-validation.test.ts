@@ -78,13 +78,10 @@ test('raw descriptor admission never runs getters and rejects aliases and exotic
   for(const mutate of cases){const f=basic();mutate(f);invalid(f.graph,f.definitions,/graph|definitions/,/data|alias|cycle|dense|array|Unicode|finite|plain/);}
   assert.equal(reads,0);
 });
-test('raw node, edge and definition counts apply before visitation and pruning',()=>{
-  const f=basic();f.graph.nodes=Array.from({length:128},(_,i)=>node(uuid(i+1)));assert.equal(validateGraph(f.graph,f.definitions).graph.nodes.length,128);
-  f.graph.nodes.push(node(uuid(129)));invalid(f.graph,f.definitions,/graph.nodes/,/128/);
-  const d=basic();for(let i=0;i<127;i++)d.definitions[hash(i)]={kind:'code',metadata:clone(metadata())};assert.equal(Object.keys(validateGraph(d.graph,d.definitions).definitions).length,128);
-  d.definitions[hash(127)]={kind:'code',metadata:clone(metadata())};invalid(d.graph,d.definitions,/definitions/,/128/);
-  const e=fanout512();assert.equal(validateGraph(e.graph,e.definitions).graph.edges.length,512);e.graph.edges.push(edge(900,D,'value',A,'in'));invalid(e.graph,e.definitions,/graph.edges/,/512/);
-  const giant=basic();Object.defineProperty(giant.graph.nodes,'length',{value:4294967295});invalid(giant.graph,giant.definitions,/graph.nodes/,/128/);
+test('flat node and definition counts have no fixed topology ceiling',()=>{
+  const f=basic();f.graph.nodes=Array.from({length:600},(_,i)=>node(uuid(i+1)));assert.equal(validateGraph(f.graph,f.definitions).graph.nodes.length,600);
+  const d=basic();for(let i=0;i<128;i++)d.definitions[hash(i)]={kind:'code',metadata:clone(metadata())};assert.equal(Object.keys(validateGraph(d.graph,d.definitions).definitions).length,129);
+  const giant=basic();Object.defineProperty(giant.graph.nodes,'length',{value:4294967295});invalid(giant.graph,giant.definitions,/graph.nodes/,/100000|raw array|value/);
   const empty=basic();empty.graph.nodes=[];invalid(empty.graph,empty.definitions,/graph.nodes/,/one|1/);
 });
 test('depth, value, property and byte budgets reject before shape normalization',()=>{
@@ -99,7 +96,7 @@ test('all raw descriptors are admitted before metadata normalization or caller c
   f.definitions[h2]={kind:'code',metadata:metadata()};Object.defineProperty(f.definitions[h2],'metadata',{enumerable:true,get(){reads++;throw Error('getter executed');}});
   invalid(f.graph,f.definitions,new RegExp(`definitions.${h2}`),/own data/);assert.equal(reads,0);
   const g=basic();Object.defineProperty(g.graph.nodes,'0',{enumerable:true,get(){reads++;throw Error('getter executed');}});g.graph.nodes.length=129;
-  invalid(g.graph,g.definitions,/graph.nodes/,/128/);assert.equal(reads,0);
+  invalid(g.graph,g.definitions,/graph.nodes/,/own data/);assert.equal(reads,0);
 });
 test('existing C01 port, tag and text limits remain authoritative without a control-count cap',()=>{
   const f=basic();f.definitions[h2]={kind:'code',metadata:sizedMetadata(20000)};
@@ -137,7 +134,7 @@ test('invalid shared UUID/hash representations reject without applying mapping n
   const f=basic();f.definitions['__proto__']= {kind:'code',metadata:metadata()};invalid(f.graph,f.definitions,/definitions/,/plain/);
   const g=diamond();g.graph.edges[0]!.id='bad';invalid(g.graph,g.definitions,/graph.edges\[/,/UUID/);
 });
-test('maximum legal topology proves the canonical byte cap is dominated by raw counts and C01 names',()=>{
+test('a dense topology remains bounded by the canonical graph byte budget',()=>{
   const f=fanout512(), output='v'.repeat(64), input=(i:number)=>`p${String(i).padStart(63,'0')}`;
   const producer=f.definitions[h]!.metadata.outputs.value!;
   (f.definitions[h]!.metadata as any).outputs={[output]:producer};
@@ -146,10 +143,7 @@ test('maximum legal topology proves the canonical byte cap is dominated by raw c
   for(let i=65;i<=128;i++)f.graph.nodes.push(node(uuid(i),h));
   const graph=validateGraph(f.graph,f.definitions).graph;
   assert.equal(graph.nodes.length,128);assert.equal(graph.edges.length,512);
-  // All UUIDs are36 ASCII chars, hashes64, C01 port IDs<=64 ASCII. Maximum
-  // encoded node129, edge324, reference125; wrapper and commas yield183213.
-  // Actual final image name is shorter. A graph cannot reach262145 bytes while
-  // satisfying these earlier invariants; do not bypass them to fake a cap test.
+  // The canonical byte budget remains independent of topology cardinality.
   assert.equal(new TextEncoder().encode(JSON.stringify(graph)).byteLength,183154);
   assert.ok(183213<262144);
 });

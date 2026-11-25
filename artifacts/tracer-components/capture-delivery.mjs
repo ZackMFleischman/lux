@@ -1,0 +1,10 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import {resolveStudioSession,createStudioConnection} from '../../scripts/studio-session.mjs';
+const base='C:/Users/zFlei/.codex/visualizations/2026/09/15/01a0a5cb-03be-7ee2-a6cf-daf659f7ebac';
+const receipt=JSON.parse(await readFile(base+'/tracer-components-launch.json','utf8'));
+const call=createStudioConnection(resolveStudioSession({workspace:receipt.workspace,env:{...process.env,...receipt.mcp.env}}),{timeoutMs:30000});
+const status=await call('status');
+const capture=await call('capture');
+await writeFile(base+'/aligned-tracers.png',Buffer.from(capture.base64,'base64'));
+await writeFile(base+'/aligned-tracers-capture.json',JSON.stringify(capture.metadata,null,2));
+console.log(JSON.stringify({fault:status.authoring?.fault,revision:status.authoring?.revisionId,session:status.studioSession}));

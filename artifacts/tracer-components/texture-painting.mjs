@@ -1,0 +1,30 @@
+import {readFileSync,writeFileSync} from 'node:fs';
+const file='examples/components/wandering-tracers/painting.ts';
+let s=readFileSync(file,'utf8');
+s=s.replace('  Vector4,','  DataTexture,\n  FloatType,\n  RGBAFormat,\n  NearestFilter,');
+s=s.replace('uniform, uniformArray, uv','uniform, texture, uv');
+s=s.replace('trailPoints: array<vec4f, 256>, trailMeta: array<vec4f, 4>', 'trailData: texture_2d<f32>');
+s=s.replace('trailMeta[traceIndex].x','textureLoad(trailData, vec2i(256 + traceIndex, 0), 0).x');
+s=s.replace('trailPoints, trailMeta','trailData');
+s=s.replace('points: array<vec4f, 256>, metadata: array<vec4f, 4>', 'trailData: texture_2d<f32>');
+s=s.replace('  let count = i32(metadata[slot].x);','  let metadata = textureLoad(trailData, vec2i(256 + slot, 0), 0);\n  let count = i32(metadata.x);');
+s=s.replace('points[offset + j + 1]', 'textureLoad(trailData, vec2i(offset + j + 1, 0), 0)');
+s=s.replace('points[offset + j]', 'textureLoad(trailData, vec2i(offset + j, 0), 0)');
+s=s.replace('points[offset + max(count - 1, 0)]', 'textureLoad(trailData, vec2i(offset + max(count - 1, 0), 0), 0)');
+s=s.replaceAll('metadata[slot].', 'metadata.');
+s=s.replace('// Preserve the last chosen regional weight variety within the 32-control budget.', '// Preserve the saved study’s regional weight variety.');
+s=s.replace(/    const points = Array\.from[\s\S]*?const pathMeta = uniformArray\(meta, 'vec4'\);/,`    // Bounded texture upload avoids large uniform arrays and uses the exact shared paths.
+    const pathData = new Float32Array(260 * 4);
+    const pathTexture = new DataTexture(pathData, 260, 1, RGBAFormat, FloatType);
+    pathTexture.minFilter = pathTexture.magFilter = NearestFilter;
+    pathTexture.generateMipmaps = false;`);
+s=s.replace('      pathPoints, pathMeta,','      texture(pathTexture),');
+s=s.replace(/        meta\.forEach[\s\S]*?\n        return \{ image:/,`        pathData.fill(0);
+        paths.forEach((path, index) => {
+          pathData.set([path.points.length, path.opacity, path.styleSeed, path.generation], (256 + index) * 4);
+          path.points.forEach((point, j) => pathData.set([point.x, point.y, point.width, point.distance], (index * 64 + j) * 4));
+        });
+        pathTexture.needsUpdate = true;
+        return { image:`);
+s=s.replace('        material.dispose();','        material.dispose();\n        pathTexture.dispose();');
+writeFileSync(file,s);

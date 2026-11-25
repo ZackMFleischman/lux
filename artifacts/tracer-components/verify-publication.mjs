@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {readFile,writeFile} from 'node:fs/promises';
+import {resolveStudioSession,createStudioConnection} from '../../scripts/studio-session.mjs';
+const base='C:/Users/zFlei/.codex/visualizations/2026/09/15/01a0a5cb-03be-7ee2-a6cf-daf659f7ebac';
+const receipt=JSON.parse(await readFile(base+'/tracer-components-launch.json','utf8'));
+const call=createStudioConnection(resolveStudioSession({workspace:receipt.workspace,env:{...process.env,...receipt.mcp.env}}),{timeoutMs:30000});
+const catalog=await call('library.list');const entry=catalog.find(e=>e.name==='Wandering Tracers');assert.ok(entry);
+const stored=await call('library.read',{id:entry.id});
+for(const file of ['overlay.ts','paths.ts','tracer-state.ts','renderer.ts','tracer-texture.ts','tracer-spline.ts'])assert.equal(stored.source.files[file],await readFile('examples/components/wandering-tracers/'+file,'utf8'));
+const status=await call('status');assert.equal(status.authoring.fault,null);
+const evidence={id:entry.id,revision:entry.revision,name:entry.name,files:Object.keys(stored.source.files),exactSourceMatch:true,paintingRevision:status.authoring.revisionId,fault:status.authoring.fault};
+await writeFile('artifacts/tracer-components/library-publication-verified.json',JSON.stringify(evidence,null,2));console.log(JSON.stringify(evidence,null,2));

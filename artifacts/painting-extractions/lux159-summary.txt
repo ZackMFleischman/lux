@@ -1,0 +1,1 @@
+Region Hatching now owns the original line families and nine controls as an independent Library node. Per-region variety, unhatched areas, crosshatching and width character are unchanged. Published, reviewed and merged.

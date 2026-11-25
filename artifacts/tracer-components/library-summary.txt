@@ -1,0 +1,1 @@
+Published Wandering Tracers revision 1 in the canonical shared Library through the running installed Lux. Entry includes the separate path generator, watercolor renderer, overlay composition, and all helper modules. Read-back verified exact source equality for all six files. Current painting revision and healthy preview preserved. No code or ACL changes were needed.

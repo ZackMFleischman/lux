@@ -1,0 +1,4834 @@
+{
+  "draftVersion": 2,
+  "status": {
+    "connection": "connected",
+    "message": null,
+    "receivedAtMs": 1789539959001,
+    "authoring": {
+      "instanceId": "f74d1eb3-ca84-4ecd-92d4-9a00b65f6c63",
+      "generation": 1,
+      "revisionId": "1fbb7e2b262d8385a6f72719a50de79b061643b4bfae92cf2571fa4e2ea723e9",
+      "composition": {
+        "version": 2,
+        "declaration": {
+          "definitions": {
+            "paths": "paths.ts",
+            "painting": "painting.ts",
+            "renderer": "renderer.ts"
+          },
+          "nodes": [
+            {
+              "id": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+              "definition": "paths"
+            },
+            {
+              "id": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "definition": "painting"
+            },
+            {
+              "id": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+              "definition": "renderer"
+            }
+          ],
+          "edges": [
+            {
+              "id": "d10d4010-63ac-49c7-8ad7-8cf6458b5104",
+              "from": {
+                "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                "portId": "paths"
+              },
+              "to": {
+                "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                "portId": "paths"
+              },
+              "delay": "none"
+            },
+            {
+              "id": "d10d4020-63ac-49c7-8ad7-8cf6458b5105",
+              "from": {
+                "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                "portId": "paths"
+              },
+              "to": {
+                "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+                "portId": "paths"
+              },
+              "delay": "none"
+            },
+            {
+              "id": "d10d4030-63ac-49c7-8ad7-8cf6458b5106",
+              "from": {
+                "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                "portId": "image"
+              },
+              "to": {
+                "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+                "portId": "image"
+              },
+              "delay": "none"
+            }
+          ],
+          "output": {
+            "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+            "portId": "image"
+          },
+          "expose": [
+            {
+              "id": "pace",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "pace"
+            },
+            {
+              "id": "motion",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "motion"
+            },
+            {
+              "id": "phrasing",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "phrasing"
+            },
+            {
+              "id": "scale",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "scale"
+            },
+            {
+              "id": "warp",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "warp"
+            },
+            {
+              "id": "growth",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "growth"
+            },
+            {
+              "id": "seed",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "seed"
+            },
+            {
+              "id": "composition",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "composition"
+            },
+            {
+              "id": "tension",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "tension"
+            },
+            {
+              "id": "hierarchy",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "hierarchy"
+            },
+            {
+              "id": "coverage",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "coverage"
+            },
+            {
+              "id": "spacing",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "spacing"
+            },
+            {
+              "id": "curvature",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "curvature"
+            },
+            {
+              "id": "angle",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "angle"
+            },
+            {
+              "id": "hatchWidth",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "hatchWidth"
+            },
+            {
+              "id": "relation",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "relation"
+            },
+            {
+              "id": "spacingVar",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "spacingVar"
+            },
+            {
+              "id": "curvatureVar",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "curvatureVar"
+            },
+            {
+              "id": "angleVar",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "angleVar"
+            },
+            {
+              "id": "palette",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "palette"
+            },
+            {
+              "id": "warmth",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "warmth"
+            },
+            {
+              "id": "contrast",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "contrast"
+            },
+            {
+              "id": "pooling",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "pooling"
+            },
+            {
+              "id": "blooms",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "blooms"
+            },
+            {
+              "id": "outline",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "outline"
+            },
+            {
+              "id": "inkWarmth",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "inkWarmth"
+            },
+            {
+              "id": "handDrawn",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "handDrawn"
+            },
+            {
+              "id": "grain",
+              "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+              "controlId": "grain"
+            },
+            {
+              "id": "tracerCount",
+              "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+              "controlId": "count"
+            },
+            {
+              "id": "tracerSpeed",
+              "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+              "controlId": "speed"
+            },
+            {
+              "id": "tracerCurl",
+              "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+              "controlId": "curl"
+            },
+            {
+              "id": "tracerSway",
+              "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+              "controlId": "sway"
+            },
+            {
+              "id": "tracerSeed",
+              "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+              "controlId": "seed"
+            },
+            {
+              "id": "tracerWidth",
+              "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+              "controlId": "width"
+            },
+            {
+              "id": "tracerPace",
+              "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+              "controlId": "pace"
+            },
+            {
+              "id": "tracerContrast",
+              "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+              "controlId": "contrast"
+            },
+            {
+              "id": "tracerHatch",
+              "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+              "controlId": "hatch"
+            },
+            {
+              "id": "tracerBleed",
+              "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+              "controlId": "bleed"
+            }
+          ],
+          "label": "Living Painting — Shared Tracers"
+        },
+        "definitionNames": {
+          "paths": "db30e71cf6f55af0b92d41c4282b34ccb6e72509ca67a0f9ff6e0932dd16c8c8",
+          "painting": "ef604f9bf06478c27f75c6aea45fef317ae3b27345b651b21e575a10f2d07634",
+          "renderer": "7f1a2038063007ce53baac6d854fc90bacd635e23fc82e1552f021a8b2260995"
+        },
+        "moduleDeclarations": {
+          "e794e56fc7335a1692d39579a6d8037d309ea6d0ac0117e46a957df584588f1f": {
+            "modulePath": "painting-composition.ts",
+            "definitionNames": {
+              "paths": "db30e71cf6f55af0b92d41c4282b34ccb6e72509ca67a0f9ff6e0932dd16c8c8",
+              "painting": "ef604f9bf06478c27f75c6aea45fef317ae3b27345b651b21e575a10f2d07634",
+              "renderer": "7f1a2038063007ce53baac6d854fc90bacd635e23fc82e1552f021a8b2260995"
+            },
+            "declaration": {
+              "definitions": {
+                "paths": "paths.ts",
+                "painting": "painting.ts",
+                "renderer": "renderer.ts"
+              },
+              "nodes": [
+                {
+                  "id": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                  "definition": "paths"
+                },
+                {
+                  "id": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "definition": "painting"
+                },
+                {
+                  "id": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+                  "definition": "renderer"
+                }
+              ],
+              "edges": [
+                {
+                  "id": "d10d4010-63ac-49c7-8ad7-8cf6458b5104",
+                  "from": {
+                    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                    "portId": "paths"
+                  },
+                  "to": {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "portId": "paths"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "d10d4020-63ac-49c7-8ad7-8cf6458b5105",
+                  "from": {
+                    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                    "portId": "paths"
+                  },
+                  "to": {
+                    "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+                    "portId": "paths"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "d10d4030-63ac-49c7-8ad7-8cf6458b5106",
+                  "from": {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "portId": "image"
+                  },
+                  "to": {
+                    "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+                    "portId": "image"
+                  },
+                  "delay": "none"
+                }
+              ],
+              "output": {
+                "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+                "portId": "image"
+              },
+              "expose": [
+                {
+                  "id": "pace",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "pace"
+                },
+                {
+                  "id": "motion",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "motion"
+                },
+                {
+                  "id": "phrasing",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "phrasing"
+                },
+                {
+                  "id": "scale",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "scale"
+                },
+                {
+                  "id": "warp",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "warp"
+                },
+                {
+                  "id": "growth",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "growth"
+                },
+                {
+                  "id": "seed",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "seed"
+                },
+                {
+                  "id": "composition",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "composition"
+                },
+                {
+                  "id": "tension",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "tension"
+                },
+                {
+                  "id": "hierarchy",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "hierarchy"
+                },
+                {
+                  "id": "coverage",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "coverage"
+                },
+                {
+                  "id": "spacing",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "spacing"
+                },
+                {
+                  "id": "curvature",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "curvature"
+                },
+                {
+                  "id": "angle",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "angle"
+                },
+                {
+                  "id": "hatchWidth",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "hatchWidth"
+                },
+                {
+                  "id": "relation",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "relation"
+                },
+                {
+                  "id": "spacingVar",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "spacingVar"
+                },
+                {
+                  "id": "curvatureVar",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "curvatureVar"
+                },
+                {
+                  "id": "angleVar",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "angleVar"
+                },
+                {
+                  "id": "palette",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "palette"
+                },
+                {
+                  "id": "warmth",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "warmth"
+                },
+                {
+                  "id": "contrast",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "contrast"
+                },
+                {
+                  "id": "pooling",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "pooling"
+                },
+                {
+                  "id": "blooms",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "blooms"
+                },
+                {
+                  "id": "outline",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "outline"
+                },
+                {
+                  "id": "inkWarmth",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "inkWarmth"
+                },
+                {
+                  "id": "handDrawn",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "handDrawn"
+                },
+                {
+                  "id": "grain",
+                  "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "controlId": "grain"
+                },
+                {
+                  "id": "tracerCount",
+                  "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                  "controlId": "count"
+                },
+                {
+                  "id": "tracerSpeed",
+                  "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                  "controlId": "speed"
+                },
+                {
+                  "id": "tracerCurl",
+                  "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                  "controlId": "curl"
+                },
+                {
+                  "id": "tracerSway",
+                  "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                  "controlId": "sway"
+                },
+                {
+                  "id": "tracerSeed",
+                  "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                  "controlId": "seed"
+                },
+                {
+                  "id": "tracerWidth",
+                  "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                  "controlId": "width"
+                },
+                {
+                  "id": "tracerPace",
+                  "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                  "controlId": "pace"
+                },
+                {
+                  "id": "tracerContrast",
+                  "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+                  "controlId": "contrast"
+                },
+                {
+                  "id": "tracerHatch",
+                  "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+                  "controlId": "hatch"
+                },
+                {
+                  "id": "tracerBleed",
+                  "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+                  "controlId": "bleed"
+                }
+              ],
+              "label": "Living Painting — Shared Tracers"
+            }
+          }
+        },
+        "graph": {
+          "version": 2,
+          "rootDefinitionHash": "e794e56fc7335a1692d39579a6d8037d309ea6d0ac0117e46a957df584588f1f",
+          "outputPort": "image"
+        },
+        "definitions": {
+          "7f1a2038063007ce53baac6d854fc90bacd635e23fc82e1552f021a8b2260995": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "examples/wandering-tracer-renderer",
+              "label": "Wandering Tracer Renderer",
+              "description": "Paints shared tracer paths with the saved watercolor, hatch, rim, and rounded-tip treatment.",
+              "tags": [
+                "effect",
+                "tracers"
+              ],
+              "inputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Background image under the tracer pigment."
+                },
+                "paths": {
+                  "type": {
+                    "kind": "paths2d",
+                    "version": 1,
+                    "coordinateSpace": "canvas-height"
+                  },
+                  "label": "Paths",
+                  "description": "Tracer path snapshot to paint."
+                }
+              },
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Background with tracer pigment composited over it."
+                },
+                "overlay": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Overlay",
+                  "description": "Premultiplied tracer-only pigment and alpha."
+                }
+              },
+              "controls": [
+                {
+                  "id": "contrast",
+                  "type": "number",
+                  "label": "Contrast",
+                  "default": 1,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Tracer appearance",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "hatch",
+                  "type": "number",
+                  "label": "Hatching",
+                  "default": 1,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Tracer appearance",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "bleed",
+                  "type": "number",
+                  "label": "Bleed",
+                  "default": 1,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Tracer appearance",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "bleed": "Scales the original textured watercolor diffusion and edge deposit.",
+                "contrast": "Matches the saved painting at one and softens pigment and rim contrast toward zero.",
+                "hatch": "Scales the dense lifetime-seeded hatch ink without changing its spacing family."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            }
+          },
+          "db30e71cf6f55af0b92d41c4282b34ccb6e72509ca67a0f9ff6e0932dd16c8c8": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "examples/wandering-tracer-paths",
+              "label": "Wandering Tracer Paths",
+              "description": "Generates reusable paths that enter from the canvas perimeter and grow across the frame.",
+              "tags": [
+                "generator",
+                "tracers"
+              ],
+              "inputs": {},
+              "outputs": {
+                "paths": {
+                  "type": {
+                    "kind": "paths2d",
+                    "version": 1,
+                    "coordinateSpace": "canvas-height"
+                  },
+                  "label": "Paths",
+                  "description": "Grown tracer paths in centered canvas-height coordinates."
+                }
+              },
+              "controls": [
+                {
+                  "id": "count",
+                  "type": "number",
+                  "label": "Count",
+                  "default": 3,
+                  "min": 0,
+                  "max": 4,
+                  "step": 1,
+                  "group": "Tracer paths",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "speed",
+                  "type": "number",
+                  "label": "Speed",
+                  "default": 0.96,
+                  "min": 0.1,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Tracer paths",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "curl",
+                  "type": "number",
+                  "label": "Curl",
+                  "default": 2.5,
+                  "min": 0,
+                  "max": 2.5,
+                  "step": 0.01,
+                  "group": "Tracer paths",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "sway",
+                  "type": "number",
+                  "label": "Sway",
+                  "default": 0.65,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Tracer paths",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "seed",
+                  "type": "number",
+                  "label": "Seed",
+                  "default": 7,
+                  "min": 0,
+                  "max": 999,
+                  "step": 1,
+                  "group": "Tracer paths",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "width",
+                  "type": "number",
+                  "label": "Width",
+                  "default": 0.021,
+                  "min": 0.005,
+                  "max": 0.12,
+                  "step": 0.001,
+                  "group": "Tracer paths",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "pace",
+                  "type": "number",
+                  "label": "Pace",
+                  "default": 1.24,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Tracer paths",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "count": "Sets the number of independent tracer lifetimes, up to four.",
+                "curl": "Sets the stable curvature chosen for each lifetime.",
+                "pace": "Scales artistic time while deposition timestamps remain scene seconds.",
+                "seed": "Chooses perimeter entries, headings, pigments, and hatch families.",
+                "speed": "Sets how quickly each tracer head advances through canvas-height space.",
+                "sway": "Sets a subtle shared-body movement without changing the deposited route.",
+                "width": "Sets the full ribbon width in canvas-height units."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            }
+          },
+          "e794e56fc7335a1692d39579a6d8037d309ea6d0ac0117e46a957df584588f1f": {
+            "kind": "graph",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "lux/image-composition",
+              "label": "Living Painting — Shared Tracers",
+              "description": "Authored image component chain",
+              "tags": [],
+              "inputs": {},
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "Image"
+                }
+              },
+              "controls": [
+                {
+                  "id": "pace",
+                  "type": "number",
+                  "label": "Pace",
+                  "default": 1.24,
+                  "min": 0,
+                  "max": 3,
+                  "step": 0.01,
+                  "description": "pace setting for the painting.",
+                  "group": "Motion",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "motion",
+                  "type": "number",
+                  "label": "Drift",
+                  "default": 1.08,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "motion setting for the painting.",
+                  "group": "Motion",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "phrasing",
+                  "type": "number",
+                  "label": "Tension and release",
+                  "default": 1,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "phrasing setting for the painting.",
+                  "group": "Motion",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "scale",
+                  "type": "number",
+                  "label": "Scale",
+                  "default": 6.2,
+                  "min": 2,
+                  "max": 10,
+                  "step": 0.01,
+                  "description": "scale setting for the painting.",
+                  "group": "Regions",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "warp",
+                  "type": "number",
+                  "label": "Flowing bends",
+                  "default": 2.65,
+                  "min": 0,
+                  "max": 3,
+                  "step": 0.01,
+                  "description": "warp setting for the painting.",
+                  "group": "Regions",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "growth",
+                  "type": "number",
+                  "label": "Region growth",
+                  "default": 0.88,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "growth setting for the painting.",
+                  "group": "Regions",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "seed",
+                  "type": "number",
+                  "label": "Variation",
+                  "default": 7,
+                  "min": 0,
+                  "max": 100,
+                  "step": 1,
+                  "description": "seed setting for the painting.",
+                  "group": "Regions",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "composition",
+                  "type": "number",
+                  "label": "Quiet to intricate",
+                  "default": 0.44,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "composition setting for the painting.",
+                  "group": "Composition",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "tension",
+                  "type": "number",
+                  "label": "Tension",
+                  "default": 0.72,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "tension setting for the painting.",
+                  "group": "Composition",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "hierarchy",
+                  "type": "number",
+                  "label": "Large and small rhythm",
+                  "default": 0.99,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "hierarchy setting for the painting.",
+                  "group": "Composition",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "coverage",
+                  "type": "number",
+                  "label": "Coverage",
+                  "default": 0.23,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "coverage setting for the painting.",
+                  "group": "Hatching",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "spacing",
+                  "type": "number",
+                  "label": "Average spacing",
+                  "default": 0.096,
+                  "min": 0.015,
+                  "max": 0.12,
+                  "step": 0.001,
+                  "description": "spacing setting for the painting.",
+                  "group": "Hatching",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "curvature",
+                  "type": "number",
+                  "label": "Overall bend",
+                  "default": 1.52,
+                  "min": 0,
+                  "max": 3,
+                  "step": 0.01,
+                  "description": "curvature setting for the painting.",
+                  "group": "Hatching",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "angle",
+                  "type": "number",
+                  "label": "Direction bias",
+                  "default": 2.31,
+                  "min": -3.1416,
+                  "max": 3.1416,
+                  "step": 0.01,
+                  "description": "angle setting for the painting.",
+                  "group": "Hatching",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "hatchWidth",
+                  "type": "number",
+                  "label": "Average ink weight",
+                  "default": 0.12,
+                  "min": 0.035,
+                  "max": 0.4,
+                  "step": 0.005,
+                  "description": "hatchWidth setting for the painting.",
+                  "group": "Hatching",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "relation",
+                  "type": "number",
+                  "label": "Neighboring harmony",
+                  "default": 0.54,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "relation setting for the painting.",
+                  "group": "Hatching",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "spacingVar",
+                  "type": "number",
+                  "label": "Spacing variety",
+                  "default": 1,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "spacingVar setting for the painting.",
+                  "group": "Regional variety",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "curvatureVar",
+                  "type": "number",
+                  "label": "Bend variety",
+                  "default": 1,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "curvatureVar setting for the painting.",
+                  "group": "Regional variety",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "angleVar",
+                  "type": "number",
+                  "label": "Direction variety",
+                  "default": 1.19,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "angleVar setting for the painting.",
+                  "group": "Regional variety",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "palette",
+                  "type": "number",
+                  "label": "Wash lightness",
+                  "default": 0.07,
+                  "min": -1,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "palette setting for the painting.",
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "warmth",
+                  "type": "number",
+                  "label": "Warm pools",
+                  "default": 1.3,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "warmth setting for the painting.",
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "contrast",
+                  "type": "number",
+                  "label": "Region contrast",
+                  "default": 1.05,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "contrast setting for the painting.",
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "pooling",
+                  "type": "number",
+                  "label": "Pigment pooling",
+                  "default": 0.74,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "pooling setting for the painting.",
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "blooms",
+                  "type": "number",
+                  "label": "Watercolor blooms",
+                  "default": 0.94,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "blooms setting for the painting.",
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "outline",
+                  "type": "number",
+                  "label": "Boundary width",
+                  "default": 0.005,
+                  "min": 0.002,
+                  "max": 0.03,
+                  "step": 0.001,
+                  "description": "outline setting for the painting.",
+                  "group": "Ink & paper",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "inkWarmth",
+                  "type": "number",
+                  "label": "Warmth",
+                  "default": 0.15,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "inkWarmth setting for the painting.",
+                  "group": "Ink & paper",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "handDrawn",
+                  "type": "number",
+                  "label": "Hand-drawn character",
+                  "default": 1.34,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "handDrawn setting for the painting.",
+                  "group": "Ink & paper",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "grain",
+                  "type": "number",
+                  "label": "Grain",
+                  "default": 1.48,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "grain setting for the painting.",
+                  "group": "Ink & paper",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "tracerCount",
+                  "type": "number",
+                  "label": "Count",
+                  "default": 3,
+                  "min": 0,
+                  "max": 4,
+                  "step": 1,
+                  "description": "Sets the number of independent tracer lifetimes, up to four.",
+                  "group": "Tracer paths",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "tracerSpeed",
+                  "type": "number",
+                  "label": "Speed",
+                  "default": 0.96,
+                  "min": 0.1,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "Sets how quickly each tracer head advances through canvas-height space.",
+                  "group": "Tracer paths",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "tracerCurl",
+                  "type": "number",
+                  "label": "Curl",
+                  "default": 2.5,
+                  "min": 0,
+                  "max": 2.5,
+                  "step": 0.01,
+                  "description": "Sets the stable curvature chosen for each lifetime.",
+                  "group": "Tracer paths",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "tracerSway",
+                  "type": "number",
+                  "label": "Sway",
+                  "default": 0.65,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "Sets a subtle shared-body movement without changing the deposited route.",
+                  "group": "Tracer paths",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "tracerSeed",
+                  "type": "number",
+                  "label": "Seed",
+                  "default": 7,
+                  "min": 0,
+                  "max": 999,
+                  "step": 1,
+                  "description": "Chooses perimeter entries, headings, pigments, and hatch families.",
+                  "group": "Tracer paths",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "tracerWidth",
+                  "type": "number",
+                  "label": "Width",
+                  "default": 0.021,
+                  "min": 0.005,
+                  "max": 0.12,
+                  "step": 0.001,
+                  "description": "Sets the full ribbon width in canvas-height units.",
+                  "group": "Tracer paths",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "tracerPace",
+                  "type": "number",
+                  "label": "Pace",
+                  "default": 1.24,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "description": "Scales artistic time while deposition timestamps remain scene seconds.",
+                  "group": "Tracer paths",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "tracerContrast",
+                  "type": "number",
+                  "label": "Contrast",
+                  "default": 1,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Matches the saved painting at one and softens pigment and rim contrast toward zero.",
+                  "group": "Tracer appearance",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "tracerHatch",
+                  "type": "number",
+                  "label": "Hatching",
+                  "default": 1,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Scales the dense lifetime-seeded hatch ink without changing its spacing family.",
+                  "group": "Tracer appearance",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "tracerBleed",
+                  "type": "number",
+                  "label": "Bleed",
+                  "default": 1,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Scales the original textured watercolor diffusion and edge deposit.",
+                  "group": "Tracer appearance",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "angle": "angle setting for the painting.",
+                "angleVar": "angleVar setting for the painting.",
+                "blooms": "blooms setting for the painting.",
+                "composition": "composition setting for the painting.",
+                "contrast": "contrast setting for the painting.",
+                "coverage": "coverage setting for the painting.",
+                "curvature": "curvature setting for the painting.",
+                "curvatureVar": "curvatureVar setting for the painting.",
+                "grain": "grain setting for the painting.",
+                "growth": "growth setting for the painting.",
+                "handDrawn": "handDrawn setting for the painting.",
+                "hatchWidth": "hatchWidth setting for the painting.",
+                "hierarchy": "hierarchy setting for the painting.",
+                "inkWarmth": "inkWarmth setting for the painting.",
+                "motion": "motion setting for the painting.",
+                "outline": "outline setting for the painting.",
+                "pace": "pace setting for the painting.",
+                "palette": "palette setting for the painting.",
+                "phrasing": "phrasing setting for the painting.",
+                "pooling": "pooling setting for the painting.",
+                "relation": "relation setting for the painting.",
+                "scale": "scale setting for the painting.",
+                "seed": "seed setting for the painting.",
+                "spacing": "spacing setting for the painting.",
+                "spacingVar": "spacingVar setting for the painting.",
+                "tension": "tension setting for the painting.",
+                "tracerBleed": "Scales the original textured watercolor diffusion and edge deposit.",
+                "tracerContrast": "Matches the saved painting at one and softens pigment and rim contrast toward zero.",
+                "tracerCount": "Sets the number of independent tracer lifetimes, up to four.",
+                "tracerCurl": "Sets the stable curvature chosen for each lifetime.",
+                "tracerHatch": "Scales the dense lifetime-seeded hatch ink without changing its spacing family.",
+                "tracerPace": "Scales artistic time while deposition timestamps remain scene seconds.",
+                "tracerSeed": "Chooses perimeter entries, headings, pigments, and hatch families.",
+                "tracerSpeed": "Sets how quickly each tracer head advances through canvas-height space.",
+                "tracerSway": "Sets a subtle shared-body movement without changing the deposited route.",
+                "tracerWidth": "Sets the full ribbon width in canvas-height units.",
+                "warmth": "warmth setting for the painting.",
+                "warp": "warp setting for the painting."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            },
+            "body": {
+              "nodes": [
+                {
+                  "id": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                  "definitionHash": "db30e71cf6f55af0b92d41c4282b34ccb6e72509ca67a0f9ff6e0932dd16c8c8",
+                  "controlDefaults": {}
+                },
+                {
+                  "id": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                  "definitionHash": "ef604f9bf06478c27f75c6aea45fef317ae3b27345b651b21e575a10f2d07634",
+                  "controlDefaults": {}
+                },
+                {
+                  "id": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+                  "definitionHash": "7f1a2038063007ce53baac6d854fc90bacd635e23fc82e1552f021a8b2260995",
+                  "controlDefaults": {}
+                }
+              ],
+              "edges": [
+                {
+                  "id": "d10d4010-63ac-49c7-8ad7-8cf6458b5104",
+                  "from": {
+                    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                    "portId": "paths"
+                  },
+                  "to": {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "portId": "paths"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "d10d4020-63ac-49c7-8ad7-8cf6458b5105",
+                  "from": {
+                    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                    "portId": "paths"
+                  },
+                  "to": {
+                    "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+                    "portId": "paths"
+                  },
+                  "delay": "none"
+                },
+                {
+                  "id": "d10d4030-63ac-49c7-8ad7-8cf6458b5106",
+                  "from": {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "portId": "image"
+                  },
+                  "to": {
+                    "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+                    "portId": "image"
+                  },
+                  "delay": "none"
+                }
+              ],
+              "inputBindings": {},
+              "outputBindings": {
+                "image": {
+                  "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+                  "portId": "image"
+                }
+              },
+              "controlBindings": {
+                "angle": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "angle"
+                  }
+                ],
+                "angleVar": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "angleVar"
+                  }
+                ],
+                "blooms": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "blooms"
+                  }
+                ],
+                "composition": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "composition"
+                  }
+                ],
+                "contrast": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "contrast"
+                  }
+                ],
+                "coverage": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "coverage"
+                  }
+                ],
+                "curvature": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "curvature"
+                  }
+                ],
+                "curvatureVar": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "curvatureVar"
+                  }
+                ],
+                "grain": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "grain"
+                  }
+                ],
+                "growth": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "growth"
+                  }
+                ],
+                "handDrawn": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "handDrawn"
+                  }
+                ],
+                "hatchWidth": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "hatchWidth"
+                  }
+                ],
+                "hierarchy": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "hierarchy"
+                  }
+                ],
+                "inkWarmth": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "inkWarmth"
+                  }
+                ],
+                "motion": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "motion"
+                  }
+                ],
+                "outline": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "outline"
+                  }
+                ],
+                "pace": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "pace"
+                  }
+                ],
+                "palette": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "palette"
+                  }
+                ],
+                "phrasing": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "phrasing"
+                  }
+                ],
+                "pooling": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "pooling"
+                  }
+                ],
+                "relation": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "relation"
+                  }
+                ],
+                "scale": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "scale"
+                  }
+                ],
+                "seed": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "seed"
+                  }
+                ],
+                "spacing": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "spacing"
+                  }
+                ],
+                "spacingVar": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "spacingVar"
+                  }
+                ],
+                "tension": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "tension"
+                  }
+                ],
+                "tracerBleed": [
+                  {
+                    "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+                    "controlId": "bleed"
+                  }
+                ],
+                "tracerContrast": [
+                  {
+                    "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+                    "controlId": "contrast"
+                  }
+                ],
+                "tracerCount": [
+                  {
+                    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                    "controlId": "count"
+                  }
+                ],
+                "tracerCurl": [
+                  {
+                    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                    "controlId": "curl"
+                  }
+                ],
+                "tracerHatch": [
+                  {
+                    "nodeId": "d10d3030-63ac-49c7-8ad7-8cf6458b5103",
+                    "controlId": "hatch"
+                  }
+                ],
+                "tracerPace": [
+                  {
+                    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                    "controlId": "pace"
+                  }
+                ],
+                "tracerSeed": [
+                  {
+                    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                    "controlId": "seed"
+                  }
+                ],
+                "tracerSpeed": [
+                  {
+                    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                    "controlId": "speed"
+                  }
+                ],
+                "tracerSway": [
+                  {
+                    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                    "controlId": "sway"
+                  }
+                ],
+                "tracerWidth": [
+                  {
+                    "nodeId": "d10d1010-63ac-49c7-8ad7-8cf6458b5101",
+                    "controlId": "width"
+                  }
+                ],
+                "warmth": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "warmth"
+                  }
+                ],
+                "warp": [
+                  {
+                    "nodeId": "d10d2020-63ac-49c7-8ad7-8cf6458b5102",
+                    "controlId": "warp"
+                  }
+                ]
+              }
+            }
+          },
+          "ef604f9bf06478c27f75c6aea45fef317ae3b27345b651b21e575a10f2d07634": {
+            "kind": "code",
+            "metadata": {
+              "declarationVersion": 1,
+              "key": "lux/living-painting",
+              "label": "Living Painting",
+              "description": "Organic watercolor regions that adopt new colors and hatch styles when shared tracer paths cross them.",
+              "tags": [
+                "painting",
+                "regions",
+                "watercolor"
+              ],
+              "inputs": {
+                "paths": {
+                  "type": {
+                    "kind": "paths2d",
+                    "version": 1,
+                    "coordinateSpace": "canvas-height"
+                  },
+                  "label": "Paths",
+                  "description": "Shared tracer geometry used to carve the regions."
+                }
+              },
+              "outputs": {
+                "image": {
+                  "type": {
+                    "kind": "image",
+                    "colorSpace": "linear-srgb",
+                    "alphaMode": "premultiplied"
+                  },
+                  "label": "Image",
+                  "description": "The painting before tracer ink is composited."
+                }
+              },
+              "controls": [
+                {
+                  "id": "pace",
+                  "type": "number",
+                  "label": "Pace",
+                  "default": 1.24,
+                  "min": 0,
+                  "max": 3,
+                  "step": 0.01,
+                  "group": "Motion",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "motion",
+                  "type": "number",
+                  "label": "Drift",
+                  "default": 1.08,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "group": "Motion",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "phrasing",
+                  "type": "number",
+                  "label": "Tension and release",
+                  "default": 1,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Slow build, crest, release, and rest. Shapes lead; linework and color follow.",
+                  "group": "Motion",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "scale",
+                  "type": "number",
+                  "label": "Scale",
+                  "default": 6.2,
+                  "min": 2,
+                  "max": 10,
+                  "step": 0.01,
+                  "group": "Regions",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "warp",
+                  "type": "number",
+                  "label": "Flowing bends",
+                  "default": 2.65,
+                  "min": 0,
+                  "max": 3,
+                  "step": 0.01,
+                  "group": "Regions",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "growth",
+                  "type": "number",
+                  "label": "Region growth",
+                  "default": 0.88,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "group": "Regions",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "seed",
+                  "type": "number",
+                  "label": "Variation",
+                  "default": 7,
+                  "min": 0,
+                  "max": 100,
+                  "step": 1,
+                  "group": "Regions",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "composition",
+                  "type": "number",
+                  "label": "Quiet to intricate",
+                  "default": 0.44,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "group": "Composition",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "tension",
+                  "type": "number",
+                  "label": "Tension",
+                  "default": 0.72,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "Strength of local pressure, contrasting line directions, and rhythmic compression.",
+                  "group": "Composition",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "hierarchy",
+                  "type": "number",
+                  "label": "Large and small rhythm",
+                  "default": 0.99,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "description": "Large anchor regions alternate with smaller supporting regions.",
+                  "group": "Composition",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "coverage",
+                  "type": "number",
+                  "label": "Coverage",
+                  "default": 0.23,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Hatching",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "spacing",
+                  "type": "number",
+                  "label": "Average spacing",
+                  "default": 0.096,
+                  "min": 0.015,
+                  "max": 0.12,
+                  "step": 0.001,
+                  "description": "Overall spacing scale. Each region keeps its own spacing ratio.",
+                  "group": "Hatching",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "curvature",
+                  "type": "number",
+                  "label": "Overall bend",
+                  "default": 1.52,
+                  "min": 0,
+                  "max": 3,
+                  "step": 0.01,
+                  "description": "Strength of distinct regional styles: restrained lines, sweeping curves, fans, and contours.",
+                  "group": "Hatching",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "angle",
+                  "type": "number",
+                  "label": "Direction bias",
+                  "default": 2.31,
+                  "min": -3.1416,
+                  "max": 3.1416,
+                  "step": 0.01,
+                  "description": "Shifts the overall direction while preserving regional relationships.",
+                  "group": "Hatching",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "hatchWidth",
+                  "type": "number",
+                  "label": "Average ink weight",
+                  "default": 0.12,
+                  "min": 0.035,
+                  "max": 0.4,
+                  "step": 0.005,
+                  "description": "Overall stroke weight. Dense patterns tend toward finer strokes; open patterns can carry heavier marks.",
+                  "group": "Hatching",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "relation",
+                  "type": "number",
+                  "label": "Neighboring harmony",
+                  "default": 0.54,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "description": "Neighboring patterns share direction, with occasional opposing accents.",
+                  "group": "Hatching",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "spacingVar",
+                  "type": "number",
+                  "label": "Spacing variety",
+                  "default": 1,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Regional variety",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "curvatureVar",
+                  "type": "number",
+                  "label": "Bend variety",
+                  "default": 1,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Regional variety",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "angleVar",
+                  "type": "number",
+                  "label": "Direction variety",
+                  "default": 1.19,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "group": "Regional variety",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "palette",
+                  "type": "number",
+                  "label": "Wash lightness",
+                  "default": 0.07,
+                  "min": -1,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "warmth",
+                  "type": "number",
+                  "label": "Warm pools",
+                  "default": 1.3,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "contrast",
+                  "type": "number",
+                  "label": "Region contrast",
+                  "default": 1.05,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "pooling",
+                  "type": "number",
+                  "label": "Pigment pooling",
+                  "default": 0.74,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "blooms",
+                  "type": "number",
+                  "label": "Watercolor blooms",
+                  "default": 0.94,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Color & watercolor",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "outline",
+                  "type": "number",
+                  "label": "Boundary width",
+                  "default": 0.005,
+                  "min": 0.002,
+                  "max": 0.03,
+                  "step": 0.001,
+                  "group": "Ink & paper",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "inkWarmth",
+                  "type": "number",
+                  "label": "Warmth",
+                  "default": 0.15,
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01,
+                  "group": "Ink & paper",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "handDrawn",
+                  "type": "number",
+                  "label": "Hand-drawn character",
+                  "default": 1.34,
+                  "min": 0,
+                  "max": 1.5,
+                  "step": 0.01,
+                  "group": "Ink & paper",
+                  "changeCost": "live"
+                },
+                {
+                  "id": "grain",
+                  "type": "number",
+                  "label": "Grain",
+                  "default": 1.48,
+                  "min": 0,
+                  "max": 2,
+                  "step": 0.01,
+                  "group": "Ink & paper",
+                  "changeCost": "live"
+                }
+              ],
+              "controlDescriptions": {
+                "angle": "angle setting for the painting.",
+                "angleVar": "angleVar setting for the painting.",
+                "blooms": "blooms setting for the painting.",
+                "composition": "composition setting for the painting.",
+                "contrast": "contrast setting for the painting.",
+                "coverage": "coverage setting for the painting.",
+                "curvature": "curvature setting for the painting.",
+                "curvatureVar": "curvatureVar setting for the painting.",
+                "grain": "grain setting for the painting.",
+                "growth": "growth setting for the painting.",
+                "handDrawn": "handDrawn setting for the painting.",
+                "hatchWidth": "hatchWidth setting for the painting.",
+                "hierarchy": "hierarchy setting for the painting.",
+                "inkWarmth": "inkWarmth setting for the painting.",
+                "motion": "motion setting for the painting.",
+                "outline": "outline setting for the painting.",
+                "pace": "pace setting for the painting.",
+                "palette": "palette setting for the painting.",
+                "phrasing": "phrasing setting for the painting.",
+                "pooling": "pooling setting for the painting.",
+                "relation": "relation setting for the painting.",
+                "scale": "scale setting for the painting.",
+                "seed": "seed setting for the painting.",
+                "spacing": "spacing setting for the painting.",
+                "spacingVar": "spacingVar setting for the painting.",
+                "tension": "tension setting for the painting.",
+                "warmth": "warmth setting for the painting.",
+                "warp": "warp setting for the painting."
+              },
+              "lifecycle": {
+                "state": "stateful",
+                "reset": "seed"
+              }
+            }
+          }
+        },
+        "publicControls": [
+          {
+            "id": "pace",
+            "type": "number",
+            "label": "Pace",
+            "default": 1.24,
+            "min": 0,
+            "max": 3,
+            "step": 0.01,
+            "description": "pace setting for the painting.",
+            "group": "Motion",
+            "changeCost": "live"
+          },
+          {
+            "id": "motion",
+            "type": "number",
+            "label": "Drift",
+            "default": 1.08,
+            "min": 0,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "motion setting for the painting.",
+            "group": "Motion",
+            "changeCost": "live"
+          },
+          {
+            "id": "phrasing",
+            "type": "number",
+            "label": "Tension and release",
+            "default": 1,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "phrasing setting for the painting.",
+            "group": "Motion",
+            "changeCost": "live"
+          },
+          {
+            "id": "scale",
+            "type": "number",
+            "label": "Scale",
+            "default": 6.2,
+            "min": 2,
+            "max": 10,
+            "step": 0.01,
+            "description": "scale setting for the painting.",
+            "group": "Regions",
+            "changeCost": "live"
+          },
+          {
+            "id": "warp",
+            "type": "number",
+            "label": "Flowing bends",
+            "default": 2.65,
+            "min": 0,
+            "max": 3,
+            "step": 0.01,
+            "description": "warp setting for the painting.",
+            "group": "Regions",
+            "changeCost": "live"
+          },
+          {
+            "id": "growth",
+            "type": "number",
+            "label": "Region growth",
+            "default": 0.88,
+            "min": 0,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "growth setting for the painting.",
+            "group": "Regions",
+            "changeCost": "live"
+          },
+          {
+            "id": "seed",
+            "type": "number",
+            "label": "Variation",
+            "default": 7,
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "description": "seed setting for the painting.",
+            "group": "Regions",
+            "changeCost": "live"
+          },
+          {
+            "id": "composition",
+            "type": "number",
+            "label": "Quiet to intricate",
+            "default": 0.44,
+            "min": 0,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "composition setting for the painting.",
+            "group": "Composition",
+            "changeCost": "live"
+          },
+          {
+            "id": "tension",
+            "type": "number",
+            "label": "Tension",
+            "default": 0.72,
+            "min": 0,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "tension setting for the painting.",
+            "group": "Composition",
+            "changeCost": "live"
+          },
+          {
+            "id": "hierarchy",
+            "type": "number",
+            "label": "Large and small rhythm",
+            "default": 0.99,
+            "min": 0,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "hierarchy setting for the painting.",
+            "group": "Composition",
+            "changeCost": "live"
+          },
+          {
+            "id": "coverage",
+            "type": "number",
+            "label": "Coverage",
+            "default": 0.23,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "coverage setting for the painting.",
+            "group": "Hatching",
+            "changeCost": "live"
+          },
+          {
+            "id": "spacing",
+            "type": "number",
+            "label": "Average spacing",
+            "default": 0.096,
+            "min": 0.015,
+            "max": 0.12,
+            "step": 0.001,
+            "description": "spacing setting for the painting.",
+            "group": "Hatching",
+            "changeCost": "live"
+          },
+          {
+            "id": "curvature",
+            "type": "number",
+            "label": "Overall bend",
+            "default": 1.52,
+            "min": 0,
+            "max": 3,
+            "step": 0.01,
+            "description": "curvature setting for the painting.",
+            "group": "Hatching",
+            "changeCost": "live"
+          },
+          {
+            "id": "angle",
+            "type": "number",
+            "label": "Direction bias",
+            "default": 2.31,
+            "min": -3.1416,
+            "max": 3.1416,
+            "step": 0.01,
+            "description": "angle setting for the painting.",
+            "group": "Hatching",
+            "changeCost": "live"
+          },
+          {
+            "id": "hatchWidth",
+            "type": "number",
+            "label": "Average ink weight",
+            "default": 0.12,
+            "min": 0.035,
+            "max": 0.4,
+            "step": 0.005,
+            "description": "hatchWidth setting for the painting.",
+            "group": "Hatching",
+            "changeCost": "live"
+          },
+          {
+            "id": "relation",
+            "type": "number",
+            "label": "Neighboring harmony",
+            "default": 0.54,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "relation setting for the painting.",
+            "group": "Hatching",
+            "changeCost": "live"
+          },
+          {
+            "id": "spacingVar",
+            "type": "number",
+            "label": "Spacing variety",
+            "default": 1,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "spacingVar setting for the painting.",
+            "group": "Regional variety",
+            "changeCost": "live"
+          },
+          {
+            "id": "curvatureVar",
+            "type": "number",
+            "label": "Bend variety",
+            "default": 1,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "curvatureVar setting for the painting.",
+            "group": "Regional variety",
+            "changeCost": "live"
+          },
+          {
+            "id": "angleVar",
+            "type": "number",
+            "label": "Direction variety",
+            "default": 1.19,
+            "min": 0,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "angleVar setting for the painting.",
+            "group": "Regional variety",
+            "changeCost": "live"
+          },
+          {
+            "id": "palette",
+            "type": "number",
+            "label": "Wash lightness",
+            "default": 0.07,
+            "min": -1,
+            "max": 1,
+            "step": 0.01,
+            "description": "palette setting for the painting.",
+            "group": "Color & watercolor",
+            "changeCost": "live"
+          },
+          {
+            "id": "warmth",
+            "type": "number",
+            "label": "Warm pools",
+            "default": 1.3,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "description": "warmth setting for the painting.",
+            "group": "Color & watercolor",
+            "changeCost": "live"
+          },
+          {
+            "id": "contrast",
+            "type": "number",
+            "label": "Region contrast",
+            "default": 1.05,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "description": "contrast setting for the painting.",
+            "group": "Color & watercolor",
+            "changeCost": "live"
+          },
+          {
+            "id": "pooling",
+            "type": "number",
+            "label": "Pigment pooling",
+            "default": 0.74,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "description": "pooling setting for the painting.",
+            "group": "Color & watercolor",
+            "changeCost": "live"
+          },
+          {
+            "id": "blooms",
+            "type": "number",
+            "label": "Watercolor blooms",
+            "default": 0.94,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "description": "blooms setting for the painting.",
+            "group": "Color & watercolor",
+            "changeCost": "live"
+          },
+          {
+            "id": "outline",
+            "type": "number",
+            "label": "Boundary width",
+            "default": 0.005,
+            "min": 0.002,
+            "max": 0.03,
+            "step": 0.001,
+            "description": "outline setting for the painting.",
+            "group": "Ink & paper",
+            "changeCost": "live"
+          },
+          {
+            "id": "inkWarmth",
+            "type": "number",
+            "label": "Warmth",
+            "default": 0.15,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "inkWarmth setting for the painting.",
+            "group": "Ink & paper",
+            "changeCost": "live"
+          },
+          {
+            "id": "handDrawn",
+            "type": "number",
+            "label": "Hand-drawn character",
+            "default": 1.34,
+            "min": 0,
+            "max": 1.5,
+            "step": 0.01,
+            "description": "handDrawn setting for the painting.",
+            "group": "Ink & paper",
+            "changeCost": "live"
+          },
+          {
+            "id": "grain",
+            "type": "number",
+            "label": "Grain",
+            "default": 1.48,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "description": "grain setting for the painting.",
+            "group": "Ink & paper",
+            "changeCost": "live"
+          },
+          {
+            "id": "tracerCount",
+            "type": "number",
+            "label": "Count",
+            "default": 3,
+            "min": 0,
+            "max": 4,
+            "step": 1,
+            "description": "Sets the number of independent tracer lifetimes, up to four.",
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "tracerSpeed",
+            "type": "number",
+            "label": "Speed",
+            "default": 0.96,
+            "min": 0.1,
+            "max": 2,
+            "step": 0.01,
+            "description": "Sets how quickly each tracer head advances through canvas-height space.",
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "tracerCurl",
+            "type": "number",
+            "label": "Curl",
+            "default": 2.5,
+            "min": 0,
+            "max": 2.5,
+            "step": 0.01,
+            "description": "Sets the stable curvature chosen for each lifetime.",
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "tracerSway",
+            "type": "number",
+            "label": "Sway",
+            "default": 0.65,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "description": "Sets a subtle shared-body movement without changing the deposited route.",
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "tracerSeed",
+            "type": "number",
+            "label": "Seed",
+            "default": 7,
+            "min": 0,
+            "max": 999,
+            "step": 1,
+            "description": "Chooses perimeter entries, headings, pigments, and hatch families.",
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "tracerWidth",
+            "type": "number",
+            "label": "Width",
+            "default": 0.021,
+            "min": 0.005,
+            "max": 0.12,
+            "step": 0.001,
+            "description": "Sets the full ribbon width in canvas-height units.",
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "tracerPace",
+            "type": "number",
+            "label": "Pace",
+            "default": 1.24,
+            "min": 0,
+            "max": 2,
+            "step": 0.01,
+            "description": "Scales artistic time while deposition timestamps remain scene seconds.",
+            "group": "Tracer paths",
+            "changeCost": "live"
+          },
+          {
+            "id": "tracerContrast",
+            "type": "number",
+            "label": "Contrast",
+            "default": 1,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "Matches the saved painting at one and softens pigment and rim contrast toward zero.",
+            "group": "Tracer appearance",
+            "changeCost": "live"
+          },
+          {
+            "id": "tracerHatch",
+            "type": "number",
+            "label": "Hatching",
+            "default": 1,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "Scales the dense lifetime-seeded hatch ink without changing its spacing family.",
+            "group": "Tracer appearance",
+            "changeCost": "live"
+          },
+          {
+            "id": "tracerBleed",
+            "type": "number",
+            "label": "Bleed",
+            "default": 1,
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "description": "Scales the original textured watercolor diffusion and edge deposit.",
+            "group": "Tracer appearance",
+            "changeCost": "live"
+          }
+        ],
+        "publicControlBindings": {
+          "pace": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "pace",
+              "active": true
+            }
+          ],
+          "motion": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "motion",
+              "active": true
+            }
+          ],
+          "phrasing": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "phrasing",
+              "active": true
+            }
+          ],
+          "scale": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "scale",
+              "active": true
+            }
+          ],
+          "warp": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "warp",
+              "active": true
+            }
+          ],
+          "growth": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "growth",
+              "active": true
+            }
+          ],
+          "seed": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "seed",
+              "active": true
+            }
+          ],
+          "composition": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "composition",
+              "active": true
+            }
+          ],
+          "tension": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "tension",
+              "active": true
+            }
+          ],
+          "hierarchy": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "hierarchy",
+              "active": true
+            }
+          ],
+          "coverage": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "coverage",
+              "active": true
+            }
+          ],
+          "spacing": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "spacing",
+              "active": true
+            }
+          ],
+          "curvature": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "curvature",
+              "active": true
+            }
+          ],
+          "angle": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "angle",
+              "active": true
+            }
+          ],
+          "hatchWidth": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "hatchWidth",
+              "active": true
+            }
+          ],
+          "relation": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "relation",
+              "active": true
+            }
+          ],
+          "spacingVar": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "spacingVar",
+              "active": true
+            }
+          ],
+          "curvatureVar": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "curvatureVar",
+              "active": true
+            }
+          ],
+          "angleVar": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "angleVar",
+              "active": true
+            }
+          ],
+          "palette": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "palette",
+              "active": true
+            }
+          ],
+          "warmth": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "warmth",
+              "active": true
+            }
+          ],
+          "contrast": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "contrast",
+              "active": true
+            }
+          ],
+          "pooling": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "pooling",
+              "active": true
+            }
+          ],
+          "blooms": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "blooms",
+              "active": true
+            }
+          ],
+          "outline": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "outline",
+              "active": true
+            }
+          ],
+          "inkWarmth": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "inkWarmth",
+              "active": true
+            }
+          ],
+          "handDrawn": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "handDrawn",
+              "active": true
+            }
+          ],
+          "grain": [
+            {
+              "nodePath": [
+                "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+              ],
+              "controlId": "grain",
+              "active": true
+            }
+          ],
+          "tracerCount": [
+            {
+              "nodePath": [
+                "d10d1010-63ac-49c7-8ad7-8cf6458b5101"
+              ],
+              "controlId": "count",
+              "active": true
+            }
+          ],
+          "tracerSpeed": [
+            {
+              "nodePath": [
+                "d10d1010-63ac-49c7-8ad7-8cf6458b5101"
+              ],
+              "controlId": "speed",
+              "active": true
+            }
+          ],
+          "tracerCurl": [
+            {
+              "nodePath": [
+                "d10d1010-63ac-49c7-8ad7-8cf6458b5101"
+              ],
+              "controlId": "curl",
+              "active": true
+            }
+          ],
+          "tracerSway": [
+            {
+              "nodePath": [
+                "d10d1010-63ac-49c7-8ad7-8cf6458b5101"
+              ],
+              "controlId": "sway",
+              "active": true
+            }
+          ],
+          "tracerSeed": [
+            {
+              "nodePath": [
+                "d10d1010-63ac-49c7-8ad7-8cf6458b5101"
+              ],
+              "controlId": "seed",
+              "active": true
+            }
+          ],
+          "tracerWidth": [
+            {
+              "nodePath": [
+                "d10d1010-63ac-49c7-8ad7-8cf6458b5101"
+              ],
+              "controlId": "width",
+              "active": true
+            }
+          ],
+          "tracerPace": [
+            {
+              "nodePath": [
+                "d10d1010-63ac-49c7-8ad7-8cf6458b5101"
+              ],
+              "controlId": "pace",
+              "active": true
+            }
+          ],
+          "tracerContrast": [
+            {
+              "nodePath": [
+                "d10d3030-63ac-49c7-8ad7-8cf6458b5103"
+              ],
+              "controlId": "contrast",
+              "active": true
+            }
+          ],
+          "tracerHatch": [
+            {
+              "nodePath": [
+                "d10d3030-63ac-49c7-8ad7-8cf6458b5103"
+              ],
+              "controlId": "hatch",
+              "active": true
+            }
+          ],
+          "tracerBleed": [
+            {
+              "nodePath": [
+                "d10d3030-63ac-49c7-8ad7-8cf6458b5103"
+              ],
+              "controlId": "bleed",
+              "active": true
+            }
+          ]
+        },
+        "nodes": [
+          {
+            "nodePath": [
+              "d10d1010-63ac-49c7-8ad7-8cf6458b5101"
+            ],
+            "definitionHash": "db30e71cf6f55af0b92d41c4282b34ccb6e72509ca67a0f9ff6e0932dd16c8c8",
+            "schema": [
+              {
+                "id": "count",
+                "type": "number",
+                "label": "Count",
+                "default": 3,
+                "min": 0,
+                "max": 4,
+                "step": 1,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "speed",
+                "type": "number",
+                "label": "Speed",
+                "default": 0.96,
+                "min": 0.1,
+                "max": 2,
+                "step": 0.01,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "curl",
+                "type": "number",
+                "label": "Curl",
+                "default": 2.5,
+                "min": 0,
+                "max": 2.5,
+                "step": 0.01,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "sway",
+                "type": "number",
+                "label": "Sway",
+                "default": 0.65,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "seed",
+                "type": "number",
+                "label": "Seed",
+                "default": 7,
+                "min": 0,
+                "max": 999,
+                "step": 1,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "width",
+                "type": "number",
+                "label": "Width",
+                "default": 0.021,
+                "min": 0.005,
+                "max": 0.12,
+                "step": 0.001,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "pace",
+                "type": "number",
+                "label": "Pace",
+                "default": 1.24,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "013f95fd3d496ea3ae5b52247ceff2e2b53640ca200f890d94932164e49b5192"
+          },
+          {
+            "nodePath": [
+              "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+            ],
+            "definitionHash": "ef604f9bf06478c27f75c6aea45fef317ae3b27345b651b21e575a10f2d07634",
+            "schema": [
+              {
+                "id": "pace",
+                "type": "number",
+                "label": "Pace",
+                "default": 1.24,
+                "min": 0,
+                "max": 3,
+                "step": 0.01,
+                "group": "Motion",
+                "changeCost": "live"
+              },
+              {
+                "id": "motion",
+                "type": "number",
+                "label": "Drift",
+                "default": 1.08,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Motion",
+                "changeCost": "live"
+              },
+              {
+                "id": "phrasing",
+                "type": "number",
+                "label": "Tension and release",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Slow build, crest, release, and rest. Shapes lead; linework and color follow.",
+                "group": "Motion",
+                "changeCost": "live"
+              },
+              {
+                "id": "scale",
+                "type": "number",
+                "label": "Scale",
+                "default": 6.2,
+                "min": 2,
+                "max": 10,
+                "step": 0.01,
+                "group": "Regions",
+                "changeCost": "live"
+              },
+              {
+                "id": "warp",
+                "type": "number",
+                "label": "Flowing bends",
+                "default": 2.65,
+                "min": 0,
+                "max": 3,
+                "step": 0.01,
+                "group": "Regions",
+                "changeCost": "live"
+              },
+              {
+                "id": "growth",
+                "type": "number",
+                "label": "Region growth",
+                "default": 0.88,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Regions",
+                "changeCost": "live"
+              },
+              {
+                "id": "seed",
+                "type": "number",
+                "label": "Variation",
+                "default": 7,
+                "min": 0,
+                "max": 100,
+                "step": 1,
+                "group": "Regions",
+                "changeCost": "live"
+              },
+              {
+                "id": "composition",
+                "type": "number",
+                "label": "Quiet to intricate",
+                "default": 0.44,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Composition",
+                "changeCost": "live"
+              },
+              {
+                "id": "tension",
+                "type": "number",
+                "label": "Tension",
+                "default": 0.72,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "description": "Strength of local pressure, contrasting line directions, and rhythmic compression.",
+                "group": "Composition",
+                "changeCost": "live"
+              },
+              {
+                "id": "hierarchy",
+                "type": "number",
+                "label": "Large and small rhythm",
+                "default": 0.99,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "description": "Large anchor regions alternate with smaller supporting regions.",
+                "group": "Composition",
+                "changeCost": "live"
+              },
+              {
+                "id": "coverage",
+                "type": "number",
+                "label": "Coverage",
+                "default": 0.23,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "spacing",
+                "type": "number",
+                "label": "Average spacing",
+                "default": 0.096,
+                "min": 0.015,
+                "max": 0.12,
+                "step": 0.001,
+                "description": "Overall spacing scale. Each region keeps its own spacing ratio.",
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "curvature",
+                "type": "number",
+                "label": "Overall bend",
+                "default": 1.52,
+                "min": 0,
+                "max": 3,
+                "step": 0.01,
+                "description": "Strength of distinct regional styles: restrained lines, sweeping curves, fans, and contours.",
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "angle",
+                "type": "number",
+                "label": "Direction bias",
+                "default": 2.31,
+                "min": -3.1416,
+                "max": 3.1416,
+                "step": 0.01,
+                "description": "Shifts the overall direction while preserving regional relationships.",
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "hatchWidth",
+                "type": "number",
+                "label": "Average ink weight",
+                "default": 0.12,
+                "min": 0.035,
+                "max": 0.4,
+                "step": 0.005,
+                "description": "Overall stroke weight. Dense patterns tend toward finer strokes; open patterns can carry heavier marks.",
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "relation",
+                "type": "number",
+                "label": "Neighboring harmony",
+                "default": 0.54,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Neighboring patterns share direction, with occasional opposing accents.",
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "spacingVar",
+                "type": "number",
+                "label": "Spacing variety",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Regional variety",
+                "changeCost": "live"
+              },
+              {
+                "id": "curvatureVar",
+                "type": "number",
+                "label": "Bend variety",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Regional variety",
+                "changeCost": "live"
+              },
+              {
+                "id": "angleVar",
+                "type": "number",
+                "label": "Direction variety",
+                "default": 1.19,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Regional variety",
+                "changeCost": "live"
+              },
+              {
+                "id": "palette",
+                "type": "number",
+                "label": "Wash lightness",
+                "default": 0.07,
+                "min": -1,
+                "max": 1,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "warmth",
+                "type": "number",
+                "label": "Warm pools",
+                "default": 1.3,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "contrast",
+                "type": "number",
+                "label": "Region contrast",
+                "default": 1.05,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "pooling",
+                "type": "number",
+                "label": "Pigment pooling",
+                "default": 0.74,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "blooms",
+                "type": "number",
+                "label": "Watercolor blooms",
+                "default": 0.94,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "outline",
+                "type": "number",
+                "label": "Boundary width",
+                "default": 0.005,
+                "min": 0.002,
+                "max": 0.03,
+                "step": 0.001,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "inkWarmth",
+                "type": "number",
+                "label": "Warmth",
+                "default": 0.15,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "handDrawn",
+                "type": "number",
+                "label": "Hand-drawn character",
+                "default": 1.34,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "grain",
+                "type": "number",
+                "label": "Grain",
+                "default": 1.48,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "27020d098ddd4d84424541e8a43c5a6da04599f7ab1b15e832ffe360d75d5a7b"
+          },
+          {
+            "nodePath": [
+              "d10d3030-63ac-49c7-8ad7-8cf6458b5103"
+            ],
+            "definitionHash": "7f1a2038063007ce53baac6d854fc90bacd635e23fc82e1552f021a8b2260995",
+            "schema": [
+              {
+                "id": "contrast",
+                "type": "number",
+                "label": "Contrast",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              },
+              {
+                "id": "hatch",
+                "type": "number",
+                "label": "Hatching",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              },
+              {
+                "id": "bleed",
+                "type": "number",
+                "label": "Bleed",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "3dd6cb33c65c8976e5a6a1801876d8b1f7d56b98d385f757f96d52036883e502"
+          }
+        ]
+      },
+      "sceneName": "Untitled visual",
+      "authority": "studio",
+      "playback": "playing",
+      "sdkVersion": "0.4.0",
+      "controlSchema": [
+        {
+          "id": "pace",
+          "type": "number",
+          "label": "Pace",
+          "default": 1.24,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "description": "pace setting for the painting.",
+          "group": "Motion",
+          "changeCost": "live"
+        },
+        {
+          "id": "motion",
+          "type": "number",
+          "label": "Drift",
+          "default": 1.08,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "motion setting for the painting.",
+          "group": "Motion",
+          "changeCost": "live"
+        },
+        {
+          "id": "phrasing",
+          "type": "number",
+          "label": "Tension and release",
+          "default": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "phrasing setting for the painting.",
+          "group": "Motion",
+          "changeCost": "live"
+        },
+        {
+          "id": "scale",
+          "type": "number",
+          "label": "Scale",
+          "default": 6.2,
+          "min": 2,
+          "max": 10,
+          "step": 0.01,
+          "description": "scale setting for the painting.",
+          "group": "Regions",
+          "changeCost": "live"
+        },
+        {
+          "id": "warp",
+          "type": "number",
+          "label": "Flowing bends",
+          "default": 2.65,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "description": "warp setting for the painting.",
+          "group": "Regions",
+          "changeCost": "live"
+        },
+        {
+          "id": "growth",
+          "type": "number",
+          "label": "Region growth",
+          "default": 0.88,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "growth setting for the painting.",
+          "group": "Regions",
+          "changeCost": "live"
+        },
+        {
+          "id": "seed",
+          "type": "number",
+          "label": "Variation",
+          "default": 7,
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "description": "seed setting for the painting.",
+          "group": "Regions",
+          "changeCost": "live"
+        },
+        {
+          "id": "composition",
+          "type": "number",
+          "label": "Quiet to intricate",
+          "default": 0.44,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "composition setting for the painting.",
+          "group": "Composition",
+          "changeCost": "live"
+        },
+        {
+          "id": "tension",
+          "type": "number",
+          "label": "Tension",
+          "default": 0.72,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "tension setting for the painting.",
+          "group": "Composition",
+          "changeCost": "live"
+        },
+        {
+          "id": "hierarchy",
+          "type": "number",
+          "label": "Large and small rhythm",
+          "default": 0.99,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "hierarchy setting for the painting.",
+          "group": "Composition",
+          "changeCost": "live"
+        },
+        {
+          "id": "coverage",
+          "type": "number",
+          "label": "Coverage",
+          "default": 0.23,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "coverage setting for the painting.",
+          "group": "Hatching",
+          "changeCost": "live"
+        },
+        {
+          "id": "spacing",
+          "type": "number",
+          "label": "Average spacing",
+          "default": 0.096,
+          "min": 0.015,
+          "max": 0.12,
+          "step": 0.001,
+          "description": "spacing setting for the painting.",
+          "group": "Hatching",
+          "changeCost": "live"
+        },
+        {
+          "id": "curvature",
+          "type": "number",
+          "label": "Overall bend",
+          "default": 1.52,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "description": "curvature setting for the painting.",
+          "group": "Hatching",
+          "changeCost": "live"
+        },
+        {
+          "id": "angle",
+          "type": "number",
+          "label": "Direction bias",
+          "default": 2.31,
+          "min": -3.1416,
+          "max": 3.1416,
+          "step": 0.01,
+          "description": "angle setting for the painting.",
+          "group": "Hatching",
+          "changeCost": "live"
+        },
+        {
+          "id": "hatchWidth",
+          "type": "number",
+          "label": "Average ink weight",
+          "default": 0.12,
+          "min": 0.035,
+          "max": 0.4,
+          "step": 0.005,
+          "description": "hatchWidth setting for the painting.",
+          "group": "Hatching",
+          "changeCost": "live"
+        },
+        {
+          "id": "relation",
+          "type": "number",
+          "label": "Neighboring harmony",
+          "default": 0.54,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "relation setting for the painting.",
+          "group": "Hatching",
+          "changeCost": "live"
+        },
+        {
+          "id": "spacingVar",
+          "type": "number",
+          "label": "Spacing variety",
+          "default": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "spacingVar setting for the painting.",
+          "group": "Regional variety",
+          "changeCost": "live"
+        },
+        {
+          "id": "curvatureVar",
+          "type": "number",
+          "label": "Bend variety",
+          "default": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "curvatureVar setting for the painting.",
+          "group": "Regional variety",
+          "changeCost": "live"
+        },
+        {
+          "id": "angleVar",
+          "type": "number",
+          "label": "Direction variety",
+          "default": 1.19,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "angleVar setting for the painting.",
+          "group": "Regional variety",
+          "changeCost": "live"
+        },
+        {
+          "id": "palette",
+          "type": "number",
+          "label": "Wash lightness",
+          "default": 0.07,
+          "min": -1,
+          "max": 1,
+          "step": 0.01,
+          "description": "palette setting for the painting.",
+          "group": "Color & watercolor",
+          "changeCost": "live"
+        },
+        {
+          "id": "warmth",
+          "type": "number",
+          "label": "Warm pools",
+          "default": 1.3,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "warmth setting for the painting.",
+          "group": "Color & watercolor",
+          "changeCost": "live"
+        },
+        {
+          "id": "contrast",
+          "type": "number",
+          "label": "Region contrast",
+          "default": 1.05,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "contrast setting for the painting.",
+          "group": "Color & watercolor",
+          "changeCost": "live"
+        },
+        {
+          "id": "pooling",
+          "type": "number",
+          "label": "Pigment pooling",
+          "default": 0.74,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "pooling setting for the painting.",
+          "group": "Color & watercolor",
+          "changeCost": "live"
+        },
+        {
+          "id": "blooms",
+          "type": "number",
+          "label": "Watercolor blooms",
+          "default": 0.94,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "blooms setting for the painting.",
+          "group": "Color & watercolor",
+          "changeCost": "live"
+        },
+        {
+          "id": "outline",
+          "type": "number",
+          "label": "Boundary width",
+          "default": 0.005,
+          "min": 0.002,
+          "max": 0.03,
+          "step": 0.001,
+          "description": "outline setting for the painting.",
+          "group": "Ink & paper",
+          "changeCost": "live"
+        },
+        {
+          "id": "inkWarmth",
+          "type": "number",
+          "label": "Warmth",
+          "default": 0.15,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "inkWarmth setting for the painting.",
+          "group": "Ink & paper",
+          "changeCost": "live"
+        },
+        {
+          "id": "handDrawn",
+          "type": "number",
+          "label": "Hand-drawn character",
+          "default": 1.34,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "description": "handDrawn setting for the painting.",
+          "group": "Ink & paper",
+          "changeCost": "live"
+        },
+        {
+          "id": "grain",
+          "type": "number",
+          "label": "Grain",
+          "default": 1.48,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "grain setting for the painting.",
+          "group": "Ink & paper",
+          "changeCost": "live"
+        },
+        {
+          "id": "tracerCount",
+          "type": "number",
+          "label": "Count",
+          "default": 3,
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "description": "Sets the number of independent tracer lifetimes, up to four.",
+          "group": "Tracer paths",
+          "changeCost": "live"
+        },
+        {
+          "id": "tracerSpeed",
+          "type": "number",
+          "label": "Speed",
+          "default": 0.96,
+          "min": 0.1,
+          "max": 2,
+          "step": 0.01,
+          "description": "Sets how quickly each tracer head advances through canvas-height space.",
+          "group": "Tracer paths",
+          "changeCost": "live"
+        },
+        {
+          "id": "tracerCurl",
+          "type": "number",
+          "label": "Curl",
+          "default": 2.5,
+          "min": 0,
+          "max": 2.5,
+          "step": 0.01,
+          "description": "Sets the stable curvature chosen for each lifetime.",
+          "group": "Tracer paths",
+          "changeCost": "live"
+        },
+        {
+          "id": "tracerSway",
+          "type": "number",
+          "label": "Sway",
+          "default": 0.65,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "Sets a subtle shared-body movement without changing the deposited route.",
+          "group": "Tracer paths",
+          "changeCost": "live"
+        },
+        {
+          "id": "tracerSeed",
+          "type": "number",
+          "label": "Seed",
+          "default": 7,
+          "min": 0,
+          "max": 999,
+          "step": 1,
+          "description": "Chooses perimeter entries, headings, pigments, and hatch families.",
+          "group": "Tracer paths",
+          "changeCost": "live"
+        },
+        {
+          "id": "tracerWidth",
+          "type": "number",
+          "label": "Width",
+          "default": 0.021,
+          "min": 0.005,
+          "max": 0.12,
+          "step": 0.001,
+          "description": "Sets the full ribbon width in canvas-height units.",
+          "group": "Tracer paths",
+          "changeCost": "live"
+        },
+        {
+          "id": "tracerPace",
+          "type": "number",
+          "label": "Pace",
+          "default": 1.24,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "description": "Scales artistic time while deposition timestamps remain scene seconds.",
+          "group": "Tracer paths",
+          "changeCost": "live"
+        },
+        {
+          "id": "tracerContrast",
+          "type": "number",
+          "label": "Contrast",
+          "default": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Matches the saved painting at one and softens pigment and rim contrast toward zero.",
+          "group": "Tracer appearance",
+          "changeCost": "live"
+        },
+        {
+          "id": "tracerHatch",
+          "type": "number",
+          "label": "Hatching",
+          "default": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Scales the dense lifetime-seeded hatch ink without changing its spacing family.",
+          "group": "Tracer appearance",
+          "changeCost": "live"
+        },
+        {
+          "id": "tracerBleed",
+          "type": "number",
+          "label": "Bleed",
+          "default": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "description": "Scales the original textured watercolor diffusion and edge deposit.",
+          "group": "Tracer appearance",
+          "changeCost": "live"
+        }
+      ],
+      "controlSchemaHash": "3bb0924b8f738afb7e37099359b84286179de647b130c748146f481900f711c5",
+      "controls": {
+        "pace": 1.24,
+        "motion": 1.08,
+        "phrasing": 1,
+        "scale": 6.2,
+        "warp": 2.65,
+        "growth": 0.88,
+        "seed": 7,
+        "composition": 0.44,
+        "tension": 0.72,
+        "hierarchy": 0.99,
+        "coverage": 0.23,
+        "spacing": 0.096,
+        "curvature": 1.52,
+        "angle": 2.31,
+        "hatchWidth": 0.12,
+        "relation": 0.54,
+        "spacingVar": 1,
+        "curvatureVar": 1,
+        "angleVar": 1.19,
+        "palette": 0.07,
+        "warmth": 1.3,
+        "contrast": 1.05,
+        "pooling": 0.74,
+        "blooms": 0.94,
+        "outline": 0.005,
+        "inkWarmth": 0.15,
+        "handDrawn": 1.34,
+        "grain": 1.48,
+        "tracerCount": 3,
+        "tracerSpeed": 0.96,
+        "tracerCurl": 2.5,
+        "tracerSway": 0.65,
+        "tracerSeed": 7,
+        "tracerWidth": 0.021,
+        "tracerPace": 1.24,
+        "tracerContrast": 1,
+        "tracerHatch": 1,
+        "tracerBleed": 1
+      },
+      "controlSequence": 0,
+      "nodeControls": {
+        "sourceHash": "1fbb7e2b262d8385a6f72719a50de79b061643b4bfae92cf2571fa4e2ea723e9",
+        "nodes": [
+          {
+            "nodePath": [
+              "d10d1010-63ac-49c7-8ad7-8cf6458b5101"
+            ],
+            "definitionHash": "db30e71cf6f55af0b92d41c4282b34ccb6e72509ca67a0f9ff6e0932dd16c8c8",
+            "schema": [
+              {
+                "id": "count",
+                "type": "number",
+                "label": "Count",
+                "default": 3,
+                "min": 0,
+                "max": 4,
+                "step": 1,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "speed",
+                "type": "number",
+                "label": "Speed",
+                "default": 0.96,
+                "min": 0.1,
+                "max": 2,
+                "step": 0.01,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "curl",
+                "type": "number",
+                "label": "Curl",
+                "default": 2.5,
+                "min": 0,
+                "max": 2.5,
+                "step": 0.01,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "sway",
+                "type": "number",
+                "label": "Sway",
+                "default": 0.65,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "seed",
+                "type": "number",
+                "label": "Seed",
+                "default": 7,
+                "min": 0,
+                "max": 999,
+                "step": 1,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "width",
+                "type": "number",
+                "label": "Width",
+                "default": 0.021,
+                "min": 0.005,
+                "max": 0.12,
+                "step": 0.001,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "pace",
+                "type": "number",
+                "label": "Pace",
+                "default": 1.24,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "013f95fd3d496ea3ae5b52247ceff2e2b53640ca200f890d94932164e49b5192",
+            "values": {
+              "count": 3,
+              "speed": 0.96,
+              "curl": 2.5,
+              "sway": 0.65,
+              "seed": 7,
+              "width": 0.021,
+              "pace": 1.24
+            }
+          },
+          {
+            "nodePath": [
+              "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+            ],
+            "definitionHash": "ef604f9bf06478c27f75c6aea45fef317ae3b27345b651b21e575a10f2d07634",
+            "schema": [
+              {
+                "id": "pace",
+                "type": "number",
+                "label": "Pace",
+                "default": 1.24,
+                "min": 0,
+                "max": 3,
+                "step": 0.01,
+                "group": "Motion",
+                "changeCost": "live"
+              },
+              {
+                "id": "motion",
+                "type": "number",
+                "label": "Drift",
+                "default": 1.08,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Motion",
+                "changeCost": "live"
+              },
+              {
+                "id": "phrasing",
+                "type": "number",
+                "label": "Tension and release",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Slow build, crest, release, and rest. Shapes lead; linework and color follow.",
+                "group": "Motion",
+                "changeCost": "live"
+              },
+              {
+                "id": "scale",
+                "type": "number",
+                "label": "Scale",
+                "default": 6.2,
+                "min": 2,
+                "max": 10,
+                "step": 0.01,
+                "group": "Regions",
+                "changeCost": "live"
+              },
+              {
+                "id": "warp",
+                "type": "number",
+                "label": "Flowing bends",
+                "default": 2.65,
+                "min": 0,
+                "max": 3,
+                "step": 0.01,
+                "group": "Regions",
+                "changeCost": "live"
+              },
+              {
+                "id": "growth",
+                "type": "number",
+                "label": "Region growth",
+                "default": 0.88,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Regions",
+                "changeCost": "live"
+              },
+              {
+                "id": "seed",
+                "type": "number",
+                "label": "Variation",
+                "default": 7,
+                "min": 0,
+                "max": 100,
+                "step": 1,
+                "group": "Regions",
+                "changeCost": "live"
+              },
+              {
+                "id": "composition",
+                "type": "number",
+                "label": "Quiet to intricate",
+                "default": 0.44,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Composition",
+                "changeCost": "live"
+              },
+              {
+                "id": "tension",
+                "type": "number",
+                "label": "Tension",
+                "default": 0.72,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "description": "Strength of local pressure, contrasting line directions, and rhythmic compression.",
+                "group": "Composition",
+                "changeCost": "live"
+              },
+              {
+                "id": "hierarchy",
+                "type": "number",
+                "label": "Large and small rhythm",
+                "default": 0.99,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "description": "Large anchor regions alternate with smaller supporting regions.",
+                "group": "Composition",
+                "changeCost": "live"
+              },
+              {
+                "id": "coverage",
+                "type": "number",
+                "label": "Coverage",
+                "default": 0.23,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "spacing",
+                "type": "number",
+                "label": "Average spacing",
+                "default": 0.096,
+                "min": 0.015,
+                "max": 0.12,
+                "step": 0.001,
+                "description": "Overall spacing scale. Each region keeps its own spacing ratio.",
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "curvature",
+                "type": "number",
+                "label": "Overall bend",
+                "default": 1.52,
+                "min": 0,
+                "max": 3,
+                "step": 0.01,
+                "description": "Strength of distinct regional styles: restrained lines, sweeping curves, fans, and contours.",
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "angle",
+                "type": "number",
+                "label": "Direction bias",
+                "default": 2.31,
+                "min": -3.1416,
+                "max": 3.1416,
+                "step": 0.01,
+                "description": "Shifts the overall direction while preserving regional relationships.",
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "hatchWidth",
+                "type": "number",
+                "label": "Average ink weight",
+                "default": 0.12,
+                "min": 0.035,
+                "max": 0.4,
+                "step": 0.005,
+                "description": "Overall stroke weight. Dense patterns tend toward finer strokes; open patterns can carry heavier marks.",
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "relation",
+                "type": "number",
+                "label": "Neighboring harmony",
+                "default": 0.54,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Neighboring patterns share direction, with occasional opposing accents.",
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "spacingVar",
+                "type": "number",
+                "label": "Spacing variety",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Regional variety",
+                "changeCost": "live"
+              },
+              {
+                "id": "curvatureVar",
+                "type": "number",
+                "label": "Bend variety",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Regional variety",
+                "changeCost": "live"
+              },
+              {
+                "id": "angleVar",
+                "type": "number",
+                "label": "Direction variety",
+                "default": 1.19,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Regional variety",
+                "changeCost": "live"
+              },
+              {
+                "id": "palette",
+                "type": "number",
+                "label": "Wash lightness",
+                "default": 0.07,
+                "min": -1,
+                "max": 1,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "warmth",
+                "type": "number",
+                "label": "Warm pools",
+                "default": 1.3,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "contrast",
+                "type": "number",
+                "label": "Region contrast",
+                "default": 1.05,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "pooling",
+                "type": "number",
+                "label": "Pigment pooling",
+                "default": 0.74,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "blooms",
+                "type": "number",
+                "label": "Watercolor blooms",
+                "default": 0.94,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "outline",
+                "type": "number",
+                "label": "Boundary width",
+                "default": 0.005,
+                "min": 0.002,
+                "max": 0.03,
+                "step": 0.001,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "inkWarmth",
+                "type": "number",
+                "label": "Warmth",
+                "default": 0.15,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "handDrawn",
+                "type": "number",
+                "label": "Hand-drawn character",
+                "default": 1.34,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "grain",
+                "type": "number",
+                "label": "Grain",
+                "default": 1.48,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "27020d098ddd4d84424541e8a43c5a6da04599f7ab1b15e832ffe360d75d5a7b",
+            "values": {
+              "pace": 1.24,
+              "motion": 1.08,
+              "phrasing": 1,
+              "scale": 6.2,
+              "warp": 2.65,
+              "growth": 0.88,
+              "seed": 7,
+              "composition": 0.44,
+              "tension": 0.72,
+              "hierarchy": 0.99,
+              "coverage": 0.23,
+              "spacing": 0.096,
+              "curvature": 1.52,
+              "angle": 2.31,
+              "hatchWidth": 0.12,
+              "relation": 0.54,
+              "spacingVar": 1,
+              "curvatureVar": 1,
+              "angleVar": 1.19,
+              "palette": 0.07,
+              "warmth": 1.3,
+              "contrast": 1.05,
+              "pooling": 0.74,
+              "blooms": 0.94,
+              "outline": 0.005,
+              "inkWarmth": 0.15,
+              "handDrawn": 1.34,
+              "grain": 1.48
+            }
+          },
+          {
+            "nodePath": [
+              "d10d3030-63ac-49c7-8ad7-8cf6458b5103"
+            ],
+            "definitionHash": "7f1a2038063007ce53baac6d854fc90bacd635e23fc82e1552f021a8b2260995",
+            "schema": [
+              {
+                "id": "contrast",
+                "type": "number",
+                "label": "Contrast",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              },
+              {
+                "id": "hatch",
+                "type": "number",
+                "label": "Hatching",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              },
+              {
+                "id": "bleed",
+                "type": "number",
+                "label": "Bleed",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "3dd6cb33c65c8976e5a6a1801876d8b1f7d56b98d385f757f96d52036883e502",
+            "values": {
+              "contrast": 1,
+              "hatch": 1,
+              "bleed": 1
+            }
+          }
+        ]
+      },
+      "controlAnimations": [],
+      "controlAnimationIssues": [],
+      "animationSequence": 0,
+      "effectiveControls": {
+        "pace": 1.24,
+        "motion": 1.08,
+        "phrasing": 1,
+        "scale": 6.2,
+        "warp": 2.65,
+        "growth": 0.88,
+        "seed": 7,
+        "composition": 0.44,
+        "tension": 0.72,
+        "hierarchy": 0.99,
+        "coverage": 0.23,
+        "spacing": 0.096,
+        "curvature": 1.52,
+        "angle": 2.31,
+        "hatchWidth": 0.12,
+        "relation": 0.54,
+        "spacingVar": 1,
+        "curvatureVar": 1,
+        "angleVar": 1.19,
+        "palette": 0.07,
+        "warmth": 1.3,
+        "contrast": 1.05,
+        "pooling": 0.74,
+        "blooms": 0.94,
+        "outline": 0.005,
+        "inkWarmth": 0.15,
+        "handDrawn": 1.34,
+        "grain": 1.48,
+        "tracerCount": 3,
+        "tracerSpeed": 0.96,
+        "tracerCurl": 2.5,
+        "tracerSway": 0.65,
+        "tracerSeed": 7,
+        "tracerWidth": 0.021,
+        "tracerPace": 1.24,
+        "tracerContrast": 1,
+        "tracerHatch": 1,
+        "tracerBleed": 1
+      },
+      "effectiveNodeControls": {
+        "sourceHash": "1fbb7e2b262d8385a6f72719a50de79b061643b4bfae92cf2571fa4e2ea723e9",
+        "nodes": [
+          {
+            "nodePath": [
+              "d10d1010-63ac-49c7-8ad7-8cf6458b5101"
+            ],
+            "definitionHash": "db30e71cf6f55af0b92d41c4282b34ccb6e72509ca67a0f9ff6e0932dd16c8c8",
+            "schema": [
+              {
+                "id": "count",
+                "type": "number",
+                "label": "Count",
+                "default": 3,
+                "min": 0,
+                "max": 4,
+                "step": 1,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "speed",
+                "type": "number",
+                "label": "Speed",
+                "default": 0.96,
+                "min": 0.1,
+                "max": 2,
+                "step": 0.01,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "curl",
+                "type": "number",
+                "label": "Curl",
+                "default": 2.5,
+                "min": 0,
+                "max": 2.5,
+                "step": 0.01,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "sway",
+                "type": "number",
+                "label": "Sway",
+                "default": 0.65,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "seed",
+                "type": "number",
+                "label": "Seed",
+                "default": 7,
+                "min": 0,
+                "max": 999,
+                "step": 1,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "width",
+                "type": "number",
+                "label": "Width",
+                "default": 0.021,
+                "min": 0.005,
+                "max": 0.12,
+                "step": 0.001,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              },
+              {
+                "id": "pace",
+                "type": "number",
+                "label": "Pace",
+                "default": 1.24,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Tracer paths",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "013f95fd3d496ea3ae5b52247ceff2e2b53640ca200f890d94932164e49b5192",
+            "values": {
+              "count": 3,
+              "speed": 0.96,
+              "curl": 2.5,
+              "sway": 0.65,
+              "seed": 7,
+              "width": 0.021,
+              "pace": 1.24
+            }
+          },
+          {
+            "nodePath": [
+              "d10d2020-63ac-49c7-8ad7-8cf6458b5102"
+            ],
+            "definitionHash": "ef604f9bf06478c27f75c6aea45fef317ae3b27345b651b21e575a10f2d07634",
+            "schema": [
+              {
+                "id": "pace",
+                "type": "number",
+                "label": "Pace",
+                "default": 1.24,
+                "min": 0,
+                "max": 3,
+                "step": 0.01,
+                "group": "Motion",
+                "changeCost": "live"
+              },
+              {
+                "id": "motion",
+                "type": "number",
+                "label": "Drift",
+                "default": 1.08,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Motion",
+                "changeCost": "live"
+              },
+              {
+                "id": "phrasing",
+                "type": "number",
+                "label": "Tension and release",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Slow build, crest, release, and rest. Shapes lead; linework and color follow.",
+                "group": "Motion",
+                "changeCost": "live"
+              },
+              {
+                "id": "scale",
+                "type": "number",
+                "label": "Scale",
+                "default": 6.2,
+                "min": 2,
+                "max": 10,
+                "step": 0.01,
+                "group": "Regions",
+                "changeCost": "live"
+              },
+              {
+                "id": "warp",
+                "type": "number",
+                "label": "Flowing bends",
+                "default": 2.65,
+                "min": 0,
+                "max": 3,
+                "step": 0.01,
+                "group": "Regions",
+                "changeCost": "live"
+              },
+              {
+                "id": "growth",
+                "type": "number",
+                "label": "Region growth",
+                "default": 0.88,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Regions",
+                "changeCost": "live"
+              },
+              {
+                "id": "seed",
+                "type": "number",
+                "label": "Variation",
+                "default": 7,
+                "min": 0,
+                "max": 100,
+                "step": 1,
+                "group": "Regions",
+                "changeCost": "live"
+              },
+              {
+                "id": "composition",
+                "type": "number",
+                "label": "Quiet to intricate",
+                "default": 0.44,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Composition",
+                "changeCost": "live"
+              },
+              {
+                "id": "tension",
+                "type": "number",
+                "label": "Tension",
+                "default": 0.72,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "description": "Strength of local pressure, contrasting line directions, and rhythmic compression.",
+                "group": "Composition",
+                "changeCost": "live"
+              },
+              {
+                "id": "hierarchy",
+                "type": "number",
+                "label": "Large and small rhythm",
+                "default": 0.99,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "description": "Large anchor regions alternate with smaller supporting regions.",
+                "group": "Composition",
+                "changeCost": "live"
+              },
+              {
+                "id": "coverage",
+                "type": "number",
+                "label": "Coverage",
+                "default": 0.23,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "spacing",
+                "type": "number",
+                "label": "Average spacing",
+                "default": 0.096,
+                "min": 0.015,
+                "max": 0.12,
+                "step": 0.001,
+                "description": "Overall spacing scale. Each region keeps its own spacing ratio.",
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "curvature",
+                "type": "number",
+                "label": "Overall bend",
+                "default": 1.52,
+                "min": 0,
+                "max": 3,
+                "step": 0.01,
+                "description": "Strength of distinct regional styles: restrained lines, sweeping curves, fans, and contours.",
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "angle",
+                "type": "number",
+                "label": "Direction bias",
+                "default": 2.31,
+                "min": -3.1416,
+                "max": 3.1416,
+                "step": 0.01,
+                "description": "Shifts the overall direction while preserving regional relationships.",
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "hatchWidth",
+                "type": "number",
+                "label": "Average ink weight",
+                "default": 0.12,
+                "min": 0.035,
+                "max": 0.4,
+                "step": 0.005,
+                "description": "Overall stroke weight. Dense patterns tend toward finer strokes; open patterns can carry heavier marks.",
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "relation",
+                "type": "number",
+                "label": "Neighboring harmony",
+                "default": 0.54,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "description": "Neighboring patterns share direction, with occasional opposing accents.",
+                "group": "Hatching",
+                "changeCost": "live"
+              },
+              {
+                "id": "spacingVar",
+                "type": "number",
+                "label": "Spacing variety",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Regional variety",
+                "changeCost": "live"
+              },
+              {
+                "id": "curvatureVar",
+                "type": "number",
+                "label": "Bend variety",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Regional variety",
+                "changeCost": "live"
+              },
+              {
+                "id": "angleVar",
+                "type": "number",
+                "label": "Direction variety",
+                "default": 1.19,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Regional variety",
+                "changeCost": "live"
+              },
+              {
+                "id": "palette",
+                "type": "number",
+                "label": "Wash lightness",
+                "default": 0.07,
+                "min": -1,
+                "max": 1,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "warmth",
+                "type": "number",
+                "label": "Warm pools",
+                "default": 1.3,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "contrast",
+                "type": "number",
+                "label": "Region contrast",
+                "default": 1.05,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "pooling",
+                "type": "number",
+                "label": "Pigment pooling",
+                "default": 0.74,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "blooms",
+                "type": "number",
+                "label": "Watercolor blooms",
+                "default": 0.94,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Color & watercolor",
+                "changeCost": "live"
+              },
+              {
+                "id": "outline",
+                "type": "number",
+                "label": "Boundary width",
+                "default": 0.005,
+                "min": 0.002,
+                "max": 0.03,
+                "step": 0.001,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "inkWarmth",
+                "type": "number",
+                "label": "Warmth",
+                "default": 0.15,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "handDrawn",
+                "type": "number",
+                "label": "Hand-drawn character",
+                "default": 1.34,
+                "min": 0,
+                "max": 1.5,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              },
+              {
+                "id": "grain",
+                "type": "number",
+                "label": "Grain",
+                "default": 1.48,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "group": "Ink & paper",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "27020d098ddd4d84424541e8a43c5a6da04599f7ab1b15e832ffe360d75d5a7b",
+            "values": {
+              "pace": 1.24,
+              "motion": 1.08,
+              "phrasing": 1,
+              "scale": 6.2,
+              "warp": 2.65,
+              "growth": 0.88,
+              "seed": 7,
+              "composition": 0.44,
+              "tension": 0.72,
+              "hierarchy": 0.99,
+              "coverage": 0.23,
+              "spacing": 0.096,
+              "curvature": 1.52,
+              "angle": 2.31,
+              "hatchWidth": 0.12,
+              "relation": 0.54,
+              "spacingVar": 1,
+              "curvatureVar": 1,
+              "angleVar": 1.19,
+              "palette": 0.07,
+              "warmth": 1.3,
+              "contrast": 1.05,
+              "pooling": 0.74,
+              "blooms": 0.94,
+              "outline": 0.005,
+              "inkWarmth": 0.15,
+              "handDrawn": 1.34,
+              "grain": 1.48
+            }
+          },
+          {
+            "nodePath": [
+              "d10d3030-63ac-49c7-8ad7-8cf6458b5103"
+            ],
+            "definitionHash": "7f1a2038063007ce53baac6d854fc90bacd635e23fc82e1552f021a8b2260995",
+            "schema": [
+              {
+                "id": "contrast",
+                "type": "number",
+                "label": "Contrast",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              },
+              {
+                "id": "hatch",
+                "type": "number",
+                "label": "Hatching",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              },
+              {
+                "id": "bleed",
+                "type": "number",
+                "label": "Bleed",
+                "default": 1,
+                "min": 0,
+                "max": 1,
+                "step": 0.01,
+                "group": "Tracer appearance",
+                "changeCost": "live"
+              }
+            ],
+            "schemaHash": "3dd6cb33c65c8976e5a6a1801876d8b1f7d56b98d385f757f96d52036883e502",
+            "values": {
+              "contrast": 1,
+              "hatch": 1,
+              "bleed": 1
+            }
+          }
+        ]
+      },
+      "controlMigration": [],
+      "clockEpoch": 0,
+      "timeSeconds": 0.00019999999552965163,
+      "frameId": "1",
+      "output": {
+        "width": 1920,
+        "height": 1080,
+        "fps": 60,
+        "seed": 0
+      },
+      "fault": null
+    },
+    "host": null,
+    "jobs": [
+      {
+        "jobId": "1d8dde52-6d38-4ca9-bac0-b87743166598",
+        "state": "succeeded",
+        "summary": "Visual is ready in Lux."
+      }
+    ],
+    "visualFps": null,
+    "uiFps": null,
+    "performance": {
+      "owner": {
+        "instanceId": "f74d1eb3-ca84-4ecd-92d4-9a00b65f6c63",
+        "generation": 1,
+        "revisionId": "1fbb7e2b262d8385a6f72719a50de79b061643b4bfae92cf2571fa4e2ea723e9"
+      },
+      "status": "pending",
+      "observedAtMs": null,
+      "worker": null
+    },
+    "capabilities": {
+      "protocolVersion": 2,
+      "supportedSdkVersions": [
+        "0.1.0",
+        "0.2.0",
+        "0.4.0"
+      ],
+      "codeDeclaredParameters": true,
+      "parameterKinds": [
+        "number"
+      ],
+      "maxParameterMetadataBytes": 32768,
+      "imageFormats": [
+        "image/bmp",
+        "image/png",
+        "image/jpeg"
+      ],
+      "assetExport": true,
+      "sceneVersions": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  }
+}

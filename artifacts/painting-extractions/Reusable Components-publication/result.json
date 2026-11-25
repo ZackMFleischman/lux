@@ -1,0 +1,54 @@
+{
+  "ok": true,
+  "parts": [
+    {
+      "id": "97cc754a-1e88-4932-9de0-b52ee81b5cc4",
+      "revision": 1,
+      "name": "Wandering Tracer Paths"
+    },
+    {
+      "id": "a60ba7fb-5799-4065-9779-826d7db3755b",
+      "revision": 1,
+      "name": "Wandering Tracer Renderer"
+    },
+    {
+      "id": "909bf033-22df-4ccc-afdb-431b6a83f9d4",
+      "revision": 1,
+      "name": "Organic Regions"
+    },
+    {
+      "id": "f564a771-028a-4031-abaa-e64a1cfc8bec",
+      "revision": 1,
+      "name": "Region Hatching"
+    },
+    {
+      "id": "998130df-ca1f-4b58-9917-1ee7045275cb",
+      "revision": 1,
+      "name": "Animated Watercolor"
+    },
+    {
+      "id": "d5718a1e-de84-477c-8330-4633fd91df85",
+      "revision": 1,
+      "name": "Organic Boundary Ink"
+    },
+    {
+      "id": "83a60efc-ec4b-4f94-a122-6d2b38b504ee",
+      "revision": 1,
+      "name": "Composition Phrasing"
+    },
+    {
+      "id": "f6b8bd71-e468-4618-9602-8b3245bfc4f7",
+      "revision": 1,
+      "name": "Region Styles & Split Transitions"
+    }
+  ],
+  "scenePath": "C:\\Users\\zFlei\\.codex\\visualizations\\2026\\09\\15\\01a0a5cb-03be-7ee2-a6cf-daf659f7ebac\\Living Painting - Reusable Components.lux-scene",
+  "checks": [
+    "Library readback exact",
+    "Linked painting rendered",
+    "Saved and reopened",
+    "Invalid edit retained last accepted preview",
+    "Published graph node selected with own controls"
+  ],
+  "profile": "test-2fd98f48-6f92-4696-857b-4f45f148d1c4"
+}

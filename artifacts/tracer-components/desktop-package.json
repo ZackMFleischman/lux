@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "name": "Lux",
+  "sourceCommit": "8a5bc7a966f63cd70b969b867f1929150febcb77",
+  "sourceTree": "working tree snapshot",
+  "canonicalLibraryRoot": "C:\\Users\\zFlei\\repos\\lux\\library",
+  "electron": {
+    "version": "44.3.0",
+    "archiveName": "electron-v44.3.0-win32-x64.zip",
+    "sha256": "26bf9a617d58d81772b3d68305d59ee48272969c15083c06db634a77358a8d9d",
+    "source": "https://github.com/electron/electron/releases/download/v44.3.0/electron-v44.3.0-win32-x64.zip"
+  },
+  "installedAt": "2026-09-16T06:44:53.789Z",
+  "directory": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\8a5bc7a9-5d99e3d2",
+  "executable": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\8a5bc7a9-5d99e3d2\\Lux.exe",
+  "workspace": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\8a5bc7a9-5d99e3d2\\resources\\app\\runtime",
+  "node": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\8a5bc7a9-5d99e3d2\\resources\\app\\node.exe",
+  "adapter": "C:\\Users\\zFlei\\AppData\\Local\\Programs\\Lux\\builds\\8a5bc7a9-5d99e3d2\\resources\\app\\runtime\\scripts\\studio-installed-mcp.mjs",
+  "profile": "desktop",
+  "sourceDigest": "9d3ee8c5f1deceb6d033beb188765a338ac11ebaf319768560ee4b89233139e2"
+}

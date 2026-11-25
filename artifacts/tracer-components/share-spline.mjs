@@ -1,0 +1,13 @@
+import {readFileSync,writeFileSync} from 'node:fs';
+const base='examples/components/wandering-tracers/';
+let renderer=readFileSync(base+'renderer.ts','utf8');
+const start=renderer.indexOf('fn wtCatmull('),end=renderer.indexOf('fn wtHash(',start);
+const functions=renderer.slice(start,end);
+writeFileSync(base+'tracer-spline.ts','// One interpolation rule for tracer ink and region carving.\nexport const tracerSplineWgsl = `\n'+functions+'`;\n');
+renderer=renderer.slice(0,start)+'${tracerSplineWgsl}\n'+renderer.slice(end);
+renderer="import { tracerSplineWgsl } from './tracer-spline.ts';\n"+renderer;
+writeFileSync(base+'renderer.ts',renderer);
+let painting=readFileSync(base+'painting.ts','utf8');
+painting="import { tracerSplineWgsl } from './tracer-spline.ts';\n"+painting;
+painting=painting.replace('// Consume the exact geometry published by Tracer Paths.', '${tracerSplineWgsl}\n\n// Consume the exact geometry published by Tracer Paths.');
+writeFileSync(base+'painting.ts',painting);

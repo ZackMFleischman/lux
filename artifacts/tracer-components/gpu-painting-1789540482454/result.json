@@ -1,0 +1,7 @@
+{
+  "ok": false,
+  "profile": "test-8963831b-4337-4aa6-a01a-aa2d2da3580c",
+  "checks": [],
+  "errors": [],
+  "failure": "Error: Pinned TypeScript compiler could not start\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/tracer-components/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/tracer-components/scripts/test-wandering-tracers.mjs:36:15"
+}

@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "profile": "test-a57e4929-4b15-4433-b1f1-c61602cd7b07",
+  "checks": [
+    "painting rendered",
+    "painting saved and reopened",
+    "Invalid edit preserved accepted preview"
+  ],
+  "errors": []
+}

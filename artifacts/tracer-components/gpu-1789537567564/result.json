@@ -1,0 +1,7 @@
+{
+  "ok": false,
+  "profile": "test-07712f13-5607-4899-af30-7c4886c40b35",
+  "checks": [],
+  "errors": [],
+  "failure": "TypeError: Cannot read properties of undefined (reading 'filter')\n    at capture (file:///C:/Users/zFlei/repos/lux/.worktrees/tracer-components/scripts/test-wandering-tracers.mjs:16:76)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/tracer-components/scripts/test-wandering-tracers.mjs:36:3"
+}

@@ -1,0 +1,1 @@
+Open Living Painting - Reusable Components.lux-scene in the user visualization directory with current Studio. All 38 controls remain exposed and the eight components are independently editable. Combined desktop package/activation is coordinated by task 01a0a7bb-ee60-76f1-bcd6-5d179614f551 after its compatibility and UI checks. New painting reference is analysis only.

@@ -1,0 +1,7 @@
+{
+  "ok": false,
+  "profile": "test-8f1099df-a5d7-4b20-b050-3fa9e59c9928",
+  "checks": [],
+  "errors": [],
+  "failure": "Error: Visual initialization stopped making progress\n    at request (file:///C:/Users/zFlei/repos/lux/.worktrees/tracer-components/scripts/studio-session.mjs:66:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/tracer-components/scripts/test-wandering-tracers.mjs:58:2"
+}

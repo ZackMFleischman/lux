@@ -1,0 +1,14 @@
+# LUX-170 transfer to orchestrator
+
+User explicitly requested transfer on 2026-09-16 so this task can prioritize Living Ornament.
+
+Checkout C:/Users/zFlei/repos/lux/.worktrees/tracer-components; branch codex/tracer-components; base17f1f3b9. All changes uncommitted. No GPU test launched. Implementer /root/typed_library_leaves stopped and completed; fixture author /root/shader_field_runtime completed. No live writer remains in this checkout after root writes this handoff.
+
+Production/test changes: apps/build-worker/src/composition-declarations.mjs; apps/studio/src/source/agent-contract.ts; packages/core/src/component-library.ts and scene-document.ts; packages/runtime-contracts/src/composition-profile.mjs, graph.ts, nested-graph.ts; packages/runtime/src/graph/validate.ts and nested-validate.ts; tests/compiler/composition-declarations.test.mjs; tests/core/component-library-dependencies.test.ts and scene-composition.test.ts; tests/runtime/graph-validation.test.ts, nested-graph-plan.test.ts, nested-graph-validation.test.ts.
+Root also changed skills/lux-visual-creation/SKILL.md and references/visual-programming.md to describe no fixed node count. Skill install/check NOT yet run. New script scripts/test-large-painting-graph.mjs is syntax/preparation/CPU-compile validated:17nodes/39controls. ActualGPU command after Studio rebuild and reservation: node scripts/test-large-painting-graph.mjs. Default approved frame artifacts/painting-extractions/tracer-before-18/frame.png exists. It tests exact pixels, extra-node control effect,17-node graph, save/reopen and invalid edit preservation. New docs/visuals/living-ornament-plan.md belongs to visual planning and will be copied to the new visualization checkout; do not include it in170 commit unless coordinated.
+
+PASS node --test tests/compiler/composition-declarations.test.mjs:9/9 including600connected components. FAIL node --test tests/runtime/nested-graph-validation.test.ts:23/24; new600-node test lacks planNestedGraph import. Add import and possible TS union narrowing, then run focused suites/typechecks. Other relevant suites not yet run. No success claim for full implementation yet.
+
+Retained resource limits: nesting/node paths8levels; planner65536resolutionoperations; canonical graph/body256KiB, all bodies/metadata1MiB, raw2MiB/100kvalues/depth16, plan4MiB; source32files/1MiB; scene7MiB; compile/link30s/1GiB worker; resource allocations/backend8192, inputs4096, frame/capture16. Separate Library catalog32-entry inventory cap unchanged/out ofscope.
+
+Conductor LUX170 revision3, session3c85cd88-ec7e-4184-a582-5783348d4c05, claimfe72b639-acf6-4dba-8659-d79f7907d8b5. Root releases claim and stops thissession; receipts alongside thisfile. Nextowner must obtain freshclaim and GPUreservation from deliverycoordinator01a0a7bb-ee60-76f1-bcd6-5d179614f551. No GPU170 launched. Userdesktop12564(new17fbuild) preservedpaused; do not terminate.

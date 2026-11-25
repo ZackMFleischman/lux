@@ -1,0 +1,8 @@
+{
+  "kind": "feature",
+  "dependencies": [],
+  "reason": "User approved batched roadmap and implementation with visual and artistic iteration.",
+  "title": "Remove the arbitrary component-count ceiling",
+  "body": "Allow larger authored compositions without an arbitrary node-count ceiling. Remove count restrictions consistently from compiler, runtime admission and saved-scene control snapshots; examine adjacent fixed graph quotas so the failure does not simply move. Retain cycle detection, valid resource provenance, byte/time/resource protections and actionable errors. Demonstrate a real scene with more than eight connected components, controls, save/reopen and failed-edit preview retention. Verify the original painting stays visually identical. Update/install authoring skills. One integrated review and merge. Needed now for the multi-pattern Living Ornament scene.",
+  "parent_id": "95a02d7f-8f07-4669-838a-b87e051000ed"
+}

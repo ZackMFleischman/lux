@@ -1,0 +1,1 @@
+Extract tinted-white region boundaries, pressure/thickness variation and hand-drawn irregularity into a reusable Library effect. Preserve the approved painting appearance. Compare before/after frames and motion, publish, commit, review and merge.

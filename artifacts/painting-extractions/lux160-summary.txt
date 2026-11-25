@@ -1,0 +1,1 @@
+All eight reusable painting components are now individually published and merged. Region Styles & Split Transitions combines the five typed fields and shared paths into one painting image while preserving original gradual daughter styles and uneven color patches.

@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "profile": "test-42caeb7b-a0a8-4cf2-8e3d-71c23d84b646",
+  "checks": [
+    "overlay rendered",
+    "overlay saved and reopened",
+    "painting rendered",
+    "painting saved and reopened"
+  ],
+  "errors": [],
+  "failure": "TypeError: fetch failed\n    at node:internal/deps/undici/undici:15845:13\n    at async request (file:///C:/Users/zFlei/repos/lux/.worktrees/tracer-components/scripts/studio-session.mjs:62:22)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/tracer-components/scripts/test-wandering-tracers.mjs:52:2"
+}
