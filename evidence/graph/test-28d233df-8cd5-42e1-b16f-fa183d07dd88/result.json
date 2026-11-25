@@ -1,0 +1,25 @@
+{
+  "ok": true,
+  "commit": "f7ebd65ee1bcc24cd25b4b0a88766d204f728d70",
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-view",
+  "profile": "test-28d233df-8cd5-42e1-b16f-fa183d07dd88",
+  "checks": [
+    "Accepted composition has three nodes, two connections and one final output.",
+    "Selected effect changed to8; repeated instance kept its prior value.",
+    "Keyboard selection showed the other instance controls.",
+    "Selection and view persisted after Graph close/reopen.",
+    "Selection and control edits retained runtime generation and playback."
+  ],
+  "screenshots": [
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-view\\evidence\\graph\\test-28d233df-8cd5-42e1-b16f-fa183d07dd88\\selected-first-effect.png",
+    "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-view\\evidence\\graph\\test-28d233df-8cd5-42e1-b16f-fa183d07dd88\\keyboard-second-effect.png"
+  ],
+  "pid": 31524,
+  "previewChanged": true,
+  "controls": {
+    "ballIntensity": 0.67,
+    "segmentsA": 8,
+    "segmentsB": 6
+  },
+  "processExited": true
+}

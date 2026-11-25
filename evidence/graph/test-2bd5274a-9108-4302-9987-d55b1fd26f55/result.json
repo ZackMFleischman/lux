@@ -1,0 +1,11 @@
+{
+  "ok": false,
+  "commit": "2b1d6b60da40033aec0192ee21d4e2bff51a86c1",
+  "root": "C:\\Users\\zFlei\\repos\\lux\\.worktrees\\graph-view",
+  "profile": "test-2bd5274a-9108-4302-9987-d55b1fd26f55",
+  "checks": [],
+  "screenshots": [],
+  "pid": 20892,
+  "error": "AssertionError [ERR_ASSERTION]: {\"content\":[{\"type\":\"text\",\"text\":\"ENOENT: no such file or directory, realpath 'C:\\\\Users\\\\zFlei\\\\repos\\\\lux\\\\.worktrees\\\\graph-view\\\\node_modules'; retained evidence: C:\\\\Users\\\\zFlei\\\\AppData\\\\Local\\\\Temp\\\\lux-compile-PiMYzB\"}],\"isError\":true}\n+ actual - expected\n\n+ true\n- undefined\n\n    at call (file:///C:/Users/zFlei/repos/lux/.worktrees/graph-view/evidence/graph-demo.mjs:23:147)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async file:///C:/Users/zFlei/repos/lux/.worktrees/graph-view/evidence/graph-demo.mjs:24:41",
+  "processExited": true
+}
